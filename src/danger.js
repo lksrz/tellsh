@@ -13,9 +13,12 @@ export const maxRisk = (a, b) => (RANK[b] > RANK[a] ? b : a);
 // light tokenizer: simple commands separated by ; & | && || ( ) and newlines, words unquoted
 // (POSIX '…' "…" \x and PowerShell `x). Good enough for danger checks, not a full shell parser.
 
-const QUOTE_CHARS = /['"\u2018\u2019\u201A\u201B\u201C\u201D\u201E]/g;
+// PowerShell also treats the typographic quotes as quote characters (about_Quoting_Rules)
+const PS_SQ = /['\u2018\u2019\u201A\u201B]/;
+const PS_DQ = /["\u201C\u201D\u201E]/;
 
-// winPaths: backslash is never an escape (cmd.exe / PowerShell paths such as "C:\")
+// winPaths: backslash is never an escape (cmd.exe / PowerShell paths such as "C:\"), and the
+// PowerShell typographic quotes ‘…’ “…” quote like ' and "
 export function simpleCommands(cmd, { winPaths = false } = {}) {
   const out = [];
   let words = [];
@@ -23,17 +26,20 @@ export function simpleCommands(cmd, { winPaths = false } = {}) {
   const flushWord = () => { if (w != null) { words.push(w); w = null; } };
   const flushCmd = () => { flushWord(); if (words.length) out.push(words); words = []; };
   const s = String(cmd);
+  const isSq = (c) => (winPaths ? PS_SQ.test(c) : c === "'");
+  const isDq = (c) => (winPaths ? PS_DQ.test(c) : c === '"');
   for (let i = 0; i < s.length; i++) {
     const c = s[i];
-    if (c === "'") {
-      const j = s.indexOf("'", i + 1);
-      const end = j < 0 ? s.length : j;
+    if (isSq(c)) {
+      let j = i + 1;
+      while (j < s.length && !isSq(s[j])) j++;
+      const end = j;
       w = (w ?? '') + s.slice(i + 1, end);
       i = end;
-    } else if (c === '"') {
+    } else if (isDq(c)) {
       let v = '';
       let j = i + 1;
-      for (; j < s.length && s[j] !== '"'; j++) {
+      for (; j < s.length && !isDq(s[j]); j++) {
         if (((!winPaths && s[j] === '\\' && /[$`"\\\n]/.test(s[j + 1])) || s[j] === '`') && j + 1 < s.length) v += s[++j]; else v += s[j];
       }
       w = (w ?? '') + v;
@@ -60,7 +66,7 @@ function commandWords(words) {
   for (;;) {
     while (w.length && /^\w+=/.test(w[0])) w = w.slice(1);
     const h = (w[0] || '').replace(/^.*[\\/]/, '').toLowerCase();
-    if (['sudo', 'doas', 'command', 'builtin', 'exec', 'nohup', 'time', 'nice', 'ionice', 'then', 'do', 'else', '&'].includes(h)) {
+    if (['sudo', 'doas', 'command', 'builtin', 'exec', 'nohup', 'time', 'nice', 'ionice', 'then', 'do', 'else', '&', 'busybox', 'toybox'].includes(h)) {
       w = w.slice(1);
       while (w.length && /^-/.test(w[0])) w = w.slice(1 + (/^-[ugnc]$/.test(w[0]) ? 1 : 0));
       continue;
@@ -98,6 +104,7 @@ function rmCheck(words, hit) {
   if (noPreserve) hit('high', 'rm --no-preserve-root', true);
   if (recursive && force) hit('high', 'rm -rf deletes without asking');
   if (recursive && targets.some((t) => POSIX_CRIT_TARGET.test(t.trim()) || PS_CRIT_TARGET.test(t.trim()))) hit('high', 'recursive rm on /, ~, * or . — would wipe everything', true);
+  if (targets.some((t) => /(?:^|[\\/])\.\.(?:[\\/]|$)/.test(t))) hit('high', 'path contains .. (refers to a parent directory)');
 }
 
 // kill [-SIG | -s SIG | -n NUM | --signal SIG] [--] pid...   (pid 1 / -1 = init / every process)
@@ -139,6 +146,108 @@ function cmdDelCheck(words, hit) {
   const a = words.slice(1);
   const recursive = a.some((x) => /^\/s$/i.test(x));
   if (recursive && a.filter((x) => !/^\/\w$/.test(x)).some((t) => CMD_CRIT_TARGET.test(t.trim()))) hit('high', 'recursive delete of a drive root or home', true);
+}
+
+// /, ~, $HOME, system directories, drive roots (not the relative ., .., * that rm -r also treats as critical)
+const critTarget = (t) => { const s = String(t).trim(); return (POSIX_CRIT_TARGET.test(s) || PS_CRIT_TARGET.test(s)) && !/^(?:\.{1,2}\/*\*?|\*|\.\*|\.\/+\*)$/.test(s); };
+const SYS_PATH = /^\/+(?:etc|boot|bin|sbin|usr|lib\w*|dev|proc|sys)(?:\/|$)/;
+const NULL_SRC = /^\/dev\/(?:null|zero|u?random)$/;
+const positional = (args) => { const out = []; let opts = true; for (const a of args) { if (opts && a === '--') { opts = false; continue; } if (opts && /^-./.test(a)) continue; out.push(a); } return out; };
+
+// find ROOT... -delete / -exec rm: bulk deletion; critical on /, ~, C:\ ...
+function findCheck(w, hit) {
+  const a = w.slice(1);
+  const roots = [];
+  for (const x of a) { if (/^[-(!]/.test(x)) break; roots.push(x); }
+  const del = a.includes('-delete') || a.some((x, i) => /^-(?:exec|execdir|ok|okdir)$/.test(x) && /^(?:\S*\/)?(?:rm|shred|unlink)$/.test(a[i + 1] || ''));
+  if (del && roots.some(critTarget)) hit('high', 'bulk deletion under /, ~ or a drive root', true);
+}
+
+// rsync --delete … DEST: makes DEST identical to the source, deleting everything else in it
+function rsyncCheck(w, hit) {
+  const a = w.slice(1);
+  if (!a.some((x) => /^--(?:delete|del$|remove-source-files)/.test(x))) return;
+  hit('high', 'rsync --delete removes files in the destination');
+  const pos = positional(a);
+  if (pos.length && critTarget(pos[pos.length - 1])) hit('high', 'rsync --delete onto /, ~ or a drive root', true);
+}
+
+// cp/mv/install/ln onto system files; /dev/null (or zero/random) copied over a file destroys it
+function copyCheck(w, hit) {
+  const pos = positional(w.slice(1));
+  if (pos.length < 2) return;
+  const dst = pos[pos.length - 1];
+  const srcs = pos.slice(0, -1);
+  if (SYS_PATH.test(dst) || /^\/+$/.test(dst)) hit('high', 'overwrites a system file or directory');
+  if (srcs.some((s) => NULL_SRC.test(s)) && !/^\/dev\//.test(dst)) hit('high', `overwrites ${dst} with ${srcs.find((s) => NULL_SRC.test(s))}`, SYS_PATH.test(dst));
+}
+
+const LISTERS = /^(?:get-childitem|gci|dir|ls|get-item|gi)$/i;
+// `Get-ChildItem C:\ -Recurse … | Remove-Item`, `find / … | xargs rm`: listing a root, deleting the results
+function pipelineDeleteCheck(text, hit) {
+  for (const stmt of String(text).split(/[;\n]|&&|\|\|/)) {
+    const segs = stmt.split('|').map((p) => commandWords(simpleCommands(p, { winPaths: true })[0] || []));
+    for (let i = 0; i < segs.length - 1; i++) {
+      const w = segs[i];
+      if (!w.length) continue;
+      const head = w[0].replace(/^.*[\\/]/, '').toLowerCase();
+      let rootList = false;
+      if (head === 'find') { const roots = []; for (const x of w.slice(1)) { if (/^[-(!]/.test(x)) break; roots.push(x); } rootList = roots.some(critTarget); }
+      else if (LISTERS.test(head)) {
+        const a = w.slice(1);
+        const rec = a.some((x) => /^-r(?:e(?:c(?:u(?:r(?:s(?:e)?)?)?)?)?)?$/i.test(x)) || head === 'ls' && a.some((x) => /^-[a-zA-Z]*R/.test(x));
+        const targets = [];
+        for (let k = 0; k < a.length; k++) {
+          if (/^-(?:path|literalpath|lp|pspath)$/i.test(a[k])) { if (a[k + 1] != null) targets.push(a[++k]); continue; }
+          if (/^-(?:filter|include|exclude|depth|attributes)$/i.test(a[k])) { k++; continue; }
+          if (!/^-/.test(a[k])) targets.push(a[k]);
+        }
+        rootList = rec && targets.some(critTarget);
+      }
+      if (!rootList) continue;
+      const del = segs.slice(i + 1).some((s) => {
+        const h = (s[0] || '').replace(/^.*[\\/]/, '').toLowerCase();
+        return PS_REMOVE.test(h) || (h === 'xargs' && s.some((x) => /^(?:\S*\/)?(?:rm|shred)$/.test(x)));
+      });
+      if (del) hit('high', 'bulk deletion under /, ~ or a drive root', true);
+    }
+  }
+}
+
+// chmod/chown/chgrp -R on /, ~, * ... (options may come in any order: chmod -R -v 777 ~)
+function permCheck(w, hit) {
+  const a = w.slice(1);
+  if (!a.some((x) => /^-[a-zA-Z]*R[a-zA-Z]*$/.test(x) || x === '--recursive')) return;
+  if (positional(a).slice(1).some(critTarget)) hit('high', 'recursive permission/owner change on /, ~ or *', true);
+}
+
+// tar -x … -C / (or --directory=/): extracting over the root or home directory
+function tarCheck(w, hit) {
+  const a = w.slice(1);
+  const extract = a.some((x) => /^-[a-zA-Z]*x/.test(x) || x === '--extract' || x === '--get') || /^[a-wyzA-Z]*x[a-zA-Z]*$/.test(a[0] || '');
+  if (!extract) return;
+  const dirs = [];
+  a.forEach((x, i) => {
+    if (x === '-C' || x === '--directory') dirs.push(a[i + 1] ?? '');
+    else if (/^-C./.test(x)) dirs.push(x.slice(2));
+    else if (/^--directory=/.test(x)) dirs.push(x.slice(12));
+  });
+  if (dirs.some(critTarget)) hit('high', 'extracts an archive over /, ~ or a drive root', true);
+}
+
+// docker run -v /:/host …: the container gets the host's whole filesystem (read-write unless :ro)
+function dockerCheck(w, hit) {
+  const a = w.slice(1);
+  if (!a.includes('run') && !a.includes('create')) return;
+  const vols = [];
+  a.forEach((x, i) => {
+    if (x === '-v' || x === '--volume' || x === '--mount') vols.push(a[i + 1] || '');
+    else if (/^(?:-v|--volume=|--mount=)/.test(x)) vols.push(x.replace(/^(?:-v|--volume=|--mount=)/, ''));
+  });
+  for (const v of vols) {
+    const root = /^\/+:/.test(v) || /(?:^|,)(?:source|src)=\/+(?:,|$)/.test(v);
+    if (root) hit('high', 'mounts the host root filesystem into a container', !/:ro(?:,|$)|(?:^|,)(?:readonly|ro)(?:=true|=1)?(?:,|$)/.test(v));
+  }
 }
 
 // [regex, risk, message, critical]
@@ -223,8 +332,15 @@ export function checkDanger(command, baseRisk = 'safe') {
       if (!a.some((x) => /^\/[a-z]$/i.test(x)) && a.some((x) => /^-\w/.test(x))) removeItemCheck(w, hit);
       else cmdDelCheck(w, hit);
     } else if (PS_REMOVE.test(lower)) removeItemCheck(w, hit);
+    else if (head === 'find') findCheck(w, hit);
+    else if (head === 'rsync') rsyncCheck(w, hit);
+    else if (['cp', 'mv', 'install', 'ln'].includes(head)) copyCheck(w, hit);
+    else if (['chmod', 'chown', 'chgrp'].includes(head)) permCheck(w, hit);
+    else if (head === 'tar' || head === 'bsdtar' || head === 'gtar') tarCheck(w, hit);
+    else if (head === 'docker' || head === 'podman') dockerCheck(w, hit);
     if (head === 'git' && w[1] === 'rm') hit('high', 'rm deletes files permanently (no trash)');
   }
+  pipelineDeleteCheck(text, hit);
   for (const c of inner) {
     if (c === command) continue;
     const d = checkDanger(c);

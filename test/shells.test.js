@@ -75,6 +75,8 @@ for (const os of ['win32', 'linux']) {
     const bad = [];
     for (const it of INTENTS) {
       const r = buildCommand(it.id, '', { env, resolved: sampleFor(it) });
+      // the sample message contains `"`, which legacy PowerShell cannot pass to a native program (git): refused by design
+      if (r.gap && /PowerShell < 7\.3/.test(r.gap)) continue;
       if (r.gap) { gaps++; continue; }
       assert.ok(r.command, it.id);
       // cheap structural lint: balanced quotes/brackets, no bash-only expansions outside bash -c
@@ -97,7 +99,9 @@ test('cmd: best-effort coverage is reported, gaps carry a reason', () => {
   const env = { shell: 'cmd', os: 'win32', coreutils: 'gnu' };
   let ok = 0;
   for (const it of INTENTS) {
-    const r = buildCommand(it.id, '', { env, resolved: sampleFor(it) });
+    // Windows paths: a value starting with / is a cmd.exe switch and is refused by design
+    const s = Object.fromEntries(Object.entries(sampleFor(it)).map(([k, v]) => [k, typeof v === 'string' && v.startsWith('/') ? 'C:' + v.replace(/\//g, '\\') : v]));
+    const r = buildCommand(it.id, '', { env, resolved: s });
     if (r.gap) assert.ok(r.gap.length > 5, it.id); else ok++;
   }
   assert.ok(ok >= 100, `cmd renders: ${ok}`);
