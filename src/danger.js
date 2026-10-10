@@ -85,6 +85,7 @@ const WRAPPER_OPTARG = {
   'systemd-run': /^-[upEH]$|^--(?:unit|property|setenv|host|machine|description|slice|uid|gid|working-directory|on-calendar|on-active)$/,
   runuser: /^-[ugl]$|^--(?:user|group|login)$/,
   pkexec: /^--user$/,
+  run0: /^-[ugD]$|^--(?:user|group|chdir|unit|property|description|slice|nice|setenv|background|machine|shell-prompt-prefix|area)$/,
   chrt: /^-[TPD]$|^--(?:sched-runtime|sched-period|sched-deadline)$/,
   cgexec: /^-g$/,
   torsocks: /^-[uapP]$|^--(?:user|pass|address|port)$/,

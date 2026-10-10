@@ -105,6 +105,16 @@ notes.txt)` + "delete it" is refused; absolute paths and segments after the subs
 unchanged). `npx wrangler tail` / `login` / `whoami` are `medium` risk like `wrangler dev` (npx may run a project-local
 binary), so `--yes` never runs them. Every eval number is unchanged.
 
+**Round 12 (review r11; A unchanged, A+B policy unchanged).** `pkexec` always runs the command in the target user's
+home, and `run0 --chdir=…` / `-D` / `--user=…` / `-u` in another directory, so relative history values after them are
+ambiguous like `sudo -i` (`run0` without them, as root, keeps the directory; its value options are now unwrapped, so
+`run0 --nice=5 cat notes.txt` still resolves). A redirection inside a `( … )` subshell after a `cd` opened its file
+there: `(cd /repo && echo hi > notes.txt)` + "delete it" is refused (a redirection on the subshell itself,
+`( … ) > out.txt`, is opened by the user's shell and still resolves). An explicit encoder rejection in the hybrid
+(pNone ≥ the policy's `none`) now also sets the re-ranked top tool to `__none__`, so the low-confidence composer no
+longer answers in its place (before, `list directories recursively with sizes` with pNone 0.99 gave `ls -l -R`). The
+hybrid eval runs with the composer off, so every A and A+B number is unchanged. Bench re-run.
+
 <!-- eval:start -->
 ## Model
 
@@ -247,13 +257,13 @@ Machine: Intel(R) Xeon(R) Processor, Node v20.19.2, linux; CPU affinity: `0` (ru
 
 | measurement | p50 | p95 | runs |
 |---|---|---|---|
-| bare `node -e 0` startup (baseline) | 111.6 ms | 113.4 ms | 10 |
-| **cold**: `node bin/tellsh.js --dry-run --json --shell bash <query>` (new process, model load, full pipeline) | **189.5 ms** | **329.0 ms** | 40 |
-| model load (in-process, one-off) | 5.5 ms | – | 1 |
-| **warm**: full cascade + tagger + render (bash, composer off) | **0.543 ms** | **4.8 ms** | 2000 |
-| warm, incl. composer modifier check (shipped default) | 0.682 ms | 7.9 ms | 2000 |
-| warm, PowerShell rendering | 0.422 ms | 0.938 ms | 2000 |
-| warm, 5 history lines given (only the previous one is read; context build + reference rules) | 0.761 ms | 8.0 ms | 2000 |
+| bare `node -e 0` startup (baseline) | 90.2 ms | 104.2 ms | 10 |
+| **cold**: `node bin/tellsh.js --dry-run --json --shell bash <query>` (new process, model load, full pipeline) | **168.8 ms** | **203.2 ms** | 40 |
+| model load (in-process, one-off) | 4.6 ms | – | 1 |
+| **warm**: full cascade + tagger + render (bash, composer off) | **0.389 ms** | **4.5 ms** | 2000 |
+| warm, incl. composer modifier check (shipped default) | 0.605 ms | 7.1 ms | 2000 |
+| warm, PowerShell rendering | 0.363 ms | 0.773 ms | 2000 |
+| warm, 5 history lines given (only the previous one is read; context build + reference rules) | 0.704 ms | 7.4 ms | 2000 |
 
 The composer runs `bash -n` (a subprocess, ~2 ms) only when it actually returns a composed command.
 <!-- bench:end -->

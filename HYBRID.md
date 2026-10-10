@@ -313,6 +313,9 @@ essentially unsupported, so they were dropped. basal-1.5-mini was not used.
   rerankers answering almost every OOD request (A+B 47.8%, A+C 0% rejection on `data/ood_eval`). Two OOD safeguards were
   then added to the *procedure* (dev OOD rejection may not drop more than ~2 rows below A_dev's; option to keep A's
   rejection when stage 1 says `__none__`), plus the "safe" variants. No other change was informed by held-out results.
+* **Rejections stay rejections.** A re-ranked rejection (B's pNone ≥ `none`, or pX below `accept`) sets the decision's
+  top tool to `__none__`, so the pipeline's low-confidence flag composer never answers in its place (the evals here run
+  with the composer off; `test/regressions13.test.js` covers the shipped path with it on).
 * **C cost control:** C was scored (Python, same prompts/weights) on every row A would defer at tau <= 0.9 plus a 10%
   uniform sample (for "C alone"); calibration of A+C is restricted to tau <= 0.9. "C alone" rows are therefore smaller
   samples (n shown).

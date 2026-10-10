@@ -52,7 +52,10 @@ export function rerank(c, pX, P, { thr, pNone = 0 } = {}) {
   const conf = ok ? Math.max(thr, px) : Math.min(thr - 1e-6, px);
   const tool = FAMILY_OF[best];
   const top = [{ intent: best, tool, p: conf, pTool: pa[best] ?? 0, pIntent: px }, ...c.top.filter((t) => t.intent !== best)];
-  return { ...c, intent: best, tool, confidence: conf, top, reranked: true, topTool: ok ? tool : c.topTool };
+  // an explicit model rejection (pNone >= none, or pX below accept) stays a rejection through the whole pipeline:
+  // topTool __none__ keeps the low-confidence composer from answering in its place
+  if (!ok) return { ...c, intent: best, tool, confidence: conf, top, reranked: true, topTool: NONE, rejected: true };
+  return { ...c, intent: best, tool, confidence: conf, top, reranked: true, topTool: tool };
 }
 
 /**

@@ -483,18 +483,21 @@ export function analyzeCommand(line, classify, kind = 'posix') {
     // `env -C /repo cat notes.txt`, `sudo -D /repo …`: relative values name files in that directory, not here;
     // `chroot /srv cat /etc/x`: every value names something under the other root
     const ws = w.length && w !== raw ? wrapperScope(w, raw) : null;
+    const subCd = k === 'posix' && !!subs?.some((id) => subCds.has(id));
     if (ws === 'root') {
       scoped = true;
       for (const x of [...ENT_TYPES, 'current', 'created']) if (e[x] != null && !isAmbiguous(e[x])) e[x] = AMB + rawOf(e[x]);
       if (segIntentAt === segIdx) { segSlots = { ...segSlots }; markScoped(segSlots); }
-    } else if (ws === 'cwd' || (k === 'posix' && subs?.some((id) => subCds.has(id)))) {
+    } else if (ws === 'cwd' || subCd) {
       // also `(cd /repo && cat notes.txt)`: the cd only lasts inside the subshell, so relative values name files
       // there, while "delete it" runs here
       wrapCwd = true;
       for (const x of [...ENT_TYPES, 'current', 'created']) if (e[x] != null && !isAmbiguous(e[x]) && isRelativePath(e[x])) e[x] = AMB + rawOf(e[x]);
       if (segIntentAt === segIdx) { segSlots = { ...segSlots }; staleRelative({}, segSlots); }
     }
-    if (redirTarget != null) e.file = redirTarget;
+    // `(cd /repo && echo hi > notes.txt)`: the redirection opened notes.txt in /repo, not here (a wrapper's
+    // redirection, `sudo -D /repo cat a > out.txt`, is opened by the calling shell, so it stays)
+    if (redirTarget != null) e.file = subCd && !isAmbiguous(redirTarget) && isRelativePath(redirTarget) ? AMB + rawOf(redirTarget) : redirTarget;
     const pipedIn = segIdx > 0 && split.segments[segIdx - 1].sep === '|';
     if (w.length && !isAmbiguous(w[0])) for (const x of listedBySegment(w, pipedIn, k)) listed[x] = segIdx;
     // every command the wrapper chain may run (also when its options are misread): a listing anywhere in it counts
@@ -593,7 +596,8 @@ function scopedElsewhere(w, raw) {
 }
 // wrapper options that run the command in another working directory (`env -C /repo`, `sudo -D /repo`, also with the
 // value attached or in a cluster) or under another root (`chroot /srv`, `unshare --root=/srv`, `nsenter -r`)
-// login shells start in the target user's home (`sudo -i`, `sudo -iu bob`, `sudo --login`, `runuser -l`, `su -`)
+// login shells start in the target user's home (`sudo -i`, `sudo -iu bob`, `sudo --login`, `runuser -l`, `su -`);
+// `run0 --user=bob` runs in bob's home (also `-i`, the target's login shell, in newer systemd)
 const WRAPPER_CWD = {
   env: /^-[a-zA-Z0-9]*C|^--chdir(?:=|$)/,
   sudo: /^-[a-zA-Z]*[Di]|^--(?:chdir|login)(?:=|$)/,
@@ -603,7 +607,10 @@ const WRAPPER_CWD = {
   nsenter: /^-w|^--wd(?:=|$)/,
   'systemd-run': /^--working-directory(?:=|$)/,
   'start-stop-daemon': /^-d|^--chdir(?:=|$)/,
+  run0: /^-[a-zA-Z]*[Dui]|^--(?:chdir|user|via-shell|login)(?:=|$)/,
 };
+// wrappers that always change to another directory: pkexec runs every command in the target user's home
+const CWD_WRAPPERS = new Set(['pkexec']);
 const WRAPPER_ROOT = {
   sudo: /^-[a-zA-Z]*R|^--chroot(?:=|$)/,
   unshare: /^-R|^--root(?:=|$)/,
@@ -621,6 +628,7 @@ function wrapperScope(w, raw) {
   for (const x of raw.slice(0, raw.length - w.length).map((v) => String(rawOf(v)))) {
     const h = x.replace(/^.*[\\/]/, '').toLowerCase();
     if (ROOT_WRAPPERS.has(h)) return 'root';
+    if (CWD_WRAPPERS.has(h)) { scope = 'cwd'; continue; }
     if (!x.startsWith('-')) { if (WRAPPER_CWD[h] || WRAPPER_ROOT[h]) cur = h; continue; }
     if (WRAPPER_ROOT[cur]?.test(x)) return 'root';
     if (WRAPPER_CWD[cur]?.test(x)) scope = 'cwd';
