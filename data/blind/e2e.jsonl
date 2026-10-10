@@ -1,0 +1,207 @@
+{"text": "what are the 15 biggest files under /opt/gitlab", "intent": "largest_files", "lang": "en", "expect_command": "find /opt/gitlab -xdev -type f -exec du -h {} + 2>/dev/null | sort -rh | head -n 15"}
+{"text": "largest files on the whole disk", "intent": "largest_files", "lang": "en", "expect_command": "find / -xdev -type f -exec du -h {} + 2>/dev/null | sort -rh | head -n 10"}
+{"text": "pokaż 20 największych plików na całym dysku", "intent": "largest_files", "lang": "pl", "expect_command": "find / -xdev -type f -exec du -h {} + 2>/dev/null | sort -rh | head -n 20"}
+{"text": "największe pliki w katalogu /srv/kopie", "intent": "largest_files", "lang": "pl", "expect_command": "find /srv/kopie -xdev -type f -exec du -h {} + 2>/dev/null | sort -rh | head -n 10"}
+{"text": "top 5 largest files on the entire drive", "intent": "largest_files", "lang": "en", "expect_command": "find / -xdev -type f -exec du -h {} + 2>/dev/null | sort -rh | head -n 5"}
+{"text": "najwieksze pliki w pobranych", "intent": "largest_files", "lang": "pl", "expect_command": "find ~/Downloads -xdev -type f -exec du -h {} + 2>/dev/null | sort -rh | head -n 10"}
+{"text": "co zajmuje najwięcej miejsca na dysku? 12 największych plików", "intent": "largest_files", "lang": "pl", "expect_command": "find / -xdev -type f -exec du -h {} + 2>/dev/null | sort -rh | head -n 12"}
+{"text": "which 8 subfolders of /home/ania are the biggest", "intent": "largest_dirs", "lang": "en", "expect_command": "du -h -d 1 /home/ania 2>/dev/null | sort -rh | head -n 8"}
+{"text": "największe katalogi na całym dysku", "intent": "largest_dirs", "lang": "pl", "expect_command": "du -h -d 1 / 2>/dev/null | sort -rh | head -n 10"}
+{"text": "największe foldery w /var/lib/postgresql", "intent": "largest_dirs", "lang": "pl", "expect_command": "du -h -d 1 /var/lib/postgresql 2>/dev/null | sort -rh | head -n 10"}
+{"text": "biggest directories on the whole drive, top 6", "intent": "largest_dirs", "lang": "en", "expect_command": "du -h -d 1 / 2>/dev/null | sort -rh | head -n 6"}
+{"text": "how big is /srv/minio-data in total", "intent": "dir_size", "lang": "en", "expect_command": "du -sh /srv/minio-data"}
+{"text": "ile waży katalog /opt/conda", "intent": "dir_size", "lang": "pl", "expect_command": "du -sh /opt/conda"}
+{"text": "ile zajmuje mój katalog domowy", "intent": "dir_size", "lang": "pl", "expect_command": "du -sh ~"}
+{"text": "find files named invoice_2024 in /srv/ksiegowosc", "intent": "find_by_name", "lang": "en", "expect_command": "find /srv/ksiegowosc -iname '*invoice_2024*'"}
+{"text": "locate id_ed25519.pub on the whole disk", "intent": "find_by_name", "lang": "en", "expect_command": "find / -iname id_ed25519.pub"}
+{"text": "znajdź plik docker-compose.override.yml na całym dysku", "intent": "find_by_name", "lang": "pl", "expect_command": "find / -iname docker-compose.override.yml"}
+{"text": "szukaj plików z nazwą faktura w katalogu /srv/biuro", "intent": "find_by_name", "lang": "pl", "expect_command": "find /srv/biuro -iname '*faktura*'"}
+{"text": "find all .parquet files in /data/lake", "intent": "find_by_ext", "lang": "en", "expect_command": "find /data/lake -type f -iname '*.parquet'"}
+{"text": "every .iso file on the entire drive", "intent": "find_by_ext", "lang": "en", "expect_command": "find / -type f -iname '*.iso'"}
+{"text": "wszystkie pliki .sqlite na całym dysku", "intent": "find_by_ext", "lang": "pl", "expect_command": "find / -type f -iname '*.sqlite'"}
+{"text": "znajdź pliki .epub w katalogu /mnt/czytnik", "intent": "find_by_ext", "lang": "pl", "expect_command": "find /mnt/czytnik -type f -iname '*.epub'"}
+{"text": "find .kdbx files on disk", "intent": "find_by_ext", "lang": "en", "expect_command": "find / -type f -iname '*.kdbx'"}
+{"text": "wszystkie pliki .heic w folderze /media/telefon", "intent": "find_by_ext", "lang": "pl", "expect_command": "find /media/telefon -type f -iname '*.heic'"}
+{"text": "files modified in the last 45 minutes in /etc", "intent": "find_recent", "lang": "en", "expect_command": "find /etc -type f -mmin -45"}
+{"text": "pliki zmienione w ciągu ostatnich 2 godzin w /srv/www", "intent": "find_recent", "lang": "pl", "expect_command": "find /srv/www -type f -mmin -120"}
+{"text": "files changed in the last 3 days on the whole disk", "intent": "find_recent", "lang": "en", "expect_command": "find / -type f -mtime -3"}
+{"text": "co się zmieniło w katalogu /opt/odoo w ciągu ostatnich 10 minut", "intent": "find_recent", "lang": "pl", "expect_command": "find /opt/odoo -type f -mmin -10"}
+{"text": "files older than 90 days in /var/spool/faxes", "intent": "find_older_than", "lang": "en", "expect_command": "find /var/spool/faxes -type f -mtime +90"}
+{"text": "pliki starsze niż 14 dni w /tmp/renderfarm", "intent": "find_older_than", "lang": "pl", "expect_command": "find /tmp/renderfarm -type f -mtime +14"}
+{"text": "pliki .log starsze niż 30 dni w /opt/tomcat/logs", "intent": "find_older_than", "lang": "pl", "expect_command": "find /opt/tomcat/logs -type f -mtime +30 -iname '*.log'"}
+{"text": "files older than 400 days on the entire drive", "intent": "find_older_than", "lang": "en", "expect_command": "find / -type f -mtime +400"}
+{"text": "files bigger than 2GB in /mnt/nas", "intent": "find_larger_than", "lang": "en", "expect_command": "find /mnt/nas -type f -size +2G -exec ls -lh {} +"}
+{"text": "pliki większe niż 500 MB na całym dysku", "intent": "find_larger_than", "lang": "pl", "expect_command": "find / -type f -size +500M -exec ls -lh {} +"}
+{"text": ".mkv files larger than 4GB in /srv/media", "intent": "find_larger_than", "lang": "en", "expect_command": "find /srv/media -type f -size +4G -iname '*.mkv' -exec ls -lh {} +"}
+{"text": "pliki powyżej 300 MB w katalogu /var/lib/docker", "intent": "find_larger_than", "lang": "pl", "expect_command": "find /var/lib/docker -type f -size +300M -exec ls -lh {} +"}
+{"text": "anything over 10 GB on the whole drive", "intent": "find_larger_than", "lang": "en", "expect_command": "find / -type f -size +10G -exec ls -lh {} +"}
+{"text": "files smaller than 2 KB in /etc/sudoers.d", "intent": "find_smaller_than", "lang": "en", "expect_command": "find /etc/sudoers.d -type f -size -2k"}
+{"text": "pliki mniejsze niż 100 KB w /srv/miniatury", "intent": "find_smaller_than", "lang": "pl", "expect_command": "find /srv/miniatury -type f -size -100k"}
+{"text": "grep for \"connection reset\" in /opt/haproxy/logs", "intent": "grep_text", "lang": "en", "expect_command": "grep -rn -- 'connection reset' /opt/haproxy/logs"}
+{"text": "wyszukaj tekst DEPRECATED_API w katalogu ~/code/billing", "intent": "grep_text", "lang": "pl", "expect_command": "grep -rn -- DEPRECATED_API ~/code/billing"}
+{"text": "search for parseLegacyDate in .ts files under src", "intent": "grep_text", "lang": "en", "expect_command": "grep -rn --include='*.ts' -- parseLegacyDate src"}
+{"text": "szukaj frazy \"Out of memory\" w /var/log/kern.log", "intent": "grep_text", "lang": "pl", "expect_command": "grep -rn -- 'Out of memory' /var/log/kern.log"}
+{"text": "znajdź tekst FIXME w plikach .go w katalogu ./internal", "intent": "grep_text", "lang": "pl", "expect_command": "grep -rn --include='*.go' -- FIXME ./internal"}
+{"text": "which files contain kubeconfig in /etc/ansible", "intent": "grep_files_containing", "lang": "en", "expect_command": "grep -rl -- kubeconfig /etc/ansible"}
+{"text": "które pliki zawierają tekst STRIPE_SECRET w ~/repo/sklep", "intent": "grep_files_containing", "lang": "pl", "expect_command": "grep -rl -- STRIPE_SECRET ~/repo/sklep"}
+{"text": "list files that contain \"BEGIN RSA PRIVATE KEY\" on the whole disk", "intent": "grep_files_containing", "lang": "en", "expect_command": "grep -rl -- 'BEGIN RSA PRIVATE KEY' /"}
+{"text": "how many lines in /srv/import/klienci_2025.csv", "intent": "count_lines", "lang": "en", "expect_command": "wc -l /srv/import/klienci_2025.csv"}
+{"text": "ile linii ma plik CHANGELOG.rst", "intent": "count_lines", "lang": "pl", "expect_command": "wc -l CHANGELOG.rst"}
+{"text": "how many lines of .rs code are in ./crates", "intent": "count_lines_code", "lang": "en", "expect_command": "find ./crates -type f -iname '*.rs' -exec cat {} + | wc -l"}
+{"text": "ile jest łącznie linii w plikach .kt w katalogu app/src", "intent": "count_lines_code", "lang": "pl", "expect_command": "find app/src -type f -iname '*.kt' -exec cat {} + | wc -l"}
+{"text": "how many files are in /srv/uploads", "intent": "count_files", "lang": "en", "expect_command": "find /srv/uploads -type f | wc -l"}
+{"text": "ile jest plików .jpg w katalogu /mnt/aparat", "intent": "count_files", "lang": "pl", "expect_command": "find /mnt/aparat -type f -iname '*.jpg' | wc -l"}
+{"text": "how many files are there on the whole disk", "intent": "count_files", "lang": "en", "expect_command": "find / -type f | wc -l"}
+{"text": "word count of thesis_ch3.tex", "intent": "count_words", "lang": "en", "expect_command": "wc -w thesis_ch3.tex"}
+{"text": "ile słów ma plik esej.md", "intent": "count_words", "lang": "pl", "expect_command": "wc -w esej.md"}
+{"text": "top 20 most common lines in errors.txt", "intent": "sort_uniq", "lang": "en", "expect_command": "sort errors.txt | uniq -c | sort -rn | head -n 20"}
+{"text": "najczęściej powtarzające się linie w pliku user_agents.log", "intent": "sort_uniq", "lang": "pl", "expect_command": "sort user_agents.log | uniq -c | sort -rn | head -n 10"}
+{"text": "5 most recently modified files in ~/vault", "intent": "recent_files", "lang": "en", "expect_command": "find ~/vault -type f -printf '%T@ %TY-%Tm-%Td %TH:%TM %p\\n' 2>/dev/null | sort -rn | head -n 5 | cut -d' ' -f2-"}
+{"text": "ostatnio zmienione pliki na całym dysku", "intent": "recent_files", "lang": "pl", "expect_command": "find / -type f -printf '%T@ %TY-%Tm-%Td %TH:%TM %p\\n' 2>/dev/null | sort -rn | head -n 10 | cut -d' ' -f2-"}
+{"text": "find empty files in /srv/ftp/incoming", "intent": "empty_files", "lang": "en", "expect_command": "find /srv/ftp/incoming -type f -empty"}
+{"text": "znajdź puste pliki w katalogu /var/cache/wyniki", "intent": "empty_files", "lang": "pl", "expect_command": "find /var/cache/wyniki -type f -empty"}
+{"text": "puste pliki na całym dysku", "intent": "empty_files", "lang": "pl", "expect_command": "find / -type f -empty"}
+{"text": "zero-byte files in ./fixtures", "intent": "empty_files", "lang": "en", "expect_command": "find ./fixtures -type f -empty"}
+{"text": "empty folders in ~/Pictures/Sorted", "intent": "empty_dirs", "lang": "en", "expect_command": "find ~/Pictures/Sorted -type d -empty"}
+{"text": "puste katalogi na całym dysku", "intent": "empty_dirs", "lang": "pl", "expect_command": "find / -type d -empty"}
+{"text": "find duplicate files in /mnt/photos", "intent": "duplicate_files", "lang": "en", "expect_command": "find /mnt/photos -type f -exec md5sum {} + | sort | uniq -w32 -dD"}
+{"text": "duplikaty plików w /srv/skany", "intent": "duplicate_files", "lang": "pl", "expect_command": "find /srv/skany -type f -exec md5sum {} + | sort | uniq -w32 -dD"}
+{"text": "duplicate files across the whole disk", "intent": "duplicate_files", "lang": "en", "expect_command": "find / -type f -exec md5sum {} + | sort | uniq -w32 -dD"}
+{"text": "list all symlinks in /usr/local/bin", "intent": "find_symlinks", "lang": "en", "expect_command": "find /usr/local/bin -type l -ls"}
+{"text": "wszystkie dowiązania symboliczne w /etc/alternatives", "intent": "find_symlinks", "lang": "pl", "expect_command": "find /etc/alternatives -type l -ls"}
+{"text": "every symlink on the whole disk", "intent": "find_symlinks", "lang": "en", "expect_command": "find / -type l -ls"}
+{"text": "find broken symlinks in /usr/local/bin", "intent": "broken_symlinks", "lang": "en", "expect_command": "find /usr/local/bin -xtype l"}
+{"text": "zepsute symlinki na całym dysku", "intent": "broken_symlinks", "lang": "pl", "expect_command": "find / -xtype l"}
+{"text": "martwe dowiązania symboliczne w katalogu /opt/narzedzia", "intent": "broken_symlinks", "lang": "pl", "expect_command": "find /opt/narzedzia -xtype l"}
+{"text": "list files in /mnt/usb-stick", "intent": "list_files", "lang": "en", "expect_command": "ls -lah /mnt/usb-stick"}
+{"text": "pokaż zawartość katalogu /opt/teamcity", "intent": "list_files", "lang": "pl", "expect_command": "ls -lah /opt/teamcity"}
+{"text": "tree of /etc/ansible 3 levels deep", "intent": "list_tree", "lang": "en", "expect_command": "find /etc/ansible -maxdepth 3 -not -path '*/.git/*' | sort"}
+{"text": "drzewo katalogów ./frontend", "intent": "list_tree", "lang": "pl", "expect_command": "find ./frontend -maxdepth 2 -not -path '*/.git/*' | sort"}
+{"text": "hidden files in /etc/skel", "intent": "hidden_files", "lang": "en", "expect_command": "find /etc/skel -maxdepth 1 -name '.*'"}
+{"text": "ukryte pliki w katalogu domowym", "intent": "hidden_files", "lang": "pl", "expect_command": "find ~ -maxdepth 1 -name '.*'"}
+{"text": "what kind of file is blob.bin", "intent": "file_type", "lang": "en", "expect_command": "file blob.bin"}
+{"text": "jaki typ ma plik firmware_v2.img", "intent": "file_type", "lang": "pl", "expect_command": "file firmware_v2.img"}
+{"text": "stat of /etc/shadow", "intent": "file_stat", "lang": "en", "expect_command": "stat /etc/shadow"}
+{"text": "first 25 lines of deploy.log", "intent": "head_file", "lang": "en", "expect_command": "head -n 25 deploy.log"}
+{"text": "pierwsze 5 linii pliku ceny.csv", "intent": "head_file", "lang": "pl", "expect_command": "head -n 5 ceny.csv"}
+{"text": "last 40 lines of /var/log/fail2ban.log", "intent": "tail_file", "lang": "en", "expect_command": "tail -n 40 /var/log/fail2ban.log"}
+{"text": "ostatnie 15 linii z pliku build_output.txt", "intent": "tail_file", "lang": "pl", "expect_command": "tail -n 15 build_output.txt"}
+{"text": "follow /opt/keycloak/log/server.log live", "intent": "tail_follow", "lang": "en", "expect_command": "tail -f /opt/keycloak/log/server.log"}
+{"text": "śledź na żywo plik /var/log/mail.log", "intent": "tail_follow", "lang": "pl", "expect_command": "tail -f /var/log/mail.log"}
+{"text": "print /etc/hosts.allow", "intent": "cat_file", "lang": "en", "expect_command": "cat /etc/hosts.allow"}
+{"text": "wyświetl zawartość pliku .npmrc", "intent": "cat_file", "lang": "pl", "expect_command": "cat .npmrc"}
+{"text": "compress ~/projekty/ksiegarnia into ksiegarnia.tar.gz", "intent": "compress_targz", "lang": "en", "expect_command": "tar -czvf ksiegarnia.tar.gz ~/projekty/ksiegarnia"}
+{"text": "spakuj katalog /srv/www do archiwum www-backup.tar.gz", "intent": "compress_targz", "lang": "pl", "expect_command": "tar -czvf www-backup.tar.gz /srv/www"}
+{"text": "extract node-v22.4.0-linux-x64.tar.gz", "intent": "extract_targz", "lang": "en", "expect_command": "tar -xzvf node-v22.4.0-linux-x64.tar.gz"}
+{"text": "rozpakuj archiwum backup_0612.tar.gz do katalogu /tmp/odzysk", "intent": "extract_targz", "lang": "pl", "expect_command": "tar -xzvf backup_0612.tar.gz -C /tmp/odzysk"}
+{"text": "zip the folder raport_q3 into raport_q3.zip", "intent": "compress_zip", "lang": "en", "expect_command": "zip -r raport_q3.zip raport_q3"}
+{"text": "unzip fonts-pack.zip into /usr/share/fonts/custom", "intent": "extract_zip", "lang": "en", "expect_command": "unzip fonts-pack.zip -d /usr/share/fonts/custom"}
+{"text": "rozpakuj plik szablony.zip", "intent": "extract_zip", "lang": "pl", "expect_command": "unzip szablony.zip"}
+{"text": "list contents of logs-archive.tar.gz", "intent": "list_archive", "lang": "en", "expect_command": "tar -tvf logs-archive.tar.gz"}
+{"text": "co jest w archiwum materialy.zip", "intent": "list_archive", "lang": "pl", "expect_command": "unzip -l materialy.zip"}
+{"text": "set permissions 600 on ~/.ssh/config", "intent": "chmod", "lang": "en", "expect_command": "chmod 600 ~/.ssh/config"}
+{"text": "zmień uprawnienia pliku deploy.key na 400", "intent": "chmod", "lang": "pl", "expect_command": "chmod 400 deploy.key"}
+{"text": "make run_migrations.sh executable", "intent": "make_executable", "lang": "en", "expect_command": "chmod +x run_migrations.sh"}
+{"text": "nadaj prawo wykonywania plikowi instaluj.sh", "intent": "make_executable", "lang": "pl", "expect_command": "chmod +x instaluj.sh"}
+{"text": "change owner of /srv/gitea to git", "intent": "chown", "lang": "en", "expect_command": "sudo chown -R git /srv/gitea"}
+{"text": "zmień właściciela katalogu /var/www/sklep na www-data", "intent": "chown", "lang": "pl", "expect_command": "sudo chown -R www-data /var/www/sklep"}
+{"text": "copy config.yaml to /etc/promtail/", "intent": "copy", "lang": "en", "expect_command": "cp -ri config.yaml /etc/promtail/"}
+{"text": "skopiuj plik nginx.conf do katalogu /etc/nginx/", "intent": "copy", "lang": "pl", "expect_command": "cp -ri nginx.conf /etc/nginx/"}
+{"text": "rename draft_v3.md to final.md", "intent": "move_rename", "lang": "en", "expect_command": "mv -i draft_v3.md final.md"}
+{"text": "przenieś plik faktura_09.pdf do /srv/faktury", "intent": "move_rename", "lang": "pl", "expect_command": "mv -i faktura_09.pdf /srv/faktury"}
+{"text": "delete the file core.12345", "intent": "delete_file", "lang": "en", "expect_command": "rm core.12345"}
+{"text": "usuń plik /tmp/sesja.lock", "intent": "delete_file", "lang": "pl", "expect_command": "rm /tmp/sesja.lock"}
+{"text": "delete directory /tmp/build-cache recursively", "intent": "delete_dir", "lang": "en", "expect_command": "rm -r /tmp/build-cache"}
+{"text": "usuń katalog ~/projekty/stary_prototyp", "intent": "delete_dir", "lang": "pl", "expect_command": "rm -r ~/projekty/stary_prototyp"}
+{"text": "delete all .orig files in ./src", "intent": "delete_by_ext", "lang": "en", "expect_command": "find ./src -type f -iname '*.orig' -delete"}
+{"text": "usuń wszystkie pliki .pyc z katalogu ./app", "intent": "delete_by_ext", "lang": "pl", "expect_command": "find ./app -type f -iname '*.pyc' -delete"}
+{"text": "create directory /srv/data/2026/q4", "intent": "mkdir", "lang": "en", "expect_command": "mkdir -p /srv/data/2026/q4"}
+{"text": "utwórz katalog /opt/kopie/miesieczne", "intent": "mkdir", "lang": "pl", "expect_command": "mkdir -p /opt/kopie/miesieczne"}
+{"text": "create an empty file .gitkeep", "intent": "touch_file", "lang": "en", "expect_command": "touch .gitkeep"}
+{"text": "stwórz pusty plik notatki_spotkanie.md", "intent": "touch_file", "lang": "pl", "expect_command": "touch notatki_spotkanie.md"}
+{"text": "create a symlink from /opt/node-22/bin/node to /usr/local/bin/node", "intent": "create_symlink", "lang": "en", "expect_command": "ln -s /opt/node-22/bin/node /usr/local/bin/node"}
+{"text": "compare old.conf and new.conf", "intent": "diff_files", "lang": "en", "expect_command": "diff -u old.conf new.conf"}
+{"text": "porównaj pliki umowa_v1.txt i umowa_v2.txt", "intent": "diff_files", "lang": "pl", "expect_command": "diff -u umowa_v1.txt umowa_v2.txt"}
+{"text": "replace localhost with dbhost in settings.py", "intent": "replace_text", "lang": "en", "expect_command": "sed -i s/localhost/dbhost/g settings.py"}
+{"text": "zamień słowo staging na production w pliku deploy.env", "intent": "replace_text", "lang": "pl", "expect_command": "sed -i s/staging/production/g deploy.env"}
+{"text": "sha256 of ubuntu-24.04-live-server-amd64.iso", "intent": "hash_sha256", "lang": "en", "expect_command": "sha256sum ubuntu-24.04-live-server-amd64.iso"}
+{"text": "suma md5 pliku film.mkv", "intent": "hash_md5", "lang": "pl", "expect_command": "md5sum film.mkv"}
+{"text": "base64 encode the file logo.png", "intent": "base64_encode", "lang": "en", "expect_command": "base64 logo.png"}
+{"text": "top 5 processes by cpu", "intent": "top_cpu", "lang": "en", "expect_command": "ps aux --sort=-%cpu | head -n 5"}
+{"text": "pokaż 15 procesów zużywających najwięcej pamięci", "intent": "top_mem", "lang": "pl", "expect_command": "ps aux --sort=-%mem | head -n 15"}
+{"text": "is there a process called syncthing running", "intent": "find_process", "lang": "en", "expect_command": "pgrep -af syncthing"}
+{"text": "znajdź proces o nazwie gunicorn", "intent": "find_process", "lang": "pl", "expect_command": "pgrep -af gunicorn"}
+{"text": "kill all ffmpeg processes", "intent": "kill_by_name", "lang": "en", "expect_command": "pkill -f ffmpeg"}
+{"text": "zabij proces kanata", "intent": "kill_by_name", "lang": "pl", "expect_command": "pkill -f kanata"}
+{"text": "force kill steamwebhelper", "intent": "kill_force", "lang": "en", "expect_command": "pkill -9 -f steamwebhelper"}
+{"text": "kill pid 48213", "intent": "kill_by_pid", "lang": "en", "expect_command": "kill 48213"}
+{"text": "zabij proces o PID 7711", "intent": "kill_by_pid", "lang": "pl", "expect_command": "kill 7711"}
+{"text": "kill whatever is listening on port 5173", "intent": "kill_by_port", "lang": "en", "expect_command": "lsof -ti tcp:5173 -sTCP:LISTEN | xargs -r kill"}
+{"text": "zabij proces nasłuchujący na porcie 4200", "intent": "kill_by_port", "lang": "pl", "expect_command": "lsof -ti tcp:4200 -sTCP:LISTEN | xargs -r kill"}
+{"text": "what's using port 6443", "intent": "process_on_port", "lang": "en", "expect_command": "ss -ltnup 'sport = :6443'"}
+{"text": "jaki proces używa portu 3306", "intent": "process_on_port", "lang": "pl", "expect_command": "ss -ltnup 'sport = :3306'"}
+{"text": "show the last 20 logins", "intent": "last_logins", "lang": "en", "expect_command": "last -n 20"}
+{"text": "what's the value of KUBECONFIG", "intent": "env_var_get", "lang": "en", "expect_command": "printenv KUBECONFIG"}
+{"text": "jaka jest wartość zmiennej GOPATH", "intent": "env_var_get", "lang": "pl", "expect_command": "printenv GOPATH"}
+{"text": "where is the rg binary", "intent": "which_cmd", "lang": "en", "expect_command": "which -a rg"}
+{"text": "search my shell history for rsync", "intent": "history_search", "lang": "en", "expect_command": "grep -ai -- rsync \"${HISTFILE:-$HOME/.bash_history}\""}
+{"text": "logs of the grafana-server service", "intent": "journal_service", "lang": "en", "expect_command": "journalctl -u grafana-server -n 50 --no-pager"}
+{"text": "last 200 log lines of the caddy service", "intent": "journal_service", "lang": "en", "expect_command": "journalctl -u caddy -n 200 --no-pager"}
+{"text": "status of the postgresql service", "intent": "service_status", "lang": "en", "expect_command": "systemctl status postgresql --no-pager"}
+{"text": "jaki jest status usługi chronyd", "intent": "service_status", "lang": "pl", "expect_command": "systemctl status chronyd --no-pager"}
+{"text": "restart the caddy service", "intent": "service_restart", "lang": "en", "expect_command": "sudo systemctl restart caddy"}
+{"text": "zrestartuj usługę php8.3-fpm", "intent": "service_restart", "lang": "pl", "expect_command": "sudo systemctl restart php8.3-fpm"}
+{"text": "zatrzymaj usługę bluetooth", "intent": "service_stop", "lang": "pl", "expect_command": "sudo systemctl stop bluetooth"}
+{"text": "start the jellyfin service", "intent": "service_start", "lang": "en", "expect_command": "sudo systemctl start jellyfin"}
+{"text": "enable the syncthing service at boot", "intent": "service_enable", "lang": "en", "expect_command": "sudo systemctl enable --now syncthing"}
+{"text": "last 30 kernel messages", "intent": "dmesg", "lang": "en", "expect_command": "sudo dmesg | tail -n 30"}
+{"text": "install ripgrep", "intent": "install_package", "lang": "en", "expect_command": "sudo apt install ripgrep"}
+{"text": "zainstaluj pakiet htop", "intent": "install_package", "lang": "pl", "expect_command": "sudo apt install htop"}
+{"text": "is libssl-dev installed", "intent": "package_installed", "lang": "en", "expect_command": "dpkg -l | grep -i -- libssl-dev"}
+{"text": "ping 10.20.0.1 8 times", "intent": "ping_host", "lang": "en", "expect_command": "ping -c 8 10.20.0.1"}
+{"text": "pinguj serwer wroclaw.example.pl", "intent": "ping_host", "lang": "pl", "expect_command": "ping -c 4 wroclaw.example.pl"}
+{"text": "dns lookup for status.hetzner.com", "intent": "dns_lookup", "lang": "en", "expect_command": "dig +short status.hetzner.com"}
+{"text": "prześledź trasę do onet.pl", "intent": "traceroute", "lang": "pl", "expect_command": "traceroute onet.pl"}
+{"text": "is port 5432 open on db-replica.lan", "intent": "port_check", "lang": "en", "expect_command": "nc -zv db-replica.lan 5432"}
+{"text": "sprawdź czy port 25 jest otwarty na mail.firma.pl", "intent": "port_check", "lang": "pl", "expect_command": "nc -zv mail.firma.pl 25"}
+{"text": "show http headers of https://kotlinlang.org", "intent": "curl_headers", "lang": "en", "expect_command": "curl -sI https://kotlinlang.org"}
+{"text": "what status code does https://api.quicktype.io/health return", "intent": "http_status", "lang": "en", "expect_command": "curl -s -o /dev/null -w '%{http_code}\\n' https://api.quicktype.io/health"}
+{"text": "jaki kod http zwraca https://bip.gov.pl", "intent": "http_status", "lang": "pl", "expect_command": "curl -s -o /dev/null -w '%{http_code}\\n' https://bip.gov.pl"}
+{"text": "download https://dl.min.io/server/minio/release/linux-amd64/minio", "intent": "download_file", "lang": "en", "expect_command": "curl -fLO https://dl.min.io/server/minio/release/linux-amd64/minio"}
+{"text": "ssh into deploy@10.4.2.17", "intent": "ssh_connect", "lang": "en", "expect_command": "ssh deploy@10.4.2.17"}
+{"text": "połącz się przez ssh z admin@vps-krakow", "intent": "ssh_connect", "lang": "pl", "expect_command": "ssh admin@vps-krakow"}
+{"text": "show the last 15 commits", "intent": "git_log", "lang": "en", "expect_command": "git log --oneline --graph --decorate -n 15"}
+{"text": "ostatnie 5 commitów", "intent": "git_log", "lang": "pl", "expect_command": "git log --oneline --graph --decorate -n 5"}
+{"text": "pokaż zmiany w pliku src/router.ts", "intent": "git_diff", "lang": "pl", "expect_command": "git diff -- src/router.ts"}
+{"text": "create a new branch feature/invoice-export", "intent": "git_new_branch", "lang": "en", "expect_command": "git checkout -b feature/invoice-export"}
+{"text": "utwórz nową gałąź fix/literowka-stopka", "intent": "git_new_branch", "lang": "pl", "expect_command": "git checkout -b fix/literowka-stopka"}
+{"text": "switch to branch release/2.7", "intent": "git_switch_branch", "lang": "en", "expect_command": "git checkout release/2.7"}
+{"text": "przełącz się na gałąź develop", "intent": "git_switch_branch", "lang": "pl", "expect_command": "git checkout develop"}
+{"text": "delete the local branch spike/graphql", "intent": "git_delete_branch", "lang": "en", "expect_command": "git branch -d spike/graphql"}
+{"text": "usuń gałąź eksperyment-cache", "intent": "git_delete_branch", "lang": "pl", "expect_command": "git branch -d eksperyment-cache"}
+{"text": "discard changes in src/app.css", "intent": "git_discard_changes", "lang": "en", "expect_command": "git restore src/app.css"}
+{"text": "push branch hotfix/csv-escape to origin", "intent": "git_push", "lang": "en", "expect_command": "git push origin hotfix/csv-escape"}
+{"text": "wypchnij gałąź feature/platnosci-blik na origin", "intent": "git_push", "lang": "pl", "expect_command": "git push origin feature/platnosci-blik"}
+{"text": "push my commits to the remote", "intent": "git_push", "lang": "en", "expect_command": "git push"}
+{"text": "ściągnij najnowsze zmiany z serwera", "intent": "git_pull", "lang": "pl", "expect_command": "git pull"}
+{"text": "clone https://github.com/charmbracelet/gum.git", "intent": "git_clone", "lang": "en", "expect_command": "git clone https://github.com/charmbracelet/gum.git"}
+{"text": "sklonuj repozytorium https://gitlab.com/firma/portal.git", "intent": "git_clone", "lang": "pl", "expect_command": "git clone https://gitlab.com/firma/portal.git"}
+{"text": "commit everything with message \"bump deps\"", "intent": "git_commit", "lang": "en", "expect_command": "git add -A && git commit -m 'bump deps'"}
+{"text": "zrób commit z opisem \"poprawka walidacji formularza\"", "intent": "git_commit", "lang": "pl", "expect_command": "git add -A && git commit -m 'poprawka walidacji formularza'"}
+{"text": "who changed each line of lib/pricing.rb", "intent": "git_blame", "lang": "en", "expect_command": "git blame lib/pricing.rb"}
+{"text": "show logs of container keycloak-dev", "intent": "docker_logs", "lang": "en", "expect_command": "docker logs --tail 100 -f keycloak-dev"}
+{"text": "ostatnie 300 linii logów kontenera minio1", "intent": "docker_logs", "lang": "pl", "expect_command": "docker logs --tail 300 -f minio1"}
+{"text": "stop the container pg-test", "intent": "docker_stop", "lang": "en", "expect_command": "docker stop pg-test"}
+{"text": "zatrzymaj kontener rabbit_local", "intent": "docker_stop", "lang": "pl", "expect_command": "docker stop rabbit_local"}
+{"text": "open a shell in container api-gateway", "intent": "docker_exec", "lang": "en", "expect_command": "docker exec -it api-gateway sh"}
+{"text": "wejdź do kontenera nextcloud_app", "intent": "docker_exec", "lang": "pl", "expect_command": "docker exec -it nextcloud_app sh"}
+{"text": "ile mam wolnego miejsca na dyskach", "intent": "disk_free", "lang": "pl", "expect_command": "df -h"}
+{"text": "list disks and partitions", "intent": "block_devices", "lang": "en", "expect_command": "lsblk"}
+{"text": "kto jest teraz zalogowany", "intent": "users_logged_in", "lang": "pl", "expect_command": "who"}
+{"text": "print my PATH one entry per line", "intent": "show_path", "lang": "en", "expect_command": "echo \"$PATH\" | tr ':' '\\n'"}
+{"text": "w jakim katalogu jestem", "intent": "current_dir", "lang": "pl", "expect_command": "pwd"}
+{"text": "git status", "intent": "git_status", "lang": "en", "expect_command": "git status"}
+{"text": "jakie kontenery są uruchomione", "intent": "docker_ps", "lang": "pl", "expect_command": "docker ps"}
+{"text": "which ports are listening", "intent": "listening_ports", "lang": "en", "expect_command": "ss -tulpn"}
+{"text": "ile ramu jest zajęte", "intent": "memory_usage", "lang": "pl", "expect_command": "free -h"}
+{"text": "which user am i", "intent": "whoami", "lang": "en", "expect_command": "whoami"}

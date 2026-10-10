@@ -1,0 +1,79 @@
+{"lang": "en", "history": ["cd /srv/app", "docker ps", "docker logs payments-worker"], "query": "stop it", "expect_intent": "docker_stop", "expect_command": "docker stop payments-worker"}
+{"lang": "en", "history": ["docker ps", "docker exec -it redis-cache sh"], "query": "show its logs", "expect_intent": "docker_logs", "expect_command": "docker logs --tail 100 -f redis-cache"}
+{"lang": "en", "history": ["systemctl status grafana-agent --no-pager"], "query": "restart it", "expect_intent": "service_restart", "expect_command": "sudo systemctl restart grafana-agent"}
+{"lang": "en", "history": ["sudo systemctl restart mosquitto"], "query": "show me its logs", "expect_intent": "journal_service", "expect_command": "journalctl -u mosquitto -n 50 --no-pager"}
+{"lang": "en", "history": ["pgrep -af vite"], "query": "kill it", "expect_intent": "kill_by_name", "expect_command": "pkill -f vite"}
+{"lang": "en", "history": ["git checkout -b feature/sso-okta", "git add -A", "git commit -m 'wip'"], "query": "push it", "expect_intent": "git_push", "expect_command": "git push origin feature/sso-okta"}
+{"lang": "en", "history": ["git checkout hotfix/tz-offset", "git log -n 3"], "query": "delete that branch", "expect_intent": "git_delete_branch", "expect_command": "git branch -d hotfix/tz-offset"}
+{"lang": "en", "history": ["git status"], "query": "delete that branch", "expect_intent": "git_delete_branch", "expect_command": "git branch -d <BRANCH>"}
+{"lang": "en", "history": ["cat deploy/values-prod.yaml"], "query": "how many lines does it have", "expect_intent": "count_lines", "expect_command": "wc -l deploy/values-prod.yaml"}
+{"lang": "en", "history": ["vim scripts/rotate_keys.sh"], "query": "make it executable", "expect_intent": "make_executable", "expect_command": "chmod +x scripts/rotate_keys.sh"}
+{"lang": "en", "history": ["du -sh /var/lib/clickhouse"], "query": "same for /var/lib/kafka", "expect_intent": "dir_size", "expect_command": "du -sh /var/lib/kafka"}
+{"lang": "en", "history": ["find /srv/ingest -type f -iname '*.parquet'"], "query": "same for .avro", "expect_intent": "find_by_ext", "expect_command": "find /srv/ingest -type f -iname '*.avro'"}
+{"lang": "en", "history": ["ping -c 4 edge-01.lan"], "query": "now traceroute to it", "expect_intent": "traceroute", "expect_command": "traceroute edge-01.lan"}
+{"lang": "en", "history": ["curl -sI https://docs.tellsh.dev"], "query": "what's the status code", "expect_intent": "http_status", "expect_command": "curl -s -o /dev/null -w '%{http_code}\\n' https://docs.tellsh.dev"}
+{"lang": "en", "history": ["tar -czvf site.tar.gz public/", "scp site.tar.gz web1:/tmp"], "query": "list what's in that archive", "expect_intent": "list_archive", "expect_command": "tar -tvf site.tar.gz"}
+{"lang": "en", "history": ["mv report_draft.odt report_final.odt"], "query": "what type of file is it", "expect_intent": "file_type", "expect_command": "file report_final.odt"}
+{"lang": "en", "history": ["cp haproxy.cfg haproxy.cfg.bak"], "query": "diff them", "expect_intent": "diff_files", "expect_command": "diff -u haproxy.cfg haproxy.cfg.bak"}
+{"lang": "en", "history": ["tellsh find big files in /opt/models", "find /opt/models -xdev -type f -exec du -h {} + 2>/dev/null | sort -rh | head -n 10"], "query": "same for /mnt/scratch", "expect_intent": "largest_files", "expect_command": "find /mnt/scratch -xdev -type f -exec du -h {} + 2>/dev/null | sort -rh | head -n 10"}
+{"lang": "en", "history": ["tellsh status of the haproxy service", "systemctl status haproxy --no-pager"], "query": "restart it", "expect_intent": "service_restart", "expect_command": "sudo systemctl restart haproxy"}
+{"lang": "en", "history": ["ssh ops@bastion.eu-west.internal"], "query": "is port 22 open there?", "expect_intent": "port_check", "expect_command": "nc -zv bastion.eu-west.internal 22"}
+{"lang": "en", "history": ["head -n 20 ledger.csv"], "query": "same but the last 20", "expect_intent": "tail_file", "expect_command": "tail -n 20 ledger.csv"}
+{"lang": "en", "history": ["lsof -nP -i :7000"], "query": "kill whatever is on that port", "expect_intent": "kill_by_port", "expect_command": "lsof -ti tcp:7000 -sTCP:LISTEN | xargs -r kill"}
+{"lang": "en", "history": ["echo $OUTFILE"], "query": "delete that file", "expect_intent": "delete_file", "expect_command": "rm <FILE>"}
+{"lang": "en", "history": ["ls *.txt"], "query": "delete it", "expect_intent": "delete_file", "expect_command": "rm <FILE>"}
+{"lang": "en", "history": ["ls -lah"], "query": "what type of file is that", "expect_intent": "file_type", "expect_command": "file <FILE>"}
+{"lang": "en", "history": ["docker images"], "query": "stop that container", "expect_intent": "docker_stop", "expect_command": "docker stop <CONTAINER>"}
+{"lang": "en", "history": ["journalctl -u loki -n 50 --no-pager"], "query": "is it running? show its status", "expect_intent": "service_status", "expect_command": "systemctl status loki --no-pager"}
+{"lang": "en", "history": ["docker exec -it pg16 psql -U app"], "query": "show logs for that container", "expect_intent": "docker_logs", "expect_command": "docker logs --tail 100 -f pg16"}
+{"lang": "en", "history": ["tail -n 50 /var/log/cups/error_log"], "query": "follow it live", "expect_intent": "tail_follow", "expect_command": "tail -f /var/log/cups/error_log"}
+{"lang": "en", "history": ["stat uploads/avatar_991.png"], "query": "delete it", "expect_intent": "delete_file", "expect_command": "rm uploads/avatar_991.png"}
+{"lang": "en", "history": ["journalctl -u traefik -n 50 --no-pager"], "query": "same for caddy", "expect_intent": "journal_service", "expect_command": "journalctl -u caddy -n 50 --no-pager"}
+{"lang": "en", "history": ["systemctl status nfs-server --no-pager"], "query": "and for rpcbind?", "expect_intent": "service_status", "expect_command": "systemctl status rpcbind --no-pager"}
+{"lang": "en", "history": ["docker restart queue-worker && docker ps"], "query": "open a shell in it", "expect_intent": "docker_exec", "expect_command": "docker exec -it queue-worker sh"}
+{"lang": "en", "history": ["dig +short mail.protonmail.ch"], "query": "ping it", "expect_intent": "ping_host", "expect_command": "ping -c 4 mail.protonmail.ch"}
+{"lang": "en", "history": ["sha256sum release-4.1.tar.gz"], "query": "now the md5 of the same file", "expect_intent": "hash_md5", "expect_command": "md5sum release-4.1.tar.gz"}
+{"lang": "en", "history": ["ls -lah ~/backups"], "query": "how big is that folder", "expect_intent": "dir_size", "expect_command": "du -sh ~/backups"}
+{"lang": "en", "history": ["cd /opt/airflow/dags; ls"], "query": "find empty files in that directory", "expect_intent": "empty_files", "expect_command": "find /opt/airflow/dags -type f -empty"}
+{"lang": "en", "history": ["history | tail"], "query": "ssh to that host again", "expect_intent": "ssh_connect", "expect_command": "ssh <TARGET>"}
+{"lang": "en", "history": ["unzip -l themes.zip"], "query": "extract it", "expect_intent": "extract_zip", "expect_command": "unzip themes.zip"}
+{"lang": "en", "history": ["make build && ./dist/atlas-cli --version"], "query": "sha256 of that binary", "expect_intent": "hash_sha256", "expect_command": "sha256sum ./dist/atlas-cli"}
+{"lang": "pl", "history": ["docker ps", "docker logs -f ingest-api"], "query": "zatrzymaj ten kontener", "expect_intent": "docker_stop", "expect_command": "docker stop ingest-api"}
+{"lang": "pl", "history": ["docker ps -a"], "query": "wejdź do tamtego kontenera", "expect_intent": "docker_exec", "expect_command": "docker exec -it <CONTAINER> sh"}
+{"lang": "pl", "history": ["git checkout -b poprawka/stopka-mobile"], "query": "wypchnij tę gałąź", "expect_intent": "git_push", "expect_command": "git push origin poprawka/stopka-mobile"}
+{"lang": "pl", "history": ["git branch -a", "git checkout develop", "git merge feature/eksport-csv"], "query": "usuń tamtą zmergowaną gałąź", "expect_intent": "git_delete_branch", "expect_command": "git branch -d feature/eksport-csv"}
+{"lang": "pl", "history": ["less /etc/haproxy/haproxy.cfg"], "query": "ile linii ma ten plik", "expect_intent": "count_lines", "expect_command": "wc -l /etc/haproxy/haproxy.cfg"}
+{"lang": "pl", "history": ["nano backup_bazy.sh"], "query": "nadaj mu prawa wykonywania", "expect_intent": "make_executable", "expect_command": "chmod +x backup_bazy.sh"}
+{"lang": "pl", "history": ["du -sh /srv/nextcloud"], "query": "a dla /srv/gitea?", "expect_intent": "dir_size", "expect_command": "du -sh /srv/gitea"}
+{"lang": "pl", "history": ["find /mnt/aparat -type f -iname '*.cr3'"], "query": "to samo dla .jpg", "expect_intent": "find_by_ext", "expect_command": "find /mnt/aparat -type f -iname '*.jpg'"}
+{"lang": "pl", "history": ["systemctl status zabbix-agent --no-pager"], "query": "zrestartuj ją", "expect_intent": "service_restart", "expect_command": "sudo systemctl restart zabbix-agent"}
+{"lang": "pl", "history": ["sudo systemctl stop vaultwarden"], "query": "a teraz uruchom ją z powrotem", "expect_intent": "service_start", "expect_command": "sudo systemctl start vaultwarden"}
+{"lang": "pl", "history": ["ping -c 4 nas.lokalna"], "query": "prześledź trasę do niego", "expect_intent": "traceroute", "expect_command": "traceroute nas.lokalna"}
+{"lang": "pl", "history": ["curl -sI https://sklep-rowery.pl"], "query": "a jaki kod odpowiedzi zwraca?", "expect_intent": "http_status", "expect_command": "curl -s -o /dev/null -w '%{http_code}\\n' https://sklep-rowery.pl"}
+{"lang": "pl", "history": ["cp umowa.docx umowa_kopia.docx"], "query": "porównaj je", "expect_intent": "diff_files", "expect_command": "diff -u umowa.docx umowa_kopia.docx"}
+{"lang": "pl", "history": ["mv raport.txt archiwum/raport_2025.txt"], "query": "pokaż zawartość tego pliku", "expect_intent": "cat_file", "expect_command": "cat archiwum/raport_2025.txt"}
+{"lang": "pl", "history": ["head -n 10 klienci.csv"], "query": "to samo, ale ostatnie 10 linii", "expect_intent": "tail_file", "expect_command": "tail -n 10 klienci.csv"}
+{"lang": "pl", "history": ["tellsh największe pliki w /var/lib/mysql", "find /var/lib/mysql -xdev -type f -exec du -h {} + 2>/dev/null | sort -rh | head -n 10"], "query": "a dla /var/lib/redis?", "expect_intent": "largest_files", "expect_command": "find /var/lib/redis -xdev -type f -exec du -h {} + 2>/dev/null | sort -rh | head -n 10"}
+{"lang": "pl", "history": ["tar -xzvf paczka.tar.gz && cd paczka"], "query": "jakie pliki są w tym archiwum", "expect_intent": "list_archive", "expect_command": "tar -tvf paczka.tar.gz"}
+{"lang": "pl", "history": ["ssh admin@10.8.0.12"], "query": "pinguj ten serwer", "expect_intent": "ping_host", "expect_command": "ping -c 4 10.8.0.12"}
+{"lang": "pl", "history": ["git status"], "query": "przełącz się na tę gałąź", "expect_intent": "git_switch_branch", "expect_command": "git checkout <BRANCH>"}
+{"lang": "pl", "history": ["ls ~/Pobrane/*.iso"], "query": "usuń ten plik", "expect_intent": "delete_file", "expect_command": "rm <FILE>"}
+{"lang": "pl", "history": ["echo $KONFIG"], "query": "pokaż zawartość tego pliku", "expect_intent": "cat_file", "expect_command": "cat <FILE>"}
+{"lang": "pl", "history": ["pgrep -af syncthing"], "query": "zabij ten proces", "expect_intent": "kill_by_name", "expect_command": "pkill -f syncthing"}
+{"lang": "pl", "history": ["lsof -nP -i :5432"], "query": "zabij to, co słucha na tym porcie", "expect_intent": "kill_by_port", "expect_command": "lsof -ti tcp:5432 -sTCP:LISTEN | xargs -r kill"}
+{"lang": "pl", "history": ["docker logs --tail 100 -f kolejka-mq"], "query": "otwórz shell w tym kontenerze", "expect_intent": "docker_exec", "expect_command": "docker exec -it kolejka-mq sh"}
+{"lang": "pl", "history": ["vim .env.produkcja"], "query": "jaki to typ pliku", "expect_intent": "file_type", "expect_command": "file .env.produkcja"}
+{"lang": "pl", "history": ["chmod 600 klucz.pem"], "query": "a teraz policz sha256 tego pliku", "expect_intent": "hash_sha256", "expect_command": "sha256sum klucz.pem"}
+{"lang": "pl", "history": ["mkdir -p /srv/kopie/2026 && cd /srv/kopie/2026"], "query": "ile miejsca zajmuje ten katalog", "expect_intent": "dir_size", "expect_command": "du -sh /srv/kopie/2026"}
+{"lang": "pl", "history": ["git checkout -b eksperyment/nowy-silnik", "git checkout main"], "query": "usuń tę gałąź eksperymentalną", "expect_intent": "git_delete_branch", "expect_command": "git branch -d eksperyment/nowy-silnik"}
+{"lang": "pl", "history": ["journalctl -u keepalived -n 50 --no-pager"], "query": "to samo dla haproxy", "expect_intent": "journal_service", "expect_command": "journalctl -u haproxy -n 50 --no-pager"}
+{"lang": "pl", "history": ["find /srv/logi -type f -mtime +30"], "query": "to samo, ale starsze niż 90 dni", "expect_intent": "find_older_than", "expect_command": "find /srv/logi -type f -mtime +90"}
+{"lang": "pl", "history": ["tellsh pokaż ukryte pliki w ~/projekty/sklep", "find ~/projekty/sklep -maxdepth 1 -name '.*'"], "query": "to samo dla ~/projekty/blog", "expect_intent": "hidden_files", "expect_command": "find ~/projekty/blog -maxdepth 1 -name '.*'"}
+{"lang": "pl", "history": ["unzip faktury_2025.zip -d faktury"], "query": "pokaż listę plików w tym zipie", "expect_intent": "list_archive", "expect_command": "unzip -l faktury_2025.zip"}
+{"lang": "pl", "history": ["grep upstream /var/log/php-fpm/www-error.log"], "query": "śledź ten log na żywo", "expect_intent": "tail_follow", "expect_command": "tail -f /var/log/php-fpm/www-error.log"}
+{"lang": "pl", "history": ["docker images"], "query": "zatrzymaj ten kontener", "expect_intent": "docker_stop", "expect_command": "docker stop <CONTAINER>"}
+{"lang": "pl", "history": ["cd $PROJEKT"], "query": "usuń ten katalog", "expect_intent": "delete_dir", "expect_command": "rm -r <PATH>"}
+{"lang": "pl", "history": ["ps -ef | grep java", "kill 23119"], "query": "sprawdź, czy proces java dalej działa", "expect_intent": "find_process", "expect_command": "pgrep -af java"}
+{"lang": "pl", "history": ["cat ~/.ssh/config", "ssh deploy@ci-runner-07"], "query": "połącz się z tym hostem jeszcze raz", "expect_intent": "ssh_connect", "expect_command": "ssh deploy@ci-runner-07"}
+{"lang": "pl", "history": ["docker stop elastic-node2"], "query": "pokaż logi tamtego kontenera", "expect_intent": "docker_logs", "expect_command": "docker logs --tail 100 -f elastic-node2"}
+{"lang": "pl", "history": ["scp dump_klienci.sql backup@10.0.5.3:/kopie/"], "query": "a teraz policz md5 tego pliku", "expect_intent": "hash_md5", "expect_command": "md5sum dump_klienci.sql"}
