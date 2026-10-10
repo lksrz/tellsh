@@ -268,13 +268,14 @@ export const INTENTS = [
 
   // ---------- Cloudflare wrangler ----------
   T('wrangler_deploy', 'Deploy a Cloudflare Worker with wrangler', 'npx wrangler deploy', {}, 'medium'),
-  // wrangler dev runs the project's configured build command (and project code): medium, like npm_run_script
+  // npx prefers a project-local wrangler binary, so every npx wrangler command may run project code (and wrangler dev
+  // runs the configured build command): medium, like npm_run_script, never auto-run with --yes
   T('wrangler_dev', 'Run a Cloudflare Worker locally (wrangler dev)', 'npx wrangler dev', {}, 'medium'),
-  T('wrangler_tail', 'Stream live logs of a deployed Cloudflare Worker', 'npx wrangler tail', {}),
+  T('wrangler_tail', 'Stream live logs of a deployed Cloudflare Worker', 'npx wrangler tail', {}, 'medium'),
   T('wrangler_secret_put', 'Set a secret (environment variable) on a Cloudflare Worker', 'npx wrangler secret put {var!raw}',
     { var: null }, 'medium', { notes: 'wrangler prompts for the value, so it never lands in shell history' }),
-  T('wrangler_login', 'Log in to Cloudflare with wrangler', 'npx wrangler login', {}),
-  T('wrangler_whoami', 'Show which Cloudflare account wrangler is logged in as', 'npx wrangler whoami', {}),
+  T('wrangler_login', 'Log in to Cloudflare with wrangler', 'npx wrangler login', {}, 'medium'),
+  T('wrangler_whoami', 'Show which Cloudflare account wrangler is logged in as', 'npx wrangler whoami', {}, 'medium'),
 
   // ---------- GitHub CLI ----------
   T('gh_auth_status', 'Show GitHub CLI login status', 'gh auth status', {}),

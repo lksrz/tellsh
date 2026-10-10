@@ -63,7 +63,7 @@ export function simpleCommands(cmd, { winPaths = false } = {}) {
 // strip wrappers that run their argument as the command (sudo, timeout N, chroot DIR, env A=b, ...)
 // options of each wrapper that take a separate value
 const WRAPPER_OPTARG = {
-  sudo: /^-[ugpCDhrtTUR]$|^--(?:user|group|prompt|close-from|chdir|host|role|type|other-user|command-timeout)$/,
+  sudo: /^-[ugpCDhrtTUR]$|^--(?:user|group|prompt|close-from|chdir|chroot|host|role|type|other-user|command-timeout)$/,
   doas: /^-[uC]$/,
   nice: /^-n$|^--adjustment$/,
   ionice: /^-[cnpPu]$|^--(?:class|classdata|pid|pgid|uid)$/,

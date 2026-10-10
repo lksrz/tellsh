@@ -137,8 +137,9 @@ Added from real command usage: `npm run <script>`, `npm install [pkg]`, `npm ins
 (`py -m pip` on Windows), activating a virtualenv (per shell), `<tool> --version` / `--help`, printing a line range
 (`sed -n 'N,Mp'`, `Get-Content … -Index` in PowerShell), SSH local port forwarding, Cloudflare `wrangler`
 (deploy, dev, tail, secret put, login, whoami) and the GitHub CLI (`gh auth`, `gh pr list/view/create/checks/merge`,
-`gh run list/view`). Installs, project scripts (also `wrangler dev`, which runs the project's build command), deploys,
-merges, secrets and tunnels are `medium` risk, so `--yes` never runs them.
+`gh run list/view`). Installs, project scripts (also every `npx wrangler` command: `npx` prefers a project-local binary,
+and `wrangler dev` runs the project's build command), deploys, merges, secrets and tunnels are `medium` risk, so `--yes`
+never runs them.
 
 ### Optional neural fallback (`--hybrid`)
 
@@ -183,8 +184,10 @@ value only when it is unambiguous; otherwise the slot stays a placeholder:
   * the checked-out branch is never the one deleted;
   * the command ran against another repository, directory or daemon (`git -C /repo blame notes.txt`, `git -C/repo …`,
     `git --work-tree=…`, `docker --context prod logs web`, `docker -H …`/`-Htcp://…`, `DOCKER_HOST=… docker …`) or under
-    another root (`chroot /srv …`): "delete it", "stop it" and "same for api" are refused, here they would hit
-    something else; after a wrapper that changes the working directory (`env -C /repo cat notes.txt`, `sudo -D /repo …`)
+    another root (`chroot /srv …`, `sudo --chroot=/srv …`): "delete it", "stop it" and "same for api" are refused, here
+    they would hit something else; after a wrapper that changes the working directory (`env -C /repo cat notes.txt`,
+    `sudo -D /repo …`, a login shell: `sudo -i …`, `sudo -iu bob …`, `runuser -l …`) or a `cd` inside a `( … )` subshell
+    (`(cd /repo && cat notes.txt)`; a `{ … }` group or a plain `cd` moves the user's own shell and resolves as before)
     relative paths are refused the same way (absolute ones still resolve);
   * the command has several operands (`touch a.txt b.txt`, `python3 script.py data.csv`): "it" may be any of them.
 Place references ("there", "over there", "in there", a final "inside", "in the same folder", "in the previous/last

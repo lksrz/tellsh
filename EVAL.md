@@ -97,6 +97,14 @@ A+B and A+B-safe unchanged (so every A+B number is unchanged), A+C tau 0.8 → 0
 (C-ft rescored on the new A_dev candidates; A+C-ft real usage 87.4 → 87.5%). B was **not** retrained on the cleaned
 export (it saw those 98 rows; it ships as a separate bundle). Every eval number of A is unchanged.
 
+**Round 11 (review r10; A unchanged, A+B policy unchanged).** A login shell runs in the target user's home, so
+`sudo -i` / `--login` (also in a cluster: `sudo -iu bob`), `runuser -l` and `su -` make relative history values
+ambiguous like `sudo -D`; `sudo --chroot` / `-R` makes every value ambiguous like `chroot`. A `cd` / `pushd` inside a
+`( … )` subshell does not outlast it: relative values after it in the same subshell are ambiguous (`(cd /repo && cat
+notes.txt)` + "delete it" is refused; absolute paths and segments after the subshell still resolve; `{ … }` groups are
+unchanged). `npx wrangler tail` / `login` / `whoami` are `medium` risk like `wrangler dev` (npx may run a project-local
+binary), so `--yes` never runs them. Every eval number is unchanged.
+
 <!-- eval:start -->
 ## Model
 
@@ -239,13 +247,13 @@ Machine: Intel(R) Xeon(R) Processor, Node v20.19.2, linux; CPU affinity: `0` (ru
 
 | measurement | p50 | p95 | runs |
 |---|---|---|---|
-| bare `node -e 0` startup (baseline) | 83.8 ms | 98.8 ms | 10 |
-| **cold**: `node bin/tellsh.js --dry-run --json --shell bash <query>` (new process, model load, full pipeline) | **180.8 ms** | **198.0 ms** | 40 |
-| model load (in-process, one-off) | 5.3 ms | – | 1 |
-| **warm**: full cascade + tagger + render (bash, composer off) | **0.452 ms** | **4.6 ms** | 2000 |
-| warm, incl. composer modifier check (shipped default) | 0.626 ms | 6.9 ms | 2000 |
-| warm, PowerShell rendering | 0.369 ms | 0.770 ms | 2000 |
-| warm, 5 history lines given (only the previous one is read; context build + reference rules) | 0.793 ms | 8.8 ms | 2000 |
+| bare `node -e 0` startup (baseline) | 111.6 ms | 113.4 ms | 10 |
+| **cold**: `node bin/tellsh.js --dry-run --json --shell bash <query>` (new process, model load, full pipeline) | **189.5 ms** | **329.0 ms** | 40 |
+| model load (in-process, one-off) | 5.5 ms | – | 1 |
+| **warm**: full cascade + tagger + render (bash, composer off) | **0.543 ms** | **4.8 ms** | 2000 |
+| warm, incl. composer modifier check (shipped default) | 0.682 ms | 7.9 ms | 2000 |
+| warm, PowerShell rendering | 0.422 ms | 0.938 ms | 2000 |
+| warm, 5 history lines given (only the previous one is read; context build + reference rules) | 0.761 ms | 8.0 ms | 2000 |
 
 The composer runs `bash -n` (a subprocess, ~2 ms) only when it actually returns a composed command.
 <!-- bench:end -->

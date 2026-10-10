@@ -438,6 +438,7 @@ export function analyzeCommand(line, classify, kind = 'posix') {
   let cdAt = -1;
   let scoped = false;
   let wrapCwd = false;
+  const subCds = new Set(); // ids of `( … )` subshells in which a cd ran (posix)
   let searchDir = false;
   let listDir = false;
   const at = {};
@@ -445,7 +446,7 @@ export function analyzeCommand(line, classify, kind = 'posix') {
   // segments from..to-1 are connected by pipes only
   const samePipe = (from, to) => from >= 0 && split.segments.slice(from, to).every((s) => s.sep === '|');
   const firstWord = (s) => unwrap(s.words.filter((x) => !REDIR_TARGET_OP.test(x) && !REDIR_DUP_OP.test(x)))[0];
-  split.segments.forEach(({ words }, segIdx) => {
+  split.segments.forEach(({ words, subs }, segIdx) => {
     const e = {};
     const setIntent = (id, s) => { segIntent = id; segSlots = s; segIntentAt = segIdx; };
     // redirections: the target is a file the command wrote (or read); it is not an argument
@@ -486,7 +487,9 @@ export function analyzeCommand(line, classify, kind = 'posix') {
       scoped = true;
       for (const x of [...ENT_TYPES, 'current', 'created']) if (e[x] != null && !isAmbiguous(e[x])) e[x] = AMB + rawOf(e[x]);
       if (segIntentAt === segIdx) { segSlots = { ...segSlots }; markScoped(segSlots); }
-    } else if (ws === 'cwd') {
+    } else if (ws === 'cwd' || (k === 'posix' && subs?.some((id) => subCds.has(id)))) {
+      // also `(cd /repo && cat notes.txt)`: the cd only lasts inside the subshell, so relative values name files
+      // there, while "delete it" runs here
       wrapCwd = true;
       for (const x of [...ENT_TYPES, 'current', 'created']) if (e[x] != null && !isAmbiguous(e[x]) && isRelativePath(e[x])) e[x] = AMB + rawOf(e[x]);
       if (segIntentAt === segIdx) { segSlots = { ...segSlots }; staleRelative({}, segSlots); }
@@ -510,6 +513,7 @@ export function analyzeCommand(line, classify, kind = 'posix') {
     if (CD_HEADS.has(head)) {
       // the working directory changes: earlier relative paths (and a relative cd target) are stale
       cdAt = segIdx;
+      if (k === 'posix' && subs) subCds.add(subs[subs.length - 1]);
       staleRelative(ents, null);
       const target = w.slice(1).filter((a) => !/^-/.test(a))[0];
       if (target != null && !isAmbiguous(target) && !isRelativePath(target) && target !== '-') e.dir = target;
@@ -589,15 +593,19 @@ function scopedElsewhere(w, raw) {
 }
 // wrapper options that run the command in another working directory (`env -C /repo`, `sudo -D /repo`, also with the
 // value attached or in a cluster) or under another root (`chroot /srv`, `unshare --root=/srv`, `nsenter -r`)
+// login shells start in the target user's home (`sudo -i`, `sudo -iu bob`, `sudo --login`, `runuser -l`, `su -`)
 const WRAPPER_CWD = {
   env: /^-[a-zA-Z0-9]*C|^--chdir(?:=|$)/,
-  sudo: /^-[a-zA-Z]*D|^--chdir(?:=|$)/,
+  sudo: /^-[a-zA-Z]*[Di]|^--(?:chdir|login)(?:=|$)/,
+  runuser: /^-[a-zA-Z]*l|^--login(?:=|$)/,
+  su: /^-$|^-[a-zA-Z]*l|^--login(?:=|$)/,
   unshare: /^-w|^--wd(?:=|$)/,
   nsenter: /^-w|^--wd(?:=|$)/,
   'systemd-run': /^--working-directory(?:=|$)/,
   'start-stop-daemon': /^-d|^--chdir(?:=|$)/,
 };
 const WRAPPER_ROOT = {
+  sudo: /^-[a-zA-Z]*R|^--chroot(?:=|$)/,
   unshare: /^-R|^--root(?:=|$)/,
   nsenter: /^-r|^--root(?:=|$)/,
   'start-stop-daemon': /^-r|^--chroot(?:=|$)/,

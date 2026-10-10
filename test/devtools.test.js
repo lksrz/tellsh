@@ -81,8 +81,8 @@ test('per-shell renders of the new intents', () => {
 
 test('risk: installs, project scripts, deploys, merges and tunnels are never safe', () => {
   for (const id of ['npm_run_script', 'npm_install', 'npm_install_global', 'pip_install', 'activate_venv', 'wrangler_deploy',
-    'wrangler_secret_put', 'gh_pr_create', 'gh_pr_merge', 'ssh_port_forward']) assert.notEqual(BY_ID[id].risk, 'safe', id);
-  for (const id of ['gh_pr_list', 'gh_auth_status', 'tool_version', 'cli_help', 'print_line_range', 'wrangler_tail']) {
+    'wrangler_secret_put', 'wrangler_tail', 'wrangler_login', 'wrangler_whoami', 'gh_pr_create', 'gh_pr_merge', 'ssh_port_forward']) assert.notEqual(BY_ID[id].risk, 'safe', id);
+  for (const id of ['gh_pr_list', 'gh_auth_status', 'tool_version', 'cli_help', 'print_line_range']) {
     assert.equal(BY_ID[id].risk, 'safe', id);
   }
   // a rendered safe command stays safe (no danger warnings)

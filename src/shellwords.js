@@ -57,7 +57,11 @@ export function splitCommand(line, kind = 'posix', { keepRedirects = false, lite
     }
     w = null; raw = ''; amb = false; glob = false; quoted0 = false;
   };
-  const flushSeg = (sep = '') => { flushWord(); if (words.length) segments.push({ words, raw: raws, sep }); else if (sep && segments.length) segments[segments.length - 1].sep += sep; words = []; raws = []; };
+  // open `( … )` subshells (posix): each segment records the ids of those it runs in (`subs`), so a `cd` inside one
+  // is known not to outlast it
+  const subs = [];
+  let subId = 0;
+  const flushSeg = (sep = '') => { flushWord(); if (words.length) segments.push({ words, raw: raws, sep, ...(subs.length ? { subs: [...subs] } : {}) }); else if (sep && segments.length) segments[segments.length - 1].sep += sep; words = []; raws = []; };
   const fail = () => ({ ok: false, segments: [] });
 
   for (let i = 0; i < s.length; i++) {
@@ -119,6 +123,8 @@ export function splitCommand(line, kind = 'posix', { keepRedirects = false, lite
       let sep = c === '\n' ? ';' : c;
       if ((c === '&' || c === '|') && s[i + 1] === c) { i++; sep += c; }
       flushSeg(sep);
+      if (c === '(') subs.push(++subId);
+      else if (c === ')') subs.pop();
     } else if ((c === '{' || c === '}') && w == null && (i + 1 >= s.length || /\s/.test(s[i + 1]))) {
       flushSeg(c); // command group / script block
     } else if (/\s/.test(c)) {
