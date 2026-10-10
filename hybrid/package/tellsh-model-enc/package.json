@@ -1,0 +1,10 @@
+{
+  "name": "tellsh-model-enc",
+  "version": "0.3.0",
+  "description": "Optional neural fallback model for tellsh (pruned multilingual-e5-small, 6 layers, int8 ONNX): tool+intent classifier and BIO slot tagger used when the linear cascade is unsure.",
+  "files": ["encoder.int8.onnx", "vocab.json", "labels.json", "manifest.json", "README.md"],
+  "license": "MIT",
+  "author": "lksrz <lukasz@wearfits.com>",
+  "repository": { "type": "git", "url": "git+https://github.com/lksrz/tellsh.git" },
+  "keywords": ["tellsh", "onnx", "intent-classification", "polish"]
+}

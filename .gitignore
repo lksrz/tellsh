@@ -11,3 +11,7 @@ hybrid/private/
 hybrid/models/
 *.onnx
 *.gguf
+hybrid/package/tellsh-model-enc/*.onnx
+hybrid/package/tellsh-model-enc/vocab.json
+hybrid/package/tellsh-model-enc/labels.json
+hybrid/package/tellsh-model-enc/manifest.json

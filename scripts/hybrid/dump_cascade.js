@@ -20,7 +20,9 @@ export const SETS = {
   dev: () => readJsonl(join(ROOT, 'build/hybrid/train.jsonl')).filter((r) => r.split === 'dev'),
   eval: () => readDir(join(ROOT, 'data/eval')).map((r) => ({ ...r, shell: 'bash', os: 'linux' })),
   shell: () => readJsonl(join(ROOT, 'data/shell/eval.jsonl')),
-  blind: () => readDir(join(ROOT, 'data/hybrid/blind')),
+  blind: () => readDir(join(ROOT, 'data/hybrid/blind')).filter((r) => r.intent),
+  blind_ood: () => readDir(join(ROOT, 'data/hybrid/blind')).filter((r) => !r.intent),
+  ood: () => readJsonl(join(ROOT, 'data/ood_eval.jsonl')),
 };
 const out = [];
 for (const [set, f] of Object.entries(SETS)) {

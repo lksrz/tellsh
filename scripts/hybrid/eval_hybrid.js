@@ -45,6 +45,7 @@ async function bOut(text, env) {
   return B.get(k);
 }
 const LM = new Map();
+const LM_SAMPLE = new Set(); // uniform random sample scored for "C alone" (deferred rows are scored in addition)
 for (const f of (arg('lm', '') || '').split(',').filter(Boolean)) {
   const cands = readJsonl(join(ROOT, `build/hybrid/cands_${f.split(':')[0]}.jsonl`));
   const byId = new Map(cands.map((c) => [`${c.set}:${c.i}`, c]));
@@ -55,6 +56,7 @@ for (const f of (arg('lm', '') || '').split(',').filter(Boolean)) {
     const e = s.logits.map((v) => Math.exp(v - m));
     const z = e.reduce((a, b) => a + b, 0);
     LM.set(key(c.text, { shell: c.shell, os: c.os }), Object.fromEntries(s.cands.map((ci, j) => [ci, e[j] / z])));
+    if (s.sample) LM_SAMPLE.add(key(c.text, { shell: c.shell, os: c.os }));
   }
 }
 const lmFn = async (text, env) => LM.get(key(text, env)) || null;
@@ -173,6 +175,7 @@ async function clsSet(name, rows) {
     const bump = (k, f) => { S[k] ??= { n: 0, tool: 0, intent: 0, ans: 0, ansOk: 0, deferred: 0, missing: 0 }; S[k][f]++; };
     for (const r of rows) {
       const env = envOf(r);
+      if (sys === 'C' && !LM_SAMPLE.has(key(r.text, env))) continue;
       const s = await run(sys, r.text, env);
       if (sys.endsWith('C') && s.hybrid?.deferred && !LM.has(key(r.text, env))) { bump('all', 'missing'); continue; }
       const ks = ['all', r.lang, 'sh:' + env.shell];
@@ -193,6 +196,7 @@ async function oodSet(name, rows) {
     let rej = 0; let n = 0;
     for (const r of rows) {
       const env = envOf(r);
+      if (sys === 'C' && !LM_SAMPLE.has(key(r.text, env))) continue;
       const s = await run(sys, r.text, env);
       if (sys.endsWith('C') && s.hybrid?.deferred && !LM.has(key(r.text, env))) continue;
       n++; if (!s.understood) rej++;
@@ -296,6 +300,7 @@ for (const [name, rows] of [['relex', relexRows], ['blind', blindE2E], ['blind_n
     const S = { all: [0, 0], en: [0, 0], pl: [0, 0] };
     for (const r of rows) {
       const env = envOf(r);
+      if (sys === 'C' && !LM_SAMPLE.has(key(r.text, env))) continue;
       const s = await run(sys, r.text, env);
       if (sys.endsWith('C') && s.hybrid?.deferred && !LM.has(key(r.text, env))) continue;
       const ok = s.understood && s.command === r.gold ? 1 : 0;

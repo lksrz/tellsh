@@ -192,7 +192,11 @@ def cmd_score(a):
     done = set()
     if os.path.exists(a.out):
         done = {(json.loads(l)['set'], json.loads(l)['i']) for l in open(a.out)}
-    rows = [r for r in rows if (r['set'], r['i']) not in done]
+    # rows A would defer (conf < --max-conf) + a uniform random sample (--sample, fraction) for "C alone"
+    def pick(r):
+        r['sample'] = random.Random(f"{r['set']}:{r['i']}").random() < a.sample
+        return r['conf'] < a.max_conf or r['sample']
+    rows = [r for r in rows if (r['set'], r['i']) not in done and pick(r)]
     lid = P.letter_ids if not chat else P.letter_ids
     with open(a.out, 'a') as f:
         for i in range(0, len(rows), 64):
@@ -200,7 +204,7 @@ def cmd_score(a):
             lists = [candidate_list(r) for r in chunk]
             lg = letter_logits(m, tok, [P(r['text'], r['shell'], r['os'], c) for r, c in zip(chunk, lists)], lid)
             for r, c, l in zip(chunk, lists, lg):
-                f.write(json.dumps({'set': r['set'], 'i': r['i'], 'cands': c, 'logits': [round(x, 4) for x in l[:len(c)]]}) + '\n')
+                f.write(json.dumps({'set': r['set'], 'i': r['i'], 'sample': r['sample'], 'cands': c, 'logits': [round(x, 4) for x in l[:len(c)]]}) + '\n')
             f.flush()
             print(f'{i + len(chunk)}/{len(rows)}', flush=True)
 
@@ -244,6 +248,8 @@ if __name__ == '__main__':
     ap.add_argument('--bs', type=int, default=8)
     ap.add_argument('--lr', type=float, default=1e-4)
     ap.add_argument('--threads', type=int, default=2)
+    ap.add_argument('--max-conf', type=float, default=2.0)
+    ap.add_argument('--sample', type=float, default=1.0)
     ap.add_argument('--dtype', default='float32', help='bfloat16 halves memory (inference)')
     ap.add_argument('--out', default=os.path.join(ROOT, 'build/hybrid/lm'))
     a = ap.parse_args()
