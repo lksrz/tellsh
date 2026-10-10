@@ -1,0 +1,76 @@
+{
+ "machine": "Intel(R) Xeon(R) Processor",
+ "node": "v20.19.2",
+ "affinity": "0",
+ "warm_A": {
+  "p50": 0.498,
+  "p95": 5.925,
+  "n": 600
+ },
+ "load_B_node_ms": 213.8,
+ "warm_B_infer_node": {
+  "p50": 4.067,
+  "p95": 7.511,
+  "n": 600
+ },
+ "warm_B_full_node": {
+  "p50": 5.428,
+  "p95": 12.589,
+  "n": 600
+ },
+ "warm_AB_node": {
+  "p50": 0.474,
+  "p95": 8.947,
+  "n": 600,
+  "deferred": 0.233
+ },
+ "load_B_web_ms": 1463.6,
+ "warm_B_infer_web": {
+  "p50": 38.514,
+  "p95": 52.909,
+  "n": 600
+ },
+ "warm_B_full_web": {
+  "p50": 40.628,
+  "p95": 55.537,
+  "n": 600
+ },
+ "warm_AB_web": {
+  "p50": 0.547,
+  "p95": 43.54,
+  "n": 600,
+  "deferred": 0.233
+ },
+ "cold_node_baseline": {
+  "p50": 100.121,
+  "p95": 127.359,
+  "n": 10
+ },
+ "cold_A": {
+  "p50": 189.5,
+  "p95": 218.319,
+  "n": 20
+ },
+ "cold_AB": {
+  "p50": 191.794,
+  "p95": 514.236,
+  "n": 20,
+  "deferred": 6
+ },
+ "cold_AB_deferred_only": {
+  "p50": 406.149,
+  "p95": 514.236,
+  "n": 6
+ },
+ "cold_B": {
+  "p50": 398.127,
+  "p95": 410.103,
+  "n": 10
+ },
+ "bundle": {
+  "encoder.int8.onnx": 26767700,
+  "export_report.json": 379,
+  "labels.json": 4224,
+  "vocab.json": 729258
+ }
+}

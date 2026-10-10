@@ -1,0 +1,67 @@
+{
+ "thrAdev": 0.41,
+ "n": 5189,
+ "A": {
+  "acc": 0.8755058778184621,
+  "n": 5189,
+  "deferred": 0,
+  "indAcc": 0.8743923779895003,
+  "oodRej": 1,
+  "nOod": 46
+ },
+ "C": {
+  "P": {
+   "tau": "Infinity",
+   "alpha": 0,
+   "k": 3,
+   "accept": 0,
+   "none": 1.01,
+   "keepNone": true
+  },
+  "s": {
+   "acc": 0.8035037878787878,
+   "n": 2112,
+   "deferred": 1,
+   "indAcc": 0.7991287512100678,
+   "oodRej": 1,
+   "nOod": 46
+  }
+ },
+ "A+C": {
+  "P": {
+   "tau": 0.9,
+   "alpha": 0.75,
+   "k": 5,
+   "accept": 0,
+   "none": 1.01,
+   "keepNone": true
+  },
+  "s": {
+   "acc": 0.9367893621121604,
+   "n": 5189,
+   "deferred": 0.4070148390826749,
+   "indAcc": 0.9362239937779506,
+   "oodRej": 1,
+   "nOod": 46
+  }
+ },
+ "A+C-safe": {
+  "P": {
+   "tau": 0.9,
+   "alpha": 0.75,
+   "k": 3,
+   "accept": 0,
+   "none": 1.01,
+   "keepNone": false,
+   "rescue": false
+  },
+  "s": {
+   "acc": 0.8972827134322605,
+   "n": 5189,
+   "deferred": 0.4070148390826749,
+   "indAcc": 0.8963639898891698,
+   "oodRej": 1,
+   "nOod": 46
+  }
+ }
+}

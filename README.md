@@ -113,16 +113,34 @@ The intent and slots are shared; only the rendering differs (`src/render.js`, va
 
 | shell | status | notes |
 |---|---|---|
-| bash, zsh | **v1** | all 149 intents; every render passes `bash -n` in tests (zsh has no checker here) |
+| bash, zsh | **v1** | all 173 intents; every render passes `bash -n` in tests (zsh has no checker here) |
 | sh (dash / busybox) | **v1** | POSIX-only templates; tests run `sh -n` (dash) and `busybox sh -n`; busybox variants for 24 intents (no `ps --sort`, `find -printf`, …) |
-| PowerShell (7, mostly 5.1) | **v1** | real cmdlets (`Get-ChildItem`, `Get-Process`, `Stop-Process`, `Get-NetTCPConnection`, …) for 146/149 on Windows; on Linux/macOS native tools or `bash -c '…'`; gaps: chmod, chmod +x, cal on Windows |
+| PowerShell (7, mostly 5.1) | **v1** | real cmdlets (`Get-ChildItem`, `Get-Process`, `Stop-Process`, `Get-NetTCPConnection`, …) for 170/173 on Windows; on Linux/macOS native tools or `bash -c '…'`; gaps: chmod, chmod +x, cal on Windows |
 | fish | best effort | POSIX template with fish quoting + fish overrides (`string join \n $PATH`, history, …); not syntax-checked (fish not installed in CI) |
-| cmd.exe | best effort | 114/149 (`dir /s /b`, `tasklist`, `taskkill`, `netstat -ano | findstr`, `certutil -hashfile`, …); the rest reports a gap (exit 5) |
+| cmd.exe | best effort | 140/173 (`dir /s /b`, `tasklist`, `taskkill`, `netstat -ano | findstr`, `certutil -hashfile`, …); the rest reports a gap (exit 5) |
 
 * **macOS** = BSD userland unless Homebrew GNU coreutils (`gdu` + `gsort`) are on `PATH`: `du -k … | sort -rn` instead of
   `sort -h`, `sed -i ''`, `stat -f`, `md5 -r`, `lsof` instead of `ss`, `vm_stat`, `launchctl`/`brew services`, …
 * **Detection** (`src/env.js`): parent process chain on Linux (`/proc`), PowerShell heuristic on Windows (`PSModulePath`),
   `$SHELL`, `TELLSH_SHELL`; `--shell` / `--os` override. `--shell cmd` implies Windows.
+
+### Developer tools (v0.4)
+
+Added from real command usage: `npm run <script>`, `npm install [pkg]`, `npm install -g`, `pip install`
+(`py -m pip` on Windows), activating a virtualenv (per shell), `<tool> --version` / `--help`, printing a line range
+(`sed -n 'N,Mp'`, `Get-Content … -Index` in PowerShell), SSH local port forwarding, Cloudflare `wrangler`
+(deploy, dev, tail, secret put, login, whoami) and the GitHub CLI (`gh auth`, `gh pr list/view/create/checks/merge`,
+`gh run list/view`). Installs, project scripts, deploys, merges, secrets and tunnels are `medium` risk, so `--yes`
+never runs them.
+
+### Optional neural fallback (`--hybrid`)
+
+`tellsh --hybrid …` (or `TELLSH_HYBRID=1`) keeps the cascade's answer when it is confident (≥ 0.9, most requests) and
+otherwise re-ranks its top-5 with a small int8 encoder (pruned multilingual-e5-small, 6 layers, 27 MB, ~4 ms on one
+core). It needs `onnxruntime-node` and the `tellsh-model-enc` 0.4 bundle (`enc-v2`, not in this repo); without them
+tellsh silently uses the cascade. `TELLSH_HYBRID=safe` never turns a rejection into an answer. Re-ranked answers are
+never auto-run with `--yes`. Details, numbers and the trade-off (fewer rejections of requests outside the catalog):
+[HYBRID.md](HYBRID.md).
 
 ### History context
 
@@ -224,26 +242,36 @@ compression from the archive name, `bash -n` and an allowed-flag check validate 
 
 ## Accuracy & speed (details: [EVAL.md](EVAL.md))
 
-All numbers are on held-out data never used for training (`npm run eval`, `npm run bench`):
+All numbers are on held-out data never used for training (`npm run eval`, `npm run bench`). v0.4 trades a little on
+the public sets for a large gain on real usage (before/after tables for A, A+B and A+C-ft: [HYBRID.md](HYBRID.md#v04-real-usage)):
 
 | metric | result |
 |---|---|
-| stage 1 tool family top-1 / top-3 (`data/eval`, 2384 EN+PL) | **97.2% / 99.7%** |
-| stage 2 intent top-1 (EN / PL) | **95.6%** (95.2% / 96.1%); v0.1 flat classifier: 95.2% |
-| per shell, intent top-1 (bash · zsh · sh · PowerShell · fish · cmd) | 95.6 · 95.6 · 95.7 · 95.2 · 95.8 · 95.7% |
-| renders passing `bash -n` / `sh -n` | 148/148 bash · zsh · sh (+ all 149 intents × 5 POSIX envs in `npm test`) |
-| slot F1, hand-annotated gold (tagger + regex fallback / tagger / regex) | **96.3%** / 94.6% / 95.1% |
-| end-to-end exact command, relexicalised held-out values (full pipeline / gold intent) | **85.3%** / 93.9% |
-| blind sets (v0.3, separate author): intent top-1 · end-to-end exact command | 98.8% (clean subset 98.6%) · 96.1% (clean 96.0%) |
-| hand-written slot cases, exact command | 99/99 |
+| stage 1 tool family top-1 / top-3 (`data/eval`, 2384 EN+PL) | **96.9% / 99.8%** |
+| stage 2 intent top-1 (EN / PL) | **95.4%** (95.2% / 95.6%); v0.3: 95.6% |
+| per shell, intent top-1 (bash · zsh · sh · PowerShell · fish · cmd) | 95.4 · 95.6 · 95.6 · 95.4 · 95.1 · 95.1% |
+| renders passing `bash -n` / `sh -n` | all 173 intents × 5 POSIX envs in `npm test` |
+| slot F1, hand-annotated gold (tagger + regex fallback / tagger / regex) | **96.3%** / 94.6% / 95.4% |
+| end-to-end exact command, relexicalised held-out values (full pipeline / gold intent) | **83.4%** / 92.6% (v0.3: 85.3%) |
+| blind sets (v0.3, separate author): intent top-1 · end-to-end exact command | 98.8% (clean subset 98.5%) · 95.7% |
+| hand-written slot cases, exact command | 98/99 |
 | history references, exact command (48 EN+PL; without history 0%) | **91.7%** (dev set, blind first run 60.4%) · v0.3 blind set (79): 79.7% (stricter rules for changing commands, see EVAL.md) |
-| composer on out-of-catalogue requests: acceptable / exact | 49.0% / 47.1% (dev set) · any answer acceptable 52.9% · v0.3 blind set (58): acceptable 22.4% · false fires on catalog requests 0.5% |
-| out-of-domain rejected | 94.6% (blind set 100%) |
-| model size | **2.71 MB** (v0.1: 3.68 MB) |
-| latency, `taskset -c 0`: cold process p50 / p95 | **171 / 190 ms** (bare `node -e 0`: 86 ms) |
-| latency, warm full cascade + tagger + render p50 / p95 | **0.35 / 3.9 ms** |
+| composer on out-of-catalogue requests: acceptable / exact | 43.1% / 41.2% (dev set) · any answer acceptable 49.0% · v0.3 blind set (58): acceptable 17.2% · false fires on catalog requests 0.7% |
+| out-of-domain rejected | 92.4% (blind set 98.4%) |
+| **real usage** (private, held-out command groups, 2957 EN+PL): intent, A · A+B (`--hybrid`) | **82.0% · 88.8%** (v0.3: 31.6% · 38.5%) |
+| v0.4 intents, independent eval set (424 rows): intent · exact command | **95.8%** · 90.7% |
+| model size | **2.95 MB** (v0.3: 2.71 MB) |
+| latency, `taskset -c 0`: cold process p50 / p95 | **188 / 264 ms** (shared, loaded box) |
+| latency, warm full cascade + tagger + render p50 / p95 | **0.41 / 4.4 ms** |
 
 ## Data & licenses
+
+**Private real-usage data (v0.4).** The shipped weights were also trained on a private set of real shell commands
+(EN/PL requests written for each command, labels partly by command pattern, partly by an LLM pipeline; see
+[HYBRID.md](HYBRID.md#v04-real-usage)). The data and anything verbatim derived from it stay outside git: it is read
+from `$TELLSH_REAL_DATA` by `scripts/real/prepare_real.js` into `build/real/` (gitignored); only model weights and
+aggregate numbers are committed. Without the file every script trains and evaluates on public data only
+(`gen_data.js --no-real` forces this).
 
 Own EN/PL data (MIT) + **tldr-pages** (CC-BY-4.0, attribution in [DATA_LICENSES.md](DATA_LICENSES.md); derived
 descriptions only, in git, never in the npm tarball). **NL2Bash is GPL-3.0 and is not used** (not even for eval).
@@ -267,7 +295,8 @@ Training needs Python 3 with numpy, scipy and scikit-learn (≈6 min on 8 cores)
 `data/teacher/*.jsonl`. `gen_data.js` drops any training sentence that collides with any eval set.
 
 To add an intent: template in `src/catalog.js` (+ shell variants in `src/variants.js`), family in `src/tools.js`,
-~60 paraphrases in `data/intents/`, ~16 in `data/eval/`; retrain; `npm test && npm run eval`.
+~60 paraphrases in `data/intents/`, ~16 eval rows written by someone else (`data/eval_v04/` for the v0.4 intents);
+retrain; `npm test && npm run eval`.
 
 ## Known gaps
 

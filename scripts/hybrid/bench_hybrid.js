@@ -3,7 +3,7 @@
 // -> build/hybrid/bench.json
 import { spawnSync } from 'node:child_process';
 import { readFileSync, readdirSync, writeFileSync, statSync, existsSync } from 'node:fs';
-import { join } from 'node:path';
+import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { performance } from 'node:perf_hooks';
 import { cpus } from 'node:os';
@@ -70,5 +70,5 @@ if (LB && existsSync(join(LB, 'llama-bench'))) {
     out[`C_cold_${f.split('/').pop()}`] = stat(ts);
   }
 }
-writeFileSync(join(ROOT, process.env.BENCH_OUT || 'build/hybrid/bench.json'), JSON.stringify(out, null, 1));
+writeFileSync(resolve(ROOT, process.env.BENCH_OUT || 'build/hybrid/bench.json'), JSON.stringify(out, null, 1));
 console.log(JSON.stringify(out, null, 1));

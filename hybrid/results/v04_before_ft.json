@@ -1,0 +1,2913 @@
+{
+ "R": {
+  "eval": {
+   "A": {
+    "all": {
+     "n": 2384,
+     "tool": 2319,
+     "intent": 2263,
+     "ans": 2344,
+     "ansOk": 2263,
+     "deferred": 0,
+     "missing": 0
+    },
+    "en": {
+     "n": 1192,
+     "tool": 1159,
+     "intent": 1127,
+     "ans": 1170,
+     "ansOk": 1127,
+     "deferred": 0,
+     "missing": 0
+    },
+    "sh:bash": {
+     "n": 2384,
+     "tool": 2319,
+     "intent": 2263,
+     "ans": 2344,
+     "ansOk": 2263,
+     "deferred": 0,
+     "missing": 0
+    },
+    "old": {
+     "n": 2384,
+     "tool": 2319,
+     "intent": 2263,
+     "ans": 2344,
+     "ansOk": 2263,
+     "deferred": 0,
+     "missing": 0
+    },
+    "pl": {
+     "n": 1192,
+     "tool": 1160,
+     "intent": 1136,
+     "ans": 1174,
+     "ansOk": 1136,
+     "deferred": 0,
+     "missing": 0
+    }
+   },
+   "C": {
+    "all": {
+     "n": 230,
+     "tool": 227,
+     "intent": 224,
+     "ans": 230,
+     "ansOk": 224,
+     "deferred": 230,
+     "missing": 0
+    },
+    "en": {
+     "n": 110,
+     "tool": 108,
+     "intent": 108,
+     "ans": 110,
+     "ansOk": 108,
+     "deferred": 110,
+     "missing": 0
+    },
+    "sh:bash": {
+     "n": 230,
+     "tool": 227,
+     "intent": 224,
+     "ans": 230,
+     "ansOk": 224,
+     "deferred": 230,
+     "missing": 0
+    },
+    "old": {
+     "n": 230,
+     "tool": 227,
+     "intent": 224,
+     "ans": 230,
+     "ansOk": 224,
+     "deferred": 230,
+     "missing": 0
+    },
+    "pl": {
+     "n": 120,
+     "tool": 119,
+     "intent": 116,
+     "ans": 120,
+     "ansOk": 116,
+     "deferred": 120,
+     "missing": 0
+    }
+   },
+   "A+C": {
+    "all": {
+     "n": 2384,
+     "tool": 2349,
+     "intent": 2324,
+     "ans": 2378,
+     "ansOk": 2324,
+     "deferred": 578,
+     "missing": 0
+    },
+    "en": {
+     "n": 1192,
+     "tool": 1177,
+     "intent": 1167,
+     "ans": 1190,
+     "ansOk": 1167,
+     "deferred": 286,
+     "missing": 0
+    },
+    "sh:bash": {
+     "n": 2384,
+     "tool": 2349,
+     "intent": 2324,
+     "ans": 2378,
+     "ansOk": 2324,
+     "deferred": 578,
+     "missing": 0
+    },
+    "old": {
+     "n": 2384,
+     "tool": 2349,
+     "intent": 2324,
+     "ans": 2378,
+     "ansOk": 2324,
+     "deferred": 578,
+     "missing": 0
+    },
+    "pl": {
+     "n": 1192,
+     "tool": 1172,
+     "intent": 1157,
+     "ans": 1188,
+     "ansOk": 1157,
+     "deferred": 292,
+     "missing": 0
+    }
+   },
+   "A+C-safe": {
+    "all": {
+     "n": 2384,
+     "tool": 2343,
+     "intent": 2289,
+     "ans": 2344,
+     "ansOk": 2289,
+     "deferred": 578,
+     "missing": 0
+    },
+    "en": {
+     "n": 1192,
+     "tool": 1171,
+     "intent": 1149,
+     "ans": 1170,
+     "ansOk": 1149,
+     "deferred": 286,
+     "missing": 0
+    },
+    "sh:bash": {
+     "n": 2384,
+     "tool": 2343,
+     "intent": 2289,
+     "ans": 2344,
+     "ansOk": 2289,
+     "deferred": 578,
+     "missing": 0
+    },
+    "old": {
+     "n": 2384,
+     "tool": 2343,
+     "intent": 2289,
+     "ans": 2344,
+     "ansOk": 2289,
+     "deferred": 578,
+     "missing": 0
+    },
+    "pl": {
+     "n": 1192,
+     "tool": 1172,
+     "intent": 1140,
+     "ans": 1174,
+     "ansOk": 1140,
+     "deferred": 292,
+     "missing": 0
+    }
+   }
+  },
+  "shell": {
+   "A": {
+    "all": {
+     "n": 336,
+     "tool": 329,
+     "intent": 324,
+     "ans": 329,
+     "ansOk": 324,
+     "deferred": 0,
+     "missing": 0
+    },
+    "en": {
+     "n": 164,
+     "tool": 160,
+     "intent": 156,
+     "ans": 158,
+     "ansOk": 156,
+     "deferred": 0,
+     "missing": 0
+    },
+    "sh:powershell": {
+     "n": 93,
+     "tool": 89,
+     "intent": 88,
+     "ans": 91,
+     "ansOk": 88,
+     "deferred": 0,
+     "missing": 0
+    },
+    "old": {
+     "n": 336,
+     "tool": 329,
+     "intent": 324,
+     "ans": 329,
+     "ansOk": 324,
+     "deferred": 0,
+     "missing": 0
+    },
+    "pl": {
+     "n": 172,
+     "tool": 169,
+     "intent": 168,
+     "ans": 171,
+     "ansOk": 168,
+     "deferred": 0,
+     "missing": 0
+    },
+    "sh:cmd": {
+     "n": 75,
+     "tool": 74,
+     "intent": 73,
+     "ans": 73,
+     "ansOk": 73,
+     "deferred": 0,
+     "missing": 0
+    },
+    "sh:zsh": {
+     "n": 55,
+     "tool": 54,
+     "intent": 53,
+     "ans": 54,
+     "ansOk": 53,
+     "deferred": 0,
+     "missing": 0
+    },
+    "sh:bash": {
+     "n": 92,
+     "tool": 91,
+     "intent": 91,
+     "ans": 91,
+     "ansOk": 91,
+     "deferred": 0,
+     "missing": 0
+    },
+    "sh:fish": {
+     "n": 18,
+     "tool": 18,
+     "intent": 16,
+     "ans": 17,
+     "ansOk": 16,
+     "deferred": 0,
+     "missing": 0
+    },
+    "sh:sh": {
+     "n": 3,
+     "tool": 3,
+     "intent": 3,
+     "ans": 3,
+     "ansOk": 3,
+     "deferred": 0,
+     "missing": 0
+    }
+   },
+   "C": {
+    "all": {
+     "n": 36,
+     "tool": 34,
+     "intent": 32,
+     "ans": 36,
+     "ansOk": 32,
+     "deferred": 36,
+     "missing": 0
+    },
+    "pl": {
+     "n": 20,
+     "tool": 20,
+     "intent": 18,
+     "ans": 20,
+     "ansOk": 18,
+     "deferred": 20,
+     "missing": 0
+    },
+    "sh:cmd": {
+     "n": 10,
+     "tool": 10,
+     "intent": 10,
+     "ans": 10,
+     "ansOk": 10,
+     "deferred": 10,
+     "missing": 0
+    },
+    "old": {
+     "n": 36,
+     "tool": 34,
+     "intent": 32,
+     "ans": 36,
+     "ansOk": 32,
+     "deferred": 36,
+     "missing": 0
+    },
+    "en": {
+     "n": 16,
+     "tool": 14,
+     "intent": 14,
+     "ans": 16,
+     "ansOk": 14,
+     "deferred": 16,
+     "missing": 0
+    },
+    "sh:bash": {
+     "n": 6,
+     "tool": 5,
+     "intent": 4,
+     "ans": 6,
+     "ansOk": 4,
+     "deferred": 6,
+     "missing": 0
+    },
+    "sh:powershell": {
+     "n": 13,
+     "tool": 13,
+     "intent": 13,
+     "ans": 13,
+     "ansOk": 13,
+     "deferred": 13,
+     "missing": 0
+    },
+    "sh:zsh": {
+     "n": 6,
+     "tool": 5,
+     "intent": 5,
+     "ans": 6,
+     "ansOk": 5,
+     "deferred": 6,
+     "missing": 0
+    },
+    "sh:fish": {
+     "n": 1,
+     "tool": 1,
+     "intent": 0,
+     "ans": 1,
+     "ansOk": 0,
+     "deferred": 1,
+     "missing": 0
+    }
+   },
+   "A+C": {
+    "all": {
+     "n": 336,
+     "tool": 332,
+     "intent": 331,
+     "ans": 336,
+     "ansOk": 331,
+     "deferred": 66,
+     "missing": 0
+    },
+    "en": {
+     "n": 164,
+     "tool": 163,
+     "intent": 162,
+     "ans": 164,
+     "ansOk": 162,
+     "deferred": 34,
+     "missing": 0
+    },
+    "sh:powershell": {
+     "n": 93,
+     "tool": 92,
+     "intent": 91,
+     "ans": 93,
+     "ansOk": 91,
+     "deferred": 24,
+     "missing": 0
+    },
+    "old": {
+     "n": 336,
+     "tool": 332,
+     "intent": 331,
+     "ans": 336,
+     "ansOk": 331,
+     "deferred": 66,
+     "missing": 0
+    },
+    "pl": {
+     "n": 172,
+     "tool": 169,
+     "intent": 169,
+     "ans": 172,
+     "ansOk": 169,
+     "deferred": 32,
+     "missing": 0
+    },
+    "sh:cmd": {
+     "n": 75,
+     "tool": 73,
+     "intent": 73,
+     "ans": 75,
+     "ansOk": 73,
+     "deferred": 19,
+     "missing": 0
+    },
+    "sh:zsh": {
+     "n": 55,
+     "tool": 54,
+     "intent": 54,
+     "ans": 55,
+     "ansOk": 54,
+     "deferred": 8,
+     "missing": 0
+    },
+    "sh:bash": {
+     "n": 92,
+     "tool": 92,
+     "intent": 92,
+     "ans": 92,
+     "ansOk": 92,
+     "deferred": 11,
+     "missing": 0
+    },
+    "sh:fish": {
+     "n": 18,
+     "tool": 18,
+     "intent": 18,
+     "ans": 18,
+     "ansOk": 18,
+     "deferred": 3,
+     "missing": 0
+    },
+    "sh:sh": {
+     "n": 3,
+     "tool": 3,
+     "intent": 3,
+     "ans": 3,
+     "ansOk": 3,
+     "deferred": 1,
+     "missing": 0
+    }
+   },
+   "A+C-safe": {
+    "all": {
+     "n": 336,
+     "tool": 330,
+     "intent": 326,
+     "ans": 329,
+     "ansOk": 326,
+     "deferred": 66,
+     "missing": 0
+    },
+    "en": {
+     "n": 164,
+     "tool": 161,
+     "intent": 157,
+     "ans": 158,
+     "ansOk": 157,
+     "deferred": 34,
+     "missing": 0
+    },
+    "sh:powershell": {
+     "n": 93,
+     "tool": 91,
+     "intent": 89,
+     "ans": 91,
+     "ansOk": 89,
+     "deferred": 24,
+     "missing": 0
+    },
+    "old": {
+     "n": 336,
+     "tool": 330,
+     "intent": 326,
+     "ans": 329,
+     "ansOk": 326,
+     "deferred": 66,
+     "missing": 0
+    },
+    "pl": {
+     "n": 172,
+     "tool": 169,
+     "intent": 169,
+     "ans": 171,
+     "ansOk": 169,
+     "deferred": 32,
+     "missing": 0
+    },
+    "sh:cmd": {
+     "n": 75,
+     "tool": 73,
+     "intent": 72,
+     "ans": 73,
+     "ansOk": 72,
+     "deferred": 19,
+     "missing": 0
+    },
+    "sh:zsh": {
+     "n": 55,
+     "tool": 54,
+     "intent": 54,
+     "ans": 54,
+     "ansOk": 54,
+     "deferred": 8,
+     "missing": 0
+    },
+    "sh:bash": {
+     "n": 92,
+     "tool": 91,
+     "intent": 91,
+     "ans": 91,
+     "ansOk": 91,
+     "deferred": 11,
+     "missing": 0
+    },
+    "sh:fish": {
+     "n": 18,
+     "tool": 18,
+     "intent": 17,
+     "ans": 17,
+     "ansOk": 17,
+     "deferred": 3,
+     "missing": 0
+    },
+    "sh:sh": {
+     "n": 3,
+     "tool": 3,
+     "intent": 3,
+     "ans": 3,
+     "ansOk": 3,
+     "deferred": 1,
+     "missing": 0
+    }
+   }
+  },
+  "blind": {
+   "A": {
+    "all": {
+     "n": 641,
+     "tool": 636,
+     "intent": 634,
+     "ans": 641,
+     "ansOk": 634,
+     "deferred": 0,
+     "missing": 0
+    },
+    "en": {
+     "n": 331,
+     "tool": 327,
+     "intent": 325,
+     "ans": 331,
+     "ansOk": 325,
+     "deferred": 0,
+     "missing": 0
+    },
+    "sh:bash": {
+     "n": 226,
+     "tool": 224,
+     "intent": 224,
+     "ans": 226,
+     "ansOk": 224,
+     "deferred": 0,
+     "missing": 0
+    },
+    "old": {
+     "n": 641,
+     "tool": 636,
+     "intent": 634,
+     "ans": 641,
+     "ansOk": 634,
+     "deferred": 0,
+     "missing": 0
+    },
+    "sh:zsh": {
+     "n": 142,
+     "tool": 140,
+     "intent": 140,
+     "ans": 142,
+     "ansOk": 140,
+     "deferred": 0,
+     "missing": 0
+    },
+    "sh:powershell": {
+     "n": 125,
+     "tool": 125,
+     "intent": 124,
+     "ans": 125,
+     "ansOk": 124,
+     "deferred": 0,
+     "missing": 0
+    },
+    "sh:fish": {
+     "n": 50,
+     "tool": 49,
+     "intent": 49,
+     "ans": 50,
+     "ansOk": 49,
+     "deferred": 0,
+     "missing": 0
+    },
+    "sh:cmd": {
+     "n": 54,
+     "tool": 54,
+     "intent": 53,
+     "ans": 54,
+     "ansOk": 53,
+     "deferred": 0,
+     "missing": 0
+    },
+    "sh:sh": {
+     "n": 44,
+     "tool": 44,
+     "intent": 44,
+     "ans": 44,
+     "ansOk": 44,
+     "deferred": 0,
+     "missing": 0
+    },
+    "pl": {
+     "n": 310,
+     "tool": 309,
+     "intent": 309,
+     "ans": 310,
+     "ansOk": 309,
+     "deferred": 0,
+     "missing": 0
+    }
+   },
+   "C": {
+    "all": {
+     "n": 65,
+     "tool": 65,
+     "intent": 63,
+     "ans": 65,
+     "ansOk": 63,
+     "deferred": 65,
+     "missing": 0
+    },
+    "en": {
+     "n": 36,
+     "tool": 36,
+     "intent": 36,
+     "ans": 36,
+     "ansOk": 36,
+     "deferred": 36,
+     "missing": 0
+    },
+    "sh:fish": {
+     "n": 3,
+     "tool": 3,
+     "intent": 2,
+     "ans": 3,
+     "ansOk": 2,
+     "deferred": 3,
+     "missing": 0
+    },
+    "old": {
+     "n": 65,
+     "tool": 65,
+     "intent": 63,
+     "ans": 65,
+     "ansOk": 63,
+     "deferred": 65,
+     "missing": 0
+    },
+    "sh:bash": {
+     "n": 34,
+     "tool": 34,
+     "intent": 34,
+     "ans": 34,
+     "ansOk": 34,
+     "deferred": 34,
+     "missing": 0
+    },
+    "sh:sh": {
+     "n": 5,
+     "tool": 5,
+     "intent": 5,
+     "ans": 5,
+     "ansOk": 5,
+     "deferred": 5,
+     "missing": 0
+    },
+    "sh:cmd": {
+     "n": 5,
+     "tool": 5,
+     "intent": 5,
+     "ans": 5,
+     "ansOk": 5,
+     "deferred": 5,
+     "missing": 0
+    },
+    "sh:powershell": {
+     "n": 5,
+     "tool": 5,
+     "intent": 5,
+     "ans": 5,
+     "ansOk": 5,
+     "deferred": 5,
+     "missing": 0
+    },
+    "sh:zsh": {
+     "n": 13,
+     "tool": 13,
+     "intent": 12,
+     "ans": 13,
+     "ansOk": 12,
+     "deferred": 13,
+     "missing": 0
+    },
+    "pl": {
+     "n": 29,
+     "tool": 29,
+     "intent": 27,
+     "ans": 29,
+     "ansOk": 27,
+     "deferred": 29,
+     "missing": 0
+    }
+   },
+   "A+C": {
+    "all": {
+     "n": 641,
+     "tool": 639,
+     "intent": 637,
+     "ans": 641,
+     "ansOk": 637,
+     "deferred": 69,
+     "missing": 0
+    },
+    "en": {
+     "n": 331,
+     "tool": 330,
+     "intent": 329,
+     "ans": 331,
+     "ansOk": 329,
+     "deferred": 46,
+     "missing": 0
+    },
+    "sh:bash": {
+     "n": 226,
+     "tool": 224,
+     "intent": 224,
+     "ans": 226,
+     "ansOk": 224,
+     "deferred": 11,
+     "missing": 0
+    },
+    "old": {
+     "n": 641,
+     "tool": 639,
+     "intent": 637,
+     "ans": 641,
+     "ansOk": 637,
+     "deferred": 69,
+     "missing": 0
+    },
+    "sh:zsh": {
+     "n": 142,
+     "tool": 142,
+     "intent": 141,
+     "ans": 142,
+     "ansOk": 141,
+     "deferred": 26,
+     "missing": 0
+    },
+    "sh:powershell": {
+     "n": 125,
+     "tool": 125,
+     "intent": 124,
+     "ans": 125,
+     "ansOk": 124,
+     "deferred": 11,
+     "missing": 0
+    },
+    "sh:fish": {
+     "n": 50,
+     "tool": 50,
+     "intent": 50,
+     "ans": 50,
+     "ansOk": 50,
+     "deferred": 9,
+     "missing": 0
+    },
+    "sh:cmd": {
+     "n": 54,
+     "tool": 54,
+     "intent": 54,
+     "ans": 54,
+     "ansOk": 54,
+     "deferred": 8,
+     "missing": 0
+    },
+    "sh:sh": {
+     "n": 44,
+     "tool": 44,
+     "intent": 44,
+     "ans": 44,
+     "ansOk": 44,
+     "deferred": 4,
+     "missing": 0
+    },
+    "pl": {
+     "n": 310,
+     "tool": 309,
+     "intent": 308,
+     "ans": 310,
+     "ansOk": 308,
+     "deferred": 23,
+     "missing": 0
+    }
+   },
+   "A+C-safe": {
+    "all": {
+     "n": 641,
+     "tool": 639,
+     "intent": 635,
+     "ans": 641,
+     "ansOk": 635,
+     "deferred": 69,
+     "missing": 0
+    },
+    "en": {
+     "n": 331,
+     "tool": 330,
+     "intent": 327,
+     "ans": 331,
+     "ansOk": 327,
+     "deferred": 46,
+     "missing": 0
+    },
+    "sh:bash": {
+     "n": 226,
+     "tool": 224,
+     "intent": 223,
+     "ans": 226,
+     "ansOk": 223,
+     "deferred": 11,
+     "missing": 0
+    },
+    "old": {
+     "n": 641,
+     "tool": 639,
+     "intent": 635,
+     "ans": 641,
+     "ansOk": 635,
+     "deferred": 69,
+     "missing": 0
+    },
+    "sh:zsh": {
+     "n": 142,
+     "tool": 142,
+     "intent": 140,
+     "ans": 142,
+     "ansOk": 140,
+     "deferred": 26,
+     "missing": 0
+    },
+    "sh:powershell": {
+     "n": 125,
+     "tool": 125,
+     "intent": 124,
+     "ans": 125,
+     "ansOk": 124,
+     "deferred": 11,
+     "missing": 0
+    },
+    "sh:fish": {
+     "n": 50,
+     "tool": 50,
+     "intent": 50,
+     "ans": 50,
+     "ansOk": 50,
+     "deferred": 9,
+     "missing": 0
+    },
+    "sh:cmd": {
+     "n": 54,
+     "tool": 54,
+     "intent": 54,
+     "ans": 54,
+     "ansOk": 54,
+     "deferred": 8,
+     "missing": 0
+    },
+    "sh:sh": {
+     "n": 44,
+     "tool": 44,
+     "intent": 44,
+     "ans": 44,
+     "ansOk": 44,
+     "deferred": 4,
+     "missing": 0
+    },
+    "pl": {
+     "n": 310,
+     "tool": 309,
+     "intent": 308,
+     "ans": 310,
+     "ansOk": 308,
+     "deferred": 23,
+     "missing": 0
+    }
+   }
+  },
+  "blind_novel": {
+   "A": {
+    "all": {
+     "n": 507,
+     "tool": 503,
+     "intent": 501,
+     "ans": 507,
+     "ansOk": 501,
+     "deferred": 0,
+     "missing": 0
+    },
+    "en": {
+     "n": 266,
+     "tool": 263,
+     "intent": 261,
+     "ans": 266,
+     "ansOk": 261,
+     "deferred": 0,
+     "missing": 0
+    },
+    "sh:bash": {
+     "n": 173,
+     "tool": 172,
+     "intent": 172,
+     "ans": 173,
+     "ansOk": 172,
+     "deferred": 0,
+     "missing": 0
+    },
+    "old": {
+     "n": 507,
+     "tool": 503,
+     "intent": 501,
+     "ans": 507,
+     "ansOk": 501,
+     "deferred": 0,
+     "missing": 0
+    },
+    "sh:zsh": {
+     "n": 124,
+     "tool": 122,
+     "intent": 122,
+     "ans": 124,
+     "ansOk": 122,
+     "deferred": 0,
+     "missing": 0
+    },
+    "sh:powershell": {
+     "n": 96,
+     "tool": 96,
+     "intent": 95,
+     "ans": 96,
+     "ansOk": 95,
+     "deferred": 0,
+     "missing": 0
+    },
+    "sh:fish": {
+     "n": 40,
+     "tool": 39,
+     "intent": 39,
+     "ans": 40,
+     "ansOk": 39,
+     "deferred": 0,
+     "missing": 0
+    },
+    "sh:cmd": {
+     "n": 34,
+     "tool": 34,
+     "intent": 33,
+     "ans": 34,
+     "ansOk": 33,
+     "deferred": 0,
+     "missing": 0
+    },
+    "sh:sh": {
+     "n": 40,
+     "tool": 40,
+     "intent": 40,
+     "ans": 40,
+     "ansOk": 40,
+     "deferred": 0,
+     "missing": 0
+    },
+    "pl": {
+     "n": 241,
+     "tool": 240,
+     "intent": 240,
+     "ans": 241,
+     "ansOk": 240,
+     "deferred": 0,
+     "missing": 0
+    }
+   },
+   "C": {
+    "all": {
+     "n": 46,
+     "tool": 46,
+     "intent": 45,
+     "ans": 46,
+     "ansOk": 45,
+     "deferred": 46,
+     "missing": 0
+    },
+    "en": {
+     "n": 25,
+     "tool": 25,
+     "intent": 25,
+     "ans": 25,
+     "ansOk": 25,
+     "deferred": 25,
+     "missing": 0
+    },
+    "sh:fish": {
+     "n": 2,
+     "tool": 2,
+     "intent": 2,
+     "ans": 2,
+     "ansOk": 2,
+     "deferred": 2,
+     "missing": 0
+    },
+    "old": {
+     "n": 46,
+     "tool": 46,
+     "intent": 45,
+     "ans": 46,
+     "ansOk": 45,
+     "deferred": 46,
+     "missing": 0
+    },
+    "sh:bash": {
+     "n": 23,
+     "tool": 23,
+     "intent": 23,
+     "ans": 23,
+     "ansOk": 23,
+     "deferred": 23,
+     "missing": 0
+    },
+    "sh:sh": {
+     "n": 5,
+     "tool": 5,
+     "intent": 5,
+     "ans": 5,
+     "ansOk": 5,
+     "deferred": 5,
+     "missing": 0
+    },
+    "sh:cmd": {
+     "n": 2,
+     "tool": 2,
+     "intent": 2,
+     "ans": 2,
+     "ansOk": 2,
+     "deferred": 2,
+     "missing": 0
+    },
+    "sh:powershell": {
+     "n": 4,
+     "tool": 4,
+     "intent": 4,
+     "ans": 4,
+     "ansOk": 4,
+     "deferred": 4,
+     "missing": 0
+    },
+    "sh:zsh": {
+     "n": 10,
+     "tool": 10,
+     "intent": 9,
+     "ans": 10,
+     "ansOk": 9,
+     "deferred": 10,
+     "missing": 0
+    },
+    "pl": {
+     "n": 21,
+     "tool": 21,
+     "intent": 20,
+     "ans": 21,
+     "ansOk": 20,
+     "deferred": 21,
+     "missing": 0
+    }
+   },
+   "A+C": {
+    "all": {
+     "n": 507,
+     "tool": 506,
+     "intent": 504,
+     "ans": 507,
+     "ansOk": 504,
+     "deferred": 60,
+     "missing": 0
+    },
+    "en": {
+     "n": 266,
+     "tool": 265,
+     "intent": 264,
+     "ans": 266,
+     "ansOk": 264,
+     "deferred": 40,
+     "missing": 0
+    },
+    "sh:bash": {
+     "n": 173,
+     "tool": 172,
+     "intent": 172,
+     "ans": 173,
+     "ansOk": 172,
+     "deferred": 9,
+     "missing": 0
+    },
+    "old": {
+     "n": 507,
+     "tool": 506,
+     "intent": 504,
+     "ans": 507,
+     "ansOk": 504,
+     "deferred": 60,
+     "missing": 0
+    },
+    "sh:zsh": {
+     "n": 124,
+     "tool": 124,
+     "intent": 123,
+     "ans": 124,
+     "ansOk": 123,
+     "deferred": 25,
+     "missing": 0
+    },
+    "sh:powershell": {
+     "n": 96,
+     "tool": 96,
+     "intent": 95,
+     "ans": 96,
+     "ansOk": 95,
+     "deferred": 11,
+     "missing": 0
+    },
+    "sh:fish": {
+     "n": 40,
+     "tool": 40,
+     "intent": 40,
+     "ans": 40,
+     "ansOk": 40,
+     "deferred": 7,
+     "missing": 0
+    },
+    "sh:cmd": {
+     "n": 34,
+     "tool": 34,
+     "intent": 34,
+     "ans": 34,
+     "ansOk": 34,
+     "deferred": 4,
+     "missing": 0
+    },
+    "sh:sh": {
+     "n": 40,
+     "tool": 40,
+     "intent": 40,
+     "ans": 40,
+     "ansOk": 40,
+     "deferred": 4,
+     "missing": 0
+    },
+    "pl": {
+     "n": 241,
+     "tool": 241,
+     "intent": 240,
+     "ans": 241,
+     "ansOk": 240,
+     "deferred": 20,
+     "missing": 0
+    }
+   },
+   "A+C-safe": {
+    "all": {
+     "n": 507,
+     "tool": 506,
+     "intent": 502,
+     "ans": 507,
+     "ansOk": 502,
+     "deferred": 60,
+     "missing": 0
+    },
+    "en": {
+     "n": 266,
+     "tool": 265,
+     "intent": 262,
+     "ans": 266,
+     "ansOk": 262,
+     "deferred": 40,
+     "missing": 0
+    },
+    "sh:bash": {
+     "n": 173,
+     "tool": 172,
+     "intent": 171,
+     "ans": 173,
+     "ansOk": 171,
+     "deferred": 9,
+     "missing": 0
+    },
+    "old": {
+     "n": 507,
+     "tool": 506,
+     "intent": 502,
+     "ans": 507,
+     "ansOk": 502,
+     "deferred": 60,
+     "missing": 0
+    },
+    "sh:zsh": {
+     "n": 124,
+     "tool": 124,
+     "intent": 122,
+     "ans": 124,
+     "ansOk": 122,
+     "deferred": 25,
+     "missing": 0
+    },
+    "sh:powershell": {
+     "n": 96,
+     "tool": 96,
+     "intent": 95,
+     "ans": 96,
+     "ansOk": 95,
+     "deferred": 11,
+     "missing": 0
+    },
+    "sh:fish": {
+     "n": 40,
+     "tool": 40,
+     "intent": 40,
+     "ans": 40,
+     "ansOk": 40,
+     "deferred": 7,
+     "missing": 0
+    },
+    "sh:cmd": {
+     "n": 34,
+     "tool": 34,
+     "intent": 34,
+     "ans": 34,
+     "ansOk": 34,
+     "deferred": 4,
+     "missing": 0
+    },
+    "sh:sh": {
+     "n": 40,
+     "tool": 40,
+     "intent": 40,
+     "ans": 40,
+     "ansOk": 40,
+     "deferred": 4,
+     "missing": 0
+    },
+    "pl": {
+     "n": 241,
+     "tool": 241,
+     "intent": 240,
+     "ans": 241,
+     "ansOk": 240,
+     "deferred": 20,
+     "missing": 0
+    }
+   }
+  },
+  "blind3": {
+   "A": {
+    "all": {
+     "n": 844,
+     "tool": 837,
+     "intent": 831,
+     "ans": 839,
+     "ansOk": 831,
+     "deferred": 0,
+     "missing": 0
+    },
+    "en": {
+     "n": 434,
+     "tool": 429,
+     "intent": 425,
+     "ans": 431,
+     "ansOk": 425,
+     "deferred": 0,
+     "missing": 0
+    },
+    "sh:bash": {
+     "n": 341,
+     "tool": 341,
+     "intent": 340,
+     "ans": 340,
+     "ansOk": 340,
+     "deferred": 0,
+     "missing": 0
+    },
+    "old": {
+     "n": 844,
+     "tool": 837,
+     "intent": 831,
+     "ans": 839,
+     "ansOk": 831,
+     "deferred": 0,
+     "missing": 0
+    },
+    "pl": {
+     "n": 410,
+     "tool": 408,
+     "intent": 406,
+     "ans": 408,
+     "ansOk": 406,
+     "deferred": 0,
+     "missing": 0
+    },
+    "sh:zsh": {
+     "n": 163,
+     "tool": 162,
+     "intent": 160,
+     "ans": 162,
+     "ansOk": 160,
+     "deferred": 0,
+     "missing": 0
+    },
+    "sh:powershell": {
+     "n": 167,
+     "tool": 165,
+     "intent": 163,
+     "ans": 166,
+     "ansOk": 163,
+     "deferred": 0,
+     "missing": 0
+    },
+    "sh:fish": {
+     "n": 63,
+     "tool": 61,
+     "intent": 61,
+     "ans": 63,
+     "ansOk": 61,
+     "deferred": 0,
+     "missing": 0
+    },
+    "sh:sh": {
+     "n": 66,
+     "tool": 64,
+     "intent": 64,
+     "ans": 65,
+     "ansOk": 64,
+     "deferred": 0,
+     "missing": 0
+    },
+    "sh:cmd": {
+     "n": 44,
+     "tool": 44,
+     "intent": 43,
+     "ans": 43,
+     "ansOk": 43,
+     "deferred": 0,
+     "missing": 0
+    }
+   },
+   "C": {
+    "all": {
+     "n": 91,
+     "tool": 89,
+     "intent": 88,
+     "ans": 91,
+     "ansOk": 88,
+     "deferred": 91,
+     "missing": 0
+    },
+    "pl": {
+     "n": 49,
+     "tool": 48,
+     "intent": 47,
+     "ans": 49,
+     "ansOk": 47,
+     "deferred": 49,
+     "missing": 0
+    },
+    "sh:bash": {
+     "n": 49,
+     "tool": 48,
+     "intent": 48,
+     "ans": 49,
+     "ansOk": 48,
+     "deferred": 49,
+     "missing": 0
+    },
+    "old": {
+     "n": 91,
+     "tool": 89,
+     "intent": 88,
+     "ans": 91,
+     "ansOk": 88,
+     "deferred": 91,
+     "missing": 0
+    },
+    "sh:sh": {
+     "n": 4,
+     "tool": 4,
+     "intent": 4,
+     "ans": 4,
+     "ansOk": 4,
+     "deferred": 4,
+     "missing": 0
+    },
+    "en": {
+     "n": 42,
+     "tool": 41,
+     "intent": 41,
+     "ans": 42,
+     "ansOk": 41,
+     "deferred": 42,
+     "missing": 0
+    },
+    "sh:cmd": {
+     "n": 6,
+     "tool": 5,
+     "intent": 5,
+     "ans": 6,
+     "ansOk": 5,
+     "deferred": 6,
+     "missing": 0
+    },
+    "sh:fish": {
+     "n": 4,
+     "tool": 4,
+     "intent": 4,
+     "ans": 4,
+     "ansOk": 4,
+     "deferred": 4,
+     "missing": 0
+    },
+    "sh:zsh": {
+     "n": 15,
+     "tool": 15,
+     "intent": 14,
+     "ans": 15,
+     "ansOk": 14,
+     "deferred": 15,
+     "missing": 0
+    },
+    "sh:powershell": {
+     "n": 13,
+     "tool": 13,
+     "intent": 13,
+     "ans": 13,
+     "ansOk": 13,
+     "deferred": 13,
+     "missing": 0
+    }
+   },
+   "A+C": {
+    "all": {
+     "n": 844,
+     "tool": 840,
+     "intent": 838,
+     "ans": 844,
+     "ansOk": 838,
+     "deferred": 103,
+     "missing": 0
+    },
+    "en": {
+     "n": 434,
+     "tool": 432,
+     "intent": 432,
+     "ans": 434,
+     "ansOk": 432,
+     "deferred": 64,
+     "missing": 0
+    },
+    "sh:bash": {
+     "n": 341,
+     "tool": 341,
+     "intent": 341,
+     "ans": 341,
+     "ansOk": 341,
+     "deferred": 32,
+     "missing": 0
+    },
+    "old": {
+     "n": 844,
+     "tool": 840,
+     "intent": 838,
+     "ans": 844,
+     "ansOk": 838,
+     "deferred": 103,
+     "missing": 0
+    },
+    "pl": {
+     "n": 410,
+     "tool": 408,
+     "intent": 406,
+     "ans": 410,
+     "ansOk": 406,
+     "deferred": 39,
+     "missing": 0
+    },
+    "sh:zsh": {
+     "n": 163,
+     "tool": 162,
+     "intent": 160,
+     "ans": 163,
+     "ansOk": 160,
+     "deferred": 15,
+     "missing": 0
+    },
+    "sh:powershell": {
+     "n": 167,
+     "tool": 167,
+     "intent": 167,
+     "ans": 167,
+     "ansOk": 167,
+     "deferred": 25,
+     "missing": 0
+    },
+    "sh:fish": {
+     "n": 63,
+     "tool": 62,
+     "intent": 62,
+     "ans": 63,
+     "ansOk": 62,
+     "deferred": 10,
+     "missing": 0
+    },
+    "sh:sh": {
+     "n": 66,
+     "tool": 64,
+     "intent": 64,
+     "ans": 66,
+     "ansOk": 64,
+     "deferred": 14,
+     "missing": 0
+    },
+    "sh:cmd": {
+     "n": 44,
+     "tool": 44,
+     "intent": 44,
+     "ans": 44,
+     "ansOk": 44,
+     "deferred": 7,
+     "missing": 0
+    }
+   },
+   "A+C-safe": {
+    "all": {
+     "n": 844,
+     "tool": 839,
+     "intent": 835,
+     "ans": 839,
+     "ansOk": 835,
+     "deferred": 103,
+     "missing": 0
+    },
+    "en": {
+     "n": 434,
+     "tool": 431,
+     "intent": 429,
+     "ans": 431,
+     "ansOk": 429,
+     "deferred": 64,
+     "missing": 0
+    },
+    "sh:bash": {
+     "n": 341,
+     "tool": 341,
+     "intent": 340,
+     "ans": 340,
+     "ansOk": 340,
+     "deferred": 32,
+     "missing": 0
+    },
+    "old": {
+     "n": 844,
+     "tool": 839,
+     "intent": 835,
+     "ans": 839,
+     "ansOk": 835,
+     "deferred": 103,
+     "missing": 0
+    },
+    "pl": {
+     "n": 410,
+     "tool": 408,
+     "intent": 406,
+     "ans": 408,
+     "ansOk": 406,
+     "deferred": 39,
+     "missing": 0
+    },
+    "sh:zsh": {
+     "n": 163,
+     "tool": 162,
+     "intent": 160,
+     "ans": 162,
+     "ansOk": 160,
+     "deferred": 15,
+     "missing": 0
+    },
+    "sh:powershell": {
+     "n": 167,
+     "tool": 166,
+     "intent": 166,
+     "ans": 166,
+     "ansOk": 166,
+     "deferred": 25,
+     "missing": 0
+    },
+    "sh:fish": {
+     "n": 63,
+     "tool": 62,
+     "intent": 62,
+     "ans": 63,
+     "ansOk": 62,
+     "deferred": 10,
+     "missing": 0
+    },
+    "sh:sh": {
+     "n": 66,
+     "tool": 64,
+     "intent": 64,
+     "ans": 65,
+     "ansOk": 64,
+     "deferred": 14,
+     "missing": 0
+    },
+    "sh:cmd": {
+     "n": 44,
+     "tool": 44,
+     "intent": 43,
+     "ans": 43,
+     "ansOk": 43,
+     "deferred": 7,
+     "missing": 0
+    }
+   }
+  },
+  "devtools": {
+   "A": {
+    "all": {
+     "n": 424,
+     "tool": 59,
+     "intent": 38,
+     "ans": 250,
+     "ansOk": 38,
+     "deferred": 0,
+     "missing": 0
+    },
+    "en": {
+     "n": 214,
+     "tool": 30,
+     "intent": 21,
+     "ans": 127,
+     "ansOk": 21,
+     "deferred": 0,
+     "missing": 0
+    },
+    "sh:bash": {
+     "n": 269,
+     "tool": 42,
+     "intent": 29,
+     "ans": 157,
+     "ansOk": 29,
+     "deferred": 0,
+     "missing": 0
+    },
+    "new": {
+     "n": 384,
+     "tool": 21,
+     "intent": 0,
+     "ans": 210,
+     "ansOk": 0,
+     "deferred": 0,
+     "missing": 0
+    },
+    "sh:zsh": {
+     "n": 80,
+     "tool": 11,
+     "intent": 7,
+     "ans": 49,
+     "ansOk": 7,
+     "deferred": 0,
+     "missing": 0
+    },
+    "sh:powershell": {
+     "n": 25,
+     "tool": 2,
+     "intent": 1,
+     "ans": 17,
+     "ansOk": 1,
+     "deferred": 0,
+     "missing": 0
+    },
+    "pl": {
+     "n": 210,
+     "tool": 29,
+     "intent": 17,
+     "ans": 123,
+     "ansOk": 17,
+     "deferred": 0,
+     "missing": 0
+    },
+    "sh:cmd": {
+     "n": 24,
+     "tool": 2,
+     "intent": 0,
+     "ans": 14,
+     "ansOk": 0,
+     "deferred": 0,
+     "missing": 0
+    },
+    "sh:fish": {
+     "n": 25,
+     "tool": 2,
+     "intent": 1,
+     "ans": 12,
+     "ansOk": 1,
+     "deferred": 0,
+     "missing": 0
+    },
+    "sh:sh": {
+     "n": 1,
+     "tool": 0,
+     "intent": 0,
+     "ans": 1,
+     "ansOk": 0,
+     "deferred": 0,
+     "missing": 0
+    },
+    "old": {
+     "n": 40,
+     "tool": 38,
+     "intent": 38,
+     "ans": 40,
+     "ansOk": 38,
+     "deferred": 0,
+     "missing": 0
+    }
+   },
+   "C": {
+    "all": {
+     "n": 49,
+     "tool": 7,
+     "intent": 5,
+     "ans": 42,
+     "ansOk": 5,
+     "deferred": 49,
+     "missing": 0
+    },
+    "pl": {
+     "n": 23,
+     "tool": 3,
+     "intent": 3,
+     "ans": 20,
+     "ansOk": 3,
+     "deferred": 23,
+     "missing": 0
+    },
+    "sh:bash": {
+     "n": 33,
+     "tool": 5,
+     "intent": 4,
+     "ans": 29,
+     "ansOk": 4,
+     "deferred": 33,
+     "missing": 0
+    },
+    "new": {
+     "n": 44,
+     "tool": 2,
+     "intent": 0,
+     "ans": 37,
+     "ansOk": 0,
+     "deferred": 44,
+     "missing": 0
+    },
+    "en": {
+     "n": 26,
+     "tool": 4,
+     "intent": 2,
+     "ans": 22,
+     "ansOk": 2,
+     "deferred": 26,
+     "missing": 0
+    },
+    "sh:fish": {
+     "n": 2,
+     "tool": 0,
+     "intent": 0,
+     "ans": 2,
+     "ansOk": 0,
+     "deferred": 2,
+     "missing": 0
+    },
+    "sh:zsh": {
+     "n": 9,
+     "tool": 2,
+     "intent": 1,
+     "ans": 8,
+     "ansOk": 1,
+     "deferred": 9,
+     "missing": 0
+    },
+    "sh:cmd": {
+     "n": 4,
+     "tool": 0,
+     "intent": 0,
+     "ans": 2,
+     "ansOk": 0,
+     "deferred": 4,
+     "missing": 0
+    },
+    "sh:powershell": {
+     "n": 1,
+     "tool": 0,
+     "intent": 0,
+     "ans": 1,
+     "ansOk": 0,
+     "deferred": 1,
+     "missing": 0
+    },
+    "old": {
+     "n": 5,
+     "tool": 5,
+     "intent": 5,
+     "ans": 5,
+     "ansOk": 5,
+     "deferred": 5,
+     "missing": 0
+    }
+   },
+   "A+C": {
+    "all": {
+     "n": 424,
+     "tool": 64,
+     "intent": 38,
+     "ans": 375,
+     "ansOk": 38,
+     "deferred": 348,
+     "missing": 0
+    },
+    "en": {
+     "n": 214,
+     "tool": 34,
+     "intent": 21,
+     "ans": 195,
+     "ansOk": 21,
+     "deferred": 182,
+     "missing": 0
+    },
+    "sh:bash": {
+     "n": 269,
+     "tool": 45,
+     "intent": 29,
+     "ans": 237,
+     "ansOk": 29,
+     "deferred": 217,
+     "missing": 0
+    },
+    "new": {
+     "n": 384,
+     "tool": 26,
+     "intent": 0,
+     "ans": 335,
+     "ansOk": 0,
+     "deferred": 339,
+     "missing": 0
+    },
+    "sh:zsh": {
+     "n": 80,
+     "tool": 12,
+     "intent": 7,
+     "ans": 73,
+     "ansOk": 7,
+     "deferred": 67,
+     "missing": 0
+    },
+    "sh:powershell": {
+     "n": 25,
+     "tool": 3,
+     "intent": 1,
+     "ans": 25,
+     "ansOk": 1,
+     "deferred": 21,
+     "missing": 0
+    },
+    "pl": {
+     "n": 210,
+     "tool": 30,
+     "intent": 17,
+     "ans": 180,
+     "ansOk": 17,
+     "deferred": 166,
+     "missing": 0
+    },
+    "sh:cmd": {
+     "n": 24,
+     "tool": 2,
+     "intent": 0,
+     "ans": 19,
+     "ansOk": 0,
+     "deferred": 20,
+     "missing": 0
+    },
+    "sh:fish": {
+     "n": 25,
+     "tool": 2,
+     "intent": 1,
+     "ans": 20,
+     "ansOk": 1,
+     "deferred": 22,
+     "missing": 0
+    },
+    "sh:sh": {
+     "n": 1,
+     "tool": 0,
+     "intent": 0,
+     "ans": 1,
+     "ansOk": 0,
+     "deferred": 1,
+     "missing": 0
+    },
+    "old": {
+     "n": 40,
+     "tool": 38,
+     "intent": 38,
+     "ans": 40,
+     "ansOk": 38,
+     "deferred": 9,
+     "missing": 0
+    }
+   },
+   "A+C-safe": {
+    "all": {
+     "n": 424,
+     "tool": 65,
+     "intent": 38,
+     "ans": 250,
+     "ansOk": 38,
+     "deferred": 348,
+     "missing": 0
+    },
+    "en": {
+     "n": 214,
+     "tool": 34,
+     "intent": 21,
+     "ans": 127,
+     "ansOk": 21,
+     "deferred": 182,
+     "missing": 0
+    },
+    "sh:bash": {
+     "n": 269,
+     "tool": 46,
+     "intent": 29,
+     "ans": 157,
+     "ansOk": 29,
+     "deferred": 217,
+     "missing": 0
+    },
+    "new": {
+     "n": 384,
+     "tool": 27,
+     "intent": 0,
+     "ans": 210,
+     "ansOk": 0,
+     "deferred": 339,
+     "missing": 0
+    },
+    "sh:zsh": {
+     "n": 80,
+     "tool": 11,
+     "intent": 7,
+     "ans": 49,
+     "ansOk": 7,
+     "deferred": 67,
+     "missing": 0
+    },
+    "sh:powershell": {
+     "n": 25,
+     "tool": 3,
+     "intent": 1,
+     "ans": 17,
+     "ansOk": 1,
+     "deferred": 21,
+     "missing": 0
+    },
+    "pl": {
+     "n": 210,
+     "tool": 31,
+     "intent": 17,
+     "ans": 123,
+     "ansOk": 17,
+     "deferred": 166,
+     "missing": 0
+    },
+    "sh:cmd": {
+     "n": 24,
+     "tool": 2,
+     "intent": 0,
+     "ans": 14,
+     "ansOk": 0,
+     "deferred": 20,
+     "missing": 0
+    },
+    "sh:fish": {
+     "n": 25,
+     "tool": 3,
+     "intent": 1,
+     "ans": 12,
+     "ansOk": 1,
+     "deferred": 22,
+     "missing": 0
+    },
+    "sh:sh": {
+     "n": 1,
+     "tool": 0,
+     "intent": 0,
+     "ans": 1,
+     "ansOk": 0,
+     "deferred": 1,
+     "missing": 0
+    },
+    "old": {
+     "n": 40,
+     "tool": 38,
+     "intent": 38,
+     "ans": 40,
+     "ansOk": 38,
+     "deferred": 9,
+     "missing": 0
+    }
+   }
+  },
+  "real": {
+   "A": {
+    "all": {
+     "n": 2957,
+     "tool": 1456,
+     "intent": 935,
+     "ans": 1952,
+     "ansOk": 935,
+     "deferred": 0,
+     "missing": 0
+    },
+    "en": {
+     "n": 1478,
+     "tool": 670,
+     "intent": 479,
+     "ans": 956,
+     "ansOk": 479,
+     "deferred": 0,
+     "missing": 0
+    },
+    "sh:zsh": {
+     "n": 1433,
+     "tool": 714,
+     "intent": 300,
+     "ans": 859,
+     "ansOk": 300,
+     "deferred": 0,
+     "missing": 0
+    },
+    "new": {
+     "n": 1242,
+     "tool": 307,
+     "intent": 0,
+     "ans": 666,
+     "ansOk": 0,
+     "deferred": 0,
+     "missing": 0
+    },
+    "nat": {
+     "n": 2706,
+     "tool": 1316,
+     "intent": 818,
+     "ans": 1778,
+     "ansOk": 818,
+     "deferred": 0,
+     "missing": 0
+    },
+    "pl": {
+     "n": 1479,
+     "tool": 786,
+     "intent": 456,
+     "ans": 996,
+     "ansOk": 456,
+     "deferred": 0,
+     "missing": 0
+    },
+    "lit": {
+     "n": 251,
+     "tool": 140,
+     "intent": 117,
+     "ans": 174,
+     "ansOk": 117,
+     "deferred": 0,
+     "missing": 0
+    },
+    "old": {
+     "n": 1715,
+     "tool": 1149,
+     "intent": 935,
+     "ans": 1286,
+     "ansOk": 935,
+     "deferred": 0,
+     "missing": 0
+    },
+    "sh:bash": {
+     "n": 1464,
+     "tool": 724,
+     "intent": 617,
+     "ans": 1036,
+     "ansOk": 617,
+     "deferred": 0,
+     "missing": 0
+    },
+    "sh:powershell": {
+     "n": 60,
+     "tool": 18,
+     "intent": 18,
+     "ans": 57,
+     "ansOk": 18,
+     "deferred": 0,
+     "missing": 0
+    }
+   },
+   "C": {
+    "all": {
+     "n": 315,
+     "tool": 184,
+     "intent": 119,
+     "ans": 308,
+     "ansOk": 119,
+     "deferred": 315,
+     "missing": 0
+    },
+    "en": {
+     "n": 144,
+     "tool": 86,
+     "intent": 61,
+     "ans": 140,
+     "ansOk": 61,
+     "deferred": 144,
+     "missing": 0
+    },
+    "sh:zsh": {
+     "n": 147,
+     "tool": 91,
+     "intent": 37,
+     "ans": 144,
+     "ansOk": 37,
+     "deferred": 147,
+     "missing": 0
+    },
+    "new": {
+     "n": 129,
+     "tool": 51,
+     "intent": 0,
+     "ans": 124,
+     "ansOk": 0,
+     "deferred": 129,
+     "missing": 0
+    },
+    "nat": {
+     "n": 279,
+     "tool": 159,
+     "intent": 96,
+     "ans": 272,
+     "ansOk": 96,
+     "deferred": 279,
+     "missing": 0
+    },
+    "pl": {
+     "n": 171,
+     "tool": 98,
+     "intent": 58,
+     "ans": 168,
+     "ansOk": 58,
+     "deferred": 171,
+     "missing": 0
+    },
+    "old": {
+     "n": 186,
+     "tool": 133,
+     "intent": 119,
+     "ans": 184,
+     "ansOk": 119,
+     "deferred": 186,
+     "missing": 0
+    },
+    "lit": {
+     "n": 36,
+     "tool": 25,
+     "intent": 23,
+     "ans": 36,
+     "ansOk": 23,
+     "deferred": 36,
+     "missing": 0
+    },
+    "sh:bash": {
+     "n": 163,
+     "tool": 89,
+     "intent": 78,
+     "ans": 159,
+     "ansOk": 78,
+     "deferred": 163,
+     "missing": 0
+    },
+    "sh:powershell": {
+     "n": 5,
+     "tool": 4,
+     "intent": 4,
+     "ans": 5,
+     "ansOk": 4,
+     "deferred": 5,
+     "missing": 0
+    }
+   },
+   "A+C": {
+    "all": {
+     "n": 2957,
+     "tool": 1661,
+     "intent": 1171,
+     "ans": 2891,
+     "ansOk": 1171,
+     "deferred": 2500,
+     "missing": 0
+    },
+    "en": {
+     "n": 1478,
+     "tool": 787,
+     "intent": 600,
+     "ans": 1444,
+     "ansOk": 600,
+     "deferred": 1246,
+     "missing": 0
+    },
+    "sh:zsh": {
+     "n": 1433,
+     "tool": 865,
+     "intent": 415,
+     "ans": 1411,
+     "ansOk": 415,
+     "deferred": 1296,
+     "missing": 0
+    },
+    "new": {
+     "n": 1242,
+     "tool": 418,
+     "intent": 0,
+     "ans": 1204,
+     "ansOk": 0,
+     "deferred": 1150,
+     "missing": 0
+    },
+    "nat": {
+     "n": 2706,
+     "tool": 1510,
+     "intent": 1028,
+     "ans": 2651,
+     "ansOk": 1028,
+     "deferred": 2320,
+     "missing": 0
+    },
+    "pl": {
+     "n": 1479,
+     "tool": 874,
+     "intent": 571,
+     "ans": 1447,
+     "ansOk": 571,
+     "deferred": 1254,
+     "missing": 0
+    },
+    "lit": {
+     "n": 251,
+     "tool": 151,
+     "intent": 143,
+     "ans": 240,
+     "ansOk": 143,
+     "deferred": 180,
+     "missing": 0
+    },
+    "old": {
+     "n": 1715,
+     "tool": 1243,
+     "intent": 1171,
+     "ans": 1687,
+     "ansOk": 1171,
+     "deferred": 1350,
+     "missing": 0
+    },
+    "sh:bash": {
+     "n": 1464,
+     "tool": 778,
+     "intent": 738,
+     "ans": 1420,
+     "ansOk": 738,
+     "deferred": 1180,
+     "missing": 0
+    },
+    "sh:powershell": {
+     "n": 60,
+     "tool": 18,
+     "intent": 18,
+     "ans": 60,
+     "ansOk": 18,
+     "deferred": 24,
+     "missing": 0
+    }
+   },
+   "A+C-safe": {
+    "all": {
+     "n": 2957,
+     "tool": 1598,
+     "intent": 998,
+     "ans": 1952,
+     "ansOk": 998,
+     "deferred": 2500,
+     "missing": 0
+    },
+    "en": {
+     "n": 1478,
+     "tool": 763,
+     "intent": 515,
+     "ans": 956,
+     "ansOk": 515,
+     "deferred": 1246,
+     "missing": 0
+    },
+    "sh:zsh": {
+     "n": 1433,
+     "tool": 814,
+     "intent": 325,
+     "ans": 859,
+     "ansOk": 325,
+     "deferred": 1296,
+     "missing": 0
+    },
+    "new": {
+     "n": 1242,
+     "tool": 386,
+     "intent": 0,
+     "ans": 666,
+     "ansOk": 0,
+     "deferred": 1150,
+     "missing": 0
+    },
+    "nat": {
+     "n": 2706,
+     "tool": 1447,
+     "intent": 870,
+     "ans": 1778,
+     "ansOk": 870,
+     "deferred": 2320,
+     "missing": 0
+    },
+    "pl": {
+     "n": 1479,
+     "tool": 835,
+     "intent": 483,
+     "ans": 996,
+     "ansOk": 483,
+     "deferred": 1254,
+     "missing": 0
+    },
+    "lit": {
+     "n": 251,
+     "tool": 151,
+     "intent": 128,
+     "ans": 174,
+     "ansOk": 128,
+     "deferred": 180,
+     "missing": 0
+    },
+    "old": {
+     "n": 1715,
+     "tool": 1212,
+     "intent": 998,
+     "ans": 1286,
+     "ansOk": 998,
+     "deferred": 1350,
+     "missing": 0
+    },
+    "sh:bash": {
+     "n": 1464,
+     "tool": 766,
+     "intent": 655,
+     "ans": 1036,
+     "ansOk": 655,
+     "deferred": 1180,
+     "missing": 0
+    },
+    "sh:powershell": {
+     "n": 60,
+     "tool": 18,
+     "intent": 18,
+     "ans": 57,
+     "ansOk": 18,
+     "deferred": 24,
+     "missing": 0
+    }
+   }
+  },
+  "ood": {
+   "A": {
+    "n": 92,
+    "rej": 87
+   },
+   "C": {
+    "n": 12,
+    "rej": 11
+   },
+   "A+C": {
+    "n": 92,
+    "rej": 86
+   },
+   "A+C-safe": {
+    "n": 92,
+    "rej": 87
+   }
+  },
+  "blind_ood": {
+   "A": {
+    "n": 40,
+    "rej": 40
+   },
+   "C": {
+    "n": 3,
+    "rej": 3
+   },
+   "A+C": {
+    "n": 40,
+    "rej": 40
+   },
+   "A+C-safe": {
+    "n": 40,
+    "rej": 40
+   }
+  },
+  "blind3_ood": {
+   "A": {
+    "n": 64,
+    "rej": 64
+   },
+   "C": {
+    "n": 7,
+    "rej": 7
+   },
+   "A+C": {
+    "n": 64,
+    "rej": 64
+   },
+   "A+C-safe": {
+    "n": 64,
+    "rej": 64
+   }
+  },
+  "real_ooc": {
+   "A": {
+    "n": 2213,
+    "rej": 1124
+   },
+   "C": {
+    "n": 230,
+    "rej": 14
+   },
+   "A+C": {
+    "n": 2213,
+    "rej": 89
+   },
+   "A+C-safe": {
+    "n": 2213,
+    "rej": 1124
+   }
+  },
+  "realSlots": {
+   "A": {
+    "n": 935,
+    "filled": 1078,
+    "found": 981,
+    "exact": 189
+   },
+   "A+C": {
+    "n": 1171,
+    "filled": 1390,
+    "found": 1268,
+    "exact": 227
+   },
+   "A+C-safe": {
+    "n": 998,
+    "filled": 1164,
+    "found": 1065,
+    "exact": 210
+   }
+  },
+  "evalShells": {
+   "A": {
+    "bash": 0.949244966442953,
+    "zsh": 0.9475671140939598,
+    "sh": 0.9475671140939598,
+    "powershell": 0.9467281879194631,
+    "fish": 0.9488255033557047,
+    "cmd": 0.9488255033557047
+   }
+  },
+  "slots": {
+   "gold": {
+    "A tagger + regex (shipped)": {
+     "p": 0.9612903225806452,
+     "r": 0.9644012944983819,
+     "f1": 0.9628432956381261,
+     "en": 0.9620253164556962,
+     "pl": 0.9636963696369637,
+     "n": 208
+    },
+    "A tagger only": {
+     "p": 0.9928825622775801,
+     "r": 0.9029126213592233,
+     "f1": 0.9457627118644069,
+     "en": 0.9501661129568106,
+     "pl": 0.9411764705882353,
+     "n": 208
+    }
+   },
+   "blind": {
+    "A tagger + regex (shipped)": {
+     "p": 0.8975791433891993,
+     "r": 0.9432485322896281,
+     "f1": 0.9198473282442747,
+     "en": 0.9100719424460431,
+     "pl": 0.9308943089430894,
+     "n": 641
+    },
+    "A tagger only": {
+     "p": 0.9648033126293996,
+     "r": 0.9119373776908023,
+     "f1": 0.937625754527163,
+     "en": 0.9371428571428572,
+     "pl": 0.9381663113006395,
+     "n": 641
+    }
+   }
+  },
+  "e2e": {
+   "relex": {
+    "A": {
+     "all": [
+      1326,
+      1115
+     ],
+     "en": [
+      674,
+      559
+     ],
+     "pl": [
+      652,
+      556
+     ]
+    },
+    "C": {
+     "all": [
+      128,
+      111
+     ],
+     "en": [
+      68,
+      61
+     ],
+     "pl": [
+      60,
+      50
+     ]
+    },
+    "A+C": {
+     "all": [
+      1326,
+      1160
+     ],
+     "en": [
+      674,
+      591
+     ],
+     "pl": [
+      652,
+      569
+     ]
+    },
+    "A+C-safe": {
+     "all": [
+      1326,
+      1124
+     ],
+     "en": [
+      674,
+      570
+     ],
+     "pl": [
+      652,
+      554
+     ]
+    }
+   },
+   "blind": {
+    "A": {
+     "all": [
+      641,
+      604
+     ],
+     "en": [
+      331,
+      309
+     ],
+     "pl": [
+      310,
+      295
+     ]
+    },
+    "C": {
+     "all": [
+      65,
+      60
+     ],
+     "en": [
+      36,
+      35
+     ],
+     "pl": [
+      29,
+      25
+     ]
+    },
+    "A+C": {
+     "all": [
+      641,
+      606
+     ],
+     "en": [
+      331,
+      312
+     ],
+     "pl": [
+      310,
+      294
+     ]
+    },
+    "A+C-safe": {
+     "all": [
+      641,
+      604
+     ],
+     "en": [
+      331,
+      310
+     ],
+     "pl": [
+      310,
+      294
+     ]
+    }
+   },
+   "blind_novel": {
+    "A": {
+     "all": [
+      507,
+      472
+     ],
+     "en": [
+      266,
+      246
+     ],
+     "pl": [
+      241,
+      226
+     ]
+    },
+    "C": {
+     "all": [
+      46,
+      42
+     ],
+     "en": [
+      25,
+      24
+     ],
+     "pl": [
+      21,
+      18
+     ]
+    },
+    "A+C": {
+     "all": [
+      507,
+      474
+     ],
+     "en": [
+      266,
+      248
+     ],
+     "pl": [
+      241,
+      226
+     ]
+    },
+    "A+C-safe": {
+     "all": [
+      507,
+      472
+     ],
+     "en": [
+      266,
+      246
+     ],
+     "pl": [
+      241,
+      226
+     ]
+    }
+   },
+   "blind3": {
+    "A": {
+     "all": [
+      207,
+      199
+     ],
+     "en": [
+      112,
+      108
+     ],
+     "pl": [
+      95,
+      91
+     ]
+    },
+    "C": {
+     "all": [
+      13,
+      13
+     ],
+     "en": [
+      10,
+      10
+     ],
+     "pl": [
+      3,
+      3
+     ]
+    },
+    "A+C": {
+     "all": [
+      194,
+      189
+     ],
+     "en": [
+      108,
+      105
+     ],
+     "pl": [
+      86,
+      84
+     ]
+    },
+    "A+C-safe": {
+     "all": [
+      194,
+      189
+     ],
+     "en": [
+      108,
+      105
+     ],
+     "pl": [
+      86,
+      84
+     ]
+    }
+   },
+   "devtools": {
+    "A": {
+     "all": [
+      324,
+      34
+     ],
+     "en": [
+      163,
+      18
+     ],
+     "pl": [
+      161,
+      16
+     ]
+    },
+    "C": {
+     "all": [
+      38,
+      5
+     ],
+     "en": [
+      21,
+      2
+     ],
+     "pl": [
+      17,
+      3
+     ]
+    },
+    "A+C": {
+     "all": [
+      324,
+      34
+     ],
+     "en": [
+      163,
+      18
+     ],
+     "pl": [
+      161,
+      16
+     ]
+    },
+    "A+C-safe": {
+     "all": [
+      324,
+      34
+     ],
+     "en": [
+      163,
+      18
+     ],
+     "pl": [
+      161,
+      16
+     ]
+    }
+   }
+  },
+  "history": {
+   "A": [
+    48,
+    44
+   ],
+   "C": [
+    48,
+    44
+   ],
+   "A+C": [
+    48,
+    44
+   ],
+   "A+C-safe": [
+    48,
+    44
+   ]
+  }
+ },
+ "policies": {
+  "A": {},
+  "C": {
+   "tau": "Infinity",
+   "alpha": 0,
+   "k": 3,
+   "accept": 0,
+   "none": 1.01,
+   "keepNone": true
+  },
+  "A+C": {
+   "tau": 0.9,
+   "alpha": 0.75,
+   "k": 5,
+   "accept": 0,
+   "none": 1.01,
+   "keepNone": true
+  },
+  "A+C-safe": {
+   "tau": 0.9,
+   "alpha": 0.5,
+   "k": 5,
+   "accept": 0,
+   "none": 1.01,
+   "keepNone": false,
+   "rescue": false
+  }
+ },
+ "lmRows": 6735,
+ "realRows": 2957,
+ "realOoc": 2213
+}

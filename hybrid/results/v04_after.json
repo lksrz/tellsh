@@ -2521,27 +2521,27 @@
   "realSlots": {
    "A": {
     "n": 2425,
-    "filled": 3809,
-    "found": 3582,
-    "exact": 268
+    "filled": 3811,
+    "found": 3586,
+    "exact": 269
    },
    "B": {
     "n": 2636,
-    "filled": 4049,
-    "found": 3814,
-    "exact": 361
+    "filled": 4051,
+    "found": 3830,
+    "exact": 363
    },
    "A+B": {
     "n": 2626,
-    "filled": 4064,
-    "found": 3825,
-    "exact": 334
+    "filled": 4067,
+    "found": 3830,
+    "exact": 336
    },
    "A+B-safe": {
     "n": 2523,
-    "filled": 3931,
-    "found": 3697,
-    "exact": 300
+    "filled": 3933,
+    "found": 3701,
+    "exact": 301
    }
   },
   "evalShells": {
