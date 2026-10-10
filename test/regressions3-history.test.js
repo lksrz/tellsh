@@ -28,16 +28,23 @@ test('history: "delete them" after a search never targets the search root', () =
   // non-destructive reuse of the search root is fine
   assert.equal(run('list it', ['find /var/log -name "*.gz"']).command, 'ls -lah /var/log');
   assert.equal(run('how big is it', ['grep -rl TODO src']).command, 'du -sh src');
-  // the same directory used by a newer non-search command is an ordinary target again
-  assert.equal(run('delete it', ['grep -rl TODO src', 'ls src']).command, 'rm -r src');
+  // the same directory used by a newer non-listing command is an ordinary target again; a newer listing
+  // of it is not (round 4b: "it" after `ls src` may be src or one of its entries)
+  assert.equal(run('delete it', ['grep -rl TODO src', 'du -sh src']).command, 'rm -r src');
+  assert.equal(run('delete it', ['grep -rl TODO src', 'ls src']).context.rule, 'refused');
   const ctx = buildContext(['find /var/log -name "*.gz"']);
   assert.ok(ctx.searchRoots.has('/var/log'));
 });
 
 test('history: the later segment of a compound line wins across entity types', () => {
-  assert.equal(run('delete it', ['cat old.txt; ls newdir']).command, 'rm -r newdir');
-  assert.equal(run('delete it', ['cat old.txt && ls newdir']).command, 'rm -r newdir');
-  assert.equal(run('delete it', ['ls olddir; cat new.txt']).command, 'rm new.txt');
+  assert.equal(run('delete it', ['cat old.txt; mkdir newdir']).command, 'rm -r newdir');
+  assert.equal(run('delete it', ['cat old.txt && du -sh newdir']).command, 'rm -r newdir');
+  assert.equal(run('delete it', ['mkdir olddir; cat new.txt']).command, 'rm new.txt');
+  // a listing: neither the listed directory nor the older file (round 4b)
+  for (const h of ['cat old.txt; ls newdir', 'cat old.txt && ls newdir', 'ls olddir; cat new.txt']) {
+    if (h.startsWith('ls')) assert.equal(run('delete it', [h]).command, 'rm new.txt');
+    else assert.match(run('delete it', [h]).command, /<PATH>/, h);
+  }
   // the newest target is ambiguous: refuse instead of falling back to old.txt
   const amb = run('delete it', ['cat old.txt; ls $D']);
   assert.equal(amb.context.rule, 'refused');
@@ -50,13 +57,17 @@ test('history: the later segment of a compound line wins across entity types', (
 });
 
 test('history: request verbs are not target hints (newest target wins)', () => {
-  assert.equal(run('remove it', ['ls /srv/remove-backups', 'ls /srv/current']).command, 'rm -r /srv/current');
-  assert.equal(run('delete it', ['ls /srv/delete-me', 'ls /srv/current']).command, 'rm -r /srv/current');
+  assert.equal(run('remove it', ['mkdir /srv/remove-backups', 'mkdir /srv/current']).command, 'rm -r /srv/current');
+  assert.equal(run('delete it', ['mkdir /srv/delete-me', 'mkdir /srv/current']).command, 'rm -r /srv/current');
   assert.equal(run('kill it', ['pgrep kill-worker', 'pgrep current-worker']).command, 'pkill -f current-worker');
   assert.equal(run('stop that process', ['pgrep stop-worker', 'pgrep current-worker']).command, 'pkill -f current-worker');
-  assert.equal(run('usuń to', ['ls /srv/usun-stare', 'ls /srv/current']).command, 'rm -r /srv/current');
-  // an explicit target word still selects an older value
-  assert.equal(run('delete that backups folder', ['ls /srv/remove-backups', 'ls /srv/current']).command, 'rm -r /srv/remove-backups');
+  assert.equal(run('usuń to', ['mkdir /srv/usun-stare', 'mkdir /srv/current']).command, 'rm -r /srv/current');
+  // an explicit target word still selects an older value for a read; a changing command only ever uses
+  // the newest value of its type (round 4b)
+  assert.equal(run('show that backups folder', ['ls /srv/remove-backups', 'ls /srv/current']).command, 'ls -lah /srv/remove-backups');
+  const old = run('delete that backups folder', ['mkdir /srv/remove-backups', 'mkdir /srv/current']);
+  assert.equal(old.context.rule, 'refused');
+  assert.equal(old.command, 'rm -r <PATH>');
 });
 
 test('history: a note never claims a history value the command does not use', () => {
@@ -68,7 +79,8 @@ test('history: a note never claims a history value the command does not use', ()
 });
 
 test('history: `ls /a /b` + "it" is the last argument', () => {
-  assert.equal(run('delete it', ['ls /a /b']).command, 'rm -r /b');
+  assert.equal(run('delete it', ['du -sh /a /b']).command, 'rm -r /b');
+  assert.equal(run('delete it', ['ls /a /b']).command, 'rm -r <PATH>'); // listed (round 4b)
   assert.equal(run('show it', ['ls /a /b']).command, 'ls -lah /b');
   assert.equal(run('how big is it', ['du -sh /a /b']).command, 'du -sh /b');
 });

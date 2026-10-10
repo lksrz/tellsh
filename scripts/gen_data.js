@@ -11,8 +11,8 @@ import { INTENTS } from '../src/catalog.js';
 import { FAMILIES, FAMILY_OF, NONE, TAG_TYPES } from '../src/tools.js';
 import { vectorize, normalize, tagTokens, tagFeatures } from '../src/features.js';
 import { ctxFeatures } from '../src/history.js';
-import { silverSpans, relex, bioLabels, mulberry32, EVAL_VALUES } from './lib/silver.js';
-import { heldOutTexts, heldOutIndex } from './lib/heldout.js';
+import { silverSpans, relex, bioLabels, mulberry32 } from './lib/silver.js';
+import { exclusionIndex } from './lib/heldout.js';
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
 export const DIM = 1 << 18;
@@ -99,13 +99,12 @@ function main() {
   mkdirSync(outDir, { recursive: true });
   const ids = new Set(INTENTS.map((i) => i.id));
 
-  // held-out texts (never trained on), with filler-word near-duplicates and contrastive rewrites
-  // (scripts/lib/heldout.js)
-  const heldOut = heldOutIndex(heldOutTexts(ROOT));
-  // eval-only slot values (scripts/lib/silver.js EVAL_POOLS) must never occur in training text
-  const esc = (v) => v.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-  const evalValRe = new RegExp(`(?<![\\p{L}\\d_])(?:${[...EVAL_VALUES].sort((a, b) => b.length - a.length).map(esc).join('|')})(?![\\p{L}\\d_])`, 'iu');
-  const leaks = (text) => heldOut.has(text) || evalValRe.test(text);
+  // held-out texts (never trained on), with filler-word near-duplicates and contrastive rewrites, and
+  // eval-only slot values (scripts/lib/silver.js EVAL_POOLS): the same index teacher.js uses (scripts/lib/heldout.js)
+  const excl = exclusionIndex(ROOT);
+  const heldOut = excl.heldOut;
+  const evalValRe = { test: excl.evalValue };
+  const leaks = excl.has;
 
   const intentRows = [...readDir(join(ROOT, 'data', 'intents')), ...readJsonl(join(ROOT, 'data', 'train.jsonl'))]
     .map((r) => ({ ...r, src: 'intents' }));

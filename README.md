@@ -133,20 +133,30 @@ Lines are split with a shell-aware tokenizer (`a\ b.txt`, quoted `;`/`|`, redire
 escapes and native cmdlets such as `Get-Content -LiteralPath`, `Remove-Item`, `Stop-Process -Id`, `Restart-Service`).
 If the latest value of the referenced type depends on the shell state (`cat $F`, `rm *.log`), comes from a line that
 cannot be parsed, or from an unknown command naming a path, the reference is **refused** (the slot stays a
-placeholder) rather than resolved to an older value. A directory that was only searched or filtered (`find /var/log
--name '*.gz'`, `grep -rl TODO src`, `Get-ChildItem DIR -Filter *.pdf`, a listing piped into any later stage such as
-`ls DIR | sort | grep pdf` or `ls -S DIR | head -1`), or only listed when the request says "them"/"those"/"je"
-(`ls /tmp/build` + "delete them"), is never the target of a changing command: the results live inside it. An
-argument-less `ls`/`Get-ChildItem` lists the directory of the latest `cd`, and a `tellsh list directory X` line counts
-as a listing too. "Same for X" / "same but …" are refused for a changing command when any newer line (or a later
+placeholder) rather than resolved to an older value. A changing command (rm, mv, cp source or destination, kill,
+chmod, git branch -d/checkout/restore, docker stop/exec, service restart, …) only ever takes a history value that is
+unambiguous **and** is the newest value of its type; otherwise the slot stays a placeholder:
+  * a directory that was searched, filtered or listed (`find /var/log -name '*.gz'`, `grep -rl TODO src`, `ls /tmp/build`,
+    `du -d 1 DIR`, `Get-ChildItem DIR`, `ls DIR | sort | grep pdf`, `ls -S DIR | head -1`) is never the target, for
+    "it" as well as "them": the user saw entries inside it;
+  * an older value is never picked (no older branch because the newest is the checked-out one, no older path because
+    a word of the request matches it); reads may still use them;
+  * a newer listing of the same type (`cat a.txt` then `ls`, `pgrep foo` then `ps aux`, `docker ps`, `git branch`,
+    `git status`, `systemctl list-units`) means "it" may be one of the listed values;
+  * the directory of a `cd` is a target only when nothing ran after the `cd` (`cd DIR` then `make`, `rg TODO`,
+    `grep -rl TODO`, `ls`: refused).
+An argument-less `ls`/`Get-ChildItem`/search lists the directory of the latest `cd`, and a `tellsh list directory X`
+line counts as a listing too. "Same for X" / "same but …" are refused for a changing command when any newer line (or a later
 segment of the same line) ran after it, or when X names nothing the previous command takes. A slot of the previous
 command that depends on the shell state (`find "$DIR" …`) stays a placeholder. With a refused or pronoun source ("move
-them to /tmp/old"), the named path is the destination. A quoted `'~/x'` from history stays the literal directory `./~/x`.
+them to /tmp/old"), the named path is the destination; with a reference in destination position ("copy notes.txt to
+it / into that folder / do niego"), the named path is the source. A quoted `'~/x'` from history stays the literal
+directory `./~/x`.
 
 * deterministic rules: "same for /var" / "to samo dla /var" (previous intent, one slot replaced), "delete it" /
   "usuń to", "logs of that container" / "logi tego kontenera", "kill it" / "zabij go" (verb × entity type table; a
-  noun in the request picks the entity type; a named part like "that release branch" picks the value; the checked-out
-  branch is never the one deleted), "same but only file names" / "to samo ale tylko nazwy plików" (previous tool,
+  noun in the request picks the entity type; a named part like "that release branch" picks an older value only for
+  a read; the checked-out branch is never the one deleted), "same but only file names" / "to samo ale tylko nazwy plików" (previous tool,
   new intent, slots carried over), and missing required slots filled from history ("ile ma słów" after `cat raport.txt`);
 * `ctx_last=…`, `ctx_has=…`, `ctx_tool=…`, `ctx_cwd=git|compose` tokens are classifier features (trained on synthetic
   anaphora), so un-ruled paraphrases still benefit.
@@ -171,7 +181,14 @@ compression from the archive name, `bash -n` and an allowed-flag check validate 
   chmod, mv, sudo, …), **high** (destructive: rm, kill, prune, discard). v0.2 raised 10 intents from safe to medium after
   the teacher review (see `EVAL.md`).
 * `src/danger.js` scans the **final** command — also edited ones — and can only escalate. It tokenizes each simple
-  command (quotes, `--`, long options, `sudo`/`xargs`/`env` wrappers, `bash -c '…'`/`su -c '…'`/`flock -c '…'`/`eval`/`'…' | bash` payloads) and
+  command (quotes, `--`, long options) and checks every command it may run: after a wrapper (`sudo`, `doas`, `su`,
+  `runuser`, `pkexec`, `flock`, `nice`, `ionice`, `timeout`, `stdbuf`, `nohup`, `setsid`, `env`, `xargs`, `chrt`, `cgexec`,
+  `eatmydata`, `torsocks`, `catchsegv`, `parallel`, `tmux`, …) the command starting at **every** later non-option word,
+  so unknown wrapper options cannot hide it; the remote command of `ssh host …` and `docker/kubectl exec …`; and any
+  `-c`/`--command`/`--command=` string (`bash -lc '…'`, `su -c '…'`, `script -c '…'`, `find … -exec sh -c '…'`,
+  `env -S '…'`, `eval`, `cmd /c`, `pwsh -Command`). Unsure is high: a command name or a runner's command string that
+  depends on the shell state (`$CMD -rf /`, `sh -c "$X"`, `eval "$X"`), `pwsh -EncodedCommand`, and text piped into a
+  shell (`… | sh`, `… | iex`). Switching user (`su`, `runuser`, `pkexec`) is at least medium, like `sudo`. It
   strips `git`/`docker` global options (`git -C dir -c k=v reset --hard` = `git reset --hard`). POSIX: `rm -rf` /
   `rm --recursive --force` on `/`, `~`, `~/*`, `"/"`, `/usr`, …, `mkfs`, `dd of=/dev/…`, fork bombs, `curl | sh`,
   `bash <(curl …)`, `sh -c "$(curl …)"`, force-push (incl. `+branch`), redirects into `/etc` (`>>`, `1>`, `&>`),
@@ -204,12 +221,12 @@ All numbers are on held-out data never used for training (`npm run eval`, `npm r
 | end-to-end exact command, relexicalised held-out values (full pipeline / gold intent) | **85.3%** / 93.9% |
 | blind sets (v0.3, separate author): intent top-1 · end-to-end exact command | 98.8% (clean subset 98.6%) · 96.1% (clean 96.0%) |
 | hand-written slot cases, exact command | 99/99 |
-| history references, exact command (48 EN+PL; without history 0%) | **97.9%** (dev set, blind first run 60.4%) · v0.3 blind set (79): 82.3% |
+| history references, exact command (48 EN+PL; without history 0%) | **91.7%** (dev set, blind first run 60.4%) · v0.3 blind set (79): 79.7% (stricter rules for changing commands, see EVAL.md) |
 | composer on out-of-catalogue requests: acceptable / exact | 49.0% / 47.1% (dev set) · any answer acceptable 52.9% · v0.3 blind set (58): acceptable 22.4% · false fires on catalog requests 0.5% |
 | out-of-domain rejected | 94.6% (blind set 100%) |
 | model size | **2.71 MB** (v0.1: 3.68 MB) |
-| latency, `taskset -c 0`: cold process p50 / p95 | **160 / 179 ms** (bare `node -e 0`: 75 ms) |
-| latency, warm full cascade + tagger + render p50 / p95 | **0.32 / 1.8 ms** |
+| latency, `taskset -c 0`: cold process p50 / p95 | **171 / 190 ms** (bare `node -e 0`: 86 ms) |
+| latency, warm full cascade + tagger + render p50 / p95 | **0.35 / 3.9 ms** |
 
 ## Data & licenses
 

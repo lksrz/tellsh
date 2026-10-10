@@ -65,8 +65,8 @@ test('a listing after `cd` is a listing of the cd directory', () => {
     refusedPath(r);
     assert.ok(!/Downloads|build|C:\\x/.test(r.command), `${JSON.stringify(h)} ${q} -> ${r.command}`);
   }
-  // singular "it" after a plain listing is still the directory; an older cd is not the cwd listing
-  assert.equal(run('delete it', ['cd /tmp/build', 'ls']).command, 'rm -r /tmp/build');
+  // singular "it" after a listing is refused too (round 4b); the newest cd with nothing after it is a target
+  assert.equal(run('delete it', ['cd /tmp/build', 'ls']).command, 'rm -r <PATH>');
   assert.equal(run('delete them', ['cd /tmp/a', 'cd /tmp/b']).command, 'rm -r /tmp/b');
 });
 
@@ -80,8 +80,8 @@ test('a listing piped into any later stage is a selection of its entries', () =>
     refusedPath(r);
     assert.ok(!/Downloads|C:\\x/.test(r.command), `${h} -> ${r.command}`);
   }
-  // an unpiped listing followed by another command on the same line is unchanged
-  assert.equal(run('delete it', ['ls /tmp/build; echo done']).command, 'rm -r /tmp/build');
+  // an unpiped listing followed by another command on the same line is a listing too (round 4b)
+  assert.equal(run('delete it', ['ls /tmp/build; echo done']).command, 'rm -r <PATH>');
 });
 
 test('a `tellsh` listing line is a listing too', () => {
@@ -99,7 +99,8 @@ test('a refused or pronoun source keeps the request path as the destination', ()
   assert.equal(b.command, 'cp -ri <SRC> /backup');
   refusedPath(b, 'src');
   assert.equal(run('copy it to /backup', ['cat a.txt']).command, 'cp -ri a.txt /backup');
-  assert.equal(run('move it to /tmp/old', ['ls /tmp/build']).command, 'mv -i /tmp/build /tmp/old');
+  assert.equal(run('move it to /tmp/old', ['mkdir /tmp/build']).command, 'mv -i /tmp/build /tmp/old');
+  assert.equal(run('move it to /tmp/old', ['ls /tmp/build']).command, 'mv -i <SRC> /tmp/old'); // listed (round 4b)
 });
 
 test('a stop word right after "folder"/"file" is a name, not a reason to use `.`', () => {
@@ -119,7 +120,9 @@ test('danger: -c command strings and more wrappers are unwrapped', () => {
     assert.equal(d.risk, 'high', c);
     assert.equal(d.critical, true, c);
   }
-  for (const c of ['flock /tmp/l echo hi', 'su - bob', 'cgexec -g cpu:x ls', 'chrt -p 1234']) assert.equal(checkDanger(c, 'safe').risk, 'safe', c);
+  for (const c of ['flock /tmp/l echo hi', 'cgexec -g cpu:x ls', 'chrt -p 1234']) assert.equal(checkDanger(c, 'safe').risk, 'safe', c);
+  // switching user is a privilege change, like sudo (round 4b)
+  assert.equal(checkDanger('su - bob', 'safe').risk, 'medium');
 });
 
 test('teacher.js and gen_data.js exclude the same held-out texts, including the slot cases', () => {
@@ -129,6 +132,6 @@ test('teacher.js and gen_data.js exclude the same held-out texts, including the 
   assert.ok(idx.has('chmod 755 deploy.sh') || !SLOT_CASES.some((c) => c[1] === 'chmod 755 deploy.sh'));
   for (const f of ['scripts/teacher.js', 'scripts/gen_data.js']) {
     const src = readFileSync(new URL(`../${f}`, import.meta.url), 'utf8');
-    assert.match(src, /heldOutIndex\(heldOutTexts\(ROOT\)\)/, f);
+    assert.match(src, /exclusionIndex\(ROOT\)/, f); // one index for both (round 4b: also the eval-only values)
   }
 });

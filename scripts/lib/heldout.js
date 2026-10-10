@@ -8,6 +8,7 @@ import { join } from 'node:path';
 import { normalize } from '../../src/features.js';
 import { CONTRAST_RULES } from './confusable.js';
 import { SLOT_CASES } from '../../test/slot-cases.js';
+import { EVAL_VALUES } from './silver.js';
 
 const readJsonl = (p) => (existsSync(p) ? readFileSync(p, 'utf8').split('\n').filter((l) => l.trim()).map((l) => JSON.parse(l)) : []);
 const readDir = (d) => (existsSync(d) ? readdirSync(d).filter((f) => f.endsWith('.jsonl')).sort().flatMap((f) => readJsonl(join(d, f))) : []);
@@ -54,4 +55,20 @@ export function heldOutIndex(texts) {
     for (const rule of CONTRAST_RULES) if (rule.re.test(t)) { const w = t.replace(rule.re, rule.to); if (w !== t) add(w); }
   }
   return { exact, near, has: (t) => exact.has(normalize(t)) || near.has(nearKey(t)) };
+}
+
+const esc = (v) => v.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+/** Eval-only slot values (scripts/lib/silver.js EVAL_POOLS) as one whole-word regex. */
+export const EVAL_VALUE_RE = new RegExp(`(?<![\\p{L}\\d_])(?:${[...EVAL_VALUES].sort((a, b) => b.length - a.length).map(esc).join('|')})(?![\\p{L}\\d_])`, 'iu');
+
+/**
+ * The one exclusion index of every build-time script that produces or sends training text (gen_data.js and
+ * the Jev teacher, teacher.js): a text is excluded when it is a held-out text (or a near-duplicate / contrastive
+ * rewrite of one) or mentions an eval-only slot value.
+ * -> { heldOut: heldOutIndex(...), evalValue(text), has(text) }
+ */
+export function exclusionIndex(root, extra = []) {
+  const heldOut = heldOutIndex(heldOutTexts(root, extra));
+  const evalValue = (t) => EVAL_VALUE_RE.test(String(t));
+  return { heldOut, evalValue, has: (t) => heldOut.has(t) || evalValue(t) };
 }

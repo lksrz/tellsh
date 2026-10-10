@@ -15,6 +15,20 @@ rejection 92.4% → **94.6%**; history references unchanged at 97.9% (dev set). 
 (117 in v0.2: a value starting with `/` is now refused where cmd.exe would read it as a switch, so the eval rows
 for `dir_size`, `chown` and `create_symlink`, which use POSIX paths like `/var/www`, report a gap).
 
+**Round 4b (stricter history rules, model unchanged).** `gen_data.js` output is byte-identical to the build the shipped
+model was trained on (31534 / 34434), so the model was not retrained; `teacher.js` (Jev) now uses the same exclusion
+index as `gen_data.js` (`exclusionIndex`: held-out texts, near-duplicates, contrastive rewrites **and** eval-only slot
+values). A changing command (rm, mv, cp source/destination, kill, chmod, git branch -d/checkout, docker exec/stop,
+service restart, …) now takes a history value only when it is unambiguous and the newest value of its type: never a
+listed or searched directory (also for "it"), never an older value, never a value a newer listing of the same type may
+have replaced, never a `cd` directory after which other commands ran. This lowers the history numbers on purpose:
+dev 97.9% → **91.7%** (3 rows expected an older branch after `git checkout main`: "delete that branch", "usuń tę gałąź",
+"switch back to that release branch"), blind 82.3% → **79.7%** (an older branch after `git checkout main`; a container
+before a newer `docker ps`); every one of these now renders a placeholder instead. The danger checker now unwraps any
+`-c`/`--command` payload, checks the command at every later word after a wrapper, and rates unreadable payloads
+(`sh -c "$X"`, `$CMD …`, `… | sh`) high. Function words never turn a path into `.` ("list files in the" → `<PATH>`).
+Benchmark re-run on a busier machine (bare `node` startup 75 → 86 ms).
+
 <!-- eval:start -->
 ## Model
 
@@ -80,17 +94,17 @@ Per type F1 (tagger only / regex only / merged): PATH 97/97/98, SIZE 100/100/100
 
 | split | n | intent | exact command | exact command without history |
 |---|---|---|---|---|
-| ALL | 48 | 100.0% | 97.9% | 0.0% |
-| EN | 24 | 100.0% | 95.8% | 0.0% |
-| PL | 24 | 100.0% | 100.0% | 0.0% |
+| ALL | 48 | 100.0% | 91.7% | 0.0% |
+| EN | 24 | 100.0% | 87.5% | 0.0% |
+| PL | 24 | 100.0% | 95.8% | 0.0% |
 
 **Blind set** `data/blind/history.jsonl` (79 rows, written for v0.3 by a separate author before any result was seen, never used for tuning):
 
 | split | n | intent | exact command | exact command without history |
 |---|---|---|---|---|
-| ALL | 79 | 93.7% | 82.3% | 13.9% |
-| EN | 40 | 95.0% | 85.0% | 12.5% |
-| PL | 39 | 92.3% | 79.5% | 15.4% |
+| ALL | 79 | 93.7% | 79.7% | 13.9% |
+| EN | 40 | 95.0% | 82.5% | 12.5% |
+| PL | 39 | 92.3% | 76.9% | 15.4% |
 
 ## 6. Second pass: experimental composer
 
@@ -157,13 +171,13 @@ Machine: Intel(R) Xeon(R) Processor, Node v20.19.2, linux; CPU affinity: `0` (ru
 
 | measurement | p50 | p95 | runs |
 |---|---|---|---|
-| bare `node -e 0` startup (baseline) | 74.7 ms | 85.2 ms | 10 |
-| **cold**: `node bin/tellsh.js --dry-run --json --shell bash <query>` (new process, model load, full pipeline) | **159.6 ms** | **178.8 ms** | 40 |
-| model load (in-process, one-off) | 6.3 ms | – | 1 |
-| **warm**: full cascade + tagger + render (bash, composer off) | **0.319 ms** | **1.8 ms** | 2000 |
-| warm, incl. composer modifier check (shipped default) | 0.493 ms | 6.0 ms | 2000 |
-| warm, PowerShell rendering | 0.273 ms | 0.554 ms | 2000 |
-| warm, with 5 history lines (context build + reference rules) | 1.0 ms | 6.5 ms | 2000 |
+| bare `node -e 0` startup (baseline) | 86.0 ms | 88.7 ms | 10 |
+| **cold**: `node bin/tellsh.js --dry-run --json --shell bash <query>` (new process, model load, full pipeline) | **170.9 ms** | **189.7 ms** | 40 |
+| model load (in-process, one-off) | 5.4 ms | – | 1 |
+| **warm**: full cascade + tagger + render (bash, composer off) | **0.353 ms** | **3.9 ms** | 2000 |
+| warm, incl. composer modifier check (shipped default) | 0.573 ms | 7.4 ms | 2000 |
+| warm, PowerShell rendering | 0.334 ms | 0.877 ms | 2000 |
+| warm, with 5 history lines (context build + reference rules) | 1.2 ms | 7.7 ms | 2000 |
 
 The composer runs `bash -n` (a subprocess, ~2 ms) only when it actually returns a composed command.
 <!-- bench:end -->

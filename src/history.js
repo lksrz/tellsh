@@ -385,8 +385,9 @@ export function analyzeCommand(line, classify, kind = 'posix') {
     if (r?.intent) { intent = r.intent; slots = { ...(r.slots || {}) }; entsFromSlots(intent, slots, ents); }
     // `tellsh list directory /tmp/build`: like `ls /tmp/build`, the user saw the entries of the directory
     const sr = isSearchRoot(intent, slots, ents);
-    const ld = !sr && ents.dir != null && FAMILY_OF[intent] === 'ls';
-    return { line: t, intent, slots, ents, at: {}, ...(sr ? { searchDir: true } : {}), ...(ld ? { listDir: true } : {}), fromTellsh: true, ambiguous };
+    const ld = !sr && ents.dir != null && (FAMILY_OF[intent] === 'ls' || intent === 'largest_dirs');
+    const listed = Object.fromEntries(listedByIntent(intent).map((x) => [x, 0]));
+    return { line: t, intent, slots, ents, at: {}, listed, ...(sr ? { searchDir: true } : {}), ...(ld ? { listDir: true } : {}), fromTellsh: true, ambiguous };
   }
   const split = splitCommand(t, k, { keepRedirects: true });
   if (!split.ok) {
@@ -394,7 +395,7 @@ export function analyzeCommand(line, classify, kind = 'posix') {
     // so older file/dir values must not be picked up by "it"
     ents.file = AMB + t;
     ents.dir = AMB + t;
-    return { line: t, intent, slots, ents, at: {}, opaque: true, ambiguous: true };
+    return { line: t, intent, slots, ents, at: {}, listed: { file: 0, dir: 0 }, opaque: true, ambiguous: true };
   }
   const inv = invert(t, k);
   let segIntent = null;
@@ -406,6 +407,7 @@ export function analyzeCommand(line, classify, kind = 'posix') {
   let listDir = false;
   let listsCwd = null; // an argument-less listing of the working directory: 'list' | 'search' (filtered)
   const at = {};
+  const listed = {}; // entity type -> index of the newest segment that listed values of that type
   // segments from..to-1 are connected by pipes only
   const samePipe = (from, to) => from >= 0 && split.segments.slice(from, to).every((s) => s.sep === '|');
   const firstWord = (s) => { let w = s.words.filter((x) => !REDIR_TARGET_OP.test(x) && !REDIR_DUP_OP.test(x)); while (w.length && (w[0] === 'sudo' || /^\w+=/.test(w[0]))) w = w.slice(1); return w[0]; };
@@ -429,6 +431,8 @@ export function analyzeCommand(line, classify, kind = 'posix') {
     while (w.length && (w[0] === 'sudo' || /^\w+=/.test(w[0]))) w = w.slice(1);
     if (w.length) segmentEnts(w, e, setIntent, split, k, segIdx, firstWord);
     if (redirTarget != null) e.file = redirTarget;
+    const pipedIn = segIdx > 0 && split.segments[segIdx - 1].sep === '|';
+    if (w.length && !isAmbiguous(w[0])) for (const x of listedBySegment(w, pipedIn, k)) listed[x] = segIdx;
     // a listing piped into anything (`ls DIR | sort | grep pdf`, `ls -S DIR | head -1`, `gci DIR | Select-Object
     // -First 1`): what the user saw is a selection of the entries inside DIR, never DIR itself
     const piped = split.segments[segIdx].sep.startsWith('|') && !split.segments[segIdx].sep.startsWith('||');
@@ -470,7 +474,7 @@ export function analyzeCommand(line, classify, kind = 'posix') {
       // a piped/filtered listing found above stays a search root even when the line is a catalog command
       const piped = searchDir && String(ie.dir) === String(ents.dir);
       searchDir = isSearchRoot(intent, slots, ie) || piped;
-      listDir = !searchDir && ['ls', 'find'].includes(FAMILY_OF[intent]);
+      listDir = !searchDir && (['ls', 'find'].includes(FAMILY_OF[intent]) || intent === 'largest_dirs');
     }
     ents = { ...ents, ...ie };
   } else if (segIntent) {
@@ -482,8 +486,47 @@ export function analyzeCommand(line, classify, kind = 'posix') {
   if (Object.values(slots).some(isAmbiguous)) ambiguous = true;
   return { line: t, intent, slots, ents, at, ambiguous, ...(searchDir && ents.dir != null ? { searchDir: true } : {}),
     ...(listDir && !searchDir && ents.dir != null ? { listDir: true } : {}), ...(cdAt >= 0 ? { cd: true } : {}),
-    ...(listsCwd ? { listsCwd } : {}), ...(intentStale ? { intentStale: true } : {}) };
+    ...(listsCwd ? { listsCwd } : {}), ...(intentStale ? { intentStale: true } : {}), listed,
+    // the dir is the `cd` target (`cdFollowed`: another segment ran after the cd)
+    ...(cdAt >= 0 && at.dir === cdAt ? { cdDir: true, cdFollowed: cdAt < split.segments.length - 1 } : {}) };
 }
+
+// Listings: commands that print many values of an entity type (`ls`, `find`, `ps aux`, `docker ps`, `git branch`).
+// After one, "it"/"them" may mean any of the printed values, so an older value of that type is not a safe
+// target for a changing command.
+const FS_LISTERS = new Set(['ls', 'tree', 'dir', 'gci', 'get-childitem', 'll', 'la', 'find', 'fd', 'fdfind', 'locate', 'mlocate', 'plocate',
+  'du', 'ncdu', 'exa', 'eza', 'lsd', 'vdir']);
+const FS_SEARCHERS = new Set(['grep', 'egrep', 'fgrep', 'rg', 'ag', 'ack', 'select-string', 'sls', 'findstr']);
+const PROC_LISTERS = new Set(['ps', 'top', 'htop', 'btop', 'atop', 'pgrep', 'pidof', 'pstree', 'get-process', 'gps', 'tasklist']);
+function listedBySegment(w, pipedIn, k) {
+  const head = w[0].replace(/^.*[\\/]/, '').replace(/\.exe$/i, '').toLowerCase();
+  const nonFlags = w.slice(1).filter((a) => !/^-/.test(a));
+  // `du -sh DIR` is the size of DIR itself; `du DIR` / `du -d 1 DIR` lists what is inside
+  if (head === 'du' && w.slice(1).some((a) => /^-[a-zA-Z]*s|^--summarize$/.test(a)) && !nonFlags.some(isGlob)) return [];
+  if (FS_LISTERS.has(head)) return ['file', 'dir'];
+  // grep reading a pipe filters what an earlier stage printed; reading files it lists matches
+  if (FS_SEARCHERS.has(head)) return pipedIn ? [] : ['file', 'dir'];
+  if (PROC_LISTERS.has(head)) return ['pid', 'proc'];
+  if (['ss', 'netstat', 'lsof', 'fuser', 'get-nettcpconnection'].includes(head)) return ['port', 'pid', 'proc'];
+  if (head === 'docker' || head === 'podman') {
+    const sub = nonFlags.slice(0, 2).join(' ');
+    return /^(?:ps|stats|container (?:ls|list|ps)|compose ps|top)\b/.test(sub) ? ['container'] : [];
+  }
+  if (head === 'systemctl') return !nonFlags.length || /^list-/.test(nonFlags[0]) || w.includes('--failed') ? ['service'] : [];
+  if (head === 'service') return w.includes('--status-all') ? ['service'] : [];
+  if (head === 'get-service' || head === 'gsv') return psArgs(w.slice(1)).pos.length || /-(?:name|displayname)\b/i.test(w.join(' ')) ? [] : ['service'];
+  if (head === 'git') {
+    const sub = nonFlags[0];
+    if (sub === 'branch') return nonFlags.length === 1 && !w.some((a) => /^-(?:d|D|m|M|c|C|-delete|-move|-copy)$/.test(a)) ? ['branch'] : [];
+    if (['grep', 'ls-files', 'status', 'clean'].includes(sub)) return ['file', 'dir'];
+  }
+  return [];
+}
+const LIST_INTENT = { docker_ps: ['container'], docker_ps_all: ['container'], docker_stats: ['container'], list_services: ['service'],
+  failed_services: ['service'], git_branches: ['branch'], git_status: ['file', 'dir'] };
+const LIST_FAMILY = { ls: ['file', 'dir'], find: ['file', 'dir'], grep: ['file', 'dir'], du: ['file', 'dir'], ps: ['pid', 'proc'], ss: ['port', 'pid', 'proc'] };
+/** Entity types a catalog intent prints many values of (for previous `tellsh <query>` lines). */
+const listedByIntent = (intent) => (intent ? LIST_INTENT[intent] || LIST_FAMILY[FAMILY_OF[intent]] || [] : []);
 
 // pipeline stages that filter the entries of a listing piped into them
 const FILTER_HEADS = new Set(['grep', 'egrep', 'fgrep', 'rg', 'ack', 'ag', 'findstr', 'select-string', 'sls', 'where-object', 'where', '?']);
@@ -618,7 +661,12 @@ function segmentEnts(w, e, setIntent, split, k, segIdx, firstWord) {
   } else if (DIR_HEADS.has(head)) {
     // find ROOT -name ...: the search root; other heads: the last directory argument (`ls /a /b` -> /b)
     const p = head === 'find' ? nonFlags[0] : nonFlags.filter((a) => !isGlob(a)).pop();
-    if (p) { e.dir = p; if (head === 'find') e.searchDir = true; else if (['ls', 'tree'].includes(head)) e.listDir = true; }
+    if (p) {
+      e.dir = p;
+      if (head === 'find') e.searchDir = true;
+      // `du DIR` / `du -d 1 DIR | sort -rh` lists the entries of DIR (`du -sh DIR` is DIR itself)
+      else if (['ls', 'tree', 'ncdu'].includes(head) || (head === 'du' && !args.some((a) => /^-[a-zA-Z]*s|^--summarize$/.test(a)))) e.listDir = true;
+    }
     // `ls`, `ls *.pdf`: the working directory (a glob selects some of its entries)
     else if (['ls', 'tree'].includes(head)) e.listCwd = nonFlags.some(isGlob) ? 'search' : 'list';
   } else if (!INERT_HEADS.has(head.toLowerCase())) {
@@ -641,6 +689,8 @@ const ENT_TYPES = ['container', 'service', 'pid', 'proc', 'port', 'file', 'dir',
  *    what pronoun resolution uses. searchRoots: dir values whose newest use was as a find/grep root or a
  *    filtered/piped listing (also the `cd` directory of a later argument-less `ls | grep …`); listedDirs: plain
  *    listings. last.skipped: a newer line (or a later segment of its line) ran after the last repeatable command.
+ *    age/pos: line age and segment of each newest value; listing: the newest listing of each entity type
+ *    ({ i, seg }); cdDir: the newest dir is a `cd` target ({ value, followed }). changeGuard() uses these.
  */
 export function buildContext(cmds, { classify, cwd, kind, query } = {}) {
   const k = kind || cmds.kind || 'posix';
@@ -653,6 +703,8 @@ export function buildContext(cmds, { classify, cwd, kind, query } = {}) {
   let last = null;
   let current = null;
   let cwdListing = null; // a newer line listed the working directory without naming it ('list' | 'search')
+  const listing = {}; // entity type -> { i: line age, seg } of the newest listing of that type
+  let cdDir = null; // the newest dir came from `cd`: { value, followed: other commands ran after the cd }
   const list = [...cmds];
   // zsh (share_history / inc_append_history), fish and PSReadLine write the running line to the
   // history file before it executes: the current `tellsh <query>` call is not a previous command
@@ -683,9 +735,13 @@ export function buildContext(cmds, { classify, cwd, kind, query } = {}) {
     // skipped: `last` is not the previous command (any newer line ran after it, or a later segment of its own line)
     if (!last && a.intent) last = { intent: a.intent, slots: a.slots, age: i, ambiguous: !!a.ambiguous, skipped: i > 0 || !!a.intentStale };
     if (current == null && a.ents.current && !isAmbiguous(a.ents.current)) current = a.ents.current;
+    for (const [t, seg] of Object.entries(a.listed || {})) listing[t] ??= { i, seg };
     for (const t of ENT_TYPES) {
       if (a.ents[t] == null) continue;
-      if (ents[t] == null) { ents[t] = a.ents[t]; recency[t] = i; pos[t] = a.at?.[t] ?? 0; }
+      if (ents[t] == null) {
+        ents[t] = a.ents[t]; recency[t] = i; pos[t] = a.at?.[t] ?? 0;
+        if (t === 'dir' && a.cdDir) cdDir = { value: String(a.ents.dir), followed: i > 0 || !!a.cdFollowed };
+      }
       const v = String(a.ents[t]);
       if (!(all[t] ??= []).includes(v)) {
         all[t].push(v);
@@ -697,7 +753,8 @@ export function buildContext(cmds, { classify, cwd, kind, query } = {}) {
   const byType = (a, b) => ENT_TYPES.indexOf(a) - ENT_TYPES.indexOf(b);
   const entOrder = Object.keys(ents).sort((a, b) => recency[a] - recency[b] || byType(a, b));
   const refOrder = Object.keys(ents).sort((a, b) => recency[a] - recency[b] || pos[b] - pos[a] || byType(a, b));
-  const ctx = { n: recent.length, ents, all, currentBranch: current, entOrder, refOrder, searchRoots, listedDirs, last, cwdFlags: cwdFlags(cwd) };
+  const ctx = { n: recent.length, ents, all, currentBranch: current, entOrder, refOrder, searchRoots, listedDirs, last, cwdFlags: cwdFlags(cwd),
+    age: recency, pos, listing, cdDir };
   ctx.features = ctxFeatures(ctx);
   return ctx;
 }
@@ -879,22 +936,50 @@ export function resolveReference(query, ctx) {
   if (value == null || isAmbiguous(value)) {
     return { rule: 'refused', intent, ent: finalEnt, blank: SLOT_FROM_ENT[finalEnt], note: `the latest ${finalEnt} in history (${rawOf(value ?? '?')}) cannot be read unambiguously; not guessing` };
   }
-  // `find /var/log -name '*.gz'` + "delete them": the search root is not what the search found;
-  // `ls /tmp/build` + "delete them": "them" are the listed entries, not the directory
-  const listedOnly = finalEnt === 'dir' && PLURAL.test(fq) && !!ctx.listedDirs?.has(String(value));
-  const searchRoot = finalEnt === 'dir' && (!!ctx.searchRoots?.has(String(value)) || listedOnly);
-  const rootNote = listedOnly && !ctx.searchRoots?.has(String(value))
-    ? `"${PLURAL.exec(fq)[1]}" are the entries listed in ${value}, not the directory; not guessing`
-    : `the latest dir in history (${value}) is where a search ran, not what it found; not guessing`;
-  if (searchRoot && intent && BY_ID[intent].risk !== 'safe') {
-    return { rule: 'refused', intent, ent: finalEnt, blank: SLOT_FROM_ENT[finalEnt], note: rootNote };
+  // a value that is fine to show but not to change (search root, listed directory, older value, ...)
+  const guardNote = changeGuard(finalEnt, value, fq, ctx);
+  if (guardNote && intent && BY_ID[intent].risk !== 'safe') {
+    return { rule: 'refused', intent, ent: finalEnt, blank: SLOT_FROM_ENT[finalEnt], note: guardNote };
   }
   if (intent === 'kill_by_name' && FORCE.test(fq)) intent = 'kill_force';
   if (intent === 'extract_targz' && /\.zip$/i.test(value)) intent = 'extract_zip';
   const fill = {};
   for (const s of SLOT_FROM_ENT[finalEnt] || []) fill[s] = value;
-  // searchRoot: the caller must not use the value for a non-safe intent it picks itself
-  return { rule: 'pronoun', intent, fill, ent: finalEnt, ...(searchRoot ? { searchRoot: true, rootNote } : {}), note: `"${finalEnt}" from history = ${value}` };
+  // guarded: the caller must not use the value for a non-safe intent it picks itself
+  return { rule: 'pronoun', intent, fill, ent: finalEnt, ...(guardNote ? { guarded: true, guardNote } : {}), note: `"${finalEnt}" from history = ${value}` };
+}
+
+/**
+ * Why `value` (of entity type `type`) must not be the target of a changing command (rm, mv, cp, kill, chmod,
+ * git branch -d, ...), or null. A history value is only used for one when it is unambiguous and is the value
+ * of the most recent history segment that produced that type:
+ *   - a find/grep search root or a listed directory (`ls /tmp/build`): the user saw entries inside it;
+ *   - an older value than the newest of its type (a branch other than the checked-out newest one, a hint word);
+ *   - a newer command listed values of the type (`cat a.txt; ls`, `pgrep foo; ps aux`, `docker ps`);
+ *   - the directory of a `cd` after which other commands ran (`cd /tmp/build; make`, `cd /tmp/build; rg TODO`).
+ */
+export function changeGuard(type, value, fq, ctx) {
+  const v = String(value);
+  if (type === 'dir' && ctx.searchRoots?.has(v)) return `the latest dir in history (${v}) is where a search ran, not what it found; not guessing`;
+  if (type === 'dir' && ctx.listedDirs?.has(v)) {
+    const pl = PLURAL.exec(fq);
+    return pl ? `"${pl[1]}" are the entries listed in ${v}, not the directory; not guessing`
+      : `${v} was listed: the reference may mean the directory or one of its entries; not guessing`;
+  }
+  const newest = ctx.ents?.[type];
+  if (newest != null && String(newest) !== v) {
+    return type === 'branch' && String(newest) === String(ctx.currentBranch)
+      ? `the newest branch in history (${rawOf(newest)}) is the checked-out one and ${v} is older; not guessing`
+      : `the newest ${type} in history is ${rawOf(newest)}, not ${v}; not guessing`;
+  }
+  const L = ctx.listing?.[type];
+  const age = ctx.age?.[type] ?? 0;
+  const seg = ctx.pos?.[type] ?? 0;
+  if (L && (L.i < age || (L.i === age && L.seg > seg))) {
+    return `a newer command listed ${type === 'dir' || type === 'file' ? 'files' : `${type} values`}, so the reference may mean one of them, not ${v}; not guessing`;
+  }
+  if (type === 'dir' && ctx.cdDir?.value === v && ctx.cdDir.followed) return `${v} is the working directory of a cd after which other commands ran; not guessing`;
+  return null;
 }
 
 /**

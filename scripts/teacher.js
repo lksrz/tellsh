@@ -29,7 +29,7 @@ import { mulberry32 } from './lib/silver.js';
 import { ask, pool, stats, recordLedger, LEDGER, PRICE_PER_MTOK, MODEL } from './lib/jev.js';
 import { updateSection } from './report.js';
 import { CONFUSABLE, CONTRAST_RULES } from './lib/confusable.js';
-import { heldOutTexts, heldOutIndex } from './lib/heldout.js';
+import { exclusionIndex } from './lib/heldout.js';
 import { parseModel, DEFAULT_MODEL } from '../src/model.js';
 import { createHash } from 'node:crypto';
 
@@ -108,8 +108,11 @@ async function askPacked(items, per, label) {
   return out;
 }
 
-/** Held-out texts incl. near-duplicates and contrastive rewrites (scripts/lib/heldout.js). */
-const heldOutSet = () => heldOutIndex(heldOutTexts(ROOT));
+/**
+ * The exclusion index of gen_data.js (scripts/lib/heldout.js exclusionIndex): held-out texts incl. near-duplicates
+ * and contrastive rewrites, and texts that mention an eval-only slot value. Nothing it excludes is sent to Jev.
+ */
+const heldOutSet = () => exclusionIndex(ROOT);
 
 /**
  * Training rows filtered as gen_data.js filters them: held-out texts (and their near-duplicates) are never
@@ -118,6 +121,7 @@ const heldOutSet = () => heldOutIndex(heldOutTexts(ROOT));
 function trainingRows(held = heldOutSet()) {
   const dropped = new Set(readJsonl(join(TDIR, 'decisions.jsonl')).filter((d) => d.text && d.action === 'drop').map((d) => normalize(d.text)));
   return [...readDir(join(ROOT, 'data', 'intents')).map((r) => ({ ...r, src: `intents/${r.file}` })),
+    ...readJsonl(join(ROOT, 'data', 'train.jsonl')).map((r) => ({ ...r, src: 'train.jsonl' })),
     ...readJsonl(join(ROOT, 'data', 'shell', 'train.jsonl')).map((r) => ({ ...r, src: 'shell/train.jsonl' }))]
     .filter((r) => !held.has(r.text) && !dropped.has(normalize(r.text)));
 }

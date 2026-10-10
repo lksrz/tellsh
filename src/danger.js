@@ -89,27 +89,66 @@ const WRAPPER_OPTARG = {
   cgexec: /^-g$/,
   torsocks: /^-[uapP]$|^--(?:user|pass|address|port)$/,
 };
-// wrappers (and su) that run a command string given with -c / --command: `flock -c "rm -rf /" LOCK`,
-// `su -c "…"`, `runuser root -c "…"`
-const CMD_STRING_OPT = { flock: /^-c$|^--command$/, su: /^-\w*c$|^--(?:command|session-command)$/, runuser: /^-\w*c$|^--(?:command|session-command)$/ };
-const WRAPPERS = new Set(['sudo', 'doas', 'command', 'builtin', 'exec', 'nohup', 'time', 'nice', 'ionice', 'then', 'do', 'else', '&', 'busybox', 'toybox', 'xargs', 'timeout', 'chroot', 'stdbuf', 'env', 'setsid', 'unbuffer', 'caffeinate',
+// Command strings given as an option value are checked as commands of their own. Any program:
+// `-c STR`, `--command STR`, `--command=STR` (`flock -c "rm -rf /" LOCK`, `script -c "…"`, `find … -exec sh -c "…"`);
+// shells, su and runuser also take -c inside a cluster (`bash -lc "…"`, `su -lc "…"`); env -S splits its string.
+const CMD_STRING_ANY = /^(?:-c|--command|--session-command)$/;
+const CMD_STRING_CLUSTER = /^-[a-zA-Z]*c$/;
+const SHELLS = /^(?:ba|z|da|k|fi|c|tc|a|mk|r)?sh$|^busybox$/;
+const PRIVILEGED = new Set(['sudo', 'doas', 'su', 'runuser', 'pkexec', 'run0', 'sudoedit']);
+// programs whose whole job is to run a command (string): a payload that depends on the shell state cannot be checked
+const RUNNERS = new Set(['su', 'runuser', 'flock', 'script', 'eval', 'env', 'watch', 'tmux', 'screen', 'ssh', 'xargs', 'parallel', 'sudo', 'doas',
+  'pkexec', 'run0', 'nohup', 'setsid', 'timeout', 'iex', 'invoke-expression', 'cmd', 'pwsh', 'powershell', 'start-process', 'sem']);
+const WRAPPERS = new Set(['sudo', 'doas', 'run0', 'command', 'builtin', 'exec', 'nohup', 'time', 'nice', 'ionice', 'then', 'do', 'else', '&', 'busybox', 'toybox', 'xargs', 'timeout', 'chroot', 'stdbuf', 'env', 'setsid', 'unbuffer', 'caffeinate',
   'unshare', 'watch', 'nsenter', 'setpriv', 'strace', 'ltrace', 'flock', 'taskset', 'systemd-run', 'runuser', 'firejail', 'proot', 'fakeroot',
-  'pkexec', 'chrt', 'cgexec', 'eatmydata', 'torsocks', 'catchsegv']);
+  'pkexec', 'chrt', 'cgexec', 'eatmydata', 'torsocks', 'catchsegv', 'proxychains', 'proxychains4', 'tsocks', 'valgrind', 'faketime', 'ts',
+  'chronic', 'nocache', 'trickle', 'numactl', 'schedtool', 'cpulimit', 'prlimit', 'sg', 'newgrp', 'su', 'parallel', 'sem', 'tmux', 'screen',
+  'script', 'xvfb-run', 'dbus-launch', 'dbus-run-session', 'expect', 'gdb', 'ssh-agent', 'sshpass', 'with-lock-ex', 'lckdo', 'daemonize', 'start-stop-daemon']);
+// programs that run the command at the end of their arguments without being a plain wrapper
+const SUFFIX_RUNNERS = new Set(['ssh', 'mosh', 'kubectl', 'docker', 'podman', 'lxc', 'incus', 'machinectl', 'distrobox', 'toolbox', 'flatpak', 'nix-shell', 'firejail', 'bwrap']);
+
+/** Collect `-c STR` style payloads of one simple command into `inner` (`unsure` when a runner's payload cannot be read). */
+function payloads(w, inner, flags) {
+  const h = (w[0] || '').replace(/^.*[\\/]/, '').replace(/\.exe$/i, '').toLowerCase();
+  if (PRIVILEGED.has(h)) flags.privileged = true;
+  // a payload of a program that runs commands (or of `sh -c` inside other arguments: `find … -exec sh -c "…"`)
+  // must be readable; `-c` of any other program (`grep -c "$PAT"`) is still checked, without that requirement
+  const add = (v, i) => {
+    if (v == null) return;
+    const prev = String(w[i - 1] ?? '').replace(/^.*[\\/]/, '').toLowerCase();
+    const runner = RUNNERS.has(h) || SHELLS.test(h) || SHELLS.test(prev) || /^--(?:command|session-command|split-string)/.test(String(w[i] ?? ''));
+    if (!runner) { (flags.lenient ??= []).push(String(v)); return; }
+    inner.push(String(v));
+    if (/[$`]|^\s*$/.test(String(v))) flags.unsure = `${SHELLS.test(prev) ? prev : h} runs a command string that depends on the shell state (${String(v).slice(0, 40)}); it cannot be checked`;
+  };
+  for (let i = 1; i < w.length; i++) {
+    const x = String(w[i]);
+    if (x === '--' && !SHELLS.test(h)) continue;
+    const eq = x.match(/^(--(?:command|session-command|split-string))=(.*)$/s);
+    if (eq) { add(eq[2], i); continue; }
+    if (h === 'pwsh' || h === 'powershell') {
+      if (/^-(?:e|ec|en|enc\w*|encodedcommand)$/i.test(x)) { flags.unsure = `${h} -EncodedCommand cannot be checked`; i++; continue; }
+      if (/^-(?:c|co\w*|command)$/i.test(x)) { add(w.slice(i + 1).join(' '), i); break; }
+      continue;
+    }
+    if (h === 'cmd' && /^\/[ck]$/i.test(x)) { add(w.slice(i + 1).join(' '), i); break; }
+    if (h === 'env' && (x === '-S' || x === '--split-string')) { add(w[i + 1], i); i++; continue; }
+    if (CMD_STRING_ANY.test(x) || ((SHELLS.test(h) || h === 'su' || h === 'runuser') && CMD_STRING_CLUSTER.test(x))) {
+      // sh -c 'cmd' arg0 args: only the string is the command
+      add(w[i + 1], i);
+      i++;
+    }
+  }
+  if (h === 'eval' || h === 'iex' || h === 'invoke-expression') add(w.slice(1).join(' '), 0);
+}
+
 /** The command a wrapper chain runs. `inner` collects command strings given as option values (`su -c "…"`). */
-function commandWords(words, inner = []) {
+function commandWords(words, inner = [], flags = {}) {
   let w = words;
   for (;;) {
     while (w.length && /^\w+=/.test(w[0])) w = w.slice(1);
     const h = (w[0] || '').replace(/^.*[\\/]/, '').toLowerCase();
-    const cmdOpt = CMD_STRING_OPT[h];
-    if (cmdOpt) {
-      for (let i = 1; i < w.length; i++) {
-        if (w[i] === '--') break;
-        const eq = String(w[i]).match(/^(--(?:command|session-command))=(.*)$/s);
-        if (eq && cmdOpt.test(eq[1])) inner.push(eq[2]);
-        else if (cmdOpt.test(w[i]) && w[i + 1] != null) inner.push(w[++i]);
-      }
-    }
+    payloads(w, inner, flags);
     if (!WRAPPERS.has(h)) return w;
     w = w.slice(1);
     const optArg = WRAPPER_OPTARG[h];
@@ -126,6 +165,31 @@ function commandWords(words, inner = []) {
     if (h === 'taskset' && w.length && /^(?:0x)?[\da-f,-]+$/i.test(w[0])) w = w.slice(1); // MASK (without -c: always one)
     if (h === 'chrt' && w.length && /^\d+$/.test(w[0])) w = w.slice(1); // PRIORITY
   }
+}
+
+/**
+ * Every command a simple command may run: the wrapper chain as parsed by commandWords, and, because wrapper
+ * options are not always understood (`sudo -iu root rm …`, `nice --adjustment=5 rm …`), the command starting
+ * at every later non-option word of a wrapper / remote runner (`ssh host rm -rf /`, `docker exec ct rm …`).
+ * The checks only ever escalate, so reading too many candidates is safe; missing one is not.
+ */
+function commandChains(words, inner, flags) {
+  const out = [];
+  const push = (w) => { if (w.length && !out.some((o) => o.length === w.length && o.every((x, i) => x === w[i]))) out.push(w); };
+  push(commandWords(words, inner, flags));
+  const lead = words.findIndex((x) => !/^\w+=/.test(x));
+  const h = lead >= 0 ? String(words[lead]).replace(/^.*[\\/]/, '').replace(/\.exe$/i, '').toLowerCase() : '';
+  const remote = SUFFIX_RUNNERS.has(h) && (!['docker', 'podman', 'kubectl', 'lxc', 'incus'].includes(h) || words.some((x) => ['exec', 'run', 'debug', 'create'].includes(x)));
+  if (WRAPPERS.has(h) || remote) {
+    for (let j = lead + 1; j < words.length; j++) {
+      if (/^-|^\w+=/.test(words[j])) continue;
+      const w = commandWords(words.slice(j), inner, flags);
+      push(w);
+      // a lone quoted string with spaces is a command (`tmux new "rm -rf /"`, `ssh host "rm -rf /"`)
+      if (w.length === 1 && /\s/.test(w[0])) inner.push(w[0]);
+    }
+  }
+  return out;
 }
 
 // Lexically normalise a path for the danger checks: `//`, `/./`, a trailing `/.` and `/..` collapse
@@ -347,6 +411,9 @@ const RULES = [
   [/\b(?:curl|wget|fetch)\b[^|;]*\|\s*(?:sudo\s+)?(?:\S*\/)?(?:ba|z|da|k|fi)?sh\b/, 'high', 'pipes a download straight into a shell'],
   [/(?:\b(?:ba|z|da|k|fi)?sh\b|\bsource\b|\beval\b|(?:^|[;&|(]\s*)\.)\s[^|;&]*(?:<\(|\$\(|`)\s*(?:sudo\s+)?(?:curl|wget|fetch)\b/, 'high', 'runs a downloaded script'],
   [/\bsudo\b|\bdoas\b/, 'medium', 'runs with root privileges'],
+  // text piped into a shell runs as a script whose content is not known here
+  [/\|\s*(?:(?:sudo|doas)\s+(?:-\S+\s+)*)?(?:\S*\/)?(?:ba|z|da|k|fi|c|tc|a|mk)?sh\b(?!\s+-[a-zA-Z]*c\b)(?![\w.-])/, 'high', 'runs piped text as a shell script'],
+  [/\|\s*(?:iex|Invoke-Expression)\b/i, 'high', 'runs piped text as a PowerShell script'],
   [/\bfind\b.*\s-delete\b|\bfind\b.*-exec(?:dir)?\s+(?:\S*\/)?rm\b|\bxargs\s+(?:-\S+\s+)*(?:\S*\/)?rm\b/, 'high', 'bulk deletion via find/xargs'],
   [/\bgit\s+push\b[^;&|]*\s(?:--force(?:-with-lease|-if-includes)?\b|-[a-zA-Z]*f\b|\+[^\s:]*(?::\S*)?|--mirror\b)/, 'high', 'force-push rewrites remote history'],
   [/\bgit\s+push\b[^;&|]*\s(?:--delete\b|-d\b|:\S)/, 'high', 'deletes a remote branch'],
@@ -388,7 +455,7 @@ export function normalizeGlobals(command) {
 }
 
 /** @returns {{risk:'safe'|'medium'|'high', warnings:string[], critical:boolean}} */
-export function checkDanger(command, baseRisk = 'safe') {
+export function checkDanger(command, baseRisk = 'safe', { lenient = false } = {}) {
   let risk = baseRisk;
   const warnings = [];
   let critical = false;
@@ -399,19 +466,16 @@ export function checkDanger(command, baseRisk = 'safe') {
   };
   const text = normalizeGlobals(command);
   const inner = [];
+  const flags = {};
   // structural checks run on both readings of backslashes (POSIX escapes / Windows path separators)
   for (const words of [...simpleCommands(text), ...simpleCommands(text, { winPaths: true })]) {
-    const w = commandWords(words, inner);
-    if (!w.length) continue;
+   for (const w of commandChains(words, inner, flags)) {
     const head = w[0].replace(/^.*[\\/]/, '');
     const lower = head.toLowerCase().replace(/\.exe$/, '');
     // a lone string with spaces is a command handed to another program ('…' | bash)
     if (w.length === 1 && /\s/.test(w[0])) inner.push(w[0]);
-    // shells / eval run their argument as a command: check it too
-    if (/^(?:ba|z|da|k|fi|c)?sh$|^(?:pwsh|powershell|cmd)$/.test(lower)) {
-      const i = w.findIndex((x, k) => k > 0 && /^(?:-c|-Command|-Co\w*|\/c|\/k)$/i.test(x));
-      if (i > 0 && w[i + 1] != null) inner.push(w.slice(i + 1).join(' '));
-    } else if (lower === 'eval' || lower === 'iex' || lower === 'invoke-expression') inner.push(w.slice(1).join(' '));
+    // the program itself depends on the shell state (`$CMD -rf /`, `$(which rm) -rf /`, `& $tool`): unknown
+    if (!lenient && /^[$`]/.test(head)) hit('high', 'runs a command whose name depends on the shell state; it cannot be checked');
     if (head === 'rm' || head === 'unlink') rmCheck(w, hit);
     else if (head === 'kill') killCheck(w, hit);
     else if (/^(?:rd|rmdir|del|erase)$/i.test(head)) {
@@ -426,10 +490,19 @@ export function checkDanger(command, baseRisk = 'safe') {
     else if (head === 'tar' || head === 'bsdtar' || head === 'gtar') tarCheck(w, hit);
     else if (head === 'docker' || head === 'podman') dockerCheck(w, hit);
     if (head === 'git' && w[1] === 'rm') hit('high', 'rm deletes files permanently (no trash)');
+   }
+  }
+  if (flags.unsure) hit('high', flags.unsure);
+  if (flags.privileged) hit('medium', 'runs with root privileges');
+  // `-c` values of other programs: checked as commands, but a name like "$PAT" is not a command name there
+  for (const c of new Set(flags.lenient || [])) {
+    if (!c.trim() || inner.includes(c)) continue;
+    const d = checkDanger(c, 'safe', { lenient: true });
+    for (const m of d.warnings) hit(d.risk, m, d.critical);
   }
   pipelineDeleteCheck(text, hit);
-  for (const c of inner) {
-    if (c === command) continue;
+  for (const c of new Set(inner)) {
+    if (c === command || !c.trim()) continue;
     const d = checkDanger(c);
     for (const m of d.warnings) hit(d.risk, m, d.critical);
   }

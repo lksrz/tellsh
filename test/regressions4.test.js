@@ -68,7 +68,9 @@ test('typed process references follow recency', () => {
   const amb = run('kill that process', ['kill 1111', 'pgrep "$PROC"']);
   assert.equal(amb.context.rule, 'refused');
   assert.ok(!/1111/.test(amb.command), amb.command);
-  assert.equal(run('kill that pid', ['kill 1111', 'pgrep current-worker']).command, 'kill 1111');
+  // pgrep printed newer PIDs: "that pid" may be one of them (round 4b)
+  assert.equal(run('kill that pid', ['kill 1111', 'pgrep current-worker']).command, 'kill <PID>');
+  assert.equal(run('kill that pid', ['pgrep current-worker', 'kill 1111']).command, 'kill 1111');
 });
 
 test('a quoted or escaped ~ from history stays a literal directory named ~', () => {
@@ -119,9 +121,9 @@ test('plural pronouns after a plain listing refer to the entries, not the direct
     assert.equal(r.context.rule, 'refused', `${q} after ${h}: ${r.command}`);
     assert.match(r.command, /<PATH>/);
   }
-  // singular "it" is the directory itself; non-destructive plural reuse is fine
-  assert.equal(run('delete it', ['ls /tmp/build']).command, 'rm -r /tmp/build');
-  assert.equal(run('delete it', ['grep -rl TODO src', 'ls src']).command, 'rm -r src');
+  // singular "it" is refused too (round 4b: the directory or one of its entries); non-destructive plural reuse is fine
+  assert.equal(run('delete it', ['ls /tmp/build']).command, 'rm -r <PATH>');
+  assert.equal(run('delete it', ['grep -rl TODO src', 'ls src']).command, 'rm -r <PATH>');
   assert.equal(run('list them', ['ls /tmp/build']).command, 'ls -lah /tmp/build');
 });
 

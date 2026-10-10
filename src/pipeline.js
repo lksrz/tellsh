@@ -9,7 +9,7 @@
 import { getModel } from './model.js';
 import { cascade } from './cascade.js';
 import { tag, exFromSpans } from './tagger.js';
-import { extractSlots, pickArg, isOptionWord } from './slots.js';
+import { extractSlots, pickArg, isOptionWord, foldKeepLength } from './slots.js';
 import { resolveSlots, buildCommand, finalizeSlots, RAW_OK } from './fill.js';
 import { BY_ID } from './catalog.js';
 import { FAMILY_OF, NONE } from './tools.js';
@@ -44,6 +44,24 @@ function namedStopWord(text, k) {
   if (m[2] == null && m.index + m[0].length !== String(text).trimEnd().length) return null;
   return m[1];
 }
+// "list files in the", "list files in out", "pokaż pliki w": the request names a location but its object is only
+// function words. The path is withheld (placeholder), never silently replaced by the catalog default `.`.
+const LOC_WORD = /^(?:in|inside|within|under|of|from|at|on|into|w|we|z|ze|na|do|od|pod|dla)$/i;
+const LOC_NOUN = /^(?:folder\w*|directory|directories|dir|dirs|katalog\w*|podkatalog\w*|files?|plik\w*)$/i;
+function danglingLocation(text) {
+  const words = String(text).trim().replace(/[?!.,;:]+$/, '').split(/\s+/).filter(Boolean);
+  while (words.length && NAME_NEXT.test(words[words.length - 1])) words.pop();
+  const last = words.length - 1;
+  if (last < 1 || !FUNCTION_WORD.test(words[last])) return false;
+  if (LOC_WORD.test(words[last])) return true;
+  for (let j = last - 1; j >= 0; j--) {
+    if (LOC_WORD.test(words[j])) return true;
+    if (!FUNCTION_WORD.test(words[j]) && !LOC_NOUN.test(words[j])) return false;
+  }
+  return false;
+}
+// a reference in destination position: "to it", "into that folder", "do niego", "there"
+const REF_DST = /(?:^|\s)(?:to|into|onto|inside|in|do|na|w|we|pod)\s+(?:(?:the|that|this|those|these|same|ten|ta|tego|tamtego|tym|tamtym|tamten)\s+)?(?:(?:folder\w*|directory|dir|katalog\w*|location|place|miejsc\w*)(?=\s|$|[?!.,])|(?:it|that|this|them|there|tego|niego|nim|tym|tam|tamtego|tamten)(?=\s|$|[?!.,]))|(?:^|\s)(?:there|tam)(?=\s|$|[?!.,])/;
 const WORDISH = (v) => /^(?!-)[\w@.:+-]{1,64}$/.test(v);
 const VALID_SLOT = {
   // a bare function word ("on", "the", "w") is a tagging error, never a file or directory to act on
@@ -98,8 +116,17 @@ export function resolveWithTagger(intentId, text, { model = getModel(), tool, mo
     if (v != null) { slots[k] = v; sources[k] = 'regex'; }
     break;
   }
+  // a path the tagger or regex read as a bare function word ("in the", "of it"), or a location whose object is only
+  // function words: withheld, so the command shows a placeholder instead of the default `.`
+  const withheld = [];
+  for (const k of ['path', 'file']) {
+    if (!usesSlot(intent, k) || slots[k] != null) continue;
+    const fw = [rT[k], rR[k]].some((v) => typeof v === 'string' && FUNCTION_WORD.test(v));
+    if (fw || danglingLocation(text)) withheld.push(k);
+    break;
+  }
   finalizeSlots(intent, slots);
-  return { slots, sources, spans: t.spans };
+  return { slots, sources, spans: t.spans, withheld };
 }
 
 /** `v` occurs in `text` only directly followed by punctuation that trimPathPunct removed (`/tmp/x!`). */
@@ -258,7 +285,7 @@ export function suggest(query, opts = {}) {
   const ambiguousPaths = [];
   // slots that were withheld on purpose: rendered as placeholders, never replaced by a catalog default
   // (an ambiguous `/tmp/data!` must not turn `find {path} … -delete` into `find . … -delete`)
-  const blank = new Set();
+  const blank = new Set(r.withheld || []);
   if (BY_ID[intent].risk !== 'safe') {
     for (const k of Object.keys(slots)) {
       if (PATH_SLOT_NAMES.has(k) && r.sources[k] !== 'history' && trailingPunctAfter(query, slots[k])) { ambiguousPaths.push(`${k}=${slots[k]}`); delete slots[k]; delete r.sources[k]; blank.add(k); }
@@ -271,32 +298,43 @@ export function suggest(query, opts = {}) {
   }
   if (ambiguousText.length) { delete slots.sedexpr; delete slots.namepat; finalizeSlots(BY_ID[intent], slots); }
   // "move it to /tmp/old", "copy them to /backup": the reference is the source, so the one path the request
-  // names is the destination (never `mv /tmp/old <DST>`)
+  // names is the destination (never `mv /tmp/old <DST>`). "copy notes.txt to it / into that folder / there":
+  // the reference is the destination and the named path the source (never `cp -ri /backup notes.txt`).
   const itR = BY_ID[intent];
-  if ((ref?.rule === 'pronoun' || ref?.rule === 'refused') && usesSlot(itR, 'src') && usesSlot(itR, 'dst') && slots.src != null && slots.dst == null &&
+  const twoPaths = usesSlot(itR, 'src') && usesSlot(itR, 'dst');
+  const refDst = twoPaths && (ref?.rule === 'pronoun' || ref?.rule === 'refused') && REF_DST.test(foldKeepLength(query).toLowerCase());
+  // the slots the reference fills (pronoun) or leaves empty (refused / guarded)
+  const refFill = refDst ? (ref.fill ? { dst: Object.values(ref.fill)[0] } : {}) : ref?.fill;
+  if (refDst) {
+    if (slots.src == null && slots.dst != null && !PRONOUN_VALUE.test(String(slots.dst))) { slots.src = slots.dst; r.sources.src = r.sources.dst; }
+    delete slots.dst; delete r.sources.dst;
+    if (slots.src != null && PRONOUN_VALUE.test(String(slots.src))) { delete slots.src; delete r.sources.src; }
+    if (ref.rule === 'refused') blank.add('dst');
+  } else if ((ref?.rule === 'pronoun' || ref?.rule === 'refused') && twoPaths && slots.src != null && slots.dst == null &&
       !PRONOUN_VALUE.test(String(slots.src)) && (ref.fill?.src != null || ref.blank?.includes('src'))) {
     slots.dst = slots.src; r.sources.dst = r.sources.src;
     delete slots.src; delete r.sources.src;
-    if (ref.rule === 'refused' || ref.searchRoot) blank.add('src');
+    if (ref.rule === 'refused' || ref.guarded) blank.add('src');
   }
   if (ref?.rule === 'refused') {
     // the reference points at something we cannot read safely: leave the slot empty (placeholder)
     for (const k of Object.keys(slots)) if (PRONOUN_VALUE.test(String(slots[k]))) { delete slots[k]; delete r.sources[k]; }
-    for (const k of ref.blank || []) if (slots[k] == null && usesSlot(BY_ID[intent], k)) blank.add(k);
+    for (const k of refDst ? [] : ref.blank || []) if (slots[k] == null && usesSlot(BY_ID[intent], k)) blank.add(k);
     finalizeSlots(BY_ID[intent], slots);
     method = 'history-rule';
   }
-  if (ref?.rule === 'pronoun' && ref.searchRoot && BY_ID[intent].risk !== 'safe') {
-    // the value is a find/grep search root and the classifier picked a modifying intent: refuse
+  if (ref?.rule === 'pronoun' && ref.guarded && BY_ID[intent].risk !== 'safe') {
+    // the value must not be changed (search root, listed directory, ...; see changeGuard) and the classifier
+    // picked a modifying intent: refuse
     for (const k of Object.keys(slots)) if (PRONOUN_VALUE.test(String(slots[k]))) { delete slots[k]; delete r.sources[k]; }
-    for (const k of Object.keys(ref.fill)) if (slots[k] == null && usesSlot(BY_ID[intent], k)) blank.add(k);
+    for (const k of Object.keys(refFill)) if (slots[k] == null && usesSlot(BY_ID[intent], k)) blank.add(k);
     finalizeSlots(BY_ID[intent], slots);
     context.rule = 'refused';
-    context.note = ref.rootNote;
+    context.note = ref.guardNote;
     method = 'history-rule';
   } else if (ref?.rule === 'pronoun') {
     const it = BY_ID[intent];
-    for (const [k, v] of Object.entries(ref.fill)) {
+    for (const [k, v] of Object.entries(refFill)) {
       if (!validSlot(k, v)) { if (slots[k] != null && PRONOUN_VALUE.test(String(slots[k]))) delete slots[k]; continue; }
       // the referenced value wins unless the request spells out its own value literally ("kill 4242")
       const literal = slots[k] != null && !PRONOUN_VALUE.test(String(slots[k])) && new RegExp(`(^|[^\\w])${String(slots[k]).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}($|[^\\w])`, 'i').test(query);
@@ -325,6 +363,7 @@ export function suggest(query, opts = {}) {
   if (ctx && b.missing.length && ref?.rule !== 'refused' && BY_ID[intent].risk === 'safe' && b.risk === 'safe') {
     const filled = [];
     for (const m of b.missing) {
+      if (r.withheld?.includes(m)) continue; // "list files in the": not a reference to history either
       const e = entityForSlot(m, ctx);
       // an ambiguous newest value blocks the fill; ctx.last is consulted only when no entity type applies
       const v = e ? (e.ambiguous ? null : e.value) : (ctx.last?.slots?.[m] ?? null);

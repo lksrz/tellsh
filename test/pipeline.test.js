@@ -66,7 +66,9 @@ test('history: pronouns, "same for", container/service/pid references (EN + PL)'
     [['pgrep -af node'], 'kill it', 'pkill -f node'],
     [['top', 'ps -fp 31337'], 'ubij ten proces', 'kill 31337'],
     [['systemctl status nginx'], 'zrestartuj tę usługę', 'sudo systemctl restart nginx'],
-    [['git checkout -b feature/x', 'git push -u origin feature/x', 'git checkout main'], 'delete that branch', 'git branch -d feature/x'],
+    // the newest branch is the checked-out main: an older branch is never picked for a delete (round 4b)
+    [['git checkout -b feature/x', 'git push -u origin feature/x', 'git checkout main'], 'delete that branch', 'git branch -d <BRANCH>'],
+    [['git checkout main', 'git push origin feature/x'], 'delete that branch', 'git branch -d feature/x'],
     [['grep -rn TODO src'], 'to samo ale tylko nazwy plików', 'grep -rl -- TODO src'],
     [['sha256sum ubuntu.iso'], 'now the md5 of the same file', 'md5sum ubuntu.iso'],
   ];
