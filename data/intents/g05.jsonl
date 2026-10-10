@@ -1,0 +1,1500 @@
+{"text": "switch to branch develop", "intent": "git_switch_branch", "lang": "en"}
+{"text": "checkout main", "intent": "git_switch_branch", "lang": "en"}
+{"text": "git checkout feature/login", "intent": "git_switch_branch", "lang": "en"}
+{"text": "go to the existing branch fix-123", "intent": "git_switch_branch", "lang": "en"}
+{"text": "how do I switch to another branch?", "intent": "git_switch_branch", "lang": "en"}
+{"text": "move me over to the develop branch", "intent": "git_switch_branch", "lang": "en"}
+{"text": "change branch to staging", "intent": "git_switch_branch", "lang": "en"}
+{"text": "I want to work on the release/2.0 branch now, switch to it", "intent": "git_switch_branch", "lang": "en"}
+{"text": "jump back to master", "intent": "git_switch_branch", "lang": "en"}
+{"text": "swich to branch main", "intent": "git_switch_branch", "lang": "en"}
+{"text": "could you please check out the existing branch hotfix/payment for me?", "intent": "git_switch_branch", "lang": "en"}
+{"text": "switch branches", "intent": "git_switch_branch", "lang": "en"}
+{"text": "go back to the main branch", "intent": "git_switch_branch", "lang": "en"}
+{"text": "checkout the feature/search branch that already exists", "intent": "git_switch_branch", "lang": "en"}
+{"text": "how to change to a different git branch", "intent": "git_switch_branch", "lang": "en"}
+{"text": "take me to branch dev", "intent": "git_switch_branch", "lang": "en"}
+{"text": "move to bugfix-42", "intent": "git_switch_branch", "lang": "en"}
+{"text": "change my current branch to feature/api-v2", "intent": "git_switch_branch", "lang": "en"}
+{"text": "i need to be on develop, switch over", "intent": "git_switch_branch", "lang": "en"}
+{"text": "checkout existing branch", "intent": "git_switch_branch", "lang": "en"}
+{"text": "git switch to main please", "intent": "git_switch_branch", "lang": "en"}
+{"text": "hop over to the qa branch", "intent": "git_switch_branch", "lang": "en"}
+{"text": "how can I go to a branch that already exists locally?", "intent": "git_switch_branch", "lang": "en"}
+{"text": "chekout develop", "intent": "git_switch_branch", "lang": "en"}
+{"text": "switch working copy to branch release", "intent": "git_switch_branch", "lang": "en"}
+{"text": "let me get onto the feature/dark-mode branch", "intent": "git_switch_branch", "lang": "en"}
+{"text": "return to the previous branch master", "intent": "git_switch_branch", "lang": "en"}
+{"text": "swap to branch test", "intent": "git_switch_branch", "lang": "en"}
+{"text": "switch to the 'experimental' branch", "intent": "git_switch_branch", "lang": "en"}
+{"text": "open branch fix/header in my working tree", "intent": "git_switch_branch", "lang": "en"}
+{"text": "przełącz się na gałąź develop", "intent": "git_switch_branch", "lang": "pl"}
+{"text": "przelacz na brancha main", "intent": "git_switch_branch", "lang": "pl"}
+{"text": "checkoutnij feature/login", "intent": "git_switch_branch", "lang": "pl"}
+{"text": "jak przejść na inną gałąź?", "intent": "git_switch_branch", "lang": "pl"}
+{"text": "zmień gałąź na master", "intent": "git_switch_branch", "lang": "pl"}
+{"text": "zmien branch na fix-123", "intent": "git_switch_branch", "lang": "pl"}
+{"text": "przejdź na istniejącą gałąź release/2.0", "intent": "git_switch_branch", "lang": "pl"}
+{"text": "przejdz na develop", "intent": "git_switch_branch", "lang": "pl"}
+{"text": "przełącz mnie na brancha feature/search", "intent": "git_switch_branch", "lang": "pl"}
+{"text": "jak zmienić branch w gicie", "intent": "git_switch_branch", "lang": "pl"}
+{"text": "wróć na maina", "intent": "git_switch_branch", "lang": "pl"}
+{"text": "wroc na galaz master", "intent": "git_switch_branch", "lang": "pl"}
+{"text": "chcę pracować na gałęzi staging, przełącz", "intent": "git_switch_branch", "lang": "pl"}
+{"text": "zrob checkout na hotfix/payment", "intent": "git_switch_branch", "lang": "pl"}
+{"text": "przeskocz na brancha dev", "intent": "git_switch_branch", "lang": "pl"}
+{"text": "jak sie przelaczyc na inny branch", "intent": "git_switch_branch", "lang": "pl"}
+{"text": "przełącz gałąź", "intent": "git_switch_branch", "lang": "pl"}
+{"text": "zmiana gałęzi na feature/api-v2", "intent": "git_switch_branch", "lang": "pl"}
+{"text": "przelacz sie na istniejacego brancha bugfix-42", "intent": "git_switch_branch", "lang": "pl"}
+{"text": "czy możesz przełączyć repozytorium na gałąź test?", "intent": "git_switch_branch", "lang": "pl"}
+{"text": "przejdź do gałęzi 'experimental'", "intent": "git_switch_branch", "lang": "pl"}
+{"text": "przelącz na develpo", "intent": "git_switch_branch", "lang": "pl"}
+{"text": "switchnij na maina", "intent": "git_switch_branch", "lang": "pl"}
+{"text": "wejdź na branch qa", "intent": "git_switch_branch", "lang": "pl"}
+{"text": "wejdz na galaz feature/dark-mode", "intent": "git_switch_branch", "lang": "pl"}
+{"text": "przestaw się na brancha release", "intent": "git_switch_branch", "lang": "pl"}
+{"text": "potrzebuję być na gałęzi develop", "intent": "git_switch_branch", "lang": "pl"}
+{"text": "jak wrócić na główną gałąź", "intent": "git_switch_branch", "lang": "pl"}
+{"text": "przełącz na isniejący branch fix/header", "intent": "git_switch_branch", "lang": "pl"}
+{"text": "checkout na gałąź main poproszę", "intent": "git_switch_branch", "lang": "pl"}
+{"text": "delete branch feature/login", "intent": "git_delete_branch", "lang": "en"}
+{"text": "remove the local branch fix-123", "intent": "git_delete_branch", "lang": "en"}
+{"text": "git delete branch develop-old", "intent": "git_delete_branch", "lang": "en"}
+{"text": "how do I delete a local branch?", "intent": "git_delete_branch", "lang": "en"}
+{"text": "get rid of the branch called experiment", "intent": "git_delete_branch", "lang": "en"}
+{"text": "delete the merged branch hotfix/payment", "intent": "git_delete_branch", "lang": "en"}
+{"text": "remove branch", "intent": "git_delete_branch", "lang": "en"}
+{"text": "I'm done with feature/search, delete that branch", "intent": "git_delete_branch", "lang": "en"}
+{"text": "how to remove a git branch locally", "intent": "git_delete_branch", "lang": "en"}
+{"text": "kill the branch test-branch", "intent": "git_delete_branch", "lang": "en"}
+{"text": "please delete my local branch bugfix-42", "intent": "git_delete_branch", "lang": "en"}
+{"text": "drop branch old-feature", "intent": "git_delete_branch", "lang": "en"}
+{"text": "clean up the branch release/1.0, it's merged", "intent": "git_delete_branch", "lang": "en"}
+{"text": "delte branch feature/x", "intent": "git_delete_branch", "lang": "en"}
+{"text": "remove local branch wip", "intent": "git_delete_branch", "lang": "en"}
+{"text": "can you delete the branch named 'spike'?", "intent": "git_delete_branch", "lang": "en"}
+{"text": "erase the git branch dev2", "intent": "git_delete_branch", "lang": "en"}
+{"text": "branch delete feature/api-v1", "intent": "git_delete_branch", "lang": "en"}
+{"text": "delete a branch I no longer need", "intent": "git_delete_branch", "lang": "en"}
+{"text": "nuke the local branch tmp", "intent": "git_delete_branch", "lang": "en"}
+{"text": "how can i remove an old branch from my repo", "intent": "git_delete_branch", "lang": "en"}
+{"text": "trash branch fix/typo", "intent": "git_delete_branch", "lang": "en"}
+{"text": "get rid of local branch feature/dark-mode", "intent": "git_delete_branch", "lang": "en"}
+{"text": "remove the merged local branch", "intent": "git_delete_branch", "lang": "en"}
+{"text": "delete branch locally", "intent": "git_delete_branch", "lang": "en"}
+{"text": "delete brnach cleanup", "intent": "git_delete_branch", "lang": "en"}
+{"text": "wipe out the branch named prototype", "intent": "git_delete_branch", "lang": "en"}
+{"text": "i want to delete the feature/old-ui branch", "intent": "git_delete_branch", "lang": "en"}
+{"text": "remove that stale branch hotfix-7", "intent": "git_delete_branch", "lang": "en"}
+{"text": "delete local git branch", "intent": "git_delete_branch", "lang": "en"}
+{"text": "usuń gałąź feature/login", "intent": "git_delete_branch", "lang": "pl"}
+{"text": "usun brancha fix-123", "intent": "git_delete_branch", "lang": "pl"}
+{"text": "skasuj lokalną gałąź develop-old", "intent": "git_delete_branch", "lang": "pl"}
+{"text": "jak usunąć lokalną gałąź?", "intent": "git_delete_branch", "lang": "pl"}
+{"text": "wywal brancha experiment", "intent": "git_delete_branch", "lang": "pl"}
+{"text": "usuń zmergowaną gałąź hotfix/payment", "intent": "git_delete_branch", "lang": "pl"}
+{"text": "usun galaz", "intent": "git_delete_branch", "lang": "pl"}
+{"text": "skończyłem z feature/search, usuń tego brancha", "intent": "git_delete_branch", "lang": "pl"}
+{"text": "jak skasowac brancha w gicie", "intent": "git_delete_branch", "lang": "pl"}
+{"text": "wyrzuć gałąź test-branch", "intent": "git_delete_branch", "lang": "pl"}
+{"text": "proszę usunąć moją lokalną gałąź bugfix-42", "intent": "git_delete_branch", "lang": "pl"}
+{"text": "skasuj branch old-feature", "intent": "git_delete_branch", "lang": "pl"}
+{"text": "posprzątaj gałąź release/1.0, jest już zmergowana", "intent": "git_delete_branch", "lang": "pl"}
+{"text": "usuń brancha 'spike'", "intent": "git_delete_branch", "lang": "pl"}
+{"text": "wywal lokalnego brancha wip", "intent": "git_delete_branch", "lang": "pl"}
+{"text": "jak usunac stara galaz", "intent": "git_delete_branch", "lang": "pl"}
+{"text": "deletnij brancha dev2", "intent": "git_delete_branch", "lang": "pl"}
+{"text": "usuń gałęź feature/api-v1", "intent": "git_delete_branch", "lang": "pl"}
+{"text": "skasuj niepotrzebną gałąź", "intent": "git_delete_branch", "lang": "pl"}
+{"text": "wywal lokalna galaz tmp", "intent": "git_delete_branch", "lang": "pl"}
+{"text": "usuwanie gałęzi fix/typo", "intent": "git_delete_branch", "lang": "pl"}
+{"text": "chcę usunąć brancha feature/dark-mode", "intent": "git_delete_branch", "lang": "pl"}
+{"text": "usun lokalny branch", "intent": "git_delete_branch", "lang": "pl"}
+{"text": "skasuj galąź cleanup", "intent": "git_delete_branch", "lang": "pl"}
+{"text": "pozbądź się gałęzi prototype", "intent": "git_delete_branch", "lang": "pl"}
+{"text": "usun brancha feature/old-ui bo juz niepotrzebny", "intent": "git_delete_branch", "lang": "pl"}
+{"text": "wyrzuc stary branch hotfix-7", "intent": "git_delete_branch", "lang": "pl"}
+{"text": "jak skasować gałąź lokalnie", "intent": "git_delete_branch", "lang": "pl"}
+{"text": "usuń lokalnego brancha", "intent": "git_delete_branch", "lang": "pl"}
+{"text": "skasuj gałąź main-backup", "intent": "git_delete_branch", "lang": "pl"}
+{"text": "undo my last commit", "intent": "git_undo_commit", "lang": "en"}
+{"text": "how do I undo the last commit but keep my changes?", "intent": "git_undo_commit", "lang": "en"}
+{"text": "revert the last commit and keep the files", "intent": "git_undo_commit", "lang": "en"}
+{"text": "uncommit", "intent": "git_undo_commit", "lang": "en"}
+{"text": "git undo last commit", "intent": "git_undo_commit", "lang": "en"}
+{"text": "I committed too early, take it back", "intent": "git_undo_commit", "lang": "en"}
+{"text": "roll back the most recent commit, keep changes staged", "intent": "git_undo_commit", "lang": "en"}
+{"text": "soft reset the last commit", "intent": "git_undo_commit", "lang": "en"}
+{"text": "reset HEAD~1 soft", "intent": "git_undo_commit", "lang": "en"}
+{"text": "cancel the previous commit without losing work", "intent": "git_undo_commit", "lang": "en"}
+{"text": "oops, wrong commit, undo it", "intent": "git_undo_commit", "lang": "en"}
+{"text": "undo commit but leave my edits", "intent": "git_undo_commit", "lang": "en"}
+{"text": "how to remove the last commit and keep the code", "intent": "git_undo_commit", "lang": "en"}
+{"text": "undo last commt", "intent": "git_undo_commit", "lang": "en"}
+{"text": "take back my latest commit", "intent": "git_undo_commit", "lang": "en"}
+{"text": "go back one commit keeping changes", "intent": "git_undo_commit", "lang": "en"}
+{"text": "i want to redo my last commit, undo it first", "intent": "git_undo_commit", "lang": "en"}
+{"text": "unmake the last commit", "intent": "git_undo_commit", "lang": "en"}
+{"text": "pop off the last commit, keep the changes in the index", "intent": "git_undo_commit", "lang": "en"}
+{"text": "remove last commit keep changes", "intent": "git_undo_commit", "lang": "en"}
+{"text": "could you undo the commit I just made?", "intent": "git_undo_commit", "lang": "en"}
+{"text": "scrap the latest commit but keep the work", "intent": "git_undo_commit", "lang": "en"}
+{"text": "git reset --soft last commit", "intent": "git_undo_commit", "lang": "en"}
+{"text": "undo the previous git commit", "intent": "git_undo_commit", "lang": "en"}
+{"text": "how can i un-commit what i just committed", "intent": "git_undo_commit", "lang": "en"}
+{"text": "revert my last commit locally, don't lose anything", "intent": "git_undo_commit", "lang": "en"}
+{"text": "step back one commit", "intent": "git_undo_commit", "lang": "en"}
+{"text": "undo the most recent commit, changes stay", "intent": "git_undo_commit", "lang": "en"}
+{"text": "i made a commit by mistake, how do i undo it", "intent": "git_undo_commit", "lang": "en"}
+{"text": "undo laast commit", "intent": "git_undo_commit", "lang": "en"}
+{"text": "cofnij ostatni commit", "intent": "git_undo_commit", "lang": "pl"}
+{"text": "jak cofnąć ostatni commit?", "intent": "git_undo_commit", "lang": "pl"}
+{"text": "cofnij ostatniego commita ale zostaw zmiany", "intent": "git_undo_commit", "lang": "pl"}
+{"text": "odcommituj", "intent": "git_undo_commit", "lang": "pl"}
+{"text": "zrób soft reset ostatniego commita", "intent": "git_undo_commit", "lang": "pl"}
+{"text": "jak cofnac commit zachowujac zmiany", "intent": "git_undo_commit", "lang": "pl"}
+{"text": "za wcześnie zacommitowałem, cofnij to", "intent": "git_undo_commit", "lang": "pl"}
+{"text": "anuluj poprzedni commit", "intent": "git_undo_commit", "lang": "pl"}
+{"text": "wycofaj ostatni commit bez utraty zmian", "intent": "git_undo_commit", "lang": "pl"}
+{"text": "ups, zły commit, cofnij go", "intent": "git_undo_commit", "lang": "pl"}
+{"text": "cofnij commit ale zostaw pliki", "intent": "git_undo_commit", "lang": "pl"}
+{"text": "usuń ostatni commit i zostaw kod", "intent": "git_undo_commit", "lang": "pl"}
+{"text": "cofnij ostatni komit", "intent": "git_undo_commit", "lang": "pl"}
+{"text": "cofnij commita", "intent": "git_undo_commit", "lang": "pl"}
+{"text": "jak odwrocic ostatni commit", "intent": "git_undo_commit", "lang": "pl"}
+{"text": "chcę cofnąć commit który właśnie zrobiłem", "intent": "git_undo_commit", "lang": "pl"}
+{"text": "cofnij się o jeden commit zachowując zmiany", "intent": "git_undo_commit", "lang": "pl"}
+{"text": "reset soft HEAD~1", "intent": "git_undo_commit", "lang": "pl"}
+{"text": "cofnij ostatnie zatwierdzenie zmian", "intent": "git_undo_commit", "lang": "pl"}
+{"text": "cofnij ostatniego komita, zmiany maja zostac", "intent": "git_undo_commit", "lang": "pl"}
+{"text": "czy możesz cofnąć ostatni commit?", "intent": "git_undo_commit", "lang": "pl"}
+{"text": "zrobiłem commit przez pomyłkę, jak go cofnąć", "intent": "git_undo_commit", "lang": "pl"}
+{"text": "anuluj ostatniego commita", "intent": "git_undo_commit", "lang": "pl"}
+{"text": "wycofaj commit lokalnie", "intent": "git_undo_commit", "lang": "pl"}
+{"text": "cofnij poprzedniego commita zostawiajac zmiany w stage", "intent": "git_undo_commit", "lang": "pl"}
+{"text": "jak zrobic uncommit", "intent": "git_undo_commit", "lang": "pl"}
+{"text": "cofnij ostani commit", "intent": "git_undo_commit", "lang": "pl"}
+{"text": "odkręć ostatni commit", "intent": "git_undo_commit", "lang": "pl"}
+{"text": "wróć o jeden commit wstecz, zmiany zostaw", "intent": "git_undo_commit", "lang": "pl"}
+{"text": "cofnij commit ktory przed chwila zrobilem", "intent": "git_undo_commit", "lang": "pl"}
+{"text": "discard all my uncommitted changes", "intent": "git_discard_changes", "lang": "en"}
+{"text": "throw away local changes", "intent": "git_discard_changes", "lang": "en"}
+{"text": "how do I discard changes in a file?", "intent": "git_discard_changes", "lang": "en"}
+{"text": "revert file src/app.js to the last commit", "intent": "git_discard_changes", "lang": "en"}
+{"text": "undo my edits to README.md", "intent": "git_discard_changes", "lang": "en"}
+{"text": "git restore everything", "intent": "git_discard_changes", "lang": "en"}
+{"text": "reset working tree changes", "intent": "git_discard_changes", "lang": "en"}
+{"text": "drop all modifications I haven't committed", "intent": "git_discard_changes", "lang": "en"}
+{"text": "get rid of my local changes", "intent": "git_discard_changes", "lang": "en"}
+{"text": "restore index.html to its committed version", "intent": "git_discard_changes", "lang": "en"}
+{"text": "discard changes in config.yaml", "intent": "git_discard_changes", "lang": "en"}
+{"text": "throw away everything I changed since the last commit", "intent": "git_discard_changes", "lang": "en"}
+{"text": "how to undo uncommitted changes", "intent": "git_discard_changes", "lang": "en"}
+{"text": "wipe my working directory changes", "intent": "git_discard_changes", "lang": "en"}
+{"text": "discard chnages", "intent": "git_discard_changes", "lang": "en"}
+{"text": "revert all unstaged edits", "intent": "git_discard_changes", "lang": "en"}
+{"text": "forget my local modifications", "intent": "git_discard_changes", "lang": "en"}
+{"text": "undo changes to main.py", "intent": "git_discard_changes", "lang": "en"}
+{"text": "clean my edits, go back to HEAD state for files", "intent": "git_discard_changes", "lang": "en"}
+{"text": "restore all modified files", "intent": "git_discard_changes", "lang": "en"}
+{"text": "i messed up, discard everything not committed", "intent": "git_discard_changes", "lang": "en"}
+{"text": "cancel my changes to package.json", "intent": "git_discard_changes", "lang": "en"}
+{"text": "please throw away the changes in styles.css", "intent": "git_discard_changes", "lang": "en"}
+{"text": "git checkout -- . basically, discard changes", "intent": "git_discard_changes", "lang": "en"}
+{"text": "undo all the edits I made in this repo", "intent": "git_discard_changes", "lang": "en"}
+{"text": "discard local changes in Dockerfile", "intent": "git_discard_changes", "lang": "en"}
+{"text": "how can I revert a modified file back", "intent": "git_discard_changes", "lang": "en"}
+{"text": "reset uncommited changes", "intent": "git_discard_changes", "lang": "en"}
+{"text": "bin all my working copy changes", "intent": "git_discard_changes", "lang": "en"}
+{"text": "restore the file utils.ts, discard my edits", "intent": "git_discard_changes", "lang": "en"}
+{"text": "odrzuć wszystkie niezacommitowane zmiany", "intent": "git_discard_changes", "lang": "pl"}
+{"text": "wyrzuć lokalne zmiany", "intent": "git_discard_changes", "lang": "pl"}
+{"text": "jak cofnąć zmiany w pliku?", "intent": "git_discard_changes", "lang": "pl"}
+{"text": "przywróć plik src/app.js do ostatniego commita", "intent": "git_discard_changes", "lang": "pl"}
+{"text": "cofnij moje zmiany w README.md", "intent": "git_discard_changes", "lang": "pl"}
+{"text": "porzuc wszystkie zmiany", "intent": "git_discard_changes", "lang": "pl"}
+{"text": "wywal zmiany ktore nie sa zacommitowane", "intent": "git_discard_changes", "lang": "pl"}
+{"text": "zresetuj zmiany w katalogu roboczym", "intent": "git_discard_changes", "lang": "pl"}
+{"text": "skasuj moje lokalne modyfikacje", "intent": "git_discard_changes", "lang": "pl"}
+{"text": "przywróć index.html do wersji z repo", "intent": "git_discard_changes", "lang": "pl"}
+{"text": "odrzuc zmiany w config.yaml", "intent": "git_discard_changes", "lang": "pl"}
+{"text": "jak cofnac niezacommitowane zmiany", "intent": "git_discard_changes", "lang": "pl"}
+{"text": "wyczyść moje zmiany, wróć do stanu z HEAD", "intent": "git_discard_changes", "lang": "pl"}
+{"text": "przywroc wszystkie zmodyfikowane pliki", "intent": "git_discard_changes", "lang": "pl"}
+{"text": "namieszałem, wywal wszystko co nie jest zacommitowane", "intent": "git_discard_changes", "lang": "pl"}
+{"text": "anuluj zmiany w package.json", "intent": "git_discard_changes", "lang": "pl"}
+{"text": "porzuć zmiany w styles.css", "intent": "git_discard_changes", "lang": "pl"}
+{"text": "cofnij wszystkie edycje w tym repo", "intent": "git_discard_changes", "lang": "pl"}
+{"text": "odrzuc lokalne zmainy", "intent": "git_discard_changes", "lang": "pl"}
+{"text": "zrób restore wszystkiego", "intent": "git_discard_changes", "lang": "pl"}
+{"text": "wyrzuć zmiany w pliku main.py", "intent": "git_discard_changes", "lang": "pl"}
+{"text": "przywróć plik utils.ts, moje zmiany do kosza", "intent": "git_discard_changes", "lang": "pl"}
+{"text": "jak przywrocic zmieniony plik do oryginalu", "intent": "git_discard_changes", "lang": "pl"}
+{"text": "zapomnij o moich lokalnych zmianach", "intent": "git_discard_changes", "lang": "pl"}
+{"text": "odrzuć niezapisane w gicie zmiany", "intent": "git_discard_changes", "lang": "pl"}
+{"text": "wywal edycje w Dockerfile", "intent": "git_discard_changes", "lang": "pl"}
+{"text": "usuń wszystkie niezatwierdzone zmiany", "intent": "git_discard_changes", "lang": "pl"}
+{"text": "cofnij zmiany w plikach roboczych", "intent": "git_discard_changes", "lang": "pl"}
+{"text": "git restore na wszystkim", "intent": "git_discard_changes", "lang": "pl"}
+{"text": "porzucam zmiany, przywroc pliki", "intent": "git_discard_changes", "lang": "pl"}
+{"text": "stash my changes", "intent": "git_stash", "lang": "en"}
+{"text": "git stash", "intent": "git_stash", "lang": "en"}
+{"text": "save my work in progress temporarily", "intent": "git_stash", "lang": "en"}
+{"text": "put my current changes aside", "intent": "git_stash", "lang": "en"}
+{"text": "how do I stash changes?", "intent": "git_stash", "lang": "en"}
+{"text": "shelve my uncommitted work", "intent": "git_stash", "lang": "en"}
+{"text": "stash everything for now", "intent": "git_stash", "lang": "en"}
+{"text": "hide my changes so I can switch branches", "intent": "git_stash", "lang": "en"}
+{"text": "temporarily save changes without committing", "intent": "git_stash", "lang": "en"}
+{"text": "stash current work", "intent": "git_stash", "lang": "en"}
+{"text": "stash it", "intent": "git_stash", "lang": "en"}
+{"text": "put my local changes on the stash", "intent": "git_stash", "lang": "en"}
+{"text": "save uncommitted changes for later", "intent": "git_stash", "lang": "en"}
+{"text": "i need a clean tree for a sec, stash my stuff", "intent": "git_stash", "lang": "en"}
+{"text": "how to temporarily store my modifications in git", "intent": "git_stash", "lang": "en"}
+{"text": "stahs changes", "intent": "git_stash", "lang": "en"}
+{"text": "tuck away my edits", "intent": "git_stash", "lang": "en"}
+{"text": "park my current changes", "intent": "git_stash", "lang": "en"}
+{"text": "could you stash what I'm working on?", "intent": "git_stash", "lang": "en"}
+{"text": "push changes onto the stash stack", "intent": "git_stash", "lang": "en"}
+{"text": "save WIP to stash", "intent": "git_stash", "lang": "en"}
+{"text": "set aside my uncommitted changes", "intent": "git_stash", "lang": "en"}
+{"text": "stash the dirty working tree", "intent": "git_stash", "lang": "en"}
+{"text": "keep my changes but clear the working directory", "intent": "git_stash", "lang": "en"}
+{"text": "stash changes before pulling", "intent": "git_stash", "lang": "en"}
+{"text": "i want to stash", "intent": "git_stash", "lang": "en"}
+{"text": "stash my modified files", "intent": "git_stash", "lang": "en"}
+{"text": "save my current edits in a stash", "intent": "git_stash", "lang": "en"}
+{"text": "stassh my work", "intent": "git_stash", "lang": "en"}
+{"text": "put away changes temporarily", "intent": "git_stash", "lang": "en"}
+{"text": "zestashuj zmiany", "intent": "git_stash", "lang": "pl"}
+{"text": "schowaj moje zmiany", "intent": "git_stash", "lang": "pl"}
+{"text": "zrób stasha", "intent": "git_stash", "lang": "pl"}
+{"text": "jak schować zmiany w gicie?", "intent": "git_stash", "lang": "pl"}
+{"text": "odłóż na bok bieżące zmiany", "intent": "git_stash", "lang": "pl"}
+{"text": "tymczasowo zapisz zmiany bez commita", "intent": "git_stash", "lang": "pl"}
+{"text": "zestashuj wszystko", "intent": "git_stash", "lang": "pl"}
+{"text": "schowaj zmiany żebym mógł zmienić gałąź", "intent": "git_stash", "lang": "pl"}
+{"text": "stashnij to", "intent": "git_stash", "lang": "pl"}
+{"text": "odloz zmiany na pozniej", "intent": "git_stash", "lang": "pl"}
+{"text": "wrzuć zmiany do stasha", "intent": "git_stash", "lang": "pl"}
+{"text": "potrzebuje czystego drzewa, schowaj moje rzeczy", "intent": "git_stash", "lang": "pl"}
+{"text": "jak tymczasowo przechować modyfikacje", "intent": "git_stash", "lang": "pl"}
+{"text": "zestaszuj zmainy", "intent": "git_stash", "lang": "pl"}
+{"text": "zaparkuj obecne zmiany", "intent": "git_stash", "lang": "pl"}
+{"text": "czy możesz zestashować to nad czym pracuję?", "intent": "git_stash", "lang": "pl"}
+{"text": "schowaj WIP do stasha", "intent": "git_stash", "lang": "pl"}
+{"text": "odłóż niezacommitowane zmiany", "intent": "git_stash", "lang": "pl"}
+{"text": "zachowaj zmiany ale wyczysc katalog roboczy", "intent": "git_stash", "lang": "pl"}
+{"text": "stash zmian przed pullem", "intent": "git_stash", "lang": "pl"}
+{"text": "chce zrobic stash", "intent": "git_stash", "lang": "pl"}
+{"text": "schowaj zmodyfikowane pliki", "intent": "git_stash", "lang": "pl"}
+{"text": "przechowaj moje bieżące edycje w schowku", "intent": "git_stash", "lang": "pl"}
+{"text": "schowek gita, zapisz zmiany", "intent": "git_stash", "lang": "pl"}
+{"text": "zestashuj moja prace", "intent": "git_stash", "lang": "pl"}
+{"text": "odstaw zmiany na chwilę", "intent": "git_stash", "lang": "pl"}
+{"text": "git stash poprosze", "intent": "git_stash", "lang": "pl"}
+{"text": "schowaj zmiany tymczasowo", "intent": "git_stash", "lang": "pl"}
+{"text": "zapisz zmiany do stasha", "intent": "git_stash", "lang": "pl"}
+{"text": "stashuj", "intent": "git_stash", "lang": "pl"}
+{"text": "pop the stash", "intent": "git_stash_pop", "lang": "en"}
+{"text": "git stash pop", "intent": "git_stash_pop", "lang": "en"}
+{"text": "restore my stashed changes", "intent": "git_stash_pop", "lang": "en"}
+{"text": "bring back what I stashed", "intent": "git_stash_pop", "lang": "en"}
+{"text": "how do I get my stashed changes back?", "intent": "git_stash_pop", "lang": "en"}
+{"text": "apply the last stash and remove it", "intent": "git_stash_pop", "lang": "en"}
+{"text": "unstash", "intent": "git_stash_pop", "lang": "en"}
+{"text": "get my changes back from the stash", "intent": "git_stash_pop", "lang": "en"}
+{"text": "pop my work in progress", "intent": "git_stash_pop", "lang": "en"}
+{"text": "restore stash", "intent": "git_stash_pop", "lang": "en"}
+{"text": "re-apply my stashed work", "intent": "git_stash_pop", "lang": "en"}
+{"text": "take my changes out of the stash", "intent": "git_stash_pop", "lang": "en"}
+{"text": "i stashed earlier, now restore it", "intent": "git_stash_pop", "lang": "en"}
+{"text": "how to unstash changes", "intent": "git_stash_pop", "lang": "en"}
+{"text": "stash pop pls", "intent": "git_stash_pop", "lang": "en"}
+{"text": "retrieve the stashed edits", "intent": "git_stash_pop", "lang": "en"}
+{"text": "pop latest stash entry", "intent": "git_stash_pop", "lang": "en"}
+{"text": "put back the changes I set aside", "intent": "git_stash_pop", "lang": "en"}
+{"text": "recover stashed modifications", "intent": "git_stash_pop", "lang": "en"}
+{"text": "unshelve my changes", "intent": "git_stash_pop", "lang": "en"}
+{"text": "stsh pop", "intent": "git_stash_pop", "lang": "en"}
+{"text": "could you restore the changes from my stash?", "intent": "git_stash_pop", "lang": "en"}
+{"text": "bring my parked changes back", "intent": "git_stash_pop", "lang": "en"}
+{"text": "apply stash", "intent": "git_stash_pop", "lang": "en"}
+{"text": "get back the WIP i stashed", "intent": "git_stash_pop", "lang": "en"}
+{"text": "pop the top of the stash stack", "intent": "git_stash_pop", "lang": "en"}
+{"text": "restore the most recent stash", "intent": "git_stash_pop", "lang": "en"}
+{"text": "undo the stash, give me my changes back", "intent": "git_stash_pop", "lang": "en"}
+{"text": "pull changes out of stash", "intent": "git_stash_pop", "lang": "en"}
+{"text": "pop stahs", "intent": "git_stash_pop", "lang": "en"}
+{"text": "przywróć zestashowane zmiany", "intent": "git_stash_pop", "lang": "pl"}
+{"text": "zrob stash pop", "intent": "git_stash_pop", "lang": "pl"}
+{"text": "wyciągnij zmiany ze stasha", "intent": "git_stash_pop", "lang": "pl"}
+{"text": "jak przywrócić schowane zmiany?", "intent": "git_stash_pop", "lang": "pl"}
+{"text": "odstashuj", "intent": "git_stash_pop", "lang": "pl"}
+{"text": "przywroc schowane zmiany", "intent": "git_stash_pop", "lang": "pl"}
+{"text": "przywróć ostatni stash", "intent": "git_stash_pop", "lang": "pl"}
+{"text": "zastosuj stasha i go usuń", "intent": "git_stash_pop", "lang": "pl"}
+{"text": "popnij stasha", "intent": "git_stash_pop", "lang": "pl"}
+{"text": "oddaj mi zmiany ze schowka", "intent": "git_stash_pop", "lang": "pl"}
+{"text": "wróć zmiany które zestashowałem", "intent": "git_stash_pop", "lang": "pl"}
+{"text": "jak odzyskac zmiany ze stasha", "intent": "git_stash_pop", "lang": "pl"}
+{"text": "przywroc moje WIP", "intent": "git_stash_pop", "lang": "pl"}
+{"text": "wyjmij zmiany ze stasha", "intent": "git_stash_pop", "lang": "pl"}
+{"text": "zestashowałem wcześniej, teraz przywróć", "intent": "git_stash_pop", "lang": "pl"}
+{"text": "przywróć odłożone zmiany", "intent": "git_stash_pop", "lang": "pl"}
+{"text": "stash pop prosze", "intent": "git_stash_pop", "lang": "pl"}
+{"text": "przywroc zmainy ze stasha", "intent": "git_stash_pop", "lang": "pl"}
+{"text": "zastosuj ostatniego stasha", "intent": "git_stash_pop", "lang": "pl"}
+{"text": "odzyskaj schowane modyfikacje", "intent": "git_stash_pop", "lang": "pl"}
+{"text": "czy możesz przywrócić zmiany ze schowka?", "intent": "git_stash_pop", "lang": "pl"}
+{"text": "przywróć zaparkowane zmiany", "intent": "git_stash_pop", "lang": "pl"}
+{"text": "wyciagnij stash", "intent": "git_stash_pop", "lang": "pl"}
+{"text": "przywróć najnowszy stash", "intent": "git_stash_pop", "lang": "pl"}
+{"text": "cofnij stasha, oddaj zmiany", "intent": "git_stash_pop", "lang": "pl"}
+{"text": "ściągnij zmiany ze stosu stash", "intent": "git_stash_pop", "lang": "pl"}
+{"text": "przywroc stasha", "intent": "git_stash_pop", "lang": "pl"}
+{"text": "jak zrobić unstash", "intent": "git_stash_pop", "lang": "pl"}
+{"text": "zdejmij ostatni wpis ze stasha", "intent": "git_stash_pop", "lang": "pl"}
+{"text": "wrzuc z powrotem zestashowane rzeczy", "intent": "git_stash_pop", "lang": "pl"}
+{"text": "git pull", "intent": "git_pull", "lang": "en"}
+{"text": "pull the latest changes from remote", "intent": "git_pull", "lang": "en"}
+{"text": "how do I get the newest code from origin?", "intent": "git_pull", "lang": "en"}
+{"text": "update my local branch from the remote", "intent": "git_pull", "lang": "en"}
+{"text": "pull", "intent": "git_pull", "lang": "en"}
+{"text": "fetch and merge upstream changes", "intent": "git_pull", "lang": "en"}
+{"text": "sync my repo with the server", "intent": "git_pull", "lang": "en"}
+{"text": "download the latest commits from github", "intent": "git_pull", "lang": "en"}
+{"text": "get my teammates' changes", "intent": "git_pull", "lang": "en"}
+{"text": "pull from origin", "intent": "git_pull", "lang": "en"}
+{"text": "bring my branch up to date with remote", "intent": "git_pull", "lang": "en"}
+{"text": "how to update local repo with remote changes", "intent": "git_pull", "lang": "en"}
+{"text": "pul latest", "intent": "git_pull", "lang": "en"}
+{"text": "grab new commits from upstream", "intent": "git_pull", "lang": "en"}
+{"text": "refresh my checkout with what's on the remote", "intent": "git_pull", "lang": "en"}
+{"text": "please pull the latest version", "intent": "git_pull", "lang": "en"}
+{"text": "update from remote", "intent": "git_pull", "lang": "en"}
+{"text": "pull down changes", "intent": "git_pull", "lang": "en"}
+{"text": "can you pull the newest stuff from origin?", "intent": "git_pull", "lang": "en"}
+{"text": "get latest code", "intent": "git_pull", "lang": "en"}
+{"text": "sync with remote branch", "intent": "git_pull", "lang": "en"}
+{"text": "git pul", "intent": "git_pull", "lang": "en"}
+{"text": "i'm behind origin, pull the changes", "intent": "git_pull", "lang": "en"}
+{"text": "merge in remote updates", "intent": "git_pull", "lang": "en"}
+{"text": "update the repository from the remote", "intent": "git_pull", "lang": "en"}
+{"text": "fetch the latest and merge into my branch", "intent": "git_pull", "lang": "en"}
+{"text": "how can i pull changes my colleague pushed", "intent": "git_pull", "lang": "en"}
+{"text": "retrieve remote changes into my working copy", "intent": "git_pull", "lang": "en"}
+{"text": "pull updates", "intent": "git_pull", "lang": "en"}
+{"text": "get up to date with the remote", "intent": "git_pull", "lang": "en"}
+{"text": "spulluj zmiany", "intent": "git_pull", "lang": "pl"}
+{"text": "zrób pulla", "intent": "git_pull", "lang": "pl"}
+{"text": "pobierz najnowsze zmiany z remote", "intent": "git_pull", "lang": "pl"}
+{"text": "jak ściągnąć najnowszy kod z origin?", "intent": "git_pull", "lang": "pl"}
+{"text": "zaktualizuj lokalną gałąź z serwera", "intent": "git_pull", "lang": "pl"}
+{"text": "ściągnij zmiany", "intent": "git_pull", "lang": "pl"}
+{"text": "sciagnij najnowsze zmiany z repo", "intent": "git_pull", "lang": "pl"}
+{"text": "zsynchronizuj repo z serwerem", "intent": "git_pull", "lang": "pl"}
+{"text": "pobierz zmiany kolegów", "intent": "git_pull", "lang": "pl"}
+{"text": "pull z origin", "intent": "git_pull", "lang": "pl"}
+{"text": "jak zaktualizowac lokalne repo", "intent": "git_pull", "lang": "pl"}
+{"text": "spuluj", "intent": "git_pull", "lang": "pl"}
+{"text": "pobierz nowe commity z upstreamu", "intent": "git_pull", "lang": "pl"}
+{"text": "odśwież kod z remote", "intent": "git_pull", "lang": "pl"}
+{"text": "proszę zrób pull najnowszej wersji", "intent": "git_pull", "lang": "pl"}
+{"text": "zaktualizuj z remote", "intent": "git_pull", "lang": "pl"}
+{"text": "czy możesz pobrać najnowsze zmiany z origin?", "intent": "git_pull", "lang": "pl"}
+{"text": "pobierz najnowszy kod", "intent": "git_pull", "lang": "pl"}
+{"text": "zsynchronizuj sie z galezia zdalna", "intent": "git_pull", "lang": "pl"}
+{"text": "jestem w tyle za originem, spulluj", "intent": "git_pull", "lang": "pl"}
+{"text": "zmerguj zmiany ze zdalnego repo", "intent": "git_pull", "lang": "pl"}
+{"text": "zaktualizuj repozytorium ze zdalnego", "intent": "git_pull", "lang": "pl"}
+{"text": "jak pobrac zmiany ktore kolega wypchnal", "intent": "git_pull", "lang": "pl"}
+{"text": "pobierz aktualizacje", "intent": "git_pull", "lang": "pl"}
+{"text": "pullnij", "intent": "git_pull", "lang": "pl"}
+{"text": "ściągnij to co jest na githubie", "intent": "git_pull", "lang": "pl"}
+{"text": "zpulluj zmiany z serwera", "intent": "git_pull", "lang": "pl"}
+{"text": "zaciągnij zmiany z remota", "intent": "git_pull", "lang": "pl"}
+{"text": "pobierz i scal zdalne zmiany", "intent": "git_pull", "lang": "pl"}
+{"text": "pulnij z serwera", "intent": "git_pull", "lang": "pl"}
+{"text": "git push", "intent": "git_push", "lang": "en"}
+{"text": "push my commits", "intent": "git_push", "lang": "en"}
+{"text": "push to origin main", "intent": "git_push", "lang": "en"}
+{"text": "upload my changes to the remote", "intent": "git_push", "lang": "en"}
+{"text": "how do I push my branch to github?", "intent": "git_push", "lang": "en"}
+{"text": "push", "intent": "git_push", "lang": "en"}
+{"text": "send my commits to the server", "intent": "git_push", "lang": "en"}
+{"text": "publish my local commits", "intent": "git_push", "lang": "en"}
+{"text": "push the branch feature/login to origin", "intent": "git_push", "lang": "en"}
+{"text": "push changes", "intent": "git_push", "lang": "en"}
+{"text": "how to push to remote", "intent": "git_push", "lang": "en"}
+{"text": "psuh my work", "intent": "git_push", "lang": "en"}
+{"text": "push develop to origin", "intent": "git_push", "lang": "en"}
+{"text": "share my commits with the team", "intent": "git_push", "lang": "en"}
+{"text": "upload commits to github", "intent": "git_push", "lang": "en"}
+{"text": "please push the latest commits", "intent": "git_push", "lang": "en"}
+{"text": "push to remote", "intent": "git_push", "lang": "en"}
+{"text": "can you push my branch fix-123?", "intent": "git_push", "lang": "en"}
+{"text": "sync my local commits up to origin", "intent": "git_push", "lang": "en"}
+{"text": "push it to the remote repo", "intent": "git_push", "lang": "en"}
+{"text": "get my commits onto the server", "intent": "git_push", "lang": "en"}
+{"text": "push current branch", "intent": "git_push", "lang": "en"}
+{"text": "pussh to origin", "intent": "git_push", "lang": "en"}
+{"text": "push my changes up", "intent": "git_push", "lang": "en"}
+{"text": "send branch release/2.0 to origin", "intent": "git_push", "lang": "en"}
+{"text": "how can i upload my local commits", "intent": "git_push", "lang": "en"}
+{"text": "deploy my commits to remote repo (push)", "intent": "git_push", "lang": "en"}
+{"text": "push the commits I just made", "intent": "git_push", "lang": "en"}
+{"text": "push origin hotfix/payment", "intent": "git_push", "lang": "en"}
+{"text": "push everything to github", "intent": "git_push", "lang": "en"}
+{"text": "zrób pusha", "intent": "git_push", "lang": "pl"}
+{"text": "wypchnij zmiany", "intent": "git_push", "lang": "pl"}
+{"text": "pushnij do origin main", "intent": "git_push", "lang": "pl"}
+{"text": "wyślij moje commity na serwer", "intent": "git_push", "lang": "pl"}
+{"text": "jak wypchnąć gałąź na githuba?", "intent": "git_push", "lang": "pl"}
+{"text": "spushuj", "intent": "git_push", "lang": "pl"}
+{"text": "wypchnij commity", "intent": "git_push", "lang": "pl"}
+{"text": "opublikuj lokalne commity", "intent": "git_push", "lang": "pl"}
+{"text": "wypchnij brancha feature/login na origin", "intent": "git_push", "lang": "pl"}
+{"text": "jak zrobic push", "intent": "git_push", "lang": "pl"}
+{"text": "wyslij zmiany na remote", "intent": "git_push", "lang": "pl"}
+{"text": "zpushuj moją pracę", "intent": "git_push", "lang": "pl"}
+{"text": "pushnij develop", "intent": "git_push", "lang": "pl"}
+{"text": "udostępnij commity zespołowi", "intent": "git_push", "lang": "pl"}
+{"text": "wrzuć commity na githuba", "intent": "git_push", "lang": "pl"}
+{"text": "proszę wypchnij ostatnie commity", "intent": "git_push", "lang": "pl"}
+{"text": "czy możesz wypchnąć brancha fix-123?", "intent": "git_push", "lang": "pl"}
+{"text": "wypchnij to do zdalnego repo", "intent": "git_push", "lang": "pl"}
+{"text": "push obecnej galezi", "intent": "git_push", "lang": "pl"}
+{"text": "wrzuc zmiany na serwer", "intent": "git_push", "lang": "pl"}
+{"text": "wypchnij brancha release/2.0", "intent": "git_push", "lang": "pl"}
+{"text": "jak wysłać lokalne commity", "intent": "git_push", "lang": "pl"}
+{"text": "wypushuj commity ktore zrobilem", "intent": "git_push", "lang": "pl"}
+{"text": "pushuj na origin hotfix/payment", "intent": "git_push", "lang": "pl"}
+{"text": "wypchnij wszystko na githuba", "intent": "git_push", "lang": "pl"}
+{"text": "wypych zmian na origin", "intent": "git_push", "lang": "pl"}
+{"text": "pusznij zmiany", "intent": "git_push", "lang": "pl"}
+{"text": "wyslij galaz na zdalne repo", "intent": "git_push", "lang": "pl"}
+{"text": "zrob push na remote", "intent": "git_push", "lang": "pl"}
+{"text": "wypchnij na zdalne", "intent": "git_push", "lang": "pl"}
+{"text": "clone https://github.com/user/repo.git", "intent": "git_clone", "lang": "en"}
+{"text": "git clone git@github.com:acme/api.git", "intent": "git_clone", "lang": "en"}
+{"text": "how do I clone a repository?", "intent": "git_clone", "lang": "en"}
+{"text": "download the repo https://gitlab.com/team/project.git", "intent": "git_clone", "lang": "en"}
+{"text": "clone the repo", "intent": "git_clone", "lang": "en"}
+{"text": "make a local copy of https://github.com/torvalds/linux", "intent": "git_clone", "lang": "en"}
+{"text": "clone repository from github", "intent": "git_clone", "lang": "en"}
+{"text": "get a copy of git@github.com:x/y.git", "intent": "git_clone", "lang": "en"}
+{"text": "check out a fresh copy of https://bitbucket.org/org/app.git", "intent": "git_clone", "lang": "en"}
+{"text": "how to download a git repository from a url", "intent": "git_clone", "lang": "en"}
+{"text": "pls clone this: https://github.com/facebook/react.git", "intent": "git_clone", "lang": "en"}
+{"text": "clone a remote repo to my machine", "intent": "git_clone", "lang": "en"}
+{"text": "cloen https://github.com/me/dotfiles", "intent": "git_clone", "lang": "en"}
+{"text": "pull down the whole repo https://github.com/user/tool.git to a new folder", "intent": "git_clone", "lang": "en"}
+{"text": "please clone git@gitlab.com:company/backend.git", "intent": "git_clone", "lang": "en"}
+{"text": "copy the github repo locally", "intent": "git_clone", "lang": "en"}
+{"text": "i want to clone https://github.com/vercel/next.js", "intent": "git_clone", "lang": "en"}
+{"text": "fetch the repository git@github.com:me/notes.git for the first time", "intent": "git_clone", "lang": "en"}
+{"text": "clone", "intent": "git_clone", "lang": "en"}
+{"text": "set up a local clone of https://github.com/user/repo", "intent": "git_clone", "lang": "en"}
+{"text": "can you clone the project at https://git.example.com/web.git?", "intent": "git_clone", "lang": "en"}
+{"text": "grab the repo from github: https://github.com/sindresorhus/got.git", "intent": "git_clone", "lang": "en"}
+{"text": "clone repo from url", "intent": "git_clone", "lang": "en"}
+{"text": "get the source of https://github.com/rust-lang/rust", "intent": "git_clone", "lang": "en"}
+{"text": "how can i copy a remote repository to my computer", "intent": "git_clone", "lang": "en"}
+{"text": "clone that repository for me", "intent": "git_clone", "lang": "en"}
+{"text": "download project from git", "intent": "git_clone", "lang": "en"}
+{"text": "git clone the repo https://github.com/user/app", "intent": "git_clone", "lang": "en"}
+{"text": "clone ssh repo git@github.com:org/infra.git", "intent": "git_clone", "lang": "en"}
+{"text": "duplicate the remote repo locally", "intent": "git_clone", "lang": "en"}
+{"text": "sklonuj https://github.com/user/repo.git", "intent": "git_clone", "lang": "pl"}
+{"text": "jak sklonować repozytorium?", "intent": "git_clone", "lang": "pl"}
+{"text": "pobierz repo https://gitlab.com/team/project.git", "intent": "git_clone", "lang": "pl"}
+{"text": "sklonuj repo", "intent": "git_clone", "lang": "pl"}
+{"text": "zrób lokalną kopię https://github.com/torvalds/linux", "intent": "git_clone", "lang": "pl"}
+{"text": "klonuj repozytorium z githuba", "intent": "git_clone", "lang": "pl"}
+{"text": "sciagnij kopie git@github.com:x/y.git", "intent": "git_clone", "lang": "pl"}
+{"text": "jak pobrac repozytorium gita z adresu", "intent": "git_clone", "lang": "pl"}
+{"text": "sklonuj to: https://github.com/facebook/react.git", "intent": "git_clone", "lang": "pl"}
+{"text": "sklonuj zdalne repo na mój komputer", "intent": "git_clone", "lang": "pl"}
+{"text": "sklnuj https://github.com/me/dotfiles", "intent": "git_clone", "lang": "pl"}
+{"text": "proszę sklonować git@gitlab.com:company/backend.git", "intent": "git_clone", "lang": "pl"}
+{"text": "skopiuj repo z githuba lokalnie", "intent": "git_clone", "lang": "pl"}
+{"text": "chcę sklonować https://github.com/vercel/next.js", "intent": "git_clone", "lang": "pl"}
+{"text": "zklonuj repozytorium git@github.com:me/notes.git", "intent": "git_clone", "lang": "pl"}
+{"text": "klonowanie repo", "intent": "git_clone", "lang": "pl"}
+{"text": "czy możesz sklonować projekt z https://git.example.com/web.git?", "intent": "git_clone", "lang": "pl"}
+{"text": "pobierz repozytorium z adresu https://bitbucket.org/org/app.git", "intent": "git_clone", "lang": "pl"}
+{"text": "sklonuj repo z url", "intent": "git_clone", "lang": "pl"}
+{"text": "jak skopiowac zdalne repozytorium na komputer", "intent": "git_clone", "lang": "pl"}
+{"text": "sklonuj mi to repozytorium", "intent": "git_clone", "lang": "pl"}
+{"text": "zaklonuj projekt https://github.com/user/app", "intent": "git_clone", "lang": "pl"}
+{"text": "klon repo ssh git@github.com:org/infra.git", "intent": "git_clone", "lang": "pl"}
+{"text": "zrob clone https://github.com/rust-lang/rust", "intent": "git_clone", "lang": "pl"}
+{"text": "pobierz projekt z gita po raz pierwszy", "intent": "git_clone", "lang": "pl"}
+{"text": "sklonuj repozytorium https://github.com/sindresorhus/got.git", "intent": "git_clone", "lang": "pl"}
+{"text": "klonuj https://github.com/user/repo", "intent": "git_clone", "lang": "pl"}
+{"text": "ściągnij całe repo https://github.com/user/tool.git do nowego folderu", "intent": "git_clone", "lang": "pl"}
+{"text": "skolonuj repozytorium z gitlaba", "intent": "git_clone", "lang": "pl"}
+{"text": "sklonuj git@github.com:acme/api.git do katalogu", "intent": "git_clone", "lang": "pl"}
+{"text": "stage all changes", "intent": "git_add_all", "lang": "en"}
+{"text": "git add everything", "intent": "git_add_all", "lang": "en"}
+{"text": "add all files to the index", "intent": "git_add_all", "lang": "en"}
+{"text": "git add .", "intent": "git_add_all", "lang": "en"}
+{"text": "how do I stage all my changes?", "intent": "git_add_all", "lang": "en"}
+{"text": "stage everything", "intent": "git_add_all", "lang": "en"}
+{"text": "add all modified and new files", "intent": "git_add_all", "lang": "en"}
+{"text": "put all changes in the staging area", "intent": "git_add_all", "lang": "en"}
+{"text": "stage all files but don't commit yet", "intent": "git_add_all", "lang": "en"}
+{"text": "add all", "intent": "git_add_all", "lang": "en"}
+{"text": "track all new files and stage changes", "intent": "git_add_all", "lang": "en"}
+{"text": "stage all the things", "intent": "git_add_all", "lang": "en"}
+{"text": "git add -A", "intent": "git_add_all", "lang": "en"}
+{"text": "how to add all files to git", "intent": "git_add_all", "lang": "en"}
+{"text": "stgae all changes", "intent": "git_add_all", "lang": "en"}
+{"text": "add every change to staging", "intent": "git_add_all", "lang": "en"}
+{"text": "prepare all changes for commit", "intent": "git_add_all", "lang": "en"}
+{"text": "include all files in the next commit (just stage them)", "intent": "git_add_all", "lang": "en"}
+{"text": "stage deletions and new files too", "intent": "git_add_all", "lang": "en"}
+{"text": "please stage everything in the repo", "intent": "git_add_all", "lang": "en"}
+{"text": "add all files", "intent": "git_add_all", "lang": "en"}
+{"text": "mark all changes as staged", "intent": "git_add_all", "lang": "en"}
+{"text": "stage all modified files", "intent": "git_add_all", "lang": "en"}
+{"text": "git add all pls", "intent": "git_add_all", "lang": "en"}
+{"text": "can you add all my changes to the index?", "intent": "git_add_all", "lang": "en"}
+{"text": "stage my whole working tree", "intent": "git_add_all", "lang": "en"}
+{"text": "add the new files to git", "intent": "git_add_all", "lang": "en"}
+{"text": "ad all changes", "intent": "git_add_all", "lang": "en"}
+{"text": "queue all changes for the next commit", "intent": "git_add_all", "lang": "en"}
+{"text": "stage all, no commit", "intent": "git_add_all", "lang": "en"}
+{"text": "dodaj wszystkie zmiany do stage", "intent": "git_add_all", "lang": "pl"}
+{"text": "zestejdżuj wszystko", "intent": "git_add_all", "lang": "pl"}
+{"text": "git add wszystko", "intent": "git_add_all", "lang": "pl"}
+{"text": "dodaj wszystkie pliki do indeksu", "intent": "git_add_all", "lang": "pl"}
+{"text": "jak dodać wszystkie zmiany do stage?", "intent": "git_add_all", "lang": "pl"}
+{"text": "stejdżuj wszystkie pliki", "intent": "git_add_all", "lang": "pl"}
+{"text": "dodaj wszystkie zmodyfikowane i nowe pliki", "intent": "git_add_all", "lang": "pl"}
+{"text": "wrzuć wszystkie zmiany do poczekalni", "intent": "git_add_all", "lang": "pl"}
+{"text": "dodaj wszystko ale jeszcze nie commituj", "intent": "git_add_all", "lang": "pl"}
+{"text": "addnij wszystko", "intent": "git_add_all", "lang": "pl"}
+{"text": "dodaj nowe pliki do gita", "intent": "git_add_all", "lang": "pl"}
+{"text": "git add kropka", "intent": "git_add_all", "lang": "pl"}
+{"text": "jak dodac wszystkie pliki do gita", "intent": "git_add_all", "lang": "pl"}
+{"text": "dodaj wszytkie zmiany", "intent": "git_add_all", "lang": "pl"}
+{"text": "przygotuj wszystkie zmiany do commita", "intent": "git_add_all", "lang": "pl"}
+{"text": "dodaj do stage takze usuniete pliki", "intent": "git_add_all", "lang": "pl"}
+{"text": "proszę dodać wszystko w repo do stage", "intent": "git_add_all", "lang": "pl"}
+{"text": "dodaj wszystkie pliki", "intent": "git_add_all", "lang": "pl"}
+{"text": "oznacz wszystkie zmiany jako staged", "intent": "git_add_all", "lang": "pl"}
+{"text": "zestageuj zmodyfikowane pliki", "intent": "git_add_all", "lang": "pl"}
+{"text": "czy możesz dodać moje zmiany do indeksu?", "intent": "git_add_all", "lang": "pl"}
+{"text": "dodaj caly katalog roboczy do stage", "intent": "git_add_all", "lang": "pl"}
+{"text": "zaddaj wszystkie zmiany", "intent": "git_add_all", "lang": "pl"}
+{"text": "dodaj wszystko do indeksu bez commitowania", "intent": "git_add_all", "lang": "pl"}
+{"text": "stage na wszystkim", "intent": "git_add_all", "lang": "pl"}
+{"text": "dodaj zmiany do stagingu", "intent": "git_add_all", "lang": "pl"}
+{"text": "zrob git add -A", "intent": "git_add_all", "lang": "pl"}
+{"text": "śledź wszystkie nowe pliki i dodaj zmiany", "intent": "git_add_all", "lang": "pl"}
+{"text": "dodaj wszysko", "intent": "git_add_all", "lang": "pl"}
+{"text": "wrzuc wszystko do stage", "intent": "git_add_all", "lang": "pl"}
+{"text": "commit with message \"fix typo\"", "intent": "git_commit", "lang": "en"}
+{"text": "git commit -m 'add tests'", "intent": "git_commit", "lang": "en"}
+{"text": "commit all changes", "intent": "git_commit", "lang": "en"}
+{"text": "how do I commit my changes?", "intent": "git_commit", "lang": "en"}
+{"text": "commit everything with the message \"initial version\"", "intent": "git_commit", "lang": "en"}
+{"text": "make a commit saying 'update readme'", "intent": "git_commit", "lang": "en"}
+{"text": "save my changes as a commit", "intent": "git_commit", "lang": "en"}
+{"text": "commit", "intent": "git_commit", "lang": "en"}
+{"text": "commit my work, message: refactor auth module", "intent": "git_commit", "lang": "en"}
+{"text": "create a commit \"bump version to 1.2.0\"", "intent": "git_commit", "lang": "en"}
+{"text": "how to commit all files with a message", "intent": "git_commit", "lang": "en"}
+{"text": "comit with message 'wip'", "intent": "git_commit", "lang": "en"}
+{"text": "commit all and describe it as \"fix login bug\"", "intent": "git_commit", "lang": "en"}
+{"text": "record my changes in git with message 'cleanup'", "intent": "git_commit", "lang": "en"}
+{"text": "please commit everything as \"add docker support\"", "intent": "git_commit", "lang": "en"}
+{"text": "commit changes", "intent": "git_commit", "lang": "en"}
+{"text": "commit with the message remove unused imports", "intent": "git_commit", "lang": "en"}
+{"text": "can you commit with 'update dependencies'?", "intent": "git_commit", "lang": "en"}
+{"text": "make a commit", "intent": "git_commit", "lang": "en"}
+{"text": "commit all my work", "intent": "git_commit", "lang": "en"}
+{"text": "commit 'fix #123'", "intent": "git_commit", "lang": "en"}
+{"text": "commit everything, message = \"hotfix\"", "intent": "git_commit", "lang": "en"}
+{"text": "add and commit all with message 'new feature'", "intent": "git_commit", "lang": "en"}
+{"text": "check in my changes with comment \"docs\"", "intent": "git_commit", "lang": "en"}
+{"text": "commmit \"typo\"", "intent": "git_commit", "lang": "en"}
+{"text": "i want to commit my changes", "intent": "git_commit", "lang": "en"}
+{"text": "commit the changes with message 'merge conflicts resolved'", "intent": "git_commit", "lang": "en"}
+{"text": "snapshot my changes into a commit called \"v2\"", "intent": "git_commit", "lang": "en"}
+{"text": "commit all files with a commit message", "intent": "git_commit", "lang": "en"}
+{"text": "commit and title it 'small tweaks'", "intent": "git_commit", "lang": "en"}
+{"text": "commitnij z wiadomością \"fix typo\"", "intent": "git_commit", "lang": "pl"}
+{"text": "zacommituj zmiany", "intent": "git_commit", "lang": "pl"}
+{"text": "zrób commita 'dodaj testy'", "intent": "git_commit", "lang": "pl"}
+{"text": "jak zrobić commit?", "intent": "git_commit", "lang": "pl"}
+{"text": "zacommituj wszystko z opisem \"pierwsza wersja\"", "intent": "git_commit", "lang": "pl"}
+{"text": "commit z wiadomoscia 'popraw readme'", "intent": "git_commit", "lang": "pl"}
+{"text": "zapisz zmiany jako commit", "intent": "git_commit", "lang": "pl"}
+{"text": "commitnij", "intent": "git_commit", "lang": "pl"}
+{"text": "zacommituj moja prace, wiadomosc: refaktor modulu auth", "intent": "git_commit", "lang": "pl"}
+{"text": "stwórz commit \"podbij wersję do 1.2.0\"", "intent": "git_commit", "lang": "pl"}
+{"text": "jak zacommitowac wszystkie pliki z wiadomoscia", "intent": "git_commit", "lang": "pl"}
+{"text": "komitnij z opisem 'wip'", "intent": "git_commit", "lang": "pl"}
+{"text": "zakomituj wszystko jako \"napraw błąd logowania\"", "intent": "git_commit", "lang": "pl"}
+{"text": "zatwierdź zmiany z komentarzem 'porzadki'", "intent": "git_commit", "lang": "pl"}
+{"text": "proszę zacommitować wszystko jako \"dodaj wsparcie dockera\"", "intent": "git_commit", "lang": "pl"}
+{"text": "commit zmian", "intent": "git_commit", "lang": "pl"}
+{"text": "zrob komita z wiadomoscia usun nieuzywane importy", "intent": "git_commit", "lang": "pl"}
+{"text": "czy możesz zrobić commit 'aktualizacja zależności'?", "intent": "git_commit", "lang": "pl"}
+{"text": "zrób commit", "intent": "git_commit", "lang": "pl"}
+{"text": "zacommituj cala moja prace", "intent": "git_commit", "lang": "pl"}
+{"text": "commitnij 'fix #123'", "intent": "git_commit", "lang": "pl"}
+{"text": "zacomituj wszystko, opis: \"hotfix\"", "intent": "git_commit", "lang": "pl"}
+{"text": "dodaj i zacommituj wszystko z wiadomością 'nowa funkcja'", "intent": "git_commit", "lang": "pl"}
+{"text": "zakomitować zmiany z opisem \"dokumentacja\"", "intent": "git_commit", "lang": "pl"}
+{"text": "chcę zacommitować zmiany", "intent": "git_commit", "lang": "pl"}
+{"text": "commit z opisem 'rozwiązane konflikty'", "intent": "git_commit", "lang": "pl"}
+{"text": "zrob commit wszystkich plikow z wiadomoscia", "intent": "git_commit", "lang": "pl"}
+{"text": "zacommituj i nazwij to 'drobne poprawki'", "intent": "git_commit", "lang": "pl"}
+{"text": "zapisz commit \"v2\"", "intent": "git_commit", "lang": "pl"}
+{"text": "komit wszystkiego z wiadomoscia 'init'", "intent": "git_commit", "lang": "pl"}
+{"text": "show git remotes", "intent": "git_remote", "lang": "en"}
+{"text": "git remote -v", "intent": "git_remote", "lang": "en"}
+{"text": "what remotes does this repo have?", "intent": "git_remote", "lang": "en"}
+{"text": "list the remote urls", "intent": "git_remote", "lang": "en"}
+{"text": "where does origin point to?", "intent": "git_remote", "lang": "en"}
+{"text": "show me the remote repository url", "intent": "git_remote", "lang": "en"}
+{"text": "which remote am I pushing to?", "intent": "git_remote", "lang": "en"}
+{"text": "list remotes", "intent": "git_remote", "lang": "en"}
+{"text": "how do I see the remote url of my repo?", "intent": "git_remote", "lang": "en"}
+{"text": "display configured git remotes", "intent": "git_remote", "lang": "en"}
+{"text": "what is the origin url", "intent": "git_remote", "lang": "en"}
+{"text": "show remote", "intent": "git_remote", "lang": "en"}
+{"text": "print all remotes with their urls", "intent": "git_remote", "lang": "en"}
+{"text": "check the upstream url", "intent": "git_remote", "lang": "en"}
+{"text": "remotes?", "intent": "git_remote", "lang": "en"}
+{"text": "what github repo is this connected to?", "intent": "git_remote", "lang": "en"}
+{"text": "show the fetch and push urls", "intent": "git_remote", "lang": "en"}
+{"text": "how to check which remote repository is set", "intent": "git_remote", "lang": "en"}
+{"text": "list git remote urls", "intent": "git_remote", "lang": "en"}
+{"text": "shwo remotes", "intent": "git_remote", "lang": "en"}
+{"text": "can you show me the remotes configured here?", "intent": "git_remote", "lang": "en"}
+{"text": "get origin address", "intent": "git_remote", "lang": "en"}
+{"text": "which server is this repo linked to", "intent": "git_remote", "lang": "en"}
+{"text": "view remote repositories", "intent": "git_remote", "lang": "en"}
+{"text": "remote url", "intent": "git_remote", "lang": "en"}
+{"text": "display origin", "intent": "git_remote", "lang": "en"}
+{"text": "tell me the remote of this project", "intent": "git_remote", "lang": "en"}
+{"text": "show all remote names and urls", "intent": "git_remote", "lang": "en"}
+{"text": "whats the url of the remote", "intent": "git_remote", "lang": "en"}
+{"text": "list remote repos for this checkout", "intent": "git_remote", "lang": "en"}
+{"text": "pokaż remote'y gita", "intent": "git_remote", "lang": "pl"}
+{"text": "jakie zdalne repozytoria ma to repo?", "intent": "git_remote", "lang": "pl"}
+{"text": "wypisz adresy remote", "intent": "git_remote", "lang": "pl"}
+{"text": "gdzie wskazuje origin?", "intent": "git_remote", "lang": "pl"}
+{"text": "pokaz url zdalnego repozytorium", "intent": "git_remote", "lang": "pl"}
+{"text": "na jaki remote pushuję?", "intent": "git_remote", "lang": "pl"}
+{"text": "lista remotów", "intent": "git_remote", "lang": "pl"}
+{"text": "jak sprawdzić adres zdalnego repo?", "intent": "git_remote", "lang": "pl"}
+{"text": "wyswietl skonfigurowane remote", "intent": "git_remote", "lang": "pl"}
+{"text": "jaki jest url origin", "intent": "git_remote", "lang": "pl"}
+{"text": "pokaż remote", "intent": "git_remote", "lang": "pl"}
+{"text": "wypisz wszystkie remoty z adresami", "intent": "git_remote", "lang": "pl"}
+{"text": "sprawdz adres upstreamu", "intent": "git_remote", "lang": "pl"}
+{"text": "z jakim repo na githubie jest to połączone?", "intent": "git_remote", "lang": "pl"}
+{"text": "pokaż adresy fetch i push", "intent": "git_remote", "lang": "pl"}
+{"text": "jak sprawdzic jaki remote jest ustawiony", "intent": "git_remote", "lang": "pl"}
+{"text": "lista adresow zdalnych repo", "intent": "git_remote", "lang": "pl"}
+{"text": "pokaz remoty", "intent": "git_remote", "lang": "pl"}
+{"text": "czy możesz pokazać zdalne repozytoria?", "intent": "git_remote", "lang": "pl"}
+{"text": "adres origina", "intent": "git_remote", "lang": "pl"}
+{"text": "z jakim serwerem jest powiazane to repo", "intent": "git_remote", "lang": "pl"}
+{"text": "wyświetl zdalne repozytoria", "intent": "git_remote", "lang": "pl"}
+{"text": "url remota", "intent": "git_remote", "lang": "pl"}
+{"text": "jaki jest remote tego projektu", "intent": "git_remote", "lang": "pl"}
+{"text": "pokaż nazwy i adresy remote", "intent": "git_remote", "lang": "pl"}
+{"text": "jaki jest adres zdalnego repo", "intent": "git_remote", "lang": "pl"}
+{"text": "remoty?", "intent": "git_remote", "lang": "pl"}
+{"text": "pokaz origin", "intent": "git_remote", "lang": "pl"}
+{"text": "sprawdź skąd sklonowane jest repo", "intent": "git_remote", "lang": "pl"}
+{"text": "wypisz remote z adresami url", "intent": "git_remote", "lang": "pl"}
+{"text": "git blame src/app.js", "intent": "git_blame", "lang": "en"}
+{"text": "who changed each line of main.py?", "intent": "git_blame", "lang": "en"}
+{"text": "show blame for README.md", "intent": "git_blame", "lang": "en"}
+{"text": "who wrote this code in utils.ts", "intent": "git_blame", "lang": "en"}
+{"text": "how do I see who last modified each line of a file?", "intent": "git_blame", "lang": "en"}
+{"text": "blame file index.html", "intent": "git_blame", "lang": "en"}
+{"text": "find out who touched line by line in config.yaml", "intent": "git_blame", "lang": "en"}
+{"text": "annotate server.go with authors", "intent": "git_blame", "lang": "en"}
+{"text": "who is responsible for the lines in package.json", "intent": "git_blame", "lang": "en"}
+{"text": "git blame", "intent": "git_blame", "lang": "en"}
+{"text": "show authorship of every line in Dockerfile", "intent": "git_blame", "lang": "en"}
+{"text": "blame", "intent": "git_blame", "lang": "en"}
+{"text": "which commit changed each line of styles.css", "intent": "git_blame", "lang": "en"}
+{"text": "bleme app.py", "intent": "git_blame", "lang": "en"}
+{"text": "who broke this file? show blame for lib/db.js", "intent": "git_blame", "lang": "en"}
+{"text": "line-by-line history of Makefile", "intent": "git_blame", "lang": "en"}
+{"text": "show who edited lines in src/routes.ts", "intent": "git_blame", "lang": "en"}
+{"text": "how to find who wrote a specific line", "intent": "git_blame", "lang": "en"}
+{"text": "blame the file auth.js", "intent": "git_blame", "lang": "en"}
+{"text": "show the author of each line", "intent": "git_blame", "lang": "en"}
+{"text": "git annotate main.c", "intent": "git_blame", "lang": "en"}
+{"text": "could you show me who changed what in api/handlers.py?", "intent": "git_blame", "lang": "en"}
+{"text": "who last touched each line of the file", "intent": "git_blame", "lang": "en"}
+{"text": "per-line authors for setup.py", "intent": "git_blame", "lang": "en"}
+{"text": "show blame info", "intent": "git_blame", "lang": "en"}
+{"text": "who's to blame for this code in index.js", "intent": "git_blame", "lang": "en"}
+{"text": "see commit and author per line in schema.sql", "intent": "git_blame", "lang": "en"}
+{"text": "blame output for test_main.py", "intent": "git_blame", "lang": "en"}
+{"text": "who modified which lines in .env.example", "intent": "git_blame", "lang": "en"}
+{"text": "git blaem router.js", "intent": "git_blame", "lang": "en"}
+{"text": "kto zmienił każdą linię w main.py?", "intent": "git_blame", "lang": "pl"}
+{"text": "pokaż blame dla README.md", "intent": "git_blame", "lang": "pl"}
+{"text": "kto napisał ten kod w utils.ts", "intent": "git_blame", "lang": "pl"}
+{"text": "jak sprawdzić kto ostatnio zmieniał każdą linię pliku?", "intent": "git_blame", "lang": "pl"}
+{"text": "blame pliku index.html", "intent": "git_blame", "lang": "pl"}
+{"text": "kto edytowal linie w config.yaml", "intent": "git_blame", "lang": "pl"}
+{"text": "pokaż autorów linii w server.go", "intent": "git_blame", "lang": "pl"}
+{"text": "kto jest odpowiedzialny za linie w package.json", "intent": "git_blame", "lang": "pl"}
+{"text": "zrób blame", "intent": "git_blame", "lang": "pl"}
+{"text": "pokaz autorstwo kazdej linii w Dockerfile", "intent": "git_blame", "lang": "pl"}
+{"text": "ktory commit zmienil kazda linie w styles.css", "intent": "git_blame", "lang": "pl"}
+{"text": "blejm app.py", "intent": "git_blame", "lang": "pl"}
+{"text": "kto zepsuł ten plik? pokaż blame lib/db.js", "intent": "git_blame", "lang": "pl"}
+{"text": "historia linia po linii dla Makefile", "intent": "git_blame", "lang": "pl"}
+{"text": "pokaż kto edytował linie w src/routes.ts", "intent": "git_blame", "lang": "pl"}
+{"text": "jak znalezc kto napisal konkretna linie", "intent": "git_blame", "lang": "pl"}
+{"text": "zblamuj plik auth.js", "intent": "git_blame", "lang": "pl"}
+{"text": "pokaż autora każdej linijki", "intent": "git_blame", "lang": "pl"}
+{"text": "czy możesz pokazać kto co zmienił w api/handlers.py?", "intent": "git_blame", "lang": "pl"}
+{"text": "kto ostatni dotykal kazdej linii pliku", "intent": "git_blame", "lang": "pl"}
+{"text": "autorzy linijek w setup.py", "intent": "git_blame", "lang": "pl"}
+{"text": "pokaz blame", "intent": "git_blame", "lang": "pl"}
+{"text": "kto zawinił w tym kodzie w index.js", "intent": "git_blame", "lang": "pl"}
+{"text": "commit i autor dla kazdej linii w schema.sql", "intent": "git_blame", "lang": "pl"}
+{"text": "blame dla test_main.py", "intent": "git_blame", "lang": "pl"}
+{"text": "kto modyfikował które linie w .env.example", "intent": "git_blame", "lang": "pl"}
+{"text": "adnotacje autorów dla pliku main.c", "intent": "git_blame", "lang": "pl"}
+{"text": "sprawdz kto pisal linijki w pliku app.vue", "intent": "git_blame", "lang": "pl"}
+{"text": "kto zmieniał linie w src/app.js", "intent": "git_blame", "lang": "pl"}
+{"text": "kto ruszał router.js linia po linii", "intent": "git_blame", "lang": "pl"}
+{"text": "git init", "intent": "git_init", "lang": "en"}
+{"text": "initialize a git repository", "intent": "git_init", "lang": "en"}
+{"text": "create a new git repo here", "intent": "git_init", "lang": "en"}
+{"text": "how do I start a git repo in this folder?", "intent": "git_init", "lang": "en"}
+{"text": "init git", "intent": "git_init", "lang": "en"}
+{"text": "make this directory a git repository", "intent": "git_init", "lang": "en"}
+{"text": "turn this project into a git repo", "intent": "git_init", "lang": "en"}
+{"text": "start version control here", "intent": "git_init", "lang": "en"}
+{"text": "set up git in the current directory", "intent": "git_init", "lang": "en"}
+{"text": "initialise an empty repo", "intent": "git_init", "lang": "en"}
+{"text": "new git repository", "intent": "git_init", "lang": "en"}
+{"text": "how to initialize git in a project", "intent": "git_init", "lang": "en"}
+{"text": "git innit", "intent": "git_init", "lang": "en"}
+{"text": "enable git for this folder", "intent": "git_init", "lang": "en"}
+{"text": "create empty git repo", "intent": "git_init", "lang": "en"}
+{"text": "please init a repository in this dir", "intent": "git_init", "lang": "en"}
+{"text": "start tracking this project with git", "intent": "git_init", "lang": "en"}
+{"text": "can you set up a fresh git repo?", "intent": "git_init", "lang": "en"}
+{"text": "init a repo", "intent": "git_init", "lang": "en"}
+{"text": "begin a new repository here", "intent": "git_init", "lang": "en"}
+{"text": "add git to this project", "intent": "git_init", "lang": "en"}
+{"text": "create a .git folder here", "intent": "git_init", "lang": "en"}
+{"text": "initialize repo", "intent": "git_init", "lang": "en"}
+{"text": "i want to put this folder under git", "intent": "git_init", "lang": "en"}
+{"text": "make a brand new local repository", "intent": "git_init", "lang": "en"}
+{"text": "how do i create a git repository from scratch", "intent": "git_init", "lang": "en"}
+{"text": "git initialize", "intent": "git_init", "lang": "en"}
+{"text": "bootstrap a git repo in cwd", "intent": "git_init", "lang": "en"}
+{"text": "intialize git", "intent": "git_init", "lang": "en"}
+{"text": "convert this dir into a git repo", "intent": "git_init", "lang": "en"}
+{"text": "zainicjuj repozytorium gita", "intent": "git_init", "lang": "pl"}
+{"text": "stwórz nowe repo gita tutaj", "intent": "git_init", "lang": "pl"}
+{"text": "jak założyć repozytorium git w tym folderze?", "intent": "git_init", "lang": "pl"}
+{"text": "zainicjalizuj gita", "intent": "git_init", "lang": "pl"}
+{"text": "zrób z tego katalogu repozytorium", "intent": "git_init", "lang": "pl"}
+{"text": "zamień ten projekt w repo gita", "intent": "git_init", "lang": "pl"}
+{"text": "zacznij kontrolę wersji tutaj", "intent": "git_init", "lang": "pl"}
+{"text": "ustaw gita w bieżącym katalogu", "intent": "git_init", "lang": "pl"}
+{"text": "nowe repozytorium git", "intent": "git_init", "lang": "pl"}
+{"text": "jak zainicjowac gita w projekcie", "intent": "git_init", "lang": "pl"}
+{"text": "zainicuj repo", "intent": "git_init", "lang": "pl"}
+{"text": "wlacz gita dla tego folderu", "intent": "git_init", "lang": "pl"}
+{"text": "utworz puste repo", "intent": "git_init", "lang": "pl"}
+{"text": "proszę zainicjować repozytorium w tym katalogu", "intent": "git_init", "lang": "pl"}
+{"text": "zacznij śledzić ten projekt gitem", "intent": "git_init", "lang": "pl"}
+{"text": "czy możesz założyć nowe repo gita?", "intent": "git_init", "lang": "pl"}
+{"text": "zainitować repo", "intent": "git_init", "lang": "pl"}
+{"text": "zalóż nowe repozytorium tutaj", "intent": "git_init", "lang": "pl"}
+{"text": "dodaj gita do tego projektu", "intent": "git_init", "lang": "pl"}
+{"text": "stwórz folder .git tutaj", "intent": "git_init", "lang": "pl"}
+{"text": "inicjalizacja repo", "intent": "git_init", "lang": "pl"}
+{"text": "chcę wrzucić ten folder pod gita", "intent": "git_init", "lang": "pl"}
+{"text": "zrob nowe lokalne repozytorium", "intent": "git_init", "lang": "pl"}
+{"text": "jak stworzyc repozytorium gita od zera", "intent": "git_init", "lang": "pl"}
+{"text": "zainicjalizuj repozytorium", "intent": "git_init", "lang": "pl"}
+{"text": "initnij gita", "intent": "git_init", "lang": "pl"}
+{"text": "zainicjuj repo w obecnym katalogu", "intent": "git_init", "lang": "pl"}
+{"text": "utwórz repozytorium git", "intent": "git_init", "lang": "pl"}
+{"text": "zrob git init w tym folderze", "intent": "git_init", "lang": "pl"}
+{"text": "załóż repo gita", "intent": "git_init", "lang": "pl"}
+{"text": "docker ps", "intent": "docker_ps", "lang": "en"}
+{"text": "list running containers", "intent": "docker_ps", "lang": "en"}
+{"text": "what containers are running right now?", "intent": "docker_ps", "lang": "en"}
+{"text": "show active docker containers", "intent": "docker_ps", "lang": "en"}
+{"text": "which containers are up?", "intent": "docker_ps", "lang": "en"}
+{"text": "how do I see running containers?", "intent": "docker_ps", "lang": "en"}
+{"text": "show me the running docker containers", "intent": "docker_ps", "lang": "en"}
+{"text": "list containers that are currently running", "intent": "docker_ps", "lang": "en"}
+{"text": "what's running in docker", "intent": "docker_ps", "lang": "en"}
+{"text": "running containers", "intent": "docker_ps", "lang": "en"}
+{"text": "docker list running", "intent": "docker_ps", "lang": "en"}
+{"text": "is my container running? show running ones", "intent": "docker_ps", "lang": "en"}
+{"text": "show live containers", "intent": "docker_ps", "lang": "en"}
+{"text": "how to list active containers in docker", "intent": "docker_ps", "lang": "en"}
+{"text": "dokcer ps", "intent": "docker_ps", "lang": "en"}
+{"text": "display running containers only", "intent": "docker_ps", "lang": "en"}
+{"text": "what docker containers are up at the moment", "intent": "docker_ps", "lang": "en"}
+{"text": "please list the containers that are running", "intent": "docker_ps", "lang": "en"}
+{"text": "show up containers", "intent": "docker_ps", "lang": "en"}
+{"text": "which docker containers are alive", "intent": "docker_ps", "lang": "en"}
+{"text": "can you show running containers?", "intent": "docker_ps", "lang": "en"}
+{"text": "list docker containers (running)", "intent": "docker_ps", "lang": "en"}
+{"text": "currently running containers?", "intent": "docker_ps", "lang": "en"}
+{"text": "check what containers are running", "intent": "docker_ps", "lang": "en"}
+{"text": "docker ps running", "intent": "docker_ps", "lang": "en"}
+{"text": "show containers in up state", "intent": "docker_ps", "lang": "en"}
+{"text": "list started containers", "intent": "docker_ps", "lang": "en"}
+{"text": "what's up in docker right now", "intent": "docker_ps", "lang": "en"}
+{"text": "view running containers", "intent": "docker_ps", "lang": "en"}
+{"text": "show runnign containers", "intent": "docker_ps", "lang": "en"}
+{"text": "pokaż działające kontenery", "intent": "docker_ps", "lang": "pl"}
+{"text": "jakie kontenery teraz działają?", "intent": "docker_ps", "lang": "pl"}
+{"text": "lista uruchomionych kontenerów", "intent": "docker_ps", "lang": "pl"}
+{"text": "ktore kontenery chodza?", "intent": "docker_ps", "lang": "pl"}
+{"text": "jak zobaczyć działające kontenery?", "intent": "docker_ps", "lang": "pl"}
+{"text": "pokaz uruchomione kontenery dockera", "intent": "docker_ps", "lang": "pl"}
+{"text": "wypisz aktualnie działające kontenery", "intent": "docker_ps", "lang": "pl"}
+{"text": "co chodzi w dockerze", "intent": "docker_ps", "lang": "pl"}
+{"text": "uruchomione kontenery", "intent": "docker_ps", "lang": "pl"}
+{"text": "czy mój kontener działa? pokaż działające", "intent": "docker_ps", "lang": "pl"}
+{"text": "pokaż aktywne kontenery", "intent": "docker_ps", "lang": "pl"}
+{"text": "jak wylistowac aktywne kontenery", "intent": "docker_ps", "lang": "pl"}
+{"text": "wyswietl tylko dzialajace kontenery", "intent": "docker_ps", "lang": "pl"}
+{"text": "jakie kontenery dockera są teraz up", "intent": "docker_ps", "lang": "pl"}
+{"text": "proszę wypisać kontenery które działają", "intent": "docker_ps", "lang": "pl"}
+{"text": "ktore kontenery zyja", "intent": "docker_ps", "lang": "pl"}
+{"text": "czy możesz pokazać działające kontenery?", "intent": "docker_ps", "lang": "pl"}
+{"text": "lista kontenerow (dzialajacych)", "intent": "docker_ps", "lang": "pl"}
+{"text": "sprawdz jakie kontenery sa uruchomione", "intent": "docker_ps", "lang": "pl"}
+{"text": "pokaż kontenery w stanie up", "intent": "docker_ps", "lang": "pl"}
+{"text": "wylistuj odpalone kontenery", "intent": "docker_ps", "lang": "pl"}
+{"text": "co jest odpalone w dockerze", "intent": "docker_ps", "lang": "pl"}
+{"text": "pokaz dzialajce kontenery", "intent": "docker_ps", "lang": "pl"}
+{"text": "jakie kontenery są włączone", "intent": "docker_ps", "lang": "pl"}
+{"text": "wypisz uruchomione kontenery", "intent": "docker_ps", "lang": "pl"}
+{"text": "aktywne kontenery dockera", "intent": "docker_ps", "lang": "pl"}
+{"text": "pokaż co działa w dockerze", "intent": "docker_ps", "lang": "pl"}
+{"text": "lista działających kontenerów", "intent": "docker_ps", "lang": "pl"}
+{"text": "kontenery które są up", "intent": "docker_ps", "lang": "pl"}
+{"text": "dzialajace kontenery dockera", "intent": "docker_ps", "lang": "pl"}
+{"text": "docker ps -a", "intent": "docker_ps_all", "lang": "en"}
+{"text": "list all containers including stopped ones", "intent": "docker_ps_all", "lang": "en"}
+{"text": "show every container, even exited", "intent": "docker_ps_all", "lang": "en"}
+{"text": "how do I see stopped containers?", "intent": "docker_ps_all", "lang": "en"}
+{"text": "list all docker containers", "intent": "docker_ps_all", "lang": "en"}
+{"text": "show all containers", "intent": "docker_ps_all", "lang": "en"}
+{"text": "include stopped containers in the list", "intent": "docker_ps_all", "lang": "en"}
+{"text": "which containers have exited?", "intent": "docker_ps_all", "lang": "en"}
+{"text": "show running and stopped containers", "intent": "docker_ps_all", "lang": "en"}
+{"text": "docker ps all", "intent": "docker_ps_all", "lang": "en"}
+{"text": "list every container on this machine", "intent": "docker_ps_all", "lang": "en"}
+{"text": "show dead containers too", "intent": "docker_ps_all", "lang": "en"}
+{"text": "how to list containers that are not running", "intent": "docker_ps_all", "lang": "en"}
+{"text": "all containers please", "intent": "docker_ps_all", "lang": "en"}
+{"text": "dokcer ps -a", "intent": "docker_ps_all", "lang": "en"}
+{"text": "display all containers regardless of state", "intent": "docker_ps_all", "lang": "en"}
+{"text": "show me exited containers as well", "intent": "docker_ps_all", "lang": "en"}
+{"text": "where's my stopped container? list all", "intent": "docker_ps_all", "lang": "en"}
+{"text": "list containers including the ones that crashed", "intent": "docker_ps_all", "lang": "en"}
+{"text": "see all containers, not just running", "intent": "docker_ps_all", "lang": "en"}
+{"text": "can you list every docker container, stopped included?", "intent": "docker_ps_all", "lang": "en"}
+{"text": "show the full list of containers", "intent": "docker_ps_all", "lang": "en"}
+{"text": "containers incl. stopped", "intent": "docker_ps_all", "lang": "en"}
+{"text": "list all containers ever created", "intent": "docker_ps_all", "lang": "en"}
+{"text": "what containers exist (running or not)", "intent": "docker_ps_all", "lang": "en"}
+{"text": "show inactive containers", "intent": "docker_ps_all", "lang": "en"}
+{"text": "list stopped containers", "intent": "docker_ps_all", "lang": "en"}
+{"text": "all docker containers incl exited", "intent": "docker_ps_all", "lang": "en"}
+{"text": "view all containers", "intent": "docker_ps_all", "lang": "en"}
+{"text": "show all contaners", "intent": "docker_ps_all", "lang": "en"}
+{"text": "pokaż wszystkie kontenery łącznie z zatrzymanymi", "intent": "docker_ps_all", "lang": "pl"}
+{"text": "lista wszystkich kontenerów", "intent": "docker_ps_all", "lang": "pl"}
+{"text": "jak zobaczyć zatrzymane kontenery?", "intent": "docker_ps_all", "lang": "pl"}
+{"text": "pokaz wszystkie kontenery nawet te wylaczone", "intent": "docker_ps_all", "lang": "pl"}
+{"text": "wypisz kontenery także zatrzymane", "intent": "docker_ps_all", "lang": "pl"}
+{"text": "które kontenery się zakończyły?", "intent": "docker_ps_all", "lang": "pl"}
+{"text": "pokaż działające i zatrzymane kontenery", "intent": "docker_ps_all", "lang": "pl"}
+{"text": "wszystkie kontenery dockera", "intent": "docker_ps_all", "lang": "pl"}
+{"text": "wylistuj kazdy kontener na tej maszynie", "intent": "docker_ps_all", "lang": "pl"}
+{"text": "pokaż też martwe kontenery", "intent": "docker_ps_all", "lang": "pl"}
+{"text": "jak wylistowac kontenery ktore nie dzialaja", "intent": "docker_ps_all", "lang": "pl"}
+{"text": "wszystkie kontenery proszę", "intent": "docker_ps_all", "lang": "pl"}
+{"text": "wyswietl wszystkie kontenery niezaleznie od stanu", "intent": "docker_ps_all", "lang": "pl"}
+{"text": "pokaz tez kontenery exited", "intent": "docker_ps_all", "lang": "pl"}
+{"text": "gdzie jest mój zatrzymany kontener? pokaż wszystkie", "intent": "docker_ps_all", "lang": "pl"}
+{"text": "lista kontenerow wlacznie z tymi co padly", "intent": "docker_ps_all", "lang": "pl"}
+{"text": "zobacz wszystkie kontenery, nie tylko działające", "intent": "docker_ps_all", "lang": "pl"}
+{"text": "czy możesz pokazać wszystkie kontenery, też zatrzymane?", "intent": "docker_ps_all", "lang": "pl"}
+{"text": "pełna lista kontenerów", "intent": "docker_ps_all", "lang": "pl"}
+{"text": "kontenery wraz z zatrzymanymi", "intent": "docker_ps_all", "lang": "pl"}
+{"text": "jakie kontenery istnieja (dzialajace lub nie)", "intent": "docker_ps_all", "lang": "pl"}
+{"text": "pokaż nieaktywne kontenery", "intent": "docker_ps_all", "lang": "pl"}
+{"text": "lista zatrzymanych kontenerow", "intent": "docker_ps_all", "lang": "pl"}
+{"text": "wszystkie kontenery z wyłączonymi", "intent": "docker_ps_all", "lang": "pl"}
+{"text": "pokaz wszytkie kontenery", "intent": "docker_ps_all", "lang": "pl"}
+{"text": "wypisz kontenery w kazdym stanie", "intent": "docker_ps_all", "lang": "pl"}
+{"text": "pokaż kontenery, również te stopnięte", "intent": "docker_ps_all", "lang": "pl"}
+{"text": "wszystkie kontenery, także nieuruchomione", "intent": "docker_ps_all", "lang": "pl"}
+{"text": "wypisz wszyskie kontenery", "intent": "docker_ps_all", "lang": "pl"}
+{"text": "docker ps z zatrzymanymi", "intent": "docker_ps_all", "lang": "pl"}
+{"text": "show logs of container web", "intent": "docker_logs", "lang": "en"}
+{"text": "docker logs db", "intent": "docker_logs", "lang": "en"}
+{"text": "tail the logs for my-app", "intent": "docker_logs", "lang": "en"}
+{"text": "how do I see the logs of a container?", "intent": "docker_logs", "lang": "en"}
+{"text": "follow logs of redis", "intent": "docker_logs", "lang": "en"}
+{"text": "show last 50 lines of logs from api", "intent": "docker_logs", "lang": "en"}
+{"text": "what is the container nginx printing?", "intent": "docker_logs", "lang": "en"}
+{"text": "logs for container worker", "intent": "docker_logs", "lang": "en"}
+{"text": "show me the last 200 log lines of web", "intent": "docker_logs", "lang": "en"}
+{"text": "stream logs from postgres", "intent": "docker_logs", "lang": "en"}
+{"text": "container logs", "intent": "docker_logs", "lang": "en"}
+{"text": "why did my-app crash? show its logs", "intent": "docker_logs", "lang": "en"}
+{"text": "docker logs -f backend", "intent": "docker_logs", "lang": "en"}
+{"text": "how to follow docker container output", "intent": "docker_logs", "lang": "en"}
+{"text": "show logs from db, last twenty lines", "intent": "docker_logs", "lang": "en"}
+{"text": "show the output of container frontend", "intent": "docker_logs", "lang": "en"}
+{"text": "dokcer logs web", "intent": "docker_logs", "lang": "en"}
+{"text": "watch the logs of the redis container", "intent": "docker_logs", "lang": "en"}
+{"text": "tail -f container logs for app", "intent": "docker_logs", "lang": "en"}
+{"text": "please show the last 100 lines of logs from celery", "intent": "docker_logs", "lang": "en"}
+{"text": "view container log for mongo", "intent": "docker_logs", "lang": "en"}
+{"text": "see what's being logged by my container", "intent": "docker_logs", "lang": "en"}
+{"text": "print logs of container api, 30 lines", "intent": "docker_logs", "lang": "en"}
+{"text": "can you tail the logs of web?", "intent": "docker_logs", "lang": "en"}
+{"text": "logs of the db container", "intent": "docker_logs", "lang": "en"}
+{"text": "live log output from proxy", "intent": "docker_logs", "lang": "en"}
+{"text": "last 10 log lines from my-app", "intent": "docker_logs", "lang": "en"}
+{"text": "show stdout of the container web", "intent": "docker_logs", "lang": "en"}
+{"text": "check logs of container rabbitmq", "intent": "docker_logs", "lang": "en"}
+{"text": "shwo logs for nginx", "intent": "docker_logs", "lang": "en"}
+{"text": "pokaż logi kontenera web", "intent": "docker_logs", "lang": "pl"}
+{"text": "śledź logi my-app", "intent": "docker_logs", "lang": "pl"}
+{"text": "jak zobaczyć logi kontenera?", "intent": "docker_logs", "lang": "pl"}
+{"text": "pokaz logi redisa na zywo", "intent": "docker_logs", "lang": "pl"}
+{"text": "pokaż ostatnie 50 linii logów z api", "intent": "docker_logs", "lang": "pl"}
+{"text": "co wypisuje kontener nginx?", "intent": "docker_logs", "lang": "pl"}
+{"text": "logi kontenera worker", "intent": "docker_logs", "lang": "pl"}
+{"text": "pokaż ostatnie 200 linii logów weba", "intent": "docker_logs", "lang": "pl"}
+{"text": "strumieniuj logi z postgresa", "intent": "docker_logs", "lang": "pl"}
+{"text": "logi kontenera", "intent": "docker_logs", "lang": "pl"}
+{"text": "czemu my-app padł? pokaż logi", "intent": "docker_logs", "lang": "pl"}
+{"text": "jak śledzić output kontenera", "intent": "docker_logs", "lang": "pl"}
+{"text": "pokaż logi db, ostatnie dwadzieścia linii", "intent": "docker_logs", "lang": "pl"}
+{"text": "pokaz wyjscie kontenera frontend", "intent": "docker_logs", "lang": "pl"}
+{"text": "obserwuj logi kontenera redis", "intent": "docker_logs", "lang": "pl"}
+{"text": "tailnij logi kontenera app", "intent": "docker_logs", "lang": "pl"}
+{"text": "proszę pokazać ostatnie 100 linii logów z celery", "intent": "docker_logs", "lang": "pl"}
+{"text": "logi z kontenera mongo", "intent": "docker_logs", "lang": "pl"}
+{"text": "zobacz co loguje mój kontener", "intent": "docker_logs", "lang": "pl"}
+{"text": "wypisz logi kontenera api, 30 linii", "intent": "docker_logs", "lang": "pl"}
+{"text": "czy możesz pokazać logi weba?", "intent": "docker_logs", "lang": "pl"}
+{"text": "logi kontenera db", "intent": "docker_logs", "lang": "pl"}
+{"text": "logi na zywo z proxy", "intent": "docker_logs", "lang": "pl"}
+{"text": "ostatnie 10 linijek logów z my-app", "intent": "docker_logs", "lang": "pl"}
+{"text": "sprawdz logi kontenera rabbitmq", "intent": "docker_logs", "lang": "pl"}
+{"text": "pokaz logii nginxa", "intent": "docker_logs", "lang": "pl"}
+{"text": "podgląd logów kontenera web", "intent": "docker_logs", "lang": "pl"}
+{"text": "logi kontenera db z dockera", "intent": "docker_logs", "lang": "pl"}
+{"text": "śledź na bieżąco logi backend", "intent": "docker_logs", "lang": "pl"}
+{"text": "logi weba w dokerze", "intent": "docker_logs", "lang": "pl"}
+{"text": "docker images", "intent": "docker_images", "lang": "en"}
+{"text": "list docker images", "intent": "docker_images", "lang": "en"}
+{"text": "what images do I have locally?", "intent": "docker_images", "lang": "en"}
+{"text": "show all images", "intent": "docker_images", "lang": "en"}
+{"text": "how do I see downloaded docker images?", "intent": "docker_images", "lang": "en"}
+{"text": "list images", "intent": "docker_images", "lang": "en"}
+{"text": "show me my docker images", "intent": "docker_images", "lang": "en"}
+{"text": "which images are on this machine", "intent": "docker_images", "lang": "en"}
+{"text": "display local container images", "intent": "docker_images", "lang": "en"}
+{"text": "docker image list", "intent": "docker_images", "lang": "en"}
+{"text": "how to list docker images", "intent": "docker_images", "lang": "en"}
+{"text": "dokcer images", "intent": "docker_images", "lang": "en"}
+{"text": "what docker images are pulled", "intent": "docker_images", "lang": "en"}
+{"text": "show images and their sizes", "intent": "docker_images", "lang": "en"}
+{"text": "list all local images", "intent": "docker_images", "lang": "en"}
+{"text": "please show docker images", "intent": "docker_images", "lang": "en"}
+{"text": "can you list the images available locally?", "intent": "docker_images", "lang": "en"}
+{"text": "images?", "intent": "docker_images", "lang": "en"}
+{"text": "show image tags I have", "intent": "docker_images", "lang": "en"}
+{"text": "view docker images", "intent": "docker_images", "lang": "en"}
+{"text": "what images have I built", "intent": "docker_images", "lang": "en"}
+{"text": "list repository images in docker", "intent": "docker_images", "lang": "en"}
+{"text": "check which docker images exist", "intent": "docker_images", "lang": "en"}
+{"text": "show the image list", "intent": "docker_images", "lang": "en"}
+{"text": "how much space do my images take, list them", "intent": "docker_images", "lang": "en"}
+{"text": "list my built images", "intent": "docker_images", "lang": "en"}
+{"text": "docker image ls", "intent": "docker_images", "lang": "en"}
+{"text": "show local images", "intent": "docker_images", "lang": "en"}
+{"text": "list imgaes", "intent": "docker_images", "lang": "en"}
+{"text": "what base images are downloaded", "intent": "docker_images", "lang": "en"}
+{"text": "pokaż obrazy dockera", "intent": "docker_images", "lang": "pl"}
+{"text": "jakie mam obrazy lokalnie?", "intent": "docker_images", "lang": "pl"}
+{"text": "lista obrazów", "intent": "docker_images", "lang": "pl"}
+{"text": "jak zobaczyć pobrane obrazy dockera?", "intent": "docker_images", "lang": "pl"}
+{"text": "wypisz obrazy", "intent": "docker_images", "lang": "pl"}
+{"text": "pokaz moje obrazy dockera", "intent": "docker_images", "lang": "pl"}
+{"text": "jakie obrazy sa na tej maszynie", "intent": "docker_images", "lang": "pl"}
+{"text": "wyswietl lokalne obrazy", "intent": "docker_images", "lang": "pl"}
+{"text": "jak wylistowac obrazy dockera", "intent": "docker_images", "lang": "pl"}
+{"text": "jakie obrazy są pobrane", "intent": "docker_images", "lang": "pl"}
+{"text": "pokaż obrazy i ich rozmiary", "intent": "docker_images", "lang": "pl"}
+{"text": "wszystkie lokalne obrazy", "intent": "docker_images", "lang": "pl"}
+{"text": "proszę pokazać obrazy dockera", "intent": "docker_images", "lang": "pl"}
+{"text": "czy możesz wypisać dostępne obrazy?", "intent": "docker_images", "lang": "pl"}
+{"text": "obrazy?", "intent": "docker_images", "lang": "pl"}
+{"text": "pokaz tagi obrazow", "intent": "docker_images", "lang": "pl"}
+{"text": "jakie obrazy zbudowałem", "intent": "docker_images", "lang": "pl"}
+{"text": "sprawdz jakie obrazy dockera istnieja", "intent": "docker_images", "lang": "pl"}
+{"text": "lista imagów", "intent": "docker_images", "lang": "pl"}
+{"text": "pokaż image'y", "intent": "docker_images", "lang": "pl"}
+{"text": "wylistuj obrazy", "intent": "docker_images", "lang": "pl"}
+{"text": "pokaz lokalne imagi", "intent": "docker_images", "lang": "pl"}
+{"text": "lista obrazow dockera", "intent": "docker_images", "lang": "pl"}
+{"text": "ile miejsca zajmują obrazy, wypisz je", "intent": "docker_images", "lang": "pl"}
+{"text": "pokaż zbudowane obrazy", "intent": "docker_images", "lang": "pl"}
+{"text": "jakie obrazy bazowe są ściągnięte", "intent": "docker_images", "lang": "pl"}
+{"text": "wypisz obrazki dockera", "intent": "docker_images", "lang": "pl"}
+{"text": "pokaż listę obrazów", "intent": "docker_images", "lang": "pl"}
+{"text": "obrazy w dokerze", "intent": "docker_images", "lang": "pl"}
+{"text": "wylistuj image dockera", "intent": "docker_images", "lang": "pl"}
+{"text": "stop container web", "intent": "docker_stop", "lang": "en"}
+{"text": "docker stop db", "intent": "docker_stop", "lang": "en"}
+{"text": "stop the redis container", "intent": "docker_stop", "lang": "en"}
+{"text": "how do I stop a container?", "intent": "docker_stop", "lang": "en"}
+{"text": "shut down my-app", "intent": "docker_stop", "lang": "en"}
+{"text": "stop container", "intent": "docker_stop", "lang": "en"}
+{"text": "halt the nginx container", "intent": "docker_stop", "lang": "en"}
+{"text": "please stop the api container", "intent": "docker_stop", "lang": "en"}
+{"text": "kill... no, gracefully stop the worker container", "intent": "docker_stop", "lang": "en"}
+{"text": "turn off container postgres", "intent": "docker_stop", "lang": "en"}
+{"text": "stop the running container called frontend", "intent": "docker_stop", "lang": "en"}
+{"text": "docker stop my-app", "intent": "docker_stop", "lang": "en"}
+{"text": "how to stop a single docker container", "intent": "docker_stop", "lang": "en"}
+{"text": "stpo container web", "intent": "docker_stop", "lang": "en"}
+{"text": "bring down the db container", "intent": "docker_stop", "lang": "en"}
+{"text": "stop mongo", "intent": "docker_stop", "lang": "en"}
+{"text": "can you stop the celery container?", "intent": "docker_stop", "lang": "en"}
+{"text": "shut the backend container down", "intent": "docker_stop", "lang": "en"}
+{"text": "stop that container", "intent": "docker_stop", "lang": "en"}
+{"text": "stop only the redis container", "intent": "docker_stop", "lang": "en"}
+{"text": "halt container proxy", "intent": "docker_stop", "lang": "en"}
+{"text": "stop container rabbitmq", "intent": "docker_stop", "lang": "en"}
+{"text": "switch off the web container", "intent": "docker_stop", "lang": "en"}
+{"text": "end the container named test-db", "intent": "docker_stop", "lang": "en"}
+{"text": "stop docker container elastic", "intent": "docker_stop", "lang": "en"}
+{"text": "i want to stop the app container", "intent": "docker_stop", "lang": "en"}
+{"text": "stop the container with name 'cache'", "intent": "docker_stop", "lang": "en"}
+{"text": "pause... i mean stop the web container", "intent": "docker_stop", "lang": "en"}
+{"text": "shutdown container grafana", "intent": "docker_stop", "lang": "en"}
+{"text": "stop contaner api", "intent": "docker_stop", "lang": "en"}
+{"text": "zatrzymaj kontener web", "intent": "docker_stop", "lang": "pl"}
+{"text": "zatrzymaj kontener redis", "intent": "docker_stop", "lang": "pl"}
+{"text": "jak zatrzymać kontener?", "intent": "docker_stop", "lang": "pl"}
+{"text": "wyłącz my-app", "intent": "docker_stop", "lang": "pl"}
+{"text": "zatrzymaj kontener", "intent": "docker_stop", "lang": "pl"}
+{"text": "stopnij nginxa", "intent": "docker_stop", "lang": "pl"}
+{"text": "proszę zatrzymać kontener api", "intent": "docker_stop", "lang": "pl"}
+{"text": "zastopuj kontener worker", "intent": "docker_stop", "lang": "pl"}
+{"text": "wylacz kontener postgres", "intent": "docker_stop", "lang": "pl"}
+{"text": "zatrzymaj działający kontener frontend", "intent": "docker_stop", "lang": "pl"}
+{"text": "jak zatrzymac pojedynczy kontener", "intent": "docker_stop", "lang": "pl"}
+{"text": "zatrzymja kontener web", "intent": "docker_stop", "lang": "pl"}
+{"text": "zgaś kontener db", "intent": "docker_stop", "lang": "pl"}
+{"text": "zatrzymaj mongo", "intent": "docker_stop", "lang": "pl"}
+{"text": "czy możesz zatrzymać kontener celery?", "intent": "docker_stop", "lang": "pl"}
+{"text": "wylacz kontener backend", "intent": "docker_stop", "lang": "pl"}
+{"text": "zatrzymaj ten kontener", "intent": "docker_stop", "lang": "pl"}
+{"text": "zatrzymaj tylko kontener redis", "intent": "docker_stop", "lang": "pl"}
+{"text": "zastopuj proxy", "intent": "docker_stop", "lang": "pl"}
+{"text": "stop kontenera rabbitmq", "intent": "docker_stop", "lang": "pl"}
+{"text": "wyłącz kontener web", "intent": "docker_stop", "lang": "pl"}
+{"text": "zakończ kontener test-db", "intent": "docker_stop", "lang": "pl"}
+{"text": "zatrzymaj kontener dockera elastic", "intent": "docker_stop", "lang": "pl"}
+{"text": "chce zatrzymac kontener app", "intent": "docker_stop", "lang": "pl"}
+{"text": "zatrzymaj kontener o nazwie 'cache'", "intent": "docker_stop", "lang": "pl"}
+{"text": "stopnij kontener grafana", "intent": "docker_stop", "lang": "pl"}
+{"text": "ubij kontener api (zatrzymaj)", "intent": "docker_stop", "lang": "pl"}
+{"text": "zatrzymaj kontenera my-app", "intent": "docker_stop", "lang": "pl"}
+{"text": "wylacz kontner web", "intent": "docker_stop", "lang": "pl"}
+{"text": "zatrzymaj kontener db prosze", "intent": "docker_stop", "lang": "pl"}
+{"text": "stop all containers", "intent": "docker_stop_all", "lang": "en"}
+{"text": "stop every running container", "intent": "docker_stop_all", "lang": "en"}
+{"text": "how do I stop all docker containers at once?", "intent": "docker_stop_all", "lang": "en"}
+{"text": "shut down all containers", "intent": "docker_stop_all", "lang": "en"}
+{"text": "kill all running containers", "intent": "docker_stop_all", "lang": "en"}
+{"text": "stop all docker containers", "intent": "docker_stop_all", "lang": "en"}
+{"text": "halt every container", "intent": "docker_stop_all", "lang": "en"}
+{"text": "stop everything in docker", "intent": "docker_stop_all", "lang": "en"}
+{"text": "turn off all containers", "intent": "docker_stop_all", "lang": "en"}
+{"text": "stop all running containers please", "intent": "docker_stop_all", "lang": "en"}
+{"text": "bring down all containers", "intent": "docker_stop_all", "lang": "en"}
+{"text": "how to stop all containers", "intent": "docker_stop_all", "lang": "en"}
+{"text": "stop all contianers", "intent": "docker_stop_all", "lang": "en"}
+{"text": "stop every single container that's up", "intent": "docker_stop_all", "lang": "en"}
+{"text": "shut every docker container down", "intent": "docker_stop_all", "lang": "en"}
+{"text": "can you stop all the running containers?", "intent": "docker_stop_all", "lang": "en"}
+{"text": "stop all of them", "intent": "docker_stop_all", "lang": "en"}
+{"text": "stop all containers on this host", "intent": "docker_stop_all", "lang": "en"}
+{"text": "mass stop containers", "intent": "docker_stop_all", "lang": "en"}
+{"text": "stop them all", "intent": "docker_stop_all", "lang": "en"}
+{"text": "docker stop all", "intent": "docker_stop_all", "lang": "en"}
+{"text": "i want every container stopped", "intent": "docker_stop_all", "lang": "en"}
+{"text": "stop all the docker stuff that's running", "intent": "docker_stop_all", "lang": "en"}
+{"text": "turn off every running docker container", "intent": "docker_stop_all", "lang": "en"}
+{"text": "stop all active containers", "intent": "docker_stop_all", "lang": "en"}
+{"text": "stop all running dockers", "intent": "docker_stop_all", "lang": "en"}
+{"text": "shutdown all containers now", "intent": "docker_stop_all", "lang": "en"}
+{"text": "stop everything that docker ps shows", "intent": "docker_stop_all", "lang": "en"}
+{"text": "halt all running containers", "intent": "docker_stop_all", "lang": "en"}
+{"text": "stopp all containers", "intent": "docker_stop_all", "lang": "en"}
+{"text": "zatrzymaj wszystkie kontenery", "intent": "docker_stop_all", "lang": "pl"}
+{"text": "zatrzymaj każdy działający kontener", "intent": "docker_stop_all", "lang": "pl"}
+{"text": "jak zatrzymać wszystkie kontenery naraz?", "intent": "docker_stop_all", "lang": "pl"}
+{"text": "wyłącz wszystkie kontenery", "intent": "docker_stop_all", "lang": "pl"}
+{"text": "ubij wszystkie dzialajace kontenery", "intent": "docker_stop_all", "lang": "pl"}
+{"text": "zatrzymaj wszystkie kontenery dockera", "intent": "docker_stop_all", "lang": "pl"}
+{"text": "zastopuj wszystkie kontenery", "intent": "docker_stop_all", "lang": "pl"}
+{"text": "zatrzymaj wszystko w dockerze", "intent": "docker_stop_all", "lang": "pl"}
+{"text": "wylacz wszystkie kontenery", "intent": "docker_stop_all", "lang": "pl"}
+{"text": "proszę zatrzymać wszystkie działające kontenery", "intent": "docker_stop_all", "lang": "pl"}
+{"text": "jak zatrzymac wszystkie kontenery", "intent": "docker_stop_all", "lang": "pl"}
+{"text": "zatrzymaj wszytkie kontenery", "intent": "docker_stop_all", "lang": "pl"}
+{"text": "stopnij wszystkie kontenery", "intent": "docker_stop_all", "lang": "pl"}
+{"text": "czy możesz zatrzymać wszystkie uruchomione kontenery?", "intent": "docker_stop_all", "lang": "pl"}
+{"text": "zatrzymaj je wszystkie", "intent": "docker_stop_all", "lang": "pl"}
+{"text": "zatrzymaj wszystkie kontenery na tym hoście", "intent": "docker_stop_all", "lang": "pl"}
+{"text": "masowo zatrzymaj kontenery", "intent": "docker_stop_all", "lang": "pl"}
+{"text": "docker stop wszystkie", "intent": "docker_stop_all", "lang": "pl"}
+{"text": "chce zeby wszystkie kontenery byly zatrzymane", "intent": "docker_stop_all", "lang": "pl"}
+{"text": "zatrzymaj wszystko co chodzi w dockerze", "intent": "docker_stop_all", "lang": "pl"}
+{"text": "wylacz kazdy dzialajacy kontener", "intent": "docker_stop_all", "lang": "pl"}
+{"text": "zatrzymaj wszystkie aktywne kontenery", "intent": "docker_stop_all", "lang": "pl"}
+{"text": "zgaś wszystkie kontenery", "intent": "docker_stop_all", "lang": "pl"}
+{"text": "wyłącz od razu wszystkie kontenery", "intent": "docker_stop_all", "lang": "pl"}
+{"text": "zatrzymaj wszystko co pokazuje docker ps", "intent": "docker_stop_all", "lang": "pl"}
+{"text": "zastopuj wszystkie dzialajace", "intent": "docker_stop_all", "lang": "pl"}
+{"text": "stop wszystkich kontenerów", "intent": "docker_stop_all", "lang": "pl"}
+{"text": "pozatrzymuj wszystkie kontenery", "intent": "docker_stop_all", "lang": "pl"}
+{"text": "wyłącz całego dockera, wszystkie kontenery", "intent": "docker_stop_all", "lang": "pl"}
+{"text": "zatrzymaj wszystkie kontnery", "intent": "docker_stop_all", "lang": "pl"}
+{"text": "docker system prune", "intent": "docker_prune", "lang": "en"}
+{"text": "remove unused docker data", "intent": "docker_prune", "lang": "en"}
+{"text": "clean up docker", "intent": "docker_prune", "lang": "en"}
+{"text": "how do I free disk space used by docker?", "intent": "docker_prune", "lang": "en"}
+{"text": "delete unused images, containers and networks", "intent": "docker_prune", "lang": "en"}
+{"text": "prune everything unused in docker", "intent": "docker_prune", "lang": "en"}
+{"text": "docker is eating my disk, clean it", "intent": "docker_prune", "lang": "en"}
+{"text": "remove dangling images and stopped containers", "intent": "docker_prune", "lang": "en"}
+{"text": "clear docker cache", "intent": "docker_prune", "lang": "en"}
+{"text": "purge unused docker resources", "intent": "docker_prune", "lang": "en"}
+{"text": "how to clean up old docker images and containers", "intent": "docker_prune", "lang": "en"}
+{"text": "docker cleanup", "intent": "docker_prune", "lang": "en"}
+{"text": "prune docker", "intent": "docker_prune", "lang": "en"}
+{"text": "get rid of all unused docker stuff", "intent": "docker_prune", "lang": "en"}
+{"text": "reclaim space from docker", "intent": "docker_prune", "lang": "en"}
+{"text": "dokcer prune", "intent": "docker_prune", "lang": "en"}
+{"text": "wipe unused docker images", "intent": "docker_prune", "lang": "en"}
+{"text": "please clean up all unused docker objects", "intent": "docker_prune", "lang": "en"}
+{"text": "can you prune docker system?", "intent": "docker_prune", "lang": "en"}
+{"text": "remove all unused images", "intent": "docker_prune", "lang": "en"}
+{"text": "delete docker garbage", "intent": "docker_prune", "lang": "en"}
+{"text": "free up space by removing unused containers and images", "intent": "docker_prune", "lang": "en"}
+{"text": "clean docker leftovers", "intent": "docker_prune", "lang": "en"}
+{"text": "nuke unused docker data", "intent": "docker_prune", "lang": "en"}
+{"text": "docker system prune -a", "intent": "docker_prune", "lang": "en"}
+{"text": "remove stale docker objects", "intent": "docker_prune", "lang": "en"}
+{"text": "clear out old docker images", "intent": "docker_prune", "lang": "en"}
+{"text": "tidy up docker disk usage", "intent": "docker_prune", "lang": "en"}
+{"text": "cleanup unused docker volumes and images", "intent": "docker_prune", "lang": "en"}
+{"text": "prnue docker", "intent": "docker_prune", "lang": "en"}
+{"text": "wyczyść dockera", "intent": "docker_prune", "lang": "pl"}
+{"text": "usuń nieużywane dane dockera", "intent": "docker_prune", "lang": "pl"}
+{"text": "jak zwolnić miejsce zajmowane przez dockera?", "intent": "docker_prune", "lang": "pl"}
+{"text": "usuń nieużywane obrazy, kontenery i sieci", "intent": "docker_prune", "lang": "pl"}
+{"text": "sprzątnij wszystko nieużywane w dockerze", "intent": "docker_prune", "lang": "pl"}
+{"text": "docker zjada mi dysk, wyczyść go", "intent": "docker_prune", "lang": "pl"}
+{"text": "usun wiszace obrazy i zatrzymane kontenery", "intent": "docker_prune", "lang": "pl"}
+{"text": "wyczysc cache dockera", "intent": "docker_prune", "lang": "pl"}
+{"text": "jak posprzątać stare obrazy i kontenery", "intent": "docker_prune", "lang": "pl"}
+{"text": "sprzatanie dockera", "intent": "docker_prune", "lang": "pl"}
+{"text": "prune dockera", "intent": "docker_prune", "lang": "pl"}
+{"text": "pozbądź się nieużywanych śmieci dockera", "intent": "docker_prune", "lang": "pl"}
+{"text": "odzyskaj miejsce z dockera", "intent": "docker_prune", "lang": "pl"}
+{"text": "wywal nieuzywane obrazy dockera", "intent": "docker_prune", "lang": "pl"}
+{"text": "proszę wyczyścić nieużywane obiekty dockera", "intent": "docker_prune", "lang": "pl"}
+{"text": "czy możesz zrobić prune systemu dockera?", "intent": "docker_prune", "lang": "pl"}
+{"text": "usuń wszystkie nieużywane obrazy", "intent": "docker_prune", "lang": "pl"}
+{"text": "usun smieci dockera", "intent": "docker_prune", "lang": "pl"}
+{"text": "zwolnij miejsce usuwając nieużywane kontenery i obrazy", "intent": "docker_prune", "lang": "pl"}
+{"text": "wyczyść pozostałości po dockerze", "intent": "docker_prune", "lang": "pl"}
+{"text": "wywal nieuzywane dane dockera", "intent": "docker_prune", "lang": "pl"}
+{"text": "usuń stare obiekty dockera", "intent": "docker_prune", "lang": "pl"}
+{"text": "wyczysc stare obrazy", "intent": "docker_prune", "lang": "pl"}
+{"text": "posprzataj miejsce na dysku po dockerze", "intent": "docker_prune", "lang": "pl"}
+{"text": "sprunuj dockera", "intent": "docker_prune", "lang": "pl"}
+{"text": "usun nieuzywane wolumeny i obrazy", "intent": "docker_prune", "lang": "pl"}
+{"text": "wyczyść docker z nieużywanych rzeczy", "intent": "docker_prune", "lang": "pl"}
+{"text": "wyczysc dokera", "intent": "docker_prune", "lang": "pl"}
+{"text": "wyczysc system dockera", "intent": "docker_prune", "lang": "pl"}
+{"text": "sprzątnij nieużywane rzeczy w dokerze", "intent": "docker_prune", "lang": "pl"}
+{"text": "open a shell in container web", "intent": "docker_exec", "lang": "en"}
+{"text": "docker exec into db", "intent": "docker_exec", "lang": "en"}
+{"text": "get a shell inside my-app", "intent": "docker_exec", "lang": "en"}
+{"text": "how do I ssh into a docker container?", "intent": "docker_exec", "lang": "en"}
+{"text": "exec bash in redis", "intent": "docker_exec", "lang": "en"}
+{"text": "enter the container api", "intent": "docker_exec", "lang": "en"}
+{"text": "log into the nginx container", "intent": "docker_exec", "lang": "en"}
+{"text": "attach a terminal to container worker", "intent": "docker_exec", "lang": "en"}
+{"text": "docker exec -it web sh", "intent": "docker_exec", "lang": "en"}
+{"text": "shell into postgres", "intent": "docker_exec", "lang": "en"}
+{"text": "open a terminal inside the container", "intent": "docker_exec", "lang": "en"}
+{"text": "how to get inside a running container", "intent": "docker_exec", "lang": "en"}
+{"text": "jump into the backend container", "intent": "docker_exec", "lang": "en"}
+{"text": "get a prompt in container frontend", "intent": "docker_exec", "lang": "en"}
+{"text": "exec into contianer web", "intent": "docker_exec", "lang": "en"}
+{"text": "i need to poke around inside the db container", "intent": "docker_exec", "lang": "en"}
+{"text": "connect to the mongo container shell", "intent": "docker_exec", "lang": "en"}
+{"text": "please open sh inside celery", "intent": "docker_exec", "lang": "en"}
+{"text": "can you get me into the my-app container?", "intent": "docker_exec", "lang": "en"}
+{"text": "interactive shell in container proxy", "intent": "docker_exec", "lang": "en"}
+{"text": "go inside container redis", "intent": "docker_exec", "lang": "en"}
+{"text": "run a shell in the app container", "intent": "docker_exec", "lang": "en"}
+{"text": "get into container", "intent": "docker_exec", "lang": "en"}
+{"text": "open console in container rabbitmq", "intent": "docker_exec", "lang": "en"}
+{"text": "enter docker container web interactively", "intent": "docker_exec", "lang": "en"}
+{"text": "ssh to container api", "intent": "docker_exec", "lang": "en"}
+{"text": "drop me into a shell in test-db", "intent": "docker_exec", "lang": "en"}
+{"text": "login to container", "intent": "docker_exec", "lang": "en"}
+{"text": "exec it into elastic", "intent": "docker_exec", "lang": "en"}
+{"text": "get shel in web", "intent": "docker_exec", "lang": "en"}
+{"text": "otwórz shella w kontenerze web", "intent": "docker_exec", "lang": "pl"}
+{"text": "wejdź do kontenera db", "intent": "docker_exec", "lang": "pl"}
+{"text": "docker exec do my-app", "intent": "docker_exec", "lang": "pl"}
+{"text": "jak wejść do kontenera dockera?", "intent": "docker_exec", "lang": "pl"}
+{"text": "odpal basha w redisie", "intent": "docker_exec", "lang": "pl"}
+{"text": "wejdz do kontenera api", "intent": "docker_exec", "lang": "pl"}
+{"text": "zaloguj się do kontenera nginx", "intent": "docker_exec", "lang": "pl"}
+{"text": "podepnij terminal do kontenera worker", "intent": "docker_exec", "lang": "pl"}
+{"text": "shell w postgresie", "intent": "docker_exec", "lang": "pl"}
+{"text": "otworz terminal w kontenerze", "intent": "docker_exec", "lang": "pl"}
+{"text": "jak dostac sie do srodka dzialajacego kontenera", "intent": "docker_exec", "lang": "pl"}
+{"text": "wskocz do kontenera backend", "intent": "docker_exec", "lang": "pl"}
+{"text": "daj mi prompt w kontenerze frontend", "intent": "docker_exec", "lang": "pl"}
+{"text": "wejdz do kontenra web", "intent": "docker_exec", "lang": "pl"}
+{"text": "muszę pogrzebać w kontenerze db", "intent": "docker_exec", "lang": "pl"}
+{"text": "połącz się z shellem kontenera mongo", "intent": "docker_exec", "lang": "pl"}
+{"text": "proszę otworzyć sh w celery", "intent": "docker_exec", "lang": "pl"}
+{"text": "czy możesz mnie wpuścić do kontenera my-app?", "intent": "docker_exec", "lang": "pl"}
+{"text": "interaktywny shell w kontenerze proxy", "intent": "docker_exec", "lang": "pl"}
+{"text": "wejdź do środka redisa", "intent": "docker_exec", "lang": "pl"}
+{"text": "uruchom powłokę w kontenerze app", "intent": "docker_exec", "lang": "pl"}
+{"text": "wejdź do kontenera", "intent": "docker_exec", "lang": "pl"}
+{"text": "otworz konsole w kontenerze rabbitmq", "intent": "docker_exec", "lang": "pl"}
+{"text": "zrob exec do kontenera web", "intent": "docker_exec", "lang": "pl"}
+{"text": "ssh do kontenera api", "intent": "docker_exec", "lang": "pl"}
+{"text": "wrzuć mnie do shella w test-db", "intent": "docker_exec", "lang": "pl"}
+{"text": "zaloguj sie do kontenera", "intent": "docker_exec", "lang": "pl"}
+{"text": "execnij się do elastic", "intent": "docker_exec", "lang": "pl"}
+{"text": "wejdz w shela weba", "intent": "docker_exec", "lang": "pl"}
+{"text": "shell sh w kontenerze web", "intent": "docker_exec", "lang": "pl"}
+{"text": "docker stats", "intent": "docker_stats", "lang": "en"}
+{"text": "container resource usage", "intent": "docker_stats", "lang": "en"}
+{"text": "how much cpu are my containers using?", "intent": "docker_stats", "lang": "en"}
+{"text": "show memory usage of containers", "intent": "docker_stats", "lang": "en"}
+{"text": "which container is eating all the ram?", "intent": "docker_stats", "lang": "en"}
+{"text": "show cpu and memory per container", "intent": "docker_stats", "lang": "en"}
+{"text": "how do I check container resource consumption?", "intent": "docker_stats", "lang": "en"}
+{"text": "docker container stats", "intent": "docker_stats", "lang": "en"}
+{"text": "what's the load of each container", "intent": "docker_stats", "lang": "en"}
+{"text": "show container cpu usage", "intent": "docker_stats", "lang": "en"}
+{"text": "resource usage of docker containers", "intent": "docker_stats", "lang": "en"}
+{"text": "is any container hogging memory?", "intent": "docker_stats", "lang": "en"}
+{"text": "dokcer stats", "intent": "docker_stats", "lang": "en"}
+{"text": "check how much memory docker containers take", "intent": "docker_stats", "lang": "en"}
+{"text": "container performance stats", "intent": "docker_stats", "lang": "en"}
+{"text": "show network and disk io of containers", "intent": "docker_stats", "lang": "en"}
+{"text": "please show resource stats for containers", "intent": "docker_stats", "lang": "en"}
+{"text": "can you show container cpu/mem?", "intent": "docker_stats", "lang": "en"}
+{"text": "usage stats for containers", "intent": "docker_stats", "lang": "en"}
+{"text": "which docker container uses most cpu", "intent": "docker_stats", "lang": "en"}
+{"text": "monitor containers resources", "intent": "docker_stats", "lang": "en"}
+{"text": "memory per container", "intent": "docker_stats", "lang": "en"}
+{"text": "show container usage snapshot", "intent": "docker_stats", "lang": "en"}
+{"text": "how heavy are my containers", "intent": "docker_stats", "lang": "en"}
+{"text": "top for docker containers", "intent": "docker_stats", "lang": "en"}
+{"text": "how to see container ram usage", "intent": "docker_stats", "lang": "en"}
+{"text": "stats of running containers", "intent": "docker_stats", "lang": "en"}
+{"text": "container cpu memory overview", "intent": "docker_stats", "lang": "en"}
+{"text": "check docker resource utilisation", "intent": "docker_stats", "lang": "en"}
+{"text": "show contianer stats", "intent": "docker_stats", "lang": "en"}
+{"text": "zużycie zasobów kontenerów", "intent": "docker_stats", "lang": "pl"}
+{"text": "ile cpu zużywają moje kontenery?", "intent": "docker_stats", "lang": "pl"}
+{"text": "pokaż zużycie pamięci kontenerów", "intent": "docker_stats", "lang": "pl"}
+{"text": "który kontener zjada cały ram?", "intent": "docker_stats", "lang": "pl"}
+{"text": "pokaz cpu i pamiec dla kazdego kontenera", "intent": "docker_stats", "lang": "pl"}
+{"text": "jak sprawdzić zużycie zasobów przez kontenery?", "intent": "docker_stats", "lang": "pl"}
+{"text": "statystyki kontenerów", "intent": "docker_stats", "lang": "pl"}
+{"text": "jakie jest obciazenie kazdego kontenera", "intent": "docker_stats", "lang": "pl"}
+{"text": "pokaż zużycie procesora przez kontenery", "intent": "docker_stats", "lang": "pl"}
+{"text": "czy jakiś kontener zżera pamięć?", "intent": "docker_stats", "lang": "pl"}
+{"text": "sprawdz ile pamieci biora kontenery", "intent": "docker_stats", "lang": "pl"}
+{"text": "wydajność kontenerów", "intent": "docker_stats", "lang": "pl"}
+{"text": "pokaż sieć i dysk io kontenerów", "intent": "docker_stats", "lang": "pl"}
+{"text": "proszę pokazać statystyki zasobów kontenerów", "intent": "docker_stats", "lang": "pl"}
+{"text": "czy możesz pokazać cpu/ram kontenerów?", "intent": "docker_stats", "lang": "pl"}
+{"text": "statystyki uzycia kontenerow", "intent": "docker_stats", "lang": "pl"}
+{"text": "ktory kontener dockera zuzywa najwiecej cpu", "intent": "docker_stats", "lang": "pl"}
+{"text": "monitoruj zasoby kontenerów", "intent": "docker_stats", "lang": "pl"}
+{"text": "pamiec na kontener", "intent": "docker_stats", "lang": "pl"}
+{"text": "ile zasobów zżerają kontenery", "intent": "docker_stats", "lang": "pl"}
+{"text": "top dla kontenerów dockera", "intent": "docker_stats", "lang": "pl"}
+{"text": "jak zobaczyc zuzycie ramu przez kontener", "intent": "docker_stats", "lang": "pl"}
+{"text": "statsy dzialajacych kontenerow", "intent": "docker_stats", "lang": "pl"}
+{"text": "przegląd cpu i pamięci kontenerów", "intent": "docker_stats", "lang": "pl"}
+{"text": "sprawdz wykorzystanie zasobow dockera", "intent": "docker_stats", "lang": "pl"}
+{"text": "pokaz staty kontenerow", "intent": "docker_stats", "lang": "pl"}
+{"text": "obciążenie kontenerów", "intent": "docker_stats", "lang": "pl"}
+{"text": "zuzycie zasobow przez dockera", "intent": "docker_stats", "lang": "pl"}
+{"text": "ile zasobów biorą kontenery", "intent": "docker_stats", "lang": "pl"}
+{"text": "staty dokera", "intent": "docker_stats", "lang": "pl"}
+{"text": "docker compose up", "intent": "docker_compose_up", "lang": "en"}
+{"text": "start docker compose services", "intent": "docker_compose_up", "lang": "en"}
+{"text": "bring up the compose stack", "intent": "docker_compose_up", "lang": "en"}
+{"text": "how do I start everything in docker-compose.yml?", "intent": "docker_compose_up", "lang": "en"}
+{"text": "spin up the services", "intent": "docker_compose_up", "lang": "en"}
+{"text": "compose up in the background", "intent": "docker_compose_up", "lang": "en"}
+{"text": "start the stack", "intent": "docker_compose_up", "lang": "en"}
+{"text": "launch all services defined in compose", "intent": "docker_compose_up", "lang": "en"}
+{"text": "docker-compose up -d", "intent": "docker_compose_up", "lang": "en"}
+{"text": "run docker compose detached", "intent": "docker_compose_up", "lang": "en"}
+{"text": "how to start containers with docker compose", "intent": "docker_compose_up", "lang": "en"}
+{"text": "start up the dev environment with compose", "intent": "docker_compose_up", "lang": "en"}
+{"text": "bring the services up", "intent": "docker_compose_up", "lang": "en"}
+{"text": "compose up", "intent": "docker_compose_up", "lang": "en"}
+{"text": "dokcer compose up", "intent": "docker_compose_up", "lang": "en"}
+{"text": "please start the compose services", "intent": "docker_compose_up", "lang": "en"}
+{"text": "can you bring up the docker compose stack?", "intent": "docker_compose_up", "lang": "en"}
+{"text": "start all compose containers", "intent": "docker_compose_up", "lang": "en"}
+{"text": "fire up the compose project", "intent": "docker_compose_up", "lang": "en"}
+{"text": "boot the services from docker-compose", "intent": "docker_compose_up", "lang": "en"}
+{"text": "up the stack", "intent": "docker_compose_up", "lang": "en"}
+{"text": "start docker-compose", "intent": "docker_compose_up", "lang": "en"}
+{"text": "launch the compose environment in detached mode", "intent": "docker_compose_up", "lang": "en"}
+{"text": "spin up containers from the compose file", "intent": "docker_compose_up", "lang": "en"}
+{"text": "start services from compose.yaml", "intent": "docker_compose_up", "lang": "en"}
+{"text": "get the compose stack running", "intent": "docker_compose_up", "lang": "en"}
+{"text": "compose start everything", "intent": "docker_compose_up", "lang": "en"}
+{"text": "start my local stack (db, redis, web) with compose", "intent": "docker_compose_up", "lang": "en"}
+{"text": "run compose up -d", "intent": "docker_compose_up", "lang": "en"}
+{"text": "bring up compose servcies", "intent": "docker_compose_up", "lang": "en"}
+{"text": "uruchom serwisy docker compose", "intent": "docker_compose_up", "lang": "pl"}
+{"text": "podnieś stack compose", "intent": "docker_compose_up", "lang": "pl"}
+{"text": "jak uruchomić wszystko z docker-compose.yml?", "intent": "docker_compose_up", "lang": "pl"}
+{"text": "odpal serwisy", "intent": "docker_compose_up", "lang": "pl"}
+{"text": "compose up w tle", "intent": "docker_compose_up", "lang": "pl"}
+{"text": "wystartuj stack", "intent": "docker_compose_up", "lang": "pl"}
+{"text": "uruchom wszystkie usługi z compose", "intent": "docker_compose_up", "lang": "pl"}
+{"text": "odpal docker compose w trybie detached", "intent": "docker_compose_up", "lang": "pl"}
+{"text": "jak uruchomic kontenery przez docker compose", "intent": "docker_compose_up", "lang": "pl"}
+{"text": "postaw środowisko dev przez compose", "intent": "docker_compose_up", "lang": "pl"}
+{"text": "podnies serwisy", "intent": "docker_compose_up", "lang": "pl"}
+{"text": "zrob compose up", "intent": "docker_compose_up", "lang": "pl"}
+{"text": "proszę uruchomić serwisy compose", "intent": "docker_compose_up", "lang": "pl"}
+{"text": "czy możesz podnieść stack docker compose?", "intent": "docker_compose_up", "lang": "pl"}
+{"text": "wystartuj wszystkie kontenery compose", "intent": "docker_compose_up", "lang": "pl"}
+{"text": "odpal projekt compose", "intent": "docker_compose_up", "lang": "pl"}
+{"text": "uruchom uslugi z docker-compose", "intent": "docker_compose_up", "lang": "pl"}
+{"text": "podnieś stacka", "intent": "docker_compose_up", "lang": "pl"}
+{"text": "wystartuj docker-compose", "intent": "docker_compose_up", "lang": "pl"}
+{"text": "uruchom środowisko compose w tle", "intent": "docker_compose_up", "lang": "pl"}
+{"text": "postaw kontenery z pliku compose", "intent": "docker_compose_up", "lang": "pl"}
+{"text": "uruchom serwisy z compose.yaml", "intent": "docker_compose_up", "lang": "pl"}
+{"text": "odpal lokalny stack (db, redis, web) przez compose", "intent": "docker_compose_up", "lang": "pl"}
+{"text": "zrób compose upa", "intent": "docker_compose_up", "lang": "pl"}
+{"text": "uruchom compose", "intent": "docker_compose_up", "lang": "pl"}
+{"text": "postaw serwsiy compose", "intent": "docker_compose_up", "lang": "pl"}
+{"text": "wstań stack z docker compose", "intent": "docker_compose_up", "lang": "pl"}
+{"text": "wstaw compose", "intent": "docker_compose_up", "lang": "pl"}
+{"text": "podnies compose w tle", "intent": "docker_compose_up", "lang": "pl"}
+{"text": "uruchom stack dockera compose", "intent": "docker_compose_up", "lang": "pl"}
+{"text": "docker compose down", "intent": "docker_compose_down", "lang": "en"}
+{"text": "stop docker compose services", "intent": "docker_compose_down", "lang": "en"}
+{"text": "tear down the compose stack", "intent": "docker_compose_down", "lang": "en"}
+{"text": "how do I stop everything started with docker-compose?", "intent": "docker_compose_down", "lang": "en"}
+{"text": "bring the services down", "intent": "docker_compose_down", "lang": "en"}
+{"text": "compose down", "intent": "docker_compose_down", "lang": "en"}
+{"text": "shut down the stack", "intent": "docker_compose_down", "lang": "en"}
+{"text": "stop and remove compose containers", "intent": "docker_compose_down", "lang": "en"}
+{"text": "docker-compose down", "intent": "docker_compose_down", "lang": "en"}
+{"text": "take down the dev environment", "intent": "docker_compose_down", "lang": "en"}
+{"text": "how to stop docker compose", "intent": "docker_compose_down", "lang": "en"}
+{"text": "kill the compose stack", "intent": "docker_compose_down", "lang": "en"}
+{"text": "dokcer compose down", "intent": "docker_compose_down", "lang": "en"}
+{"text": "please bring down the compose services", "intent": "docker_compose_down", "lang": "en"}
+{"text": "can you tear down docker compose?", "intent": "docker_compose_down", "lang": "en"}
+{"text": "stop the compose project", "intent": "docker_compose_down", "lang": "en"}
+{"text": "down the stack", "intent": "docker_compose_down", "lang": "en"}
+{"text": "stop all services from docker-compose.yml", "intent": "docker_compose_down", "lang": "en"}
+{"text": "shut the compose environment down", "intent": "docker_compose_down", "lang": "en"}
+{"text": "remove the compose containers and network", "intent": "docker_compose_down", "lang": "en"}
+{"text": "stop docker-compose", "intent": "docker_compose_down", "lang": "en"}
+{"text": "turn off the compose stack", "intent": "docker_compose_down", "lang": "en"}
+{"text": "bring compose down", "intent": "docker_compose_down", "lang": "en"}
+{"text": "stop my local stack started by compose", "intent": "docker_compose_down", "lang": "en"}
+{"text": "teardown compose", "intent": "docker_compose_down", "lang": "en"}
+{"text": "stop compose services and clean up their containers", "intent": "docker_compose_down", "lang": "en"}
+{"text": "run compose down", "intent": "docker_compose_down", "lang": "en"}
+{"text": "end the docker compose session", "intent": "docker_compose_down", "lang": "en"}
+{"text": "tear the services down", "intent": "docker_compose_down", "lang": "en"}
+{"text": "compose dwon", "intent": "docker_compose_down", "lang": "en"}
+{"text": "zatrzymaj serwisy docker compose", "intent": "docker_compose_down", "lang": "pl"}
+{"text": "zrzuć stack compose", "intent": "docker_compose_down", "lang": "pl"}
+{"text": "jak zatrzymać wszystko uruchomione przez docker-compose?", "intent": "docker_compose_down", "lang": "pl"}
+{"text": "położ serwisy", "intent": "docker_compose_down", "lang": "pl"}
+{"text": "wyłącz stack", "intent": "docker_compose_down", "lang": "pl"}
+{"text": "zatrzymaj i usuń kontenery compose", "intent": "docker_compose_down", "lang": "pl"}
+{"text": "zgaś środowisko dev", "intent": "docker_compose_down", "lang": "pl"}
+{"text": "jak zatrzymac docker compose", "intent": "docker_compose_down", "lang": "pl"}
+{"text": "ubij stack compose", "intent": "docker_compose_down", "lang": "pl"}
+{"text": "proszę zatrzymać serwisy compose", "intent": "docker_compose_down", "lang": "pl"}
+{"text": "czy możesz położyć docker compose?", "intent": "docker_compose_down", "lang": "pl"}
+{"text": "zatrzymaj projekt compose", "intent": "docker_compose_down", "lang": "pl"}
+{"text": "zrzuc stacka", "intent": "docker_compose_down", "lang": "pl"}
+{"text": "zatrzymaj wszystkie uslugi z docker-compose.yml", "intent": "docker_compose_down", "lang": "pl"}
+{"text": "wylacz srodowisko compose", "intent": "docker_compose_down", "lang": "pl"}
+{"text": "usun kontenery i siec compose", "intent": "docker_compose_down", "lang": "pl"}
+{"text": "zatrzymaj docker-compose", "intent": "docker_compose_down", "lang": "pl"}
+{"text": "wyłącz stack compose", "intent": "docker_compose_down", "lang": "pl"}
+{"text": "zrob compose down", "intent": "docker_compose_down", "lang": "pl"}
+{"text": "zatrzymaj lokalny stack z compose", "intent": "docker_compose_down", "lang": "pl"}
+{"text": "zwiń compose", "intent": "docker_compose_down", "lang": "pl"}
+{"text": "zatrzymaj serwisy compose i posprzątaj kontenery", "intent": "docker_compose_down", "lang": "pl"}
+{"text": "odpal compose down", "intent": "docker_compose_down", "lang": "pl"}
+{"text": "zakończ docker compose", "intent": "docker_compose_down", "lang": "pl"}
+{"text": "położ usługi compose", "intent": "docker_compose_down", "lang": "pl"}
+{"text": "położ stack docker compose", "intent": "docker_compose_down", "lang": "pl"}
+{"text": "wyłącz compose", "intent": "docker_compose_down", "lang": "pl"}
+{"text": "zrzuć compose'a", "intent": "docker_compose_down", "lang": "pl"}
+{"text": "zdejmij serwisy compose", "intent": "docker_compose_down", "lang": "pl"}
+{"text": "zatrzymaj compose", "intent": "docker_compose_down", "lang": "pl"}

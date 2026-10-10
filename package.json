@@ -1,0 +1,54 @@
+{
+  "name": "tellsh",
+  "version": "0.1.0",
+  "description": "Offline natural-language (Polish & English) to bash command CLI. Tiny classifier + templates, no LLM at runtime, zero dependencies.",
+  "type": "module",
+  "bin": {
+    "tellsh": "bin/tellsh.js"
+  },
+  "main": "src/cli.js",
+  "exports": {
+    ".": "./src/cli.js",
+    "./classifier": "./src/classifier.js",
+    "./fill": "./src/fill.js",
+    "./slots": "./src/slots.js",
+    "./danger": "./src/danger.js",
+    "./catalog": "./src/catalog.js",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "bin/tellsh.js",
+    "src/*.js",
+    "model/model.bin",
+    "README.md",
+    "LICENSE"
+  ],
+  "engines": {
+    "node": ">=18"
+  },
+  "scripts": {
+    "test": "node --test test/",
+    "train": "python3 scripts/train.py",
+    "eval": "node scripts/eval.js",
+    "bench": "taskset -c 0 node scripts/bench.js",
+    "prepack": "node -e \"require('fs').statSync('model/model.bin')\""
+  },
+  "keywords": [
+    "cli",
+    "bash",
+    "shell",
+    "natural-language",
+    "nl2bash",
+    "offline",
+    "polish",
+    "intent-classification",
+    "terminal"
+  ],
+  "author": "lksrz <lukasz@wearfits.com>",
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lksrz/tellsh.git"
+  },
+  "dependencies": {}
+}

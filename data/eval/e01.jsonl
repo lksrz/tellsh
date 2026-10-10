@@ -1,0 +1,832 @@
+{"text": "make a new folder called build/output", "intent": "mkdir", "lang": "en"}
+{"text": "create directory ~/projects/demo/src including any missing parents", "intent": "mkdir", "lang": "en"}
+{"text": "how do I create a folder named backups", "intent": "mkdir", "lang": "en"}
+{"text": "mkdir for logs/2024/june please", "intent": "mkdir", "lang": "en"}
+{"text": "new dir assets/img", "intent": "mkdir", "lang": "en"}
+{"text": "I need an empty directory at /tmp/staging", "intent": "mkdir", "lang": "en"}
+{"text": "create nested folders a/b/c", "intent": "mkdir", "lang": "en"}
+{"text": "make a foldr called notes", "intent": "mkdir", "lang": "en"}
+{"text": "utwórz folder o nazwie dist", "intent": "mkdir", "lang": "pl"}
+{"text": "stworz katalog ~/praca/raporty razem z nadrzednymi", "intent": "mkdir", "lang": "pl"}
+{"text": "jak założyć nowy katalog logs/archiwum?", "intent": "mkdir", "lang": "pl"}
+{"text": "nowy folder zdjecia", "intent": "mkdir", "lang": "pl"}
+{"text": "zrób katalog /opt/aplikacja/config", "intent": "mkdir", "lang": "pl"}
+{"text": "potrzebuje pustego katalogu tmp/test", "intent": "mkdir", "lang": "pl"}
+{"text": "utworz zagniezdzone katalogi src/main/java", "intent": "mkdir", "lang": "pl"}
+{"text": "załóż kataolg backup", "intent": "mkdir", "lang": "pl"}
+{"text": "create an empty file named notes.txt", "intent": "touch_file", "lang": "en"}
+{"text": "touch README.md", "intent": "touch_file", "lang": "en"}
+{"text": "make a blank file called .env", "intent": "touch_file", "lang": "en"}
+{"text": "how do i create a new empty file src/index.js", "intent": "touch_file", "lang": "en"}
+{"text": "new empty file todo.md", "intent": "touch_file", "lang": "en"}
+{"text": "create file config.yaml with nothing in it", "intent": "touch_file", "lang": "en"}
+{"text": "I want a zero-byte file at /tmp/lockfile", "intent": "touch_file", "lang": "en"}
+{"text": "create an empty fiel called app.log", "intent": "touch_file", "lang": "en"}
+{"text": "utwórz pusty plik notatki.txt", "intent": "touch_file", "lang": "pl"}
+{"text": "stworz nowy pusty plik index.html", "intent": "touch_file", "lang": "pl"}
+{"text": "jak zrobić pusty plik .gitignore?", "intent": "touch_file", "lang": "pl"}
+{"text": "pusty plik dane.csv", "intent": "touch_file", "lang": "pl"}
+{"text": "załóż plik test.py bez zawartości", "intent": "touch_file", "lang": "pl"}
+{"text": "zrob pusty plik o nazwie start.sh", "intent": "touch_file", "lang": "pl"}
+{"text": "potrzebuję nowego, pustego pliku w /tmp/flaga", "intent": "touch_file", "lang": "pl"}
+{"text": "utworz pusty plk log.txt", "intent": "touch_file", "lang": "pl"}
+{"text": "where am i", "intent": "current_dir", "lang": "en"}
+{"text": "print working directory", "intent": "current_dir", "lang": "en"}
+{"text": "what folder am I currently in?", "intent": "current_dir", "lang": "en"}
+{"text": "pwd", "intent": "current_dir", "lang": "en"}
+{"text": "show the current directory path", "intent": "current_dir", "lang": "en"}
+{"text": "which directory is this terminal in right now", "intent": "current_dir", "lang": "en"}
+{"text": "display my current location in the filesystem", "intent": "current_dir", "lang": "en"}
+{"text": "whats the curent dir", "intent": "current_dir", "lang": "en"}
+{"text": "gdzie jestem?", "intent": "current_dir", "lang": "pl"}
+{"text": "w jakim katalogu teraz jestem", "intent": "current_dir", "lang": "pl"}
+{"text": "pokaż bieżący katalog", "intent": "current_dir", "lang": "pl"}
+{"text": "aktualna sciezka", "intent": "current_dir", "lang": "pl"}
+{"text": "wyswietl obecny folder roboczy", "intent": "current_dir", "lang": "pl"}
+{"text": "jaki jest mój katalog roboczy?", "intent": "current_dir", "lang": "pl"}
+{"text": "pokaz pelna sciezke do miejsca w ktorym jestem", "intent": "current_dir", "lang": "pl"}
+{"text": "bierzący katalog", "intent": "current_dir", "lang": "pl"}
+{"text": "create a symlink from /opt/node/bin/node to /usr/local/bin/node", "intent": "create_symlink", "lang": "en"}
+{"text": "make a symbolic link called latest pointing to releases/v2.3", "intent": "create_symlink", "lang": "en"}
+{"text": "how do I soft link config.prod.json as config.json", "intent": "create_symlink", "lang": "en"}
+{"text": "ln -s style: link ~/dotfiles/.vimrc to ~/.vimrc", "intent": "create_symlink", "lang": "en"}
+{"text": "symlink /data/media into my home as media", "intent": "create_symlink", "lang": "en"}
+{"text": "create a shortcut link to /var/www/html named site", "intent": "create_symlink", "lang": "en"}
+{"text": "add a soft link for python3 called python", "intent": "create_symlink", "lang": "en"}
+{"text": "make a symlnk to /mnt/backup at ~/backup", "intent": "create_symlink", "lang": "en"}
+{"text": "utwórz dowiązanie symboliczne do /opt/app/bin/app w /usr/local/bin/app", "intent": "create_symlink", "lang": "pl"}
+{"text": "zrob symlink current wskazujacy na releases/1.4", "intent": "create_symlink", "lang": "pl"}
+{"text": "jak stworzyć link symboliczny do ~/dotfiles/.bashrc?", "intent": "create_symlink", "lang": "pl"}
+{"text": "symlink z /data/zdjecia do ~/zdjecia", "intent": "create_symlink", "lang": "pl"}
+{"text": "dowiazanie symboliczne nginx.conf -> /etc/nginx/nginx.conf", "intent": "create_symlink", "lang": "pl"}
+{"text": "podlinkuj miękkim linkiem katalog /mnt/dysk jako dysk", "intent": "create_symlink", "lang": "pl"}
+{"text": "stworz skrot (soft link) o nazwie latest do build/v3", "intent": "create_symlink", "lang": "pl"}
+{"text": "utworz dowiazanie symobliczne do pliku config.json", "intent": "create_symlink", "lang": "pl"}
+{"text": "compare old.txt and new.txt", "intent": "diff_files", "lang": "en"}
+{"text": "what's the difference between config.yaml and config.yaml.bak?", "intent": "diff_files", "lang": "en"}
+{"text": "diff a.json b.json", "intent": "diff_files", "lang": "en"}
+{"text": "show me line differences between main.py and main_v2.py", "intent": "diff_files", "lang": "en"}
+{"text": "are these two files different: /etc/hosts and hosts.orig", "intent": "diff_files", "lang": "en"}
+{"text": "unified diff of before.sql vs after.sql", "intent": "diff_files", "lang": "en"}
+{"text": "what changed between nginx.conf and nginx.conf.default", "intent": "diff_files", "lang": "en"}
+{"text": "compre file1.txt with file2.txt", "intent": "diff_files", "lang": "en"}
+{"text": "porównaj pliki stary.txt i nowy.txt", "intent": "diff_files", "lang": "pl"}
+{"text": "czym sie roznia config.ini i config.ini.bak?", "intent": "diff_files", "lang": "pl"}
+{"text": "diff miedzy a.csv a b.csv", "intent": "diff_files", "lang": "pl"}
+{"text": "pokaż różnice między main.c a main_old.c", "intent": "diff_files", "lang": "pl"}
+{"text": "porownaj dwa pliki: raport1.md i raport2.md", "intent": "diff_files", "lang": "pl"}
+{"text": "jakie są zmiany pomiędzy plikiem settings.json a settings.default.json", "intent": "diff_files", "lang": "pl"}
+{"text": "roznice w plikach /etc/hosts i hosts.kopia", "intent": "diff_files", "lang": "pl"}
+{"text": "porwnaj index.html z index2.html", "intent": "diff_files", "lang": "pl"}
+{"text": "replace foo with bar in config.txt", "intent": "replace_text", "lang": "en"}
+{"text": "in settings.py change every DEBUG = True to DEBUG = False", "intent": "replace_text", "lang": "en"}
+{"text": "substitute 'localhost' with '10.0.0.5' in app.conf in place", "intent": "replace_text", "lang": "en"}
+{"text": "sed replace http:// with https:// in links.md", "intent": "replace_text", "lang": "en"}
+{"text": "swap all occurrences of 'oldname' for 'newname' in README.md", "intent": "replace_text", "lang": "en"}
+{"text": "find and replace version 1.2.0 with 1.3.0 in package.json", "intent": "replace_text", "lang": "en"}
+{"text": "how do I replace a word in a file without opening an editor", "intent": "replace_text", "lang": "en"}
+{"text": "replace 'teh' with 'the' in essay.txt inplace", "intent": "replace_text", "lang": "en"}
+{"text": "zamień foo na bar w pliku config.txt", "intent": "replace_text", "lang": "pl"}
+{"text": "podmien wszystkie wystapienia localhost na 127.0.0.1 w app.env", "intent": "replace_text", "lang": "pl"}
+{"text": "w pliku index.html zamien 'Witaj' na 'Czesc'", "intent": "replace_text", "lang": "pl"}
+{"text": "sedem zamień http na https w linki.txt", "intent": "replace_text", "lang": "pl"}
+{"text": "znajdź i zamień 2023 na 2024 w raport.md", "intent": "replace_text", "lang": "pl"}
+{"text": "zastap slowo 'stary' slowem 'nowy' w notatki.txt", "intent": "replace_text", "lang": "pl"}
+{"text": "jak podmienić tekst w pliku bez otwierania edytora?", "intent": "replace_text", "lang": "pl"}
+{"text": "zamien port 8080 na 9090 w pliku server.conf", "intent": "replace_text", "lang": "pl"}
+{"text": "show mounted filesystems", "intent": "disk_mounts", "lang": "en"}
+{"text": "what is mounted where?", "intent": "disk_mounts", "lang": "en"}
+{"text": "list all mount points", "intent": "disk_mounts", "lang": "en"}
+{"text": "which partitions are currently mounted", "intent": "disk_mounts", "lang": "en"}
+{"text": "mounts", "intent": "disk_mounts", "lang": "en"}
+{"text": "where is my usb drive mounted", "intent": "disk_mounts", "lang": "en"}
+{"text": "display the filesystem mount tree", "intent": "disk_mounts", "lang": "en"}
+{"text": "show mounted file sytems", "intent": "disk_mounts", "lang": "en"}
+{"text": "pokaż zamontowane systemy plików", "intent": "disk_mounts", "lang": "pl"}
+{"text": "co jest zamontowane i gdzie?", "intent": "disk_mounts", "lang": "pl"}
+{"text": "lista punktow montowania", "intent": "disk_mounts", "lang": "pl"}
+{"text": "jakie partycje sa teraz zamontowane", "intent": "disk_mounts", "lang": "pl"}
+{"text": "gdzie zamontował się mój pendrive", "intent": "disk_mounts", "lang": "pl"}
+{"text": "montowania", "intent": "disk_mounts", "lang": "pl"}
+{"text": "wyswietl drzewo zamontowanych systemow plikow", "intent": "disk_mounts", "lang": "pl"}
+{"text": "pokaz zamontowane systemy plikw", "intent": "disk_mounts", "lang": "pl"}
+{"text": "list disks and partitions", "intent": "block_devices", "lang": "en"}
+{"text": "show all block devices", "intent": "block_devices", "lang": "en"}
+{"text": "what drives are attached to this machine", "intent": "block_devices", "lang": "en"}
+{"text": "lsblk", "intent": "block_devices", "lang": "en"}
+{"text": "how are my disks partitioned?", "intent": "block_devices", "lang": "en"}
+{"text": "show me the partitions on my ssd", "intent": "block_devices", "lang": "en"}
+{"text": "list storage devices", "intent": "block_devices", "lang": "en"}
+{"text": "show disk partitons", "intent": "block_devices", "lang": "en"}
+{"text": "pokaż dyski i partycje", "intent": "block_devices", "lang": "pl"}
+{"text": "lista urzadzen blokowych", "intent": "block_devices", "lang": "pl"}
+{"text": "jakie dyski są podłączone do komputera?", "intent": "block_devices", "lang": "pl"}
+{"text": "partycje", "intent": "block_devices", "lang": "pl"}
+{"text": "jak sa podzielone moje dyski na partycje", "intent": "block_devices", "lang": "pl"}
+{"text": "wyswietl wszystkie dyski", "intent": "block_devices", "lang": "pl"}
+{"text": "pokaż partycje na dysku ssd", "intent": "block_devices", "lang": "pl"}
+{"text": "pokaz dsyki i partycje", "intent": "block_devices", "lang": "pl"}
+{"text": "sha256 of ubuntu.iso", "intent": "hash_sha256", "lang": "en"}
+{"text": "compute the SHA-256 checksum of release.tar.gz", "intent": "hash_sha256", "lang": "en"}
+{"text": "what's the sha256 hash of this file: installer.exe", "intent": "hash_sha256", "lang": "en"}
+{"text": "verify the sha256sum of backup.zip", "intent": "hash_sha256", "lang": "en"}
+{"text": "give me the sha-256 for package.deb", "intent": "hash_sha256", "lang": "en"}
+{"text": "calculate sha256 checksum", "intent": "hash_sha256", "lang": "en"}
+{"text": "generate a sha256 hash for ~/Downloads/app.dmg", "intent": "hash_sha256", "lang": "en"}
+{"text": "sha256 chekcsum of firmware.bin", "intent": "hash_sha256", "lang": "en"}
+{"text": "policz sumę SHA-256 pliku ubuntu.iso", "intent": "hash_sha256", "lang": "pl"}
+{"text": "sha256 dla archiwum.tar.gz", "intent": "hash_sha256", "lang": "pl"}
+{"text": "jaki jest hash sha256 pliku instalator.exe?", "intent": "hash_sha256", "lang": "pl"}
+{"text": "sprawdz sume kontrolna sha256 backup.zip", "intent": "hash_sha256", "lang": "pl"}
+{"text": "wygeneruj skrót sha-256 dla obraz.img", "intent": "hash_sha256", "lang": "pl"}
+{"text": "suma sha256 pliku", "intent": "hash_sha256", "lang": "pl"}
+{"text": "oblicz sha256 ~/Pobrane/app.AppImage", "intent": "hash_sha256", "lang": "pl"}
+{"text": "sume kontrolna sha256 dla pakiet.deb pokaz", "intent": "hash_sha256", "lang": "pl"}
+{"text": "md5 of file.zip", "intent": "hash_md5", "lang": "en"}
+{"text": "compute md5 checksum for image.iso", "intent": "hash_md5", "lang": "en"}
+{"text": "what is the md5 hash of data.csv?", "intent": "hash_md5", "lang": "en"}
+{"text": "md5sum report.pdf", "intent": "hash_md5", "lang": "en"}
+{"text": "give me an MD5 digest of backup.tar", "intent": "hash_md5", "lang": "en"}
+{"text": "calculate the md5 for this download", "intent": "hash_md5", "lang": "en"}
+{"text": "check md5 of ~/Downloads/setup.exe", "intent": "hash_md5", "lang": "en"}
+{"text": "md5 hsah of video.mp4", "intent": "hash_md5", "lang": "en"}
+{"text": "policz md5 pliku archiwum.zip", "intent": "hash_md5", "lang": "pl"}
+{"text": "suma md5 dla obraz.iso", "intent": "hash_md5", "lang": "pl"}
+{"text": "jaki jest hash md5 pliku dane.csv?", "intent": "hash_md5", "lang": "pl"}
+{"text": "md5sum faktura.pdf", "intent": "hash_md5", "lang": "pl"}
+{"text": "wygeneruj skrot md5 dla backup.tar", "intent": "hash_md5", "lang": "pl"}
+{"text": "oblicz sumę kontrolną MD5 tego pliku", "intent": "hash_md5", "lang": "pl"}
+{"text": "sprawdź md5 ~/Pobrane/setup.exe", "intent": "hash_md5", "lang": "pl"}
+{"text": "md5 pliku film.mp4 prosze", "intent": "hash_md5", "lang": "pl"}
+{"text": "base64 encode hello world", "intent": "base64_encode", "lang": "en"}
+{"text": "encode the string 'admin:secret' in base64", "intent": "base64_encode", "lang": "en"}
+{"text": "convert image.png to base64", "intent": "base64_encode", "lang": "en"}
+{"text": "how do I base64-encode a file called cert.pem", "intent": "base64_encode", "lang": "en"}
+{"text": "base64 'user:pass'", "intent": "base64_encode", "lang": "en"}
+{"text": "turn this text into base64: my token", "intent": "base64_encode", "lang": "en"}
+{"text": "encode key.bin as base64", "intent": "base64_encode", "lang": "en"}
+{"text": "base64 encdoe config.json", "intent": "base64_encode", "lang": "en"}
+{"text": "zakoduj w base64 tekst hello", "intent": "base64_encode", "lang": "pl"}
+{"text": "przekonwertuj obraz.png na base64", "intent": "base64_encode", "lang": "pl"}
+{"text": "zakoduj 'admin:haslo' do base64", "intent": "base64_encode", "lang": "pl"}
+{"text": "base64 z pliku cert.pem", "intent": "base64_encode", "lang": "pl"}
+{"text": "jak zakodowac plik do base64?", "intent": "base64_encode", "lang": "pl"}
+{"text": "zamien tekst 'tajny klucz' na base64", "intent": "base64_encode", "lang": "pl"}
+{"text": "kodowanie base64 pliku dane.bin", "intent": "base64_encode", "lang": "pl"}
+{"text": "zakoduj w bas64 plik klucz.txt", "intent": "base64_encode", "lang": "pl"}
+{"text": "decode base64 aGVsbG8=", "intent": "base64_decode", "lang": "en"}
+{"text": "base64 decode the file token.b64", "intent": "base64_decode", "lang": "en"}
+{"text": "what does 'dXNlcjpwYXNz' decode to from base64", "intent": "base64_decode", "lang": "en"}
+{"text": "convert this base64 string back to text: SGVsbG8gV29ybGQ=", "intent": "base64_decode", "lang": "en"}
+{"text": "unbase64 encoded.txt", "intent": "base64_decode", "lang": "en"}
+{"text": "decode a base64 file named payload.txt", "intent": "base64_decode", "lang": "en"}
+{"text": "how to decode base64", "intent": "base64_decode", "lang": "en"}
+{"text": "base64 decdoe secret.b64", "intent": "base64_decode", "lang": "en"}
+{"text": "odkoduj base64 aGVsbG8=", "intent": "base64_decode", "lang": "pl"}
+{"text": "zdekoduj plik token.b64 z base64", "intent": "base64_decode", "lang": "pl"}
+{"text": "co oznacza 'dXNlcjpwYXNz' po odkodowaniu z base64?", "intent": "base64_decode", "lang": "pl"}
+{"text": "zamien ten ciag base64 z powrotem na tekst: SGVsbG8=", "intent": "base64_decode", "lang": "pl"}
+{"text": "dekodowanie base64 pliku zakodowany.txt", "intent": "base64_decode", "lang": "pl"}
+{"text": "jak odkodować base64?", "intent": "base64_decode", "lang": "pl"}
+{"text": "rozkoduj base64 z pliku dane.b64", "intent": "base64_decode", "lang": "pl"}
+{"text": "odkoduj z bae64 sekret.txt", "intent": "base64_decode", "lang": "pl"}
+{"text": "which processes are using the most cpu", "intent": "top_cpu", "lang": "en"}
+{"text": "top 5 cpu hogs", "intent": "top_cpu", "lang": "en"}
+{"text": "show the ten most CPU-intensive processes", "intent": "top_cpu", "lang": "en"}
+{"text": "what's eating my processor?", "intent": "top_cpu", "lang": "en"}
+{"text": "list processes sorted by cpu usage", "intent": "top_cpu", "lang": "en"}
+{"text": "highest cpu processes, top 3", "intent": "top_cpu", "lang": "en"}
+{"text": "why is my cpu at 100%, show top processes", "intent": "top_cpu", "lang": "en"}
+{"text": "procesess using most cpu", "intent": "top_cpu", "lang": "en"}
+{"text": "które procesy zużywają najwięcej procesora", "intent": "top_cpu", "lang": "pl"}
+{"text": "top 5 procesow wg cpu", "intent": "top_cpu", "lang": "pl"}
+{"text": "pokaz dziesiec procesow najbardziej obciazajacych procesor", "intent": "top_cpu", "lang": "pl"}
+{"text": "co mi zjada cpu?", "intent": "top_cpu", "lang": "pl"}
+{"text": "lista procesów posortowana po użyciu CPU", "intent": "top_cpu", "lang": "pl"}
+{"text": "trzy procesy z najwiekszym zuzyciem procesora", "intent": "top_cpu", "lang": "pl"}
+{"text": "dlaczego procesor jest na 100%, pokaż najcięższe procesy", "intent": "top_cpu", "lang": "pl"}
+{"text": "procesy zurzywajace najwiecej cpu", "intent": "top_cpu", "lang": "pl"}
+{"text": "which processes use the most memory", "intent": "top_mem", "lang": "en"}
+{"text": "top 10 ram hogs", "intent": "top_mem", "lang": "en"}
+{"text": "show the five processes consuming the most RAM", "intent": "top_mem", "lang": "en"}
+{"text": "what's eating all my memory?", "intent": "top_mem", "lang": "en"}
+{"text": "list processes sorted by memory usage", "intent": "top_mem", "lang": "en"}
+{"text": "biggest memory users, top 3", "intent": "top_mem", "lang": "en"}
+{"text": "which app is using so much ram", "intent": "top_mem", "lang": "en"}
+{"text": "processes with highest memroy usage", "intent": "top_mem", "lang": "en"}
+{"text": "które procesy zużywają najwięcej pamięci", "intent": "top_mem", "lang": "pl"}
+{"text": "top 10 procesow wg ramu", "intent": "top_mem", "lang": "pl"}
+{"text": "pokaz piec procesow ktore zjadaja najwiecej RAM", "intent": "top_mem", "lang": "pl"}
+{"text": "co mi zżera całą pamięć?", "intent": "top_mem", "lang": "pl"}
+{"text": "lista procesow posortowana po zuzyciu pamieci", "intent": "top_mem", "lang": "pl"}
+{"text": "trzy procesy z najwiekszym zużyciem ramu", "intent": "top_mem", "lang": "pl"}
+{"text": "który program bierze tyle pamięci RAM", "intent": "top_mem", "lang": "pl"}
+{"text": "procesy zjadajace najwiecej pamieci ram", "intent": "top_mem", "lang": "pl"}
+{"text": "is nginx running?", "intent": "find_process", "lang": "en"}
+{"text": "find the process for postgres", "intent": "find_process", "lang": "en"}
+{"text": "show me any running node processes", "intent": "find_process", "lang": "en"}
+{"text": "ps grep python", "intent": "find_process", "lang": "en"}
+{"text": "check whether redis-server is running", "intent": "find_process", "lang": "en"}
+{"text": "look for a process named java", "intent": "find_process", "lang": "en"}
+{"text": "what's the pid of firefox", "intent": "find_process", "lang": "en"}
+{"text": "is chrome runing", "intent": "find_process", "lang": "en"}
+{"text": "czy nginx jest uruchomiony?", "intent": "find_process", "lang": "pl"}
+{"text": "znajdz proces postgres", "intent": "find_process", "lang": "pl"}
+{"text": "pokaż działające procesy node", "intent": "find_process", "lang": "pl"}
+{"text": "sprawdz czy dziala redis-server", "intent": "find_process", "lang": "pl"}
+{"text": "szukaj procesu o nazwie java", "intent": "find_process", "lang": "pl"}
+{"text": "jaki pid ma firefox?", "intent": "find_process", "lang": "pl"}
+{"text": "czy python jest teraz odpalony", "intent": "find_process", "lang": "pl"}
+{"text": "znajdz proces chorme", "intent": "find_process", "lang": "pl"}
+{"text": "kill all node processes", "intent": "kill_by_name", "lang": "en"}
+{"text": "stop every process named python", "intent": "kill_by_name", "lang": "en"}
+{"text": "terminate firefox", "intent": "kill_by_name", "lang": "en"}
+{"text": "pkill chrome", "intent": "kill_by_name", "lang": "en"}
+{"text": "kill the process called gunicorn", "intent": "kill_by_name", "lang": "en"}
+{"text": "end all instances of slack", "intent": "kill_by_name", "lang": "en"}
+{"text": "shut down the java processes", "intent": "kill_by_name", "lang": "en"}
+{"text": "kil all ruby processes", "intent": "kill_by_name", "lang": "en"}
+{"text": "zabij wszystkie procesy node", "intent": "kill_by_name", "lang": "pl"}
+{"text": "zakoncz procesy o nazwie python", "intent": "kill_by_name", "lang": "pl"}
+{"text": "ubij firefoxa", "intent": "kill_by_name", "lang": "pl"}
+{"text": "pkill na chrome prosze", "intent": "kill_by_name", "lang": "pl"}
+{"text": "zabij proces gunicorn", "intent": "kill_by_name", "lang": "pl"}
+{"text": "zamknij wszystkie instancje slacka", "intent": "kill_by_name", "lang": "pl"}
+{"text": "wyłącz procesy javy", "intent": "kill_by_name", "lang": "pl"}
+{"text": "zabji procesy ruby", "intent": "kill_by_name", "lang": "pl"}
+{"text": "force kill chrome", "intent": "kill_force", "lang": "en"}
+{"text": "kill -9 every python process", "intent": "kill_force", "lang": "en"}
+{"text": "sigkill the hung node processes", "intent": "kill_force", "lang": "en"}
+{"text": "firefox is frozen, force-kill it", "intent": "kill_force", "lang": "en"}
+{"text": "forcefully terminate java, it won't die", "intent": "kill_force", "lang": "en"}
+{"text": "hard kill all processes named zoom", "intent": "kill_force", "lang": "en"}
+{"text": "send SIGKILL to gunicorn", "intent": "kill_force", "lang": "en"}
+{"text": "force kil vlc", "intent": "kill_force", "lang": "en"}
+{"text": "zabij na siłę chrome", "intent": "kill_force", "lang": "pl"}
+{"text": "kill -9 wszystkie procesy pythona", "intent": "kill_force", "lang": "pl"}
+{"text": "wyślij SIGKILL do zawieszonych procesów node", "intent": "kill_force", "lang": "pl"}
+{"text": "firefox sie zawiesil, ubij go silowo", "intent": "kill_force", "lang": "pl"}
+{"text": "brutalnie zakoncz javę, nie chce się zamknąć", "intent": "kill_force", "lang": "pl"}
+{"text": "wymuś zabicie procesów zoom", "intent": "kill_force", "lang": "pl"}
+{"text": "twarde zabicie gunicorn sygnalem 9", "intent": "kill_force", "lang": "pl"}
+{"text": "zabij silowo vlc bo wisi", "intent": "kill_force", "lang": "pl"}
+{"text": "kill process 12345", "intent": "kill_by_pid", "lang": "en"}
+{"text": "terminate pid 4821", "intent": "kill_by_pid", "lang": "en"}
+{"text": "kill pid 999", "intent": "kill_by_pid", "lang": "en"}
+{"text": "stop the process with id 31337", "intent": "kill_by_pid", "lang": "en"}
+{"text": "send a term signal to process 2048", "intent": "kill_by_pid", "lang": "en"}
+{"text": "end process number seven hundred", "intent": "kill_by_pid", "lang": "en"}
+{"text": "kill 15002 please", "intent": "kill_by_pid", "lang": "en"}
+{"text": "terminte pid 6060", "intent": "kill_by_pid", "lang": "en"}
+{"text": "zabij proces 12345", "intent": "kill_by_pid", "lang": "pl"}
+{"text": "zakoncz pid 4821", "intent": "kill_by_pid", "lang": "pl"}
+{"text": "ubij pid 999", "intent": "kill_by_pid", "lang": "pl"}
+{"text": "zatrzymaj proces o identyfikatorze 31337", "intent": "kill_by_pid", "lang": "pl"}
+{"text": "ubij proces numer 2048", "intent": "kill_by_pid", "lang": "pl"}
+{"text": "zakończ proces o PID siedemset", "intent": "kill_by_pid", "lang": "pl"}
+{"text": "zabij 15002 prosze", "intent": "kill_by_pid", "lang": "pl"}
+{"text": "zabij procs o pid 6060", "intent": "kill_by_pid", "lang": "pl"}
+{"text": "kill whatever is running on port 3000", "intent": "kill_by_port", "lang": "en"}
+{"text": "free up port 8080", "intent": "kill_by_port", "lang": "en"}
+{"text": "something is blocking port 5432, kill it", "intent": "kill_by_port", "lang": "en"}
+{"text": "stop the process listening on :9000", "intent": "kill_by_port", "lang": "en"}
+{"text": "kill port 4200", "intent": "kill_by_port", "lang": "en"}
+{"text": "terminate the app bound to port eighty", "intent": "kill_by_port", "lang": "en"}
+{"text": "port 5000 is already in use, kill the process", "intent": "kill_by_port", "lang": "en"}
+{"text": "kil process on port 8000", "intent": "kill_by_port", "lang": "en"}
+{"text": "zabij to co działa na porcie 3000", "intent": "kill_by_port", "lang": "pl"}
+{"text": "zwolnij port 8080", "intent": "kill_by_port", "lang": "pl"}
+{"text": "cos blokuje port 5432, ubij to", "intent": "kill_by_port", "lang": "pl"}
+{"text": "zatrzymaj proces nasluchujacy na :9000", "intent": "kill_by_port", "lang": "pl"}
+{"text": "ubij port 4200", "intent": "kill_by_port", "lang": "pl"}
+{"text": "zakończ aplikację na porcie osiemdziesiąt", "intent": "kill_by_port", "lang": "pl"}
+{"text": "port 5000 jest zajety, zabij proces", "intent": "kill_by_port", "lang": "pl"}
+{"text": "zabij proces na porice 8000", "intent": "kill_by_port", "lang": "pl"}
+{"text": "show listening ports", "intent": "listening_ports", "lang": "en"}
+{"text": "which ports are open on this machine", "intent": "listening_ports", "lang": "en"}
+{"text": "what ports is my computer listening on?", "intent": "listening_ports", "lang": "en"}
+{"text": "list all open tcp and udp listeners", "intent": "listening_ports", "lang": "en"}
+{"text": "netstat listening", "intent": "listening_ports", "lang": "en"}
+{"text": "show services waiting for connections", "intent": "listening_ports", "lang": "en"}
+{"text": "open ports", "intent": "listening_ports", "lang": "en"}
+{"text": "show listenning ports", "intent": "listening_ports", "lang": "en"}
+{"text": "pokaż porty nasłuchujące", "intent": "listening_ports", "lang": "pl"}
+{"text": "jakie porty sa otwarte na tym komputerze", "intent": "listening_ports", "lang": "pl"}
+{"text": "na jakich portach nasłuchuje system?", "intent": "listening_ports", "lang": "pl"}
+{"text": "lista otwartych portow tcp i udp", "intent": "listening_ports", "lang": "pl"}
+{"text": "otwarte porty", "intent": "listening_ports", "lang": "pl"}
+{"text": "pokaz uslugi czekajace na polaczenia", "intent": "listening_ports", "lang": "pl"}
+{"text": "netstat nasluchujace", "intent": "listening_ports", "lang": "pl"}
+{"text": "pokaz porty nasluchjace", "intent": "listening_ports", "lang": "pl"}
+{"text": "what is using port 3000", "intent": "process_on_port", "lang": "en"}
+{"text": "which process is listening on 8080?", "intent": "process_on_port", "lang": "en"}
+{"text": "who's on port 5432", "intent": "process_on_port", "lang": "en"}
+{"text": "find the app occupying port 443", "intent": "process_on_port", "lang": "en"}
+{"text": "lsof port 9000", "intent": "process_on_port", "lang": "en"}
+{"text": "what program has port eighty open", "intent": "process_on_port", "lang": "en"}
+{"text": "port 6379 — which process?", "intent": "process_on_port", "lang": "en"}
+{"text": "whats runing on port 8000", "intent": "process_on_port", "lang": "en"}
+{"text": "co używa portu 3000", "intent": "process_on_port", "lang": "pl"}
+{"text": "jaki proces nasluchuje na 8080?", "intent": "process_on_port", "lang": "pl"}
+{"text": "kto zajmuje port 5432", "intent": "process_on_port", "lang": "pl"}
+{"text": "znajdz aplikacje na porcie 443", "intent": "process_on_port", "lang": "pl"}
+{"text": "lsof na porcie 9000", "intent": "process_on_port", "lang": "pl"}
+{"text": "który program ma otwarty port osiemdziesiąt", "intent": "process_on_port", "lang": "pl"}
+{"text": "port 6379 - jaki proces?", "intent": "process_on_port", "lang": "pl"}
+{"text": "co dziala na proie 8000", "intent": "process_on_port", "lang": "pl"}
+{"text": "show established network connections", "intent": "established_connections", "lang": "en"}
+{"text": "what active connections do I have right now", "intent": "established_connections", "lang": "en"}
+{"text": "list current tcp connections", "intent": "established_connections", "lang": "en"}
+{"text": "who is my machine connected to?", "intent": "established_connections", "lang": "en"}
+{"text": "show open network connections", "intent": "established_connections", "lang": "en"}
+{"text": "established sockets", "intent": "established_connections", "lang": "en"}
+{"text": "which remote hosts are connected to this server", "intent": "established_connections", "lang": "en"}
+{"text": "show active conections", "intent": "established_connections", "lang": "en"}
+{"text": "pokaż nawiązane połączenia sieciowe", "intent": "established_connections", "lang": "pl"}
+{"text": "jakie mam teraz aktywne polaczenia", "intent": "established_connections", "lang": "pl"}
+{"text": "lista bieżących połączeń tcp", "intent": "established_connections", "lang": "pl"}
+{"text": "z kim jest połączony mój komputer?", "intent": "established_connections", "lang": "pl"}
+{"text": "aktywne polaczenia sieciowe", "intent": "established_connections", "lang": "pl"}
+{"text": "ustanowione polaczenia", "intent": "established_connections", "lang": "pl"}
+{"text": "jakie zdalne hosty są podłączone do serwera", "intent": "established_connections", "lang": "pl"}
+{"text": "pokaz aktywne polaczneia", "intent": "established_connections", "lang": "pl"}
+{"text": "show process tree", "intent": "process_tree", "lang": "en"}
+{"text": "display processes as a tree", "intent": "process_tree", "lang": "en"}
+{"text": "which processes are children of which?", "intent": "process_tree", "lang": "en"}
+{"text": "ps forest view", "intent": "process_tree", "lang": "en"}
+{"text": "show parent child relationships of processes", "intent": "process_tree", "lang": "en"}
+{"text": "process hierarchy", "intent": "process_tree", "lang": "en"}
+{"text": "tree of all running processes", "intent": "process_tree", "lang": "en"}
+{"text": "show proces tree", "intent": "process_tree", "lang": "en"}
+{"text": "pokaż drzewo procesów", "intent": "process_tree", "lang": "pl"}
+{"text": "wyswietl procesy w formie drzewa", "intent": "process_tree", "lang": "pl"}
+{"text": "które procesy są potomkami których?", "intent": "process_tree", "lang": "pl"}
+{"text": "hierarchia procesow", "intent": "process_tree", "lang": "pl"}
+{"text": "drzewo procesow", "intent": "process_tree", "lang": "pl"}
+{"text": "pokaz relacje rodzic-dziecko miedzy procesami", "intent": "process_tree", "lang": "pl"}
+{"text": "wszystkie procesy jako drzewko", "intent": "process_tree", "lang": "pl"}
+{"text": "pokaz drzwo procesow", "intent": "process_tree", "lang": "pl"}
+{"text": "show system info", "intent": "system_info", "lang": "en"}
+{"text": "give me general information about this machine", "intent": "system_info", "lang": "en"}
+{"text": "what system am I on?", "intent": "system_info", "lang": "en"}
+{"text": "uname -a", "intent": "system_info", "lang": "en"}
+{"text": "system details", "intent": "system_info", "lang": "en"}
+{"text": "tell me about this computer", "intent": "system_info", "lang": "en"}
+{"text": "show basic info about the os and hardware", "intent": "system_info", "lang": "en"}
+{"text": "sytem information", "intent": "system_info", "lang": "en"}
+{"text": "pokaż informacje o systemie", "intent": "system_info", "lang": "pl"}
+{"text": "ogolne informacje o tej maszynie", "intent": "system_info", "lang": "pl"}
+{"text": "na jakim systemie pracuje?", "intent": "system_info", "lang": "pl"}
+{"text": "podstawowe dane o sprzecie i systemie", "intent": "system_info", "lang": "pl"}
+{"text": "szczegoly systemu", "intent": "system_info", "lang": "pl"}
+{"text": "powiedz mi coś o tym komputerze", "intent": "system_info", "lang": "pl"}
+{"text": "info o systemie", "intent": "system_info", "lang": "pl"}
+{"text": "informacje o sytemie", "intent": "system_info", "lang": "pl"}
+{"text": "which linux distro is this", "intent": "os_release", "lang": "en"}
+{"text": "what OS version am I running?", "intent": "os_release", "lang": "en"}
+{"text": "show the distribution name and version", "intent": "os_release", "lang": "en"}
+{"text": "cat os-release", "intent": "os_release", "lang": "en"}
+{"text": "is this ubuntu or debian?", "intent": "os_release", "lang": "en"}
+{"text": "what release of the operating system is installed", "intent": "os_release", "lang": "en"}
+{"text": "distro version", "intent": "os_release", "lang": "en"}
+{"text": "which distribtion am i on", "intent": "os_release", "lang": "en"}
+{"text": "jaka to dystrybucja linuksa", "intent": "os_release", "lang": "pl"}
+{"text": "jaką wersję systemu mam?", "intent": "os_release", "lang": "pl"}
+{"text": "pokaz nazwe i wersje dystrybucji", "intent": "os_release", "lang": "pl"}
+{"text": "czy to ubuntu czy debian?", "intent": "os_release", "lang": "pl"}
+{"text": "wersja systemu operacyjnego", "intent": "os_release", "lang": "pl"}
+{"text": "jakie wydanie systemu jest zainstalowane", "intent": "os_release", "lang": "pl"}
+{"text": "wersja dystrybucji", "intent": "os_release", "lang": "pl"}
+{"text": "jaka mam dystrybucje", "intent": "os_release", "lang": "pl"}
+{"text": "what kernel version am I running", "intent": "kernel_version", "lang": "en"}
+{"text": "show the linux kernel version", "intent": "kernel_version", "lang": "en"}
+{"text": "uname -r", "intent": "kernel_version", "lang": "en"}
+{"text": "kernel release?", "intent": "kernel_version", "lang": "en"}
+{"text": "which kernel is installed", "intent": "kernel_version", "lang": "en"}
+{"text": "check kernel version", "intent": "kernel_version", "lang": "en"}
+{"text": "tell me the current kernel", "intent": "kernel_version", "lang": "en"}
+{"text": "kernal version", "intent": "kernel_version", "lang": "en"}
+{"text": "jaka mam wersje jadra", "intent": "kernel_version", "lang": "pl"}
+{"text": "pokaż wersję kernela", "intent": "kernel_version", "lang": "pl"}
+{"text": "jaki release kernela", "intent": "kernel_version", "lang": "pl"}
+{"text": "wersja jądra linuksa?", "intent": "kernel_version", "lang": "pl"}
+{"text": "które jądro jest uruchomione", "intent": "kernel_version", "lang": "pl"}
+{"text": "sprawdz wersje kernela", "intent": "kernel_version", "lang": "pl"}
+{"text": "jaki kernel mam teraz", "intent": "kernel_version", "lang": "pl"}
+{"text": "werjsa jadra", "intent": "kernel_version", "lang": "pl"}
+{"text": "how much ram is free", "intent": "memory_usage", "lang": "en"}
+{"text": "show memory usage", "intent": "memory_usage", "lang": "en"}
+{"text": "how much memory am I using?", "intent": "memory_usage", "lang": "en"}
+{"text": "free -h", "intent": "memory_usage", "lang": "en"}
+{"text": "check available RAM", "intent": "memory_usage", "lang": "en"}
+{"text": "ram usage", "intent": "memory_usage", "lang": "en"}
+{"text": "is the system running out of memory", "intent": "memory_usage", "lang": "en"}
+{"text": "show memroy usage", "intent": "memory_usage", "lang": "en"}
+{"text": "ile jest wolnego ramu", "intent": "memory_usage", "lang": "pl"}
+{"text": "pokaż zużycie pamięci", "intent": "memory_usage", "lang": "pl"}
+{"text": "ile pamięci RAM jest zajęte?", "intent": "memory_usage", "lang": "pl"}
+{"text": "ile ramu mi zostało", "intent": "memory_usage", "lang": "pl"}
+{"text": "sprawdz dostepna pamiec", "intent": "memory_usage", "lang": "pl"}
+{"text": "zuzycie ramu", "intent": "memory_usage", "lang": "pl"}
+{"text": "czy brakuje pamieci w systemie", "intent": "memory_usage", "lang": "pl"}
+{"text": "pokaz uzycie pamiecie", "intent": "memory_usage", "lang": "pl"}
+{"text": "what cpu do i have", "intent": "cpu_info", "lang": "en"}
+{"text": "show processor model and details", "intent": "cpu_info", "lang": "en"}
+{"text": "lscpu", "intent": "cpu_info", "lang": "en"}
+{"text": "which processor is in this machine?", "intent": "cpu_info", "lang": "en"}
+{"text": "cpu details", "intent": "cpu_info", "lang": "en"}
+{"text": "tell me about my CPU", "intent": "cpu_info", "lang": "en"}
+{"text": "show the cpu model name and speed", "intent": "cpu_info", "lang": "en"}
+{"text": "procesor info", "intent": "cpu_info", "lang": "en"}
+{"text": "jaki mam procesor", "intent": "cpu_info", "lang": "pl"}
+{"text": "pokaż model procesora i szczegóły", "intent": "cpu_info", "lang": "pl"}
+{"text": "dane techniczne procesora", "intent": "cpu_info", "lang": "pl"}
+{"text": "jaki procesor jest w tym komputerze?", "intent": "cpu_info", "lang": "pl"}
+{"text": "szczegoly cpu", "intent": "cpu_info", "lang": "pl"}
+{"text": "informacje o procesorze", "intent": "cpu_info", "lang": "pl"}
+{"text": "pokaz nazwe modelu i taktowanie cpu", "intent": "cpu_info", "lang": "pl"}
+{"text": "jakie mam cpu", "intent": "cpu_info", "lang": "pl"}
+{"text": "how many cpu cores do i have", "intent": "cpu_cores", "lang": "en"}
+{"text": "number of cores", "intent": "cpu_cores", "lang": "en"}
+{"text": "nproc", "intent": "cpu_cores", "lang": "en"}
+{"text": "how many processors does this machine have?", "intent": "cpu_cores", "lang": "en"}
+{"text": "count cpu cores", "intent": "cpu_cores", "lang": "en"}
+{"text": "how many threads can I run in parallel on this box", "intent": "cpu_cores", "lang": "en"}
+{"text": "core count", "intent": "cpu_cores", "lang": "en"}
+{"text": "how many cors", "intent": "cpu_cores", "lang": "en"}
+{"text": "ile mam rdzeni procesora", "intent": "cpu_cores", "lang": "pl"}
+{"text": "liczba rdzeni", "intent": "cpu_cores", "lang": "pl"}
+{"text": "ile watkow ma procesor", "intent": "cpu_cores", "lang": "pl"}
+{"text": "ile procesorów ma ta maszyna?", "intent": "cpu_cores", "lang": "pl"}
+{"text": "policz rdzenie cpu", "intent": "cpu_cores", "lang": "pl"}
+{"text": "ile wątków mogę odpalić równolegle", "intent": "cpu_cores", "lang": "pl"}
+{"text": "ile rdzeni ma cpu", "intent": "cpu_cores", "lang": "pl"}
+{"text": "ile rdzeni ma procesr", "intent": "cpu_cores", "lang": "pl"}
+{"text": "how long has the system been up", "intent": "uptime", "lang": "en"}
+{"text": "uptime", "intent": "uptime", "lang": "en"}
+{"text": "show load average", "intent": "uptime", "lang": "en"}
+{"text": "when was the last reboot?", "intent": "uptime", "lang": "en"}
+{"text": "how long since the machine started", "intent": "uptime", "lang": "en"}
+{"text": "current system load", "intent": "uptime", "lang": "en"}
+{"text": "how long has this server been running", "intent": "uptime", "lang": "en"}
+{"text": "uptme", "intent": "uptime", "lang": "en"}
+{"text": "jak długo działa system", "intent": "uptime", "lang": "pl"}
+{"text": "ile godzin juz chodzi ta maszyna", "intent": "uptime", "lang": "pl"}
+{"text": "pokaz srednie obciazenie", "intent": "uptime", "lang": "pl"}
+{"text": "od kiedy komputer jest wlaczony?", "intent": "uptime", "lang": "pl"}
+{"text": "ile czasu minęło od uruchomienia", "intent": "uptime", "lang": "pl"}
+{"text": "obciazenie systemu", "intent": "uptime", "lang": "pl"}
+{"text": "jak dlugo serwer chodzi bez restartu", "intent": "uptime", "lang": "pl"}
+{"text": "czas dzialania sytemu", "intent": "uptime", "lang": "pl"}
+{"text": "what's the hostname", "intent": "hostname", "lang": "en"}
+{"text": "show machine name", "intent": "hostname", "lang": "en"}
+{"text": "what is this computer called?", "intent": "hostname", "lang": "en"}
+{"text": "hostname", "intent": "hostname", "lang": "en"}
+{"text": "print the host name", "intent": "hostname", "lang": "en"}
+{"text": "name of this server", "intent": "hostname", "lang": "en"}
+{"text": "which host am I on", "intent": "hostname", "lang": "en"}
+{"text": "hostnmae", "intent": "hostname", "lang": "en"}
+{"text": "jaka jest nazwa hosta", "intent": "hostname", "lang": "pl"}
+{"text": "pokaż nazwę maszyny", "intent": "hostname", "lang": "pl"}
+{"text": "jak sie nazywa ten komputer?", "intent": "hostname", "lang": "pl"}
+{"text": "jak nazywa się ten serwer w sieci", "intent": "hostname", "lang": "pl"}
+{"text": "nazwa serwera", "intent": "hostname", "lang": "pl"}
+{"text": "wyswietl nazwe hosta", "intent": "hostname", "lang": "pl"}
+{"text": "na jakim hoście jestem", "intent": "hostname", "lang": "pl"}
+{"text": "nazwa hsota", "intent": "hostname", "lang": "pl"}
+{"text": "who am i", "intent": "whoami", "lang": "en"}
+{"text": "what's my username", "intent": "whoami", "lang": "en"}
+{"text": "which user am I logged in as?", "intent": "whoami", "lang": "en"}
+{"text": "whoami", "intent": "whoami", "lang": "en"}
+{"text": "show current user", "intent": "whoami", "lang": "en"}
+{"text": "print my user name", "intent": "whoami", "lang": "en"}
+{"text": "am i root?", "intent": "whoami", "lang": "en"}
+{"text": "whats my usernmae", "intent": "whoami", "lang": "en"}
+{"text": "kim jestem", "intent": "whoami", "lang": "pl"}
+{"text": "jaka jest moja nazwa użytkownika", "intent": "whoami", "lang": "pl"}
+{"text": "jako kto jestem zalogowany?", "intent": "whoami", "lang": "pl"}
+{"text": "na jakim koncie jestem", "intent": "whoami", "lang": "pl"}
+{"text": "pokaz biezacego uzytkownika", "intent": "whoami", "lang": "pl"}
+{"text": "moj login", "intent": "whoami", "lang": "pl"}
+{"text": "czy jestem rootem?", "intent": "whoami", "lang": "pl"}
+{"text": "jaka mam nazwe uzytkowika", "intent": "whoami", "lang": "pl"}
+{"text": "who is logged in", "intent": "users_logged_in", "lang": "en"}
+{"text": "show logged-in users", "intent": "users_logged_in", "lang": "en"}
+{"text": "which users are currently on this machine?", "intent": "users_logged_in", "lang": "en"}
+{"text": "list active user sessions", "intent": "users_logged_in", "lang": "en"}
+{"text": "anyone else logged in right now", "intent": "users_logged_in", "lang": "en"}
+{"text": "who's connected to the server", "intent": "users_logged_in", "lang": "en"}
+{"text": "current users", "intent": "users_logged_in", "lang": "en"}
+{"text": "who is loged in", "intent": "users_logged_in", "lang": "en"}
+{"text": "kto jest zalogowany", "intent": "users_logged_in", "lang": "pl"}
+{"text": "pokaż zalogowanych użytkowników", "intent": "users_logged_in", "lang": "pl"}
+{"text": "którzy użytkownicy są teraz na maszynie?", "intent": "users_logged_in", "lang": "pl"}
+{"text": "lista aktywnych sesji uzytkownikow", "intent": "users_logged_in", "lang": "pl"}
+{"text": "czy ktos jeszcze jest teraz zalogowany", "intent": "users_logged_in", "lang": "pl"}
+{"text": "kto jest podlaczony do serwera", "intent": "users_logged_in", "lang": "pl"}
+{"text": "obecni uzytkownicy", "intent": "users_logged_in", "lang": "pl"}
+{"text": "kto jest zalogowny", "intent": "users_logged_in", "lang": "pl"}
+{"text": "show recent logins", "intent": "last_logins", "lang": "en"}
+{"text": "last 20 logins", "intent": "last_logins", "lang": "en"}
+{"text": "who logged in recently?", "intent": "last_logins", "lang": "en"}
+{"text": "login history", "intent": "last_logins", "lang": "en"}
+{"text": "show the last five user logins", "intent": "last_logins", "lang": "en"}
+{"text": "when did people last log into this box", "intent": "last_logins", "lang": "en"}
+{"text": "last -n 15", "intent": "last_logins", "lang": "en"}
+{"text": "recent loggins", "intent": "last_logins", "lang": "en"}
+{"text": "pokaż ostatnie logowania", "intent": "last_logins", "lang": "pl"}
+{"text": "ostatnie 20 logowan", "intent": "last_logins", "lang": "pl"}
+{"text": "kto się ostatnio logował?", "intent": "last_logins", "lang": "pl"}
+{"text": "historia logowań", "intent": "last_logins", "lang": "pl"}
+{"text": "pokaz piec ostatnich logowan", "intent": "last_logins", "lang": "pl"}
+{"text": "kiedy ktos ostatnio logowal sie na serwer", "intent": "last_logins", "lang": "pl"}
+{"text": "ostatnie logowania, 15 wpisow", "intent": "last_logins", "lang": "pl"}
+{"text": "ostanie logowania", "intent": "last_logins", "lang": "pl"}
+{"text": "list environment variables", "intent": "env_vars", "lang": "en"}
+{"text": "show all env vars", "intent": "env_vars", "lang": "en"}
+{"text": "printenv", "intent": "env_vars", "lang": "en"}
+{"text": "what environment variables are set?", "intent": "env_vars", "lang": "en"}
+{"text": "dump the environment", "intent": "env_vars", "lang": "en"}
+{"text": "display every variable in my environment", "intent": "env_vars", "lang": "en"}
+{"text": "env", "intent": "env_vars", "lang": "en"}
+{"text": "show enviroment variables", "intent": "env_vars", "lang": "en"}
+{"text": "pokaż zmienne środowiskowe", "intent": "env_vars", "lang": "pl"}
+{"text": "lista wszystkich zmiennych srodowiskowych", "intent": "env_vars", "lang": "pl"}
+{"text": "wypisz env", "intent": "env_vars", "lang": "pl"}
+{"text": "jakie zmienne środowiskowe są ustawione?", "intent": "env_vars", "lang": "pl"}
+{"text": "wypisz cale srodowisko", "intent": "env_vars", "lang": "pl"}
+{"text": "wyswietl wszystkie zmienne env", "intent": "env_vars", "lang": "pl"}
+{"text": "zmienne srodowiska", "intent": "env_vars", "lang": "pl"}
+{"text": "pokaz zmiene srodowiskowe", "intent": "env_vars", "lang": "pl"}
+{"text": "what's the value of HOME", "intent": "env_var_get", "lang": "en"}
+{"text": "echo $JAVA_HOME", "intent": "env_var_get", "lang": "en"}
+{"text": "show the EDITOR variable", "intent": "env_var_get", "lang": "en"}
+{"text": "print env var DATABASE_URL", "intent": "env_var_get", "lang": "en"}
+{"text": "what is SHELL set to?", "intent": "env_var_get", "lang": "en"}
+{"text": "value of NODE_ENV", "intent": "env_var_get", "lang": "en"}
+{"text": "check the LANG environment variable", "intent": "env_var_get", "lang": "en"}
+{"text": "show me the vaule of GOPATH", "intent": "env_var_get", "lang": "en"}
+{"text": "jaka jest wartość HOME", "intent": "env_var_get", "lang": "pl"}
+{"text": "co jest w zmiennej $JAVA_HOME", "intent": "env_var_get", "lang": "pl"}
+{"text": "pokaz zmienna EDITOR", "intent": "env_var_get", "lang": "pl"}
+{"text": "wypisz zmienną środowiskową DATABASE_URL", "intent": "env_var_get", "lang": "pl"}
+{"text": "na co jest ustawiony SHELL?", "intent": "env_var_get", "lang": "pl"}
+{"text": "wartosc NODE_ENV", "intent": "env_var_get", "lang": "pl"}
+{"text": "sprawdz zmienna srodowiskowa LANG", "intent": "env_var_get", "lang": "pl"}
+{"text": "pokaz wartsc GOPATH", "intent": "env_var_get", "lang": "pl"}
+{"text": "where is python installed", "intent": "which_cmd", "lang": "en"}
+{"text": "which node", "intent": "which_cmd", "lang": "en"}
+{"text": "path to the git executable", "intent": "which_cmd", "lang": "en"}
+{"text": "where's the docker binary located?", "intent": "which_cmd", "lang": "en"}
+{"text": "locate the command java", "intent": "which_cmd", "lang": "en"}
+{"text": "which ffmpeg am I using", "intent": "which_cmd", "lang": "en"}
+{"text": "find where npm lives", "intent": "which_cmd", "lang": "en"}
+{"text": "whihc python3", "intent": "which_cmd", "lang": "en"}
+{"text": "gdzie jest zainstalowany python", "intent": "which_cmd", "lang": "pl"}
+{"text": "gdzie lezy node", "intent": "which_cmd", "lang": "pl"}
+{"text": "ścieżka do pliku wykonywalnego git", "intent": "which_cmd", "lang": "pl"}
+{"text": "gdzie znajduje się binarka dockera?", "intent": "which_cmd", "lang": "pl"}
+{"text": "zlokalizuj polecenie java", "intent": "which_cmd", "lang": "pl"}
+{"text": "ktorego ffmpeg uzywam", "intent": "which_cmd", "lang": "pl"}
+{"text": "skąd się uruchamia npm", "intent": "which_cmd", "lang": "pl"}
+{"text": "gdzie jest polecenei curl", "intent": "which_cmd", "lang": "pl"}
+{"text": "show my PATH", "intent": "show_path", "lang": "en"}
+{"text": "list PATH entries one per line", "intent": "show_path", "lang": "en"}
+{"text": "what directories are in my path?", "intent": "show_path", "lang": "en"}
+{"text": "echo $PATH split by line", "intent": "show_path", "lang": "en"}
+{"text": "print the search path for commands", "intent": "show_path", "lang": "en"}
+{"text": "which folders does the shell look in for executables", "intent": "show_path", "lang": "en"}
+{"text": "path entries", "intent": "show_path", "lang": "en"}
+{"text": "show me the PAHT variable", "intent": "show_path", "lang": "en"}
+{"text": "pokaż mój PATH", "intent": "show_path", "lang": "pl"}
+{"text": "wypisz wpisy PATH po jednym w linii", "intent": "show_path", "lang": "pl"}
+{"text": "jakie katalogi są w ścieżce PATH?", "intent": "show_path", "lang": "pl"}
+{"text": "echo $PATH linia po linii", "intent": "show_path", "lang": "pl"}
+{"text": "sciezka wyszukiwania polecen", "intent": "show_path", "lang": "pl"}
+{"text": "w jakich folderach shell szuka programow", "intent": "show_path", "lang": "pl"}
+{"text": "zawartosc zmiennej PATH", "intent": "show_path", "lang": "pl"}
+{"text": "pokaz PTAH", "intent": "show_path", "lang": "pl"}
+{"text": "search my history for docker", "intent": "history_search", "lang": "en"}
+{"text": "find the ssh command I ran earlier", "intent": "history_search", "lang": "en"}
+{"text": "grep history for 'git push'", "intent": "history_search", "lang": "en"}
+{"text": "what was that kubectl command I typed yesterday", "intent": "history_search", "lang": "en"}
+{"text": "search shell history", "intent": "history_search", "lang": "en"}
+{"text": "look through bash history for rsync", "intent": "history_search", "lang": "en"}
+{"text": "history containing npm install", "intent": "history_search", "lang": "en"}
+{"text": "serach history for ffmpeg", "intent": "history_search", "lang": "en"}
+{"text": "przeszukaj historię pod kątem docker", "intent": "history_search", "lang": "pl"}
+{"text": "znajdź komendę ssh, którą wcześniej wpisałem", "intent": "history_search", "lang": "pl"}
+{"text": "grep historii po 'git push'", "intent": "history_search", "lang": "pl"}
+{"text": "jaka byla ta komenda kubectl co wczoraj wpisalem", "intent": "history_search", "lang": "pl"}
+{"text": "szukaj w historii poleceń", "intent": "history_search", "lang": "pl"}
+{"text": "przeszukaj historie basha po rsync", "intent": "history_search", "lang": "pl"}
+{"text": "historia zawierajaca npm install", "intent": "history_search", "lang": "pl"}
+{"text": "szukaj w histori ffmpeg", "intent": "history_search", "lang": "pl"}
+{"text": "what time is it", "intent": "date_time", "lang": "en"}
+{"text": "show current date and time", "intent": "date_time", "lang": "en"}
+{"text": "today's date", "intent": "date_time", "lang": "en"}
+{"text": "date", "intent": "date_time", "lang": "en"}
+{"text": "what day is it today?", "intent": "date_time", "lang": "en"}
+{"text": "print the current timestamp", "intent": "date_time", "lang": "en"}
+{"text": "what's the time now", "intent": "date_time", "lang": "en"}
+{"text": "curent date", "intent": "date_time", "lang": "en"}
+{"text": "która godzina", "intent": "date_time", "lang": "pl"}
+{"text": "pokaż aktualną datę i godzinę", "intent": "date_time", "lang": "pl"}
+{"text": "dzisiejsza data", "intent": "date_time", "lang": "pl"}
+{"text": "jaki dzisiaj dzien?", "intent": "date_time", "lang": "pl"}
+{"text": "data i czas teraz", "intent": "date_time", "lang": "pl"}
+{"text": "wyswietl biezacy czas", "intent": "date_time", "lang": "pl"}
+{"text": "ktora jest teraz godzina", "intent": "date_time", "lang": "pl"}
+{"text": "aktualan data", "intent": "date_time", "lang": "pl"}
+{"text": "what timezone is this system in", "intent": "timezone", "lang": "en"}
+{"text": "show time zone", "intent": "timezone", "lang": "en"}
+{"text": "which tz is configured?", "intent": "timezone", "lang": "en"}
+{"text": "timedatectl timezone", "intent": "timezone", "lang": "en"}
+{"text": "is the server set to UTC?", "intent": "timezone", "lang": "en"}
+{"text": "current timezone setting", "intent": "timezone", "lang": "en"}
+{"text": "what time zone does the machine use", "intent": "timezone", "lang": "en"}
+{"text": "show timzone", "intent": "timezone", "lang": "en"}
+{"text": "jaka strefa czasowa jest ustawiona", "intent": "timezone", "lang": "pl"}
+{"text": "pokaż strefę czasową", "intent": "timezone", "lang": "pl"}
+{"text": "w jakiej strefie czasowej jest serwer?", "intent": "timezone", "lang": "pl"}
+{"text": "czy system jest na UTC?", "intent": "timezone", "lang": "pl"}
+{"text": "strefa czasowa systemu", "intent": "timezone", "lang": "pl"}
+{"text": "jaka mam strefe czasowa", "intent": "timezone", "lang": "pl"}
+{"text": "sprawdz ustawienie strefy czasowej", "intent": "timezone", "lang": "pl"}
+{"text": "strefa czsowa", "intent": "timezone", "lang": "pl"}
+{"text": "show a calendar", "intent": "calendar", "lang": "en"}
+{"text": "cal", "intent": "calendar", "lang": "en"}
+{"text": "display this month's calendar", "intent": "calendar", "lang": "en"}
+{"text": "show me the calendar for the current month", "intent": "calendar", "lang": "en"}
+{"text": "what weekday does the 15th fall on this month", "intent": "calendar", "lang": "en"}
+{"text": "print a calendar", "intent": "calendar", "lang": "en"}
+{"text": "month view calendar", "intent": "calendar", "lang": "en"}
+{"text": "show calender", "intent": "calendar", "lang": "en"}
+{"text": "pokaż kalendarz", "intent": "calendar", "lang": "pl"}
+{"text": "pokaż kalendarzyk miesięczny", "intent": "calendar", "lang": "pl"}
+{"text": "wyswietl kalendarz na ten miesiac", "intent": "calendar", "lang": "pl"}
+{"text": "kalendarz biezacego miesiaca", "intent": "calendar", "lang": "pl"}
+{"text": "jaki dzień tygodnia wypada 15 w tym miesiącu", "intent": "calendar", "lang": "pl"}
+{"text": "wydrukuj kalendarz", "intent": "calendar", "lang": "pl"}
+{"text": "kalendarz", "intent": "calendar", "lang": "pl"}
+{"text": "pokaz kalnedarz", "intent": "calendar", "lang": "pl"}
+{"text": "list my cron jobs", "intent": "cron_list", "lang": "en"}
+{"text": "show crontab", "intent": "cron_list", "lang": "en"}
+{"text": "what scheduled jobs do I have?", "intent": "cron_list", "lang": "en"}
+{"text": "crontab -l", "intent": "cron_list", "lang": "en"}
+{"text": "show my cron entries", "intent": "cron_list", "lang": "en"}
+{"text": "which tasks are scheduled in cron", "intent": "cron_list", "lang": "en"}
+{"text": "view my crontab", "intent": "cron_list", "lang": "en"}
+{"text": "list cronjobs", "intent": "cron_list", "lang": "en"}
+{"text": "pokaż moje zadania cron", "intent": "cron_list", "lang": "pl"}
+{"text": "wyswietl crontab", "intent": "cron_list", "lang": "pl"}
+{"text": "jakie mam zaplanowane zadania?", "intent": "cron_list", "lang": "pl"}
+{"text": "wypisz moj crontab", "intent": "cron_list", "lang": "pl"}
+{"text": "lista wpisow crona", "intent": "cron_list", "lang": "pl"}
+{"text": "co jest zaplanowane w cronie", "intent": "cron_list", "lang": "pl"}
+{"text": "podglad crontaba", "intent": "cron_list", "lang": "pl"}
+{"text": "pokaz zadania crona", "intent": "cron_list", "lang": "pl"}
+{"text": "edit my crontab", "intent": "cron_edit", "lang": "en"}
+{"text": "add a cron job", "intent": "cron_edit", "lang": "en"}
+{"text": "open crontab for editing", "intent": "cron_edit", "lang": "en"}
+{"text": "crontab -e", "intent": "cron_edit", "lang": "en"}
+{"text": "I want to schedule a script to run every night", "intent": "cron_edit", "lang": "en"}
+{"text": "modify my cron jobs", "intent": "cron_edit", "lang": "en"}
+{"text": "change a scheduled cron task", "intent": "cron_edit", "lang": "en"}
+{"text": "edit cron", "intent": "cron_edit", "lang": "en"}
+{"text": "edytuj crontab", "intent": "cron_edit", "lang": "pl"}
+{"text": "dodaj zadanie do crona", "intent": "cron_edit", "lang": "pl"}
+{"text": "otwórz crontab do edycji", "intent": "cron_edit", "lang": "pl"}
+{"text": "chce poprawic wpis w crontabie", "intent": "cron_edit", "lang": "pl"}
+{"text": "chce zaplanowac skrypt co noc", "intent": "cron_edit", "lang": "pl"}
+{"text": "zmien moje zadania cron", "intent": "cron_edit", "lang": "pl"}
+{"text": "zmodyfikuj zaplanowane zadanie w cronie", "intent": "cron_edit", "lang": "pl"}
+{"text": "edytuj crona", "intent": "cron_edit", "lang": "pl"}
+{"text": "show logs for nginx", "intent": "journal_service", "lang": "en"}
+{"text": "journalctl for the docker service", "intent": "journal_service", "lang": "en"}
+{"text": "last 100 log lines of sshd", "intent": "journal_service", "lang": "en"}
+{"text": "why did postgresql fail? show its logs", "intent": "journal_service", "lang": "en"}
+{"text": "view systemd logs of apache2", "intent": "journal_service", "lang": "en"}
+{"text": "show the last fifty lines from the redis service log", "intent": "journal_service", "lang": "en"}
+{"text": "logs of cron.service", "intent": "journal_service", "lang": "en"}
+{"text": "show logs of the mysql servce", "intent": "journal_service", "lang": "en"}
+{"text": "pokaż logi nginx", "intent": "journal_service", "lang": "pl"}
+{"text": "journalctl dla usługi docker", "intent": "journal_service", "lang": "pl"}
+{"text": "ostatnie 100 linii logów sshd", "intent": "journal_service", "lang": "pl"}
+{"text": "czemu postgresql padł? pokaż jego logi", "intent": "journal_service", "lang": "pl"}
+{"text": "logi systemd dla apache2", "intent": "journal_service", "lang": "pl"}
+{"text": "pokaz ostatnie piecdziesiat linii logu uslugi redis", "intent": "journal_service", "lang": "pl"}
+{"text": "logi cron.service", "intent": "journal_service", "lang": "pl"}
+{"text": "pokaz logi usugi mysql", "intent": "journal_service", "lang": "pl"}
+{"text": "show system error logs", "intent": "journal_errors", "lang": "en"}
+{"text": "what errors happened since boot", "intent": "journal_errors", "lang": "en"}
+{"text": "last 30 system errors", "intent": "journal_errors", "lang": "en"}
+{"text": "journalctl errors only", "intent": "journal_errors", "lang": "en"}
+{"text": "any error messages in the system log?", "intent": "journal_errors", "lang": "en"}
+{"text": "show the most recent critical log entries", "intent": "journal_errors", "lang": "en"}
+{"text": "list errors from the journal", "intent": "journal_errors", "lang": "en"}
+{"text": "system eror log", "intent": "journal_errors", "lang": "en"}
+{"text": "pokaż logi błędów systemu", "intent": "journal_errors", "lang": "pl"}
+{"text": "jakie błędy wystąpiły od startu", "intent": "journal_errors", "lang": "pl"}
+{"text": "ostatnie 30 bledow systemowych", "intent": "journal_errors", "lang": "pl"}
+{"text": "journalctl tylko bledy", "intent": "journal_errors", "lang": "pl"}
+{"text": "czy sa jakies bledy w logu systemowym?", "intent": "journal_errors", "lang": "pl"}
+{"text": "pokaz najnowsze wpisy o bledach", "intent": "journal_errors", "lang": "pl"}
+{"text": "lista błędów z dziennika", "intent": "journal_errors", "lang": "pl"}
+{"text": "logi bledow sytemu", "intent": "journal_errors", "lang": "pl"}
+{"text": "is nginx running as a service", "intent": "service_status", "lang": "en"}
+{"text": "status of docker", "intent": "service_status", "lang": "en"}
+{"text": "systemctl status sshd", "intent": "service_status", "lang": "en"}
+{"text": "check if postgresql service is active", "intent": "service_status", "lang": "en"}
+{"text": "how is the apache2 service doing?", "intent": "service_status", "lang": "en"}
+{"text": "show state of redis", "intent": "service_status", "lang": "en"}
+{"text": "is the cron daemon up", "intent": "service_status", "lang": "en"}
+{"text": "status of mysql servce", "intent": "service_status", "lang": "en"}
+{"text": "czy usługa nginx działa", "intent": "service_status", "lang": "pl"}
+{"text": "status dockera", "intent": "service_status", "lang": "pl"}
+{"text": "jaki status ma sshd", "intent": "service_status", "lang": "pl"}
+{"text": "sprawdz czy usluga postgresql jest aktywna", "intent": "service_status", "lang": "pl"}
+{"text": "jaki jest stan uslugi apache2?", "intent": "service_status", "lang": "pl"}
+{"text": "status redis", "intent": "service_status", "lang": "pl"}
+{"text": "czy demon cron chodzi", "intent": "service_status", "lang": "pl"}
+{"text": "stan usulgi mysql", "intent": "service_status", "lang": "pl"}
+{"text": "restart nginx", "intent": "service_restart", "lang": "en"}
+{"text": "restart the docker service", "intent": "service_restart", "lang": "en"}
+{"text": "systemctl restart sshd", "intent": "service_restart", "lang": "en"}
+{"text": "bounce postgresql", "intent": "service_restart", "lang": "en"}
+{"text": "can you restart apache2?", "intent": "service_restart", "lang": "en"}
+{"text": "reload redis by restarting it", "intent": "service_restart", "lang": "en"}
+{"text": "please restart the cron service", "intent": "service_restart", "lang": "en"}
+{"text": "restrat mysql", "intent": "service_restart", "lang": "en"}
+{"text": "zrestartuj nginx", "intent": "service_restart", "lang": "pl"}
+{"text": "restart usługi docker", "intent": "service_restart", "lang": "pl"}
+{"text": "restartnij sshd", "intent": "service_restart", "lang": "pl"}
+{"text": "uruchom ponownie postgresql", "intent": "service_restart", "lang": "pl"}
+{"text": "mozesz zrestartowac apache2?", "intent": "service_restart", "lang": "pl"}
+{"text": "przeładuj redis restartem", "intent": "service_restart", "lang": "pl"}
+{"text": "zrestartuj usluge cron", "intent": "service_restart", "lang": "pl"}
+{"text": "zrestatuj mysql", "intent": "service_restart", "lang": "pl"}
+{"text": "stop nginx", "intent": "service_stop", "lang": "en"}
+{"text": "stop the docker service", "intent": "service_stop", "lang": "en"}
+{"text": "systemctl stop sshd", "intent": "service_stop", "lang": "en"}
+{"text": "shut down the postgresql service", "intent": "service_stop", "lang": "en"}
+{"text": "turn off apache2", "intent": "service_stop", "lang": "en"}
+{"text": "halt redis service", "intent": "service_stop", "lang": "en"}
+{"text": "please stop the cups service", "intent": "service_stop", "lang": "en"}
+{"text": "stpo mysql service", "intent": "service_stop", "lang": "en"}
+{"text": "zatrzymaj nginx", "intent": "service_stop", "lang": "pl"}
+{"text": "zatrzymaj usługę docker", "intent": "service_stop", "lang": "pl"}
+{"text": "zastopuj sshd", "intent": "service_stop", "lang": "pl"}
+{"text": "wyłącz usługę postgresql", "intent": "service_stop", "lang": "pl"}
+{"text": "wylacz apache2", "intent": "service_stop", "lang": "pl"}
+{"text": "stop redis", "intent": "service_stop", "lang": "pl"}
+{"text": "zatrzymaj usluge cups", "intent": "service_stop", "lang": "pl"}
+{"text": "zatzymaj mysql", "intent": "service_stop", "lang": "pl"}
+{"text": "start nginx", "intent": "service_start", "lang": "en"}
+{"text": "start the docker service", "intent": "service_start", "lang": "en"}
+{"text": "systemctl start sshd", "intent": "service_start", "lang": "en"}
+{"text": "bring up postgresql", "intent": "service_start", "lang": "en"}
+{"text": "launch the apache2 service", "intent": "service_start", "lang": "en"}
+{"text": "turn on redis", "intent": "service_start", "lang": "en"}
+{"text": "please start the bluetooth service", "intent": "service_start", "lang": "en"}
+{"text": "strat mysql", "intent": "service_start", "lang": "en"}
+{"text": "uruchom nginx", "intent": "service_start", "lang": "pl"}
+{"text": "wystartuj usługę docker", "intent": "service_start", "lang": "pl"}
+{"text": "odpal usluge sshd", "intent": "service_start", "lang": "pl"}
+{"text": "odpal postgresql", "intent": "service_start", "lang": "pl"}
+{"text": "włącz usługę apache2", "intent": "service_start", "lang": "pl"}
+{"text": "uruchom redisa", "intent": "service_start", "lang": "pl"}
+{"text": "wystartuj usluge bluetooth", "intent": "service_start", "lang": "pl"}
+{"text": "urchom mysql", "intent": "service_start", "lang": "pl"}
+{"text": "enable nginx at boot", "intent": "service_enable", "lang": "en"}
+{"text": "make docker start automatically on startup", "intent": "service_enable", "lang": "en"}
+{"text": "systemctl enable sshd", "intent": "service_enable", "lang": "en"}
+{"text": "start postgresql on every boot", "intent": "service_enable", "lang": "en"}
+{"text": "enable the apache2 service", "intent": "service_enable", "lang": "en"}
+{"text": "autostart redis when the machine boots", "intent": "service_enable", "lang": "en"}
+{"text": "turn on autostart for cron", "intent": "service_enable", "lang": "en"}
+{"text": "enabel mysql on boot", "intent": "service_enable", "lang": "en"}
+{"text": "włącz nginx przy starcie systemu", "intent": "service_enable", "lang": "pl"}
+{"text": "niech docker startuje automatycznie po uruchomieniu", "intent": "service_enable", "lang": "pl"}
+{"text": "sshd ma sie wlaczac automatycznie przy starcie", "intent": "service_enable", "lang": "pl"}
+{"text": "uruchamiaj postgresql przy kazdym starcie", "intent": "service_enable", "lang": "pl"}
+{"text": "wlacz usluge apache2 na stale", "intent": "service_enable", "lang": "pl"}
+{"text": "autostart redisa przy bootowaniu", "intent": "service_enable", "lang": "pl"}
+{"text": "dodaj cron do autostartu", "intent": "service_enable", "lang": "pl"}
+{"text": "wlacz mysql przy satrcie", "intent": "service_enable", "lang": "pl"}
+{"text": "list running services", "intent": "list_services", "lang": "en"}
+{"text": "what services are running?", "intent": "list_services", "lang": "en"}
+{"text": "show all active systemd services", "intent": "list_services", "lang": "en"}
+{"text": "systemctl list-units services", "intent": "list_services", "lang": "en"}
+{"text": "which daemons are up right now", "intent": "list_services", "lang": "en"}
+{"text": "running services", "intent": "list_services", "lang": "en"}
+{"text": "show me services that are currently running", "intent": "list_services", "lang": "en"}
+{"text": "list runing services", "intent": "list_services", "lang": "en"}
+{"text": "pokaż działające usługi", "intent": "list_services", "lang": "pl"}
+{"text": "jakie usługi są uruchomione?", "intent": "list_services", "lang": "pl"}
+{"text": "lista aktywnych uslug systemd", "intent": "list_services", "lang": "pl"}
+{"text": "ktore demony teraz chodza", "intent": "list_services", "lang": "pl"}
+{"text": "uruchomione uslugi", "intent": "list_services", "lang": "pl"}
+{"text": "pokaz uslugi ktore aktualnie dzialaja", "intent": "list_services", "lang": "pl"}
+{"text": "wszystkie dzialajace serwisy", "intent": "list_services", "lang": "pl"}
+{"text": "lista dzialajacyh uslug", "intent": "list_services", "lang": "pl"}

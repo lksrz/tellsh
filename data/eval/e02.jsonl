@@ -1,0 +1,832 @@
+{"text": "which systemd services have failed?", "intent": "failed_services", "lang": "en"}
+{"text": "list failed units", "intent": "failed_services", "lang": "en"}
+{"text": "show me any services that crashed on boot", "intent": "failed_services", "lang": "en"}
+{"text": "are there failed services on this box", "intent": "failed_services", "lang": "en"}
+{"text": "systemctl failed", "intent": "failed_services", "lang": "en"}
+{"text": "did any service fail to start", "intent": "failed_services", "lang": "en"}
+{"text": "show broken servcies", "intent": "failed_services", "lang": "en"}
+{"text": "check for units in failed state", "intent": "failed_services", "lang": "en"}
+{"text": "pokaż usługi które padły", "intent": "failed_services", "lang": "pl"}
+{"text": "jakie serwisy sie wywalily?", "intent": "failed_services", "lang": "pl"}
+{"text": "lista nieudanych usług systemd", "intent": "failed_services", "lang": "pl"}
+{"text": "czy jakis service jest w stanie failed", "intent": "failed_services", "lang": "pl"}
+{"text": "ktore uslugi nie wystartowaly", "intent": "failed_services", "lang": "pl"}
+{"text": "sprawdź failed unity", "intent": "failed_services", "lang": "pl"}
+{"text": "pokaz serwisy z bledem", "intent": "failed_services", "lang": "pl"}
+{"text": "co sie nie uruchomiło z systemd", "intent": "failed_services", "lang": "pl"}
+{"text": "show kernel messages", "intent": "dmesg", "lang": "en"}
+{"text": "last 30 lines of dmesg", "intent": "dmesg", "lang": "en"}
+{"text": "what does the kernel log say", "intent": "dmesg", "lang": "en"}
+{"text": "dmesg tail 100", "intent": "dmesg", "lang": "en"}
+{"text": "show the kernel ring buffer", "intent": "dmesg", "lang": "en"}
+{"text": "print recent kernel msgs", "intent": "dmesg", "lang": "en"}
+{"text": "show me the last 20 kernel log entries", "intent": "dmesg", "lang": "en"}
+{"text": "check dmseg for errors from the kernel", "intent": "dmesg", "lang": "en"}
+{"text": "pokaż komunikaty jądra", "intent": "dmesg", "lang": "pl"}
+{"text": "ostatnie 40 linii dmesg", "intent": "dmesg", "lang": "pl"}
+{"text": "co mowi kernel w logach", "intent": "dmesg", "lang": "pl"}
+{"text": "dmesg ostatnie 200", "intent": "dmesg", "lang": "pl"}
+{"text": "pokaz logi kernela", "intent": "dmesg", "lang": "pl"}
+{"text": "wyświetl bufor jądra", "intent": "dmesg", "lang": "pl"}
+{"text": "daj 15 ostatnich wpisów z dmesga", "intent": "dmesg", "lang": "pl"}
+{"text": "komunikaty kernela z ostatniego czasu", "intent": "dmesg", "lang": "pl"}
+{"text": "how much battery do i have left", "intent": "battery", "lang": "en"}
+{"text": "battery level", "intent": "battery", "lang": "en"}
+{"text": "what's my battery percentage", "intent": "battery", "lang": "en"}
+{"text": "is the laptop charging?", "intent": "battery", "lang": "en"}
+{"text": "show battery status", "intent": "battery", "lang": "en"}
+{"text": "check batery charge", "intent": "battery", "lang": "en"}
+{"text": "how full is the battery", "intent": "battery", "lang": "en"}
+{"text": "battery %", "intent": "battery", "lang": "en"}
+{"text": "ile mam baterii", "intent": "battery", "lang": "pl"}
+{"text": "stan baterii", "intent": "battery", "lang": "pl"}
+{"text": "ile procent baterii zostało", "intent": "battery", "lang": "pl"}
+{"text": "czy laptop sie laduje?", "intent": "battery", "lang": "pl"}
+{"text": "pokaż poziom naładowania baterii", "intent": "battery", "lang": "pl"}
+{"text": "bateria ile jeszcze", "intent": "battery", "lang": "pl"}
+{"text": "sprawdz akumulator w laptopie", "intent": "battery", "lang": "pl"}
+{"text": "jaki jest status baterri", "intent": "battery", "lang": "pl"}
+{"text": "what's the cpu temperature", "intent": "temperature", "lang": "en"}
+{"text": "show temps", "intent": "temperature", "lang": "en"}
+{"text": "how hot is my processor", "intent": "temperature", "lang": "en"}
+{"text": "check cpu temp sensors", "intent": "temperature", "lang": "en"}
+{"text": "is the cpu overheating?", "intent": "temperature", "lang": "en"}
+{"text": "read the temperature sensors", "intent": "temperature", "lang": "en"}
+{"text": "cpu temprature", "intent": "temperature", "lang": "en"}
+{"text": "display core temperatures", "intent": "temperature", "lang": "en"}
+{"text": "jaka jest temperatura procesora", "intent": "temperature", "lang": "pl"}
+{"text": "temperatura cpu", "intent": "temperature", "lang": "pl"}
+{"text": "jak gorący jest procek", "intent": "temperature", "lang": "pl"}
+{"text": "pokaz odczyty z czujnikow temperatury", "intent": "temperature", "lang": "pl"}
+{"text": "czy procesor sie przegrzewa?", "intent": "temperature", "lang": "pl"}
+{"text": "sprawdź temperaturę rdzeni", "intent": "temperature", "lang": "pl"}
+{"text": "ile stopni ma cpu", "intent": "temperature", "lang": "pl"}
+{"text": "temperatury sensorów", "intent": "temperature", "lang": "pl"}
+{"text": "what graphics card do i have", "intent": "gpu_info", "lang": "en"}
+{"text": "show gpu info", "intent": "gpu_info", "lang": "en"}
+{"text": "which gpu is installed", "intent": "gpu_info", "lang": "en"}
+{"text": "list video cards", "intent": "gpu_info", "lang": "en"}
+{"text": "gpu model?", "intent": "gpu_info", "lang": "en"}
+{"text": "tell me about my graphics adapter", "intent": "gpu_info", "lang": "en"}
+{"text": "detect the graphcis card", "intent": "gpu_info", "lang": "en"}
+{"text": "is there an nvidia card in this machine", "intent": "gpu_info", "lang": "en"}
+{"text": "jaką mam kartę graficzną", "intent": "gpu_info", "lang": "pl"}
+{"text": "info o gpu", "intent": "gpu_info", "lang": "pl"}
+{"text": "pokaz karte graficzna", "intent": "gpu_info", "lang": "pl"}
+{"text": "jaki model grafiki jest w kompie", "intent": "gpu_info", "lang": "pl"}
+{"text": "czy jest tu karta nvidia", "intent": "gpu_info", "lang": "pl"}
+{"text": "wyświetl informacje o karcie graficznej", "intent": "gpu_info", "lang": "pl"}
+{"text": "sprawdz gpu", "intent": "gpu_info", "lang": "pl"}
+{"text": "jakie mam grafike zainstalowana", "intent": "gpu_info", "lang": "pl"}
+{"text": "list usb devices", "intent": "usb_devices", "lang": "en"}
+{"text": "what's plugged into usb", "intent": "usb_devices", "lang": "en"}
+{"text": "show connected usb stuff", "intent": "usb_devices", "lang": "en"}
+{"text": "lsusb", "intent": "usb_devices", "lang": "en"}
+{"text": "is my usb stick detected?", "intent": "usb_devices", "lang": "en"}
+{"text": "which usb devices are attached", "intent": "usb_devices", "lang": "en"}
+{"text": "show all usb peripherals", "intent": "usb_devices", "lang": "en"}
+{"text": "list usb devcies connected", "intent": "usb_devices", "lang": "en"}
+{"text": "pokaż urządzenia usb", "intent": "usb_devices", "lang": "pl"}
+{"text": "co jest podpiete pod usb", "intent": "usb_devices", "lang": "pl"}
+{"text": "lista urzadzen usb", "intent": "usb_devices", "lang": "pl"}
+{"text": "czy pendrive jest wykryty?", "intent": "usb_devices", "lang": "pl"}
+{"text": "jakie urządzenia są podłączone przez usb", "intent": "usb_devices", "lang": "pl"}
+{"text": "wylistuj usb", "intent": "usb_devices", "lang": "pl"}
+{"text": "pokaz podlaczone urzadzenia usb", "intent": "usb_devices", "lang": "pl"}
+{"text": "sprawdź porty usb co wisi", "intent": "usb_devices", "lang": "pl"}
+{"text": "install htop", "intent": "install_package", "lang": "en"}
+{"text": "how do i install ffmpeg", "intent": "install_package", "lang": "en"}
+{"text": "add the package jq", "intent": "install_package", "lang": "en"}
+{"text": "i need curl installed", "intent": "install_package", "lang": "en"}
+{"text": "apt install tmux", "intent": "install_package", "lang": "en"}
+{"text": "please install neovim for me", "intent": "install_package", "lang": "en"}
+{"text": "get nginx on this machine", "intent": "install_package", "lang": "en"}
+{"text": "instal ripgrep", "intent": "install_package", "lang": "en"}
+{"text": "zainstaluj htop", "intent": "install_package", "lang": "pl"}
+{"text": "jak zainstalować ffmpeg", "intent": "install_package", "lang": "pl"}
+{"text": "zainstaluj paczke jq", "intent": "install_package", "lang": "pl"}
+{"text": "potrzebuje gita na tym kompie", "intent": "install_package", "lang": "pl"}
+{"text": "doinstaluj tmux", "intent": "install_package", "lang": "pl"}
+{"text": "zainstaluj pakiet nginx", "intent": "install_package", "lang": "pl"}
+{"text": "chce miec vim zainstalowanego", "intent": "install_package", "lang": "pl"}
+{"text": "zainstauj wget", "intent": "install_package", "lang": "pl"}
+{"text": "is docker installed?", "intent": "package_installed", "lang": "en"}
+{"text": "check if python3 is installed", "intent": "package_installed", "lang": "en"}
+{"text": "do i have git installed", "intent": "package_installed", "lang": "en"}
+{"text": "is the package openssl present", "intent": "package_installed", "lang": "en"}
+{"text": "verify that nginx is installed", "intent": "package_installed", "lang": "en"}
+{"text": "is curl on this system", "intent": "package_installed", "lang": "en"}
+{"text": "check whether htop package exists", "intent": "package_installed", "lang": "en"}
+{"text": "is postgresql instaled", "intent": "package_installed", "lang": "en"}
+{"text": "czy mam zainstalowanego dockera?", "intent": "package_installed", "lang": "pl"}
+{"text": "sprawdź czy python3 jest zainstalowany", "intent": "package_installed", "lang": "pl"}
+{"text": "czy jest zainstalowany pakiet nginx", "intent": "package_installed", "lang": "pl"}
+{"text": "czy git jest zainstalowany", "intent": "package_installed", "lang": "pl"}
+{"text": "sprawdz czy mam paczke openssl", "intent": "package_installed", "lang": "pl"}
+{"text": "czy curl jest w systemie", "intent": "package_installed", "lang": "pl"}
+{"text": "zobacz czy jest zainstalowane htop", "intent": "package_installed", "lang": "pl"}
+{"text": "czy postgres jest zainstalowny", "intent": "package_installed", "lang": "pl"}
+{"text": "update the system", "intent": "system_update", "lang": "en"}
+{"text": "upgrade all packages", "intent": "system_update", "lang": "en"}
+{"text": "update everything", "intent": "system_update", "lang": "en"}
+{"text": "apt update and upgrade", "intent": "system_update", "lang": "en"}
+{"text": "install all available updates", "intent": "system_update", "lang": "en"}
+{"text": "bring the system up to date", "intent": "system_update", "lang": "en"}
+{"text": "how do i update my packages", "intent": "system_update", "lang": "en"}
+{"text": "updte system pls", "intent": "system_update", "lang": "en"}
+{"text": "zaktualizuj system", "intent": "system_update", "lang": "pl"}
+{"text": "aktualizacja pakietów", "intent": "system_update", "lang": "pl"}
+{"text": "zrob update systemu", "intent": "system_update", "lang": "pl"}
+{"text": "zaktualizuj wszystkie paczki", "intent": "system_update", "lang": "pl"}
+{"text": "upgrade calego systemu", "intent": "system_update", "lang": "pl"}
+{"text": "zainstaluj dostępne aktualizacje", "intent": "system_update", "lang": "pl"}
+{"text": "jak zaktualizowac pakiety", "intent": "system_update", "lang": "pl"}
+{"text": "aktualizuj sytem", "intent": "system_update", "lang": "pl"}
+{"text": "what's my local ip", "intent": "ip_addresses", "lang": "en"}
+{"text": "show my ip addresses", "intent": "ip_addresses", "lang": "en"}
+{"text": "list network interfaces with their ips", "intent": "ip_addresses", "lang": "en"}
+{"text": "what ip does this machine have on the lan", "intent": "ip_addresses", "lang": "en"}
+{"text": "my ip address?", "intent": "ip_addresses", "lang": "en"}
+{"text": "show the addresses on each interface", "intent": "ip_addresses", "lang": "en"}
+{"text": "which ip is assigned to eth0", "intent": "ip_addresses", "lang": "en"}
+{"text": "show local ip adress", "intent": "ip_addresses", "lang": "en"}
+{"text": "jaki mam lokalny adres ip", "intent": "ip_addresses", "lang": "pl"}
+{"text": "pokaz moje adresy ip", "intent": "ip_addresses", "lang": "pl"}
+{"text": "adresy ip interfejsów", "intent": "ip_addresses", "lang": "pl"}
+{"text": "jakie ip ma ten komputer w sieci lokalnej", "intent": "ip_addresses", "lang": "pl"}
+{"text": "moje ip w lanie", "intent": "ip_addresses", "lang": "pl"}
+{"text": "wyświetl adresy na interfejsach sieciowych", "intent": "ip_addresses", "lang": "pl"}
+{"text": "jaki adres ma karta sieciowa", "intent": "ip_addresses", "lang": "pl"}
+{"text": "pokaż ip lokalne", "intent": "ip_addresses", "lang": "pl"}
+{"text": "what's my public ip", "intent": "public_ip", "lang": "en"}
+{"text": "show my external ip address", "intent": "public_ip", "lang": "en"}
+{"text": "what ip do i appear as on the internet", "intent": "public_ip", "lang": "en"}
+{"text": "public ip?", "intent": "public_ip", "lang": "en"}
+{"text": "find my wan ip", "intent": "public_ip", "lang": "en"}
+{"text": "what's my ip from outside", "intent": "public_ip", "lang": "en"}
+{"text": "get external ip", "intent": "public_ip", "lang": "en"}
+{"text": "whats my pubic ip address", "intent": "public_ip", "lang": "en"}
+{"text": "jaki mam publiczny adres ip", "intent": "public_ip", "lang": "pl"}
+{"text": "pokaz zewnetrzne ip", "intent": "public_ip", "lang": "pl"}
+{"text": "z jakim ip wychodzę do internetu", "intent": "public_ip", "lang": "pl"}
+{"text": "moje publiczne ip", "intent": "public_ip", "lang": "pl"}
+{"text": "jakie mam ip na zewnątrz", "intent": "public_ip", "lang": "pl"}
+{"text": "sprawdz adres wan", "intent": "public_ip", "lang": "pl"}
+{"text": "zewnętrzny adres ip", "intent": "public_ip", "lang": "pl"}
+{"text": "jkie mam publiczne ip", "intent": "public_ip", "lang": "pl"}
+{"text": "ping google.com", "intent": "ping_host", "lang": "en"}
+{"text": "is 192.168.1.1 reachable?", "intent": "ping_host", "lang": "en"}
+{"text": "ping example.org 10 times", "intent": "ping_host", "lang": "en"}
+{"text": "check if the server db01 responds to ping", "intent": "ping_host", "lang": "en"}
+{"text": "send 3 pings to 8.8.8.8", "intent": "ping_host", "lang": "en"}
+{"text": "can i reach github.com", "intent": "ping_host", "lang": "en"}
+{"text": "ping the router", "intent": "ping_host", "lang": "en"}
+{"text": "pign 1.1.1.1", "intent": "ping_host", "lang": "en"}
+{"text": "pingnij google.com", "intent": "ping_host", "lang": "pl"}
+{"text": "czy 192.168.0.1 odpowiada?", "intent": "ping_host", "lang": "pl"}
+{"text": "wyślij 5 pingów do 8.8.8.8", "intent": "ping_host", "lang": "pl"}
+{"text": "sprawdz czy serwer app01 odpowiada na ping", "intent": "ping_host", "lang": "pl"}
+{"text": "ping wp.pl", "intent": "ping_host", "lang": "pl"}
+{"text": "czy da się dosięgnąć onet.pl", "intent": "ping_host", "lang": "pl"}
+{"text": "spinguj 10.0.0.5 dwadzieścia razy", "intent": "ping_host", "lang": "pl"}
+{"text": "pinguj router", "intent": "ping_host", "lang": "pl"}
+{"text": "dns lookup for example.com", "intent": "dns_lookup", "lang": "en"}
+{"text": "what ip does github.com resolve to", "intent": "dns_lookup", "lang": "en"}
+{"text": "resolve api.stripe.com", "intent": "dns_lookup", "lang": "en"}
+{"text": "look up the A record of wearfits.com", "intent": "dns_lookup", "lang": "en"}
+{"text": "dig google.com", "intent": "dns_lookup", "lang": "en"}
+{"text": "what's the address behind openai.com", "intent": "dns_lookup", "lang": "en"}
+{"text": "nslookup reddit.com", "intent": "dns_lookup", "lang": "en"}
+{"text": "resolv domain kernel.org", "intent": "dns_lookup", "lang": "en"}
+{"text": "sprawdź dns dla example.com", "intent": "dns_lookup", "lang": "pl"}
+{"text": "na jakie ip rozwiazuje sie github.com", "intent": "dns_lookup", "lang": "pl"}
+{"text": "rozwiąż domenę allegro.pl", "intent": "dns_lookup", "lang": "pl"}
+{"text": "jaki adres ip ma onet.pl", "intent": "dns_lookup", "lang": "pl"}
+{"text": "dig wp.pl", "intent": "dns_lookup", "lang": "pl"}
+{"text": "zapytanie dns o api.github.com", "intent": "dns_lookup", "lang": "pl"}
+{"text": "rekord A dla mbank.pl", "intent": "dns_lookup", "lang": "pl"}
+{"text": "nslookup interia.pl", "intent": "dns_lookup", "lang": "pl"}
+{"text": "traceroute to google.com", "intent": "traceroute", "lang": "en"}
+{"text": "trace the route to 8.8.8.8", "intent": "traceroute", "lang": "en"}
+{"text": "which hops does traffic take to github.com", "intent": "traceroute", "lang": "en"}
+{"text": "show the network path to example.com", "intent": "traceroute", "lang": "en"}
+{"text": "tracert cloudflare.com", "intent": "traceroute", "lang": "en"}
+{"text": "how do packets get to 1.1.1.1", "intent": "traceroute", "lang": "en"}
+{"text": "trace route to my server 203.0.113.7", "intent": "traceroute", "lang": "en"}
+{"text": "tracerout amazon.com", "intent": "traceroute", "lang": "en"}
+{"text": "traceroute do google.com", "intent": "traceroute", "lang": "pl"}
+{"text": "pokaż trasę pakietów do 8.8.8.8", "intent": "traceroute", "lang": "pl"}
+{"text": "przez jakie hopy idzie ruch do wp.pl", "intent": "traceroute", "lang": "pl"}
+{"text": "sledz trase do github.com", "intent": "traceroute", "lang": "pl"}
+{"text": "trasa sieciowa do example.com", "intent": "traceroute", "lang": "pl"}
+{"text": "jak pakiety ida do 1.1.1.1", "intent": "traceroute", "lang": "pl"}
+{"text": "traceroute na serwer 10.20.30.40", "intent": "traceroute", "lang": "pl"}
+{"text": "zrob tracerouta do onet.pl", "intent": "traceroute", "lang": "pl"}
+{"text": "show the routing table", "intent": "routes", "lang": "en"}
+{"text": "what's my default gateway", "intent": "routes", "lang": "en"}
+{"text": "list routes", "intent": "routes", "lang": "en"}
+{"text": "which gateway am i using", "intent": "routes", "lang": "en"}
+{"text": "ip route", "intent": "routes", "lang": "en"}
+{"text": "display kernel routing table", "intent": "routes", "lang": "en"}
+{"text": "where does my default route point", "intent": "routes", "lang": "en"}
+{"text": "show routng table", "intent": "routes", "lang": "en"}
+{"text": "pokaż tablicę routingu", "intent": "routes", "lang": "pl"}
+{"text": "jaka jest brama domyslna", "intent": "routes", "lang": "pl"}
+{"text": "lista tras", "intent": "routes", "lang": "pl"}
+{"text": "jaki mam gateway", "intent": "routes", "lang": "pl"}
+{"text": "pokaz routing", "intent": "routes", "lang": "pl"}
+{"text": "wyświetl trasy sieciowe", "intent": "routes", "lang": "pl"}
+{"text": "gdzie idzie domyślna trasa", "intent": "routes", "lang": "pl"}
+{"text": "tablica routingu pokaz", "intent": "routes", "lang": "pl"}
+{"text": "is port 443 open on example.com", "intent": "port_check", "lang": "en"}
+{"text": "check if db.internal:5432 is reachable", "intent": "port_check", "lang": "en"}
+{"text": "can i connect to 10.0.0.12 on port 22", "intent": "port_check", "lang": "en"}
+{"text": "test port 3306 on mysql01", "intent": "port_check", "lang": "en"}
+{"text": "is redis port 6379 open on cache.local", "intent": "port_check", "lang": "en"}
+{"text": "check port 80 on 192.168.1.50", "intent": "port_check", "lang": "en"}
+{"text": "nc test port 8080 host api.dev", "intent": "port_check", "lang": "en"}
+{"text": "is port 25 opne on mail.example.com", "intent": "port_check", "lang": "en"}
+{"text": "czy port 443 jest otwarty na example.com", "intent": "port_check", "lang": "pl"}
+{"text": "sprawdz czy dziala port 5432 na db.local", "intent": "port_check", "lang": "pl"}
+{"text": "czy moge sie polaczyc z 10.0.0.12 na porcie 22", "intent": "port_check", "lang": "pl"}
+{"text": "test portu 3306 na serwerze mysql01", "intent": "port_check", "lang": "pl"}
+{"text": "czy port 6379 jest otwarty na redis.prod", "intent": "port_check", "lang": "pl"}
+{"text": "sprawdź port 80 na 192.168.1.50", "intent": "port_check", "lang": "pl"}
+{"text": "czy na hoście api.test słucha port 8080", "intent": "port_check", "lang": "pl"}
+{"text": "czy port 21 jest otwrty na ftp.firma.pl", "intent": "port_check", "lang": "pl"}
+{"text": "show http headers of https://example.com", "intent": "curl_headers", "lang": "en"}
+{"text": "get response headers for https://github.com", "intent": "curl_headers", "lang": "en"}
+{"text": "what headers does https://api.stripe.com return", "intent": "curl_headers", "lang": "en"}
+{"text": "curl -I wearfits.com", "intent": "curl_headers", "lang": "en"}
+{"text": "fetch only the headers from https://google.com", "intent": "curl_headers", "lang": "en"}
+{"text": "check the server header of http://localhost:8080", "intent": "curl_headers", "lang": "en"}
+{"text": "head request to https://httpbin.org/get", "intent": "curl_headers", "lang": "en"}
+{"text": "show me the reponse headers of https://openai.com", "intent": "curl_headers", "lang": "en"}
+{"text": "pokaż nagłówki http dla https://example.com", "intent": "curl_headers", "lang": "pl"}
+{"text": "jakie naglowki zwraca https://github.com", "intent": "curl_headers", "lang": "pl"}
+{"text": "pobierz same headery z https://allegro.pl", "intent": "curl_headers", "lang": "pl"}
+{"text": "naglowki odpowiedzi dla http://localhost:3000", "intent": "curl_headers", "lang": "pl"}
+{"text": "curl -I onet.pl", "intent": "curl_headers", "lang": "pl"}
+{"text": "sprawdź headery strony https://wp.pl", "intent": "curl_headers", "lang": "pl"}
+{"text": "wyswietl response headers https://api.test.pl/health", "intent": "curl_headers", "lang": "pl"}
+{"text": "pokaz naglowi z https://google.pl", "intent": "curl_headers", "lang": "pl"}
+{"text": "what status code does https://example.com return", "intent": "http_status", "lang": "en"}
+{"text": "http status of https://github.com", "intent": "http_status", "lang": "en"}
+{"text": "is https://api.myapp.io/health returning 200?", "intent": "http_status", "lang": "en"}
+{"text": "check response code for http://localhost:8000", "intent": "http_status", "lang": "en"}
+{"text": "get the status code of wearfits.com", "intent": "http_status", "lang": "en"}
+{"text": "does https://google.com give a 200 or a redirect", "intent": "http_status", "lang": "en"}
+{"text": "just the http code for https://httpbin.org/status/404", "intent": "http_status", "lang": "en"}
+{"text": "status code of https://staging.example.com plz", "intent": "http_status", "lang": "en"}
+{"text": "jaki kod http zwraca https://example.com", "intent": "http_status", "lang": "pl"}
+{"text": "status http dla https://github.com", "intent": "http_status", "lang": "pl"}
+{"text": "czy https://api.sklep.pl/health zwraca 200?", "intent": "http_status", "lang": "pl"}
+{"text": "sprawdz kod odpowiedzi http://localhost:8000", "intent": "http_status", "lang": "pl"}
+{"text": "kod statusu strony onet.pl", "intent": "http_status", "lang": "pl"}
+{"text": "jaki status zwraca https://wp.pl", "intent": "http_status", "lang": "pl"}
+{"text": "tylko kod http dla https://httpbin.org/status/500", "intent": "http_status", "lang": "pl"}
+{"text": "sprawdź czy strona https://firma.pl odpowiada kodem 200", "intent": "http_status", "lang": "pl"}
+{"text": "download https://example.com/file.zip", "intent": "download_file", "lang": "en"}
+{"text": "fetch https://github.com/foo/bar/releases/download/v1.2/bar.tar.gz", "intent": "download_file", "lang": "en"}
+{"text": "save https://cdn.site.com/image.png to disk", "intent": "download_file", "lang": "en"}
+{"text": "grab this file: https://downloads.dev/setup.sh", "intent": "download_file", "lang": "en"}
+{"text": "how do i download https://nodejs.org/dist/v20.0.0/node.tar.xz", "intent": "download_file", "lang": "en"}
+{"text": "wget https://ftp.gnu.org/gnu/make/make-4.4.tar.gz", "intent": "download_file", "lang": "en"}
+{"text": "download the iso from https://releases.ubuntu.com/24.04/ubuntu.iso", "intent": "download_file", "lang": "en"}
+{"text": "dowload https://example.org/data.csv", "intent": "download_file", "lang": "en"}
+{"text": "pobierz https://example.com/plik.zip", "intent": "download_file", "lang": "pl"}
+{"text": "sciagnij https://github.com/foo/bar/archive/main.zip", "intent": "download_file", "lang": "pl"}
+{"text": "zapisz na dysku https://cdn.strona.pl/obraz.jpg", "intent": "download_file", "lang": "pl"}
+{"text": "ściągnij plik z https://downloads.dev/install.sh", "intent": "download_file", "lang": "pl"}
+{"text": "jak pobrać https://nodejs.org/dist/v20.0.0/node.tar.xz", "intent": "download_file", "lang": "pl"}
+{"text": "pobierz plik z tego linku https://dane.gov.pl/dane.csv", "intent": "download_file", "lang": "pl"}
+{"text": "wget https://ftp.gnu.org/gnu/bash/bash-5.2.tar.gz", "intent": "download_file", "lang": "pl"}
+{"text": "pobiez https://example.org/raport.pdf", "intent": "download_file", "lang": "pl"}
+{"text": "ssh into root@192.168.1.10", "intent": "ssh_connect", "lang": "en"}
+{"text": "connect to deploy@prod.example.com", "intent": "ssh_connect", "lang": "en"}
+{"text": "log into the server web01 over ssh", "intent": "ssh_connect", "lang": "en"}
+{"text": "open an ssh session to ubuntu@10.0.0.4", "intent": "ssh_connect", "lang": "en"}
+{"text": "ssh admin@nas.local", "intent": "ssh_connect", "lang": "en"}
+{"text": "how do i connect to my vps at 203.0.113.9", "intent": "ssh_connect", "lang": "en"}
+{"text": "remote login to pi@raspberrypi", "intent": "ssh_connect", "lang": "en"}
+{"text": "conect via ssh to lukasz@dev.wearfits.com", "intent": "ssh_connect", "lang": "en"}
+{"text": "połącz się przez ssh z root@192.168.1.10", "intent": "ssh_connect", "lang": "pl"}
+{"text": "zaloguj sie na deploy@prod.firma.pl", "intent": "ssh_connect", "lang": "pl"}
+{"text": "wejdz na serwer web01 po ssh", "intent": "ssh_connect", "lang": "pl"}
+{"text": "ssh na ubuntu@10.0.0.4", "intent": "ssh_connect", "lang": "pl"}
+{"text": "podłącz mnie do admin@nas.local", "intent": "ssh_connect", "lang": "pl"}
+{"text": "jak sie polaczyc z vpsem 203.0.113.9", "intent": "ssh_connect", "lang": "pl"}
+{"text": "zaloguj się zdalnie na pi@raspberrypi", "intent": "ssh_connect", "lang": "pl"}
+{"text": "polacz po sshu z jan@serwer.pl", "intent": "ssh_connect", "lang": "pl"}
+{"text": "git status", "intent": "git_status", "lang": "en"}
+{"text": "what files have i changed", "intent": "git_status", "lang": "en"}
+{"text": "show the state of the repo", "intent": "git_status", "lang": "en"}
+{"text": "anything uncommitted?", "intent": "git_status", "lang": "en"}
+{"text": "which files are modified or untracked", "intent": "git_status", "lang": "en"}
+{"text": "is my working tree clean", "intent": "git_status", "lang": "en"}
+{"text": "show repo status", "intent": "git_status", "lang": "en"}
+{"text": "what's changed in git sicne last commit", "intent": "git_status", "lang": "en"}
+{"text": "status gita", "intent": "git_status", "lang": "pl"}
+{"text": "jakie pliki zmieniłem", "intent": "git_status", "lang": "pl"}
+{"text": "pokaz stan repozytorium", "intent": "git_status", "lang": "pl"}
+{"text": "czy mam coś niezacommitowanego?", "intent": "git_status", "lang": "pl"}
+{"text": "ktore pliki sa zmodyfikowane", "intent": "git_status", "lang": "pl"}
+{"text": "czy working tree jest czysty", "intent": "git_status", "lang": "pl"}
+{"text": "co sie zmienilo w repo", "intent": "git_status", "lang": "pl"}
+{"text": "git statsu", "intent": "git_status", "lang": "pl"}
+{"text": "show recent commits", "intent": "git_log", "lang": "en"}
+{"text": "last 5 commits", "intent": "git_log", "lang": "en"}
+{"text": "git log", "intent": "git_log", "lang": "en"}
+{"text": "what were the latest commits", "intent": "git_log", "lang": "en"}
+{"text": "show commit history", "intent": "git_log", "lang": "en"}
+{"text": "show me the last 20 commits as a graph", "intent": "git_log", "lang": "en"}
+{"text": "who committed recently", "intent": "git_log", "lang": "en"}
+{"text": "list the previous 3 comits", "intent": "git_log", "lang": "en"}
+{"text": "pokaż ostatnie commity", "intent": "git_log", "lang": "pl"}
+{"text": "ostatnie 5 commitow", "intent": "git_log", "lang": "pl"}
+{"text": "historia commitów", "intent": "git_log", "lang": "pl"}
+{"text": "git log pokaz", "intent": "git_log", "lang": "pl"}
+{"text": "jakie byly ostatnie zmiany w repo", "intent": "git_log", "lang": "pl"}
+{"text": "pokaz 15 ostatnich commitów", "intent": "git_log", "lang": "pl"}
+{"text": "wyświetl historię repozytorium", "intent": "git_log", "lang": "pl"}
+{"text": "ostatnie 3 komity", "intent": "git_log", "lang": "pl"}
+{"text": "show unstaged changes", "intent": "git_diff", "lang": "en"}
+{"text": "git diff", "intent": "git_diff", "lang": "en"}
+{"text": "what did i change but not stage yet", "intent": "git_diff", "lang": "en"}
+{"text": "show diff of my working copy", "intent": "git_diff", "lang": "en"}
+{"text": "show changes in src/app.js", "intent": "git_diff", "lang": "en"}
+{"text": "what's different from the last commit (not staged)", "intent": "git_diff", "lang": "en"}
+{"text": "diff for README.md", "intent": "git_diff", "lang": "en"}
+{"text": "show me the unstagged diff", "intent": "git_diff", "lang": "en"}
+{"text": "pokaż niezastage'owane zmiany", "intent": "git_diff", "lang": "pl"}
+{"text": "git diff pokaz", "intent": "git_diff", "lang": "pl"}
+{"text": "co zmieniłem a jeszcze nie dodałem", "intent": "git_diff", "lang": "pl"}
+{"text": "pokaz diffa", "intent": "git_diff", "lang": "pl"}
+{"text": "jakie zmiany sa w pliku src/main.py", "intent": "git_diff", "lang": "pl"}
+{"text": "roznice w kopii roboczej", "intent": "git_diff", "lang": "pl"}
+{"text": "diff dla README.md", "intent": "git_diff", "lang": "pl"}
+{"text": "pokaz zmainy nie dodane do stage", "intent": "git_diff", "lang": "pl"}
+{"text": "show staged changes", "intent": "git_diff_staged", "lang": "en"}
+{"text": "git diff --cached", "intent": "git_diff_staged", "lang": "en"}
+{"text": "what am i about to commit", "intent": "git_diff_staged", "lang": "en"}
+{"text": "diff of the staging area", "intent": "git_diff_staged", "lang": "en"}
+{"text": "what's in the index right now", "intent": "git_diff_staged", "lang": "en"}
+{"text": "show changes that are staged for commit", "intent": "git_diff_staged", "lang": "en"}
+{"text": "review what i git added", "intent": "git_diff_staged", "lang": "en"}
+{"text": "show staged diff pls", "intent": "git_diff_staged", "lang": "en"}
+{"text": "pokaż zmiany w stage", "intent": "git_diff_staged", "lang": "pl"}
+{"text": "co idzie do commita", "intent": "git_diff_staged", "lang": "pl"}
+{"text": "diff zastage'owanych zmian", "intent": "git_diff_staged", "lang": "pl"}
+{"text": "pokaz co dodalem przez git add", "intent": "git_diff_staged", "lang": "pl"}
+{"text": "jakie zmiany sa w indeksie", "intent": "git_diff_staged", "lang": "pl"}
+{"text": "zmiany przygotowane do commitu", "intent": "git_diff_staged", "lang": "pl"}
+{"text": "diff --staged", "intent": "git_diff_staged", "lang": "pl"}
+{"text": "pokaz staged zmainy", "intent": "git_diff_staged", "lang": "pl"}
+{"text": "list branches", "intent": "git_branches", "lang": "en"}
+{"text": "show all git branches", "intent": "git_branches", "lang": "en"}
+{"text": "what branches exist", "intent": "git_branches", "lang": "en"}
+{"text": "show local and remote branches", "intent": "git_branches", "lang": "en"}
+{"text": "git branch list", "intent": "git_branches", "lang": "en"}
+{"text": "which branches are there in this repo", "intent": "git_branches", "lang": "en"}
+{"text": "list all branchs", "intent": "git_branches", "lang": "en"}
+{"text": "branches?", "intent": "git_branches", "lang": "en"}
+{"text": "lista branchy", "intent": "git_branches", "lang": "pl"}
+{"text": "pokaż wszystkie gałęzie", "intent": "git_branches", "lang": "pl"}
+{"text": "jakie są branche w repo", "intent": "git_branches", "lang": "pl"}
+{"text": "pokaz lokalne i zdalne galezie", "intent": "git_branches", "lang": "pl"}
+{"text": "wylistuj branche", "intent": "git_branches", "lang": "pl"}
+{"text": "jakie mamy gałęzie", "intent": "git_branches", "lang": "pl"}
+{"text": "wszystkie brancze", "intent": "git_branches", "lang": "pl"}
+{"text": "pokaz galezie gita", "intent": "git_branches", "lang": "pl"}
+{"text": "what branch am i on", "intent": "git_current_branch", "lang": "en"}
+{"text": "current branch", "intent": "git_current_branch", "lang": "en"}
+{"text": "which git branch is checked out", "intent": "git_current_branch", "lang": "en"}
+{"text": "show the name of the current branch", "intent": "git_current_branch", "lang": "en"}
+{"text": "am i on main or develop?", "intent": "git_current_branch", "lang": "en"}
+{"text": "tell me my active branch", "intent": "git_current_branch", "lang": "en"}
+{"text": "branch name?", "intent": "git_current_branch", "lang": "en"}
+{"text": "waht branch is this", "intent": "git_current_branch", "lang": "en"}
+{"text": "na jakim jestem branchu", "intent": "git_current_branch", "lang": "pl"}
+{"text": "aktualna gałąź", "intent": "git_current_branch", "lang": "pl"}
+{"text": "ktora galaz jest wybrana", "intent": "git_current_branch", "lang": "pl"}
+{"text": "pokaż nazwę bieżącego brancha", "intent": "git_current_branch", "lang": "pl"}
+{"text": "czy jestem na mainie?", "intent": "git_current_branch", "lang": "pl"}
+{"text": "jaki mam teraz branch", "intent": "git_current_branch", "lang": "pl"}
+{"text": "nazwa obecnej galezi", "intent": "git_current_branch", "lang": "pl"}
+{"text": "na ktorym brachu jestem", "intent": "git_current_branch", "lang": "pl"}
+{"text": "create a new branch feature/login", "intent": "git_new_branch", "lang": "en"}
+{"text": "make branch bugfix-123 and switch to it", "intent": "git_new_branch", "lang": "en"}
+{"text": "new branch called release/2.0", "intent": "git_new_branch", "lang": "en"}
+{"text": "checkout -b hotfix/payment", "intent": "git_new_branch", "lang": "en"}
+{"text": "start a branch named experiment", "intent": "git_new_branch", "lang": "en"}
+{"text": "create and switch to branch feat/dark-mode", "intent": "git_new_branch", "lang": "en"}
+{"text": "branch off as refactor-api", "intent": "git_new_branch", "lang": "en"}
+{"text": "craete new branch test/ci", "intent": "git_new_branch", "lang": "en"}
+{"text": "utwórz nowy branch feature/login", "intent": "git_new_branch", "lang": "pl"}
+{"text": "stworz brancha bugfix-123 i przelacz sie", "intent": "git_new_branch", "lang": "pl"}
+{"text": "nowa gałąź release/2.0", "intent": "git_new_branch", "lang": "pl"}
+{"text": "zrob nowego brancha hotfix/platnosci", "intent": "git_new_branch", "lang": "pl"}
+{"text": "załóż gałąź o nazwie eksperyment", "intent": "git_new_branch", "lang": "pl"}
+{"text": "utworz i przejdz na branch feat/dark-mode", "intent": "git_new_branch", "lang": "pl"}
+{"text": "nowy branch refactor-api", "intent": "git_new_branch", "lang": "pl"}
+{"text": "stwórz nowa galaz tset/ci", "intent": "git_new_branch", "lang": "pl"}
+{"text": "switch to main", "intent": "git_switch_branch", "lang": "en"}
+{"text": "checkout develop", "intent": "git_switch_branch", "lang": "en"}
+{"text": "go to branch feature/login", "intent": "git_switch_branch", "lang": "en"}
+{"text": "change branch to release/1.4", "intent": "git_switch_branch", "lang": "en"}
+{"text": "move to the staging branch", "intent": "git_switch_branch", "lang": "en"}
+{"text": "switch over to master", "intent": "git_switch_branch", "lang": "en"}
+{"text": "jump to existing branch hotfix/payment", "intent": "git_switch_branch", "lang": "en"}
+{"text": "swtich to dev", "intent": "git_switch_branch", "lang": "en"}
+{"text": "przełącz się na main", "intent": "git_switch_branch", "lang": "pl"}
+{"text": "checkout na develop", "intent": "git_switch_branch", "lang": "pl"}
+{"text": "przejdz na brancha feature/login", "intent": "git_switch_branch", "lang": "pl"}
+{"text": "zmień gałąź na release/1.4", "intent": "git_switch_branch", "lang": "pl"}
+{"text": "przeskocz na staging", "intent": "git_switch_branch", "lang": "pl"}
+{"text": "przelacz na mastera", "intent": "git_switch_branch", "lang": "pl"}
+{"text": "wróć na branch hotfix/platnosci", "intent": "git_switch_branch", "lang": "pl"}
+{"text": "przelacz sie na dve", "intent": "git_switch_branch", "lang": "pl"}
+{"text": "delete branch feature/old", "intent": "git_delete_branch", "lang": "en"}
+{"text": "remove local branch bugfix-99", "intent": "git_delete_branch", "lang": "en"}
+{"text": "get rid of the branch experiment", "intent": "git_delete_branch", "lang": "en"}
+{"text": "git branch -d test", "intent": "git_delete_branch", "lang": "en"}
+{"text": "delete the merged branch hotfix/login", "intent": "git_delete_branch", "lang": "en"}
+{"text": "remove branch release/0.9 locally", "intent": "git_delete_branch", "lang": "en"}
+{"text": "drop branch wip", "intent": "git_delete_branch", "lang": "en"}
+{"text": "delte branch tmp-fix", "intent": "git_delete_branch", "lang": "en"}
+{"text": "usuń brancha feature/old", "intent": "git_delete_branch", "lang": "pl"}
+{"text": "skasuj lokalna galaz bugfix-99", "intent": "git_delete_branch", "lang": "pl"}
+{"text": "wywal branch eksperyment", "intent": "git_delete_branch", "lang": "pl"}
+{"text": "usun galaz test", "intent": "git_delete_branch", "lang": "pl"}
+{"text": "usuń zmergowany branch hotfix/login", "intent": "git_delete_branch", "lang": "pl"}
+{"text": "skasuj brancha release/0.9", "intent": "git_delete_branch", "lang": "pl"}
+{"text": "pozbadz sie gałęzi wip", "intent": "git_delete_branch", "lang": "pl"}
+{"text": "usn branch tmp-fix", "intent": "git_delete_branch", "lang": "pl"}
+{"text": "undo the last commit", "intent": "git_undo_commit", "lang": "en"}
+{"text": "revert my last commit but keep the changes", "intent": "git_undo_commit", "lang": "en"}
+{"text": "uncommit", "intent": "git_undo_commit", "lang": "en"}
+{"text": "soft reset the previous commit", "intent": "git_undo_commit", "lang": "en"}
+{"text": "i committed too early, undo it", "intent": "git_undo_commit", "lang": "en"}
+{"text": "take back the last commit without losing work", "intent": "git_undo_commit", "lang": "en"}
+{"text": "reset HEAD~1 soft", "intent": "git_undo_commit", "lang": "en"}
+{"text": "undo last comit keep files", "intent": "git_undo_commit", "lang": "en"}
+{"text": "cofnij ostatni commit", "intent": "git_undo_commit", "lang": "pl"}
+{"text": "odkręć ostatniego commita ale zostaw zmiany", "intent": "git_undo_commit", "lang": "pl"}
+{"text": "odcommituj", "intent": "git_undo_commit", "lang": "pl"}
+{"text": "zrob soft reset ostatniego commita", "intent": "git_undo_commit", "lang": "pl"}
+{"text": "za wczesnie scommitowalem, cofnij", "intent": "git_undo_commit", "lang": "pl"}
+{"text": "wycofaj ostatni commit bez utraty zmian", "intent": "git_undo_commit", "lang": "pl"}
+{"text": "cofnij commit zostawiajac pliki", "intent": "git_undo_commit", "lang": "pl"}
+{"text": "cofnj ostatni komit", "intent": "git_undo_commit", "lang": "pl"}
+{"text": "discard all my changes", "intent": "git_discard_changes", "lang": "en"}
+{"text": "throw away uncommitted changes", "intent": "git_discard_changes", "lang": "en"}
+{"text": "revert src/config.js to the last commit", "intent": "git_discard_changes", "lang": "en"}
+{"text": "reset my working copy, drop local edits", "intent": "git_discard_changes", "lang": "en"}
+{"text": "undo changes to index.html", "intent": "git_discard_changes", "lang": "en"}
+{"text": "git restore everything", "intent": "git_discard_changes", "lang": "en"}
+{"text": "get rid of local modifications", "intent": "git_discard_changes", "lang": "en"}
+{"text": "discard changse in package.json", "intent": "git_discard_changes", "lang": "en"}
+{"text": "odrzuć wszystkie zmiany", "intent": "git_discard_changes", "lang": "pl"}
+{"text": "wywal niezacommitowane zmiany", "intent": "git_discard_changes", "lang": "pl"}
+{"text": "przywroc src/config.js do ostatniego commita", "intent": "git_discard_changes", "lang": "pl"}
+{"text": "cofnij lokalne zmiany w plikach", "intent": "git_discard_changes", "lang": "pl"}
+{"text": "porzuć zmiany w index.html", "intent": "git_discard_changes", "lang": "pl"}
+{"text": "git restore wszystko", "intent": "git_discard_changes", "lang": "pl"}
+{"text": "anuluj moje modyfikacje", "intent": "git_discard_changes", "lang": "pl"}
+{"text": "odrzuc zmainy w package.json", "intent": "git_discard_changes", "lang": "pl"}
+{"text": "stash my changes", "intent": "git_stash", "lang": "en"}
+{"text": "git stash", "intent": "git_stash", "lang": "en"}
+{"text": "put my work aside temporarily", "intent": "git_stash", "lang": "en"}
+{"text": "save uncommitted changes for later", "intent": "git_stash", "lang": "en"}
+{"text": "shelve current changes", "intent": "git_stash", "lang": "en"}
+{"text": "stash everything so i can switch branches", "intent": "git_stash", "lang": "en"}
+{"text": "hide my changes for now", "intent": "git_stash", "lang": "en"}
+{"text": "stahs changes", "intent": "git_stash", "lang": "en"}
+{"text": "schowaj zmiany do stasha", "intent": "git_stash", "lang": "pl"}
+{"text": "zrob stash", "intent": "git_stash", "lang": "pl"}
+{"text": "odłóż zmiany na później", "intent": "git_stash", "lang": "pl"}
+{"text": "zastashuj moje zmiany", "intent": "git_stash", "lang": "pl"}
+{"text": "przechowaj tymczasowo niezacommitowane zmiany", "intent": "git_stash", "lang": "pl"}
+{"text": "stashnij wszystko", "intent": "git_stash", "lang": "pl"}
+{"text": "odloz robote na bok", "intent": "git_stash", "lang": "pl"}
+{"text": "git stahs", "intent": "git_stash", "lang": "pl"}
+{"text": "pop the stash", "intent": "git_stash_pop", "lang": "en"}
+{"text": "restore my stashed changes", "intent": "git_stash_pop", "lang": "en"}
+{"text": "git stash pop", "intent": "git_stash_pop", "lang": "en"}
+{"text": "bring back what i stashed", "intent": "git_stash_pop", "lang": "en"}
+{"text": "apply the last stash and drop it", "intent": "git_stash_pop", "lang": "en"}
+{"text": "unstash", "intent": "git_stash_pop", "lang": "en"}
+{"text": "get my stashed work back", "intent": "git_stash_pop", "lang": "en"}
+{"text": "stash pop pls", "intent": "git_stash_pop", "lang": "en"}
+{"text": "przywróć zmiany ze stasha", "intent": "git_stash_pop", "lang": "pl"}
+{"text": "stash pop", "intent": "git_stash_pop", "lang": "pl"}
+{"text": "wyciągnij schowane zmiany", "intent": "git_stash_pop", "lang": "pl"}
+{"text": "przywroc to co zastashowalem", "intent": "git_stash_pop", "lang": "pl"}
+{"text": "zastosuj ostatni stash", "intent": "git_stash_pop", "lang": "pl"}
+{"text": "odstashuj", "intent": "git_stash_pop", "lang": "pl"}
+{"text": "wroc moje odlozone zmiany", "intent": "git_stash_pop", "lang": "pl"}
+{"text": "popnij stasha", "intent": "git_stash_pop", "lang": "pl"}
+{"text": "pull latest changes", "intent": "git_pull", "lang": "en"}
+{"text": "git pull", "intent": "git_pull", "lang": "en"}
+{"text": "update my branch from remote", "intent": "git_pull", "lang": "en"}
+{"text": "fetch and merge from origin", "intent": "git_pull", "lang": "en"}
+{"text": "get the newest code from the server", "intent": "git_pull", "lang": "en"}
+{"text": "sync with remote", "intent": "git_pull", "lang": "en"}
+{"text": "pull from upstream", "intent": "git_pull", "lang": "en"}
+{"text": "pul changes", "intent": "git_pull", "lang": "en"}
+{"text": "pullnij zmiany", "intent": "git_pull", "lang": "pl"}
+{"text": "zrob git pull", "intent": "git_pull", "lang": "pl"}
+{"text": "zaktualizuj brancha z remote", "intent": "git_pull", "lang": "pl"}
+{"text": "ściągnij najnowsze zmiany z repo", "intent": "git_pull", "lang": "pl"}
+{"text": "pobierz zmiany z origin", "intent": "git_pull", "lang": "pl"}
+{"text": "zsynchronizuj z remote", "intent": "git_pull", "lang": "pl"}
+{"text": "pull z serwera", "intent": "git_pull", "lang": "pl"}
+{"text": "pulnij", "intent": "git_pull", "lang": "pl"}
+{"text": "push my commits", "intent": "git_push", "lang": "en"}
+{"text": "git push", "intent": "git_push", "lang": "en"}
+{"text": "push to origin", "intent": "git_push", "lang": "en"}
+{"text": "push branch feature/login to origin", "intent": "git_push", "lang": "en"}
+{"text": "upload my changes to the remote", "intent": "git_push", "lang": "en"}
+{"text": "send commits to github", "intent": "git_push", "lang": "en"}
+{"text": "push develop", "intent": "git_push", "lang": "en"}
+{"text": "psuh it", "intent": "git_push", "lang": "en"}
+{"text": "pushnij zmiany", "intent": "git_push", "lang": "pl"}
+{"text": "wypchnij commity", "intent": "git_push", "lang": "pl"}
+{"text": "push do origin", "intent": "git_push", "lang": "pl"}
+{"text": "wypchnij brancha feature/login", "intent": "git_push", "lang": "pl"}
+{"text": "wyślij zmiany na remote", "intent": "git_push", "lang": "pl"}
+{"text": "zrob pusha na githuba", "intent": "git_push", "lang": "pl"}
+{"text": "pushnij develop na origin", "intent": "git_push", "lang": "pl"}
+{"text": "puhsnij", "intent": "git_push", "lang": "pl"}
+{"text": "clone https://github.com/torvalds/linux.git", "intent": "git_clone", "lang": "en"}
+{"text": "git clone git@github.com:user/repo.git", "intent": "git_clone", "lang": "en"}
+{"text": "download the repo https://gitlab.com/group/project", "intent": "git_clone", "lang": "en"}
+{"text": "clone this repository: https://github.com/facebook/react", "intent": "git_clone", "lang": "en"}
+{"text": "how do i clone https://bitbucket.org/team/app.git", "intent": "git_clone", "lang": "en"}
+{"text": "copy the repo git@gitlab.com:me/dotfiles.git locally", "intent": "git_clone", "lang": "en"}
+{"text": "clone repo https://github.com/wearfits/tellsh", "intent": "git_clone", "lang": "en"}
+{"text": "clnoe https://github.com/sharkdp/bat", "intent": "git_clone", "lang": "en"}
+{"text": "sklonuj https://github.com/torvalds/linux.git", "intent": "git_clone", "lang": "pl"}
+{"text": "sklonuj git@github.com:user/repo.git", "intent": "git_clone", "lang": "pl"}
+{"text": "pobierz repo https://gitlab.com/grupa/projekt", "intent": "git_clone", "lang": "pl"}
+{"text": "sklonuj to repozytorium https://github.com/facebook/react", "intent": "git_clone", "lang": "pl"}
+{"text": "jak sklonowac https://bitbucket.org/team/app.git", "intent": "git_clone", "lang": "pl"}
+{"text": "zrob clone git@gitlab.com:ja/dotfiles.git", "intent": "git_clone", "lang": "pl"}
+{"text": "sklonuj repozytorium https://github.com/wearfits/tellsh", "intent": "git_clone", "lang": "pl"}
+{"text": "sklnuj https://github.com/sharkdp/bat", "intent": "git_clone", "lang": "pl"}
+{"text": "stage all changes", "intent": "git_add_all", "lang": "en"}
+{"text": "git add everything", "intent": "git_add_all", "lang": "en"}
+{"text": "add all files to the index", "intent": "git_add_all", "lang": "en"}
+{"text": "stage all modified and new files", "intent": "git_add_all", "lang": "en"}
+{"text": "git add -A", "intent": "git_add_all", "lang": "en"}
+{"text": "add all changes to staging", "intent": "git_add_all", "lang": "en"}
+{"text": "stage everything including deletions", "intent": "git_add_all", "lang": "en"}
+{"text": "add al files", "intent": "git_add_all", "lang": "en"}
+{"text": "dodaj wszystkie zmiany do stage", "intent": "git_add_all", "lang": "pl"}
+{"text": "git add wszystko", "intent": "git_add_all", "lang": "pl"}
+{"text": "zastage'uj wszystkie pliki", "intent": "git_add_all", "lang": "pl"}
+{"text": "dodaj wszystkie pliki do indeksu", "intent": "git_add_all", "lang": "pl"}
+{"text": "dodaj wszystko do commita", "intent": "git_add_all", "lang": "pl"}
+{"text": "stage'uj wszystkie zmiany", "intent": "git_add_all", "lang": "pl"}
+{"text": "dodaj -A wszystko", "intent": "git_add_all", "lang": "pl"}
+{"text": "dodja wszystkie pliki", "intent": "git_add_all", "lang": "pl"}
+{"text": "commit with message \"fix login bug\"", "intent": "git_commit", "lang": "en"}
+{"text": "commit everything as 'initial commit'", "intent": "git_commit", "lang": "en"}
+{"text": "git commit -m \"update readme\"", "intent": "git_commit", "lang": "en"}
+{"text": "commit all changes, message: add tests", "intent": "git_commit", "lang": "en"}
+{"text": "save my work as a commit called \"refactor api\"", "intent": "git_commit", "lang": "en"}
+{"text": "make a commit \"bump version to 1.2.0\"", "intent": "git_commit", "lang": "en"}
+{"text": "commit all with msg 'wip'", "intent": "git_commit", "lang": "en"}
+{"text": "comit changes \"fix typo in docs\"", "intent": "git_commit", "lang": "en"}
+{"text": "zacommituj z wiadomością \"poprawka logowania\"", "intent": "git_commit", "lang": "pl"}
+{"text": "commit wszystkiego jako 'initial commit'", "intent": "git_commit", "lang": "pl"}
+{"text": "zrob commita \"aktualizacja readme\"", "intent": "git_commit", "lang": "pl"}
+{"text": "scommituj zmiany z opisem dodane testy", "intent": "git_commit", "lang": "pl"}
+{"text": "commitnij wszystko \"refaktor api\"", "intent": "git_commit", "lang": "pl"}
+{"text": "utwórz commit z wiadomością 'podbicie wersji'", "intent": "git_commit", "lang": "pl"}
+{"text": "zacommituj z msg 'wip'", "intent": "git_commit", "lang": "pl"}
+{"text": "zrob komita \"fix literowki\"", "intent": "git_commit", "lang": "pl"}
+{"text": "show git remotes", "intent": "git_remote", "lang": "en"}
+{"text": "what's the remote url", "intent": "git_remote", "lang": "en"}
+{"text": "list remotes", "intent": "git_remote", "lang": "en"}
+{"text": "where does origin point to", "intent": "git_remote", "lang": "en"}
+{"text": "git remote -v", "intent": "git_remote", "lang": "en"}
+{"text": "which remote repositories are configured", "intent": "git_remote", "lang": "en"}
+{"text": "show the origin url of this repo", "intent": "git_remote", "lang": "en"}
+{"text": "list remtoes", "intent": "git_remote", "lang": "en"}
+{"text": "pokaż remote'y", "intent": "git_remote", "lang": "pl"}
+{"text": "jaki jest url remote", "intent": "git_remote", "lang": "pl"}
+{"text": "lista remotów", "intent": "git_remote", "lang": "pl"}
+{"text": "gdzie wskazuje origin", "intent": "git_remote", "lang": "pl"}
+{"text": "jakie zdalne repozytoria są skonfigurowane", "intent": "git_remote", "lang": "pl"}
+{"text": "pokaz adres origin", "intent": "git_remote", "lang": "pl"}
+{"text": "wyswietl remote -v", "intent": "git_remote", "lang": "pl"}
+{"text": "pokaz remotey gita", "intent": "git_remote", "lang": "pl"}
+{"text": "git blame src/app.js", "intent": "git_blame", "lang": "en"}
+{"text": "who changed each line of main.py", "intent": "git_blame", "lang": "en"}
+{"text": "show who wrote what in README.md", "intent": "git_blame", "lang": "en"}
+{"text": "blame for lib/utils.ts", "intent": "git_blame", "lang": "en"}
+{"text": "who last modified lines in config/settings.yml", "intent": "git_blame", "lang": "en"}
+{"text": "line by line authorship of index.html", "intent": "git_blame", "lang": "en"}
+{"text": "find out who touched each line of Makefile", "intent": "git_blame", "lang": "en"}
+{"text": "blmae server.go", "intent": "git_blame", "lang": "en"}
+{"text": "zrob blame na src/app.js", "intent": "git_blame", "lang": "pl"}
+{"text": "kto zmienił każdą linię w main.py", "intent": "git_blame", "lang": "pl"}
+{"text": "pokaz kto co napisal w README.md", "intent": "git_blame", "lang": "pl"}
+{"text": "blame dla lib/utils.ts", "intent": "git_blame", "lang": "pl"}
+{"text": "kto ostatnio edytowal linie w config/settings.yml", "intent": "git_blame", "lang": "pl"}
+{"text": "autorzy poszczególnych linii pliku index.html", "intent": "git_blame", "lang": "pl"}
+{"text": "sprawdz kto ruszal linijki w Makefile", "intent": "git_blame", "lang": "pl"}
+{"text": "blame na server.go", "intent": "git_blame", "lang": "pl"}
+{"text": "init a git repo here", "intent": "git_init", "lang": "en"}
+{"text": "git init", "intent": "git_init", "lang": "en"}
+{"text": "make this folder a git repository", "intent": "git_init", "lang": "en"}
+{"text": "initialize a new repository", "intent": "git_init", "lang": "en"}
+{"text": "start version control in this directory", "intent": "git_init", "lang": "en"}
+{"text": "create an empty git repo", "intent": "git_init", "lang": "en"}
+{"text": "set up git in the current dir", "intent": "git_init", "lang": "en"}
+{"text": "initalize git", "intent": "git_init", "lang": "en"}
+{"text": "zainicjuj repozytorium gita", "intent": "git_init", "lang": "pl"}
+{"text": "git init tutaj prosze", "intent": "git_init", "lang": "pl"}
+{"text": "zrob z tego folderu repo", "intent": "git_init", "lang": "pl"}
+{"text": "utwórz nowe repozytorium git", "intent": "git_init", "lang": "pl"}
+{"text": "inicjalizacja gita w tym katalogu", "intent": "git_init", "lang": "pl"}
+{"text": "stworz puste repo", "intent": "git_init", "lang": "pl"}
+{"text": "zalozyc repo git tutaj", "intent": "git_init", "lang": "pl"}
+{"text": "zainicjalizuj gita", "intent": "git_init", "lang": "pl"}
+{"text": "list running containers", "intent": "docker_ps", "lang": "en"}
+{"text": "docker ps", "intent": "docker_ps", "lang": "en"}
+{"text": "what containers are up", "intent": "docker_ps", "lang": "en"}
+{"text": "show active docker containers", "intent": "docker_ps", "lang": "en"}
+{"text": "which containers are running right now", "intent": "docker_ps", "lang": "en"}
+{"text": "running containers?", "intent": "docker_ps", "lang": "en"}
+{"text": "show me the docker containers that are live", "intent": "docker_ps", "lang": "en"}
+{"text": "list runing containers", "intent": "docker_ps", "lang": "en"}
+{"text": "lista działających kontenerów", "intent": "docker_ps", "lang": "pl"}
+{"text": "docker ps pokaz", "intent": "docker_ps", "lang": "pl"}
+{"text": "jakie kontenery chodza", "intent": "docker_ps", "lang": "pl"}
+{"text": "pokaż uruchomione kontenery", "intent": "docker_ps", "lang": "pl"}
+{"text": "ktore kontenery sa teraz odpalone", "intent": "docker_ps", "lang": "pl"}
+{"text": "co dziala w dockerze", "intent": "docker_ps", "lang": "pl"}
+{"text": "pokaz aktywne kontenery", "intent": "docker_ps", "lang": "pl"}
+{"text": "lista kontenerow odpalonych", "intent": "docker_ps", "lang": "pl"}
+{"text": "list all containers including stopped ones", "intent": "docker_ps_all", "lang": "en"}
+{"text": "docker ps -a", "intent": "docker_ps_all", "lang": "en"}
+{"text": "show every container, even exited", "intent": "docker_ps_all", "lang": "en"}
+{"text": "show stopped containers too", "intent": "docker_ps_all", "lang": "en"}
+{"text": "all docker containers", "intent": "docker_ps_all", "lang": "en"}
+{"text": "list exited and running containers", "intent": "docker_ps_all", "lang": "en"}
+{"text": "which containers exist on this host", "intent": "docker_ps_all", "lang": "en"}
+{"text": "show all contianers", "intent": "docker_ps_all", "lang": "en"}
+{"text": "pokaż wszystkie kontenery łącznie z zatrzymanymi", "intent": "docker_ps_all", "lang": "pl"}
+{"text": "pokaz docker ps -a", "intent": "docker_ps_all", "lang": "pl"}
+{"text": "lista wszystkich kontenerów", "intent": "docker_ps_all", "lang": "pl"}
+{"text": "pokaz tez zatrzymane kontenery", "intent": "docker_ps_all", "lang": "pl"}
+{"text": "wszystkie kontenery, rowniez wylaczone", "intent": "docker_ps_all", "lang": "pl"}
+{"text": "jakie kontenery istnieja na tym hoscie", "intent": "docker_ps_all", "lang": "pl"}
+{"text": "kontenery zatrzymane i działające", "intent": "docker_ps_all", "lang": "pl"}
+{"text": "pokaz wszytkie kontenery", "intent": "docker_ps_all", "lang": "pl"}
+{"text": "show logs of container web", "intent": "docker_logs", "lang": "en"}
+{"text": "docker logs for nginx", "intent": "docker_logs", "lang": "en"}
+{"text": "tail the logs of api-server", "intent": "docker_logs", "lang": "en"}
+{"text": "last 50 log lines from postgres container", "intent": "docker_logs", "lang": "en"}
+{"text": "follow logs of redis", "intent": "docker_logs", "lang": "en"}
+{"text": "what is the container worker-1 printing", "intent": "docker_logs", "lang": "en"}
+{"text": "show 200 lines of logs for my_app", "intent": "docker_logs", "lang": "en"}
+{"text": "logs of contaner db", "intent": "docker_logs", "lang": "en"}
+{"text": "pokaż logi kontenera web", "intent": "docker_logs", "lang": "pl"}
+{"text": "docker logs nginx", "intent": "docker_logs", "lang": "pl"}
+{"text": "śledź logi api-server", "intent": "docker_logs", "lang": "pl"}
+{"text": "ostatnie 50 linii logów kontenera postgres", "intent": "docker_logs", "lang": "pl"}
+{"text": "logi z redisa", "intent": "docker_logs", "lang": "pl"}
+{"text": "co wypisuje kontener worker-1", "intent": "docker_logs", "lang": "pl"}
+{"text": "pokaz 200 linii logow my_app", "intent": "docker_logs", "lang": "pl"}
+{"text": "logi kontnera db", "intent": "docker_logs", "lang": "pl"}
+{"text": "list docker images", "intent": "docker_images", "lang": "en"}
+{"text": "docker images", "intent": "docker_images", "lang": "en"}
+{"text": "what images do i have locally", "intent": "docker_images", "lang": "en"}
+{"text": "show downloaded images", "intent": "docker_images", "lang": "en"}
+{"text": "which docker images are on this machine", "intent": "docker_images", "lang": "en"}
+{"text": "show image list", "intent": "docker_images", "lang": "en"}
+{"text": "local container images?", "intent": "docker_images", "lang": "en"}
+{"text": "list imgaes", "intent": "docker_images", "lang": "en"}
+{"text": "lista obrazów dockera", "intent": "docker_images", "lang": "pl"}
+{"text": "pokaz docker images", "intent": "docker_images", "lang": "pl"}
+{"text": "jakie mam obrazy lokalnie", "intent": "docker_images", "lang": "pl"}
+{"text": "pokaż pobrane obrazy", "intent": "docker_images", "lang": "pl"}
+{"text": "ktore obrazy dockera sa na tym kompie", "intent": "docker_images", "lang": "pl"}
+{"text": "wylistuj obrazy", "intent": "docker_images", "lang": "pl"}
+{"text": "pokaz image'y", "intent": "docker_images", "lang": "pl"}
+{"text": "lista obrazow dokera", "intent": "docker_images", "lang": "pl"}
+{"text": "stop container web", "intent": "docker_stop", "lang": "en"}
+{"text": "docker stop nginx", "intent": "docker_stop", "lang": "en"}
+{"text": "shut down the redis container", "intent": "docker_stop", "lang": "en"}
+{"text": "stop my_app", "intent": "docker_stop", "lang": "en"}
+{"text": "halt container api-server", "intent": "docker_stop", "lang": "en"}
+{"text": "kill the postgres container gracefully", "intent": "docker_stop", "lang": "en"}
+{"text": "stop the container named worker-2", "intent": "docker_stop", "lang": "en"}
+{"text": "stpo container db", "intent": "docker_stop", "lang": "en"}
+{"text": "zatrzymaj kontener web", "intent": "docker_stop", "lang": "pl"}
+{"text": "zatrzymaj nginx", "intent": "docker_stop", "lang": "pl"}
+{"text": "wyłącz kontener redis", "intent": "docker_stop", "lang": "pl"}
+{"text": "zatrzymaj my_app", "intent": "docker_stop", "lang": "pl"}
+{"text": "stopnij kontener api-server", "intent": "docker_stop", "lang": "pl"}
+{"text": "zatrzymaj kontener postgresa", "intent": "docker_stop", "lang": "pl"}
+{"text": "ubij kontener worker-2", "intent": "docker_stop", "lang": "pl"}
+{"text": "zatrzmaj kontener db", "intent": "docker_stop", "lang": "pl"}
+{"text": "stop all containers", "intent": "docker_stop_all", "lang": "en"}
+{"text": "stop every running container", "intent": "docker_stop_all", "lang": "en"}
+{"text": "shut down all docker containers", "intent": "docker_stop_all", "lang": "en"}
+{"text": "kill all running containers", "intent": "docker_stop_all", "lang": "en"}
+{"text": "halt everything in docker", "intent": "docker_stop_all", "lang": "en"}
+{"text": "stop all the containers at once", "intent": "docker_stop_all", "lang": "en"}
+{"text": "docker stop all", "intent": "docker_stop_all", "lang": "en"}
+{"text": "stop al containers", "intent": "docker_stop_all", "lang": "en"}
+{"text": "zatrzymaj wszystkie kontenery", "intent": "docker_stop_all", "lang": "pl"}
+{"text": "wyłącz wszystkie działające kontenery", "intent": "docker_stop_all", "lang": "pl"}
+{"text": "stopnij wszystkie kontenery", "intent": "docker_stop_all", "lang": "pl"}
+{"text": "zatrzymaj caly docker", "intent": "docker_stop_all", "lang": "pl"}
+{"text": "ubij wszystkie kontenery", "intent": "docker_stop_all", "lang": "pl"}
+{"text": "zatrzymaj wszystko w dockerze", "intent": "docker_stop_all", "lang": "pl"}
+{"text": "docker stop wszystkie", "intent": "docker_stop_all", "lang": "pl"}
+{"text": "zatrzymaj wszytkie kontenery", "intent": "docker_stop_all", "lang": "pl"}
+{"text": "clean up docker", "intent": "docker_prune", "lang": "en"}
+{"text": "remove unused docker images and containers", "intent": "docker_prune", "lang": "en"}
+{"text": "docker system prune", "intent": "docker_prune", "lang": "en"}
+{"text": "free up space used by docker", "intent": "docker_prune", "lang": "en"}
+{"text": "delete dangling images and stopped containers", "intent": "docker_prune", "lang": "en"}
+{"text": "purge all unused docker data", "intent": "docker_prune", "lang": "en"}
+{"text": "docker is eating my disk, clean it", "intent": "docker_prune", "lang": "en"}
+{"text": "prune dokcer", "intent": "docker_prune", "lang": "en"}
+{"text": "wyczyść dockera", "intent": "docker_prune", "lang": "pl"}
+{"text": "usuń nieużywane obrazy i kontenery", "intent": "docker_prune", "lang": "pl"}
+{"text": "zrob docker system prune", "intent": "docker_prune", "lang": "pl"}
+{"text": "zwolnij miejsce zajete przez dockera", "intent": "docker_prune", "lang": "pl"}
+{"text": "usun wiszace obrazy i zatrzymane kontenery", "intent": "docker_prune", "lang": "pl"}
+{"text": "posprzataj nieuzywane dane dockera", "intent": "docker_prune", "lang": "pl"}
+{"text": "docker zjada dysk, wyczysc go", "intent": "docker_prune", "lang": "pl"}
+{"text": "wyczysc dokera", "intent": "docker_prune", "lang": "pl"}
+{"text": "open a shell in container web", "intent": "docker_exec", "lang": "en"}
+{"text": "exec into nginx", "intent": "docker_exec", "lang": "en"}
+{"text": "get a shell inside the postgres container", "intent": "docker_exec", "lang": "en"}
+{"text": "docker exec -it api-server sh", "intent": "docker_exec", "lang": "en"}
+{"text": "attach a terminal to redis", "intent": "docker_exec", "lang": "en"}
+{"text": "log into container my_app", "intent": "docker_exec", "lang": "en"}
+{"text": "enter container worker-1", "intent": "docker_exec", "lang": "en"}
+{"text": "shell into contianer db", "intent": "docker_exec", "lang": "en"}
+{"text": "otwórz shell w kontenerze web", "intent": "docker_exec", "lang": "pl"}
+{"text": "wejdź do kontenera nginx", "intent": "docker_exec", "lang": "pl"}
+{"text": "konsola w kontenerze postgres", "intent": "docker_exec", "lang": "pl"}
+{"text": "docker exec do api-server", "intent": "docker_exec", "lang": "pl"}
+{"text": "wejdz do srodka redisa", "intent": "docker_exec", "lang": "pl"}
+{"text": "zaloguj sie do kontenera my_app", "intent": "docker_exec", "lang": "pl"}
+{"text": "terminal w kontenerze worker-1", "intent": "docker_exec", "lang": "pl"}
+{"text": "wejdz do kontnera db", "intent": "docker_exec", "lang": "pl"}
+{"text": "show container resource usage", "intent": "docker_stats", "lang": "en"}
+{"text": "docker stats", "intent": "docker_stats", "lang": "en"}
+{"text": "how much cpu and memory are containers using", "intent": "docker_stats", "lang": "en"}
+{"text": "which container uses the most ram", "intent": "docker_stats", "lang": "en"}
+{"text": "container cpu usage", "intent": "docker_stats", "lang": "en"}
+{"text": "resource consumption of docker containers", "intent": "docker_stats", "lang": "en"}
+{"text": "memory per container", "intent": "docker_stats", "lang": "en"}
+{"text": "docker stast", "intent": "docker_stats", "lang": "en"}
+{"text": "zużycie zasobów przez kontenery", "intent": "docker_stats", "lang": "pl"}
+{"text": "pokaz docker stats", "intent": "docker_stats", "lang": "pl"}
+{"text": "ile cpu i ramu biora kontenery", "intent": "docker_stats", "lang": "pl"}
+{"text": "ktory kontener zjada najwiecej pamieci", "intent": "docker_stats", "lang": "pl"}
+{"text": "obciazenie cpu kontenerow", "intent": "docker_stats", "lang": "pl"}
+{"text": "statystyki kontenerow", "intent": "docker_stats", "lang": "pl"}
+{"text": "pamięć zużywana przez każdy kontener", "intent": "docker_stats", "lang": "pl"}
+{"text": "statsy dokera", "intent": "docker_stats", "lang": "pl"}
+{"text": "start docker compose", "intent": "docker_compose_up", "lang": "en"}
+{"text": "docker compose up", "intent": "docker_compose_up", "lang": "en"}
+{"text": "bring up the compose stack", "intent": "docker_compose_up", "lang": "en"}
+{"text": "start all services from docker-compose.yml", "intent": "docker_compose_up", "lang": "en"}
+{"text": "run compose in the background", "intent": "docker_compose_up", "lang": "en"}
+{"text": "spin up the services", "intent": "docker_compose_up", "lang": "en"}
+{"text": "launch the compose project detached", "intent": "docker_compose_up", "lang": "en"}
+{"text": "compsoe up", "intent": "docker_compose_up", "lang": "en"}
+{"text": "uruchom docker compose", "intent": "docker_compose_up", "lang": "pl"}
+{"text": "zrob docker compose up", "intent": "docker_compose_up", "lang": "pl"}
+{"text": "podnieś stack compose", "intent": "docker_compose_up", "lang": "pl"}
+{"text": "odpal wszystkie serwisy z docker-compose.yml", "intent": "docker_compose_up", "lang": "pl"}
+{"text": "uruchom compose w tle", "intent": "docker_compose_up", "lang": "pl"}
+{"text": "postaw uslugi z compose", "intent": "docker_compose_up", "lang": "pl"}
+{"text": "wystartuj projekt compose", "intent": "docker_compose_up", "lang": "pl"}
+{"text": "odpal kompose", "intent": "docker_compose_up", "lang": "pl"}
+{"text": "stop docker compose", "intent": "docker_compose_down", "lang": "en"}
+{"text": "docker compose down", "intent": "docker_compose_down", "lang": "en"}
+{"text": "tear down the compose stack", "intent": "docker_compose_down", "lang": "en"}
+{"text": "bring down all compose services", "intent": "docker_compose_down", "lang": "en"}
+{"text": "shut down the services from docker-compose.yml", "intent": "docker_compose_down", "lang": "en"}
+{"text": "stop and remove compose containers", "intent": "docker_compose_down", "lang": "en"}
+{"text": "take the compose project down", "intent": "docker_compose_down", "lang": "en"}
+{"text": "compose donw", "intent": "docker_compose_down", "lang": "en"}
+{"text": "zatrzymaj docker compose", "intent": "docker_compose_down", "lang": "pl"}
+{"text": "zrob docker compose down", "intent": "docker_compose_down", "lang": "pl"}
+{"text": "wyłącz stack compose", "intent": "docker_compose_down", "lang": "pl"}
+{"text": "zgaś wszystkie serwisy compose", "intent": "docker_compose_down", "lang": "pl"}
+{"text": "zatrzymaj uslugi z docker-compose.yml", "intent": "docker_compose_down", "lang": "pl"}
+{"text": "położ compose", "intent": "docker_compose_down", "lang": "pl"}
+{"text": "wylacz projekt compose", "intent": "docker_compose_down", "lang": "pl"}
+{"text": "kompose down", "intent": "docker_compose_down", "lang": "pl"}

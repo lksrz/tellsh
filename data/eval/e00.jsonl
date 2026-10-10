@@ -1,0 +1,720 @@
+{"text": "what are the biggest files in /var/log?", "intent": "largest_files", "lang": "en"}
+{"text": "show me the 20 largest files in my home dir", "intent": "largest_files", "lang": "en"}
+{"text": "largest files here", "intent": "largest_files", "lang": "en"}
+{"text": "which files take up the most space under ~/Downloads", "intent": "largest_files", "lang": "en"}
+{"text": "top five biggest files in /opt", "intent": "largest_files", "lang": "en"}
+{"text": "list the heaviest files in this project", "intent": "largest_files", "lang": "en"}
+{"text": "find the bigest files on the disk under /srv, show 15", "intent": "largest_files", "lang": "en"}
+{"text": "what's eating space in ./build — biggest files please", "intent": "largest_files", "lang": "en"}
+{"text": "pokaż największe pliki w /var/log", "intent": "largest_files", "lang": "pl"}
+{"text": "jakie pliki zajmują najwięcej miejsca w katalogu domowym?", "intent": "largest_files", "lang": "pl"}
+{"text": "najwieksze pliki tutaj", "intent": "largest_files", "lang": "pl"}
+{"text": "10 największych plików w ~/Pobrane", "intent": "largest_files", "lang": "pl"}
+{"text": "wypisz dwadzieścia najwiekszych plikow w /opt", "intent": "largest_files", "lang": "pl"}
+{"text": "które pliki są najcięższe w tym projekcie", "intent": "largest_files", "lang": "pl"}
+{"text": "znajdz najwieksze pliki w /srv, pokaz 5", "intent": "largest_files", "lang": "pl"}
+{"text": "top pliki wg rozmiaru w ./dist", "intent": "largest_files", "lang": "pl"}
+{"text": "which folders are the biggest in /var?", "intent": "largest_dirs", "lang": "en"}
+{"text": "show the largest subdirectories of my home", "intent": "largest_dirs", "lang": "en"}
+{"text": "biggest dirs here", "intent": "largest_dirs", "lang": "en"}
+{"text": "what subfolders take up the most space in ~/projects, top 5", "intent": "largest_dirs", "lang": "en"}
+{"text": "rank directories under /usr by size", "intent": "largest_dirs", "lang": "en"}
+{"text": "which directory inside node_modules is the largest? show 15", "intent": "largest_dirs", "lang": "en"}
+{"text": "largest folders in current directory", "intent": "largest_dirs", "lang": "en"}
+{"text": "top 3 biggest direcotries in /home", "intent": "largest_dirs", "lang": "en"}
+{"text": "które katalogi są największe w /var?", "intent": "largest_dirs", "lang": "pl"}
+{"text": "pokaż największe podkatalogi w moim katalogu domowym", "intent": "largest_dirs", "lang": "pl"}
+{"text": "najwieksze foldery tutaj", "intent": "largest_dirs", "lang": "pl"}
+{"text": "jakie podfoldery zajmują najwięcej miejsca w ~/projekty, top 5", "intent": "largest_dirs", "lang": "pl"}
+{"text": "posortuj katalogi w /usr wedlug rozmiaru", "intent": "largest_dirs", "lang": "pl"}
+{"text": "który folder w node_modules jest najwiekszy? pokaż piętnaście", "intent": "largest_dirs", "lang": "pl"}
+{"text": "najwięksi zjadacze miejsca wśród folderów w /home", "intent": "largest_dirs", "lang": "pl"}
+{"text": "najwieksze katalgi w /srv/data", "intent": "largest_dirs", "lang": "pl"}
+{"text": "how much disk space is left?", "intent": "disk_free", "lang": "en"}
+{"text": "show free space on all drives", "intent": "disk_free", "lang": "en"}
+{"text": "df", "intent": "disk_free", "lang": "en"}
+{"text": "am I running out of disk?", "intent": "disk_free", "lang": "en"}
+{"text": "check disk usage per filesystem", "intent": "disk_free", "lang": "en"}
+{"text": "how full are my partitions", "intent": "disk_free", "lang": "en"}
+{"text": "free space on disk", "intent": "disk_free", "lang": "en"}
+{"text": "how much storage do i have avialable", "intent": "disk_free", "lang": "en"}
+{"text": "ile zostało miejsca na dysku?", "intent": "disk_free", "lang": "pl"}
+{"text": "pokaż wolne miejsce na dyskach", "intent": "disk_free", "lang": "pl"}
+{"text": "wolne miejsce", "intent": "disk_free", "lang": "pl"}
+{"text": "czy kończy mi się miejsce na dysku", "intent": "disk_free", "lang": "pl"}
+{"text": "sprawdz zajetosc systemow plikow", "intent": "disk_free", "lang": "pl"}
+{"text": "jak bardzo zapełnione są partycje?", "intent": "disk_free", "lang": "pl"}
+{"text": "ile mam wolnego miejsca na dysku twardym", "intent": "disk_free", "lang": "pl"}
+{"text": "miejsce na dyskach - ile zajete ile wolne", "intent": "disk_free", "lang": "pl"}
+{"text": "how big is the /var/lib/docker folder?", "intent": "dir_size", "lang": "en"}
+{"text": "total size of this directory", "intent": "dir_size", "lang": "en"}
+{"text": "what's the size of ~/Downloads", "intent": "dir_size", "lang": "en"}
+{"text": "how much space does node_modules take up", "intent": "dir_size", "lang": "en"}
+{"text": "size of folder ./backups", "intent": "dir_size", "lang": "en"}
+{"text": "du of current dir", "intent": "dir_size", "lang": "en"}
+{"text": "how large is my home directory in total", "intent": "dir_size", "lang": "en"}
+{"text": "check the toatl size of /opt/app", "intent": "dir_size", "lang": "en"}
+{"text": "ile zajmuje folder /var/lib/docker?", "intent": "dir_size", "lang": "pl"}
+{"text": "jaki jest rozmiar tego katalogu", "intent": "dir_size", "lang": "pl"}
+{"text": "ile waży katalog ~/Pobrane", "intent": "dir_size", "lang": "pl"}
+{"text": "ile miejsca zajmuje node_modules", "intent": "dir_size", "lang": "pl"}
+{"text": "rozmiar folderu ./backupy", "intent": "dir_size", "lang": "pl"}
+{"text": "calkowity rozmiar katalogu domowego", "intent": "dir_size", "lang": "pl"}
+{"text": "ile wazy /opt/app lacznie", "intent": "dir_size", "lang": "pl"}
+{"text": "sprawdź ile zajmuje katalog projektu", "intent": "dir_size", "lang": "pl"}
+{"text": "find files named config.yaml", "intent": "find_by_name", "lang": "en"}
+{"text": "where is the file called docker-compose.yml?", "intent": "find_by_name", "lang": "en"}
+{"text": "search for files with 'invoice' in the name under ~/Documents", "intent": "find_by_name", "lang": "en"}
+{"text": "locate anything named README in /usr/share", "intent": "find_by_name", "lang": "en"}
+{"text": "find file Makefile", "intent": "find_by_name", "lang": "en"}
+{"text": "is there a file with 'backup' in its name somewhere in /etc?", "intent": "find_by_name", "lang": "en"}
+{"text": "look for files whose name contains report", "intent": "find_by_name", "lang": "en"}
+{"text": "find a fiel named .env in this project", "intent": "find_by_name", "lang": "en"}
+{"text": "znajdź pliki o nazwie config.yaml", "intent": "find_by_name", "lang": "pl"}
+{"text": "gdzie jest plik docker-compose.yml?", "intent": "find_by_name", "lang": "pl"}
+{"text": "szukaj plikow z 'faktura' w nazwie w ~/Dokumenty", "intent": "find_by_name", "lang": "pl"}
+{"text": "znajdz plik Makefile", "intent": "find_by_name", "lang": "pl"}
+{"text": "czy jest gdzieś w /etc plik z 'backup' w nazwie?", "intent": "find_by_name", "lang": "pl"}
+{"text": "wyszukaj pliki ktorych nazwa zawiera raport", "intent": "find_by_name", "lang": "pl"}
+{"text": "odszukaj plik nazwany notes.txt w katalogu domowym", "intent": "find_by_name", "lang": "pl"}
+{"text": "znajdz plik o nazwie .env w tym projekcie", "intent": "find_by_name", "lang": "pl"}
+{"text": "find all .log files", "intent": "find_by_ext", "lang": "en"}
+{"text": "list every PDF in ~/Documents", "intent": "find_by_ext", "lang": "en"}
+{"text": "show me all python files in src", "intent": "find_by_ext", "lang": "en"}
+{"text": "where are the .jpg images under /home/anna/Pictures?", "intent": "find_by_ext", "lang": "en"}
+{"text": "find *.json files in this repo", "intent": "find_by_ext", "lang": "en"}
+{"text": "find all markdown files", "intent": "find_by_ext", "lang": "en"}
+{"text": "search for .iso files in Downloads", "intent": "find_by_ext", "lang": "en"}
+{"text": "list all .tsx fiels in ./frontend", "intent": "find_by_ext", "lang": "en"}
+{"text": "znajdź wszystkie pliki .log", "intent": "find_by_ext", "lang": "pl"}
+{"text": "pokaż wszystkie pliki PDF w ~/Dokumenty", "intent": "find_by_ext", "lang": "pl"}
+{"text": "wypisz pliki pythona w src", "intent": "find_by_ext", "lang": "pl"}
+{"text": "gdzie są obrazki .jpg w /home/anna/Obrazy?", "intent": "find_by_ext", "lang": "pl"}
+{"text": "znajdz pliki *.json w tym repo", "intent": "find_by_ext", "lang": "pl"}
+{"text": "wszystkie pliki markdown", "intent": "find_by_ext", "lang": "pl"}
+{"text": "szukaj plikow z rozszerzeniem .iso w Pobranych", "intent": "find_by_ext", "lang": "pl"}
+{"text": "lista plików .csv w katalogu data", "intent": "find_by_ext", "lang": "pl"}
+{"text": "what files were modified in the last 24 hours?", "intent": "find_recent", "lang": "en"}
+{"text": "find files changed in the last 3 days", "intent": "find_recent", "lang": "en"}
+{"text": "files modified today in /etc", "intent": "find_recent", "lang": "en"}
+{"text": "show files that changed within the last hour", "intent": "find_recent", "lang": "en"}
+{"text": "which files in ~/projects were edited this week?", "intent": "find_recent", "lang": "en"}
+{"text": "find files modified in the past 30 minutes", "intent": "find_recent", "lang": "en"}
+{"text": "recently changed files in /var/www over the last two days", "intent": "find_recent", "lang": "en"}
+{"text": "files modifed in the last 7 days", "intent": "find_recent", "lang": "en"}
+{"text": "jakie pliki zmieniły się w ciągu ostatnich 24 godzin?", "intent": "find_recent", "lang": "pl"}
+{"text": "znajdź pliki zmodyfikowane w ostatnich 3 dniach", "intent": "find_recent", "lang": "pl"}
+{"text": "pliki zmienione dzisiaj w /etc", "intent": "find_recent", "lang": "pl"}
+{"text": "pokaz pliki zmienione w ciagu ostatniej godziny", "intent": "find_recent", "lang": "pl"}
+{"text": "ktore pliki w ~/projekty byly edytowane w tym tygodniu?", "intent": "find_recent", "lang": "pl"}
+{"text": "pliki modyfikowane z ostatniego tygodnia", "intent": "find_recent", "lang": "pl"}
+{"text": "znajdz pliki zmienione w ciągu ostatnich 30 minut w /var/www", "intent": "find_recent", "lang": "pl"}
+{"text": "co sie zmienilo w plikach przez ostatnie dwa dni", "intent": "find_recent", "lang": "pl"}
+{"text": "find files older than 30 days", "intent": "find_older_than", "lang": "en"}
+{"text": "which files in /tmp haven't been modified for over a week?", "intent": "find_older_than", "lang": "en"}
+{"text": "files older than 90 days in ~/Downloads", "intent": "find_older_than", "lang": "en"}
+{"text": "list stale files not touched in 6 months under /var/backups", "intent": "find_older_than", "lang": "en"}
+{"text": "find logs older than fourteen days in /var/log", "intent": "find_older_than", "lang": "en"}
+{"text": "show files last modified more than a year ago", "intent": "find_older_than", "lang": "en"}
+{"text": "old files in this directory, older than 60 days", "intent": "find_older_than", "lang": "en"}
+{"text": "files olde than 10 days in ./cache", "intent": "find_older_than", "lang": "en"}
+{"text": "znajdź pliki starsze niż 30 dni", "intent": "find_older_than", "lang": "pl"}
+{"text": "ktore pliki w /tmp nie byly zmieniane od ponad tygodnia?", "intent": "find_older_than", "lang": "pl"}
+{"text": "pliki starsze niz 90 dni w ~/Pobrane", "intent": "find_older_than", "lang": "pl"}
+{"text": "pokaż pliki niemodyfikowane od pół roku w /var/backups", "intent": "find_older_than", "lang": "pl"}
+{"text": "znajdz logi starsze niż czternaście dni w /var/log", "intent": "find_older_than", "lang": "pl"}
+{"text": "pliki ostatnio zmieniane ponad rok temu", "intent": "find_older_than", "lang": "pl"}
+{"text": "stare pliki w tym katalogu, starsze niz 60 dni", "intent": "find_older_than", "lang": "pl"}
+{"text": "pliki starsze niz 7 dnii w ./cache", "intent": "find_older_than", "lang": "pl"}
+{"text": "find files bigger than 100MB", "intent": "find_larger_than", "lang": "en"}
+{"text": "which files are over 1GB in /home?", "intent": "find_larger_than", "lang": "en"}
+{"text": "list files larger than 500M in ~/Videos", "intent": "find_larger_than", "lang": "en"}
+{"text": "files above 50 megabytes in this folder", "intent": "find_larger_than", "lang": "en"}
+{"text": "show me anything bigger than 2G on /data", "intent": "find_larger_than", "lang": "en"}
+{"text": "find files exceeding 200MB in /var", "intent": "find_larger_than", "lang": "en"}
+{"text": "any files more than 10MB in the repo?", "intent": "find_larger_than", "lang": "en"}
+{"text": "files largr than 1 gig in Downloads", "intent": "find_larger_than", "lang": "en"}
+{"text": "znajdź pliki większe niż 100MB", "intent": "find_larger_than", "lang": "pl"}
+{"text": "ktore pliki maja ponad 1GB w /home?", "intent": "find_larger_than", "lang": "pl"}
+{"text": "pliki wieksze niz 500M w ~/Wideo", "intent": "find_larger_than", "lang": "pl"}
+{"text": "pliki powyżej 50 megabajtów w tym folderze", "intent": "find_larger_than", "lang": "pl"}
+{"text": "pokaz wszystko co ma wiecej niz 2G na /data", "intent": "find_larger_than", "lang": "pl"}
+{"text": "znajdz pliki przekraczajace 200MB w /var", "intent": "find_larger_than", "lang": "pl"}
+{"text": "czy w repo są pliki większe niż 10 MB?", "intent": "find_larger_than", "lang": "pl"}
+{"text": "pliki wieksze od 1 giga w Pobranych", "intent": "find_larger_than", "lang": "pl"}
+{"text": "find files smaller than 1KB", "intent": "find_smaller_than", "lang": "en"}
+{"text": "which files are under 100 bytes in ./data?", "intent": "find_smaller_than", "lang": "en"}
+{"text": "list files less than 10k in /etc", "intent": "find_smaller_than", "lang": "en"}
+{"text": "files below 5MB in ~/Pictures", "intent": "find_smaller_than", "lang": "en"}
+{"text": "show tiny files, smaller than 512 bytes", "intent": "find_smaller_than", "lang": "en"}
+{"text": "find files under 1 megabyte in uploads", "intent": "find_smaller_than", "lang": "en"}
+{"text": "files smaller than 2k in this dir", "intent": "find_smaller_than", "lang": "en"}
+{"text": "files smaler than 50KB in /var/www", "intent": "find_smaller_than", "lang": "en"}
+{"text": "znajdź pliki mniejsze niż 1KB", "intent": "find_smaller_than", "lang": "pl"}
+{"text": "ktore pliki maja mniej niz 100 bajtow w ./data?", "intent": "find_smaller_than", "lang": "pl"}
+{"text": "pliki mniejsze niz 10k w /etc", "intent": "find_smaller_than", "lang": "pl"}
+{"text": "pliki poniżej 5MB w ~/Obrazy", "intent": "find_smaller_than", "lang": "pl"}
+{"text": "pokaż malutkie pliki, mniejsze niż 512 bajtów", "intent": "find_smaller_than", "lang": "pl"}
+{"text": "znajdz pliki ponizej 1 megabajta w uploads", "intent": "find_smaller_than", "lang": "pl"}
+{"text": "pliki mniejsze od 2k w tym katalogu", "intent": "find_smaller_than", "lang": "pl"}
+{"text": "pliki mniejsze niz 50KB w /var/ww", "intent": "find_smaller_than", "lang": "pl"}
+{"text": "search for 'TODO' in all files", "intent": "grep_text", "lang": "en"}
+{"text": "grep for connection refused in /var/log", "intent": "grep_text", "lang": "en"}
+{"text": "where in the code is the function parseConfig used? show lines", "intent": "grep_text", "lang": "en"}
+{"text": "find occurrences of \"api_key\" in src with line numbers", "intent": "grep_text", "lang": "en"}
+{"text": "search text DATABASE_URL recursively", "intent": "grep_text", "lang": "en"}
+{"text": "look for the word deprecated in ./lib", "intent": "grep_text", "lang": "en"}
+{"text": "grep -r 'FIXME' here", "intent": "grep_text", "lang": "en"}
+{"text": "find every line mentioning localhost:8080 in config files under /etc/nginx", "intent": "grep_text", "lang": "en"}
+{"text": "szukaj 'TODO' we wszystkich plikach", "intent": "grep_text", "lang": "pl"}
+{"text": "wyszukaj tekst connection refused w /var/log", "intent": "grep_text", "lang": "pl"}
+{"text": "gdzie w kodzie jest uzywana funkcja parseConfig? pokaz linie", "intent": "grep_text", "lang": "pl"}
+{"text": "znajdź wystąpienia \"api_key\" w src z numerami linii", "intent": "grep_text", "lang": "pl"}
+{"text": "przeszukaj rekurencyjnie pod kątem DATABASE_URL", "intent": "grep_text", "lang": "pl"}
+{"text": "poszukaj slowa deprecated w ./lib", "intent": "grep_text", "lang": "pl"}
+{"text": "grepnij FIXME tutaj", "intent": "grep_text", "lang": "pl"}
+{"text": "znajdz linie zawierajace localhost:8080 w /etc/nginx", "intent": "grep_text", "lang": "pl"}
+{"text": "which files contain the word 'password'?", "intent": "grep_files_containing", "lang": "en"}
+{"text": "list files that mention TODO", "intent": "grep_files_containing", "lang": "en"}
+{"text": "just the filenames of files containing \"import React\" in src", "intent": "grep_files_containing", "lang": "en"}
+{"text": "what files in /etc reference 192.168.1.10?", "intent": "grep_files_containing", "lang": "en"}
+{"text": "show only file names that include deprecated", "intent": "grep_files_containing", "lang": "en"}
+{"text": "files containing the string api.example.com", "intent": "grep_files_containing", "lang": "en"}
+{"text": "which config files have 'ssl_certificate' in them, under /etc/nginx", "intent": "grep_files_containing", "lang": "en"}
+{"text": "list fils that contain FIXME", "intent": "grep_files_containing", "lang": "en"}
+{"text": "które pliki zawierają słowo 'hasło'?", "intent": "grep_files_containing", "lang": "pl"}
+{"text": "wypisz pliki w ktorych jest TODO", "intent": "grep_files_containing", "lang": "pl"}
+{"text": "tylko nazwy plikow zawierajacych \"import React\" w src", "intent": "grep_files_containing", "lang": "pl"}
+{"text": "jakie pliki w /etc odwołują się do 192.168.1.10?", "intent": "grep_files_containing", "lang": "pl"}
+{"text": "pokaz same nazwy plikow ktore zawieraja deprecated", "intent": "grep_files_containing", "lang": "pl"}
+{"text": "pliki zawierające tekst api.example.com", "intent": "grep_files_containing", "lang": "pl"}
+{"text": "w ktorych plikach w /etc/nginx jest ssl_certificate", "intent": "grep_files_containing", "lang": "pl"}
+{"text": "lista plików z napisem FIXME w ./lib", "intent": "grep_files_containing", "lang": "pl"}
+{"text": "how many lines in access.log?", "intent": "count_lines", "lang": "en"}
+{"text": "count lines of /etc/passwd", "intent": "count_lines", "lang": "en"}
+{"text": "wc -l on data.csv", "intent": "count_lines", "lang": "en"}
+{"text": "number of lines in README.md", "intent": "count_lines", "lang": "en"}
+{"text": "how long is the file main.py in lines", "intent": "count_lines", "lang": "en"}
+{"text": "line count for /var/log/syslog", "intent": "count_lines", "lang": "en"}
+{"text": "how many rows does users.csv have", "intent": "count_lines", "lang": "en"}
+{"text": "count teh lines in notes.txt", "intent": "count_lines", "lang": "en"}
+{"text": "ile linii ma access.log?", "intent": "count_lines", "lang": "pl"}
+{"text": "policz linie w /etc/passwd", "intent": "count_lines", "lang": "pl"}
+{"text": "liczba linii w pliku data.csv", "intent": "count_lines", "lang": "pl"}
+{"text": "ile wierszy jest w README.md", "intent": "count_lines", "lang": "pl"}
+{"text": "ile linijek ma main.py", "intent": "count_lines", "lang": "pl"}
+{"text": "zlicz linie w /var/log/syslog", "intent": "count_lines", "lang": "pl"}
+{"text": "ile rekordow ma plik users.csv", "intent": "count_lines", "lang": "pl"}
+{"text": "policz lnie w notatki.txt", "intent": "count_lines", "lang": "pl"}
+{"text": "how many lines of python code are in this project?", "intent": "count_lines_code", "lang": "en"}
+{"text": "total lines across all .js files in src", "intent": "count_lines_code", "lang": "en"}
+{"text": "count lines of code in all go files", "intent": "count_lines_code", "lang": "en"}
+{"text": "LOC for *.ts in ./app", "intent": "count_lines_code", "lang": "en"}
+{"text": "sum of lines in every .java file", "intent": "count_lines_code", "lang": "en"}
+{"text": "how much rust code do we have, total line count of .rs", "intent": "count_lines_code", "lang": "en"}
+{"text": "count all lines in .md files under docs", "intent": "count_lines_code", "lang": "en"}
+{"text": "total line count of all .c fiels", "intent": "count_lines_code", "lang": "en"}
+{"text": "ile linii kodu pythona jest w tym projekcie?", "intent": "count_lines_code", "lang": "pl"}
+{"text": "łączna liczba linii we wszystkich plikach .js w src", "intent": "count_lines_code", "lang": "pl"}
+{"text": "policz linie kodu we wszystkich plikach go", "intent": "count_lines_code", "lang": "pl"}
+{"text": "suma linii w plikach *.ts w ./app", "intent": "count_lines_code", "lang": "pl"}
+{"text": "ile mamy linijek w plikach .java razem", "intent": "count_lines_code", "lang": "pl"}
+{"text": "ile kodu w ruscie, laczna liczba linii plikow .rs", "intent": "count_lines_code", "lang": "pl"}
+{"text": "zlicz wszystkie linie w plikach .md w docs", "intent": "count_lines_code", "lang": "pl"}
+{"text": "calkowita liczba lini we wszystkich plikach .php", "intent": "count_lines_code", "lang": "pl"}
+{"text": "how many files are in this directory?", "intent": "count_files", "lang": "en"}
+{"text": "count files in /var/log recursively", "intent": "count_files", "lang": "en"}
+{"text": "number of files under ~/Pictures", "intent": "count_files", "lang": "en"}
+{"text": "how many files does node_modules contain", "intent": "count_files", "lang": "en"}
+{"text": "file count for ./dataset", "intent": "count_files", "lang": "en"}
+{"text": "count all files in /etc including subfolders", "intent": "count_files", "lang": "en"}
+{"text": "how many files total in my home dir", "intent": "count_files", "lang": "en"}
+{"text": "cuont files in src", "intent": "count_files", "lang": "en"}
+{"text": "ile plików jest w tym katalogu?", "intent": "count_files", "lang": "pl"}
+{"text": "policz pliki w /var/log rekurencyjnie", "intent": "count_files", "lang": "pl"}
+{"text": "liczba plikow w ~/Obrazy", "intent": "count_files", "lang": "pl"}
+{"text": "ile plikow zawiera node_modules", "intent": "count_files", "lang": "pl"}
+{"text": "zlicz pliki w ./dataset", "intent": "count_files", "lang": "pl"}
+{"text": "ile jest plików w /etc razem z podkatalogami", "intent": "count_files", "lang": "pl"}
+{"text": "ile mam plikow w katalogu domowym", "intent": "count_files", "lang": "pl"}
+{"text": "polcz pliki w src", "intent": "count_files", "lang": "pl"}
+{"text": "how many words are in essay.txt?", "intent": "count_words", "lang": "en"}
+{"text": "word count of README.md", "intent": "count_words", "lang": "en"}
+{"text": "count words in /tmp/draft.md", "intent": "count_words", "lang": "en"}
+{"text": "wc -w chapter1.txt", "intent": "count_words", "lang": "en"}
+{"text": "number of words in thesis.tex", "intent": "count_words", "lang": "en"}
+{"text": "how many words does the file notes.txt contain", "intent": "count_words", "lang": "en"}
+{"text": "give me the word count for article.md", "intent": "count_words", "lang": "en"}
+{"text": "count wrods in letter.txt", "intent": "count_words", "lang": "en"}
+{"text": "ile słów jest w wypracowanie.txt?", "intent": "count_words", "lang": "pl"}
+{"text": "liczba slow w README.md", "intent": "count_words", "lang": "pl"}
+{"text": "policz słowa w /tmp/szkic.md", "intent": "count_words", "lang": "pl"}
+{"text": "ile wyrazow ma rozdzial1.txt", "intent": "count_words", "lang": "pl"}
+{"text": "zlicz slowa w pliku praca.tex", "intent": "count_words", "lang": "pl"}
+{"text": "ile słów zawiera plik notatki.txt", "intent": "count_words", "lang": "pl"}
+{"text": "podaj liczbę słów w artykul.md", "intent": "count_words", "lang": "pl"}
+{"text": "policz slowa w liscie.txt", "intent": "count_words", "lang": "pl"}
+{"text": "what are the most common lines in access.log?", "intent": "sort_uniq", "lang": "en"}
+{"text": "show the 20 most frequent lines in ips.txt", "intent": "sort_uniq", "lang": "en"}
+{"text": "count duplicate lines in words.txt and sort by frequency", "intent": "sort_uniq", "lang": "en"}
+{"text": "sort | uniq -c on urls.txt", "intent": "sort_uniq", "lang": "en"}
+{"text": "top repeated entries in /var/log/auth.log", "intent": "sort_uniq", "lang": "en"}
+{"text": "which lines occur most often in errors.log, top 5", "intent": "sort_uniq", "lang": "en"}
+{"text": "frequency count of lines in names.csv", "intent": "sort_uniq", "lang": "en"}
+{"text": "most frequnt lines in requests.log", "intent": "sort_uniq", "lang": "en"}
+{"text": "jakie linie najczęściej się powtarzają w access.log?", "intent": "sort_uniq", "lang": "pl"}
+{"text": "pokaz 20 najczestszych linii w ips.txt", "intent": "sort_uniq", "lang": "pl"}
+{"text": "policz powtorzone linie w slowa.txt i posortuj po czestosci", "intent": "sort_uniq", "lang": "pl"}
+{"text": "najczestsze wpisy w /var/log/auth.log", "intent": "sort_uniq", "lang": "pl"}
+{"text": "ktore linie wystepuja najczesciej w errors.log, top 5", "intent": "sort_uniq", "lang": "pl"}
+{"text": "zlicz wystąpienia każdej linii w imiona.csv", "intent": "sort_uniq", "lang": "pl"}
+{"text": "ranking najczęstszych linii w pliku urls.txt", "intent": "sort_uniq", "lang": "pl"}
+{"text": "najczestrze linie w requests.log", "intent": "sort_uniq", "lang": "pl"}
+{"text": "what are the most recently modified files here?", "intent": "recent_files", "lang": "en"}
+{"text": "show the 10 newest files in ~/Downloads", "intent": "recent_files", "lang": "en"}
+{"text": "latest changed files in /var/log", "intent": "recent_files", "lang": "en"}
+{"text": "list last 5 modified files in this project", "intent": "recent_files", "lang": "en"}
+{"text": "which files did I touch most recently?", "intent": "recent_files", "lang": "en"}
+{"text": "newest files in /etc, top twenty", "intent": "recent_files", "lang": "en"}
+{"text": "recently modified files sorted by time", "intent": "recent_files", "lang": "en"}
+{"text": "most recntly edited files in src", "intent": "recent_files", "lang": "en"}
+{"text": "jakie pliki były ostatnio modyfikowane tutaj?", "intent": "recent_files", "lang": "pl"}
+{"text": "pokaz 10 najnowszych plikow w ~/Pobrane", "intent": "recent_files", "lang": "pl"}
+{"text": "ostatnio zmienione pliki w /var/log", "intent": "recent_files", "lang": "pl"}
+{"text": "lista 5 ostatnio edytowanych plikow w projekcie", "intent": "recent_files", "lang": "pl"}
+{"text": "nad którymi plikami pracowałem ostatnio?", "intent": "recent_files", "lang": "pl"}
+{"text": "najnowsze pliki w /etc, dwadzieścia", "intent": "recent_files", "lang": "pl"}
+{"text": "ostatnio zmodyfikowane pliki posortowane po czasie", "intent": "recent_files", "lang": "pl"}
+{"text": "najswiezsze pliki w src", "intent": "recent_files", "lang": "pl"}
+{"text": "find empty files", "intent": "empty_files", "lang": "en"}
+{"text": "are there any zero-byte files in /tmp?", "intent": "empty_files", "lang": "en"}
+{"text": "list all empty files in this project", "intent": "empty_files", "lang": "en"}
+{"text": "show files with size 0 in ~/Documents", "intent": "empty_files", "lang": "en"}
+{"text": "find blank files under ./logs", "intent": "empty_files", "lang": "en"}
+{"text": "which files are empty in /var/www", "intent": "empty_files", "lang": "en"}
+{"text": "0 byte files here", "intent": "empty_files", "lang": "en"}
+{"text": "find empy files in src", "intent": "empty_files", "lang": "en"}
+{"text": "znajdź puste pliki", "intent": "empty_files", "lang": "pl"}
+{"text": "czy są jakieś pliki o rozmiarze zero w /tmp?", "intent": "empty_files", "lang": "pl"}
+{"text": "wypisz wszystkie puste pliki w projekcie", "intent": "empty_files", "lang": "pl"}
+{"text": "pokaz pliki o rozmiarze 0 w ~/Dokumenty", "intent": "empty_files", "lang": "pl"}
+{"text": "puste pliki w ./logs", "intent": "empty_files", "lang": "pl"}
+{"text": "ktore pliki sa puste w /var/www", "intent": "empty_files", "lang": "pl"}
+{"text": "pliki 0 bajtów tutaj", "intent": "empty_files", "lang": "pl"}
+{"text": "znajdz pusye pliki w src", "intent": "empty_files", "lang": "pl"}
+{"text": "find empty directories", "intent": "empty_dirs", "lang": "en"}
+{"text": "are there any empty folders in ~/Downloads?", "intent": "empty_dirs", "lang": "en"}
+{"text": "list empty dirs in this project", "intent": "empty_dirs", "lang": "en"}
+{"text": "show folders with nothing in them under /srv", "intent": "empty_dirs", "lang": "en"}
+{"text": "which directories are empty in ./build", "intent": "empty_dirs", "lang": "en"}
+{"text": "empty folders here", "intent": "empty_dirs", "lang": "en"}
+{"text": "find all empty subdirectories in /var/www", "intent": "empty_dirs", "lang": "en"}
+{"text": "find emtpy directories in src", "intent": "empty_dirs", "lang": "en"}
+{"text": "znajdź puste katalogi", "intent": "empty_dirs", "lang": "pl"}
+{"text": "czy są jakieś puste foldery w ~/Pobrane?", "intent": "empty_dirs", "lang": "pl"}
+{"text": "wypisz puste katalogi w projekcie", "intent": "empty_dirs", "lang": "pl"}
+{"text": "pokaż foldery bez zawartości w /srv", "intent": "empty_dirs", "lang": "pl"}
+{"text": "ktore katalogi sa puste w ./build", "intent": "empty_dirs", "lang": "pl"}
+{"text": "puste foldery tutaj", "intent": "empty_dirs", "lang": "pl"}
+{"text": "znajdz wszystkie puste podkatalogi w /var/www", "intent": "empty_dirs", "lang": "pl"}
+{"text": "puste katalgi w src", "intent": "empty_dirs", "lang": "pl"}
+{"text": "find duplicate files", "intent": "duplicate_files", "lang": "en"}
+{"text": "are there any identical files in ~/Pictures?", "intent": "duplicate_files", "lang": "en"}
+{"text": "detect duplicate photos in /mnt/photos by content", "intent": "duplicate_files", "lang": "en"}
+{"text": "list files with the same content in this folder", "intent": "duplicate_files", "lang": "en"}
+{"text": "find dupes in Downloads", "intent": "duplicate_files", "lang": "en"}
+{"text": "which files are exact copies of each other in ./data", "intent": "duplicate_files", "lang": "en"}
+{"text": "find duplicated files using checksums", "intent": "duplicate_files", "lang": "en"}
+{"text": "find duplicat files in /srv/media", "intent": "duplicate_files", "lang": "en"}
+{"text": "znajdź zduplikowane pliki", "intent": "duplicate_files", "lang": "pl"}
+{"text": "czy są identyczne pliki w ~/Obrazy?", "intent": "duplicate_files", "lang": "pl"}
+{"text": "wykryj duplikaty zdjęć w /mnt/zdjecia po zawartości", "intent": "duplicate_files", "lang": "pl"}
+{"text": "pliki o tej samej zawartosci w tym folderze", "intent": "duplicate_files", "lang": "pl"}
+{"text": "duplikaty w Pobranych", "intent": "duplicate_files", "lang": "pl"}
+{"text": "ktore pliki sa dokladnymi kopiami w ./data", "intent": "duplicate_files", "lang": "pl"}
+{"text": "znajdz powielone pliki po sumach kontrolnych", "intent": "duplicate_files", "lang": "pl"}
+{"text": "znajdz duplkaty plikow w /srv/media", "intent": "duplicate_files", "lang": "pl"}
+{"text": "list symbolic links in this directory", "intent": "find_symlinks", "lang": "en"}
+{"text": "find all symlinks in /usr/local/bin", "intent": "find_symlinks", "lang": "en"}
+{"text": "show me the symlinks under /etc", "intent": "find_symlinks", "lang": "en"}
+{"text": "which files are soft links in ~/dotfiles?", "intent": "find_symlinks", "lang": "en"}
+{"text": "find symlinks", "intent": "find_symlinks", "lang": "en"}
+{"text": "list all links (symbolic) in /opt", "intent": "find_symlinks", "lang": "en"}
+{"text": "are there any symlinks in node_modules", "intent": "find_symlinks", "lang": "en"}
+{"text": "show sym links in /var/www", "intent": "find_symlinks", "lang": "en"}
+{"text": "wypisz dowiązania symboliczne w tym katalogu", "intent": "find_symlinks", "lang": "pl"}
+{"text": "znajdz wszystkie symlinki w /usr/local/bin", "intent": "find_symlinks", "lang": "pl"}
+{"text": "pokaz linki symboliczne w /etc", "intent": "find_symlinks", "lang": "pl"}
+{"text": "które pliki są dowiązaniami w ~/dotfiles?", "intent": "find_symlinks", "lang": "pl"}
+{"text": "znajdź symlinki", "intent": "find_symlinks", "lang": "pl"}
+{"text": "lista linkow symbolicznych w /opt", "intent": "find_symlinks", "lang": "pl"}
+{"text": "czy w node_modules sa symlinki", "intent": "find_symlinks", "lang": "pl"}
+{"text": "pokaż dowiazania symboliczne w /var/ww", "intent": "find_symlinks", "lang": "pl"}
+{"text": "find broken symlinks", "intent": "broken_symlinks", "lang": "en"}
+{"text": "are there any dangling links in /usr/local/bin?", "intent": "broken_symlinks", "lang": "en"}
+{"text": "list symlinks pointing to nothing in ~/dotfiles", "intent": "broken_symlinks", "lang": "en"}
+{"text": "show dead symbolic links under /etc", "intent": "broken_symlinks", "lang": "en"}
+{"text": "which links are broken in this project", "intent": "broken_symlinks", "lang": "en"}
+{"text": "find orphaned symlinks in /opt", "intent": "broken_symlinks", "lang": "en"}
+{"text": "symlinks whose target no longer exists", "intent": "broken_symlinks", "lang": "en"}
+{"text": "find brokn links in /var/www", "intent": "broken_symlinks", "lang": "en"}
+{"text": "znajdź uszkodzone dowiązania symboliczne", "intent": "broken_symlinks", "lang": "pl"}
+{"text": "czy są zepsute symlinki w /usr/local/bin?", "intent": "broken_symlinks", "lang": "pl"}
+{"text": "linki symboliczne wskazujące na nieistniejące pliki w ~/dotfiles", "intent": "broken_symlinks", "lang": "pl"}
+{"text": "pokaz martwe dowiazania w /etc", "intent": "broken_symlinks", "lang": "pl"}
+{"text": "ktore linki sa zepsute w tym projekcie", "intent": "broken_symlinks", "lang": "pl"}
+{"text": "znajdz osierocone symlinki w /opt", "intent": "broken_symlinks", "lang": "pl"}
+{"text": "symlinki ktorych cel juz nie istnieje", "intent": "broken_symlinks", "lang": "pl"}
+{"text": "zepsute linki w /var/ww", "intent": "broken_symlinks", "lang": "pl"}
+{"text": "list files in this directory", "intent": "list_files", "lang": "en"}
+{"text": "show what's in /etc with details", "intent": "list_files", "lang": "en"}
+{"text": "ls -la ~/Downloads", "intent": "list_files", "lang": "en"}
+{"text": "what files are in /var/log?", "intent": "list_files", "lang": "en"}
+{"text": "show directory contents with sizes and permissions", "intent": "list_files", "lang": "en"}
+{"text": "list everything in /tmp", "intent": "list_files", "lang": "en"}
+{"text": "what's inside the folder ./config", "intent": "list_files", "lang": "en"}
+{"text": "lsit files in my home", "intent": "list_files", "lang": "en"}
+{"text": "wylistuj pliki w tym katalogu", "intent": "list_files", "lang": "pl"}
+{"text": "pokaż zawartość /etc ze szczegółami", "intent": "list_files", "lang": "pl"}
+{"text": "co jest w ~/Pobrane", "intent": "list_files", "lang": "pl"}
+{"text": "jakie pliki są w /var/log?", "intent": "list_files", "lang": "pl"}
+{"text": "zawartosc katalogu z rozmiarami i uprawnieniami", "intent": "list_files", "lang": "pl"}
+{"text": "wypisz wszystko w /tmp", "intent": "list_files", "lang": "pl"}
+{"text": "co jest w folderze ./config", "intent": "list_files", "lang": "pl"}
+{"text": "pokaz pliki w moim katalogu domowym", "intent": "list_files", "lang": "pl"}
+{"text": "show the directory tree", "intent": "list_tree", "lang": "en"}
+{"text": "tree view of ./src", "intent": "list_tree", "lang": "en"}
+{"text": "display the folder structure of /etc 3 levels deep", "intent": "list_tree", "lang": "en"}
+{"text": "what does the structure of this project look like?", "intent": "list_tree", "lang": "en"}
+{"text": "show nested folders and files in ~/projects/api", "intent": "list_tree", "lang": "en"}
+{"text": "tree of current dir, depth 1", "intent": "list_tree", "lang": "en"}
+{"text": "print the hierarchy of /opt/app", "intent": "list_tree", "lang": "en"}
+{"text": "show dir tre for docs", "intent": "list_tree", "lang": "en"}
+{"text": "pokaż drzewo katalogów", "intent": "list_tree", "lang": "pl"}
+{"text": "drzewo ./src", "intent": "list_tree", "lang": "pl"}
+{"text": "wyswietl strukture folderow /etc na 3 poziomy", "intent": "list_tree", "lang": "pl"}
+{"text": "jak wygląda struktura tego projektu?", "intent": "list_tree", "lang": "pl"}
+{"text": "pokaz zagniezdzone foldery i pliki w ~/projekty/api", "intent": "list_tree", "lang": "pl"}
+{"text": "drzewo bieżącego katalogu, głębokość 1", "intent": "list_tree", "lang": "pl"}
+{"text": "hierarchia katalogow /opt/app", "intent": "list_tree", "lang": "pl"}
+{"text": "struktua katalogu docs", "intent": "list_tree", "lang": "pl"}
+{"text": "show hidden files", "intent": "hidden_files", "lang": "en"}
+{"text": "list dotfiles in my home directory", "intent": "hidden_files", "lang": "en"}
+{"text": "what hidden files are in this folder?", "intent": "hidden_files", "lang": "en"}
+{"text": "show files starting with a dot in ~/projects/web", "intent": "hidden_files", "lang": "en"}
+{"text": "list the .files here", "intent": "hidden_files", "lang": "en"}
+{"text": "any hidden config files in /etc/skel?", "intent": "hidden_files", "lang": "en"}
+{"text": "show dot files", "intent": "hidden_files", "lang": "en"}
+{"text": "list hiden files in ~", "intent": "hidden_files", "lang": "en"}
+{"text": "pokaż ukryte pliki", "intent": "hidden_files", "lang": "pl"}
+{"text": "wypisz dotfiles w katalogu domowym", "intent": "hidden_files", "lang": "pl"}
+{"text": "jakie ukryte pliki sa w tym folderze?", "intent": "hidden_files", "lang": "pl"}
+{"text": "pokaz pliki zaczynajace sie od kropki w ~/projekty/web", "intent": "hidden_files", "lang": "pl"}
+{"text": "ukryte pliki tutaj", "intent": "hidden_files", "lang": "pl"}
+{"text": "czy są ukryte pliki konfiguracyjne w /etc/skel?", "intent": "hidden_files", "lang": "pl"}
+{"text": "pliki z kropką na początku", "intent": "hidden_files", "lang": "pl"}
+{"text": "pokaz ukryre pliki w ~", "intent": "hidden_files", "lang": "pl"}
+{"text": "what type of file is data.bin?", "intent": "file_type", "lang": "en"}
+{"text": "detect the file type of /usr/bin/python3", "intent": "file_type", "lang": "en"}
+{"text": "is image.png really a png?", "intent": "file_type", "lang": "en"}
+{"text": "what kind of file is unknown_download", "intent": "file_type", "lang": "en"}
+{"text": "check format of archive.dat", "intent": "file_type", "lang": "en"}
+{"text": "file type of report", "intent": "file_type", "lang": "en"}
+{"text": "is this binary or text: script.sh", "intent": "file_type", "lang": "en"}
+{"text": "what filetype is blob.raw", "intent": "file_type", "lang": "en"}
+{"text": "jakiego typu jest plik data.bin?", "intent": "file_type", "lang": "pl"}
+{"text": "wykryj typ pliku /usr/bin/python3", "intent": "file_type", "lang": "pl"}
+{"text": "czy image.png to naprawdę png?", "intent": "file_type", "lang": "pl"}
+{"text": "co to za plik nieznany_plik", "intent": "file_type", "lang": "pl"}
+{"text": "sprawdz format archiwum.dat", "intent": "file_type", "lang": "pl"}
+{"text": "typ pliku raport", "intent": "file_type", "lang": "pl"}
+{"text": "czy skrypt.sh jest binarny czy tekstowy", "intent": "file_type", "lang": "pl"}
+{"text": "jaki typ ma plk blob.raw", "intent": "file_type", "lang": "pl"}
+{"text": "show metadata for config.yaml", "intent": "file_stat", "lang": "en"}
+{"text": "when was /etc/hosts last modified and what are its permissions?", "intent": "file_stat", "lang": "en"}
+{"text": "stat main.py", "intent": "file_stat", "lang": "en"}
+{"text": "file details: size, owner, timestamps of backup.tar", "intent": "file_stat", "lang": "en"}
+{"text": "show inode info for /var/log/syslog", "intent": "file_stat", "lang": "en"}
+{"text": "get the access and modify times of notes.txt", "intent": "file_stat", "lang": "en"}
+{"text": "full info about the file ~/.bashrc", "intent": "file_stat", "lang": "en"}
+{"text": "show file metdata for app.log", "intent": "file_stat", "lang": "en"}
+{"text": "pokaż metadane pliku config.yaml", "intent": "file_stat", "lang": "pl"}
+{"text": "kiedy /etc/hosts był ostatnio zmieniany i jakie ma uprawnienia?", "intent": "file_stat", "lang": "pl"}
+{"text": "stat na main.py", "intent": "file_stat", "lang": "pl"}
+{"text": "szczegoly pliku: rozmiar, wlasciciel, daty backup.tar", "intent": "file_stat", "lang": "pl"}
+{"text": "informacje o inode dla /var/log/syslog", "intent": "file_stat", "lang": "pl"}
+{"text": "czasy dostępu i modyfikacji pliku notatki.txt", "intent": "file_stat", "lang": "pl"}
+{"text": "pelne info o pliku ~/.bashrc", "intent": "file_stat", "lang": "pl"}
+{"text": "metadne pliku app.log", "intent": "file_stat", "lang": "pl"}
+{"text": "show the first 10 lines of data.csv", "intent": "head_file", "lang": "en"}
+{"text": "head of access.log", "intent": "head_file", "lang": "en"}
+{"text": "print the first twenty lines of /etc/passwd", "intent": "head_file", "lang": "en"}
+{"text": "first 5 lines of README.md", "intent": "head_file", "lang": "en"}
+{"text": "preview the beginning of users.csv", "intent": "head_file", "lang": "en"}
+{"text": "what's at the top of config.ini?", "intent": "head_file", "lang": "en"}
+{"text": "show first 50 rows of export.csv", "intent": "head_file", "lang": "en"}
+{"text": "frist lines of main.py", "intent": "head_file", "lang": "en"}
+{"text": "pokaż pierwsze 10 linii data.csv", "intent": "head_file", "lang": "pl"}
+{"text": "początek pliku access.log", "intent": "head_file", "lang": "pl"}
+{"text": "wyswietl pierwsze dwadziescia linii /etc/passwd", "intent": "head_file", "lang": "pl"}
+{"text": "pierwsze 5 linijek README.md", "intent": "head_file", "lang": "pl"}
+{"text": "podglad poczatku users.csv", "intent": "head_file", "lang": "pl"}
+{"text": "co jest na górze pliku config.ini?", "intent": "head_file", "lang": "pl"}
+{"text": "pokaz pierwsze 50 wierszy export.csv", "intent": "head_file", "lang": "pl"}
+{"text": "pierwsze lnie main.py", "intent": "head_file", "lang": "pl"}
+{"text": "show the last 10 lines of app.log", "intent": "tail_file", "lang": "en"}
+{"text": "tail of /var/log/syslog", "intent": "tail_file", "lang": "en"}
+{"text": "print last 50 lines of error.log", "intent": "tail_file", "lang": "en"}
+{"text": "end of file results.txt", "intent": "tail_file", "lang": "en"}
+{"text": "last 100 lines of nginx access log /var/log/nginx/access.log", "intent": "tail_file", "lang": "en"}
+{"text": "what's at the bottom of output.csv?", "intent": "tail_file", "lang": "en"}
+{"text": "show the final three lines of notes.md", "intent": "tail_file", "lang": "en"}
+{"text": "last lnes of build.log", "intent": "tail_file", "lang": "en"}
+{"text": "pokaż ostatnie 10 linii app.log", "intent": "tail_file", "lang": "pl"}
+{"text": "koniec pliku /var/log/syslog", "intent": "tail_file", "lang": "pl"}
+{"text": "wyswietl ostatnie 50 linii error.log", "intent": "tail_file", "lang": "pl"}
+{"text": "koncowka pliku wyniki.txt", "intent": "tail_file", "lang": "pl"}
+{"text": "ostatnie 100 linijek /var/log/nginx/access.log", "intent": "tail_file", "lang": "pl"}
+{"text": "co jest na samym dole output.csv?", "intent": "tail_file", "lang": "pl"}
+{"text": "ostatnie trzy linie notatki.md", "intent": "tail_file", "lang": "pl"}
+{"text": "ostanie linie build.log", "intent": "tail_file", "lang": "pl"}
+{"text": "follow app.log live", "intent": "tail_follow", "lang": "en"}
+{"text": "watch /var/log/nginx/error.log in real time", "intent": "tail_follow", "lang": "en"}
+{"text": "tail -f the syslog", "intent": "tail_follow", "lang": "en"}
+{"text": "stream new lines from server.log as they appear", "intent": "tail_follow", "lang": "en"}
+{"text": "keep watching the log file /var/log/auth.log", "intent": "tail_follow", "lang": "en"}
+{"text": "monitor output.log live", "intent": "tail_follow", "lang": "en"}
+{"text": "follow the system log", "intent": "tail_follow", "lang": "en"}
+{"text": "live tail of worker.log plz", "intent": "tail_follow", "lang": "en"}
+{"text": "śledź app.log na żywo", "intent": "tail_follow", "lang": "pl"}
+{"text": "obserwuj /var/log/nginx/error.log w czasie rzeczywistym", "intent": "tail_follow", "lang": "pl"}
+{"text": "tail -f na syslogu", "intent": "tail_follow", "lang": "pl"}
+{"text": "pokazuj nowe linie z server.log na biezaco", "intent": "tail_follow", "lang": "pl"}
+{"text": "monitoruj plik logu /var/log/auth.log", "intent": "tail_follow", "lang": "pl"}
+{"text": "podgladaj output.log na zywo", "intent": "tail_follow", "lang": "pl"}
+{"text": "sledz log systemowy", "intent": "tail_follow", "lang": "pl"}
+{"text": "sledz na biezaco worker.log", "intent": "tail_follow", "lang": "pl"}
+{"text": "show the contents of config.yaml", "intent": "cat_file", "lang": "en"}
+{"text": "print /etc/hosts", "intent": "cat_file", "lang": "en"}
+{"text": "cat README.md", "intent": "cat_file", "lang": "en"}
+{"text": "display the file notes.txt", "intent": "cat_file", "lang": "en"}
+{"text": "what's in .env?", "intent": "cat_file", "lang": "en"}
+{"text": "open and print ~/.bashrc to the terminal", "intent": "cat_file", "lang": "en"}
+{"text": "output the whole file requirements.txt", "intent": "cat_file", "lang": "en"}
+{"text": "show me whats inside todo.txt", "intent": "cat_file", "lang": "en"}
+{"text": "pokaż zawartość pliku config.yaml", "intent": "cat_file", "lang": "pl"}
+{"text": "wyswietl /etc/hosts", "intent": "cat_file", "lang": "pl"}
+{"text": "cat na README.md", "intent": "cat_file", "lang": "pl"}
+{"text": "wypisz plik notatki.txt", "intent": "cat_file", "lang": "pl"}
+{"text": "co jest w .env?", "intent": "cat_file", "lang": "pl"}
+{"text": "wyświetl cały ~/.bashrc w terminalu", "intent": "cat_file", "lang": "pl"}
+{"text": "pokaz caly plik requirements.txt", "intent": "cat_file", "lang": "pl"}
+{"text": "pokaz co jest w todo.txt", "intent": "cat_file", "lang": "pl"}
+{"text": "compress the folder project into project.tar.gz", "intent": "compress_targz", "lang": "en"}
+{"text": "make a tarball of ./logs called logs.tar.gz", "intent": "compress_targz", "lang": "en"}
+{"text": "tar gz the directory ~/photos as photos-backup.tar.gz", "intent": "compress_targz", "lang": "en"}
+{"text": "create a tar.gz archive of /etc named etc.tgz", "intent": "compress_targz", "lang": "en"}
+{"text": "archive and gzip src", "intent": "compress_targz", "lang": "en"}
+{"text": "pack this directory into backup.tar.gz", "intent": "compress_targz", "lang": "en"}
+{"text": "tar.gz my Documents folder", "intent": "compress_targz", "lang": "en"}
+{"text": "compres website/ to site.tar.gz", "intent": "compress_targz", "lang": "en"}
+{"text": "spakuj folder projekt do projekt.tar.gz", "intent": "compress_targz", "lang": "pl"}
+{"text": "zrob archiwum tar.gz z ./logs o nazwie logi.tar.gz", "intent": "compress_targz", "lang": "pl"}
+{"text": "skompresuj katalog ~/zdjecia jako zdjecia-backup.tar.gz", "intent": "compress_targz", "lang": "pl"}
+{"text": "utwórz archiwum tar.gz z /etc o nazwie etc.tgz", "intent": "compress_targz", "lang": "pl"}
+{"text": "zarchiwizuj i spakuj gzipem src", "intent": "compress_targz", "lang": "pl"}
+{"text": "spakuj ten katalog do backup.tar.gz", "intent": "compress_targz", "lang": "pl"}
+{"text": "tar.gz z folderu Dokumenty", "intent": "compress_targz", "lang": "pl"}
+{"text": "skompresj strona/ do strona.tar.gz", "intent": "compress_targz", "lang": "pl"}
+{"text": "extract backup.tar.gz", "intent": "extract_targz", "lang": "en"}
+{"text": "unpack project.tar.gz", "intent": "extract_targz", "lang": "en"}
+{"text": "untar logs.tgz into /tmp/logs", "intent": "extract_targz", "lang": "en"}
+{"text": "decompress archive.tar.gz here", "intent": "extract_targz", "lang": "en"}
+{"text": "how do I open site.tar.gz", "intent": "extract_targz", "lang": "en"}
+{"text": "extract the tarball release-1.2.tar.gz", "intent": "extract_targz", "lang": "en"}
+{"text": "unzip the tar.gz file data.tar.gz", "intent": "extract_targz", "lang": "en"}
+{"text": "extarct node-v20.tar.gz to /opt", "intent": "extract_targz", "lang": "en"}
+{"text": "rozpakuj backup.tar.gz", "intent": "extract_targz", "lang": "pl"}
+{"text": "wypakuj projekt.tar.gz", "intent": "extract_targz", "lang": "pl"}
+{"text": "rozpakuj logi.tgz do /tmp/logi", "intent": "extract_targz", "lang": "pl"}
+{"text": "rozpakuj tutaj archiwum.tar.gz", "intent": "extract_targz", "lang": "pl"}
+{"text": "jak otworzyć strona.tar.gz", "intent": "extract_targz", "lang": "pl"}
+{"text": "wypakuj tarballa release-1.2.tar.gz", "intent": "extract_targz", "lang": "pl"}
+{"text": "rozpakowanie pliku dane.tar.gz", "intent": "extract_targz", "lang": "pl"}
+{"text": "rozpakuj node-v20.tar.gz do /opt", "intent": "extract_targz", "lang": "pl"}
+{"text": "zip the folder project into project.zip", "intent": "compress_zip", "lang": "en"}
+{"text": "create a zip archive of ./reports", "intent": "compress_zip", "lang": "en"}
+{"text": "compress ~/photos into photos.zip", "intent": "compress_zip", "lang": "en"}
+{"text": "make a zip file named site.zip from website/", "intent": "compress_zip", "lang": "en"}
+{"text": "zip up this directory", "intent": "compress_zip", "lang": "en"}
+{"text": "zip src as code.zip", "intent": "compress_zip", "lang": "en"}
+{"text": "pack Documents into a zip", "intent": "compress_zip", "lang": "en"}
+{"text": "create zip archve backup.zip from data", "intent": "compress_zip", "lang": "en"}
+{"text": "spakuj folder projekt do projekt.zip", "intent": "compress_zip", "lang": "pl"}
+{"text": "utwórz archiwum zip z ./raporty", "intent": "compress_zip", "lang": "pl"}
+{"text": "skompresuj ~/zdjecia do zdjecia.zip", "intent": "compress_zip", "lang": "pl"}
+{"text": "zrob plik zip o nazwie strona.zip z website/", "intent": "compress_zip", "lang": "pl"}
+{"text": "zipnij ten katalog", "intent": "compress_zip", "lang": "pl"}
+{"text": "spakuj src zipem jako kod.zip", "intent": "compress_zip", "lang": "pl"}
+{"text": "zrób zipa z Dokumentów", "intent": "compress_zip", "lang": "pl"}
+{"text": "spakuj do zipa backup.zip katalog dane", "intent": "compress_zip", "lang": "pl"}
+{"text": "extract photos.zip", "intent": "extract_zip", "lang": "en"}
+{"text": "unzip archive.zip", "intent": "extract_zip", "lang": "en"}
+{"text": "unpack the zip file data.zip into ./data", "intent": "extract_zip", "lang": "en"}
+{"text": "decompress release.zip here", "intent": "extract_zip", "lang": "en"}
+{"text": "open the zip download.zip", "intent": "extract_zip", "lang": "en"}
+{"text": "unzip files.zip to /tmp/files", "intent": "extract_zip", "lang": "en"}
+{"text": "extract all from report.zip", "intent": "extract_zip", "lang": "en"}
+{"text": "unzipp project.zip", "intent": "extract_zip", "lang": "en"}
+{"text": "rozpakuj zdjecia.zip", "intent": "extract_zip", "lang": "pl"}
+{"text": "wypakuj archiwum.zip", "intent": "extract_zip", "lang": "pl"}
+{"text": "rozpakuj plik zip dane.zip do ./dane", "intent": "extract_zip", "lang": "pl"}
+{"text": "rozpakuj tutaj release.zip", "intent": "extract_zip", "lang": "pl"}
+{"text": "otwórz zipa pobrane.zip", "intent": "extract_zip", "lang": "pl"}
+{"text": "wypakuj pliki.zip do /tmp/pliki", "intent": "extract_zip", "lang": "pl"}
+{"text": "wyciagnij wszystko z raport.zip", "intent": "extract_zip", "lang": "pl"}
+{"text": "rozpakój projekt.zip", "intent": "extract_zip", "lang": "pl"}
+{"text": "what's inside backup.tar.gz?", "intent": "list_archive", "lang": "en"}
+{"text": "list contents of archive.zip without extracting", "intent": "list_archive", "lang": "en"}
+{"text": "show files in project.tar", "intent": "list_archive", "lang": "en"}
+{"text": "peek into release.zip", "intent": "list_archive", "lang": "en"}
+{"text": "list the files in logs.tgz", "intent": "list_archive", "lang": "en"}
+{"text": "what does data.tar.gz contain", "intent": "list_archive", "lang": "en"}
+{"text": "view the archive contents of site.zip", "intent": "list_archive", "lang": "en"}
+{"text": "lsit contents of dump.tar.gz", "intent": "list_archive", "lang": "en"}
+{"text": "co jest w środku backup.tar.gz?", "intent": "list_archive", "lang": "pl"}
+{"text": "wylistuj zawartosc archiwum.zip bez rozpakowywania", "intent": "list_archive", "lang": "pl"}
+{"text": "pokaz pliki w projekt.tar", "intent": "list_archive", "lang": "pl"}
+{"text": "zajrzyj do release.zip", "intent": "list_archive", "lang": "pl"}
+{"text": "lista plikow w logi.tgz", "intent": "list_archive", "lang": "pl"}
+{"text": "co zawiera dane.tar.gz", "intent": "list_archive", "lang": "pl"}
+{"text": "podgląd zawartości archiwum strona.zip", "intent": "list_archive", "lang": "pl"}
+{"text": "zawartosc archwum dump.tar.gz", "intent": "list_archive", "lang": "pl"}
+{"text": "set permissions of script.sh to 755", "intent": "chmod", "lang": "en"}
+{"text": "chmod 644 config.yaml", "intent": "chmod", "lang": "en"}
+{"text": "change permissions of id_rsa to 600", "intent": "chmod", "lang": "en"}
+{"text": "make secrets.env readable only by owner (600)", "intent": "chmod", "lang": "en"}
+{"text": "give deploy.sh rwxr-xr-x", "intent": "chmod", "lang": "en"}
+{"text": "set mode 700 on ~/private", "intent": "chmod", "lang": "en"}
+{"text": "change file permissions of index.html to 644", "intent": "chmod", "lang": "en"}
+{"text": "chmod 0640 on app.log pls", "intent": "chmod", "lang": "en"}
+{"text": "ustaw uprawnienia script.sh na 755", "intent": "chmod", "lang": "pl"}
+{"text": "chmod 644 dla config.yaml", "intent": "chmod", "lang": "pl"}
+{"text": "zmien uprawnienia id_rsa na 600", "intent": "chmod", "lang": "pl"}
+{"text": "niech secrets.env bedzie do odczytu tylko dla wlasciciela (600)", "intent": "chmod", "lang": "pl"}
+{"text": "nadaj deploy.sh prawa rwxr-xr-x", "intent": "chmod", "lang": "pl"}
+{"text": "ustaw tryb 700 na ~/prywatne", "intent": "chmod", "lang": "pl"}
+{"text": "zmień uprawnienia pliku index.html na 644", "intent": "chmod", "lang": "pl"}
+{"text": "zmien uprawnenia app.log na 640", "intent": "chmod", "lang": "pl"}
+{"text": "make script.sh executable", "intent": "make_executable", "lang": "en"}
+{"text": "chmod +x deploy.sh", "intent": "make_executable", "lang": "en"}
+{"text": "allow running install.sh", "intent": "make_executable", "lang": "en"}
+{"text": "give execute permission to ./run.py", "intent": "make_executable", "lang": "en"}
+{"text": "make the file build executable", "intent": "make_executable", "lang": "en"}
+{"text": "I can't run start.sh, permission denied — make it executable", "intent": "make_executable", "lang": "en"}
+{"text": "set the executable bit on backup.sh", "intent": "make_executable", "lang": "en"}
+{"text": "make exectuable setup.sh", "intent": "make_executable", "lang": "en"}
+{"text": "nadaj prawa wykonywania script.sh", "intent": "make_executable", "lang": "pl"}
+{"text": "chmod +x na deploy.sh", "intent": "make_executable", "lang": "pl"}
+{"text": "zrób install.sh wykonywalnym", "intent": "make_executable", "lang": "pl"}
+{"text": "daj prawo uruchamiania dla ./run.py", "intent": "make_executable", "lang": "pl"}
+{"text": "uczyn plik build wykonywalnym", "intent": "make_executable", "lang": "pl"}
+{"text": "nie moge uruchomic start.sh, brak uprawnien - zrob go wykonywalnym", "intent": "make_executable", "lang": "pl"}
+{"text": "ustaw bit wykonywania na backup.sh", "intent": "make_executable", "lang": "pl"}
+{"text": "zrob wykonywalny setup.sh", "intent": "make_executable", "lang": "pl"}
+{"text": "change owner of /var/www to www-data", "intent": "chown", "lang": "en"}
+{"text": "make john the owner of ~/shared", "intent": "chown", "lang": "en"}
+{"text": "chown /srv/app to deploy", "intent": "chown", "lang": "en"}
+{"text": "give ownership of ./uploads to user nginx", "intent": "chown", "lang": "en"}
+{"text": "set the owner of /opt/tool recursively to alice", "intent": "chown", "lang": "en"}
+{"text": "transfer ownership of this folder to bob", "intent": "chown", "lang": "en"}
+{"text": "change file owner of data.db to postgres", "intent": "chown", "lang": "en"}
+{"text": "chnage owner of /home/kasia/projekty to kasia", "intent": "chown", "lang": "en"}
+{"text": "zmień właściciela /var/www na www-data", "intent": "chown", "lang": "pl"}
+{"text": "niech john bedzie wlascicielem ~/shared", "intent": "chown", "lang": "pl"}
+{"text": "chown /srv/app na deploy", "intent": "chown", "lang": "pl"}
+{"text": "przekaz wlasnosc ./uploads uzytkownikowi nginx", "intent": "chown", "lang": "pl"}
+{"text": "ustaw rekurencyjnie właściciela /opt/tool na alice", "intent": "chown", "lang": "pl"}
+{"text": "zmien wlasciciela tego folderu na bob", "intent": "chown", "lang": "pl"}
+{"text": "zmiana właściciela pliku data.db na postgres", "intent": "chown", "lang": "pl"}
+{"text": "zmien wlascicela /home/kasia/projekty na kasia", "intent": "chown", "lang": "pl"}
+{"text": "copy report.pdf to ~/Documents", "intent": "copy", "lang": "en"}
+{"text": "duplicate config.yaml as config.backup.yaml", "intent": "copy", "lang": "en"}
+{"text": "cp -r src to /tmp/src-copy", "intent": "copy", "lang": "en"}
+{"text": "copy the folder photos to /mnt/usb", "intent": "copy", "lang": "en"}
+{"text": "make a copy of notes.txt in /tmp", "intent": "copy", "lang": "en"}
+{"text": "copy /etc/nginx/nginx.conf to ./nginx.conf.bak", "intent": "copy", "lang": "en"}
+{"text": "copy everything from dist into /var/www/html", "intent": "copy", "lang": "en"}
+{"text": "cpoy main.py to old_main.py", "intent": "copy", "lang": "en"}
+{"text": "skopiuj raport.pdf do ~/Dokumenty", "intent": "copy", "lang": "pl"}
+{"text": "zrob kopie config.yaml jako config.backup.yaml", "intent": "copy", "lang": "pl"}
+{"text": "skopiuj rekurencyjnie src do /tmp/src-kopia", "intent": "copy", "lang": "pl"}
+{"text": "skopiuj folder zdjecia na /mnt/usb", "intent": "copy", "lang": "pl"}
+{"text": "zrób kopię notatki.txt w /tmp", "intent": "copy", "lang": "pl"}
+{"text": "skopiuj /etc/nginx/nginx.conf do ./nginx.conf.bak", "intent": "copy", "lang": "pl"}
+{"text": "przekopiuj zawartość dist do /var/www/html", "intent": "copy", "lang": "pl"}
+{"text": "skopjuj main.py do stary_main.py", "intent": "copy", "lang": "pl"}
+{"text": "rename old.txt to new.txt", "intent": "move_rename", "lang": "en"}
+{"text": "move report.pdf to ~/Documents", "intent": "move_rename", "lang": "en"}
+{"text": "mv draft.md into the archive folder", "intent": "move_rename", "lang": "en"}
+{"text": "rename the folder build to build_old", "intent": "move_rename", "lang": "en"}
+{"text": "move all of photos to /mnt/backup/photos", "intent": "move_rename", "lang": "en"}
+{"text": "change the name of index.htm to index.html", "intent": "move_rename", "lang": "en"}
+{"text": "move /tmp/data.csv to ./data/", "intent": "move_rename", "lang": "en"}
+{"text": "renmae app.js to server.js", "intent": "move_rename", "lang": "en"}
+{"text": "zmień nazwę old.txt na new.txt", "intent": "move_rename", "lang": "pl"}
+{"text": "przenies raport.pdf do ~/Dokumenty", "intent": "move_rename", "lang": "pl"}
+{"text": "przenieś szkic.md do folderu archiwum", "intent": "move_rename", "lang": "pl"}
+{"text": "zmien nazwe folderu build na build_old", "intent": "move_rename", "lang": "pl"}
+{"text": "przenies zdjecia do /mnt/backup/zdjecia", "intent": "move_rename", "lang": "pl"}
+{"text": "przemianuj index.htm na index.html", "intent": "move_rename", "lang": "pl"}
+{"text": "przenieś /tmp/dane.csv do ./dane/", "intent": "move_rename", "lang": "pl"}
+{"text": "zmien nazwe app.js na serwer.js", "intent": "move_rename", "lang": "pl"}
+{"text": "delete old.log", "intent": "delete_file", "lang": "en"}
+{"text": "remove the file /tmp/test.txt", "intent": "delete_file", "lang": "en"}
+{"text": "rm notes.bak", "intent": "delete_file", "lang": "en"}
+{"text": "get rid of draft.md", "intent": "delete_file", "lang": "en"}
+{"text": "erase config.old", "intent": "delete_file", "lang": "en"}
+{"text": "delete file ~/Downloads/installer.dmg", "intent": "delete_file", "lang": "en"}
+{"text": "please remove core.dump", "intent": "delete_file", "lang": "en"}
+{"text": "delet temp.txt", "intent": "delete_file", "lang": "en"}
+{"text": "usuń plik old.log", "intent": "delete_file", "lang": "pl"}
+{"text": "skasuj /tmp/test.txt", "intent": "delete_file", "lang": "pl"}
+{"text": "rm notatki.bak", "intent": "delete_file", "lang": "pl"}
+{"text": "pozbadz sie szkic.md", "intent": "delete_file", "lang": "pl"}
+{"text": "wywal config.old", "intent": "delete_file", "lang": "pl"}
+{"text": "usun plik ~/Pobrane/instalator.dmg", "intent": "delete_file", "lang": "pl"}
+{"text": "proszę usunąć core.dump", "intent": "delete_file", "lang": "pl"}
+{"text": "usun tmep.txt", "intent": "delete_file", "lang": "pl"}
+{"text": "delete the folder build", "intent": "delete_dir", "lang": "en"}
+{"text": "remove directory node_modules", "intent": "delete_dir", "lang": "en"}
+{"text": "rm -r /tmp/cache", "intent": "delete_dir", "lang": "en"}
+{"text": "delete ~/old_project and everything in it", "intent": "delete_dir", "lang": "en"}
+{"text": "wipe out the dist directory", "intent": "delete_dir", "lang": "en"}
+{"text": "remove the folder ./tmp recursively", "intent": "delete_dir", "lang": "en"}
+{"text": "get rid of the __pycache__ directory", "intent": "delete_dir", "lang": "en"}
+{"text": "delte folder target", "intent": "delete_dir", "lang": "en"}
+{"text": "usuń folder build", "intent": "delete_dir", "lang": "pl"}
+{"text": "skasuj katalog node_modules", "intent": "delete_dir", "lang": "pl"}
+{"text": "rm -r na /tmp/cache", "intent": "delete_dir", "lang": "pl"}
+{"text": "usun ~/stary_projekt razem z zawartoscia", "intent": "delete_dir", "lang": "pl"}
+{"text": "wywal katalog dist", "intent": "delete_dir", "lang": "pl"}
+{"text": "usuń rekurencyjnie folder ./tmp", "intent": "delete_dir", "lang": "pl"}
+{"text": "pozbądź się katalogu __pycache__", "intent": "delete_dir", "lang": "pl"}
+{"text": "usun katlog target", "intent": "delete_dir", "lang": "pl"}
+{"text": "delete all .log files", "intent": "delete_by_ext", "lang": "en"}
+{"text": "remove every .tmp file in /tmp", "intent": "delete_by_ext", "lang": "en"}
+{"text": "get rid of all *.pyc files in this project", "intent": "delete_by_ext", "lang": "en"}
+{"text": "delete all .bak files under ~/Documents", "intent": "delete_by_ext", "lang": "en"}
+{"text": "remove .DS_Store files recursively", "intent": "delete_by_ext", "lang": "en"}
+{"text": "wipe all .o files from ./build", "intent": "delete_by_ext", "lang": "en"}
+{"text": "delete every jpg in ./thumbnails", "intent": "delete_by_ext", "lang": "en"}
+{"text": "remove all .swp fiels", "intent": "delete_by_ext", "lang": "en"}
+{"text": "usuń wszystkie pliki .log", "intent": "delete_by_ext", "lang": "pl"}
+{"text": "skasuj kazdy plik .tmp w /tmp", "intent": "delete_by_ext", "lang": "pl"}
+{"text": "pozbądź się wszystkich plików *.pyc w projekcie", "intent": "delete_by_ext", "lang": "pl"}
+{"text": "usun wszystkie pliki .bak w ~/Dokumenty", "intent": "delete_by_ext", "lang": "pl"}
+{"text": "usuń rekurencyjnie pliki .DS_Store", "intent": "delete_by_ext", "lang": "pl"}
+{"text": "wywal wszystkie pliki .o z ./build", "intent": "delete_by_ext", "lang": "pl"}
+{"text": "skasuj wszystkie jpg w ./miniatury", "intent": "delete_by_ext", "lang": "pl"}
+{"text": "usun wszystkie plki .swp", "intent": "delete_by_ext", "lang": "pl"}

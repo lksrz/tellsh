@@ -1,0 +1,1440 @@
+{"text": "list all symlinks here", "intent": "find_symlinks", "lang": "en"}
+{"text": "show symbolic links in /usr/local/bin", "intent": "find_symlinks", "lang": "en"}
+{"text": "find symlinks under ~/projects", "intent": "find_symlinks", "lang": "en"}
+{"text": "which files are symlinks in this folder?", "intent": "find_symlinks", "lang": "en"}
+{"text": "list soft links in /etc", "intent": "find_symlinks", "lang": "en"}
+{"text": "any symbolic links in ./node_modules/.bin?", "intent": "find_symlinks", "lang": "en"}
+{"text": "show me every symlink in /opt", "intent": "find_symlinks", "lang": "en"}
+{"text": "find all symlinks recursively", "intent": "find_symlinks", "lang": "en"}
+{"text": "symlinks in current dir", "intent": "find_symlinks", "lang": "en"}
+{"text": "what are the symbolic links in ~/dotfiles and where do they point", "intent": "find_symlinks", "lang": "en"}
+{"text": "locate soft links under /var/www", "intent": "find_symlinks", "lang": "en"}
+{"text": "can you list the symlinks inside /usr/lib?", "intent": "find_symlinks", "lang": "en"}
+{"text": "show links (symbolic ones) in this repo", "intent": "find_symlinks", "lang": "en"}
+{"text": "find symbolic links in ./build", "intent": "find_symlinks", "lang": "en"}
+{"text": "list every soft link in my home directory", "intent": "find_symlinks", "lang": "en"}
+{"text": "I need to see all symlinks in /srv", "intent": "find_symlinks", "lang": "en"}
+{"text": "are there any symlinks in /home/anna/bin", "intent": "find_symlinks", "lang": "en"}
+{"text": "enumerate symlinks under the current directory", "intent": "find_symlinks", "lang": "en"}
+{"text": "find symlnks in /etc/nginx", "intent": "find_symlinks", "lang": "en"}
+{"text": "show sym links in ~/.config", "intent": "find_symlinks", "lang": "en"}
+{"text": "display all symbolic links and their targets", "intent": "find_symlinks", "lang": "en"}
+{"text": "search for symlinks in /lib", "intent": "find_symlinks", "lang": "en"}
+{"text": "list symlinks please", "intent": "find_symlinks", "lang": "en"}
+{"text": "which entries in /etc/alternatives are links?", "intent": "find_symlinks", "lang": "en"}
+{"text": "find all ln -s links in this project", "intent": "find_symlinks", "lang": "en"}
+{"text": "show symbolic links in ../shared", "intent": "find_symlinks", "lang": "en"}
+{"text": "give me a list of symlinks under /data", "intent": "find_symlinks", "lang": "en"}
+{"text": "scan /usr/bin for symbolic links", "intent": "find_symlinks", "lang": "en"}
+{"text": "list all the symlinks in ./vendor", "intent": "find_symlinks", "lang": "en"}
+{"text": "where are the symlinks in this tree", "intent": "find_symlinks", "lang": "en"}
+{"text": "pokaż wszystkie dowiązania symboliczne", "intent": "find_symlinks", "lang": "pl"}
+{"text": "znajdź symlinki w /usr/local/bin", "intent": "find_symlinks", "lang": "pl"}
+{"text": "pokaz linki symboliczne w tym katalogu", "intent": "find_symlinks", "lang": "pl"}
+{"text": "jakie są symlinki w ~/projects?", "intent": "find_symlinks", "lang": "pl"}
+{"text": "wylistuj dowiązania symboliczne w /etc", "intent": "find_symlinks", "lang": "pl"}
+{"text": "znajdz wszystkie symlinki rekurencyjnie", "intent": "find_symlinks", "lang": "pl"}
+{"text": "symlinki w bieżącym folderze", "intent": "find_symlinks", "lang": "pl"}
+{"text": "gdzie są linki symboliczne w /opt", "intent": "find_symlinks", "lang": "pl"}
+{"text": "pokaż soft linki w katalogu domowym", "intent": "find_symlinks", "lang": "pl"}
+{"text": "lista symlinków w ./node_modules/.bin", "intent": "find_symlinks", "lang": "pl"}
+{"text": "które pliki w /usr/bin to dowiązania?", "intent": "find_symlinks", "lang": "pl"}
+{"text": "wyszukaj dowiązania symboliczne w /var/www", "intent": "find_symlinks", "lang": "pl"}
+{"text": "pokaz symlinki w ~/.config", "intent": "find_symlinks", "lang": "pl"}
+{"text": "czy są jakieś symlinki w /srv?", "intent": "find_symlinks", "lang": "pl"}
+{"text": "znajdź linki symboliczne w folderze build", "intent": "find_symlinks", "lang": "pl"}
+{"text": "wyświetl wszystkie dowiązania i ich cele", "intent": "find_symlinks", "lang": "pl"}
+{"text": "pokaż mi symlinki w /home/anna/bin", "intent": "find_symlinks", "lang": "pl"}
+{"text": "listuj linki symboliczne w /lib", "intent": "find_symlinks", "lang": "pl"}
+{"text": "znajdz dowiazania symboliczne w ./vendor", "intent": "find_symlinks", "lang": "pl"}
+{"text": "jakie mam symlinki w dotfiles", "intent": "find_symlinks", "lang": "pl"}
+{"text": "potrzebuję listy symlinków w /data", "intent": "find_symlinks", "lang": "pl"}
+{"text": "przeszukaj /etc/alternatives pod kątem dowiązań", "intent": "find_symlinks", "lang": "pl"}
+{"text": "pokaż symlnki w repozytorium", "intent": "find_symlinks", "lang": "pl"}
+{"text": "symlinki pod /usr/lib", "intent": "find_symlinks", "lang": "pl"}
+{"text": "wypisz linki symboliczne w katalogu ../shared", "intent": "find_symlinks", "lang": "pl"}
+{"text": "znajdź wszystkie dowiązania symboliczne w projekcie", "intent": "find_symlinks", "lang": "pl"}
+{"text": "pokaz soft linki w /etc/nginx", "intent": "find_symlinks", "lang": "pl"}
+{"text": "gdzie w tym drzewie są symlinki?", "intent": "find_symlinks", "lang": "pl"}
+{"text": "wylistuj symlinki w bieżącym katalogu proszę", "intent": "find_symlinks", "lang": "pl"}
+{"text": "które wpisy w tym folderze są dowiązaniami symbolicznymi", "intent": "find_symlinks", "lang": "pl"}
+{"text": "find broken symlinks", "intent": "broken_symlinks", "lang": "en"}
+{"text": "show dangling symbolic links in /usr/local/bin", "intent": "broken_symlinks", "lang": "en"}
+{"text": "which symlinks are broken in ~/dotfiles?", "intent": "broken_symlinks", "lang": "en"}
+{"text": "list dead links under /etc", "intent": "broken_symlinks", "lang": "en"}
+{"text": "find symlinks pointing to nothing", "intent": "broken_symlinks", "lang": "en"}
+{"text": "any broken links in this directory?", "intent": "broken_symlinks", "lang": "en"}
+{"text": "detect dangling symlinks in /opt", "intent": "broken_symlinks", "lang": "en"}
+{"text": "show orphaned symbolic links in ./node_modules", "intent": "broken_symlinks", "lang": "en"}
+{"text": "find symlinks whose target doesn't exist", "intent": "broken_symlinks", "lang": "en"}
+{"text": "broken symlinks in /usr/lib", "intent": "broken_symlinks", "lang": "en"}
+{"text": "check for broken soft links in my home dir", "intent": "broken_symlinks", "lang": "en"}
+{"text": "I think some links are dead in /srv, find them", "intent": "broken_symlinks", "lang": "en"}
+{"text": "list invalid symlinks under ./build", "intent": "broken_symlinks", "lang": "en"}
+{"text": "find brokn symlinks in /var/www", "intent": "broken_symlinks", "lang": "en"}
+{"text": "which links point to missing files?", "intent": "broken_symlinks", "lang": "en"}
+{"text": "scan for dangling links in ~/.config", "intent": "broken_symlinks", "lang": "en"}
+{"text": "locate dead symbolic links recursively", "intent": "broken_symlinks", "lang": "en"}
+{"text": "show me symlinks that are broken in /home/marek", "intent": "broken_symlinks", "lang": "en"}
+{"text": "find stale symlinks in the project", "intent": "broken_symlinks", "lang": "en"}
+{"text": "search for broken links in /etc/nginx/sites-enabled", "intent": "broken_symlinks", "lang": "en"}
+{"text": "can you find all dangling symlinks here?", "intent": "broken_symlinks", "lang": "en"}
+{"text": "list symlinks with missing targets in /lib", "intent": "broken_symlinks", "lang": "en"}
+{"text": "are there broken symbolic links in ~/bin?", "intent": "broken_symlinks", "lang": "en"}
+{"text": "find dead symlinks in /data", "intent": "broken_symlinks", "lang": "en"}
+{"text": "dangling links in current folder", "intent": "broken_symlinks", "lang": "en"}
+{"text": "clean-up check: which symlinks are broken in ./vendor", "intent": "broken_symlinks", "lang": "en"}
+{"text": "show broken symlinks in /etc/alternatives", "intent": "broken_symlinks", "lang": "en"}
+{"text": "find symlinks that lead nowhere", "intent": "broken_symlinks", "lang": "en"}
+{"text": "detect broken soft links in ../shared", "intent": "broken_symlinks", "lang": "en"}
+{"text": "what symlinks are dead in /usr/share", "intent": "broken_symlinks", "lang": "en"}
+{"text": "znajdź zepsute symlinki", "intent": "broken_symlinks", "lang": "pl"}
+{"text": "pokaż uszkodzone dowiązania symboliczne w /usr/local/bin", "intent": "broken_symlinks", "lang": "pl"}
+{"text": "ktore symlinki sa zepsute w ~/dotfiles?", "intent": "broken_symlinks", "lang": "pl"}
+{"text": "znajdz martwe linki w /etc", "intent": "broken_symlinks", "lang": "pl"}
+{"text": "symlinki wskazujące na nieistniejące pliki", "intent": "broken_symlinks", "lang": "pl"}
+{"text": "czy są jakieś zepsute linki w tym katalogu?", "intent": "broken_symlinks", "lang": "pl"}
+{"text": "wykryj wiszące dowiązania w /opt", "intent": "broken_symlinks", "lang": "pl"}
+{"text": "pokaż osierocone symlinki w ./node_modules", "intent": "broken_symlinks", "lang": "pl"}
+{"text": "znajdź dowiązania, których cel nie istnieje", "intent": "broken_symlinks", "lang": "pl"}
+{"text": "zepsute symlinki w /usr/lib", "intent": "broken_symlinks", "lang": "pl"}
+{"text": "sprawdź czy w katalogu domowym są uszkodzone linki", "intent": "broken_symlinks", "lang": "pl"}
+{"text": "chyba część linków w /srv jest martwa, znajdź je", "intent": "broken_symlinks", "lang": "pl"}
+{"text": "wylistuj niedziałające symlinki w ./build", "intent": "broken_symlinks", "lang": "pl"}
+{"text": "znajdz zepsue symlinki w /var/www", "intent": "broken_symlinks", "lang": "pl"}
+{"text": "które linki wskazują na brakujące pliki?", "intent": "broken_symlinks", "lang": "pl"}
+{"text": "przeskanuj ~/.config pod kątem martwych dowiązań", "intent": "broken_symlinks", "lang": "pl"}
+{"text": "znajdź rekurencyjnie uszkodzone linki symboliczne", "intent": "broken_symlinks", "lang": "pl"}
+{"text": "pokaz zepsute symlinki w /home/marek", "intent": "broken_symlinks", "lang": "pl"}
+{"text": "znajdź nieaktualne dowiązania w projekcie", "intent": "broken_symlinks", "lang": "pl"}
+{"text": "szukaj zepsutych linków w /etc/nginx/sites-enabled", "intent": "broken_symlinks", "lang": "pl"}
+{"text": "możesz znaleźć wszystkie wiszące symlinki tutaj?", "intent": "broken_symlinks", "lang": "pl"}
+{"text": "symlinki z brakującym celem w /lib", "intent": "broken_symlinks", "lang": "pl"}
+{"text": "czy w ~/bin są zepsute dowiązania symboliczne?", "intent": "broken_symlinks", "lang": "pl"}
+{"text": "znajdz martwe symlinki w /data", "intent": "broken_symlinks", "lang": "pl"}
+{"text": "wiszace linki w biezacym folderze", "intent": "broken_symlinks", "lang": "pl"}
+{"text": "które symlinki w ./vendor są uszkodzone", "intent": "broken_symlinks", "lang": "pl"}
+{"text": "pokaż broken symlinki w /etc/alternatives", "intent": "broken_symlinks", "lang": "pl"}
+{"text": "znajdź symlinki prowadzące donikąd", "intent": "broken_symlinks", "lang": "pl"}
+{"text": "wykryj zepsute soft linki w ../shared", "intent": "broken_symlinks", "lang": "pl"}
+{"text": "jakie dowiązania w /usr/share nie działają", "intent": "broken_symlinks", "lang": "pl"}
+{"text": "ls", "intent": "list_files", "lang": "en"}
+{"text": "list files here", "intent": "list_files", "lang": "en"}
+{"text": "show files in /var/log with details", "intent": "list_files", "lang": "en"}
+{"text": "what's in this folder?", "intent": "list_files", "lang": "en"}
+{"text": "list contents of ~/Downloads", "intent": "list_files", "lang": "en"}
+{"text": "show directory listing of /etc with sizes and permissions", "intent": "list_files", "lang": "en"}
+{"text": "ls -la /tmp", "intent": "list_files", "lang": "en"}
+{"text": "list everything in ./src including hidden", "intent": "list_files", "lang": "en"}
+{"text": "whats inside /opt", "intent": "list_files", "lang": "en"}
+{"text": "show me the files in my home directory", "intent": "list_files", "lang": "en"}
+{"text": "detailed listing of /var/www/html", "intent": "list_files", "lang": "en"}
+{"text": "list all files with permissions in current directory", "intent": "list_files", "lang": "en"}
+{"text": "what files are in ~/Documents?", "intent": "list_files", "lang": "en"}
+{"text": "display folder contents of /srv/app", "intent": "list_files", "lang": "en"}
+{"text": "show long listing of ../backup", "intent": "list_files", "lang": "en"}
+{"text": "can you list what's in /usr/local/bin", "intent": "list_files", "lang": "en"}
+{"text": "list dir /home/ola", "intent": "list_files", "lang": "en"}
+{"text": "show files and their sizes in ./dist", "intent": "list_files", "lang": "en"}
+{"text": "what does this directory contain", "intent": "list_files", "lang": "en"}
+{"text": "lsit files in /mnt/usb", "intent": "list_files", "lang": "en"}
+{"text": "show contents of the folder Desktop", "intent": "list_files", "lang": "en"}
+{"text": "list files in . with owner and date", "intent": "list_files", "lang": "en"}
+{"text": "give me a directory listing", "intent": "list_files", "lang": "en"}
+{"text": "show all entries in /etc/nginx", "intent": "list_files", "lang": "en"}
+{"text": "what's in the current dir, with details", "intent": "list_files", "lang": "en"}
+{"text": "list the files in ~/music please", "intent": "list_files", "lang": "en"}
+{"text": "display files in /data/exports", "intent": "list_files", "lang": "en"}
+{"text": "show what's in this dir incl. sizes", "intent": "list_files", "lang": "en"}
+{"text": "contents of /var/lib/docker?", "intent": "list_files", "lang": "en"}
+{"text": "list /boot", "intent": "list_files", "lang": "en"}
+{"text": "wylistuj pliki", "intent": "list_files", "lang": "pl"}
+{"text": "pokaż pliki w /var/log ze szczegółami", "intent": "list_files", "lang": "pl"}
+{"text": "co jest w tym folderze?", "intent": "list_files", "lang": "pl"}
+{"text": "pokaz zawartosc ~/Downloads", "intent": "list_files", "lang": "pl"}
+{"text": "lista plików w /etc z uprawnieniami i rozmiarami", "intent": "list_files", "lang": "pl"}
+{"text": "co mam w katalogu domowym", "intent": "list_files", "lang": "pl"}
+{"text": "wyświetl zawartość katalogu ./src", "intent": "list_files", "lang": "pl"}
+{"text": "co jest w /opt?", "intent": "list_files", "lang": "pl"}
+{"text": "pokaż szczegółową listę plików w /var/www/html", "intent": "list_files", "lang": "pl"}
+{"text": "jakie pliki są w ~/Dokumenty?", "intent": "list_files", "lang": "pl"}
+{"text": "listuj pliki w bieżącym katalogu", "intent": "list_files", "lang": "pl"}
+{"text": "pokaz pliki w /tmp", "intent": "list_files", "lang": "pl"}
+{"text": "zawartość folderu /srv/app", "intent": "list_files", "lang": "pl"}
+{"text": "co zawiera ten katalog", "intent": "list_files", "lang": "pl"}
+{"text": "wyswietl pliki w ../backup", "intent": "list_files", "lang": "pl"}
+{"text": "pokaż mi co jest w /usr/local/bin", "intent": "list_files", "lang": "pl"}
+{"text": "lista plikow w /home/ola", "intent": "list_files", "lang": "pl"}
+{"text": "pokaż pliki i ich rozmiary w ./dist", "intent": "list_files", "lang": "pl"}
+{"text": "wylsituj pliki w /mnt/usb", "intent": "list_files", "lang": "pl"}
+{"text": "co siedzi w folderze Pulpit?", "intent": "list_files", "lang": "pl"}
+{"text": "pokaż wszystkie pliki z właścicielem i datą", "intent": "list_files", "lang": "pl"}
+{"text": "daj listę plików w tym katalogu", "intent": "list_files", "lang": "pl"}
+{"text": "pokaz zawartosc /etc/nginx", "intent": "list_files", "lang": "pl"}
+{"text": "co jest w obecnym katalogu, ze szczegółami", "intent": "list_files", "lang": "pl"}
+{"text": "wylistuj zawartość ~/muzyka proszę", "intent": "list_files", "lang": "pl"}
+{"text": "pliki w /data/exports", "intent": "list_files", "lang": "pl"}
+{"text": "jakie pliki leżą w /var/lib/docker?", "intent": "list_files", "lang": "pl"}
+{"text": "pokaż zawartość /boot", "intent": "list_files", "lang": "pl"}
+{"text": "ls w katalogu /home/kasia", "intent": "list_files", "lang": "pl"}
+{"text": "wyświetl listę plików razem z ukrytymi", "intent": "list_files", "lang": "pl"}
+{"text": "show directory tree", "intent": "list_tree", "lang": "en"}
+{"text": "tree of ./src", "intent": "list_tree", "lang": "en"}
+{"text": "display folder structure of ~/projects/app", "intent": "list_tree", "lang": "en"}
+{"text": "show the tree 3 levels deep", "intent": "list_tree", "lang": "en"}
+{"text": "what's the structure of this project?", "intent": "list_tree", "lang": "en"}
+{"text": "directory tree for /etc/nginx, depth 2", "intent": "list_tree", "lang": "en"}
+{"text": "print a tree view of the current folder", "intent": "list_tree", "lang": "en"}
+{"text": "show nested folder structure of ./docs", "intent": "list_tree", "lang": "en"}
+{"text": "tree -L 4 for /var/www", "intent": "list_tree", "lang": "en"}
+{"text": "give me an overview of the directory hierarchy", "intent": "list_tree", "lang": "en"}
+{"text": "show the layout of this repo", "intent": "list_tree", "lang": "en"}
+{"text": "folder tree of /opt/app with depth one", "intent": "list_tree", "lang": "en"}
+{"text": "show subdirectories as a tree", "intent": "list_tree", "lang": "en"}
+{"text": "display hierarchy of ~/Documents two levels", "intent": "list_tree", "lang": "en"}
+{"text": "tree view please", "intent": "list_tree", "lang": "en"}
+{"text": "show dir tree down to 5 levels in ./lib", "intent": "list_tree", "lang": "en"}
+{"text": "what does the project structure look like", "intent": "list_tree", "lang": "en"}
+{"text": "visualize the folder structure of /srv", "intent": "list_tree", "lang": "en"}
+{"text": "show tree of /home/piotr/code", "intent": "list_tree", "lang": "en"}
+{"text": "print directory structure recursively, depth 3", "intent": "list_tree", "lang": "en"}
+{"text": "show treee of current dir", "intent": "list_tree", "lang": "en"}
+{"text": "outline the directory structure of ../monorepo", "intent": "list_tree", "lang": "en"}
+{"text": "show the structure of ./packages up to 2 levels", "intent": "list_tree", "lang": "en"}
+{"text": "tree for /usr/share/doc", "intent": "list_tree", "lang": "en"}
+{"text": "how is this folder organised? show tree", "intent": "list_tree", "lang": "en"}
+{"text": "display tree of ./config, three levels", "intent": "list_tree", "lang": "en"}
+{"text": "directory hierarchy of /data", "intent": "list_tree", "lang": "en"}
+{"text": "show file tree of the project, depth 6", "intent": "list_tree", "lang": "en"}
+{"text": "map out the folders in ~/work", "intent": "list_tree", "lang": "en"}
+{"text": "show me a tree of src/components", "intent": "list_tree", "lang": "en"}
+{"text": "pokaż drzewo katalogów", "intent": "list_tree", "lang": "pl"}
+{"text": "drzewo ./src", "intent": "list_tree", "lang": "pl"}
+{"text": "pokaż strukturę folderów w ~/projects/app", "intent": "list_tree", "lang": "pl"}
+{"text": "pokaz drzewo na 3 poziomy", "intent": "list_tree", "lang": "pl"}
+{"text": "jaka jest struktura tego projektu?", "intent": "list_tree", "lang": "pl"}
+{"text": "drzewo katalogów /etc/nginx do głębokości 2", "intent": "list_tree", "lang": "pl"}
+{"text": "wyświetl drzewko bieżącego folderu", "intent": "list_tree", "lang": "pl"}
+{"text": "pokaż zagnieżdżoną strukturę ./docs", "intent": "list_tree", "lang": "pl"}
+{"text": "struktura katalogu /var/www, cztery poziomy", "intent": "list_tree", "lang": "pl"}
+{"text": "daj przegląd hierarchii katalogów", "intent": "list_tree", "lang": "pl"}
+{"text": "pokaz uklad tego repozytorium", "intent": "list_tree", "lang": "pl"}
+{"text": "drzewo folderów /opt/app głębokość 1", "intent": "list_tree", "lang": "pl"}
+{"text": "pokaż podkatalogi w formie drzewa", "intent": "list_tree", "lang": "pl"}
+{"text": "hierarchia ~/Dokumenty na dwa poziomy", "intent": "list_tree", "lang": "pl"}
+{"text": "widok drzewa proszę", "intent": "list_tree", "lang": "pl"}
+{"text": "pokaż drzewo do 5 poziomów w ./lib", "intent": "list_tree", "lang": "pl"}
+{"text": "jak wygląda struktura projektu", "intent": "list_tree", "lang": "pl"}
+{"text": "zwizualizuj strukturę folderów w /srv", "intent": "list_tree", "lang": "pl"}
+{"text": "drzewo /home/piotr/kod", "intent": "list_tree", "lang": "pl"}
+{"text": "pokaż strukturę katalogów rekurencyjnie, głębokość 3", "intent": "list_tree", "lang": "pl"}
+{"text": "pokaz drzwo biezacego katalogu", "intent": "list_tree", "lang": "pl"}
+{"text": "struktura katalogów w ../monorepo", "intent": "list_tree", "lang": "pl"}
+{"text": "pokaż strukturę ./packages do 2 poziomów", "intent": "list_tree", "lang": "pl"}
+{"text": "drzewo dla /usr/share/doc", "intent": "list_tree", "lang": "pl"}
+{"text": "jak jest zorganizowany ten folder? pokaż drzewo", "intent": "list_tree", "lang": "pl"}
+{"text": "wyswietl drzewo ./config, trzy poziomy", "intent": "list_tree", "lang": "pl"}
+{"text": "hierarchia katalogu /data", "intent": "list_tree", "lang": "pl"}
+{"text": "drzewo plików projektu, głębokość 6", "intent": "list_tree", "lang": "pl"}
+{"text": "rozrysuj foldery w ~/praca", "intent": "list_tree", "lang": "pl"}
+{"text": "pokaż drzewko src/components", "intent": "list_tree", "lang": "pl"}
+{"text": "show hidden files", "intent": "hidden_files", "lang": "en"}
+{"text": "list dotfiles in my home directory", "intent": "hidden_files", "lang": "en"}
+{"text": "what hidden files are in ~?", "intent": "hidden_files", "lang": "en"}
+{"text": "show files starting with a dot in ./project", "intent": "hidden_files", "lang": "en"}
+{"text": "list hidden files in /etc/skel", "intent": "hidden_files", "lang": "en"}
+{"text": "any dotfiles in this folder?", "intent": "hidden_files", "lang": "en"}
+{"text": "display hidden config files in ~", "intent": "hidden_files", "lang": "en"}
+{"text": "show .files here", "intent": "hidden_files", "lang": "en"}
+{"text": "find hidden files in /root", "intent": "hidden_files", "lang": "en"}
+{"text": "which hidden files does ./repo have", "intent": "hidden_files", "lang": "en"}
+{"text": "list dot files in /home/tomek", "intent": "hidden_files", "lang": "en"}
+{"text": "show me the invisible files in this directory", "intent": "hidden_files", "lang": "en"}
+{"text": "hidden files in ~/Downloads?", "intent": "hidden_files", "lang": "en"}
+{"text": "list all dotfiles in current dir", "intent": "hidden_files", "lang": "en"}
+{"text": "show hiden files in /var/www", "intent": "hidden_files", "lang": "en"}
+{"text": "what dot files exist in ../app", "intent": "hidden_files", "lang": "en"}
+{"text": "show only the hidden entries in ~", "intent": "hidden_files", "lang": "en"}
+{"text": "list .env and other dotfiles here", "intent": "hidden_files", "lang": "en"}
+{"text": "show hidden stuff in /tmp", "intent": "hidden_files", "lang": "en"}
+{"text": "can you show hidden files in ~/work?", "intent": "hidden_files", "lang": "en"}
+{"text": "list hidden dirs and files in .", "intent": "hidden_files", "lang": "en"}
+{"text": "dotfiles in /opt/service", "intent": "hidden_files", "lang": "en"}
+{"text": "display files beginning with . in /srv", "intent": "hidden_files", "lang": "en"}
+{"text": "show me hidden files in the project root", "intent": "hidden_files", "lang": "en"}
+{"text": "which config dotfiles do I have in home", "intent": "hidden_files", "lang": "en"}
+{"text": "list hidden files in ./frontend", "intent": "hidden_files", "lang": "en"}
+{"text": "reveal hidden files in this folder", "intent": "hidden_files", "lang": "en"}
+{"text": "show dotfiles under /home/ola", "intent": "hidden_files", "lang": "en"}
+{"text": "hidden files in /mnt/data", "intent": "hidden_files", "lang": "en"}
+{"text": "list the hidden files please", "intent": "hidden_files", "lang": "en"}
+{"text": "pokaż ukryte pliki", "intent": "hidden_files", "lang": "pl"}
+{"text": "wylistuj dotfiles w katalogu domowym", "intent": "hidden_files", "lang": "pl"}
+{"text": "jakie ukryte pliki są w ~?", "intent": "hidden_files", "lang": "pl"}
+{"text": "pokaż pliki zaczynające się od kropki w ./project", "intent": "hidden_files", "lang": "pl"}
+{"text": "lista ukrytych plików w /etc/skel", "intent": "hidden_files", "lang": "pl"}
+{"text": "czy w tym folderze są jakieś pliki z kropką?", "intent": "hidden_files", "lang": "pl"}
+{"text": "pokaz ukryte pliki konfiguracyjne w home", "intent": "hidden_files", "lang": "pl"}
+{"text": "pokaż pliki .coś tutaj", "intent": "hidden_files", "lang": "pl"}
+{"text": "znajdź ukryte pliki w /root", "intent": "hidden_files", "lang": "pl"}
+{"text": "jakie ukryte pliki ma ./repo", "intent": "hidden_files", "lang": "pl"}
+{"text": "pokaz pliki z kropka w /home/tomek", "intent": "hidden_files", "lang": "pl"}
+{"text": "pokaż niewidoczne pliki w tym katalogu", "intent": "hidden_files", "lang": "pl"}
+{"text": "ukryte pliki w ~/Pobrane?", "intent": "hidden_files", "lang": "pl"}
+{"text": "wylistuj wszystkie dotfile w biezacym katalogu", "intent": "hidden_files", "lang": "pl"}
+{"text": "pokaż ukryte pilki w /var/www", "intent": "hidden_files", "lang": "pl"}
+{"text": "jakie pliki z kropką są w ../app", "intent": "hidden_files", "lang": "pl"}
+{"text": "pokaż tylko ukryte wpisy w katalogu domowym", "intent": "hidden_files", "lang": "pl"}
+{"text": "pokaż .env i inne ukryte pliki tutaj", "intent": "hidden_files", "lang": "pl"}
+{"text": "ukryte rzeczy w /tmp", "intent": "hidden_files", "lang": "pl"}
+{"text": "możesz pokazać ukryte pliki w ~/praca?", "intent": "hidden_files", "lang": "pl"}
+{"text": "wylistuj ukryte katalogi i pliki w .", "intent": "hidden_files", "lang": "pl"}
+{"text": "dotfiles w /opt/service", "intent": "hidden_files", "lang": "pl"}
+{"text": "pokaz pliki zaczynajace sie od kropki w /srv", "intent": "hidden_files", "lang": "pl"}
+{"text": "pokaż ukryte pliki w głównym katalogu projektu", "intent": "hidden_files", "lang": "pl"}
+{"text": "jakie mam ukryte pliki konfiguracyjne w home", "intent": "hidden_files", "lang": "pl"}
+{"text": "lista ukrytych plików w ./frontend", "intent": "hidden_files", "lang": "pl"}
+{"text": "odkryj ukryte pliki w tym folderze", "intent": "hidden_files", "lang": "pl"}
+{"text": "pokaż dotfiles w /home/ola", "intent": "hidden_files", "lang": "pl"}
+{"text": "ukryte pliki w /mnt/data", "intent": "hidden_files", "lang": "pl"}
+{"text": "wylistuj ukryte pliki proszę", "intent": "hidden_files", "lang": "pl"}
+{"text": "what type of file is data.bin?", "intent": "file_type", "lang": "en"}
+{"text": "detect file type of image.png", "intent": "file_type", "lang": "en"}
+{"text": "what kind of file is this: download", "intent": "file_type", "lang": "en"}
+{"text": "check the file type of ./mystery", "intent": "file_type", "lang": "en"}
+{"text": "is backup.img a zip or something else?", "intent": "file_type", "lang": "en"}
+{"text": "identify the format of report", "intent": "file_type", "lang": "en"}
+{"text": "file type of /usr/bin/python3", "intent": "file_type", "lang": "en"}
+{"text": "what format is archive.dat", "intent": "file_type", "lang": "en"}
+{"text": "tell me what kind of file unknown.xyz is", "intent": "file_type", "lang": "en"}
+{"text": "is setup.sh a text file or binary?", "intent": "file_type", "lang": "en"}
+{"text": "determine file type of firmware.bin", "intent": "file_type", "lang": "en"}
+{"text": "whats the filetype of photo", "intent": "file_type", "lang": "en"}
+{"text": "check if video.mkv is really a video", "intent": "file_type", "lang": "en"}
+{"text": "what is /tmp/blob", "intent": "file_type", "lang": "en"}
+{"text": "identify the mime/type of document.pdf", "intent": "file_type", "lang": "en"}
+{"text": "detect type of attachment.eml", "intent": "file_type", "lang": "en"}
+{"text": "is this file an executable? ./run", "intent": "file_type", "lang": "en"}
+{"text": "what kind of file is ~/Downloads/file123", "intent": "file_type", "lang": "en"}
+{"text": "figure out the file format of dump.raw", "intent": "file_type", "lang": "en"}
+{"text": "check what type logo.svg is", "intent": "file_type", "lang": "en"}
+{"text": "file type for /bin/ls", "intent": "file_type", "lang": "en"}
+{"text": "what is the encoding/type of notes.txt", "intent": "file_type", "lang": "en"}
+{"text": "is out.gz actually gzip?", "intent": "file_type", "lang": "en"}
+{"text": "identify filetype of a.out", "intent": "file_type", "lang": "en"}
+{"text": "waht type of file is config", "intent": "file_type", "lang": "en"}
+{"text": "tell me the type of core.12345", "intent": "file_type", "lang": "en"}
+{"text": "detect format of the file data", "intent": "file_type", "lang": "en"}
+{"text": "inspect file type of /var/lib/app/db", "intent": "file_type", "lang": "en"}
+{"text": "what sort of file is snapshot.qcow2", "intent": "file_type", "lang": "en"}
+{"text": "check file type: libssl.so.3", "intent": "file_type", "lang": "en"}
+{"text": "jaki to typ pliku data.bin?", "intent": "file_type", "lang": "pl"}
+{"text": "sprawdź typ pliku image.png", "intent": "file_type", "lang": "pl"}
+{"text": "co to za plik: download", "intent": "file_type", "lang": "pl"}
+{"text": "sprawdz typ pliku ./mystery", "intent": "file_type", "lang": "pl"}
+{"text": "czy backup.img to zip czy coś innego?", "intent": "file_type", "lang": "pl"}
+{"text": "rozpoznaj format pliku report", "intent": "file_type", "lang": "pl"}
+{"text": "typ pliku /usr/bin/python3", "intent": "file_type", "lang": "pl"}
+{"text": "jaki format ma archive.dat", "intent": "file_type", "lang": "pl"}
+{"text": "powiedz mi jakiego rodzaju jest plik unknown.xyz", "intent": "file_type", "lang": "pl"}
+{"text": "czy setup.sh to plik tekstowy czy binarny?", "intent": "file_type", "lang": "pl"}
+{"text": "określ typ pliku firmware.bin", "intent": "file_type", "lang": "pl"}
+{"text": "jaki typ ma plik photo", "intent": "file_type", "lang": "pl"}
+{"text": "sprawdź czy video.mkv to naprawdę wideo", "intent": "file_type", "lang": "pl"}
+{"text": "co to jest /tmp/blob", "intent": "file_type", "lang": "pl"}
+{"text": "zidentyfikuj typ pliku document.pdf", "intent": "file_type", "lang": "pl"}
+{"text": "wykryj typ pliku attachment.eml", "intent": "file_type", "lang": "pl"}
+{"text": "czy ./run to plik wykonywalny?", "intent": "file_type", "lang": "pl"}
+{"text": "co to za plik ~/Pobrane/plik123", "intent": "file_type", "lang": "pl"}
+{"text": "ustal format pliku dump.raw", "intent": "file_type", "lang": "pl"}
+{"text": "sprawdz jakiego typu jest logo.svg", "intent": "file_type", "lang": "pl"}
+{"text": "typ pliku dla /bin/ls", "intent": "file_type", "lang": "pl"}
+{"text": "jakie kodowanie i typ ma notatki.txt", "intent": "file_type", "lang": "pl"}
+{"text": "czy out.gz to faktycznie gzip?", "intent": "file_type", "lang": "pl"}
+{"text": "rozpoznaj typ pliku a.out", "intent": "file_type", "lang": "pl"}
+{"text": "jaki tpy pliku ma config", "intent": "file_type", "lang": "pl"}
+{"text": "jakiego typu jest core.12345", "intent": "file_type", "lang": "pl"}
+{"text": "wykryj format pliku data", "intent": "file_type", "lang": "pl"}
+{"text": "sprawdź typ pliku /var/lib/app/db", "intent": "file_type", "lang": "pl"}
+{"text": "co to za rodzaj pliku snapshot.qcow2", "intent": "file_type", "lang": "pl"}
+{"text": "jaki to plik: libssl.so.3", "intent": "file_type", "lang": "pl"}
+{"text": "show metadata of report.pdf", "intent": "file_stat", "lang": "en"}
+{"text": "stat app.log", "intent": "file_stat", "lang": "en"}
+{"text": "when was config.yml last modified and what are its permissions?", "intent": "file_stat", "lang": "en"}
+{"text": "file details for /etc/passwd", "intent": "file_stat", "lang": "en"}
+{"text": "show size, owner and timestamps of backup.tar.gz", "intent": "file_stat", "lang": "en"}
+{"text": "get file info for notes.txt", "intent": "file_stat", "lang": "en"}
+{"text": "show inode info of ./data.db", "intent": "file_stat", "lang": "en"}
+{"text": "what are the access and modify times of index.html", "intent": "file_stat", "lang": "en"}
+{"text": "display file stats for ~/.bashrc", "intent": "file_stat", "lang": "en"}
+{"text": "file metadata: /var/log/syslog", "intent": "file_stat", "lang": "en"}
+{"text": "show creation time and permissions of script.sh", "intent": "file_stat", "lang": "en"}
+{"text": "full info about the file main.go", "intent": "file_stat", "lang": "en"}
+{"text": "stat the file /etc/hosts", "intent": "file_stat", "lang": "en"}
+{"text": "check timestamps on photo.jpg", "intent": "file_stat", "lang": "en"}
+{"text": "show detailed attributes of package.json", "intent": "file_stat", "lang": "en"}
+{"text": "when was README.md changed? full stat", "intent": "file_stat", "lang": "en"}
+{"text": "what are the permissions, size and dates of db.sqlite", "intent": "file_stat", "lang": "en"}
+{"text": "show statistics for file output.csv", "intent": "file_stat", "lang": "en"}
+{"text": "stat /usr/bin/bash", "intent": "file_stat", "lang": "en"}
+{"text": "file inode, links and size for ./bin/app", "intent": "file_stat", "lang": "en"}
+{"text": "show last access time of secrets.env", "intent": "file_stat", "lang": "en"}
+{"text": "metadata of ~/Downloads/video.mp4", "intent": "file_stat", "lang": "en"}
+{"text": "show file properties of Makefile", "intent": "file_stat", "lang": "en"}
+{"text": "detailed info on /var/www/index.php", "intent": "file_stat", "lang": "en"}
+{"text": "get mtime/atime/ctime of server.log", "intent": "file_stat", "lang": "en"}
+{"text": "show stat output for dump.sql", "intent": "file_stat", "lang": "en"}
+{"text": "how big is test.bin and when was it modified, full details", "intent": "file_stat", "lang": "en"}
+{"text": "file info /etc/fstab", "intent": "file_stat", "lang": "en"}
+{"text": "show all file metadata for key.pem", "intent": "file_stat", "lang": "en"}
+{"text": "stats on file ./docker-compose.yml", "intent": "file_stat", "lang": "en"}
+{"text": "pokaż metadane pliku raport.pdf", "intent": "file_stat", "lang": "pl"}
+{"text": "kiedy config.yml był ostatnio modyfikowany i jakie ma uprawnienia?", "intent": "file_stat", "lang": "pl"}
+{"text": "szczegóły pliku /etc/passwd", "intent": "file_stat", "lang": "pl"}
+{"text": "pokaż rozmiar, właściciela i daty pliku backup.tar.gz", "intent": "file_stat", "lang": "pl"}
+{"text": "informacje o pliku notatki.txt", "intent": "file_stat", "lang": "pl"}
+{"text": "pokaz informacje o inode ./data.db", "intent": "file_stat", "lang": "pl"}
+{"text": "jakie są czasy dostępu i modyfikacji index.html", "intent": "file_stat", "lang": "pl"}
+{"text": "wyświetl statystyki pliku ~/.bashrc", "intent": "file_stat", "lang": "pl"}
+{"text": "metadane pliku /var/log/syslog", "intent": "file_stat", "lang": "pl"}
+{"text": "pokaż datę utworzenia i uprawnienia skrypt.sh", "intent": "file_stat", "lang": "pl"}
+{"text": "pełne informacje o pliku main.go", "intent": "file_stat", "lang": "pl"}
+{"text": "zrób stat na /etc/hosts", "intent": "file_stat", "lang": "pl"}
+{"text": "sprawdz znaczniki czasu na zdjecie.jpg", "intent": "file_stat", "lang": "pl"}
+{"text": "pokaż szczegółowe atrybuty package.json", "intent": "file_stat", "lang": "pl"}
+{"text": "kiedy zmieniono README.md? pełne info", "intent": "file_stat", "lang": "pl"}
+{"text": "jakie uprawnienia, rozmiar i daty ma db.sqlite", "intent": "file_stat", "lang": "pl"}
+{"text": "statystyki pliku output.csv", "intent": "file_stat", "lang": "pl"}
+{"text": "stat dla /usr/bin/bash", "intent": "file_stat", "lang": "pl"}
+{"text": "inode, liczba dowiązań i rozmiar ./bin/app", "intent": "file_stat", "lang": "pl"}
+{"text": "pokaż czas ostatniego dostępu do secrets.env", "intent": "file_stat", "lang": "pl"}
+{"text": "metadane ~/Pobrane/film.mp4", "intent": "file_stat", "lang": "pl"}
+{"text": "pokaz wlasciwosci pliku Makefile", "intent": "file_stat", "lang": "pl"}
+{"text": "szczegółowe informacje o /var/www/index.php", "intent": "file_stat", "lang": "pl"}
+{"text": "daj mtime, atime i ctime pliku server.log", "intent": "file_stat", "lang": "pl"}
+{"text": "wynik stat dla dump.sql", "intent": "file_stat", "lang": "pl"}
+{"text": "ile waży test.bin i kiedy był modyfikowany, wszystkie szczegóły", "intent": "file_stat", "lang": "pl"}
+{"text": "info o pliku /etc/fstab", "intent": "file_stat", "lang": "pl"}
+{"text": "wszystkie metadane pliku klucz.pem", "intent": "file_stat", "lang": "pl"}
+{"text": "pokaż atrybuty pliku ./docker-compose.yml", "intent": "file_stat", "lang": "pl"}
+{"text": "show first 10 lines of app.log", "intent": "head_file", "lang": "en"}
+{"text": "head notes.txt", "intent": "head_file", "lang": "en"}
+{"text": "first 20 lines of /var/log/syslog", "intent": "head_file", "lang": "en"}
+{"text": "show the beginning of data.csv", "intent": "head_file", "lang": "en"}
+{"text": "print top 5 lines of config.yml", "intent": "head_file", "lang": "en"}
+{"text": "peek at the start of README.md", "intent": "head_file", "lang": "en"}
+{"text": "show first fifteen lines of server.log", "intent": "head_file", "lang": "en"}
+{"text": "what are the first lines of output.txt", "intent": "head_file", "lang": "en"}
+{"text": "head -n 50 dump.sql", "intent": "head_file", "lang": "en"}
+{"text": "show me the header row of users.csv", "intent": "head_file", "lang": "en"}
+{"text": "first 3 lines of /etc/passwd", "intent": "head_file", "lang": "en"}
+{"text": "give me the opening lines of main.py", "intent": "head_file", "lang": "en"}
+{"text": "show the top of the file error.log", "intent": "head_file", "lang": "en"}
+{"text": "display first 100 lines of big.json", "intent": "head_file", "lang": "en"}
+{"text": "preview the first few lines of report.txt", "intent": "head_file", "lang": "en"}
+{"text": "first line of version.txt", "intent": "head_file", "lang": "en"}
+{"text": "show the first twenty lines of access.log", "intent": "head_file", "lang": "en"}
+{"text": "head of ~/Downloads/list.txt", "intent": "head_file", "lang": "en"}
+{"text": "show beginning of file /etc/hosts, 8 lines", "intent": "head_file", "lang": "en"}
+{"text": "just the first lines of Dockerfile please", "intent": "head_file", "lang": "en"}
+{"text": "show frist 10 lines of todo.md", "intent": "head_file", "lang": "en"}
+{"text": "top 25 lines of results.tsv", "intent": "head_file", "lang": "en"}
+{"text": "glance at the first part of changelog.md", "intent": "head_file", "lang": "en"}
+{"text": "print lines 1-30 of index.js", "intent": "head_file", "lang": "en"}
+{"text": "show the start of nginx.conf", "intent": "head_file", "lang": "en"}
+{"text": "what's at the top of package.json", "intent": "head_file", "lang": "en"}
+{"text": "first two lines of id_rsa.pub", "intent": "head_file", "lang": "en"}
+{"text": "show the head of transactions.csv, 12 rows", "intent": "head_file", "lang": "en"}
+{"text": "print the first 40 lines of build.log", "intent": "head_file", "lang": "en"}
+{"text": "quick look at the first lines of data.txt", "intent": "head_file", "lang": "en"}
+{"text": "pokaż pierwsze 10 linii app.log", "intent": "head_file", "lang": "pl"}
+{"text": "początek pliku notatki.txt", "intent": "head_file", "lang": "pl"}
+{"text": "pierwsze 20 linii /var/log/syslog", "intent": "head_file", "lang": "pl"}
+{"text": "pokaz poczatek data.csv", "intent": "head_file", "lang": "pl"}
+{"text": "wyświetl 5 pierwszych linii config.yml", "intent": "head_file", "lang": "pl"}
+{"text": "zerknij na początek README.md", "intent": "head_file", "lang": "pl"}
+{"text": "pokaż pierwsze piętnaście linijek server.log", "intent": "head_file", "lang": "pl"}
+{"text": "jakie są pierwsze linie output.txt", "intent": "head_file", "lang": "pl"}
+{"text": "pierwsze 50 linii dump.sql", "intent": "head_file", "lang": "pl"}
+{"text": "pokaz naglowek pliku users.csv", "intent": "head_file", "lang": "pl"}
+{"text": "pierwsze 3 linie /etc/passwd", "intent": "head_file", "lang": "pl"}
+{"text": "pokaż początkowe linijki main.py", "intent": "head_file", "lang": "pl"}
+{"text": "pokaż górę pliku error.log", "intent": "head_file", "lang": "pl"}
+{"text": "wyświetl pierwsze sto linii big.json", "intent": "head_file", "lang": "pl"}
+{"text": "podgląd kilku pierwszych linii raport.txt", "intent": "head_file", "lang": "pl"}
+{"text": "pierwsza linia version.txt", "intent": "head_file", "lang": "pl"}
+{"text": "pokaz pierwsze dwadziescia linii access.log", "intent": "head_file", "lang": "pl"}
+{"text": "początek pliku ~/Pobrane/lista.txt", "intent": "head_file", "lang": "pl"}
+{"text": "pokaż początek /etc/hosts, 8 linii", "intent": "head_file", "lang": "pl"}
+{"text": "tylko pierwsze linie Dockerfile proszę", "intent": "head_file", "lang": "pl"}
+{"text": "pokaz pierwsze 10 lnii todo.md", "intent": "head_file", "lang": "pl"}
+{"text": "25 pierwszych wierszy results.tsv", "intent": "head_file", "lang": "pl"}
+{"text": "rzuć okiem na pierwszą część changelog.md", "intent": "head_file", "lang": "pl"}
+{"text": "wypisz linie 1-30 z index.js", "intent": "head_file", "lang": "pl"}
+{"text": "pokaż początek nginx.conf", "intent": "head_file", "lang": "pl"}
+{"text": "co jest na górze package.json", "intent": "head_file", "lang": "pl"}
+{"text": "pierwsze dwie linie id_rsa.pub", "intent": "head_file", "lang": "pl"}
+{"text": "pokaż pierwsze 12 wierszy transactions.csv", "intent": "head_file", "lang": "pl"}
+{"text": "wypisz pierwsze 40 linii build.log", "intent": "head_file", "lang": "pl"}
+{"text": "szybki podgląd początku pliku dane.txt", "intent": "head_file", "lang": "pl"}
+{"text": "show last 10 lines of app.log", "intent": "tail_file", "lang": "en"}
+{"text": "tail error.log", "intent": "tail_file", "lang": "en"}
+{"text": "last 50 lines of /var/log/syslog", "intent": "tail_file", "lang": "en"}
+{"text": "show the end of output.txt", "intent": "tail_file", "lang": "en"}
+{"text": "print the last 5 lines of build.log", "intent": "tail_file", "lang": "en"}
+{"text": "what's at the bottom of server.log", "intent": "tail_file", "lang": "en"}
+{"text": "show the last twenty lines of access.log", "intent": "tail_file", "lang": "en"}
+{"text": "last lines of dump.sql", "intent": "tail_file", "lang": "en"}
+{"text": "tail -n 100 /var/log/nginx/error.log", "intent": "tail_file", "lang": "en"}
+{"text": "show me the final lines of report.csv", "intent": "tail_file", "lang": "en"}
+{"text": "last line of results.txt", "intent": "tail_file", "lang": "en"}
+{"text": "display the ending of debug.log, 30 lines", "intent": "tail_file", "lang": "en"}
+{"text": "show the tail of install.log", "intent": "tail_file", "lang": "en"}
+{"text": "last 3 lines of /etc/passwd", "intent": "tail_file", "lang": "en"}
+{"text": "give me the last fifteen lines of cron.log", "intent": "tail_file", "lang": "en"}
+{"text": "end of file notes.md", "intent": "tail_file", "lang": "en"}
+{"text": "show bottom 25 lines of messages", "intent": "tail_file", "lang": "en"}
+{"text": "peek at the end of history.txt", "intent": "tail_file", "lang": "en"}
+{"text": "show last lnies of app.log", "intent": "tail_file", "lang": "en"}
+{"text": "the last 200 lines of catalina.out", "intent": "tail_file", "lang": "en"}
+{"text": "show final 8 lines of deploy.log", "intent": "tail_file", "lang": "en"}
+{"text": "what are the most recent lines in auth.log (not live, just last 40)", "intent": "tail_file", "lang": "en"}
+{"text": "last few lines of ~/Downloads/data.csv", "intent": "tail_file", "lang": "en"}
+{"text": "show the end of the file Makefile", "intent": "tail_file", "lang": "en"}
+{"text": "print the tail end of test-results.xml", "intent": "tail_file", "lang": "en"}
+{"text": "last 12 lines of kern.log", "intent": "tail_file", "lang": "en"}
+{"text": "display bottom of changelog.txt", "intent": "tail_file", "lang": "en"}
+{"text": "last ten lines of /var/log/dpkg.log", "intent": "tail_file", "lang": "en"}
+{"text": "show trailing lines of transactions.csv", "intent": "tail_file", "lang": "en"}
+{"text": "just the last line of version.log", "intent": "tail_file", "lang": "en"}
+{"text": "pokaż ostatnie 10 linii app.log", "intent": "tail_file", "lang": "pl"}
+{"text": "koniec pliku error.log", "intent": "tail_file", "lang": "pl"}
+{"text": "ostatnie 50 linii /var/log/syslog", "intent": "tail_file", "lang": "pl"}
+{"text": "pokaz koniec output.txt", "intent": "tail_file", "lang": "pl"}
+{"text": "wyświetl 5 ostatnich linii build.log", "intent": "tail_file", "lang": "pl"}
+{"text": "co jest na dole server.log", "intent": "tail_file", "lang": "pl"}
+{"text": "pokaż ostatnie dwadzieścia linijek access.log", "intent": "tail_file", "lang": "pl"}
+{"text": "ostatnie linie dump.sql", "intent": "tail_file", "lang": "pl"}
+{"text": "ostatnie 100 linii /var/log/nginx/error.log", "intent": "tail_file", "lang": "pl"}
+{"text": "pokaż końcowe linie raport.csv", "intent": "tail_file", "lang": "pl"}
+{"text": "ostatnia linia results.txt", "intent": "tail_file", "lang": "pl"}
+{"text": "wyświetl końcówkę debug.log, 30 linii", "intent": "tail_file", "lang": "pl"}
+{"text": "pokaz koncowke install.log", "intent": "tail_file", "lang": "pl"}
+{"text": "ostatnie 3 linie /etc/passwd", "intent": "tail_file", "lang": "pl"}
+{"text": "daj ostatnie piętnaście linii cron.log", "intent": "tail_file", "lang": "pl"}
+{"text": "koniec pliku notatki.md", "intent": "tail_file", "lang": "pl"}
+{"text": "pokaż dolne 25 linii messages", "intent": "tail_file", "lang": "pl"}
+{"text": "zerknij na koniec historia.txt", "intent": "tail_file", "lang": "pl"}
+{"text": "pokaz ostanie linie app.log", "intent": "tail_file", "lang": "pl"}
+{"text": "ostatnie 200 linii catalina.out", "intent": "tail_file", "lang": "pl"}
+{"text": "pokaż ostatnie 8 linii deploy.log", "intent": "tail_file", "lang": "pl"}
+{"text": "najnowsze linie w auth.log (bez śledzenia, tylko ostatnie 40)", "intent": "tail_file", "lang": "pl"}
+{"text": "kilka ostatnich linii ~/Pobrane/dane.csv", "intent": "tail_file", "lang": "pl"}
+{"text": "pokaż koniec pliku Makefile", "intent": "tail_file", "lang": "pl"}
+{"text": "wypisz końcówkę test-results.xml", "intent": "tail_file", "lang": "pl"}
+{"text": "ostatnie 12 linii kern.log", "intent": "tail_file", "lang": "pl"}
+{"text": "wyswietl dol pliku changelog.txt", "intent": "tail_file", "lang": "pl"}
+{"text": "ostatnie dziesięć linii /var/log/dpkg.log", "intent": "tail_file", "lang": "pl"}
+{"text": "końcowe wiersze transactions.csv", "intent": "tail_file", "lang": "pl"}
+{"text": "tylko ostatnia linijka version.log", "intent": "tail_file", "lang": "pl"}
+{"text": "follow app.log live", "intent": "tail_follow", "lang": "en"}
+{"text": "tail -f /var/log/syslog", "intent": "tail_follow", "lang": "en"}
+{"text": "watch the log file in real time", "intent": "tail_follow", "lang": "en"}
+{"text": "stream new lines of server.log as they come", "intent": "tail_follow", "lang": "en"}
+{"text": "follow /var/log/nginx/access.log", "intent": "tail_follow", "lang": "en"}
+{"text": "keep watching error.log for new entries", "intent": "tail_follow", "lang": "en"}
+{"text": "monitor syslog live", "intent": "tail_follow", "lang": "en"}
+{"text": "live view of debug.log", "intent": "tail_follow", "lang": "en"}
+{"text": "follow the log", "intent": "tail_follow", "lang": "en"}
+{"text": "tail and follow ~/app/logs/output.log", "intent": "tail_follow", "lang": "en"}
+{"text": "watch auth.log as it grows", "intent": "tail_follow", "lang": "en"}
+{"text": "show new log lines in real time from /var/log/messages", "intent": "tail_follow", "lang": "en"}
+{"text": "continuously print appended lines of worker.log", "intent": "tail_follow", "lang": "en"}
+{"text": "follow kern.log", "intent": "tail_follow", "lang": "en"}
+{"text": "keep the log open and update: deploy.log", "intent": "tail_follow", "lang": "en"}
+{"text": "live tail of production.log", "intent": "tail_follow", "lang": "en"}
+{"text": "follow logs as they are written in /var/log/apache2/error.log", "intent": "tail_follow", "lang": "en"}
+{"text": "watch the system log live", "intent": "tail_follow", "lang": "en"}
+{"text": "real-time monitoring of cron.log", "intent": "tail_follow", "lang": "en"}
+{"text": "folow app.log", "intent": "tail_follow", "lang": "en"}
+{"text": "stream the end of build.log continuously", "intent": "tail_follow", "lang": "en"}
+{"text": "tail with follow on catalina.out", "intent": "tail_follow", "lang": "en"}
+{"text": "i want to watch requests.log live while I test", "intent": "tail_follow", "lang": "en"}
+{"text": "keep tailing /var/log/mail.log", "intent": "tail_follow", "lang": "en"}
+{"text": "watch for new lines in queue.log", "intent": "tail_follow", "lang": "en"}
+{"text": "follow the end of the file events.log", "intent": "tail_follow", "lang": "en"}
+{"text": "live log /var/log/dmesg.log", "intent": "tail_follow", "lang": "en"}
+{"text": "monitor celery.log as it updates", "intent": "tail_follow", "lang": "en"}
+{"text": "watch ~/logs/bot.log in realtime", "intent": "tail_follow", "lang": "en"}
+{"text": "stream syslog", "intent": "tail_follow", "lang": "en"}
+{"text": "śledź app.log na żywo", "intent": "tail_follow", "lang": "pl"}
+{"text": "obserwuj plik logu w czasie rzeczywistym", "intent": "tail_follow", "lang": "pl"}
+{"text": "pokazuj nowe linie server.log na bieżąco", "intent": "tail_follow", "lang": "pl"}
+{"text": "sledz /var/log/nginx/access.log", "intent": "tail_follow", "lang": "pl"}
+{"text": "obserwuj error.log i pokazuj nowe wpisy", "intent": "tail_follow", "lang": "pl"}
+{"text": "monitoruj syslog na zywo", "intent": "tail_follow", "lang": "pl"}
+{"text": "podgląd na żywo debug.log", "intent": "tail_follow", "lang": "pl"}
+{"text": "śledź logi", "intent": "tail_follow", "lang": "pl"}
+{"text": "śledź na bieżąco ~/app/logs/output.log", "intent": "tail_follow", "lang": "pl"}
+{"text": "obserwuj auth.log jak rośnie", "intent": "tail_follow", "lang": "pl"}
+{"text": "pokazuj nowe wpisy z /var/log/messages w czasie rzeczywistym", "intent": "tail_follow", "lang": "pl"}
+{"text": "wypisuj ciągle dopisywane linie worker.log", "intent": "tail_follow", "lang": "pl"}
+{"text": "sledz kern.log", "intent": "tail_follow", "lang": "pl"}
+{"text": "trzymaj log otwarty i odświeżaj: deploy.log", "intent": "tail_follow", "lang": "pl"}
+{"text": "podgląd na żywo production.log", "intent": "tail_follow", "lang": "pl"}
+{"text": "śledź logi zapisywane do /var/log/apache2/error.log", "intent": "tail_follow", "lang": "pl"}
+{"text": "obserwuj log systemowy na żywo", "intent": "tail_follow", "lang": "pl"}
+{"text": "monitorowanie cron.log w czasie rzeczywistym", "intent": "tail_follow", "lang": "pl"}
+{"text": "sledz app.lgo", "intent": "tail_follow", "lang": "pl"}
+{"text": "pokazuj końcówkę build.log w trybie ciągłym", "intent": "tail_follow", "lang": "pl"}
+{"text": "tail z follow na catalina.out", "intent": "tail_follow", "lang": "pl"}
+{"text": "chcę patrzeć na requests.log na żywo podczas testów", "intent": "tail_follow", "lang": "pl"}
+{"text": "śledź non stop /var/log/mail.log", "intent": "tail_follow", "lang": "pl"}
+{"text": "obserwuj nowe linie w queue.log", "intent": "tail_follow", "lang": "pl"}
+{"text": "podążaj za końcem pliku events.log", "intent": "tail_follow", "lang": "pl"}
+{"text": "log na zywo /var/log/dmesg.log", "intent": "tail_follow", "lang": "pl"}
+{"text": "monitoruj celery.log na bieżąco", "intent": "tail_follow", "lang": "pl"}
+{"text": "obserwuj ~/logs/bot.log w realtime", "intent": "tail_follow", "lang": "pl"}
+{"text": "streamuj syslog", "intent": "tail_follow", "lang": "pl"}
+{"text": "show contents of notes.txt", "intent": "cat_file", "lang": "en"}
+{"text": "cat config.yml", "intent": "cat_file", "lang": "en"}
+{"text": "print the whole file /etc/hosts", "intent": "cat_file", "lang": "en"}
+{"text": "display README.md", "intent": "cat_file", "lang": "en"}
+{"text": "what's in todo.txt?", "intent": "cat_file", "lang": "en"}
+{"text": "open and print .env", "intent": "cat_file", "lang": "en"}
+{"text": "read the file package.json", "intent": "cat_file", "lang": "en"}
+{"text": "show me the full content of nginx.conf", "intent": "cat_file", "lang": "en"}
+{"text": "dump the file output.json to the screen", "intent": "cat_file", "lang": "en"}
+{"text": "print ~/.bashrc", "intent": "cat_file", "lang": "en"}
+{"text": "cat /etc/os-release please", "intent": "cat_file", "lang": "en"}
+{"text": "show what's written in letter.txt", "intent": "cat_file", "lang": "en"}
+{"text": "display the entire file requirements.txt", "intent": "cat_file", "lang": "en"}
+{"text": "let me see the content of Dockerfile", "intent": "cat_file", "lang": "en"}
+{"text": "print out script.sh", "intent": "cat_file", "lang": "en"}
+{"text": "view file /etc/fstab", "intent": "cat_file", "lang": "en"}
+{"text": "show the file docker-compose.yml", "intent": "cat_file", "lang": "en"}
+{"text": "output the content of key.pub", "intent": "cat_file", "lang": "en"}
+{"text": "whats in the file .gitignore", "intent": "cat_file", "lang": "en"}
+{"text": "read me the contents of hosts.ini", "intent": "cat_file", "lang": "en"}
+{"text": "display the text of LICENSE", "intent": "cat_file", "lang": "en"}
+{"text": "show contents fo app.conf", "intent": "cat_file", "lang": "en"}
+{"text": "print everything in data.txt", "intent": "cat_file", "lang": "en"}
+{"text": "show me secrets.yaml", "intent": "cat_file", "lang": "en"}
+{"text": "cat the file ~/notes/ideas.md", "intent": "cat_file", "lang": "en"}
+{"text": "read /proc/cpuinfo in full", "intent": "cat_file", "lang": "en"}
+{"text": "show full file crontab.txt", "intent": "cat_file", "lang": "en"}
+{"text": "print contents of /etc/resolv.conf", "intent": "cat_file", "lang": "en"}
+{"text": "display whole file index.html", "intent": "cat_file", "lang": "en"}
+{"text": "what does settings.py contain", "intent": "cat_file", "lang": "en"}
+{"text": "pokaż zawartość notatki.txt", "intent": "cat_file", "lang": "pl"}
+{"text": "wypisz cały plik /etc/hosts", "intent": "cat_file", "lang": "pl"}
+{"text": "wyswietl README.md", "intent": "cat_file", "lang": "pl"}
+{"text": "co jest w todo.txt?", "intent": "cat_file", "lang": "pl"}
+{"text": "otwórz i wypisz .env", "intent": "cat_file", "lang": "pl"}
+{"text": "przeczytaj plik package.json", "intent": "cat_file", "lang": "pl"}
+{"text": "pokaż całą zawartość nginx.conf", "intent": "cat_file", "lang": "pl"}
+{"text": "wyrzuć plik output.json na ekran", "intent": "cat_file", "lang": "pl"}
+{"text": "wypisz ~/.bashrc", "intent": "cat_file", "lang": "pl"}
+{"text": "cat /etc/os-release proszę", "intent": "cat_file", "lang": "pl"}
+{"text": "pokaz co jest napisane w list.txt", "intent": "cat_file", "lang": "pl"}
+{"text": "wyświetl cały plik requirements.txt", "intent": "cat_file", "lang": "pl"}
+{"text": "daj zobaczyć zawartość Dockerfile", "intent": "cat_file", "lang": "pl"}
+{"text": "wypisz skrypt.sh", "intent": "cat_file", "lang": "pl"}
+{"text": "podglad pliku /etc/fstab", "intent": "cat_file", "lang": "pl"}
+{"text": "pokaż plik docker-compose.yml", "intent": "cat_file", "lang": "pl"}
+{"text": "wyświetl treść key.pub", "intent": "cat_file", "lang": "pl"}
+{"text": "co jest w pliku .gitignore", "intent": "cat_file", "lang": "pl"}
+{"text": "przeczytaj zawartosc hosts.ini", "intent": "cat_file", "lang": "pl"}
+{"text": "pokaż tekst pliku LICENSE", "intent": "cat_file", "lang": "pl"}
+{"text": "pokaż zawrtość app.conf", "intent": "cat_file", "lang": "pl"}
+{"text": "wypisz wszystko z dane.txt", "intent": "cat_file", "lang": "pl"}
+{"text": "pokaż mi secrets.yaml", "intent": "cat_file", "lang": "pl"}
+{"text": "wyświetl plik ~/notatki/pomysly.md", "intent": "cat_file", "lang": "pl"}
+{"text": "przeczytaj w całości /proc/cpuinfo", "intent": "cat_file", "lang": "pl"}
+{"text": "pokaz caly plik crontab.txt", "intent": "cat_file", "lang": "pl"}
+{"text": "zawartość /etc/resolv.conf", "intent": "cat_file", "lang": "pl"}
+{"text": "wyświetl cały plik index.html", "intent": "cat_file", "lang": "pl"}
+{"text": "co zawiera settings.py", "intent": "cat_file", "lang": "pl"}
+{"text": "compress ./src into src.tar.gz", "intent": "compress_targz", "lang": "en"}
+{"text": "make a tarball of ~/projects/app", "intent": "compress_targz", "lang": "en"}
+{"text": "create a tar.gz archive of /var/www named site.tar.gz", "intent": "compress_targz", "lang": "en"}
+{"text": "tar up the logs folder", "intent": "compress_targz", "lang": "en"}
+{"text": "pack this directory into backup.tar.gz", "intent": "compress_targz", "lang": "en"}
+{"text": "gzip the whole folder photos into an archive", "intent": "compress_targz", "lang": "en"}
+{"text": "create tgz of ./build", "intent": "compress_targz", "lang": "en"}
+{"text": "archive /etc/nginx as nginx-conf.tar.gz", "intent": "compress_targz", "lang": "en"}
+{"text": "compress the current directory to tar.gz", "intent": "compress_targz", "lang": "en"}
+{"text": "make a .tar.gz from the docs dir", "intent": "compress_targz", "lang": "en"}
+{"text": "bundle ~/Documents into docs.tgz", "intent": "compress_targz", "lang": "en"}
+{"text": "how do I tar and gzip the folder data", "intent": "compress_targz", "lang": "en"}
+{"text": "create a compressed tarball of release/ called release-1.2.tar.gz", "intent": "compress_targz", "lang": "en"}
+{"text": "pack /home/ola into ola-home.tar.gz", "intent": "compress_targz", "lang": "en"}
+{"text": "tar czf the dist folder", "intent": "compress_targz", "lang": "en"}
+{"text": "compres project into project.tar.gz", "intent": "compress_targz", "lang": "en"}
+{"text": "make a gzipped tar archive of /opt/app", "intent": "compress_targz", "lang": "en"}
+{"text": "create an archive backup-2024.tar.gz from ./db", "intent": "compress_targz", "lang": "en"}
+{"text": "turn the folder exports into a tar.gz", "intent": "compress_targz", "lang": "en"}
+{"text": "put config/ into a tarball", "intent": "compress_targz", "lang": "en"}
+{"text": "tar gz the directory ~/music", "intent": "compress_targz", "lang": "en"}
+{"text": "archive and compress ./assets to assets.tar.gz", "intent": "compress_targz", "lang": "en"}
+{"text": "can you make a tar.gz of the whole repo?", "intent": "compress_targz", "lang": "en"}
+{"text": "compress notes.txt into notes.tar.gz", "intent": "compress_targz", "lang": "en"}
+{"text": "backup /srv/data as data.tar.gz", "intent": "compress_targz", "lang": "en"}
+{"text": "make tarball out of ./vendor", "intent": "compress_targz", "lang": "en"}
+{"text": "create site-backup.tgz of /var/www/html", "intent": "compress_targz", "lang": "en"}
+{"text": "gzip-compressed tar of the logs dir please", "intent": "compress_targz", "lang": "en"}
+{"text": "pack ./public to public.tar.gz", "intent": "compress_targz", "lang": "en"}
+{"text": "squash the folder uploads into a .tar.gz file", "intent": "compress_targz", "lang": "en"}
+{"text": "spakuj ./src do src.tar.gz", "intent": "compress_targz", "lang": "pl"}
+{"text": "zrób tarball z ~/projects/app", "intent": "compress_targz", "lang": "pl"}
+{"text": "utwórz archiwum tar.gz z /var/www o nazwie site.tar.gz", "intent": "compress_targz", "lang": "pl"}
+{"text": "spakuj folder logs tarem", "intent": "compress_targz", "lang": "pl"}
+{"text": "skompresuj ten katalog do backup.tar.gz", "intent": "compress_targz", "lang": "pl"}
+{"text": "zrob archiwum tar.gz z folderu zdjecia", "intent": "compress_targz", "lang": "pl"}
+{"text": "stwórz tgz z ./build", "intent": "compress_targz", "lang": "pl"}
+{"text": "zarchiwizuj /etc/nginx jako nginx-conf.tar.gz", "intent": "compress_targz", "lang": "pl"}
+{"text": "skompresuj biezacy katalog do tar.gz", "intent": "compress_targz", "lang": "pl"}
+{"text": "zrób .tar.gz z katalogu docs", "intent": "compress_targz", "lang": "pl"}
+{"text": "spakuj ~/Dokumenty do docs.tgz", "intent": "compress_targz", "lang": "pl"}
+{"text": "jak spakować folder data do tar.gz", "intent": "compress_targz", "lang": "pl"}
+{"text": "utwórz skompresowany tarball z release/ nazwany release-1.2.tar.gz", "intent": "compress_targz", "lang": "pl"}
+{"text": "spakuj /home/ola do ola-home.tar.gz", "intent": "compress_targz", "lang": "pl"}
+{"text": "tar czf folderu dist", "intent": "compress_targz", "lang": "pl"}
+{"text": "skompresój projekt do projekt.tar.gz", "intent": "compress_targz", "lang": "pl"}
+{"text": "zrób archiwum tar gzip z /opt/app", "intent": "compress_targz", "lang": "pl"}
+{"text": "stworz archiwum backup-2024.tar.gz z ./db", "intent": "compress_targz", "lang": "pl"}
+{"text": "zamień folder exports w tar.gz", "intent": "compress_targz", "lang": "pl"}
+{"text": "wrzuć config/ do tarballa", "intent": "compress_targz", "lang": "pl"}
+{"text": "spakuj katalog ~/muzyka w tar.gz", "intent": "compress_targz", "lang": "pl"}
+{"text": "zarchiwizuj i skompresuj ./assets do assets.tar.gz", "intent": "compress_targz", "lang": "pl"}
+{"text": "możesz zrobić tar.gz z całego repo?", "intent": "compress_targz", "lang": "pl"}
+{"text": "skompresuj notatki.txt do notatki.tar.gz", "intent": "compress_targz", "lang": "pl"}
+{"text": "kopia zapasowa /srv/data jako data.tar.gz", "intent": "compress_targz", "lang": "pl"}
+{"text": "zrob tarball z ./vendor", "intent": "compress_targz", "lang": "pl"}
+{"text": "utwórz site-backup.tgz z /var/www/html", "intent": "compress_targz", "lang": "pl"}
+{"text": "spakuj katalog logów do tar.gz proszę", "intent": "compress_targz", "lang": "pl"}
+{"text": "spakuj ./public do public.tar.gz", "intent": "compress_targz", "lang": "pl"}
+{"text": "ściśnij folder uploads do pliku .tar.gz", "intent": "compress_targz", "lang": "pl"}
+{"text": "extract backup.tar.gz", "intent": "extract_targz", "lang": "en"}
+{"text": "untar site.tar.gz", "intent": "extract_targz", "lang": "en"}
+{"text": "unpack archive.tgz here", "intent": "extract_targz", "lang": "en"}
+{"text": "decompress release-1.2.tar.gz", "intent": "extract_targz", "lang": "en"}
+{"text": "extract data.tar.gz into /tmp/data", "intent": "extract_targz", "lang": "en"}
+{"text": "how do I unpack a tar.gz file? logs.tar.gz", "intent": "extract_targz", "lang": "en"}
+{"text": "open the tarball node-v20.tar.gz", "intent": "extract_targz", "lang": "en"}
+{"text": "unzip the tar.gz file project.tar.gz", "intent": "extract_targz", "lang": "en"}
+{"text": "extract ~/Downloads/linux-6.8.tar.gz", "intent": "extract_targz", "lang": "en"}
+{"text": "untar and ungzip dump.tar.gz", "intent": "extract_targz", "lang": "en"}
+{"text": "expand the archive assets.tgz", "intent": "extract_targz", "lang": "en"}
+{"text": "extract nginx-conf.tar.gz to /etc/nginx", "intent": "extract_targz", "lang": "en"}
+{"text": "unpack the tgz in ./vendor.tgz", "intent": "extract_targz", "lang": "en"}
+{"text": "tar xzf go1.22.linux-amd64.tar.gz", "intent": "extract_targz", "lang": "en"}
+{"text": "extact photos.tar.gz", "intent": "extract_targz", "lang": "en"}
+{"text": "decompress the tarball backup-2024.tar.gz into ./restore", "intent": "extract_targz", "lang": "en"}
+{"text": "get the files out of src.tar.gz", "intent": "extract_targz", "lang": "en"}
+{"text": "unarchive db.tar.gz", "intent": "extract_targz", "lang": "en"}
+{"text": "extract the gzipped tar theme.tar.gz", "intent": "extract_targz", "lang": "en"}
+{"text": "open up docs.tgz", "intent": "extract_targz", "lang": "en"}
+{"text": "uncompress firmware.tar.gz", "intent": "extract_targz", "lang": "en"}
+{"text": "extract this tar.gz: build.tar.gz", "intent": "extract_targz", "lang": "en"}
+{"text": "unpack ~/backups/home.tar.gz to ~/restore", "intent": "extract_targz", "lang": "en"}
+{"text": "untar the release archive app-3.0.tar.gz", "intent": "extract_targz", "lang": "en"}
+{"text": "extract all files from public.tar.gz", "intent": "extract_targz", "lang": "en"}
+{"text": "please unpack exports.tar.gz", "intent": "extract_targz", "lang": "en"}
+{"text": "decompress archive.tar.gz in current folder", "intent": "extract_targz", "lang": "en"}
+{"text": "inflate the tar.gz package wordpress.tar.gz", "intent": "extract_targz", "lang": "en"}
+{"text": "pull the contents out of uploads.tar.gz", "intent": "extract_targz", "lang": "en"}
+{"text": "extract tarball ./dist.tgz", "intent": "extract_targz", "lang": "en"}
+{"text": "rozpakuj backup.tar.gz", "intent": "extract_targz", "lang": "pl"}
+{"text": "wypakuj site.tar.gz", "intent": "extract_targz", "lang": "pl"}
+{"text": "rozpakuj archive.tgz tutaj", "intent": "extract_targz", "lang": "pl"}
+{"text": "zdekompresuj release-1.2.tar.gz", "intent": "extract_targz", "lang": "pl"}
+{"text": "wypakuj data.tar.gz do /tmp/data", "intent": "extract_targz", "lang": "pl"}
+{"text": "jak rozpakować plik tar.gz? logs.tar.gz", "intent": "extract_targz", "lang": "pl"}
+{"text": "otwórz tarball node-v20.tar.gz", "intent": "extract_targz", "lang": "pl"}
+{"text": "rozpakuj plik tar.gz project.tar.gz", "intent": "extract_targz", "lang": "pl"}
+{"text": "wypakuj ~/Pobrane/linux-6.8.tar.gz", "intent": "extract_targz", "lang": "pl"}
+{"text": "rozpakuj tar gz dump.tar.gz", "intent": "extract_targz", "lang": "pl"}
+{"text": "rozwiń archiwum assets.tgz", "intent": "extract_targz", "lang": "pl"}
+{"text": "wypakuj nginx-conf.tar.gz do /etc/nginx", "intent": "extract_targz", "lang": "pl"}
+{"text": "rozpakuj tgz ./vendor.tgz", "intent": "extract_targz", "lang": "pl"}
+{"text": "rozpakój zdjecia.tar.gz", "intent": "extract_targz", "lang": "pl"}
+{"text": "zdekompresuj tarball backup-2024.tar.gz do ./restore", "intent": "extract_targz", "lang": "pl"}
+{"text": "wyciągnij pliki z src.tar.gz", "intent": "extract_targz", "lang": "pl"}
+{"text": "rozarchiwizuj db.tar.gz", "intent": "extract_targz", "lang": "pl"}
+{"text": "wypakuj skompresowany tar theme.tar.gz", "intent": "extract_targz", "lang": "pl"}
+{"text": "otworz docs.tgz", "intent": "extract_targz", "lang": "pl"}
+{"text": "rozpakuj firmware.tar.gz", "intent": "extract_targz", "lang": "pl"}
+{"text": "wypakuj ten tar.gz: build.tar.gz", "intent": "extract_targz", "lang": "pl"}
+{"text": "rozpakuj ~/backupy/home.tar.gz do ~/restore", "intent": "extract_targz", "lang": "pl"}
+{"text": "wypakuj archiwum wydania app-3.0.tar.gz", "intent": "extract_targz", "lang": "pl"}
+{"text": "wypakuj wszystkie pliki z public.tar.gz", "intent": "extract_targz", "lang": "pl"}
+{"text": "proszę rozpakuj exports.tar.gz", "intent": "extract_targz", "lang": "pl"}
+{"text": "rozpakuj archive.tar.gz w bieżącym folderze", "intent": "extract_targz", "lang": "pl"}
+{"text": "rozpakuj paczkę tar.gz wordpress.tar.gz", "intent": "extract_targz", "lang": "pl"}
+{"text": "wyciagnij zawartosc uploads.tar.gz", "intent": "extract_targz", "lang": "pl"}
+{"text": "wypakuj tarball ./dist.tgz", "intent": "extract_targz", "lang": "pl"}
+{"text": "zip the folder ./src into src.zip", "intent": "compress_zip", "lang": "en"}
+{"text": "create a zip of ~/Documents", "intent": "compress_zip", "lang": "en"}
+{"text": "make a zip archive named photos.zip from ./photos", "intent": "compress_zip", "lang": "en"}
+{"text": "compress this directory into a zip file", "intent": "compress_zip", "lang": "en"}
+{"text": "zip up report.pdf", "intent": "compress_zip", "lang": "en"}
+{"text": "put the folder project in project.zip", "intent": "compress_zip", "lang": "en"}
+{"text": "zip -r site.zip /var/www", "intent": "compress_zip", "lang": "en"}
+{"text": "create backup.zip from ./data", "intent": "compress_zip", "lang": "en"}
+{"text": "make a .zip of the docs directory", "intent": "compress_zip", "lang": "en"}
+{"text": "how do I zip the folder exports", "intent": "compress_zip", "lang": "en"}
+{"text": "archive ./build as build.zip", "intent": "compress_zip", "lang": "en"}
+{"text": "pack these files into a zip: assets", "intent": "compress_zip", "lang": "en"}
+{"text": "zip the current dir", "intent": "compress_zip", "lang": "en"}
+{"text": "create a zip file of ~/music called music.zip", "intent": "compress_zip", "lang": "en"}
+{"text": "compress logs to logs.zip", "intent": "compress_zip", "lang": "en"}
+{"text": "zipp the folder invoices", "intent": "compress_zip", "lang": "en"}
+{"text": "zip ./dist for upload as dist.zip", "intent": "compress_zip", "lang": "en"}
+{"text": "turn the folder screenshots into a zip", "intent": "compress_zip", "lang": "en"}
+{"text": "make a zip of notes.txt named notes.zip", "intent": "compress_zip", "lang": "en"}
+{"text": "create zip archive of /home/ola/cv", "intent": "compress_zip", "lang": "en"}
+{"text": "bundle the theme folder into theme.zip", "intent": "compress_zip", "lang": "en"}
+{"text": "zip everything in ./public", "intent": "compress_zip", "lang": "en"}
+{"text": "make me a zip of the project for windows users", "intent": "compress_zip", "lang": "en"}
+{"text": "zip this directory recursively to archive.zip", "intent": "compress_zip", "lang": "en"}
+{"text": "I need a zip of config/", "intent": "compress_zip", "lang": "en"}
+{"text": "create a zip archive from /srv/files as files.zip", "intent": "compress_zip", "lang": "en"}
+{"text": "compress folder homework into homework.zip", "intent": "compress_zip", "lang": "en"}
+{"text": "zip the plugin directory", "intent": "compress_zip", "lang": "en"}
+{"text": "pack ./reports into reports-2024.zip", "intent": "compress_zip", "lang": "en"}
+{"text": "please zip ~/Desktop/stuff", "intent": "compress_zip", "lang": "en"}
+{"text": "spakuj folder ./src do src.zip", "intent": "compress_zip", "lang": "pl"}
+{"text": "zrób zipa z ~/Dokumenty", "intent": "compress_zip", "lang": "pl"}
+{"text": "utwórz archiwum zip photos.zip z ./photos", "intent": "compress_zip", "lang": "pl"}
+{"text": "skompresuj ten katalog do pliku zip", "intent": "compress_zip", "lang": "pl"}
+{"text": "spakuj raport.pdf do zipa", "intent": "compress_zip", "lang": "pl"}
+{"text": "wrzuc folder projekt do projekt.zip", "intent": "compress_zip", "lang": "pl"}
+{"text": "stwórz backup.zip z ./data", "intent": "compress_zip", "lang": "pl"}
+{"text": "zrób .zip z katalogu docs", "intent": "compress_zip", "lang": "pl"}
+{"text": "jak zzipować folder exports", "intent": "compress_zip", "lang": "pl"}
+{"text": "zarchiwizuj ./build jako build.zip", "intent": "compress_zip", "lang": "pl"}
+{"text": "spakuj te pliki do zipa: assets", "intent": "compress_zip", "lang": "pl"}
+{"text": "zzipuj bieżący katalog", "intent": "compress_zip", "lang": "pl"}
+{"text": "utwórz plik zip z ~/muzyka o nazwie muzyka.zip", "intent": "compress_zip", "lang": "pl"}
+{"text": "skompresuj logi do logs.zip", "intent": "compress_zip", "lang": "pl"}
+{"text": "spakój folder faktury do zip", "intent": "compress_zip", "lang": "pl"}
+{"text": "zzipuj ./dist do wysłania jako dist.zip", "intent": "compress_zip", "lang": "pl"}
+{"text": "zamień folder screenshoty w zipa", "intent": "compress_zip", "lang": "pl"}
+{"text": "zrób zip z notatki.txt o nazwie notatki.zip", "intent": "compress_zip", "lang": "pl"}
+{"text": "utworz archiwum zip z /home/ola/cv", "intent": "compress_zip", "lang": "pl"}
+{"text": "spakuj folder theme do theme.zip", "intent": "compress_zip", "lang": "pl"}
+{"text": "zzipuj wszystko z ./public", "intent": "compress_zip", "lang": "pl"}
+{"text": "zrób mi zipa z projektu dla ludzi na windowsie", "intent": "compress_zip", "lang": "pl"}
+{"text": "spakuj ten katalog rekurencyjnie do archive.zip", "intent": "compress_zip", "lang": "pl"}
+{"text": "potrzebuję zipa z config/", "intent": "compress_zip", "lang": "pl"}
+{"text": "stwórz archiwum zip z /srv/files jako files.zip", "intent": "compress_zip", "lang": "pl"}
+{"text": "skompresuj folder zadania do zadania.zip", "intent": "compress_zip", "lang": "pl"}
+{"text": "spakuj zipem katalog z pluginem", "intent": "compress_zip", "lang": "pl"}
+{"text": "spakuj ./raporty do raporty-2024.zip", "intent": "compress_zip", "lang": "pl"}
+{"text": "prosze zzipuj ~/Pulpit/rzeczy", "intent": "compress_zip", "lang": "pl"}
+{"text": "unzip archive.zip", "intent": "extract_zip", "lang": "en"}
+{"text": "extract photos.zip", "intent": "extract_zip", "lang": "en"}
+{"text": "unpack site.zip into /var/www", "intent": "extract_zip", "lang": "en"}
+{"text": "open the zip file project.zip", "intent": "extract_zip", "lang": "en"}
+{"text": "extract ~/Downloads/data.zip here", "intent": "extract_zip", "lang": "en"}
+{"text": "decompress files.zip", "intent": "extract_zip", "lang": "en"}
+{"text": "unzip theme.zip to ./themes", "intent": "extract_zip", "lang": "en"}
+{"text": "how do I extract a zip? invoices.zip", "intent": "extract_zip", "lang": "en"}
+{"text": "get the files out of backup.zip", "intent": "extract_zip", "lang": "en"}
+{"text": "unzip -d /tmp/out release.zip", "intent": "extract_zip", "lang": "en"}
+{"text": "extract the zip archive dist.zip", "intent": "extract_zip", "lang": "en"}
+{"text": "unpack reports-2024.zip", "intent": "extract_zip", "lang": "en"}
+{"text": "expand fonts.zip", "intent": "extract_zip", "lang": "en"}
+{"text": "extrct build.zip", "intent": "extract_zip", "lang": "en"}
+{"text": "unzip the downloaded file sdk.zip", "intent": "extract_zip", "lang": "en"}
+{"text": "uncompress homework.zip", "intent": "extract_zip", "lang": "en"}
+{"text": "unzip everything from music.zip into ~/music", "intent": "extract_zip", "lang": "en"}
+{"text": "extract the contents of plugin.zip", "intent": "extract_zip", "lang": "en"}
+{"text": "please unzip docs.zip", "intent": "extract_zip", "lang": "en"}
+{"text": "decompress the zip in ./uploads/batch.zip", "intent": "extract_zip", "lang": "en"}
+{"text": "unzip cv.zip", "intent": "extract_zip", "lang": "en"}
+{"text": "pull the files out of screenshots.zip", "intent": "extract_zip", "lang": "en"}
+{"text": "open up the archive logs.zip and extract it", "intent": "extract_zip", "lang": "en"}
+{"text": "extract wordpress.zip into /srv/www", "intent": "extract_zip", "lang": "en"}
+{"text": "unzip this: assets.zip", "intent": "extract_zip", "lang": "en"}
+{"text": "unpack the windows zip setup.zip", "intent": "extract_zip", "lang": "en"}
+{"text": "unzip config.zip in current directory", "intent": "extract_zip", "lang": "en"}
+{"text": "extract zip file ~/Desktop/stuff.zip", "intent": "extract_zip", "lang": "en"}
+{"text": "inflate dataset.zip", "intent": "extract_zip", "lang": "en"}
+{"text": "unzip the.zip I just downloaded, export.zip", "intent": "extract_zip", "lang": "en"}
+{"text": "rozpakuj archive.zip", "intent": "extract_zip", "lang": "pl"}
+{"text": "wypakuj photos.zip", "intent": "extract_zip", "lang": "pl"}
+{"text": "rozpakuj site.zip do /var/www", "intent": "extract_zip", "lang": "pl"}
+{"text": "otwórz plik zip project.zip", "intent": "extract_zip", "lang": "pl"}
+{"text": "wypakuj ~/Pobrane/data.zip tutaj", "intent": "extract_zip", "lang": "pl"}
+{"text": "zdekompresuj files.zip", "intent": "extract_zip", "lang": "pl"}
+{"text": "unzip theme.zip do ./themes", "intent": "extract_zip", "lang": "pl"}
+{"text": "jak rozpakować zipa? faktury.zip", "intent": "extract_zip", "lang": "pl"}
+{"text": "wyciągnij pliki z backup.zip", "intent": "extract_zip", "lang": "pl"}
+{"text": "rozpakuj release.zip do /tmp/out", "intent": "extract_zip", "lang": "pl"}
+{"text": "wypakuj archiwum zip dist.zip", "intent": "extract_zip", "lang": "pl"}
+{"text": "rozpakuj raporty-2024.zip", "intent": "extract_zip", "lang": "pl"}
+{"text": "rozwiń fonts.zip", "intent": "extract_zip", "lang": "pl"}
+{"text": "rozpakj build.zip", "intent": "extract_zip", "lang": "pl"}
+{"text": "odzipuj pobrany plik sdk.zip", "intent": "extract_zip", "lang": "pl"}
+{"text": "rozpakuj zadania.zip", "intent": "extract_zip", "lang": "pl"}
+{"text": "wypakuj wszystko z muzyka.zip do ~/muzyka", "intent": "extract_zip", "lang": "pl"}
+{"text": "wypakuj zawartosc plugin.zip", "intent": "extract_zip", "lang": "pl"}
+{"text": "proszę rozpakuj docs.zip", "intent": "extract_zip", "lang": "pl"}
+{"text": "rozpakuj zipa ./uploads/batch.zip", "intent": "extract_zip", "lang": "pl"}
+{"text": "unzipnij cv.zip", "intent": "extract_zip", "lang": "pl"}
+{"text": "wyciagnij pliki ze screenshoty.zip", "intent": "extract_zip", "lang": "pl"}
+{"text": "otworz archiwum logs.zip i je wypakuj", "intent": "extract_zip", "lang": "pl"}
+{"text": "wypakuj wordpress.zip do /srv/www", "intent": "extract_zip", "lang": "pl"}
+{"text": "rozpakuj to: assets.zip", "intent": "extract_zip", "lang": "pl"}
+{"text": "rozpakuj zipa z windowsa setup.zip", "intent": "extract_zip", "lang": "pl"}
+{"text": "rozzipuj config.zip w bieżącym katalogu", "intent": "extract_zip", "lang": "pl"}
+{"text": "wypakuj plik zip ~/Pulpit/rzeczy.zip", "intent": "extract_zip", "lang": "pl"}
+{"text": "rozpakuj dataset.zip", "intent": "extract_zip", "lang": "pl"}
+{"text": "rozpakuj zipa którego właśnie pobrałem, export.zip", "intent": "extract_zip", "lang": "pl"}
+{"text": "list contents of backup.tar.gz", "intent": "list_archive", "lang": "en"}
+{"text": "what's inside archive.zip?", "intent": "list_archive", "lang": "en"}
+{"text": "show files in site.tar.gz without extracting", "intent": "list_archive", "lang": "en"}
+{"text": "peek inside release.tgz", "intent": "list_archive", "lang": "en"}
+{"text": "list the files in photos.zip", "intent": "list_archive", "lang": "en"}
+{"text": "what does project.tar contain", "intent": "list_archive", "lang": "en"}
+{"text": "show archive contents of data.tar.gz", "intent": "list_archive", "lang": "en"}
+{"text": "tar -tvf dump.tar", "intent": "list_archive", "lang": "en"}
+{"text": "view the file list of dist.zip", "intent": "list_archive", "lang": "en"}
+{"text": "which files are in logs.tar.gz?", "intent": "list_archive", "lang": "en"}
+{"text": "list zip contents: invoices.zip", "intent": "list_archive", "lang": "en"}
+{"text": "show what's packed in node-v20.tar.gz", "intent": "list_archive", "lang": "en"}
+{"text": "inspect archive ~/Downloads/sdk.zip", "intent": "list_archive", "lang": "en"}
+{"text": "browse the tarball linux-6.8.tar.gz without unpacking", "intent": "list_archive", "lang": "en"}
+{"text": "whats in the zip theme.zip", "intent": "list_archive", "lang": "en"}
+{"text": "list entries in backup-2024.tar.gz", "intent": "list_archive", "lang": "en"}
+{"text": "check contents of assets.tgz before extracting", "intent": "list_archive", "lang": "en"}
+{"text": "show me the list of files in music.zip", "intent": "list_archive", "lang": "en"}
+{"text": "contents of the archive db.tar", "intent": "list_archive", "lang": "en"}
+{"text": "list files inside wordpress.zip", "intent": "list_archive", "lang": "en"}
+{"text": "peek into plugin.zip", "intent": "list_archive", "lang": "en"}
+{"text": "lsit contents of build.tar.gz", "intent": "list_archive", "lang": "en"}
+{"text": "does src.tar.gz contain the config folder? list it", "intent": "list_archive", "lang": "en"}
+{"text": "show tar listing of firmware.tar.gz", "intent": "list_archive", "lang": "en"}
+{"text": "what's in this archive: docs.zip", "intent": "list_archive", "lang": "en"}
+{"text": "list archive members of exports.tar.gz", "intent": "list_archive", "lang": "en"}
+{"text": "show inside of cv.zip", "intent": "list_archive", "lang": "en"}
+{"text": "display the table of contents of uploads.tar.gz", "intent": "list_archive", "lang": "en"}
+{"text": "list what's in public.zip", "intent": "list_archive", "lang": "en"}
+{"text": "see files packed inside home.tar.gz", "intent": "list_archive", "lang": "en"}
+{"text": "pokaż zawartość backup.tar.gz", "intent": "list_archive", "lang": "pl"}
+{"text": "co jest w archive.zip?", "intent": "list_archive", "lang": "pl"}
+{"text": "pokaż pliki w site.tar.gz bez rozpakowywania", "intent": "list_archive", "lang": "pl"}
+{"text": "zajrzyj do release.tgz", "intent": "list_archive", "lang": "pl"}
+{"text": "wylistuj pliki w photos.zip", "intent": "list_archive", "lang": "pl"}
+{"text": "co zawiera project.tar", "intent": "list_archive", "lang": "pl"}
+{"text": "zawartość archiwum data.tar.gz", "intent": "list_archive", "lang": "pl"}
+{"text": "lista plików w dist.zip", "intent": "list_archive", "lang": "pl"}
+{"text": "jakie pliki są w logs.tar.gz?", "intent": "list_archive", "lang": "pl"}
+{"text": "zawartosc zipa faktury.zip", "intent": "list_archive", "lang": "pl"}
+{"text": "pokaż co jest spakowane w node-v20.tar.gz", "intent": "list_archive", "lang": "pl"}
+{"text": "przejrzyj archiwum ~/Pobrane/sdk.zip", "intent": "list_archive", "lang": "pl"}
+{"text": "pokaż listę plików w tarballu linux-6.8.tar.gz bez wypakowywania", "intent": "list_archive", "lang": "pl"}
+{"text": "co jest w zipie theme.zip", "intent": "list_archive", "lang": "pl"}
+{"text": "wylistuj wpisy w backup-2024.tar.gz", "intent": "list_archive", "lang": "pl"}
+{"text": "sprawdź zawartość assets.tgz zanim rozpakuję", "intent": "list_archive", "lang": "pl"}
+{"text": "pokaz liste plikow w muzyka.zip", "intent": "list_archive", "lang": "pl"}
+{"text": "zawartość archiwum db.tar", "intent": "list_archive", "lang": "pl"}
+{"text": "wylistuj pliki wewnątrz wordpress.zip", "intent": "list_archive", "lang": "pl"}
+{"text": "zerknij do środka plugin.zip", "intent": "list_archive", "lang": "pl"}
+{"text": "wylsituj zawartosc build.tar.gz", "intent": "list_archive", "lang": "pl"}
+{"text": "czy src.tar.gz zawiera folder config? wylistuj", "intent": "list_archive", "lang": "pl"}
+{"text": "pokaż listing tar dla firmware.tar.gz", "intent": "list_archive", "lang": "pl"}
+{"text": "co jest w tym archiwum: docs.zip", "intent": "list_archive", "lang": "pl"}
+{"text": "lista plików w archiwum exports.tar.gz", "intent": "list_archive", "lang": "pl"}
+{"text": "pokaż wnętrze cv.zip", "intent": "list_archive", "lang": "pl"}
+{"text": "spis zawartości uploads.tar.gz", "intent": "list_archive", "lang": "pl"}
+{"text": "co siedzi w public.zip", "intent": "list_archive", "lang": "pl"}
+{"text": "zobacz jakie pliki są w home.tar.gz", "intent": "list_archive", "lang": "pl"}
+{"text": "chmod 755 deploy.sh", "intent": "chmod", "lang": "en"}
+{"text": "set permissions of config.yml to 644", "intent": "chmod", "lang": "en"}
+{"text": "change file permissions of secret.key to 600", "intent": "chmod", "lang": "en"}
+{"text": "make notes.txt read-only for everyone (444)", "intent": "chmod", "lang": "en"}
+{"text": "give rwxr-xr-x to ./bin/start", "intent": "chmod", "lang": "en"}
+{"text": "set mode 700 on ~/.ssh", "intent": "chmod", "lang": "en"}
+{"text": "change perms of index.html to 644", "intent": "chmod", "lang": "en"}
+{"text": "restrict access to id_rsa, chmod 600", "intent": "chmod", "lang": "en"}
+{"text": "set permissions 775 on /var/www/uploads", "intent": "chmod", "lang": "en"}
+{"text": "chmod 640 app.env", "intent": "chmod", "lang": "en"}
+{"text": "change the permission bits of data.db to 660", "intent": "chmod", "lang": "en"}
+{"text": "make backup.sh 750", "intent": "chmod", "lang": "en"}
+{"text": "how do I set 644 permissions on style.css", "intent": "chmod", "lang": "en"}
+{"text": "set file mode to 0600 for credentials.json", "intent": "chmod", "lang": "en"}
+{"text": "fix permissions on ~/.ssh/authorized_keys to 600", "intent": "chmod", "lang": "en"}
+{"text": "change access rights of report.pdf to 444", "intent": "chmod", "lang": "en"}
+{"text": "chmod go-w settings.ini", "intent": "chmod", "lang": "en"}
+{"text": "remove write permission for others on shared.txt", "intent": "chmod", "lang": "en"}
+{"text": "set rw-r--r-- on README.md", "intent": "chmod", "lang": "en"}
+{"text": "change permisions of run.py to 755", "intent": "chmod", "lang": "en"}
+{"text": "apply 711 to the folder ~/public", "intent": "chmod", "lang": "en"}
+{"text": "give group write access to team.doc (664)", "intent": "chmod", "lang": "en"}
+{"text": "make private.pem readable only by me", "intent": "chmod", "lang": "en"}
+{"text": "change mode of /etc/app.conf to 640", "intent": "chmod", "lang": "en"}
+{"text": "set chmod 777 on tmpdir", "intent": "chmod", "lang": "en"}
+{"text": "permissions 600 for .env please", "intent": "chmod", "lang": "en"}
+{"text": "alter permissions of script to u+rw", "intent": "chmod", "lang": "en"}
+{"text": "set the octal mode 0755 on install.sh", "intent": "chmod", "lang": "en"}
+{"text": "modify file permissions: log.txt -> 666", "intent": "chmod", "lang": "en"}
+{"text": "lock down token.txt so only owner can read and write", "intent": "chmod", "lang": "en"}
+{"text": "ustaw uprawnienia config.yml na 644", "intent": "chmod", "lang": "pl"}
+{"text": "zmień uprawnienia pliku secret.key na 600", "intent": "chmod", "lang": "pl"}
+{"text": "ustaw notatki.txt tylko do odczytu dla wszystkich (444)", "intent": "chmod", "lang": "pl"}
+{"text": "nadaj rwxr-xr-x dla ./bin/start", "intent": "chmod", "lang": "pl"}
+{"text": "ustaw tryb 700 na ~/.ssh", "intent": "chmod", "lang": "pl"}
+{"text": "zmien prawa index.html na 644", "intent": "chmod", "lang": "pl"}
+{"text": "ogranicz dostęp do id_rsa, chmod 600", "intent": "chmod", "lang": "pl"}
+{"text": "ustaw uprawnienia 775 na /var/www/uploads", "intent": "chmod", "lang": "pl"}
+{"text": "zmień bity uprawnień data.db na 660", "intent": "chmod", "lang": "pl"}
+{"text": "nadaj backup.sh prawa 750", "intent": "chmod", "lang": "pl"}
+{"text": "jak ustawić uprawnienia 644 na style.css", "intent": "chmod", "lang": "pl"}
+{"text": "ustaw tryb pliku 0600 dla credentials.json", "intent": "chmod", "lang": "pl"}
+{"text": "napraw uprawnienia ~/.ssh/authorized_keys na 600", "intent": "chmod", "lang": "pl"}
+{"text": "zmień prawa dostępu raport.pdf na 444", "intent": "chmod", "lang": "pl"}
+{"text": "odbierz prawo zapisu innym dla shared.txt", "intent": "chmod", "lang": "pl"}
+{"text": "ustaw rw-r--r-- na README.md", "intent": "chmod", "lang": "pl"}
+{"text": "zmien uprawninia run.py na 755", "intent": "chmod", "lang": "pl"}
+{"text": "nadaj 711 folderowi ~/public", "intent": "chmod", "lang": "pl"}
+{"text": "daj grupie prawo zapisu do team.doc (664)", "intent": "chmod", "lang": "pl"}
+{"text": "niech private.pem będzie czytelny tylko dla mnie", "intent": "chmod", "lang": "pl"}
+{"text": "zmień tryb /etc/app.conf na 640", "intent": "chmod", "lang": "pl"}
+{"text": "ustaw chmod 777 na tmpdir", "intent": "chmod", "lang": "pl"}
+{"text": "uprawnienia 600 dla .env proszę", "intent": "chmod", "lang": "pl"}
+{"text": "zmień uprawnienia pliku skrypt na u+rw", "intent": "chmod", "lang": "pl"}
+{"text": "ustaw ósemkowo 0755 na install.sh", "intent": "chmod", "lang": "pl"}
+{"text": "zmodyfikuj uprawnienia pliku log.txt na 666", "intent": "chmod", "lang": "pl"}
+{"text": "zablokuj token.txt tak żeby tylko właściciel mógł czytać i pisać", "intent": "chmod", "lang": "pl"}
+{"text": "make deploy.sh executable", "intent": "make_executable", "lang": "en"}
+{"text": "chmod +x install.sh", "intent": "make_executable", "lang": "en"}
+{"text": "make the script runnable", "intent": "make_executable", "lang": "en"}
+{"text": "allow executing ./run.sh", "intent": "make_executable", "lang": "en"}
+{"text": "give execute permission to build.py", "intent": "make_executable", "lang": "en"}
+{"text": "mark start.sh as executable", "intent": "make_executable", "lang": "en"}
+{"text": "I get permission denied running ./setup.sh, make it executable", "intent": "make_executable", "lang": "en"}
+{"text": "make backup.sh executable please", "intent": "make_executable", "lang": "en"}
+{"text": "add the x bit to bin/tool", "intent": "make_executable", "lang": "en"}
+{"text": "set executable flag on script.sh", "intent": "make_executable", "lang": "en"}
+{"text": "how do I make test.sh runnable", "intent": "make_executable", "lang": "en"}
+{"text": "make ~/bin/myscript executable", "intent": "make_executable", "lang": "en"}
+{"text": "enable execution of ./gradlew", "intent": "make_executable", "lang": "en"}
+{"text": "make it executable: entrypoint.sh", "intent": "make_executable", "lang": "en"}
+{"text": "chmod plus x on configure", "intent": "make_executable", "lang": "en"}
+{"text": "add execute rights to cleanup.sh", "intent": "make_executable", "lang": "en"}
+{"text": "make the file app executable", "intent": "make_executable", "lang": "en"}
+{"text": "make my python script main.py executable", "intent": "make_executable", "lang": "en"}
+{"text": "set +x on hooks/pre-commit", "intent": "make_executable", "lang": "en"}
+{"text": "allow running migrate.sh", "intent": "make_executable", "lang": "en"}
+{"text": "make executible ./start", "intent": "make_executable", "lang": "en"}
+{"text": "turn on exec permission for launch.sh", "intent": "make_executable", "lang": "en"}
+{"text": "mark ./mvnw as executable", "intent": "make_executable", "lang": "en"}
+{"text": "give run permission to deploy-prod.sh", "intent": "make_executable", "lang": "en"}
+{"text": "can't run ./script, fix it so it can be executed", "intent": "make_executable", "lang": "en"}
+{"text": "make all.sh executable", "intent": "make_executable", "lang": "en"}
+{"text": "make the binary ./server executable", "intent": "make_executable", "lang": "en"}
+{"text": "grant exec on update.sh", "intent": "make_executable", "lang": "en"}
+{"text": "make ./tools/lint.sh runnable", "intent": "make_executable", "lang": "en"}
+{"text": "add executable permission to the file run", "intent": "make_executable", "lang": "en"}
+{"text": "nadaj prawa wykonywania deploy.sh", "intent": "make_executable", "lang": "pl"}
+{"text": "zrób skrypt wykonywalnym", "intent": "make_executable", "lang": "pl"}
+{"text": "pozwól na uruchamianie ./run.sh", "intent": "make_executable", "lang": "pl"}
+{"text": "daj prawo wykonania dla build.py", "intent": "make_executable", "lang": "pl"}
+{"text": "oznacz start.sh jako wykonywalny", "intent": "make_executable", "lang": "pl"}
+{"text": "mam permission denied przy ./setup.sh, zrób go wykonywalnym", "intent": "make_executable", "lang": "pl"}
+{"text": "ustaw backup.sh jako wykonywalny prosze", "intent": "make_executable", "lang": "pl"}
+{"text": "dodaj bit x do bin/tool", "intent": "make_executable", "lang": "pl"}
+{"text": "ustaw flagę wykonywalności na skrypt.sh", "intent": "make_executable", "lang": "pl"}
+{"text": "jak zrobić żeby test.sh dało się uruchomić", "intent": "make_executable", "lang": "pl"}
+{"text": "zrob ~/bin/mojskrypt wykonywalnym", "intent": "make_executable", "lang": "pl"}
+{"text": "włącz wykonywanie ./gradlew", "intent": "make_executable", "lang": "pl"}
+{"text": "niech entrypoint.sh będzie wykonywalny", "intent": "make_executable", "lang": "pl"}
+{"text": "chmod plus x na configure", "intent": "make_executable", "lang": "pl"}
+{"text": "dodaj prawa uruchamiania do cleanup.sh", "intent": "make_executable", "lang": "pl"}
+{"text": "uczyn plik app wykonywalnym", "intent": "make_executable", "lang": "pl"}
+{"text": "zrób mój skrypt pythona main.py wykonywalnym", "intent": "make_executable", "lang": "pl"}
+{"text": "ustaw +x na hooks/pre-commit", "intent": "make_executable", "lang": "pl"}
+{"text": "pozwól uruchamiać migrate.sh", "intent": "make_executable", "lang": "pl"}
+{"text": "zrob wykonywalny ./start", "intent": "make_executable", "lang": "pl"}
+{"text": "włącz uprawnienie exec dla launch.sh", "intent": "make_executable", "lang": "pl"}
+{"text": "oznacz ./mvnw jako wykonywalny", "intent": "make_executable", "lang": "pl"}
+{"text": "daj prawo uruchomienia deploy-prod.sh", "intent": "make_executable", "lang": "pl"}
+{"text": "nie mogę odpalić ./script, napraw żeby się dało uruchomić", "intent": "make_executable", "lang": "pl"}
+{"text": "nadaj x dla all.sh", "intent": "make_executable", "lang": "pl"}
+{"text": "zrób binarkę ./server wykonywalną", "intent": "make_executable", "lang": "pl"}
+{"text": "daj exec na update.sh", "intent": "make_executable", "lang": "pl"}
+{"text": "żeby ./tools/lint.sh dało się odpalić", "intent": "make_executable", "lang": "pl"}
+{"text": "dodaj uprawnienie wykonywania do pliku run", "intent": "make_executable", "lang": "pl"}
+{"text": "change owner of /var/www to www-data", "intent": "chown", "lang": "en"}
+{"text": "chown -R nginx /srv/static", "intent": "chown", "lang": "en"}
+{"text": "make anna the owner of ~/shared", "intent": "chown", "lang": "en"}
+{"text": "give ownership of ./data to postgres", "intent": "chown", "lang": "en"}
+{"text": "set the owner of /opt/app to deploy", "intent": "chown", "lang": "en"}
+{"text": "transfer ownership of uploads/ to www-data", "intent": "chown", "lang": "en"}
+{"text": "change file owner of report.pdf to marek", "intent": "chown", "lang": "en"}
+{"text": "who should own this? make it root: /etc/app.conf", "intent": "chown", "lang": "en"}
+{"text": "chown backup.sh to user admin", "intent": "chown", "lang": "en"}
+{"text": "make me (lukasz) the owner of ./project", "intent": "chown", "lang": "en"}
+{"text": "change ownership of /home/ola/docs to ola", "intent": "chown", "lang": "en"}
+{"text": "set user ownership of /var/lib/mysql to mysql", "intent": "chown", "lang": "en"}
+{"text": "chown the folder logs to syslog", "intent": "chown", "lang": "en"}
+{"text": "reassign owner of /data/media to jellyfin", "intent": "chown", "lang": "en"}
+{"text": "change the owner recursively of /srv/git to git", "intent": "chown", "lang": "en"}
+{"text": "make user tomek own notes.txt", "intent": "chown", "lang": "en"}
+{"text": "fix ownership on ~/Downloads, should be piotr", "intent": "chown", "lang": "en"}
+{"text": "change owner to ubuntu for /home/ubuntu/app", "intent": "chown", "lang": "en"}
+{"text": "chwon /var/cache/app to app", "intent": "chown", "lang": "en"}
+{"text": "set owner redis on /var/lib/redis", "intent": "chown", "lang": "en"}
+{"text": "give user jenkins ownership of the workspace dir", "intent": "chown", "lang": "en"}
+{"text": "change file ownership of key.pem to root", "intent": "chown", "lang": "en"}
+{"text": "make www-data own /var/www/html recursively", "intent": "chown", "lang": "en"}
+{"text": "transfer /mnt/usb to user kasia", "intent": "chown", "lang": "en"}
+{"text": "owner of ./build should be ci, change it", "intent": "chown", "lang": "en"}
+{"text": "change who owns dump.sql to postgres", "intent": "chown", "lang": "en"}
+{"text": "recursively chown ./node_modules to me", "intent": "chown", "lang": "en"}
+{"text": "set ownership of /etc/nginx to root", "intent": "chown", "lang": "en"}
+{"text": "make docker the owner of /srv/registry", "intent": "chown", "lang": "en"}
+{"text": "change owning user of /opt/minecraft to mc", "intent": "chown", "lang": "en"}
+{"text": "zmień właściciela /var/www na www-data", "intent": "chown", "lang": "pl"}
+{"text": "ustaw anna jako właściciela ~/shared", "intent": "chown", "lang": "pl"}
+{"text": "przekaż własność ./data użytkownikowi postgres", "intent": "chown", "lang": "pl"}
+{"text": "ustaw właściciela /opt/app na deploy", "intent": "chown", "lang": "pl"}
+{"text": "przenieś własność uploads/ na www-data", "intent": "chown", "lang": "pl"}
+{"text": "zmien wlasciciela pliku raport.pdf na marek", "intent": "chown", "lang": "pl"}
+{"text": "niech root będzie właścicielem /etc/app.conf", "intent": "chown", "lang": "pl"}
+{"text": "chown backup.sh na użytkownika admin", "intent": "chown", "lang": "pl"}
+{"text": "zrób mnie (lukasz) właścicielem ./project", "intent": "chown", "lang": "pl"}
+{"text": "zmień właściciela /home/ola/docs na ola", "intent": "chown", "lang": "pl"}
+{"text": "ustaw własność /var/lib/mysql na mysql", "intent": "chown", "lang": "pl"}
+{"text": "zmien wlasciciela folderu logs na syslog", "intent": "chown", "lang": "pl"}
+{"text": "nowy właściciel /data/media to jellyfin", "intent": "chown", "lang": "pl"}
+{"text": "zmień rekurencyjnie właściciela /srv/git na git", "intent": "chown", "lang": "pl"}
+{"text": "niech użytkownik tomek będzie właścicielem notatki.txt", "intent": "chown", "lang": "pl"}
+{"text": "napraw właściciela ~/Pobrane, ma być piotr", "intent": "chown", "lang": "pl"}
+{"text": "zmien ownera na ubuntu dla /home/ubuntu/app", "intent": "chown", "lang": "pl"}
+{"text": "chonw /var/cache/app na app", "intent": "chown", "lang": "pl"}
+{"text": "ustaw właściciela redis na /var/lib/redis", "intent": "chown", "lang": "pl"}
+{"text": "oddaj katalog workspace użytkownikowi jenkins", "intent": "chown", "lang": "pl"}
+{"text": "zmień właściciela pliku klucz.pem na root", "intent": "chown", "lang": "pl"}
+{"text": "niech www-data posiada /var/www/html rekurencyjnie", "intent": "chown", "lang": "pl"}
+{"text": "przekaż /mnt/usb użytkowniczce kasia", "intent": "chown", "lang": "pl"}
+{"text": "właścicielem ./build ma być ci, zmień to", "intent": "chown", "lang": "pl"}
+{"text": "zmien kto jest wlascicielem dump.sql na postgres", "intent": "chown", "lang": "pl"}
+{"text": "rekurencyjnie zmień właściciela ./node_modules na mnie", "intent": "chown", "lang": "pl"}
+{"text": "ustaw właściciela /etc/nginx na root", "intent": "chown", "lang": "pl"}
+{"text": "niech docker będzie właścicielem /srv/registry", "intent": "chown", "lang": "pl"}
+{"text": "zmień użytkownika-właściciela /opt/minecraft na mc", "intent": "chown", "lang": "pl"}
+{"text": "copy notes.txt to /tmp", "intent": "copy", "lang": "en"}
+{"text": "cp config.yml config.yml.bak", "intent": "copy", "lang": "en"}
+{"text": "copy the folder ./src to ./src-backup", "intent": "copy", "lang": "en"}
+{"text": "duplicate report.pdf into ~/Documents", "intent": "copy", "lang": "en"}
+{"text": "copy app.log to /var/backups/", "intent": "copy", "lang": "en"}
+{"text": "make a copy of photo.jpg called photo2.jpg", "intent": "copy", "lang": "en"}
+{"text": "copy ~/Downloads/data.csv to ./data/", "intent": "copy", "lang": "en"}
+{"text": "copy everything in ./dist to /var/www/html", "intent": "copy", "lang": "en"}
+{"text": "cp -r themes /srv/themes", "intent": "copy", "lang": "en"}
+{"text": "copy a.txt to backup/", "intent": "copy", "lang": "en"}
+{"text": "copy the directory project to /mnt/usb", "intent": "copy", "lang": "en"}
+{"text": "clone the file .env.example to .env", "intent": "copy", "lang": "en"}
+{"text": "copy /etc/nginx/nginx.conf to my home dir", "intent": "copy", "lang": "en"}
+{"text": "make a backup copy of db.sqlite to db.sqlite.old", "intent": "copy", "lang": "en"}
+{"text": "copy settings.json into ../other-project", "intent": "copy", "lang": "en"}
+{"text": "copy over the logs folder to /tmp/logs", "intent": "copy", "lang": "en"}
+{"text": "cpy index.html to public/", "intent": "copy", "lang": "en"}
+{"text": "duplicate the folder assets as assets_old", "intent": "copy", "lang": "en"}
+{"text": "copy id_rsa.pub to ~/keys", "intent": "copy", "lang": "en"}
+{"text": "copy main.py to main_v2.py", "intent": "copy", "lang": "en"}
+{"text": "please copy invoice.pdf to /home/ola/shared", "intent": "copy", "lang": "en"}
+{"text": "copy all of ./configs to /etc/myapp", "intent": "copy", "lang": "en"}
+{"text": "copy the script deploy.sh into bin/", "intent": "copy", "lang": "en"}
+{"text": "replicate ~/music to /media/backup/music", "intent": "copy", "lang": "en"}
+{"text": "copy file1 to file2", "intent": "copy", "lang": "en"}
+{"text": "copy the whole ~/work dir to the external drive /media/ext", "intent": "copy", "lang": "en"}
+{"text": "put a copy of README.md in docs/", "intent": "copy", "lang": "en"}
+{"text": "copy dump.sql from /tmp to ./backups", "intent": "copy", "lang": "en"}
+{"text": "make a duplicate of Dockerfile named Dockerfile.dev", "intent": "copy", "lang": "en"}
+{"text": "copy folder images into ./site/static", "intent": "copy", "lang": "en"}
+{"text": "skopiuj notatki.txt do /tmp", "intent": "copy", "lang": "pl"}
+{"text": "skopiuj folder ./src do ./src-backup", "intent": "copy", "lang": "pl"}
+{"text": "zduplikuj raport.pdf do ~/Dokumenty", "intent": "copy", "lang": "pl"}
+{"text": "skopiuj app.log do /var/backups/", "intent": "copy", "lang": "pl"}
+{"text": "zrob kopie zdjecie.jpg o nazwie zdjecie2.jpg", "intent": "copy", "lang": "pl"}
+{"text": "skopiuj ~/Pobrane/dane.csv do ./data/", "intent": "copy", "lang": "pl"}
+{"text": "skopiuj wszystko z ./dist do /var/www/html", "intent": "copy", "lang": "pl"}
+{"text": "skopiuj plik a.txt do /tmp", "intent": "copy", "lang": "pl"}
+{"text": "skopiuj katalog projekt na /mnt/usb", "intent": "copy", "lang": "pl"}
+{"text": "sklonuj plik .env.example jako .env", "intent": "copy", "lang": "pl"}
+{"text": "skopiuj /etc/nginx/nginx.conf do katalogu domowego", "intent": "copy", "lang": "pl"}
+{"text": "zrób kopię zapasową db.sqlite jako db.sqlite.old", "intent": "copy", "lang": "pl"}
+{"text": "skopiuj settings.json do ../inny-projekt", "intent": "copy", "lang": "pl"}
+{"text": "przekopiuj folder logs do /tmp/logs", "intent": "copy", "lang": "pl"}
+{"text": "skopjuj index.html do public/", "intent": "copy", "lang": "pl"}
+{"text": "zduplikuj folder assets jako assets_old", "intent": "copy", "lang": "pl"}
+{"text": "skopiuj id_rsa.pub do ~/klucze", "intent": "copy", "lang": "pl"}
+{"text": "skopiuj main.py do main_v2.py", "intent": "copy", "lang": "pl"}
+{"text": "proszę skopiuj faktura.pdf do /home/ola/shared", "intent": "copy", "lang": "pl"}
+{"text": "skopiuj całe ./configs do /etc/myapp", "intent": "copy", "lang": "pl"}
+{"text": "skopiuj skrypt deploy.sh do bin/", "intent": "copy", "lang": "pl"}
+{"text": "skopiuj ~/muzyka na /media/backup/muzyka", "intent": "copy", "lang": "pl"}
+{"text": "kopiuj plik1 do plik2", "intent": "copy", "lang": "pl"}
+{"text": "skopiuj cały katalog ~/praca na dysk zewnętrzny /media/ext", "intent": "copy", "lang": "pl"}
+{"text": "wrzuć kopię README.md do docs/", "intent": "copy", "lang": "pl"}
+{"text": "skopiuj dump.sql z /tmp do ./backups", "intent": "copy", "lang": "pl"}
+{"text": "zrob duplikat Dockerfile o nazwie Dockerfile.dev", "intent": "copy", "lang": "pl"}
+{"text": "skopiuj folder obrazki do ./site/static", "intent": "copy", "lang": "pl"}
+{"text": "rename notes.txt to ideas.txt", "intent": "move_rename", "lang": "en"}
+{"text": "move app.log to /var/log/old/", "intent": "move_rename", "lang": "en"}
+{"text": "mv report.pdf ~/Documents", "intent": "move_rename", "lang": "en"}
+{"text": "rename the folder src to source", "intent": "move_rename", "lang": "en"}
+{"text": "move all of ./build to /tmp/build", "intent": "move_rename", "lang": "en"}
+{"text": "rename config.yml.bak back to config.yml", "intent": "move_rename", "lang": "en"}
+{"text": "move photo.jpg into ~/Pictures", "intent": "move_rename", "lang": "en"}
+{"text": "change the name of main.py to app.py", "intent": "move_rename", "lang": "en"}
+{"text": "move ~/Downloads/movie.mkv to /media/films", "intent": "move_rename", "lang": "en"}
+{"text": "rename directory old_project to archive_project", "intent": "move_rename", "lang": "en"}
+{"text": "mv data.csv data_2024.csv", "intent": "move_rename", "lang": "en"}
+{"text": "move the file key.pem to ~/.ssh/", "intent": "move_rename", "lang": "en"}
+{"text": "relocate the logs folder to /srv/logs", "intent": "move_rename", "lang": "en"}
+{"text": "rename index.htm to index.html", "intent": "move_rename", "lang": "en"}
+{"text": "move a.txt to backup/", "intent": "move_rename", "lang": "en"}
+{"text": "give draft.md a new name: final.md", "intent": "move_rename", "lang": "en"}
+{"text": "move dump.sql out of here into ./backups", "intent": "move_rename", "lang": "en"}
+{"text": "renmae test.py to test_utils.py", "intent": "move_rename", "lang": "en"}
+{"text": "move the directory images to ./static/images", "intent": "move_rename", "lang": "en"}
+{"text": "rename my file \"CV old.pdf\" to cv.pdf", "intent": "move_rename", "lang": "en"}
+{"text": "move invoice.pdf to /home/ola/shared and remove it from here", "intent": "move_rename", "lang": "en"}
+{"text": "transfer script.sh into bin/", "intent": "move_rename", "lang": "en"}
+{"text": "rename branch-notes.txt to notes.txt", "intent": "move_rename", "lang": "en"}
+{"text": "move .env.local to .env", "intent": "move_rename", "lang": "en"}
+{"text": "move the whole ~/work folder to /data/work", "intent": "move_rename", "lang": "en"}
+{"text": "rename Dockerfile.dev to Dockerfile", "intent": "move_rename", "lang": "en"}
+{"text": "mv -i settings.json ../settings.json", "intent": "move_rename", "lang": "en"}
+{"text": "move song.mp3 into the music folder", "intent": "move_rename", "lang": "en"}
+{"text": "rename the file foo to bar", "intent": "move_rename", "lang": "en"}
+{"text": "change filename of todo to TODO.md", "intent": "move_rename", "lang": "en"}
+{"text": "zmień nazwę notatki.txt na pomysly.txt", "intent": "move_rename", "lang": "pl"}
+{"text": "przenieś app.log do /var/log/old/", "intent": "move_rename", "lang": "pl"}
+{"text": "mv raport.pdf ~/Dokumenty", "intent": "move_rename", "lang": "pl"}
+{"text": "zmien nazwe folderu src na source", "intent": "move_rename", "lang": "pl"}
+{"text": "przenieś całe ./build do /tmp/build", "intent": "move_rename", "lang": "pl"}
+{"text": "zmień nazwę config.yml.bak z powrotem na config.yml", "intent": "move_rename", "lang": "pl"}
+{"text": "przenies zdjecie.jpg do ~/Obrazy", "intent": "move_rename", "lang": "pl"}
+{"text": "zmień nazwę main.py na app.py", "intent": "move_rename", "lang": "pl"}
+{"text": "przenieś ~/Pobrane/film.mkv do /media/filmy", "intent": "move_rename", "lang": "pl"}
+{"text": "zmień nazwę katalogu stary_projekt na archiwum_projekt", "intent": "move_rename", "lang": "pl"}
+{"text": "mv dane.csv dane_2024.csv", "intent": "move_rename", "lang": "pl"}
+{"text": "przenieś plik klucz.pem do ~/.ssh/", "intent": "move_rename", "lang": "pl"}
+{"text": "przenieś folder logs do /srv/logs", "intent": "move_rename", "lang": "pl"}
+{"text": "zmien nazwe index.htm na index.html", "intent": "move_rename", "lang": "pl"}
+{"text": "przenieś plik a.txt do backup/", "intent": "move_rename", "lang": "pl"}
+{"text": "nadaj szkic.md nową nazwę: final.md", "intent": "move_rename", "lang": "pl"}
+{"text": "przenieś dump.sql stąd do ./backups", "intent": "move_rename", "lang": "pl"}
+{"text": "zmień nazwę test.py na test_utils.py", "intent": "move_rename", "lang": "pl"}
+{"text": "przenies katalog obrazki do ./static/obrazki", "intent": "move_rename", "lang": "pl"}
+{"text": "przemianuj plik \"CV stare.pdf\" na cv.pdf", "intent": "move_rename", "lang": "pl"}
+{"text": "przenieś faktura.pdf do /home/ola/shared i usuń stąd", "intent": "move_rename", "lang": "pl"}
+{"text": "przerzuć skrypt.sh do bin/", "intent": "move_rename", "lang": "pl"}
+{"text": "zmien nazwe pliku notatki-galaz.txt na notatki.txt", "intent": "move_rename", "lang": "pl"}
+{"text": "przenieś .env.local na .env", "intent": "move_rename", "lang": "pl"}
+{"text": "przenieś cały folder ~/praca do /data/praca", "intent": "move_rename", "lang": "pl"}
+{"text": "zmień nazwę Dockerfile.dev na Dockerfile", "intent": "move_rename", "lang": "pl"}
+{"text": "przenieś piosenka.mp3 do folderu muzyka", "intent": "move_rename", "lang": "pl"}
+{"text": "przemianuj plik foo na bar", "intent": "move_rename", "lang": "pl"}
+{"text": "zmień nazwę pliku todo na TODO.md", "intent": "move_rename", "lang": "pl"}
+{"text": "delete notes.txt", "intent": "delete_file", "lang": "en"}
+{"text": "remove the file app.log", "intent": "delete_file", "lang": "en"}
+{"text": "rm old.conf", "intent": "delete_file", "lang": "en"}
+{"text": "delete file /tmp/test.txt", "intent": "delete_file", "lang": "en"}
+{"text": "get rid of report.pdf", "intent": "delete_file", "lang": "en"}
+{"text": "remove ~/Downloads/installer.exe", "intent": "delete_file", "lang": "en"}
+{"text": "erase the file secrets.env", "intent": "delete_file", "lang": "en"}
+{"text": "delete that file dump.sql", "intent": "delete_file", "lang": "en"}
+{"text": "rm ./build/output.bin", "intent": "delete_file", "lang": "en"}
+{"text": "trash the file draft.md", "intent": "delete_file", "lang": "en"}
+{"text": "remove backup.tar.gz please", "intent": "delete_file", "lang": "en"}
+{"text": "delete config.yml.bak", "intent": "delete_file", "lang": "en"}
+{"text": "how do I delete the file core.12345", "intent": "delete_file", "lang": "en"}
+{"text": "remove a single file: nohup.out", "intent": "delete_file", "lang": "en"}
+{"text": "delete the file called \"old notes.txt\"", "intent": "delete_file", "lang": "en"}
+{"text": "dlete temp.txt", "intent": "delete_file", "lang": "en"}
+{"text": "remove /var/log/app/debug.log", "intent": "delete_file", "lang": "en"}
+{"text": "delete package-lock.json", "intent": "delete_file", "lang": "en"}
+{"text": "get rid of the stray file foo", "intent": "delete_file", "lang": "en"}
+{"text": "rm the file .DS_Store in this dir", "intent": "delete_file", "lang": "en"}
+{"text": "delete photo_copy.jpg", "intent": "delete_file", "lang": "en"}
+{"text": "remove the file id_rsa.old from ~/.ssh", "intent": "delete_file", "lang": "en"}
+{"text": "erase log.txt", "intent": "delete_file", "lang": "en"}
+{"text": "delete ./data/cache.db", "intent": "delete_file", "lang": "en"}
+{"text": "remove the empty file placeholder", "intent": "delete_file", "lang": "en"}
+{"text": "I want to delete movie.mkv from ~/Videos", "intent": "delete_file", "lang": "en"}
+{"text": "delete file Dockerfile.old", "intent": "delete_file", "lang": "en"}
+{"text": "remove the leftover file setup.log", "intent": "delete_file", "lang": "en"}
+{"text": "delete index.html.orig", "intent": "delete_file", "lang": "en"}
+{"text": "nuke the file error.log", "intent": "delete_file", "lang": "en"}
+{"text": "usuń notatki.txt", "intent": "delete_file", "lang": "pl"}
+{"text": "usuń plik app.log", "intent": "delete_file", "lang": "pl"}
+{"text": "skasuj plik /tmp/test.txt", "intent": "delete_file", "lang": "pl"}
+{"text": "pozbądź się raport.pdf", "intent": "delete_file", "lang": "pl"}
+{"text": "usun ~/Pobrane/installer.exe", "intent": "delete_file", "lang": "pl"}
+{"text": "wymaż plik secrets.env", "intent": "delete_file", "lang": "pl"}
+{"text": "skasuj ten plik dump.sql", "intent": "delete_file", "lang": "pl"}
+{"text": "wywal plik szkic.md", "intent": "delete_file", "lang": "pl"}
+{"text": "usuń backup.tar.gz proszę", "intent": "delete_file", "lang": "pl"}
+{"text": "skasuj config.yml.bak", "intent": "delete_file", "lang": "pl"}
+{"text": "jak usunąć plik core.12345", "intent": "delete_file", "lang": "pl"}
+{"text": "usuń pojedynczy plik nohup.out", "intent": "delete_file", "lang": "pl"}
+{"text": "usuń plik o nazwie \"stare notatki.txt\"", "intent": "delete_file", "lang": "pl"}
+{"text": "usń temp.txt", "intent": "delete_file", "lang": "pl"}
+{"text": "usun plik /var/log/app/debug.log", "intent": "delete_file", "lang": "pl"}
+{"text": "skasuj package-lock.json", "intent": "delete_file", "lang": "pl"}
+{"text": "pozbadz sie pliku foo", "intent": "delete_file", "lang": "pl"}
+{"text": "usuń plik .DS_Store w tym katalogu", "intent": "delete_file", "lang": "pl"}
+{"text": "skasuj zdjecie_kopia.jpg", "intent": "delete_file", "lang": "pl"}
+{"text": "usuń plik id_rsa.old z ~/.ssh", "intent": "delete_file", "lang": "pl"}
+{"text": "wymaz log.txt", "intent": "delete_file", "lang": "pl"}
+{"text": "usuń ./data/cache.db", "intent": "delete_file", "lang": "pl"}
+{"text": "skasuj pusty plik placeholder", "intent": "delete_file", "lang": "pl"}
+{"text": "chcę usunąć film.mkv z ~/Wideo", "intent": "delete_file", "lang": "pl"}
+{"text": "usun plik Dockerfile.old", "intent": "delete_file", "lang": "pl"}
+{"text": "usuń pozostały plik setup.log", "intent": "delete_file", "lang": "pl"}
+{"text": "skasuj index.html.orig", "intent": "delete_file", "lang": "pl"}
+{"text": "wywal plik error.log", "intent": "delete_file", "lang": "pl"}
+{"text": "delete the folder build", "intent": "delete_dir", "lang": "en"}
+{"text": "remove directory ./dist recursively", "intent": "delete_dir", "lang": "en"}
+{"text": "rm -r node_modules", "intent": "delete_dir", "lang": "en"}
+{"text": "delete /tmp/cache and everything in it", "intent": "delete_dir", "lang": "en"}
+{"text": "get rid of the old_project directory", "intent": "delete_dir", "lang": "en"}
+{"text": "remove the folder ~/Downloads/junk with all contents", "intent": "delete_dir", "lang": "en"}
+{"text": "wipe out the dir ./target", "intent": "delete_dir", "lang": "en"}
+{"text": "delete directory logs/ including files", "intent": "delete_dir", "lang": "en"}
+{"text": "remove the whole ~/old-backups folder", "intent": "delete_dir", "lang": "en"}
+{"text": "nuke the .venv folder", "intent": "delete_dir", "lang": "en"}
+{"text": "delete folder coverage", "intent": "delete_dir", "lang": "en"}
+{"text": "how do I delete a non-empty directory? ./tmp", "intent": "delete_dir", "lang": "en"}
+{"text": "rm -rf the __pycache__ dir", "intent": "delete_dir", "lang": "en"}
+{"text": "remove dir /var/www/old-site", "intent": "delete_dir", "lang": "en"}
+{"text": "delete the entire src-backup folder", "intent": "delete_dir", "lang": "en"}
+{"text": "erase the directory /opt/legacy", "intent": "delete_dir", "lang": "en"}
+{"text": "remove folder .cache from home", "intent": "delete_dir", "lang": "en"}
+{"text": "delet the dist directory", "intent": "delete_dir", "lang": "en"}
+{"text": "remove the vendor folder completely", "intent": "delete_dir", "lang": "en"}
+{"text": "get rid of folder \"New Folder\"", "intent": "delete_dir", "lang": "en"}
+{"text": "delete ./out directory and its contents", "intent": "delete_dir", "lang": "en"}
+{"text": "blow away the build directory", "intent": "delete_dir", "lang": "en"}
+{"text": "delete the directory /srv/tmp recursively", "intent": "delete_dir", "lang": "en"}
+{"text": "remove the folder test-output and everything inside", "intent": "delete_dir", "lang": "en"}
+{"text": "delete my ~/projects/abandoned dir", "intent": "delete_dir", "lang": "en"}
+{"text": "trash the whole folder screenshots", "intent": "delete_dir", "lang": "en"}
+{"text": "remove .git directory from ./copy", "intent": "delete_dir", "lang": "en"}
+{"text": "delete the docs/_build folder", "intent": "delete_dir", "lang": "en"}
+{"text": "wipe folder /data/scratch", "intent": "delete_dir", "lang": "en"}
+{"text": "remove directory tree ./generated", "intent": "delete_dir", "lang": "en"}
+{"text": "usuń folder build", "intent": "delete_dir", "lang": "pl"}
+{"text": "usuń katalog ./dist rekurencyjnie", "intent": "delete_dir", "lang": "pl"}
+{"text": "skasuj /tmp/cache razem z zawartością", "intent": "delete_dir", "lang": "pl"}
+{"text": "pozbądź się katalogu old_project", "intent": "delete_dir", "lang": "pl"}
+{"text": "usun folder ~/Pobrane/smieci z cala zawartoscia", "intent": "delete_dir", "lang": "pl"}
+{"text": "wyczyść i usuń katalog ./target", "intent": "delete_dir", "lang": "pl"}
+{"text": "usuń katalog logs/ razem z plikami", "intent": "delete_dir", "lang": "pl"}
+{"text": "usuń cały folder ~/stare-backupy", "intent": "delete_dir", "lang": "pl"}
+{"text": "wywal folder .venv", "intent": "delete_dir", "lang": "pl"}
+{"text": "skasuj folder coverage", "intent": "delete_dir", "lang": "pl"}
+{"text": "jak usunąć niepusty katalog? ./tmp", "intent": "delete_dir", "lang": "pl"}
+{"text": "rm -rf katalog __pycache__", "intent": "delete_dir", "lang": "pl"}
+{"text": "usun katalog /var/www/old-site", "intent": "delete_dir", "lang": "pl"}
+{"text": "usuń cały folder src-backup", "intent": "delete_dir", "lang": "pl"}
+{"text": "wymaż katalog /opt/legacy", "intent": "delete_dir", "lang": "pl"}
+{"text": "usuń folder .cache z katalogu domowego", "intent": "delete_dir", "lang": "pl"}
+{"text": "usń katalog dist", "intent": "delete_dir", "lang": "pl"}
+{"text": "usuń folder vendor całkowicie", "intent": "delete_dir", "lang": "pl"}
+{"text": "pozbądź się folderu \"Nowy folder\"", "intent": "delete_dir", "lang": "pl"}
+{"text": "skasuj katalog ./out wraz z zawartością", "intent": "delete_dir", "lang": "pl"}
+{"text": "wywal katalog build", "intent": "delete_dir", "lang": "pl"}
+{"text": "usuń rekurencyjnie katalog /srv/tmp", "intent": "delete_dir", "lang": "pl"}
+{"text": "usun folder test-output i wszystko w srodku", "intent": "delete_dir", "lang": "pl"}
+{"text": "usuń mój katalog ~/projects/porzucony", "intent": "delete_dir", "lang": "pl"}
+{"text": "wyrzuć cały folder screenshoty", "intent": "delete_dir", "lang": "pl"}
+{"text": "usuń katalog .git z ./kopia", "intent": "delete_dir", "lang": "pl"}
+{"text": "skasuj folder docs/_build", "intent": "delete_dir", "lang": "pl"}
+{"text": "wyczyść i skasuj folder /data/scratch", "intent": "delete_dir", "lang": "pl"}
+{"text": "usuń drzewo katalogów ./generated", "intent": "delete_dir", "lang": "pl"}
+{"text": "delete all .log files", "intent": "delete_by_ext", "lang": "en"}
+{"text": "remove every *.tmp file in /tmp", "intent": "delete_by_ext", "lang": "en"}
+{"text": "rm all pyc files recursively", "intent": "delete_by_ext", "lang": "en"}
+{"text": "delete all .bak files in ./config", "intent": "delete_by_ext", "lang": "en"}
+{"text": "get rid of all .orig files in the repo", "intent": "delete_by_ext", "lang": "en"}
+{"text": "remove all files ending in .swp", "intent": "delete_by_ext", "lang": "en"}
+{"text": "delete every .DS_Store file under ~/projects", "intent": "delete_by_ext", "lang": "en"}
+{"text": "remove all .class files from ./target", "intent": "delete_by_ext", "lang": "en"}
+{"text": "delete all jpg files in ~/Downloads", "intent": "delete_by_ext", "lang": "en"}
+{"text": "wipe all *.o object files in ./build", "intent": "delete_by_ext", "lang": "en"}
+{"text": "erase all .zip files in this folder", "intent": "delete_by_ext", "lang": "en"}
+{"text": "delete all log files in /var/log/myapp", "intent": "delete_by_ext", "lang": "en"}
+{"text": "clean up all .pyc files", "intent": "delete_by_ext", "lang": "en"}
+{"text": "remove all .part files from ~/Downloads", "intent": "delete_by_ext", "lang": "en"}
+{"text": "delete *.tmp everywhere under .", "intent": "delete_by_ext", "lang": "en"}
+{"text": "how do I delete all files with .cache extension", "intent": "delete_by_ext", "lang": "en"}
+{"text": "remove every .mp4 in ~/Videos/old", "intent": "delete_by_ext", "lang": "en"}
+{"text": "delete all .map files in dist", "intent": "delete_by_ext", "lang": "en"}
+{"text": "nuke all the .log files in ./logs", "intent": "delete_by_ext", "lang": "en"}
+{"text": "remove files with extension .old in /etc/app", "intent": "delete_by_ext", "lang": "en"}
+{"text": "delet all .tmp files", "intent": "delete_by_ext", "lang": "en"}
+{"text": "delete all png files in ./screenshots", "intent": "delete_by_ext", "lang": "en"}
+{"text": "purge all .gz files from /var/backups", "intent": "delete_by_ext", "lang": "en"}
+{"text": "remove all *.retry files", "intent": "delete_by_ext", "lang": "en"}
+{"text": "delete every .crdownload file in Downloads", "intent": "delete_by_ext", "lang": "en"}
+{"text": "remove all .txt files from ./out", "intent": "delete_by_ext", "lang": "en"}
+{"text": "delete all files of type .bak recursively in /srv", "intent": "delete_by_ext", "lang": "en"}
+{"text": "get rid of every *.pyo file in this project", "intent": "delete_by_ext", "lang": "en"}
+{"text": "remove all .lock files in ./tmp", "intent": "delete_by_ext", "lang": "en"}
+{"text": "delete all .csv files in /data/exports", "intent": "delete_by_ext", "lang": "en"}
+{"text": "usuń wszystkie pliki .log", "intent": "delete_by_ext", "lang": "pl"}
+{"text": "usuń każdy plik *.tmp w /tmp", "intent": "delete_by_ext", "lang": "pl"}
+{"text": "rm wszystkie pliki pyc rekurencyjnie", "intent": "delete_by_ext", "lang": "pl"}
+{"text": "skasuj wszystkie pliki .bak w ./config", "intent": "delete_by_ext", "lang": "pl"}
+{"text": "pozbądź się wszystkich plików .orig w repo", "intent": "delete_by_ext", "lang": "pl"}
+{"text": "usun wszystkie pliki konczace sie na .swp", "intent": "delete_by_ext", "lang": "pl"}
+{"text": "usuń każdy plik .DS_Store w ~/projects", "intent": "delete_by_ext", "lang": "pl"}
+{"text": "usuń wszystkie pliki .class z ./target", "intent": "delete_by_ext", "lang": "pl"}
+{"text": "skasuj wszystkie pliki jpg w ~/Pobrane", "intent": "delete_by_ext", "lang": "pl"}
+{"text": "wyczyść wszystkie pliki obiektowe *.o w ./build", "intent": "delete_by_ext", "lang": "pl"}
+{"text": "wymaż wszystkie pliki .zip w tym folderze", "intent": "delete_by_ext", "lang": "pl"}
+{"text": "usuń wszystkie logi .log w /var/log/myapp", "intent": "delete_by_ext", "lang": "pl"}
+{"text": "posprzątaj wszystkie pliki .pyc", "intent": "delete_by_ext", "lang": "pl"}
+{"text": "usun wszystkie pliki .part z ~/Pobrane", "intent": "delete_by_ext", "lang": "pl"}
+{"text": "skasuj *.tmp wszędzie w bieżącym katalogu", "intent": "delete_by_ext", "lang": "pl"}
+{"text": "jak usunąć wszystkie pliki z rozszerzeniem .cache", "intent": "delete_by_ext", "lang": "pl"}
+{"text": "usuń każde .mp4 w ~/Wideo/stare", "intent": "delete_by_ext", "lang": "pl"}
+{"text": "skasuj wszystkie pliki .map w dist", "intent": "delete_by_ext", "lang": "pl"}
+{"text": "wywal wszystkie pliki .log w ./logs", "intent": "delete_by_ext", "lang": "pl"}
+{"text": "usuń pliki z rozszerzeniem .old w /etc/app", "intent": "delete_by_ext", "lang": "pl"}
+{"text": "usń wszystkie pliki .tmp", "intent": "delete_by_ext", "lang": "pl"}
+{"text": "usuń wszystkie pliki png w ./screenshoty", "intent": "delete_by_ext", "lang": "pl"}
+{"text": "wyczysc wszystkie pliki .gz z /var/backups", "intent": "delete_by_ext", "lang": "pl"}
+{"text": "usuń wszystkie pliki *.retry", "intent": "delete_by_ext", "lang": "pl"}
+{"text": "skasuj każdy plik .crdownload w Pobranych", "intent": "delete_by_ext", "lang": "pl"}
+{"text": "usuń wszystkie pliki .txt z ./out", "intent": "delete_by_ext", "lang": "pl"}
+{"text": "usuń rekurencyjnie wszystkie pliki typu .bak w /srv", "intent": "delete_by_ext", "lang": "pl"}
+{"text": "pozbadz sie kazdego pliku *.pyo w tym projekcie", "intent": "delete_by_ext", "lang": "pl"}
+{"text": "usuń wszystkie pliki .lock w ./tmp", "intent": "delete_by_ext", "lang": "pl"}
+{"text": "skasuj wszystkie pliki csv w /data/exports", "intent": "delete_by_ext", "lang": "pl"}
+{"text": "zmień uprawnienia deploy.sh na 755", "intent": "chmod", "lang": "pl"}
+{"text": "ustaw prawa 640 dla app.env", "intent": "chmod", "lang": "pl"}
+{"text": "nadaj plikowi config.ini uprawnienia 600", "intent": "chmod", "lang": "pl"}
+{"text": "pokaz zawartosc pliku config.yml", "intent": "cat_file", "lang": "pl"}
+{"text": "oddaj /srv/static na własność nginx", "intent": "chown", "lang": "pl"}
+{"text": "zrób kopię config.yml jako config.yml.bak", "intent": "copy", "lang": "pl"}
+{"text": "skopiuj rekurencyjnie folder themes do /srv/themes", "intent": "copy", "lang": "pl"}
+{"text": "usuń plik old.conf", "intent": "delete_file", "lang": "pl"}
+{"text": "skasuj plik ./build/output.bin", "intent": "delete_file", "lang": "pl"}
+{"text": "usun katalog node_modules ze wszystkim", "intent": "delete_dir", "lang": "pl"}
+{"text": "przenieś settings.json katalog wyżej", "intent": "move_rename", "lang": "pl"}
+{"text": "ustaw prawo wykonywania na install.sh", "intent": "make_executable", "lang": "pl"}
+{"text": "pokaz stat pliku app.log", "intent": "file_stat", "lang": "pl"}
+{"text": "śledź na żywo log systemowy /var/log/syslog", "intent": "tail_follow", "lang": "pl"}
+{"text": "rozpakuj go1.22.linux-amd64.tar.gz", "intent": "extract_targz", "lang": "pl"}
+{"text": "spakuj /var/www do site.zip", "intent": "compress_zip", "lang": "pl"}
+{"text": "wylistuj zawartość dump.tar", "intent": "list_archive", "lang": "pl"}
