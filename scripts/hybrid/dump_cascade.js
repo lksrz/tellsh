@@ -8,6 +8,7 @@ import { fileURLToPath } from 'node:url';
 import { loadModel, getModel } from '../../src/model.js';
 import { cascade } from '../../src/cascade.js';
 import { envFeatures } from '../../src/env.js';
+import { silverSpans, relex, mulberry32 } from '../lib/silver.js';
 
 const ROOT = fileURLToPath(new URL('../..', import.meta.url));
 const arg = (k, d) => process.argv.find((a) => a.startsWith(`--${k}=`))?.split('=')[1] ?? d;
@@ -23,6 +24,18 @@ export const SETS = {
   blind: () => readDir(join(ROOT, 'data/hybrid/blind')).filter((r) => r.intent),
   blind_ood: () => readDir(join(ROOT, 'data/hybrid/blind')).filter((r) => !r.intent),
   ood: () => readJsonl(join(ROOT, 'data/ood_eval.jsonl')),
+  // relexicalised data/eval: same construction and seed as scripts/eval.js section 4
+  relex: () => {
+    const rng = mulberry32(7);
+    const out = [];
+    for (const r of readDir(join(ROOT, 'data/eval'))) {
+      const { spans } = silverSpans(r.text, r.intent);
+      if (!spans.length) continue;
+      const rx = relex(r.text, spans, { lang: r.lang, rng, split: 'eval', keepProb: 0 });
+      out.push({ text: rx.text, intent: r.intent, lang: r.lang, shell: 'bash', os: 'linux' });
+    }
+    return out;
+  },
 };
 const out = [];
 for (const [set, f] of Object.entries(SETS)) {

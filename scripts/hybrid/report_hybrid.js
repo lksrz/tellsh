@@ -13,7 +13,7 @@ const zs = existsSync(join(ROOT, 'build/hybrid/zeroshot.jsonl')) ? readFileSync(
 const pct = (a, b) => (b ? `${((100 * a) / b).toFixed(1)}%` : 'n/a');
 const R = res.R;
 const SYS = Object.keys(R.eval);
-const NAME = { A: 'A cascade (v0.2)', B: 'B encoder alone', C: 'C LM rerank alone', 'A+B': 'A+B hybrid', 'A+C': 'A+C hybrid' };
+const NAME = { A: 'A cascade (v0.2)', B: 'B encoder alone', C: 'C LM rerank alone', 'A+B': 'A+B hybrid', 'A+C': 'A+C hybrid', 'A+B-safe': 'A+B safe (no rescue)', 'A+C-safe': 'A+C safe (no rescue)' };
 const md = [];
 const L = (s = '') => md.push(s);
 
@@ -26,6 +26,7 @@ for (const set of Object.keys(SETNAME)) {
   if (!R[set]) continue;
   for (const s of SYS) {
     const x = R[set][s]; if (!x?.all) continue;
+    if (set === 'private' && /C/.test(s)) continue; // C was not scored on the private set
     const a = x.all;
     L(`| ${SETNAME[set]} | ${NAME[s]} | ${a.n} | ${pct(a.tool, a.n)} | **${pct(a.intent, a.n)}** | ${pct(x.en?.intent, x.en?.n)} | ${pct(x.pl?.intent, x.pl?.n)} | ${pct(a.ans, a.n)} | ${pct(a.ansOk, a.ans)} | ${s === 'A' ? '–' : pct(a.deferred, a.n)} |`);
   }
@@ -74,9 +75,9 @@ if (pol) {
   L('| system | tau (A conf to answer alone) | k | alpha (weight of log pA) | accept | none | dev decision acc | dev deferred |');
   L('|---|---|---|---|---|---|---|---|');
   L(`| A_dev alone | – | – | – | – | – | ${(pol.A.acc * 100).toFixed(1)}% | – |`);
-  for (const s of ['B', 'A+B', 'C', 'A+C']) {
+  for (const s of ['B', 'A+B', 'A+B-safe', 'C', 'A+C', 'A+C-safe']) {
     const p = pol[s]; if (!p) continue;
-    L(`| ${s} | ${p.P.tau} | ${p.P.k} | ${p.P.alpha} | ${p.P.accept} | ${p.P.none} | ${(p.s.acc * 100).toFixed(1)}% (n=${p.s.n}) | ${(p.s.deferred * 100).toFixed(1)}% |`);
+    L(`| ${s} | ${p.P.tau} | ${p.P.k} | ${p.P.alpha} | ${p.P.accept} | ${p.P.none}${p.P.keepNone ? ', keepNone' : ''} | ${(p.s.acc * 100).toFixed(1)}% (n=${p.s.n}) | ${(p.s.deferred * 100).toFixed(1)}% |`);
   }
   L();
 }

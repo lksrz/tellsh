@@ -1,6 +1,7 @@
 // Hybrid policy: the linear cascade (A) answers when it is confident; otherwise a neural model re-ranks A's top-k.
 //
 //   A conf >= tau                      -> A (fast path, ~0.3 ms)
+//   A stage 1 says __none__ (keepNone)  -> keep A's rejection
 //   else  B (encoder) / C (tiny LM)    -> score_i = alpha*log pA_i + (1-alpha)*log pX_i over A's top-k candidates
 //                                         answer if pX(best) >= accept and pX(__none__) < none (B only), else reject
 //
@@ -14,6 +15,8 @@ import { FAMILY_OF, NONE } from '../tools.js';
 export const POLICY = {
   'A+B': { tau: 0.9, k: 5, alpha: 0.25, accept: 0.3, none: 0.5, tagger: 'A' },
   'A+C': { tau: 0.9, k: 5, alpha: 0.5, accept: 0.3 },
+  'A+B-safe': { tau: 0.9, k: 5, alpha: 0.5, accept: 0, rescue: false, tagger: 'A' },
+  'A+C-safe': { tau: 0.9, k: 5, alpha: 0.75, accept: 0, rescue: false },
   B: { tau: Infinity, k: 0, alpha: 0, accept: 0.3, none: 0.5, tagger: 'B' },
   C: { tau: Infinity, k: 5, alpha: 0, accept: 0 },
 };
@@ -27,6 +30,10 @@ const LOG = (p) => Math.log(Math.max(p, 1e-6));
  */
 export function rerank(c, pX, P, { thr, pNone = 0 } = {}) {
   if (c.confidence >= P.tau) return c;
+  // keepNone: the cascade's stage 1 says "not a shell request" -> keep its rejection (OOD safety)
+  if (P.keepNone && c.topTool === NONE && c.confidence < thr) return c;
+  // safe (rescue: false): only re-rank requests A answers anyway; A's rejections stay rejections
+  if (P.rescue === false && c.confidence < thr) return c;
   const pa = Object.fromEntries(c.top.map((t) => [t.intent, t.p]));
   const cands = P.k > 0 ? c.top.slice(0, P.k).map((t) => t.intent) : Object.keys(pX);
   let best = null;
@@ -60,7 +67,7 @@ export async function suggestHybrid(query, opts = {}) {
   if (!seen || seen.confidence >= P.tau) return { ...first, hybrid: { system, deferred: false } };
   const t0 = performance.now();
   let pX; let pNone = 0; let tagger;
-  if (system.endsWith('B')) {
+  if (/B/.test(system)) {
     if (!opts.encoder) return { ...first, hybrid: { system, deferred: false, unavailable: 'encoder' } };
     const b = await opts.encoder.infer(query, env);
     pX = b.intents;
@@ -69,6 +76,7 @@ export async function suggestHybrid(query, opts = {}) {
   } else {
     if (!opts.lm) return { ...first, hybrid: { system, deferred: false, unavailable: 'lm' } };
     pX = await opts.lm(query, env, seen.top.slice(0, P.k).map((t) => t.intent));
+    if (!pX) return { ...first, hybrid: { system, deferred: true, unavailable: 'lm' } };
   }
   const ms = performance.now() - t0;
   const res = suggest(query, { ...base, tagger, rerank: (c, { thr }) => rerank(c, pX, P, { thr, pNone }) });

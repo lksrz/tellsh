@@ -64,10 +64,10 @@ const lmFn = async (text, env) => LM.get(key(text, env)) || null;
 // ---------------------------------------------------------------- calibration on the training dev split
 function decide(c, sys, P, bo, lo, thr) {
   if (sys === 'A') return c;
-  if (sys.endsWith('B')) return bo ? rerank(c, bo.intents, P, { thr, pNone: bo.pNone }) : c;
+  if (/B/.test(sys)) return bo ? rerank(c, bo.intents, P, { thr, pNone: bo.pNone }) : c;
   return lo ? rerank(c, lo, P, { thr }) : c;
 }
-const SYSTEMS = ['A', 'B', 'C', 'A+B', 'A+C'];
+const SYSTEMS = ['A', 'B', 'C', 'A+B', 'A+C', 'A+B-safe', 'A+C-safe'];
 if (has('calibrate')) {
   const adev = loadModel(join(ROOT, 'build/adev/model/model.bin'));
   const thr = adev.thresholds.accept;
@@ -79,36 +79,42 @@ if (has('calibrate')) {
     rows.push({ r, c, bo: encoder ? await bOut(r.text, env) : null, lo: LM.get(key(r.text, env)) || null });
   }
   const score = (sys, P) => {
-    let ok = 0; let n = 0; let deferred = 0;
+    let ok = 0; let n = 0; let deferred = 0; let ood = 0; let oodRej = 0; let ind = 0; let indOk = 0;
     for (const { r, c, bo, lo } of rows) {
-      if (sys.endsWith('C') && !lo && c.confidence < P.tau) continue;
+      if (/C/.test(sys) && !lo && c.confidence < P.tau) continue;
       const d = decide(c, sys, P, bo, lo, thr);
       const und = d.confidence >= thr;
       n++;
       if (d.reranked !== undefined || c.confidence < P.tau) deferred++;
       ok += r.intent ? (und && d.intent === r.intent ? 1 : 0) : (und ? 0 : 1);
+      if (r.intent) { ind++; if (und && d.intent === r.intent) indOk++; } else { ood++; if (!und) oodRej++; }
     }
-    return { acc: ok / n, n, deferred: deferred / n };
+    return { acc: ok / n, n, deferred: deferred / n, indAcc: indOk / ind, oodRej: oodRej / ood, nOod: ood };
   };
   const grid = (sys) => {
-    const taus = sys === 'B' || sys === 'C' ? [Infinity] : [0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 0.98, 0.995];
-    const alphas = sys === 'B' ? [0] : [0, 0.25, 0.5, 0.75];
+    // C was scored only where A_dev conf < 0.9 (cost), so A+C cannot defer above that
+    const taus = sys === 'B' || sys === 'C' ? [Infinity] : /A\+C/.test(sys) ? [0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9] : [0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 0.95, 0.98, 0.995];
+    const alphas = sys === 'B' || sys === 'C' ? [0] : [0, 0.25, 0.5, 0.75];
     const ks = sys === 'B' ? [0] : [3, 5];
     const accepts = [0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7];
-    const nones = sys.endsWith('B') ? [0.3, 0.5, 0.7, 1.01] : [1.01];
+    const nones = /B/.test(sys) ? [0.1, 0.2, 0.3, 0.5, 0.7, 1.01] : [1.01];
     let best = null;
-    for (const tau of taus) for (const alpha of alphas) for (const k of ks) for (const accept of accepts) for (const none of nones) {
-      const P = { tau, alpha, k, accept, none, tagger: POLICY[sys]?.tagger };
+    // constraint: OOD rejection on dev may drop at most ~2 of the 48 OOD rows below A_dev's (added after the first
+    // held-out run showed the unconstrained policies answering almost every OOD request; see HYBRID.md)
+    const oodFloor = out.A.oodRej - 0.045;
+    for (const tau of taus) for (const alpha of alphas) for (const k of ks) for (const accept of accepts) for (const none of nones) for (const keepNone of [false, true]) {
+      const P = { tau, alpha, k, accept, none, keepNone, tagger: POLICY[sys]?.tagger, ...(/safe/.test(sys) ? { rescue: false } : {}) };
       const s = score(sys, P);
+      if (s.oodRej < oodFloor) continue;
       // ties (within 0.05 pt) -> prefer the policy that defers less (faster)
       if (!best || s.acc > best.s.acc + 5e-4 || (Math.abs(s.acc - best.s.acc) <= 5e-4 && s.deferred < best.s.deferred)) best = { P, s };
     }
     return best;
   };
   const out = { thrAdev: thr, n: rows.length, A: score('A', { tau: 0 }) };
-  for (const sys of ['B', 'A+B', 'C', 'A+C']) {
-    if (sys.endsWith('B') && !encoder) continue;
-    if (sys.endsWith('C') && !LM.size) continue;
+  for (const sys of ['B', 'A+B', 'C', 'A+C', 'A+B-safe', 'A+C-safe']) {
+    if (/B/.test(sys) && !encoder) continue;
+    if (/C/.test(sys) && !LM.size) continue;
     out[sys] = grid(sys);
   }
   writeFileSync(join(ROOT, 'build/hybrid/policy.json'), JSON.stringify(out, (k, v) => (v === Infinity ? 'Infinity' : v), 1));
@@ -126,12 +132,12 @@ const policyOf = (sys) => {
 };
 const model = getModel();
 const thr = model.thresholds.accept;
-const active = SYSTEMS.filter((s) => (s.endsWith('B') ? !!encoder : s.endsWith('C') ? LM.size > 0 : true));
+const active = SYSTEMS.filter((s) => (/B/.test(s) ? !!encoder : /C/.test(s) ? LM.size > 0 : true));
 
 async function run(sys, text, env, extra = {}) {
   if (sys === 'A') return suggest(text, { env, model, compose: 'off', ...extra });
   const P = policyOf(sys);
-  if (sys.endsWith('B')) await bOut(text, env);
+  if (/B/.test(sys)) await bOut(text, env);
   const r = await suggestHybrid(text, { env, model, compose: 'off', system: sys, policy: P, encoder: encoder && { infer: bOut }, lm: lmFn, ...extra });
   return r;
 }
@@ -177,7 +183,7 @@ async function clsSet(name, rows) {
       const env = envOf(r);
       if (sys === 'C' && !LM_SAMPLE.has(key(r.text, env))) continue;
       const s = await run(sys, r.text, env);
-      if (sys.endsWith('C') && s.hybrid?.deferred && !LM.has(key(r.text, env))) { bump('all', 'missing'); continue; }
+      if (/C/.test(sys) && s.hybrid?.deferred && !LM.has(key(r.text, env))) { bump('all', 'missing'); continue; }
       const ks = ['all', r.lang, 'sh:' + env.shell];
       for (const k of ks) {
         bump(k, 'n');
@@ -198,7 +204,7 @@ async function oodSet(name, rows) {
       const env = envOf(r);
       if (sys === 'C' && !LM_SAMPLE.has(key(r.text, env))) continue;
       const s = await run(sys, r.text, env);
-      if (sys.endsWith('C') && s.hybrid?.deferred && !LM.has(key(r.text, env))) continue;
+      if (/C/.test(sys) && s.hybrid?.deferred && !LM.has(key(r.text, env))) continue;
       n++; if (!s.understood) rej++;
     }
     R[name][sys] = { n, rej };
@@ -215,7 +221,7 @@ const ENVS = { bash: BASH, zsh: { shell: 'zsh', os: 'darwin', coreutils: 'bsd' }
   powershell: { shell: 'powershell', os: 'win32', coreutils: 'gnu' }, fish: { shell: 'fish', os: 'linux', coreutils: 'gnu' }, cmd: { shell: 'cmd', os: 'win32', coreutils: 'gnu' } };
 R.evalShells = {};
 if (!has('fast')) {
-  for (const sys of active.filter((s) => !s.endsWith('C'))) {
+  for (const sys of active.filter((s) => !/C/.test(s))) {
     R.evalShells[sys] = {};
     for (const [sh, env] of Object.entries(ENVS)) {
       let ok = 0;
@@ -302,7 +308,7 @@ for (const [name, rows] of [['relex', relexRows], ['blind', blindE2E], ['blind_n
       const env = envOf(r);
       if (sys === 'C' && !LM_SAMPLE.has(key(r.text, env))) continue;
       const s = await run(sys, r.text, env);
-      if (sys.endsWith('C') && s.hybrid?.deferred && !LM.has(key(r.text, env))) continue;
+      if (/C/.test(sys) && s.hybrid?.deferred && !LM.has(key(r.text, env))) continue;
       const ok = s.understood && s.command === r.gold ? 1 : 0;
       for (const k of ['all', r.lang]) { S[k][0]++; S[k][1] += ok; }
     }
