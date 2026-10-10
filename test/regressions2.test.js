@@ -99,3 +99,97 @@ test('danger: busybox, rsync --delete, /dev/null copies, root bind mounts, chmod
 test('danger: PowerShell typographic quotes do not hide a drive root', () => {
   for (const c of ['Remove-Item -Recurse -Force ‘C:\\’', 'Remove-Item -Recurse -Force “C:\\”']) assert.equal(checkDanger(c).critical, true, c);
 });
+
+// ---------------------------------------------------------------------------------------------
+// history references (r1-claude major 5-9, minor 1/8; codex 1-3)
+
+test('history: a mv/cp destination directory is not "it"', () => {
+  const r = run('delete it', ['mv notes.txt ~/Documents/']);
+  assert.ok(!/Documents/.test(r.command), r.command);
+  assert.equal(r.context.rule, 'refused');
+  const p = run('delete it', ['Move-Item notes.txt -Destination C:\\Users\\me\\Documents'], PS_WIN);
+  assert.ok(!/Documents/.test(p.command), p.command);
+  // renaming a file: the new name is "it"
+  assert.equal(run('delete it', ['mv a.txt b.txt']).command, 'rm b.txt');
+});
+
+test('history: a requested type that is not in history is refused, and "gallery" is not a branch', () => {
+  const r = run('delete that branch', ['ls tmp_dir']);
+  assert.ok(!/tmp_dir/.test(r.command), r.command);
+  assert.equal(r.context.rule, 'refused');
+  const g = run('delete that gallery folder', ['git checkout gallery', 'ls gallery']);
+  assert.ok(!/git branch/.test(g.command), g.command);
+});
+
+test('history: parsers pick the right word (kill -s, grep -v grep, pkill -u, checkout --)', () => {
+  assert.equal(run('kill that process', ['kill -s 9 4242']).command, 'kill 4242');
+  assert.equal(run('kill it', ['ps aux | grep -v grep | grep node']).command, 'pkill -f node');
+  assert.equal(run('kill it', ['pkill nginx -u bob']).command, 'pkill -f nginx');
+  const c = run('switch to that branch', ['git checkout -- app.js']);
+  assert.ok(!/app\.js/.test(c.command), c.command);
+  assert.equal(run('switch to that branch', ['git checkout -b feature/x origin/main']).command, 'git checkout feature/x');
+});
+
+test('history: later segments of a compound line win; redirect targets count', () => {
+  assert.equal(run('delete it', ['cat old.txt; cat new.txt']).command, 'rm new.txt');
+  assert.equal(run('delete it', ['cat old.txt && cat new.txt']).command, 'rm new.txt');
+  const amb = run('delete it', ['cat old.txt; cat $F']);
+  assert.ok(!/old\.txt/.test(amb.command), amb.command);
+  assert.equal(run('delete it', ['echo hi > out.txt']).command, 'rm out.txt');
+  assert.equal(run('delete it', ['cat a.txt > /dev/null']).command, 'rm a.txt');
+});
+
+test('history: no implicit fill of destructive commands, no fallback past an ambiguous value', () => {
+  const r = run('delete the folder', ['du -sh /var/lib/docker']);
+  assert.ok(!/docker/.test(r.command), r.command);
+  const f = run('delete file', ['cat old.txt', 'frobnicate new.txt']);
+  assert.ok(!/old\.txt/.test(f.command), f.command);
+  // safe intents may still be filled implicitly ...
+  assert.equal(run('count words', ['cat notes.txt']).command, 'wc -w notes.txt');
+  // ... but never from an older value when the newest one is ambiguous
+  const s = run('count words', ['cat notes.txt', 'frobnicate other.txt']);
+  assert.ok(!/notes\.txt/.test(s.command), s.command);
+});
+
+test('history: any history-derived slot marks the result as history (never --yes)', () => {
+  for (const [q, h] of [['show file contents', ['cat secret.txt']], ['count words', ['cat notes.txt']]]) {
+    const r = run(q, h);
+    assert.equal(r.method, 'history-rule', q);
+    assert.ok(Object.values(r.slotSources).includes('history'));
+  }
+  const dir = mkdtempSync(join(tmpdir(), 'tellsh-r2-'));
+  try {
+    const hf = join(dir, 'bash_history');
+    writeFileSync(hf, 'cat secret.txt\n');
+    const out = cli(['--yes', `--history=${hf}`, '--shell', 'bash', '--os', 'linux', 'show', 'file', 'contents'], { cwd: dir });
+    assert.equal(out.status, 4, out.stdout + out.stderr);
+    assert.match(out.stdout, /Not running/);
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
+test('history: relative paths from before a cd are not reused', () => {
+  const r = run('delete it', ['cat notes.txt', 'cd /tmp', 'true']);
+  assert.ok(!/notes\.txt/.test(r.command), r.command);
+  const rel = run('show it', ['cat notes.txt', 'cd sub']);
+  assert.ok(!/notes\.txt|sub/.test(rel.command), rel.command);
+  // absolute paths survive a cd
+  assert.equal(run('show that file', ['cat /etc/hosts', 'cd sub', 'true']).command, 'cat /etc/hosts');
+  // same line: `cat a.txt; cd y` makes a.txt stale
+  const same = run('show it', ['cat a.txt; cd y']);
+  assert.ok(!/a\.txt/.test(same.command), same.command);
+});
+
+test('history: the running tellsh call is not the previous command', () => {
+  assert.equal(run('same for /var', ['du -sh /home', 'tellsh --history same for /var']).command, 'du -sh /var');
+  assert.equal(run('same for /var', ['du -sh /home', "tellsh --history 'same for /var'"]).command, 'du -sh /var');
+  assert.equal(run('same for /var', ['du -sh /home', 'node bin/tellsh.js same for /var']).command, 'du -sh /var');
+});
+
+test('history: "same for" does not take pronouns or filler words as values', () => {
+  for (const q of ['what about this', 'and with force', 'what about it']) {
+    const r = run(q, ['rm -r olddir']);
+    assert.notEqual(r.context.rule, 'same-for', q);
+    assert.ok(!r.command || !/\b(this|force|it)\b/.test(r.command), `${q}: ${r.command}`);
+  }
+  assert.equal(run('same for build', ['rm -r olddir']).command, 'rm -r build');
+});

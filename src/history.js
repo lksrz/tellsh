@@ -6,7 +6,7 @@ import { homedir } from 'node:os';
 import { join } from 'node:path';
 import { INTENTS, BY_ID } from './catalog.js';
 import { FAMILY_OF } from './tools.js';
-import { extractSlots, foldKeepLength } from './slots.js';
+import { extractSlots, foldKeepLength, isStopWord } from './slots.js';
 import { VARIANTS } from './variants.js';
 import { splitCommand, wordsOf, decodeWord, AMB, isAmbiguous, isExpansion, isGlob, rawOf } from './shellwords.js';
 
@@ -220,6 +220,73 @@ function psArgs(args) {
 
 const typeByExt = (p) => (/\.\w{1,5}$/.test(rawOf(p)) ? 'file' : 'dir');
 
+/**
+ * mv/cp/ln (Move-Item/Copy-Item) SRC... DST: "it" afterwards is the moved/copied item, which is DST
+ * itself only when DST names the new file (`mv a.txt b.txt`). When DST is a directory the item now
+ * lives somewhere inside it, so neither DST nor SRC is a safe "it": both types become ambiguous.
+ */
+function destEnts(srcs, dst, ents) {
+  const d = rawOf(dst);
+  if (!isAmbiguous(dst) && srcs.length === 1 && typeByExt(srcs[0]) === 'file' && typeByExt(d) === 'file' && !/[\\/]$/.test(d)) {
+    ents.file ??= dst;
+    return;
+  }
+  ents.file ??= AMB + d;
+  ents.dir ??= AMB + d;
+}
+
+// options that take a value, per command (so `kill -s 9 4242` or `pkill nginx -u bob` pick the right word)
+const VALUE_OPTS = {
+  kill: new Set(['-s', '-n', '--signal']),
+  pkill: new Set(['-u', '-U', '-g', '-G', '-P', '-s', '-t', '-F', '--signal', '--euid', '--uid', '--group', '--pgroup', '--parent', '--session', '--terminal', '--pidfile', '--ns', '--nslist']),
+  killall: new Set(['-u', '--user', '-s', '--signal', '-o', '--older-than', '-y', '--younger-than', '-n', '--ns', '-Z', '--context']),
+  pidof: new Set(['-o', '--omit-pid']),
+  grep: new Set(['-e', '--regexp', '-f', '--file', '-m', '--max-count', '-A', '-B', '-C', '--include', '--exclude', '--exclude-dir', '--label', '--color', '-d', '-D']),
+  checkout: new Set(['-b', '-B', '--orphan', '--conflict', '--pathspec-from-file']),
+  switch: new Set(['-c', '-C', '--create', '--force-create', '--orphan', '--conflict']),
+  mv: new Set(['-t', '--target-directory', '-S', '--suffix']),
+};
+VALUE_OPTS.pgrep = VALUE_OPTS.pkill;
+VALUE_OPTS.cp = VALUE_OPTS.mv;
+VALUE_OPTS.ln = VALUE_OPTS.mv;
+VALUE_OPTS.rg = VALUE_OPTS.grep;
+
+/** -> { pos: positional args, opts: {opt: value}, flags: [options without value], after: args after `--` } */
+function parseArgs(args, valueOpts = new Set()) {
+  const pos = [];
+  const opts = {};
+  const flags = [];
+  let after = null;
+  for (let i = 0; i < args.length; i++) {
+    const a = String(args[i]);
+    if (a === '--') { after = args.slice(i + 1); pos.push(...after); break; }
+    if (/^--[^=]+=/.test(a)) { opts[a.replace(/=.*$/s, '')] = a.slice(a.indexOf('=') + 1); continue; }
+    if (valueOpts.has(a)) { opts[a] = args[i + 1]; i++; continue; }
+    // attached short value: -uroot, -tDIR
+    if (/^-[A-Za-z]./.test(a) && valueOpts.has(a.slice(0, 2)) && !/^--/.test(a)) { opts[a.slice(0, 2)] = a.slice(2); continue; }
+    if (/^-./.test(a)) { flags.push(a); continue; }
+    pos.push(args[i]);
+  }
+  return { pos, opts, flags, after };
+}
+
+const CD_HEADS = new Set(['cd', 'pushd', 'popd', 'chdir', 'set-location', 'sl', 'push-location', 'pop-location']);
+// a path that depends on the working directory (stale once the directory changes)
+export const isRelativePath = (v) => {
+  const s = rawOf(String(v));
+  return !/^(?:[~/\\]|[A-Za-z]:[\\/]|\$HOME\b|\$\{HOME\}|\$env:|%USERPROFILE%)/i.test(s);
+};
+const PATH_SLOT_KEYS = ['path', 'file', 'src', 'dst', 'dest', 'archive'];
+/** Mark working-directory-relative file/dir values as ambiguous (the cwd changed after they were used). */
+function staleRelative(ents, slots) {
+  for (const t of ['file', 'dir']) if (ents[t] != null && !isAmbiguous(ents[t]) && isRelativePath(ents[t])) ents[t] = AMB + ents[t];
+  if (slots) for (const k of PATH_SLOT_KEYS) if (slots[k] != null && !isAmbiguous(slots[k]) && isRelativePath(slots[k])) slots[k] = AMB + slots[k];
+}
+
+// output/input redirection operator words (splitCommand keepRedirects): `>`, `2>>`, `&>`, `>|`, `<`, `>&`
+const REDIR_TARGET_OP = /^\d*(?:[<>]{1,2}[&|]?|&>>?)$/;
+const REDIR_DUP_OP = /^\d*[<>]+&[\d-]+$/;
+
 /** PowerShell native commands. Returns true when the head was recognised. */
 function psNative(head, args, ents, setIntent) {
   const kind = PS_NATIVE[head];
@@ -230,7 +297,7 @@ function psNative(head, args, ents, setIntent) {
   else if (kind === 'path' && path != null) ents[typeByExt(path)] ??= path;
   else if (kind === 'dir' && path != null) ents.dir ??= path;
   else if (kind === 'remove' && path != null) ents[[...sw].some((s) => 'recurse'.startsWith(s)) ? 'dir' : typeByExt(path)] ??= path;
-  else if (kind === 'copy') { const d = named.destination ?? pos[1]; if (d != null) ents[typeByExt(d)] ??= d; }
+  else if (kind === 'copy') { const d = named.destination ?? pos[1]; if (d != null) destEnts(path != null ? String(path).split(',') : [], d, ents); }
   else if (kind === 'new' && path != null) ents[/^dir/i.test(named.itemtype ?? named.type ?? '') ? 'dir' : 'file'] ??= path;
   else if (kind === 'proc') {
     const id = named.id ?? (pos[0] != null && /^\d+$/.test(pos[0]) ? pos[0] : null);
@@ -263,30 +330,44 @@ function entsFromSlots(intent, slots, ents) {
   if (slots.url) put('url', slots.url);
   if (slots.file) put('file', slots.file);
   if (slots.archive) put('file', slots.archive);
-  if (slots.dst) put(/\.\w+$/.test(slots.dst) ? 'file' : 'dir', slots.dst);
+  if (slots.dst && !isAmbiguous(slots.dst)) destEnts(slots.src != null ? [slots.src] : [], slots.dst, ents);
   if (slots.path && slots.path !== '.') put(['delete_dir', 'mkdir', 'dir_size', 'largest_dirs', 'list_files'].includes(intent) || fam === 'find' ? 'dir' : /\.\w{1,5}$/.test(slots.path) ? 'file' : 'dir', slots.path);
+}
+
+// the tellsh CLI itself (installed, via npx, or `node bin/tellsh.js`)
+const TELLSH_LINE = /^(?:npx\s+(?:-y\s+)?|node\s+)?(?:\S*[\\/])?tellsh(?:\.js)?(?:\s+(.*))?$/s;
+
+/** The request text of a `tellsh ...` history line (options removed), or null if the line is not a tellsh call. */
+export function tellshQuery(line, kind = 'posix') {
+  const t = String(line).trim();
+  const tm = t.match(TELLSH_LINE);
+  if (!tm) return null;
+  const w = wordsOf(tm[1] || '', lineKind(t, kind));
+  return w ? w.filter((x) => !/^-/.test(x)).map(rawOf).join(' ') : '';
 }
 
 /**
  * Analyse one history line. `classify(query)` handles previous `tellsh <query>` lines.
  * kind: 'posix' | 'pwsh' (PowerShell history; Verb-Noun lines are always read as PowerShell).
+ * Segments of a compound line (`a; b`, `a && b`, `a | b`) are read in order and later ones win: the
+ * entities of `cat old.txt; cat new.txt` are those of `cat new.txt`. Redirection targets (`> out.txt`)
+ * are files the line wrote. A `cd` makes every earlier working-directory-relative path ambiguous.
+ * -> { line, intent, slots, ents, ambiguous, cd?, fromTellsh?, opaque? }
  */
 export function analyzeCommand(line, classify, kind = 'posix') {
-  const ents = {};
+  let ents = {};
   let intent = null;
   let slots = {};
   let ambiguous = false;
   const t = line.trim();
   const k = lineKind(t, kind);
-  const tm = t.match(/^(?:npx\s+(?:-y\s+)?)?tellsh\s+(.*)$/s);
-  if (tm) {
-    const w = wordsOf(tm[1], k);
-    const q = w ? w.filter((x) => !/^-/.test(x)).map(rawOf).join(' ') : '';
+  if (TELLSH_LINE.test(t)) {
+    const q = tellshQuery(t, k);
     const r = q && classify ? classify(q) : null;
-    if (r?.intent) { intent = r.intent; slots = r.slots || {}; entsFromSlots(intent, slots, ents); }
+    if (r?.intent) { intent = r.intent; slots = { ...(r.slots || {}) }; entsFromSlots(intent, slots, ents); }
     return { line: t, intent, slots, ents, fromTellsh: true, ambiguous };
   }
-  const split = splitCommand(t, k);
+  const split = splitCommand(t, k, { keepRedirects: true });
   if (!split.ok) {
     // cannot interpret the line (unterminated quote, heredoc, ...): it may name any file or directory,
     // so older file/dir values must not be picked up by "it"
@@ -295,116 +376,178 @@ export function analyzeCommand(line, classify, kind = 'posix') {
     return { line: t, intent, slots, ents, opaque: true, ambiguous: true };
   }
   const inv = invert(t, k);
-  if (inv) { intent = inv.intent; slots = inv.slots; ambiguous = inv.ambiguous; entsFromSlots(intent, slots, ents); }
-  const setIntent = (id, s) => { if (!intent) { intent = id; slots = s; } };
-  for (const { words } of split.segments) {
-    let w = words;
+  let segIntent = null;
+  let segSlots = {};
+  let segIntentAt = -1;
+  let cdAt = -1;
+  const firstWord = (s) => { let w = s.words.filter((x) => !REDIR_TARGET_OP.test(x) && !REDIR_DUP_OP.test(x)); while (w.length && (w[0] === 'sudo' || /^\w+=/.test(w[0]))) w = w.slice(1); return w[0]; };
+  split.segments.forEach(({ words }, segIdx) => {
+    const e = {};
+    const setIntent = (id, s) => { segIntent = id; segSlots = s; segIntentAt = segIdx; };
+    // redirections: the target is a file the command wrote (or read); it is not an argument
+    let w = [];
+    let redirTarget = null;
+    for (let i = 0; i < words.length; i++) {
+      const x = words[i];
+      if (REDIR_DUP_OP.test(x)) continue;
+      if (REDIR_TARGET_OP.test(x)) {
+        const target = words[i + 1];
+        i++;
+        if (target != null && !/^\/dev\/(?:null|stdout|stderr|tty)$|^(?:\$null|NUL)$/i.test(rawOf(target))) redirTarget = target;
+        continue;
+      }
+      w.push(x);
+    }
     while (w.length && (w[0] === 'sudo' || /^\w+=/.test(w[0]))) w = w.slice(1);
-    if (!w.length) continue;
-    if (isAmbiguous(w[0])) {
-      if (w.slice(1).some((a) => PATHLIKE.test(rawOf(a)))) { ents.file ??= AMB + t; ents.dir ??= AMB + t; }
-      continue;
+    if (w.length) segmentEnts(w, e, setIntent, split, k, segIdx, firstWord);
+    if (redirTarget != null) e.file = redirTarget;
+    const head = w.length && !isAmbiguous(w[0]) ? w[0].replace(/^.*[\\/]/, '').toLowerCase() : '';
+    if (CD_HEADS.has(head)) {
+      // the working directory changes: earlier relative paths (and a relative cd target) are stale
+      cdAt = segIdx;
+      staleRelative(ents, null);
+      const target = w.slice(1).filter((a) => !/^-/.test(a))[0];
+      if (target != null && !isAmbiguous(target) && !isRelativePath(target) && target !== '-') e.dir = target;
+      else e.dir = AMB + (target ?? '-');
+      delete e.file;
     }
-    const head = w[0].replace(/^.*[\\/]/, '').replace(/\.exe$/i, '');
-    const args = w.slice(1);
-    const nonFlags = args.filter((a) => !/^-/.test(a));
-    if ((k === 'pwsh' || PS_CMDLET.test(head)) && psNative(head.toLowerCase(), args, ents, setIntent)) continue;
-    if (head === 'docker') {
-      const sub = nonFlags[0];
-      if (sub === 'run') {
-        const i = args.indexOf('--name');
-        if (i >= 0 && args[i + 1]) ents.container ??= args[i + 1];
-        const nm = args.find((a) => a.startsWith('--name='));
-        if (nm) ents.container ??= nm.slice(7);
-      } else if (DOCKER_CT.has(sub)) {
-        const rest = args.slice(args.indexOf(sub) + 1);
-        for (let i = 0; i < rest.length; i++) {
-          if (DOCKER_VAL_FLAGS.has(rest[i])) { i++; continue; }
-          if (/^-/.test(rest[i])) continue;
-          ents.container ??= rest[i];
-          break;
-        }
-        intent ??= DOCKER_INTENT[sub] || null;
-        if (intent) slots = { container: ents.container, ...slots };
-      }
-    } else if (head === 'systemctl' || head === 'service') {
-      const svc = head === 'systemctl' ? nonFlags[1] : nonFlags[0];
-      const verb = head === 'systemctl' ? nonFlags[0] : nonFlags[1];
-      if (svc) ents.service ??= svc.replace(/\.service$/, '');
-      if (!intent && SYSTEMCTL_INTENT[verb] && svc) { intent = SYSTEMCTL_INTENT[verb]; slots = { service: ents.service }; }
-    } else if (head === 'journalctl') {
-      const i = args.findIndex((a) => a === '-u' || a === '--unit');
-      if (i >= 0 && args[i + 1]) { ents.service ??= args[i + 1].replace(/\.service$/, ''); intent ??= 'journal_service'; }
-    } else if (head === 'kill') {
-      const pid = nonFlags.find((a) => /^\d+$/.test(a));
-      if (pid) { ents.pid ??= pid; if (!intent) { intent = 'kill_by_pid'; slots = { pid }; } }
-    } else if (['pkill', 'killall', 'pgrep', 'pidof'].includes(head)) {
-      if (nonFlags[0]) ents.proc ??= nonFlags[nonFlags.length - 1];
-      if (!intent && head === 'pgrep') { intent = 'find_process'; slots = { name: ents.proc }; }
-    } else if ((head === 'ps' || head === 'top' || head === 'htop') && args.some((a) => /^-\w*p$/.test(a))) {
-      const i = args.findIndex((a) => /^-\w*p$/.test(a));
-      const pid = (args[i + 1] || '').split(',')[0];
-      if (/^\d+$/.test(pid)) ents.pid ??= pid;
-    } else if (head === 'grep' && split.segments.some((s) => s.words[0] === 'ps')) {
-      if (nonFlags[0]) ents.proc ??= nonFlags[0];
-    } else if ((head === 'grep' || head === 'rg') && nonFlags[0]) {
-      const path = nonFlags[1];
-      if (!intent) {
-        intent = args.some((a) => /^-\w*l/.test(a)) ? 'grep_files_containing' : 'grep_text';
-        slots = { pattern: rawOf(nonFlags[0]), ...(path ? { path } : {}) };
-      }
-      if (path) ents[typeByExt(path)] ??= path;
-    } else if (head === 'lsof' || head === 'ss' || head === 'netstat' || head === 'fuser') {
-      const pm = args.map(rawOf).join(' ').match(/(?::|tcp:|udp:|sport = :)(\d{2,5})\b/);
-      if (pm) { ents.port ??= pm[1]; if (!intent) { intent = 'process_on_port'; slots = { port: pm[1] }; } }
-    } else if (head === 'git') {
-      const sub = nonFlags[0];
-      if (['checkout', 'switch', 'merge', 'rebase'].includes(sub) || (sub === 'branch' && nonFlags[1])) {
-        const b = nonFlags[nonFlags.length - 1];
-        const creates = args.some((a) => ['-b', '-B', '-c', '-C'].includes(a));
-        if (b && b !== sub && b !== '.' && !isGlob(b) && !b.startsWith('-')) {
-          ents.branch ??= b;
-          if ((sub === 'checkout' || sub === 'switch')) ents.current ??= b;
-          if (creates) ents.created ??= b;
-        }
-      } else if (sub === 'push' && nonFlags.length >= 2) ents.branch ??= nonFlags[nonFlags.length - 1];
-      else if (sub === 'clone' && nonFlags[1]) ents.url ??= nonFlags[1];
-      else if (['add', 'diff', 'blame', 'restore', 'rm', 'log'].includes(sub) && nonFlags[1] && nonFlags[1] !== '.') ents.file ??= nonFlags[nonFlags.length - 1];
-    } else if (['ssh', 'ping', 'dig', 'nslookup', 'traceroute', 'mtr', 'host', 'telnet', 'nc'].includes(head)) {
-      const h = nonFlags.find((a) => /[\w-]+\.[\w.-]+|^[\w-]+@/.test(a)) || nonFlags[0];
-      if (h) ents.host ??= h;
-    } else if (['curl', 'wget', 'http'].includes(head)) {
-      const u = args.find((a) => /^https?:\/\//.test(a));
-      if (u) {
-        ents.url ??= u;
-        const base = u.replace(/[?#].*$/, '').split('/').pop();
-        const saves = head === 'wget' || args.some((a) => /^-\w*O/.test(a));
-        if (saves && /\.\w{1,5}$/.test(base)) ents.file ??= base;
-      }
-    } else if (head === 'rm' || head === 'trash' || head === 'rmdir') {
-      const p = nonFlags[nonFlags.length - 1];
-      if (p) ents[args.some((a) => /^-\w*r/i.test(a)) || head === 'rmdir' ? 'dir' : 'file'] ??= p;
-    } else if (head === 'cp' || head === 'mv' || head === 'ln') {
-      const p = nonFlags[nonFlags.length - 1];
-      if (p) ents[typeByExt(p)] ??= p;
-    } else if (head === 'tar' || head === 'zip') {
-      const a = nonFlags.find((x) => /\.(tar(\.\w+)?|tgz|zip)$/.test(x));
-      if (a) ents.file ??= a;
-    } else if (FILE_HEADS.has(head)) {
-      const p = nonFlags.filter((a) => !/^[0-7]{3,4}$|^[ugoa]*[+=-][rwxXst]+$/.test(a)).pop();
-      if (p) ents[/\/$/.test(p) ? 'dir' : 'file'] ??= p;
-    } else if (DIR_HEADS.has(head)) {
-      const p = head === 'find' ? nonFlags[0] : nonFlags.find((a) => !isGlob(a));
-      if (p) ents.dir ??= p;
-    } else if (!INERT_HEADS.has(head.toLowerCase())) {
-      // unknown command (or unknown cmdlet) naming a path: we cannot tell what it did with it, so an
-      // older file/dir must not be picked up by "it"
-      const p = nonFlags.find((a) => PATHLIKE.test(rawOf(a)) && !/^\w+:\/\//.test(rawOf(a)));
-      if (p) ents[typeByExt(p)] ??= AMB + rawOf(p);
-    }
+    Object.assign(ents, e); // later segments supersede earlier ones
+  });
+  if (inv && cdAt < 0) {
+    // the whole line is a catalog/variant command: its slots are the most precise reading
+    intent = inv.intent; slots = inv.slots; ambiguous = inv.ambiguous;
+    const ie = {};
+    entsFromSlots(intent, slots, ie);
+    ents = { ...ents, ...ie };
+  } else if (segIntent) {
+    intent = segIntent; slots = { ...segSlots };
+    if (segIntentAt < cdAt) staleRelative({}, slots);
   }
   if (Object.values(slots).some(isAmbiguous)) ambiguous = true;
-  return { line: t, intent, slots, ents, ambiguous };
+  return { line: t, intent, slots, ents, ambiguous, ...(cdAt >= 0 ? { cd: true } : {}) };
+}
+
+/** Entities of one simple command `w` (sudo/VAR= removed) into `e`. */
+function segmentEnts(w, e, setIntent, split, k, segIdx, firstWord) {
+  if (isAmbiguous(w[0])) {
+    if (w.slice(1).some((a) => PATHLIKE.test(rawOf(a)))) { e.file = AMB + w.join(' '); e.dir = AMB + w.join(' '); }
+    return;
+  }
+  const head = w[0].replace(/^.*[\\/]/, '').replace(/\.exe$/i, '');
+  const args = w.slice(1);
+  const nonFlags = args.filter((a) => !/^-/.test(a));
+  if (CD_HEADS.has(head.toLowerCase())) return; // handled by the caller
+  if ((k === 'pwsh' || PS_CMDLET.test(head)) && psNative(head.toLowerCase(), args, e, setIntent)) return;
+  if (head === 'docker') {
+    const sub = nonFlags[0];
+    if (sub === 'run') {
+      const i = args.indexOf('--name');
+      if (i >= 0 && args[i + 1]) e.container ??= args[i + 1];
+      const nm = args.find((a) => a.startsWith('--name='));
+      if (nm) e.container ??= nm.slice(7);
+    } else if (DOCKER_CT.has(sub)) {
+      const rest = args.slice(args.indexOf(sub) + 1);
+      for (let i = 0; i < rest.length; i++) {
+        if (DOCKER_VAL_FLAGS.has(rest[i])) { i++; continue; }
+        if (/^-/.test(rest[i])) continue;
+        e.container ??= rest[i];
+        break;
+      }
+      if (DOCKER_INTENT[sub] && e.container != null) setIntent(DOCKER_INTENT[sub], { container: e.container });
+    }
+  } else if (head === 'systemctl' || head === 'service') {
+    const svc = head === 'systemctl' ? nonFlags[1] : nonFlags[0];
+    const verb = head === 'systemctl' ? nonFlags[0] : nonFlags[1];
+    if (svc) e.service ??= svc.replace(/\.service$/, '');
+    if (SYSTEMCTL_INTENT[verb] && svc) setIntent(SYSTEMCTL_INTENT[verb], { service: e.service });
+  } else if (head === 'journalctl') {
+    const i = args.findIndex((a) => a === '-u' || a === '--unit');
+    if (i >= 0 && args[i + 1]) { e.service ??= args[i + 1].replace(/\.service$/, ''); setIntent('journal_service', { service: e.service }); }
+  } else if (head === 'kill') {
+    const { pos } = parseArgs(args, VALUE_OPTS.kill);
+    if (pos.length === 1 && /^\d+$/.test(pos[0])) { e.pid = pos[0]; setIntent('kill_by_pid', { pid: pos[0] }); }
+    else if (pos.length) e.pid = AMB + pos.map(rawOf).join(' '); // several PIDs or a job spec: not one process
+  } else if (['pkill', 'killall', 'pgrep', 'pidof'].includes(head)) {
+    const { pos } = parseArgs(args, VALUE_OPTS[head]);
+    if (pos.length === 1) e.proc = pos[0];
+    else if (pos.length > 1) e.proc = AMB + pos.map(rawOf).join(' ');
+    if (head === 'pgrep' && pos.length === 1) setIntent('find_process', { name: pos[0] });
+  } else if ((head === 'ps' || head === 'top' || head === 'htop') && args.some((a) => /^-\w*p$/.test(a))) {
+    const i = args.findIndex((a) => /^-\w*p$/.test(a));
+    const pid = (args[i + 1] || '').split(',')[0];
+    if (/^\d+$/.test(pid)) e.pid = pid;
+  } else if ((head === 'grep' || head === 'egrep') && split.segments.some((s, j) => j < segIdx && firstWord(s) === 'ps')) {
+    // ps aux | grep -v grep | grep node: the process is the pattern of a non-inverted grep
+    const { pos, opts, flags } = parseArgs(args, VALUE_OPTS.grep);
+    const inverted = flags.some((f) => /^-[a-zA-Z]*v/.test(f) || f === '--invert-match');
+    const pat = opts['-e'] ?? opts['--regexp'] ?? pos[0];
+    if (!inverted && pat != null) e.proc = pat;
+  } else if ((head === 'grep' || head === 'rg') && nonFlags[0]) {
+    const { pos, opts, flags } = parseArgs(args, VALUE_OPTS[head]);
+    const pat = opts['-e'] ?? opts['--regexp'] ?? pos[0];
+    const path = opts['-e'] != null || opts['--regexp'] != null ? pos[0] : pos[1];
+    if (pat != null) setIntent(flags.some((a) => /^-\w*l/.test(a)) ? 'grep_files_containing' : 'grep_text', { pattern: rawOf(pat), ...(path != null ? { path } : {}) });
+    if (path != null) e[typeByExt(path)] = path;
+  } else if (head === 'lsof' || head === 'ss' || head === 'netstat' || head === 'fuser') {
+    const pm = args.map(rawOf).join(' ').match(/(?::|tcp:|udp:|sport = :)(\d{2,5})\b/);
+    if (pm) { e.port = pm[1]; setIntent('process_on_port', { port: pm[1] }); }
+  } else if (head === 'git') {
+    const sub = nonFlags[0];
+    const rest = args.slice(args.indexOf(sub) + 1);
+    if (sub === 'checkout' || sub === 'switch') {
+      const { pos, opts, after } = parseArgs(rest, VALUE_OPTS[sub]);
+      const created = opts['-b'] ?? opts['-B'] ?? opts['-c'] ?? opts['-C'] ?? opts['--create'] ?? opts['--force-create'] ?? opts['--orphan'];
+      if (after) {
+        // git checkout [<tree-ish>] -- <file>...: restores files, it does not switch branches
+        if (after.length) e.file = after.length === 1 ? after[0] : AMB + after.map(rawOf).join(' ');
+        return;
+      }
+      const b = created ?? pos[0];
+      if (b != null && b !== '.' && b !== '-' && !isAmbiguous(b) && !String(b).startsWith('-')) {
+        e.branch = b;
+        e.current = b;
+        if (created != null) e.created = b;
+      }
+    } else if (['merge', 'rebase'].includes(sub) || (sub === 'branch' && nonFlags[1])) {
+      const b = nonFlags[nonFlags.length - 1];
+      if (b && b !== sub && b !== '.' && !isGlob(b) && !b.startsWith('-')) e.branch = b;
+    } else if (sub === 'push' && nonFlags.length >= 2) e.branch = nonFlags[nonFlags.length - 1];
+    else if (sub === 'clone' && nonFlags[1]) e.url = nonFlags[1];
+    else if (['add', 'diff', 'blame', 'restore', 'rm', 'log'].includes(sub) && nonFlags[1] && nonFlags[1] !== '.') e.file = nonFlags[nonFlags.length - 1];
+  } else if (['ssh', 'ping', 'dig', 'nslookup', 'traceroute', 'mtr', 'host', 'telnet', 'nc'].includes(head)) {
+    const h = nonFlags.find((a) => /[\w-]+\.[\w.-]+|^[\w-]+@/.test(a)) || nonFlags[0];
+    if (h) e.host = h;
+  } else if (['curl', 'wget', 'http'].includes(head)) {
+    const u = args.find((a) => /^https?:\/\//.test(a));
+    if (u) {
+      e.url = u;
+      const base = u.replace(/[?#].*$/, '').split('/').pop();
+      const saves = head === 'wget' || args.some((a) => /^-\w*O/.test(a));
+      if (saves && /\.\w{1,5}$/.test(base)) e.file = base;
+    }
+  } else if (head === 'rm' || head === 'trash' || head === 'rmdir') {
+    const p = nonFlags[nonFlags.length - 1];
+    if (p) e[args.some((a) => /^-\w*r/i.test(a)) || head === 'rmdir' ? 'dir' : 'file'] = p;
+  } else if (head === 'cp' || head === 'mv' || head === 'ln') {
+    const { pos, opts } = parseArgs(args, VALUE_OPTS[head]);
+    const tdir = opts['-t'] ?? opts['--target-directory'];
+    if (tdir != null) destEnts(pos.length === 1 ? pos : [...pos, ''], String(tdir) + '/', e);
+    else if (pos.length >= 2) destEnts(pos.slice(0, -1), pos[pos.length - 1], e);
+  } else if (head === 'tar' || head === 'zip') {
+    const a = nonFlags.find((x) => /\.(tar(\.\w+)?|tgz|zip)$/.test(x));
+    if (a) e.file = a;
+  } else if (FILE_HEADS.has(head)) {
+    const p = nonFlags.filter((a) => !/^[0-7]{3,4}$|^[ugoa]*[+=-][rwxXst]+$/.test(a)).pop();
+    if (p) e[/\/$/.test(p) ? 'dir' : 'file'] = p;
+  } else if (DIR_HEADS.has(head)) {
+    const p = head === 'find' ? nonFlags[0] : nonFlags.find((a) => !isGlob(a));
+    if (p) e.dir = p;
+  } else if (!INERT_HEADS.has(head.toLowerCase())) {
+    // unknown command (or unknown cmdlet) naming a path: we cannot tell what it did with it, so an
+    // older file/dir must not be picked up by "it"
+    const p = nonFlags.find((a) => PATHLIKE.test(rawOf(a)) && !/^\w+:\/\//.test(rawOf(a)));
+    if (p) e[typeByExt(p)] = AMB + rawOf(p);
+  }
 }
 
 const ENT_TYPES = ['container', 'service', 'pid', 'proc', 'port', 'file', 'dir', 'branch', 'host', 'url'];
@@ -415,16 +558,34 @@ const ENT_TYPES = ['container', 'service', 'pid', 'proc', 'port', 'file', 'dir',
  * -> { n, ents: {type: value}, entOrder: [types by recency], last: {intent, slots, ambiguous}, features: [...] }
  *    values that could not be read unambiguously are kept as AMB-prefixed strings (see isAmbiguous)
  */
-export function buildContext(cmds, { classify, cwd, kind } = {}) {
+export function buildContext(cmds, { classify, cwd, kind, query } = {}) {
   const k = kind || cmds.kind || 'posix';
   const ents = {};
   const all = {};
   const recency = {};
   let last = null;
   let current = null;
-  const recent = [...cmds].reverse();
+  const list = [...cmds];
+  // zsh (share_history / inc_append_history), fish and PSReadLine write the running line to the
+  // history file before it executes: the current `tellsh <query>` call is not a previous command
+  if (query != null) {
+    const norm = (s) => String(s).trim().replace(/\s+/g, ' ');
+    while (list.length) {
+      const q = tellshQuery(list[list.length - 1], k);
+      if (q == null || !(norm(q) === norm(query) || norm(list[list.length - 1]).includes(norm(query)))) break;
+      list.pop();
+    }
+  }
+  const recent = list.reverse();
+  let cdAfter = false; // a newer line changed the working directory
   recent.forEach((line, i) => {
     const a = analyzeCommand(line, classify, k);
+    if (cdAfter) {
+      // relative paths of lines before a `cd` point somewhere else now: never reuse them
+      staleRelative(a.ents, a.slots);
+      if (Object.values(a.slots).some(isAmbiguous)) a.ambiguous = true;
+    }
+    if (a.cd) cdAfter = true;
     if (!last && a.intent) last = { intent: a.intent, slots: a.slots, age: i, ambiguous: !!a.ambiguous };
     if (current == null && a.ents.current && !isAmbiguous(a.ents.current)) current = a.ents.current;
     for (const t of ENT_TYPES) {
@@ -434,7 +595,7 @@ export function buildContext(cmds, { classify, cwd, kind } = {}) {
     }
   });
   const entOrder = Object.keys(ents).sort((a, b) => recency[a] - recency[b] || ENT_TYPES.indexOf(a) - ENT_TYPES.indexOf(b));
-  const ctx = { n: cmds.length, ents, all, currentBranch: current, entOrder, last, cwdFlags: cwdFlags(cwd) };
+  const ctx = { n: recent.length, ents, all, currentBranch: current, entOrder, last, cwdFlags: cwdFlags(cwd) };
   ctx.features = ctxFeatures(ctx);
   return ctx;
 }
@@ -476,6 +637,7 @@ const SAME_RES = [
 // all rule regexes run on the diacritic-folded, lowercased query (same length as the original)
 const fold = (q) => foldKeepLength(String(q)).toLowerCase();
 const PRONOUN_EN = /\b(it|its|that|this|them|those|these|the same one)\b/;
+const PRONOUN_WORD = /^(it|its|that|this|them|those|these|one|again|there|here|tego|ten|te|ta|tej|tym|go|je|ja|jego|jej|niego|nia|nim|niej|mu|im|tamten|tamtego|tamta|tamtej|tamto|tamtym|to|force|forced|forcibly|sila|sile|silowo|recursive\w*|rekurencyjn\w*|please|prosze|too|also|tez|rowniez)$/;
 const PRONOUN_PL = /(?:^|\s)(tego|ten|te|ta|tej|tym|go|je|ja|jego|jej|niego|nia|nim|niej|mu|im|tamten|tamtego|tamta|tamtej|tamto|tamtym)(?=\s|$|[?!.,])|(?:^|\s)to(?=\s*[?!.]*$|\s+(?:co|ktor\w*|tam))/;
 
 const NOUN_TYPE = [
@@ -484,7 +646,7 @@ const NOUN_TYPE = [
   [/\b(process(es)?|proces\w*|program\w*|app)\b/i, ['pid', 'proc']],
   [/\b(pid)\b/i, ['pid']],
   [/\b(ports?|port\w*)\b/i, ['port']],
-  [/\b(branch\w*|gal\w*|gal[eę]\w*|branch)\b/i, ['branch']],
+  [/\b(branch\w*|galaz\w*|galez\w*)\b/i, ['branch']], // folded gałąź/gałęzi/gałęzie (not "gallery")
   [/\b(dir(ectory)?|folder\w*|katalog\w*)\b/i, ['dir']],
   [/\b(files?|plik\w*)\b/i, ['file']],
   [/\b(hosts?|server\w*|serwer\w*|machine|maszyn\w*)\b/i, ['host']],
@@ -545,6 +707,8 @@ function retarget(intent, arg) {
   if (ex.count != null && (has('count') || has('pid'))) return { slot: has('pid') ? 'pid' : 'count', value: ex.count };
   const word = arg.trim().replace(/^(the|ten|ta|to|kontener\w*|container|service|usług\w*|branch|gałąź|galaz|proces\w*|process)\s+/i, '').trim();
   if (!/^[\w@.:/~+-]+$/.test(word)) return null;
+  // pronouns and filler words are not values ("what about this", "and with force")
+  if (isStopWord(word) || PRONOUN_WORD.test(fold(word)) || /^-/.test(word)) return null;
   for (const k of ['container', 'service', 'name', 'branch', 'pkg', 'host', 'path', 'file']) if (has(k)) return { slot: k, value: word };
   return null;
 }
@@ -573,7 +737,12 @@ export function resolveReference(query, ctx) {
   // which entity does the pronoun point at? noun hint first ("that container"), else most recent
   const fq = fold(query);
   let types = null;
-  for (const [re, ts] of NOUN_TYPE) if (re.test(fq)) { types = ts.filter((t) => ctx.ents[t] != null); if (types.length) break; }
+  const named = [];
+  for (const [re, ts] of NOUN_TYPE) if (re.test(fq)) { named.push(...ts); types = ts.filter((t) => ctx.ents[t] != null); if (types.length) break; }
+  // "delete that branch" with no branch in history: refuse instead of using another type's value
+  if (named.length && !types?.length) {
+    return { rule: 'refused', intent: null, ent: named[0], note: `no ${named[0]} in the recent history; not guessing` };
+  }
   const ent = (types && types.length ? types : ctx.entOrder)[0];
   if (!ent) return null;
   let intent = null;
@@ -601,6 +770,8 @@ export function resolveReference(query, ctx) {
  * release/2.3) wins; deleting/switching a branch skips the branch that is checked out; else most recent.
  */
 function chooseValue(type, fq, ctx, verb) {
+  // the newest value cannot be read ($BACKUP, a glob, an unknown command): never fall back to an older one
+  if (isAmbiguous(ctx.ents[type])) return ctx.ents[type];
   let vals = ctx.all?.[type] || (ctx.ents[type] != null ? [String(ctx.ents[type])] : []);
   const words = fq.split(/[^a-z0-9]+/).filter((w) => w.length >= 4 && !/^(that|this|branch|file|plik|galez|container|kontener|service|usluga|back)$/.test(w));
   const named = vals.find((v) => !isAmbiguous(v) && words.some((w) => foldKeepLength(v).toLowerCase().includes(w)));
@@ -614,11 +785,14 @@ function chooseValue(type, fq, ctx, verb) {
 
 /** Implicit references ("ile ma słów", "md5 of the same file"): fill a missing slot from history. */
 export function entityForSlot(slot, ctx) {
-  // the most recent value of the type is used, or nothing: an ambiguous latest value never falls back to an older one
+  // the most recent value of the type is used, or nothing: an ambiguous latest value never falls back
+  // to an older one ({ ambiguous: true } tells the caller not to look anywhere else either)
   for (const [ent, slots] of Object.entries(SLOT_FROM_ENT)) {
-    if (slots[0] === slot && ctx.ents[ent] != null) return isAmbiguous(ctx.ents[ent]) ? null : { ent, value: String(ctx.ents[ent]) };
+    if (slots[0] === slot && ctx.ents[ent] != null) return isAmbiguous(ctx.ents[ent]) ? { ent, ambiguous: true } : { ent, value: String(ctx.ents[ent]) };
   }
-  if (slot === 'file' && ctx.ents.dir == null && ctx.ents.file != null && !isAmbiguous(ctx.ents.file)) return { ent: 'file', value: String(ctx.ents.file) };
+  if (slot === 'file' && ctx.ents.dir == null && ctx.ents.file != null) return isAmbiguous(ctx.ents.file) ? { ent: 'file', ambiguous: true } : { ent: 'file', value: String(ctx.ents.file) };
+  // a type that maps onto this slot exists but is ambiguous (e.g. src <- file/dir)
+  if (Object.entries(SLOT_FROM_ENT).some(([ent, slots]) => slots.includes(slot) && isAmbiguous(ctx.ents[ent]))) return { ambiguous: true };
   return null;
 }
 
