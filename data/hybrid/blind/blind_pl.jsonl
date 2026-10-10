@@ -1,0 +1,310 @@
+{"text": "pokaż dziesięć największych plików w /srv/backup", "intent": "largest_files", "lang": "pl", "shell": "bash", "os": "linux", "spans": [["NUM", "dziesięć"], ["PATH", "/srv/backup"]]}
+{"text": "co zajmuje najwiecej miejsca w ~/Pobrane? najwieksze pliki", "intent": "largest_files", "lang": "pl", "shell": "zsh", "os": "darwin", "spans": [["PATH", "~/Pobrane"]]}
+{"text": "25 najwiekszych plikow na D:\\filmy", "intent": "largest_files", "lang": "pl", "shell": "powershell", "os": "win32", "spans": [["NUM", "25"], ["PATH", "D:\\filmy"]]}
+{"text": "które katalogi w /var zajmują najwięcej miejsca", "intent": "largest_dirs", "lang": "pl", "shell": "bash", "os": "linux", "spans": [["PATH", "/var"]]}
+{"text": "top 8 najwiekszych podkatalogow w C:\\Users\\piotr", "intent": "largest_dirs", "lang": "pl", "shell": "powershell", "os": "win32", "spans": [["NUM", "8"], ["PATH", "C:\\Users\\piotr"]]}
+{"text": "ktore podfoldery tutaj sa najciezsze", "intent": "largest_dirs", "lang": "pl", "shell": "fish", "os": "linux", "spans": []}
+{"text": "ile mam wolnego miejsca na dysku C:", "intent": "disk_free", "lang": "pl", "shell": "powershell", "os": "win32", "spans": []}
+{"text": "sprawdz mejsce na dyskach", "intent": "disk_free", "lang": "pl", "shell": "sh", "os": "linux", "spans": []}
+{"text": "ile zostało miejsca na partycjach?", "intent": "disk_free", "lang": "pl", "shell": "cmd", "os": "win32", "spans": []}
+{"text": "ile waży katalog ~/projekty/sklep", "intent": "dir_size", "lang": "pl", "shell": "zsh", "os": "darwin", "spans": [["PATH", "~/projekty/sklep"]]}
+{"text": "rozmar folderu /var/cache/apt", "intent": "dir_size", "lang": "pl", "shell": "bash", "os": "linux", "spans": [["PATH", "/var/cache/apt"]]}
+{"text": "znajdź plik o nazwie docker-compose.yml w C:\\repos", "intent": "find_by_name", "lang": "pl", "shell": "powershell", "os": "win32", "spans": [["NAME", "docker-compose.yml"], ["PATH", "C:\\repos"]]}
+{"text": "szukaj plikow z faktura w nazwie w katalogu domowym", "intent": "find_by_name", "lang": "pl", "shell": "zsh", "os": "darwin", "spans": [["NAME", "faktura"], ["PATH", "katalogu domowym"]]}
+{"text": "gdzie jest plik umowa_najmu na dysku C:\\", "intent": "find_by_name", "lang": "pl", "shell": "powershell", "os": "win32", "spans": [["NAME", "umowa_najmu"], ["PATH", "C:\\"]]}
+{"text": "znajdź wszystkie pliki .jpg w ~/Obrazy", "intent": "find_by_ext", "lang": "pl", "shell": "bash", "os": "linux", "spans": [["EXT", ".jpg"], ["PATH", "~/Obrazy"]]}
+{"text": "wylistuj pilki csv w folderze dane", "intent": "find_by_ext", "lang": "pl", "shell": "fish", "os": "linux", "spans": [["EXT", "csv"], ["PATH", "dane"]]}
+{"text": "pokaż wszystkie pliki markdown w ./docs", "intent": "find_by_ext", "lang": "pl", "shell": "zsh", "os": "darwin", "spans": [["EXT", "markdown"], ["PATH", "./docs"]]}
+{"text": "pliki zmienione w ciągu ostatnich 3 dni w /etc/nginx", "intent": "find_recent", "lang": "pl", "shell": "bash", "os": "linux", "spans": [["TIME", "ostatnich 3 dni"], ["PATH", "/etc/nginx"]]}
+{"text": "co sie zmienilo dzisiaj w ./src", "intent": "find_recent", "lang": "pl", "shell": "bash", "os": "linux", "spans": [["TIME", "dzisiaj"], ["PATH", "./src"]]}
+{"text": "pliki modyfikowane w ostatnie 2 godziny", "intent": "find_recent", "lang": "pl", "shell": "sh", "os": "linux", "spans": [["TIME", "ostatnie 2 godziny"]]}
+{"text": "znajdź pliki starsze niż 60 dni w /var/backups", "intent": "find_older_than", "lang": "pl", "shell": "bash", "os": "linux", "spans": [["TIME", "60 dni"], ["PATH", "/var/backups"]]}
+{"text": "pliki starsze niz tydzien w /tmp", "intent": "find_older_than", "lang": "pl", "shell": "fish", "os": "linux", "spans": [["TIME", "tydzien"], ["PATH", "/tmp"]]}
+{"text": "które pliki w C:\\Temp mają ponad dwa miesiące", "intent": "find_older_than", "lang": "pl", "shell": "powershell", "os": "win32", "spans": [["PATH", "C:\\Temp"], ["TIME", "dwa miesiące"]]}
+{"text": "znajdź pliki większe niż 1GB", "intent": "find_larger_than", "lang": "pl", "shell": "bash", "os": "linux", "spans": [["SIZE", "1GB"]]}
+{"text": "pliki powyzej 2 giga w /home", "intent": "find_larger_than", "lang": "pl", "shell": "zsh", "os": "darwin", "spans": [["SIZE", "2 giga"], ["PATH", "/home"]]}
+{"text": "pliki ponad 300 MB na D:\\", "intent": "find_larger_than", "lang": "pl", "shell": "cmd", "os": "win32", "spans": [["SIZE", "300 MB"], ["PATH", "D:\\"]]}
+{"text": "pliki mniejsze niż 5 kB w ./logs", "intent": "find_smaller_than", "lang": "pl", "shell": "bash", "os": "linux", "spans": [["SIZE", "5 kB"], ["PATH", "./logs"]]}
+{"text": "znajdz plki ponizej 100 bajtow", "intent": "find_smaller_than", "lang": "pl", "shell": "sh", "os": "linux", "spans": [["SIZE", "100 bajtow"]]}
+{"text": "szukaj tekstu NullPointerException w logach w /opt/app/logs", "intent": "grep_text", "lang": "pl", "shell": "bash", "os": "linux", "spans": [["PATTERN", "NullPointerException"], ["PATH", "/opt/app/logs"]]}
+{"text": "grepnij FIXME w całym projekcie", "intent": "grep_text", "lang": "pl", "shell": "zsh", "os": "darwin", "spans": [["PATTERN", "FIXME"]]}
+{"text": "gdzie w kodzie jest uzwane getUserById", "intent": "grep_text", "lang": "pl", "shell": "fish", "os": "linux", "spans": [["PATTERN", "getUserById"]]}
+{"text": "które pliki zawierają słowo secret, szukaj w C:\\app\\config", "intent": "grep_files_containing", "lang": "pl", "shell": "powershell", "os": "win32", "spans": [["PATTERN", "secret"], ["PATH", "C:\\app\\config"]]}
+{"text": "wypisz pliki w ./config gdzie wystepuje DATABASE_URL", "intent": "grep_files_containing", "lang": "pl", "shell": "zsh", "os": "darwin", "spans": [["PATH", "./config"], ["PATTERN", "DATABASE_URL"]]}
+{"text": "podaj tylko nazwy plików, w których jest fraza \"TODO: usunąć\"", "intent": "grep_files_containing", "lang": "pl", "shell": "powershell", "os": "win32", "spans": [["PATTERN", "TODO: usunąć"]]}
+{"text": "ile linii ma plik dane.csv", "intent": "count_lines", "lang": "pl", "shell": "powershell", "os": "win32", "spans": [["PATH", "dane.csv"]]}
+{"text": "policz wirsze w /etc/passwd", "intent": "count_lines", "lang": "pl", "shell": "sh", "os": "linux", "spans": [["PATH", "/etc/passwd"]]}
+{"text": "ile lini kodu w plikach .ts w ./src", "intent": "count_lines_code", "lang": "pl", "shell": "bash", "os": "linux", "spans": [["EXT", ".ts"], ["PATH", "./src"]]}
+{"text": "policz wszystkie linie kodu we wszystkich plikach php", "intent": "count_lines_code", "lang": "pl", "shell": "zsh", "os": "darwin", "spans": [["EXT", "php"]]}
+{"text": "ile plików jest w katalogu /var/www/html", "intent": "count_files", "lang": "pl", "shell": "bash", "os": "linux", "spans": [["PATH", "/var/www/html"]]}
+{"text": "policz pliki w ~/Dokumenty", "intent": "count_files", "lang": "pl", "shell": "zsh", "os": "darwin", "spans": [["PATH", "~/Dokumenty"]]}
+{"text": "ile słów ma rozdzial1.txt", "intent": "count_words", "lang": "pl", "shell": "cmd", "os": "win32", "spans": [["PATH", "rozdzial1.txt"]]}
+{"text": "policz slowa w pliku praca_magisterska.md", "intent": "count_words", "lang": "pl", "shell": "powershell", "os": "win32", "spans": [["PATH", "praca_magisterska.md"]]}
+{"text": "najczestsze linie w pliku nginx_access.log, posortowane po liczbie wystąpień", "intent": "sort_uniq", "lang": "pl", "shell": "bash", "os": "linux", "spans": [["PATH", "nginx_access.log"]]}
+{"text": "top 15 powtarzających się wierszy w adresy.txt", "intent": "sort_uniq", "lang": "pl", "shell": "zsh", "os": "linux", "spans": [["NUM", "15"], ["PATH", "adresy.txt"]]}
+{"text": "ostatnio modyfikowane pliki w ~/Pulpit", "intent": "recent_files", "lang": "pl", "shell": "zsh", "os": "darwin", "spans": [["PATH", "~/Pulpit"]]}
+{"text": "pokaz 5 najnowszych plikow", "intent": "recent_files", "lang": "pl", "shell": "powershell", "os": "win32", "spans": [["NUM", "5"]]}
+{"text": "znajdz puste pliki w /var/spool", "intent": "empty_files", "lang": "pl", "shell": "bash", "os": "linux", "spans": [["PATH", "/var/spool"]]}
+{"text": "wyszukaj pliki o rozmiarze zero w tym katalogu", "intent": "empty_files", "lang": "pl", "shell": "fish", "os": "linux", "spans": []}
+{"text": "puste katalogi w ~/projekty", "intent": "empty_dirs", "lang": "pl", "shell": "zsh", "os": "darwin", "spans": [["PATH", "~/projekty"]]}
+{"text": "znajdz puste foldey", "intent": "empty_dirs", "lang": "pl", "shell": "sh", "os": "linux", "spans": []}
+{"text": "znajdź zduplikowane pliki w ~/Zdjęcia", "intent": "duplicate_files", "lang": "pl", "shell": "zsh", "os": "darwin", "spans": [["PATH", "~/Zdjęcia"]]}
+{"text": "duplikaty plikow w E:\\muzyka", "intent": "duplicate_files", "lang": "pl", "shell": "powershell", "os": "win32", "spans": [["PATH", "E:\\muzyka"]]}
+{"text": "pokaż dowiązania symboliczne w /etc/alternatives", "intent": "find_symlinks", "lang": "pl", "shell": "bash", "os": "linux", "spans": [["PATH", "/etc/alternatives"]]}
+{"text": "lista symlinkow w tym katalogu", "intent": "find_symlinks", "lang": "pl", "shell": "bash", "os": "linux", "spans": []}
+{"text": "znajdź zepsute linki symboliczne w /usr/lib", "intent": "broken_symlinks", "lang": "pl", "shell": "bash", "os": "linux", "spans": [["PATH", "/usr/lib"]]}
+{"text": "martwe symlinki w ~", "intent": "broken_symlinks", "lang": "pl", "shell": "fish", "os": "linux", "spans": [["PATH", "~"]]}
+{"text": "pokaz zawartosc katalogu /etc/ssh ze szczegolami", "intent": "list_files", "lang": "pl", "shell": "bash", "os": "linux", "spans": [["PATH", "/etc/ssh"]]}
+{"text": "wylistuj pliki w D:\\projekty", "intent": "list_files", "lang": "pl", "shell": "cmd", "os": "win32", "spans": [["PATH", "D:\\projekty"]]}
+{"text": "co jest w tym folderze", "intent": "list_files", "lang": "pl", "shell": "zsh", "os": "darwin", "spans": []}
+{"text": "pokaż drzewo katalogów ~/repo/api", "intent": "list_tree", "lang": "pl", "shell": "bash", "os": "linux", "spans": [["PATH", "~/repo/api"]]}
+{"text": "struktura katalogu src na 4 poziomy", "intent": "list_tree", "lang": "pl", "shell": "zsh", "os": "darwin", "spans": [["PATH", "src"], ["NUM", "4"]]}
+{"text": "pokaż ukryte pliki", "intent": "hidden_files", "lang": "pl", "shell": "bash", "os": "linux", "spans": []}
+{"text": "ukryte pliki w katalogu domowym", "intent": "hidden_files", "lang": "pl", "shell": "zsh", "os": "darwin", "spans": [["PATH", "katalogu domowym"]]}
+{"text": "jakiego typu jest plik dump.dat", "intent": "file_type", "lang": "pl", "shell": "cmd", "os": "win32", "spans": [["PATH", "dump.dat"]]}
+{"text": "sprawdz tpy pliku nieznany_plik", "intent": "file_type", "lang": "pl", "shell": "sh", "os": "linux", "spans": [["PATH", "nieznany_plik"]]}
+{"text": "pokaż metadane pliku umowa.pdf", "intent": "file_stat", "lang": "pl", "shell": "zsh", "os": "darwin", "spans": [["PATH", "umowa.pdf"]]}
+{"text": "uprawnienia, rozmiar i daty modyfikacji pliku /etc/fstab", "intent": "file_stat", "lang": "pl", "shell": "bash", "os": "linux", "spans": [["PATH", "/etc/fstab"]]}
+{"text": "pierwsze dwadzieścia linii pliku logi.txt", "intent": "head_file", "lang": "pl", "shell": "powershell", "os": "win32", "spans": [["NUM", "dwadzieścia"], ["PATH", "logi.txt"]]}
+{"text": "pokaz poczatek pliku zamowienia.csv", "intent": "head_file", "lang": "pl", "shell": "powershell", "os": "win32", "spans": [["PATH", "zamowienia.csv"]]}
+{"text": "ostatnie trzydzieści linii /var/log/kern.log", "intent": "tail_file", "lang": "pl", "shell": "bash", "os": "linux", "spans": [["NUM", "trzydzieści"], ["PATH", "/var/log/kern.log"]]}
+{"text": "pokaż koniec pliku wyniki.txt", "intent": "tail_file", "lang": "pl", "shell": "zsh", "os": "darwin", "spans": [["PATH", "wyniki.txt"]]}
+{"text": "śledź na żywo /var/log/apache2/access.log", "intent": "tail_follow", "lang": "pl", "shell": "bash", "os": "linux", "spans": [["PATH", "/var/log/apache2/access.log"]]}
+{"text": "podgladaj log aplikacji app.log na biezaco", "intent": "tail_follow", "lang": "pl", "shell": "fish", "os": "linux", "spans": [["PATH", "app.log"]]}
+{"text": "wyswietl zawartosc pliku /etc/resolv.conf", "intent": "cat_file", "lang": "pl", "shell": "bash", "os": "linux", "spans": [["PATH", "/etc/resolv.conf"]]}
+{"text": "pokaz co jest w notatki.txt", "intent": "cat_file", "lang": "pl", "shell": "cmd", "os": "win32", "spans": [["PATH", "notatki.txt"]]}
+{"text": "spakuj katalog dokumenty do dokumenty.tar.gz", "intent": "compress_targz", "lang": "pl", "shell": "bash", "os": "linux", "spans": [["PATH", "dokumenty"], ["PATH", "dokumenty.tar.gz"]]}
+{"text": "zrób archiwum tar.gz z ~/projekty/blog", "intent": "compress_targz", "lang": "pl", "shell": "zsh", "os": "darwin", "spans": [["PATH", "~/projekty/blog"]]}
+{"text": "rozpakuj plik paczka.tar.gz do biezacego katalogu", "intent": "extract_targz", "lang": "pl", "shell": "bash", "os": "linux", "spans": [["PATH", "paczka.tar.gz"]]}
+{"text": "wypakuj backup_2024.tgz do /opt/restore", "intent": "extract_targz", "lang": "pl", "shell": "sh", "os": "linux", "spans": [["PATH", "backup_2024.tgz"], ["PATH", "/opt/restore"]]}
+{"text": "spakuj folder zdjecia do zipa zdjecia.zip", "intent": "compress_zip", "lang": "pl", "shell": "zsh", "os": "darwin", "spans": [["PATH", "zdjecia"], ["PATH", "zdjecia.zip"]]}
+{"text": "zrób zip z C:\\Users\\ola\\Desktop\\prezentacja", "intent": "compress_zip", "lang": "pl", "shell": "powershell", "os": "win32", "spans": [["PATH", "C:\\Users\\ola\\Desktop\\prezentacja"]]}
+{"text": "rozpakuj plik dane.zip do D:\\rozpakowane", "intent": "extract_zip", "lang": "pl", "shell": "cmd", "os": "win32", "spans": [["PATH", "dane.zip"], ["PATH", "D:\\rozpakowane"]]}
+{"text": "wypakuj szablon.zip do katalogu ./theme", "intent": "extract_zip", "lang": "pl", "shell": "zsh", "os": "darwin", "spans": [["PATH", "szablon.zip"], ["PATH", "./theme"]]}
+{"text": "co jest w środku archiwum obrazy.tar.gz", "intent": "list_archive", "lang": "pl", "shell": "bash", "os": "linux", "spans": [["PATH", "obrazy.tar.gz"]]}
+{"text": "pokaz liste plikow w paczce sterowniki.zip bez rozpakowywania", "intent": "list_archive", "lang": "pl", "shell": "powershell", "os": "win32", "spans": [["PATH", "sterowniki.zip"]]}
+{"text": "ustaw uprawnienia 644 dla pliku index.html", "intent": "chmod", "lang": "pl", "shell": "bash", "os": "linux", "spans": [["MODE", "644"], ["PATH", "index.html"]]}
+{"text": "chmod 700 na katalog ~/prywatne", "intent": "chmod", "lang": "pl", "shell": "zsh", "os": "darwin", "spans": [["MODE", "700"], ["PATH", "~/prywatne"]]}
+{"text": "nadaj prawa wykonywania plikowi start.sh", "intent": "make_executable", "lang": "pl", "shell": "bash", "os": "linux", "spans": [["PATH", "start.sh"]]}
+{"text": "zrob backup.sh wykonywalnm", "intent": "make_executable", "lang": "pl", "shell": "fish", "os": "linux", "spans": [["PATH", "backup.sh"]]}
+{"text": "zmien wlasciciela /var/www na nginx", "intent": "chown", "lang": "pl", "shell": "bash", "os": "linux", "spans": [["PATH", "/var/www"], ["USER", "nginx"]]}
+{"text": "ustaw usera tomek jako wlasciciela katalogu /home/wspolny", "intent": "chown", "lang": "pl", "shell": "sh", "os": "linux", "spans": [["USER", "tomek"], ["PATH", "/home/wspolny"]]}
+{"text": "skopiuj raport_2024.csv do ~/kopie", "intent": "copy", "lang": "pl", "shell": "bash", "os": "linux", "spans": [["PATH", "raport_2024.csv"], ["PATH", "~/kopie"]]}
+{"text": "kopiuj folder szablony do C:\\inetpub\\szablony", "intent": "copy", "lang": "pl", "shell": "powershell", "os": "win32", "spans": [["PATH", "szablony"], ["PATH", "C:\\inetpub\\szablony"]]}
+{"text": "zmień nazwę pliku stary.txt na nowy.txt", "intent": "move_rename", "lang": "pl", "shell": "powershell", "os": "win32", "spans": [["PATH", "stary.txt"], ["PATH", "nowy.txt"]]}
+{"text": "przenieś faktura.pdf do ~/Dokumenty/faktury", "intent": "move_rename", "lang": "pl", "shell": "zsh", "os": "darwin", "spans": [["PATH", "faktura.pdf"], ["PATH", "~/Dokumenty/faktury"]]}
+{"text": "usun plik smieci.log", "intent": "delete_file", "lang": "pl", "shell": "cmd", "os": "win32", "spans": [["PATH", "smieci.log"]]}
+{"text": "wywal tmp_dump.sql", "intent": "delete_file", "lang": "pl", "shell": "zsh", "os": "darwin", "spans": [["PATH", "tmp_dump.sql"]]}
+{"text": "usuń katalog node_modules", "intent": "delete_dir", "lang": "pl", "shell": "powershell", "os": "win32", "spans": [["PATH", "node_modules"]]}
+{"text": "skasuj folder stare_backupy razem z zawartością", "intent": "delete_dir", "lang": "pl", "shell": "powershell", "os": "win32", "spans": [["PATH", "stare_backupy"]]}
+{"text": "usuń wszystkie pliki .bak z katalogu /etc", "intent": "delete_by_ext", "lang": "pl", "shell": "bash", "os": "linux", "spans": [["EXT", ".bak"], ["PATH", "/etc"]]}
+{"text": "wywal wszystkie pliki log z katalogu ./logs", "intent": "delete_by_ext", "lang": "pl", "shell": "zsh", "os": "darwin", "spans": [["EXT", "log"], ["PATH", "./logs"]]}
+{"text": "utworz katalog projekty/nowy/src razem z podkatalogami", "intent": "mkdir", "lang": "pl", "shell": "bash", "os": "linux", "spans": [["PATH", "projekty/nowy/src"]]}
+{"text": "stworz folder D:\\backup\\2024", "intent": "mkdir", "lang": "pl", "shell": "cmd", "os": "win32", "spans": [["PATH", "D:\\backup\\2024"]]}
+{"text": "utwórz pusty plik README.md", "intent": "touch_file", "lang": "pl", "shell": "powershell", "os": "win32", "spans": [["PATH", "README.md"]]}
+{"text": "stworz pusty plik config.local", "intent": "touch_file", "lang": "pl", "shell": "zsh", "os": "darwin", "spans": [["PATH", "config.local"]]}
+{"text": "w jakim jestem katalogu", "intent": "current_dir", "lang": "pl", "shell": "cmd", "os": "win32", "spans": []}
+{"text": "pokaz biezacy katalog", "intent": "current_dir", "lang": "pl", "shell": "powershell", "os": "win32", "spans": []}
+{"text": "utwórz dowiązanie symboliczne z /opt/python3.12/bin/python do /usr/local/bin/python", "intent": "create_symlink", "lang": "pl", "shell": "bash", "os": "linux", "spans": [["PATH", "/opt/python3.12/bin/python"], ["PATH", "/usr/local/bin/python"]]}
+{"text": "zrob symlink ~/Dropbox/notatki -> ~/notatki", "intent": "create_symlink", "lang": "pl", "shell": "zsh", "os": "darwin", "spans": [["PATH", "~/Dropbox/notatki"], ["PATH", "~/notatki"]]}
+{"text": "porownaj pliki a.txt i b.txt", "intent": "diff_files", "lang": "pl", "shell": "powershell", "os": "win32", "spans": [["PATH", "a.txt"], ["PATH", "b.txt"]]}
+{"text": "róznice miedzy config.old a config.new", "intent": "diff_files", "lang": "pl", "shell": "fish", "os": "linux", "spans": [["PATH", "config.old"], ["PATH", "config.new"]]}
+{"text": "zamień kot na pies w pliku zwierzeta.txt", "intent": "replace_text", "lang": "pl", "shell": "bash", "os": "linux", "spans": [["PATTERN", "kot"], ["REPL", "pies"], ["PATH", "zwierzeta.txt"]]}
+{"text": "podmien wszystkie wystapienia 8080 na 9090 w nginx.conf", "intent": "replace_text", "lang": "pl", "shell": "zsh", "os": "darwin", "spans": [["PATTERN", "8080"], ["REPL", "9090"], ["PATH", "nginx.conf"]]}
+{"text": "pokaz zamontowane systemy plikow", "intent": "disk_mounts", "lang": "pl", "shell": "bash", "os": "linux", "spans": []}
+{"text": "co jest zamontowane", "intent": "disk_mounts", "lang": "pl", "shell": "sh", "os": "linux", "spans": []}
+{"text": "lista dyskow i partycji", "intent": "block_devices", "lang": "pl", "shell": "bash", "os": "linux", "spans": []}
+{"text": "pokaz urzadzenia blokowe", "intent": "block_devices", "lang": "pl", "shell": "zsh", "os": "linux", "spans": []}
+{"text": "policz sumę sha256 pliku debian.iso", "intent": "hash_sha256", "lang": "pl", "shell": "bash", "os": "linux", "spans": [["PATH", "debian.iso"]]}
+{"text": "suma kontrolna sha-256 dla setup.exe", "intent": "hash_sha256", "lang": "pl", "shell": "powershell", "os": "win32", "spans": [["PATH", "setup.exe"]]}
+{"text": "md5 pliku obraz.img", "intent": "hash_md5", "lang": "pl", "shell": "powershell", "os": "win32", "spans": [["PATH", "obraz.img"]]}
+{"text": "oblicz sume md5 archiwum.tar", "intent": "hash_md5", "lang": "pl", "shell": "zsh", "os": "darwin", "spans": [["PATH", "archiwum.tar"]]}
+{"text": "zakoduj w base64 tekst ala ma kota", "intent": "base64_encode", "lang": "pl", "shell": "powershell", "os": "win32", "spans": [["TEXT", "ala ma kota"]]}
+{"text": "zakoduj plik certyfikat.pem do base64", "intent": "base64_encode", "lang": "pl", "shell": "zsh", "os": "darwin", "spans": [["PATH", "certyfikat.pem"]]}
+{"text": "odkoduj base64: ZHppZW4gZG9icnk=", "intent": "base64_decode", "lang": "pl", "shell": "bash", "os": "linux", "spans": [["TEXT", "ZHppZW4gZG9icnk="]]}
+{"text": "zdekoduj z base64 plik wiadomosc.b64", "intent": "base64_decode", "lang": "pl", "shell": "fish", "os": "linux", "spans": [["PATH", "wiadomosc.b64"]]}
+{"text": "ktore procesy zuzywaja najwiecej procesora", "intent": "top_cpu", "lang": "pl", "shell": "cmd", "os": "win32", "spans": []}
+{"text": "top 10 procesow wg cpu", "intent": "top_cpu", "lang": "pl", "shell": "powershell", "os": "win32", "spans": [["NUM", "10"]]}
+{"text": "co zjada pamięć RAM", "intent": "top_mem", "lang": "pl", "shell": "powershell", "os": "win32", "spans": []}
+{"text": "pokaz 7 procesow ktore zuzywaja najwiecej pamieci", "intent": "top_mem", "lang": "pl", "shell": "zsh", "os": "darwin", "spans": [["NUM", "7"]]}
+{"text": "czy dziala proces mysqld", "intent": "find_process", "lang": "pl", "shell": "bash", "os": "linux", "spans": [["NAME", "mysqld"]]}
+{"text": "znajdz proccess o nazwie spotify", "intent": "find_process", "lang": "pl", "shell": "zsh", "os": "darwin", "spans": [["NAME", "spotify"]]}
+{"text": "ubij proces firefox", "intent": "kill_by_name", "lang": "pl", "shell": "powershell", "os": "win32", "spans": [["NAME", "firefox"]]}
+{"text": "zabij wszystkie procesy node'a", "intent": "kill_by_name", "lang": "pl", "shell": "zsh", "os": "darwin", "spans": [["NAME", "node"]]}
+{"text": "zabij siłowo chrome, nie odpowiada", "intent": "kill_force", "lang": "pl", "shell": "cmd", "os": "win32", "spans": [["NAME", "chrome"]]}
+{"text": "kill -9 na wszystkie procesy java", "intent": "kill_force", "lang": "pl", "shell": "fish", "os": "linux", "spans": [["NAME", "java"]]}
+{"text": "zabij proces o PID 9876", "intent": "kill_by_pid", "lang": "pl", "shell": "bash", "os": "linux", "spans": [["PID", "9876"]]}
+{"text": "ubij pid 31337", "intent": "kill_by_pid", "lang": "pl", "shell": "sh", "os": "linux", "spans": [["PID", "31337"]]}
+{"text": "zabij to co nasłuchuje na porcie 5000", "intent": "kill_by_port", "lang": "pl", "shell": "powershell", "os": "win32", "spans": [["PORT", "5000"]]}
+{"text": "zwolnij port 8000", "intent": "kill_by_port", "lang": "pl", "shell": "zsh", "os": "darwin", "spans": [["PORT", "8000"]]}
+{"text": "pokaż porty na których coś nasłuchuje", "intent": "listening_ports", "lang": "pl", "shell": "cmd", "os": "win32", "spans": []}
+{"text": "jakie porty sa otwarte", "intent": "listening_ports", "lang": "pl", "shell": "powershell", "os": "win32", "spans": []}
+{"text": "jaki proces uzywa portu 80", "intent": "process_on_port", "lang": "pl", "shell": "bash", "os": "linux", "spans": [["PORT", "80"]]}
+{"text": "kto siedzi na porcie 6379", "intent": "process_on_port", "lang": "pl", "shell": "zsh", "os": "darwin", "spans": [["PORT", "6379"]]}
+{"text": "pokaż aktywne połączenia sieciowe", "intent": "established_connections", "lang": "pl", "shell": "powershell", "os": "win32", "spans": []}
+{"text": "nawiazane polacznia tcp", "intent": "established_connections", "lang": "pl", "shell": "sh", "os": "linux", "spans": []}
+{"text": "pokaż drzewko procesów", "intent": "process_tree", "lang": "pl", "shell": "bash", "os": "linux", "spans": []}
+{"text": "procesy w formie drzewa", "intent": "process_tree", "lang": "pl", "shell": "fish", "os": "linux", "spans": []}
+{"text": "informacje o systemie", "intent": "system_info", "lang": "pl", "shell": "powershell", "os": "win32", "spans": []}
+{"text": "pokaz ogolne info o maszynie", "intent": "system_info", "lang": "pl", "shell": "cmd", "os": "win32", "spans": []}
+{"text": "jaka to dystrybucja linuxa?", "intent": "os_release", "lang": "pl", "shell": "bash", "os": "linux", "spans": []}
+{"text": "jaka wersja systemu operacyjnego", "intent": "os_release", "lang": "pl", "shell": "zsh", "os": "darwin", "spans": []}
+{"text": "jaka wersja jadra", "intent": "kernel_version", "lang": "pl", "shell": "bash", "os": "linux", "spans": []}
+{"text": "wersja kernela", "intent": "kernel_version", "lang": "pl", "shell": "sh", "os": "linux", "spans": []}
+{"text": "ile mam wolnego RAMu", "intent": "memory_usage", "lang": "pl", "shell": "bash", "os": "linux", "spans": []}
+{"text": "zuzycie pamieci", "intent": "memory_usage", "lang": "pl", "shell": "powershell", "os": "win32", "spans": []}
+{"text": "jaki mam procesor", "intent": "cpu_info", "lang": "pl", "shell": "bash", "os": "linux", "spans": []}
+{"text": "szczegoly procesora", "intent": "cpu_info", "lang": "pl", "shell": "zsh", "os": "darwin", "spans": []}
+{"text": "ile rdzeni ma procesor", "intent": "cpu_cores", "lang": "pl", "shell": "cmd", "os": "win32", "spans": []}
+{"text": "liczba rdzeni cpu", "intent": "cpu_cores", "lang": "pl", "shell": "fish", "os": "linux", "spans": []}
+{"text": "jak dlugo dziala serwer bez restartu", "intent": "uptime", "lang": "pl", "shell": "bash", "os": "linux", "spans": []}
+{"text": "pokaz uptime i obciazenie", "intent": "uptime", "lang": "pl", "shell": "bash", "os": "linux", "spans": []}
+{"text": "jaka jest nazwa hosta", "intent": "hostname", "lang": "pl", "shell": "bash", "os": "linux", "spans": []}
+{"text": "nazwa tego komputera", "intent": "hostname", "lang": "pl", "shell": "powershell", "os": "win32", "spans": []}
+{"text": "jako kto jestem zalogowany", "intent": "whoami", "lang": "pl", "shell": "bash", "os": "linux", "spans": []}
+{"text": "jaki jest moj login", "intent": "whoami", "lang": "pl", "shell": "cmd", "os": "win32", "spans": []}
+{"text": "kto jest terz zalogowany", "intent": "users_logged_in", "lang": "pl", "shell": "bash", "os": "linux", "spans": []}
+{"text": "lista zalogowanych uzytkownikow", "intent": "users_logged_in", "lang": "pl", "shell": "sh", "os": "linux", "spans": []}
+{"text": "ostatnie logowania na tej maszynie", "intent": "last_logins", "lang": "pl", "shell": "bash", "os": "linux", "spans": []}
+{"text": "pokaż 15 ostatnich logowań", "intent": "last_logins", "lang": "pl", "shell": "zsh", "os": "linux", "spans": [["NUM", "15"]]}
+{"text": "pokaż zmienne środowiskowe", "intent": "env_vars", "lang": "pl", "shell": "cmd", "os": "win32", "spans": []}
+{"text": "lista wszystkich zmiennych srodowiskowych", "intent": "env_vars", "lang": "pl", "shell": "powershell", "os": "win32", "spans": []}
+{"text": "jaka jest wartość zmiennej USERPROFILE", "intent": "env_var_get", "lang": "pl", "shell": "powershell", "os": "win32", "spans": [["VAR", "USERPROFILE"]]}
+{"text": "pokaz zmienna GOPATH", "intent": "env_var_get", "lang": "pl", "shell": "zsh", "os": "darwin", "spans": [["VAR", "GOPATH"]]}
+{"text": "gdzie jest zainstalowany node", "intent": "which_cmd", "lang": "pl", "shell": "powershell", "os": "win32", "spans": [["NAME", "node"]]}
+{"text": "ktory pip jest uzywany", "intent": "which_cmd", "lang": "pl", "shell": "bash", "os": "linux", "spans": [["NAME", "pip"]]}
+{"text": "pokaż PATH, każdy wpis w osobnej linii", "intent": "show_path", "lang": "pl", "shell": "bash", "os": "linux", "spans": []}
+{"text": "jakie katalogi sa w zmiennej path", "intent": "show_path", "lang": "pl", "shell": "fish", "os": "linux", "spans": []}
+{"text": "przeszukaj historię poleceń pod kątem rsync", "intent": "history_search", "lang": "pl", "shell": "bash", "os": "linux", "spans": [["PATTERN", "rsync"]]}
+{"text": "jak ostatnio odpalałem kubectl? szukaj w historii", "intent": "history_search", "lang": "pl", "shell": "zsh", "os": "darwin", "spans": [["PATTERN", "kubectl"]]}
+{"text": "która godzina", "intent": "date_time", "lang": "pl", "shell": "cmd", "os": "win32", "spans": []}
+{"text": "podaj aktualna date i godzine", "intent": "date_time", "lang": "pl", "shell": "powershell", "os": "win32", "spans": []}
+{"text": "jaka strefa czasowa jest ustawiona", "intent": "timezone", "lang": "pl", "shell": "bash", "os": "linux", "spans": []}
+{"text": "strefa czasowa systemu", "intent": "timezone", "lang": "pl", "shell": "zsh", "os": "darwin", "spans": []}
+{"text": "pokaż kalendarz", "intent": "calendar", "lang": "pl", "shell": "bash", "os": "linux", "spans": []}
+{"text": "kalendaz na ten miesiac", "intent": "calendar", "lang": "pl", "shell": "sh", "os": "linux", "spans": []}
+{"text": "pokaż moje zadania w cronie", "intent": "cron_list", "lang": "pl", "shell": "bash", "os": "linux", "spans": []}
+{"text": "lista cronjobow", "intent": "cron_list", "lang": "pl", "shell": "bash", "os": "linux", "spans": []}
+{"text": "edytuj crontaba", "intent": "cron_edit", "lang": "pl", "shell": "bash", "os": "linux", "spans": []}
+{"text": "chce dodac nowe zadanie do crona", "intent": "cron_edit", "lang": "pl", "shell": "fish", "os": "linux", "spans": []}
+{"text": "logi usługi postgresql", "intent": "journal_service", "lang": "pl", "shell": "bash", "os": "linux", "spans": [["NAME", "postgresql"]]}
+{"text": "pokaz logi serwisu cron z ostatnich 30 minut", "intent": "journal_service", "lang": "pl", "shell": "sh", "os": "linux", "spans": [["NAME", "cron"], ["TIME", "ostatnich 30 minut"]]}
+{"text": "50 ostatnich wpisów z journala dla kubelet", "intent": "journal_service", "lang": "pl", "shell": "zsh", "os": "linux", "spans": [["NUM", "50"], ["NAME", "kubelet"]]}
+{"text": "pokaz bledy systemowe z logow", "intent": "journal_errors", "lang": "pl", "shell": "bash", "os": "linux", "spans": []}
+{"text": "jakie bledy sa w journalu od startu", "intent": "journal_errors", "lang": "pl", "shell": "sh", "os": "linux", "spans": []}
+{"text": "status usługi docker", "intent": "service_status", "lang": "pl", "shell": "bash", "os": "linux", "spans": [["NAME", "docker"]]}
+{"text": "sprawdz stauts serwisu ssh", "intent": "service_status", "lang": "pl", "shell": "fish", "os": "linux", "spans": [["NAME", "ssh"]]}
+{"text": "zrestartuj nginxa", "intent": "service_restart", "lang": "pl", "shell": "bash", "os": "linux", "spans": [["NAME", "nginx"]]}
+{"text": "restartnij usluge php8.2-fpm", "intent": "service_restart", "lang": "pl", "shell": "sh", "os": "linux", "spans": [["NAME", "php8.2-fpm"]]}
+{"text": "zatrzymaj usługę apache2", "intent": "service_stop", "lang": "pl", "shell": "bash", "os": "linux", "spans": [["NAME", "apache2"]]}
+{"text": "stopnij serwis mongod", "intent": "service_stop", "lang": "pl", "shell": "zsh", "os": "linux", "spans": [["NAME", "mongod"]]}
+{"text": "uruchom usluge mariadb", "intent": "service_start", "lang": "pl", "shell": "bash", "os": "linux", "spans": [["NAME", "mariadb"]]}
+{"text": "wystartuj serwis bluetooth", "intent": "service_start", "lang": "pl", "shell": "sh", "os": "linux", "spans": [["NAME", "bluetooth"]]}
+{"text": "wlacz dockera przy starcie systemu", "intent": "service_enable", "lang": "pl", "shell": "bash", "os": "linux", "spans": [["NAME", "docker"]]}
+{"text": "niech nginx startuje automatycznie po reboocie", "intent": "service_enable", "lang": "pl", "shell": "fish", "os": "linux", "spans": [["NAME", "nginx"]]}
+{"text": "lista działających usług", "intent": "list_services", "lang": "pl", "shell": "bash", "os": "linux", "spans": []}
+{"text": "jakie serwisy sa odpalone", "intent": "list_services", "lang": "pl", "shell": "sh", "os": "linux", "spans": []}
+{"text": "które usługi się wysypały", "intent": "failed_services", "lang": "pl", "shell": "bash", "os": "linux", "spans": []}
+{"text": "pokaz nieudane uslugi systemd", "intent": "failed_services", "lang": "pl", "shell": "zsh", "os": "linux", "spans": []}
+{"text": "pokaż komunikaty jądra z dmesg", "intent": "dmesg", "lang": "pl", "shell": "bash", "os": "linux", "spans": []}
+{"text": "ostatnie czterdzieści linii dmesg", "intent": "dmesg", "lang": "pl", "shell": "sh", "os": "linux", "spans": [["NUM", "czterdzieści"]]}
+{"text": "ile baterii zostało", "intent": "battery", "lang": "pl", "shell": "zsh", "os": "darwin", "spans": []}
+{"text": "stan bateri", "intent": "battery", "lang": "pl", "shell": "bash", "os": "linux", "spans": []}
+{"text": "temperatura procka", "intent": "temperature", "lang": "pl", "shell": "bash", "os": "linux", "spans": []}
+{"text": "czy laptop sie przegrzewa, pokaz czujniki", "intent": "temperature", "lang": "pl", "shell": "fish", "os": "linux", "spans": []}
+{"text": "jaka mam karte graficzna", "intent": "gpu_info", "lang": "pl", "shell": "bash", "os": "linux", "spans": []}
+{"text": "informacje o gpu", "intent": "gpu_info", "lang": "pl", "shell": "powershell", "os": "win32", "spans": []}
+{"text": "lista urzadzen usb", "intent": "usb_devices", "lang": "pl", "shell": "bash", "os": "linux", "spans": []}
+{"text": "co jest podpiete przez usb", "intent": "usb_devices", "lang": "pl", "shell": "zsh", "os": "darwin", "spans": []}
+{"text": "zainstaluj vima", "intent": "install_package", "lang": "pl", "shell": "bash", "os": "linux", "spans": [["NAME", "vim"]]}
+{"text": "doinstaluj pakiet tmux", "intent": "install_package", "lang": "pl", "shell": "fish", "os": "linux", "spans": [["NAME", "tmux"]]}
+{"text": "czy mam zainstalowany git", "intent": "package_installed", "lang": "pl", "shell": "bash", "os": "linux", "spans": [["NAME", "git"]]}
+{"text": "sprawdz czy pakiet nginx jest zainstalowny", "intent": "package_installed", "lang": "pl", "shell": "sh", "os": "linux", "spans": [["NAME", "nginx"]]}
+{"text": "zaktualizuj system, wszystkie paczki", "intent": "system_update", "lang": "pl", "shell": "bash", "os": "linux", "spans": []}
+{"text": "zrob update i upgrade pakietow", "intent": "system_update", "lang": "pl", "shell": "sh", "os": "linux", "spans": []}
+{"text": "jaki mam lokalny adres ip", "intent": "ip_addresses", "lang": "pl", "shell": "bash", "os": "linux", "spans": []}
+{"text": "pokaz adresy ip interfejsow", "intent": "ip_addresses", "lang": "pl", "shell": "powershell", "os": "win32", "spans": []}
+{"text": "jaki jest mój publiczny adres IP", "intent": "public_ip", "lang": "pl", "shell": "bash", "os": "linux", "spans": []}
+{"text": "zewnetrzne ip", "intent": "public_ip", "lang": "pl", "shell": "zsh", "os": "darwin", "spans": []}
+{"text": "pingnij wp.pl", "intent": "ping_host", "lang": "pl", "shell": "bash", "os": "linux", "spans": [["HOST", "wp.pl"]]}
+{"text": "spinguj 10.0.0.1 trzy razy", "intent": "ping_host", "lang": "pl", "shell": "cmd", "os": "win32", "spans": [["HOST", "10.0.0.1"], ["NUM", "trzy"]]}
+{"text": "sprawdź DNS dla onet.pl", "intent": "dns_lookup", "lang": "pl", "shell": "powershell", "os": "win32", "spans": [["HOST", "onet.pl"]]}
+{"text": "na jakie ip rozwiazuje sie allegro.pl", "intent": "dns_lookup", "lang": "pl", "shell": "zsh", "os": "darwin", "spans": [["HOST", "allegro.pl"]]}
+{"text": "traceroute do interia.pl", "intent": "traceroute", "lang": "pl", "shell": "bash", "os": "linux", "spans": [["HOST", "interia.pl"]]}
+{"text": "przesledz trase pakietow do 9.9.9.9", "intent": "traceroute", "lang": "pl", "shell": "fish", "os": "linux", "spans": [["HOST", "9.9.9.9"]]}
+{"text": "pokaż tablicę routingu", "intent": "routes", "lang": "pl", "shell": "cmd", "os": "win32", "spans": []}
+{"text": "jaka jest brama domyslna", "intent": "routes", "lang": "pl", "shell": "bash", "os": "linux", "spans": []}
+{"text": "sprawdź czy port 443 jest otwarty na serwer.firma.pl", "intent": "port_check", "lang": "pl", "shell": "bash", "os": "linux", "spans": [["PORT", "443"], ["HOST", "serwer.firma.pl"]]}
+{"text": "czy na 192.168.1.20 dziala port 3306", "intent": "port_check", "lang": "pl", "shell": "powershell", "os": "win32", "spans": [["HOST", "192.168.1.20"], ["PORT", "3306"]]}
+{"text": "pokaż nagłówki HTTP dla https://www.gov.pl", "intent": "curl_headers", "lang": "pl", "shell": "bash", "os": "linux", "spans": [["URL", "https://www.gov.pl"]]}
+{"text": "naglowki odpowiedzi z https://api.allegro.pl", "intent": "curl_headers", "lang": "pl", "shell": "bash", "os": "darwin", "spans": [["URL", "https://api.allegro.pl"]]}
+{"text": "jaki kod statusu zwraca https://sklep.example.pl/koszyk", "intent": "http_status", "lang": "pl", "shell": "bash", "os": "linux", "spans": [["URL", "https://sklep.example.pl/koszyk"]]}
+{"text": "sprawdz kod http dla http://localhost:3000", "intent": "http_status", "lang": "pl", "shell": "fish", "os": "linux", "spans": [["URL", "http://localhost:3000"]]}
+{"text": "pobierz https://example.com/pliki/raport.pdf", "intent": "download_file", "lang": "pl", "shell": "powershell", "os": "win32", "spans": [["URL", "https://example.com/pliki/raport.pdf"]]}
+{"text": "sciagnij plik z https://github.com/user/repo/releases/download/v1.0/app.AppImage", "intent": "download_file", "lang": "pl", "shell": "zsh", "os": "darwin", "spans": [["URL", "https://github.com/user/repo/releases/download/v1.0/app.AppImage"]]}
+{"text": "polacz sie przez ssh z 10.10.0.5", "intent": "ssh_connect", "lang": "pl", "shell": "bash", "os": "linux", "spans": [["HOST", "10.10.0.5"]]}
+{"text": "zaloguj sie po ssh na admin@vps.mojadomena.pl", "intent": "ssh_connect", "lang": "pl", "shell": "zsh", "os": "darwin", "spans": [["USER", "admin"], ["HOST", "vps.mojadomena.pl"]]}
+{"text": "pokaż status gita", "intent": "git_status", "lang": "pl", "shell": "powershell", "os": "win32", "spans": []}
+{"text": "co sie zmienilo w repo, git status", "intent": "git_status", "lang": "pl", "shell": "zsh", "os": "darwin", "spans": []}
+{"text": "pokaż ostatnie siedem commitów", "intent": "git_log", "lang": "pl", "shell": "bash", "os": "linux", "spans": [["NUM", "siedem"]]}
+{"text": "historia commitow", "intent": "git_log", "lang": "pl", "shell": "powershell", "os": "win32", "spans": []}
+{"text": "pokaż niezastage'owane zmiany", "intent": "git_diff", "lang": "pl", "shell": "cmd", "os": "win32", "spans": []}
+{"text": "jakie zmiany mam w pliku routes.py", "intent": "git_diff", "lang": "pl", "shell": "zsh", "os": "darwin", "spans": [["PATH", "routes.py"]]}
+{"text": "pokaż zmiany dodane do stage'a", "intent": "git_diff_staged", "lang": "pl", "shell": "bash", "os": "linux", "spans": []}
+{"text": "diff tego co jest w staged", "intent": "git_diff_staged", "lang": "pl", "shell": "fish", "os": "linux", "spans": []}
+{"text": "lista gałęzi", "intent": "git_branches", "lang": "pl", "shell": "bash", "os": "linux", "spans": []}
+{"text": "pokaz wszystkie branche", "intent": "git_branches", "lang": "pl", "shell": "zsh", "os": "darwin", "spans": []}
+{"text": "na jakiej jestem gałęzi", "intent": "git_current_branch", "lang": "pl", "shell": "bash", "os": "linux", "spans": []}
+{"text": "jaki jest aktualny branch", "intent": "git_current_branch", "lang": "pl", "shell": "powershell", "os": "win32", "spans": []}
+{"text": "utwórz nową gałąź feature/koszyk i przełącz się na nią", "intent": "git_new_branch", "lang": "pl", "shell": "bash", "os": "linux", "spans": [["BRANCH", "feature/koszyk"]]}
+{"text": "zrob nowego brancha bugfix/logowanie", "intent": "git_new_branch", "lang": "pl", "shell": "zsh", "os": "darwin", "spans": [["BRANCH", "bugfix/logowanie"]]}
+{"text": "przełącz się na gałąź staging", "intent": "git_switch_branch", "lang": "pl", "shell": "powershell", "os": "win32", "spans": [["BRANCH", "staging"]]}
+{"text": "checkoutnij brancha release-2.0", "intent": "git_switch_branch", "lang": "pl", "shell": "zsh", "os": "darwin", "spans": [["BRANCH", "release-2.0"]]}
+{"text": "usun galaz stara-funkcja", "intent": "git_delete_branch", "lang": "pl", "shell": "bash", "os": "linux", "spans": [["BRANCH", "stara-funkcja"]]}
+{"text": "skasuj lokalnego brancha test/eksperyment", "intent": "git_delete_branch", "lang": "pl", "shell": "fish", "os": "linux", "spans": [["BRANCH", "test/eksperyment"]]}
+{"text": "cofnij ostatni commit ale zostaw zmiany", "intent": "git_undo_commit", "lang": "pl", "shell": "cmd", "os": "win32", "spans": []}
+{"text": "odkrec ostatniego commita, soft", "intent": "git_undo_commit", "lang": "pl", "shell": "zsh", "os": "darwin", "spans": []}
+{"text": "odrzuć wszystkie niezacommitowane zmiany", "intent": "git_discard_changes", "lang": "pl", "shell": "bash", "os": "linux", "spans": []}
+{"text": "wywal zmiany w pliku style.css", "intent": "git_discard_changes", "lang": "pl", "shell": "zsh", "os": "darwin", "spans": [["PATH", "style.css"]]}
+{"text": "schowaj zmiany do stasha", "intent": "git_stash", "lang": "pl", "shell": "bash", "os": "linux", "spans": []}
+{"text": "zrob git stash", "intent": "git_stash", "lang": "pl", "shell": "powershell", "os": "win32", "spans": []}
+{"text": "przywróć zmiany ze stasha", "intent": "git_stash_pop", "lang": "pl", "shell": "powershell", "os": "win32", "spans": []}
+{"text": "stash pop", "intent": "git_stash_pop", "lang": "pl", "shell": "powershell", "os": "linux", "spans": []}
+{"text": "zrob pulla z repo", "intent": "git_pull", "lang": "pl", "shell": "bash", "os": "linux", "spans": []}
+{"text": "pullnij zmiany z origin", "intent": "git_pull", "lang": "pl", "shell": "zsh", "os": "darwin", "spans": []}
+{"text": "wypchnij commity", "intent": "git_push", "lang": "pl", "shell": "cmd", "os": "win32", "spans": []}
+{"text": "pushnij na brancha feature/platnosci", "intent": "git_push", "lang": "pl", "shell": "zsh", "os": "darwin", "spans": [["BRANCH", "feature/platnosci"]]}
+{"text": "sklonuj https://github.com/django/django.git", "intent": "git_clone", "lang": "pl", "shell": "bash", "os": "linux", "spans": [["URL", "https://github.com/django/django.git"]]}
+{"text": "zrob clone repo git@gitlab.com:firma/backend.git", "intent": "git_clone", "lang": "pl", "shell": "powershell", "os": "win32", "spans": [["URL", "git@gitlab.com:firma/backend.git"]]}
+{"text": "dodaj wszystkie zmiany do stagingu", "intent": "git_add_all", "lang": "pl", "shell": "bash", "os": "linux", "spans": []}
+{"text": "git add wszystkiego", "intent": "git_add_all", "lang": "pl", "shell": "bash", "os": "linux", "spans": []}
+{"text": "zrób commit z wiadomością 'poprawka walidacji formularza'", "intent": "git_commit", "lang": "pl", "shell": "powershell", "os": "win32", "spans": [["MSG", "poprawka walidacji formularza"]]}
+{"text": "zacommituj wszystko z opisem dodano testy", "intent": "git_commit", "lang": "pl", "shell": "zsh", "os": "darwin", "spans": [["MSG", "dodano testy"]]}
+{"text": "pokaz zdalne repozytoria", "intent": "git_remote", "lang": "pl", "shell": "bash", "os": "linux", "spans": []}
+{"text": "jaki jest adres remota", "intent": "git_remote", "lang": "pl", "shell": "fish", "os": "linux", "spans": []}
+{"text": "kto zmienial linijki w pliku models.py", "intent": "git_blame", "lang": "pl", "shell": "bash", "os": "linux", "spans": [["PATH", "models.py"]]}
+{"text": "git blame dla src/App.vue", "intent": "git_blame", "lang": "pl", "shell": "zsh", "os": "darwin", "spans": [["PATH", "src/App.vue"]]}
+{"text": "zainicjalizuj repozytorium git", "intent": "git_init", "lang": "pl", "shell": "bash", "os": "linux", "spans": []}
+{"text": "zrob nowe repo gita w tym katalogu", "intent": "git_init", "lang": "pl", "shell": "powershell", "os": "win32", "spans": []}
+{"text": "pokaż działające kontenery", "intent": "docker_ps", "lang": "pl", "shell": "powershell", "os": "win32", "spans": []}
+{"text": "jakie kontenery sa uruchomione", "intent": "docker_ps", "lang": "pl", "shell": "bash", "os": "linux", "spans": []}
+{"text": "wszystkie kontenery łącznie z zatrzymanymi", "intent": "docker_ps_all", "lang": "pl", "shell": "bash", "os": "linux", "spans": []}
+{"text": "lista kontenerow takze tych wylaczonych", "intent": "docker_ps_all", "lang": "pl", "shell": "powershell", "os": "win32", "spans": []}
+{"text": "logi kontenera nginx-proxy", "intent": "docker_logs", "lang": "pl", "shell": "bash", "os": "linux", "spans": [["NAME", "nginx-proxy"]]}
+{"text": "pokaz piecdziesiat ostatnich linii logow z kontenera worker", "intent": "docker_logs", "lang": "pl", "shell": "zsh", "os": "darwin", "spans": [["NUM", "piecdziesiat"], ["NAME", "worker"]]}
+{"text": "lista obrazów dockera", "intent": "docker_images", "lang": "pl", "shell": "cmd", "os": "win32", "spans": []}
+{"text": "jakie mam obrazy docker", "intent": "docker_images", "lang": "pl", "shell": "fish", "os": "linux", "spans": []}
+{"text": "zatrzymaj kontener mysql-test", "intent": "docker_stop", "lang": "pl", "shell": "bash", "os": "linux", "spans": [["NAME", "mysql-test"]]}
+{"text": "stopnij kontener frontend", "intent": "docker_stop", "lang": "pl", "shell": "zsh", "os": "darwin", "spans": [["NAME", "frontend"]]}
+{"text": "zatrzymaj wszystkie kontenery", "intent": "docker_stop_all", "lang": "pl", "shell": "cmd", "os": "win32", "spans": []}
+{"text": "wylacz wszystkie dzialajace kontenery dockera", "intent": "docker_stop_all", "lang": "pl", "shell": "powershell", "os": "win32", "spans": []}
+{"text": "wyczysc nieuzywane dane dockera", "intent": "docker_prune", "lang": "pl", "shell": "bash", "os": "linux", "spans": []}
+{"text": "docker zajmuje za duzo miejsca, posprzataj", "intent": "docker_prune", "lang": "pl", "shell": "zsh", "os": "darwin", "spans": []}
+{"text": "otwórz shell w kontenerze php-app", "intent": "docker_exec", "lang": "pl", "shell": "powershell", "os": "win32", "spans": [["NAME", "php-app"]]}
+{"text": "wejdz do kontenera elastic", "intent": "docker_exec", "lang": "pl", "shell": "zsh", "os": "darwin", "spans": [["NAME", "elastic"]]}
+{"text": "zużycie zasobów przez kontenery", "intent": "docker_stats", "lang": "pl", "shell": "bash", "os": "linux", "spans": []}
+{"text": "ile cpu i ramu zjadaja kontenery", "intent": "docker_stats", "lang": "pl", "shell": "powershell", "os": "win32", "spans": []}
+{"text": "odpal docker compose", "intent": "docker_compose_up", "lang": "pl", "shell": "powershell", "os": "win32", "spans": []}
+{"text": "uruchom usługi z docker-compose w tle", "intent": "docker_compose_up", "lang": "pl", "shell": "zsh", "os": "darwin", "spans": []}
+{"text": "zatrzymaj docker compose", "intent": "docker_compose_down", "lang": "pl", "shell": "cmd", "os": "win32", "spans": []}
+{"text": "wyłacz stack compose", "intent": "docker_compose_down", "lang": "pl", "shell": "fish", "os": "linux", "spans": []}

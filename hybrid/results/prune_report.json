@@ -1,0 +1,10 @@
+{
+ "base": "intfloat/multilingual-e5-small",
+ "vocab_before": 250002,
+ "vocab_after": 36357,
+ "params_after": 35600640,
+ "emb_params_before": 96014208,
+ "emb_params_after": 13961088,
+ "corpus_texts": 46980,
+ "segmentation_diff_on_corpus": 0
+}

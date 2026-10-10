@@ -20,11 +20,13 @@
     "./history": "./src/history.js",
     "./env": "./src/env.js",
     "./compose": "./src/compose.js",
-    "./package.json": "./package.json"
+    "./package.json": "./package.json",
+    "./hybrid": "./src/rerank/hybrid.js"
   },
   "files": [
     "bin/tellsh.js",
     "src/*.js",
+    "src/rerank/*.js",
     "model/model.bin",
     "model/tldr_triggers.json",
     "model/compose_explained.json",
@@ -65,5 +67,17 @@
     "type": "git",
     "url": "git+https://github.com/lksrz/tellsh.git"
   },
-  "dependencies": {}
+  "dependencies": {},
+  "peerDependencies": {
+    "onnxruntime-node": ">=1.20.0",
+    "tellsh-model-enc": "0.3.x"
+  },
+  "peerDependenciesMeta": {
+    "onnxruntime-node": {
+      "optional": true
+    },
+    "tellsh-model-enc": {
+      "optional": true
+    }
+  }
 }

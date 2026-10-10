@@ -1,0 +1,127 @@
+{
+ "machine": "Intel(R) Xeon(R) Processor",
+ "node": "v20.19.2",
+ "affinity": "0",
+ "warm_A": {
+  "p50": 0.34,
+  "p95": 4.399,
+  "n": 600
+ },
+ "load_B_node_ms": 189,
+ "warm_B_infer_node": {
+  "p50": 3.547,
+  "p95": 5.669,
+  "n": 600
+ },
+ "warm_B_full_node": {
+  "p50": 4.653,
+  "p95": 9.477,
+  "n": 600
+ },
+ "warm_AB_node": {
+  "p50": 0.376,
+  "p95": 8.338,
+  "n": 600,
+  "deferred": 0.303
+ },
+ "load_B_web_ms": 1099.2,
+ "warm_B_infer_web": {
+  "p50": 32.59,
+  "p95": 44.271,
+  "n": 600
+ },
+ "warm_B_full_web": {
+  "p50": 32.403,
+  "p95": 41.737,
+  "n": 600
+ },
+ "warm_AB_web": {
+  "p50": 0.418,
+  "p95": 37.804,
+  "n": 600,
+  "deferred": 0.303
+ },
+ "cold_node_baseline": {
+  "p50": 90.335,
+  "p95": 106.408,
+  "n": 10
+ },
+ "cold_A": {
+  "p50": 152.678,
+  "p95": 165.871,
+  "n": 20
+ },
+ "cold_AB": {
+  "p50": 156.715,
+  "p95": 349.333,
+  "n": 20,
+  "deferred": 9
+ },
+ "cold_AB_deferred_only": {
+  "p50": 340.429,
+  "p95": 349.333,
+  "n": 9
+ },
+ "cold_B": {
+  "p50": 341.633,
+  "p95": 355.12,
+  "n": 10
+ },
+ "bundle": {
+  "encoder.int8.onnx": 26723040,
+  "export_report.json": 394,
+  "labels.json": 3717,
+  "manifest.json": 298,
+  "vocab.json": 729258
+ },
+ "C_llama_qwen05-q8_0.gguf": [
+  {
+   "n_prompt": 112,
+   "n_gen": 0,
+   "tps": 474.334823,
+   "size": 525120000
+  },
+  {
+   "n_prompt": 308,
+   "n_gen": 0,
+   "tps": 421.589925,
+   "size": 525120000
+  },
+  {
+   "n_prompt": 0,
+   "n_gen": 1,
+   "tps": 27.48787,
+   "size": 525120000
+  }
+ ],
+ "C_cold_qwen05-q8_0.gguf": {
+  "p50": 1665.217,
+  "p95": 1698.228,
+  "n": 3
+ },
+ "C_llama_qwen05-q4_k_m.gguf": [
+  {
+   "n_prompt": 112,
+   "n_gen": 0,
+   "tps": 118.864457,
+   "size": 391859712
+  },
+  {
+   "n_prompt": 308,
+   "n_gen": 0,
+   "tps": 117.70149,
+   "size": 391859712
+  },
+  {
+   "n_prompt": 0,
+   "n_gen": 1,
+   "tps": 19.34891,
+   "size": 391859712
+  }
+ ],
+ "C_cold_qwen05-q4_k_m.gguf": {
+  "p50": 3425.443,
+  "p95": 3426.963,
+  "n": 3
+ }
+}

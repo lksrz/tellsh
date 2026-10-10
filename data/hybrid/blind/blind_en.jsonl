@@ -1,0 +1,331 @@
+{"text": "show me the 15 biggest files in /var/log", "intent": "largest_files", "lang": "en", "shell": "bash", "os": "linux", "spans": [["NUM", "15"], ["PATH", "/var/log"]]}
+{"text": "what's eating my space? top files by size under ~/Downloads", "intent": "largest_files", "lang": "en", "shell": "zsh", "os": "darwin", "spans": [["PATH", "~/Downloads"]]}
+{"text": "list the twenty largest files in C:\\Users\\anna\\Documents", "intent": "largest_files", "lang": "en", "shell": "powershell", "os": "win32", "spans": [["NUM", "twenty"], ["PATH", "C:\\Users\\anna\\Documents"]]}
+{"text": "which folders in /home take up teh most space", "intent": "largest_dirs", "lang": "en", "shell": "bash", "os": "linux", "spans": [["PATH", "/home"]]}
+{"text": "top 5 biggest subdirectories here", "intent": "largest_dirs", "lang": "en", "shell": "fish", "os": "linux", "spans": [["NUM", "5"]]}
+{"text": "rank the subfolders of ~/projects by size", "intent": "largest_dirs", "lang": "en", "shell": "bash", "os": "linux", "spans": [["PATH", "~/projects"]]}
+{"text": "how much free space is left on my drives", "intent": "disk_free", "lang": "en", "shell": "cmd", "os": "win32", "spans": []}
+{"text": "free space on all drives", "intent": "disk_free", "lang": "en", "shell": "powershell", "os": "win32", "spans": []}
+{"text": "is my disk almost full?", "intent": "disk_free", "lang": "en", "shell": "zsh", "os": "darwin", "spans": []}
+{"text": "how big is the node_modules folder", "intent": "dir_size", "lang": "en", "shell": "bash", "os": "linux", "spans": [["PATH", "node_modules"]]}
+{"text": "total size of /var/lib/docker", "intent": "dir_size", "lang": "en", "shell": "bash", "os": "linux", "spans": [["PATH", "/var/lib/docker"]]}
+{"text": "size of D:\\backup folder", "intent": "dir_size", "lang": "en", "shell": "cmd", "os": "win32", "spans": [["PATH", "D:\\backup"]]}
+{"text": "find files named config.yaml under /etc", "intent": "find_by_name", "lang": "en", "shell": "bash", "os": "linux", "spans": [["NAME", "config.yaml"], ["PATH", "/etc"]]}
+{"text": "where is the file called invoice somewhere in my home dir", "intent": "find_by_name", "lang": "en", "shell": "zsh", "os": "darwin", "spans": [["NAME", "invoice"], ["PATH", "home dir"]]}
+{"text": "serach for files with backup in the name", "intent": "find_by_name", "lang": "en", "shell": "sh", "os": "linux", "spans": [["NAME", "backup"]]}
+{"text": "find all .log files in /var/log/nginx", "intent": "find_by_ext", "lang": "en", "shell": "bash", "os": "linux", "spans": [["EXT", ".log"], ["PATH", "/var/log/nginx"]]}
+{"text": "list every pdf in ~/Documents", "intent": "find_by_ext", "lang": "en", "shell": "zsh", "os": "darwin", "spans": [["EXT", "pdf"], ["PATH", "~/Documents"]]}
+{"text": "show me all the python files in ./src", "intent": "find_by_ext", "lang": "en", "shell": "fish", "os": "linux", "spans": [["EXT", "python"], ["PATH", "./src"]]}
+{"text": "files modified in the last 2 hours in /etc", "intent": "find_recent", "lang": "en", "shell": "bash", "os": "linux", "spans": [["TIME", "2 hours"], ["PATH", "/etc"]]}
+{"text": "what changed in this folder today", "intent": "find_recent", "lang": "en", "shell": "zsh", "os": "darwin", "spans": [["TIME", "today"]]}
+{"text": "find files edited during the past week under C:\\projects\\api", "intent": "find_recent", "lang": "en", "shell": "powershell", "os": "win32", "spans": [["TIME", "week"], ["PATH", "C:\\projects\\api"]]}
+{"text": "find files older than 30 days in /tmp so I can clean up", "intent": "find_older_than", "lang": "en", "shell": "bash", "os": "linux", "spans": [["TIME", "30 days"], ["PATH", "/tmp"]]}
+{"text": "which logs in /var/log are more than ninety days old", "intent": "find_older_than", "lang": "en", "shell": "sh", "os": "linux", "spans": [["PATH", "/var/log"], ["TIME", "ninety days"]]}
+{"text": "files in ~/Downloads that haven't been modified for over 180 days", "intent": "find_older_than", "lang": "en", "shell": "zsh", "os": "darwin", "spans": [["PATH", "~/Downloads"], ["TIME", "180 days"]]}
+{"text": "find files bigger than 500MB in C:\\Users\\anna\\Videos", "intent": "find_larger_than", "lang": "en", "shell": "powershell", "os": "win32", "spans": [["SIZE", "500MB"], ["PATH", "C:\\Users\\anna\\Videos"]]}
+{"text": "any files over 2GB in /home/marek?", "intent": "find_larger_than", "lang": "en", "shell": "fish", "os": "linux", "spans": [["SIZE", "2GB"], ["PATH", "/home/marek"]]}
+{"text": "list files larger than 100 megs in D:\\video", "intent": "find_larger_than", "lang": "en", "shell": "powershell", "os": "win32", "spans": [["SIZE", "100 megs"], ["PATH", "D:\\video"]]}
+{"text": "find files smaller than 1kb in ./data", "intent": "find_smaller_than", "lang": "en", "shell": "bash", "os": "linux", "spans": [["SIZE", "1kb"], ["PATH", "./data"]]}
+{"text": "show tiny files under 10 bytes in /srv/uploads", "intent": "find_smaller_than", "lang": "en", "shell": "zsh", "os": "linux", "spans": [["SIZE", "10 bytes"], ["PATH", "/srv/uploads"]]}
+{"text": "search for TODO in all files under .\\src", "intent": "grep_text", "lang": "en", "shell": "powershell", "os": "win32", "spans": [["PATTERN", "TODO"], ["PATH", ".\\src"]]}
+{"text": "grep \"connection refused\" in /var/log", "intent": "grep_text", "lang": "en", "shell": "sh", "os": "linux", "spans": [["PATTERN", "connection refused"], ["PATH", "/var/log"]]}
+{"text": "find where the function parseConfig is used in this project", "intent": "grep_text", "lang": "en", "shell": "zsh", "os": "darwin", "spans": [["PATTERN", "parseConfig"]]}
+{"text": "whcih files contain the word password", "intent": "grep_files_containing", "lang": "en", "shell": "cmd", "os": "win32", "spans": [["PATTERN", "password"]]}
+{"text": "list files mentioning API_KEY in ~/code/backend", "intent": "grep_files_containing", "lang": "en", "shell": "zsh", "os": "darwin", "spans": [["PATTERN", "API_KEY"], ["PATH", "~/code/backend"]]}
+{"text": "just give me the names of files whose content includes 'deprecated', in .\\lib", "intent": "grep_files_containing", "lang": "en", "shell": "powershell", "os": "win32", "spans": [["PATTERN", "deprecated"], ["PATH", ".\\lib"]]}
+{"text": "how many lines does access.log have", "intent": "count_lines", "lang": "en", "shell": "powershell", "os": "win32", "spans": [["PATH", "access.log"]]}
+{"text": "count lines in C:\\data\\export.csv", "intent": "count_lines", "lang": "en", "shell": "powershell", "os": "win32", "spans": [["PATH", "C:\\data\\export.csv"]]}
+{"text": "line count of todo.txt pls", "intent": "count_lines", "lang": "en", "shell": "bash", "os": "darwin", "spans": [["PATH", "todo.txt"]]}
+{"text": "how many lines of python code are in this repo", "intent": "count_lines_code", "lang": "en", "shell": "bash", "os": "linux", "spans": [["EXT", "python"]]}
+{"text": "total line count of all .js files in ./frontend", "intent": "count_lines_code", "lang": "en", "shell": "zsh", "os": "darwin", "spans": [["EXT", ".js"], ["PATH", "./frontend"]]}
+{"text": "count lines of code in rs files under src", "intent": "count_lines_code", "lang": "en", "shell": "fish", "os": "linux", "spans": [["EXT", "rs"], ["PATH", "src"]]}
+{"text": "how many fiels are in /var/www", "intent": "count_files", "lang": "en", "shell": "bash", "os": "linux", "spans": [["PATH", "/var/www"]]}
+{"text": "count the files in my Downloads folder recursively", "intent": "count_files", "lang": "en", "shell": "zsh", "os": "darwin", "spans": [["PATH", "Downloads"]]}
+{"text": "number of files in C:\\inetpub\\wwwroot including subfolders", "intent": "count_files", "lang": "en", "shell": "cmd", "os": "win32", "spans": [["PATH", "C:\\inetpub\\wwwroot"]]}
+{"text": "word count of essay.txt", "intent": "count_words", "lang": "en", "shell": "zsh", "os": "darwin", "spans": [["PATH", "essay.txt"]]}
+{"text": "how many words in README.md", "intent": "count_words", "lang": "en", "shell": "bash", "os": "linux", "spans": [["PATH", "README.md"]]}
+{"text": "most frequnet lines in requests.log", "intent": "sort_uniq", "lang": "en", "shell": "bash", "os": "linux", "spans": [["PATH", "requests.log"]]}
+{"text": "top 20 most common entries in ips.txt", "intent": "sort_uniq", "lang": "en", "shell": "sh", "os": "linux", "spans": [["NUM", "20"], ["PATH", "ips.txt"]]}
+{"text": "count duplicate lines in words.list and sort them by frequency", "intent": "sort_uniq", "lang": "en", "shell": "zsh", "os": "linux", "spans": [["PATH", "words.list"]]}
+{"text": "show the 10 most recently modifed files", "intent": "recent_files", "lang": "en", "shell": "powershell", "os": "win32", "spans": [["NUM", "10"]]}
+{"text": "what are the latest files I touched in ~/notes", "intent": "recent_files", "lang": "en", "shell": "zsh", "os": "darwin", "spans": [["PATH", "~/notes"]]}
+{"text": "newest files in /var/log, sorted by mtime", "intent": "recent_files", "lang": "en", "shell": "fish", "os": "linux", "spans": [["PATH", "/var/log"]]}
+{"text": "find empty files in this dir", "intent": "empty_files", "lang": "en", "shell": "cmd", "os": "win32", "spans": []}
+{"text": "list zero-byte files under /data/incoming", "intent": "empty_files", "lang": "en", "shell": "sh", "os": "linux", "spans": [["PATH", "/data/incoming"]]}
+{"text": "find empty folders in ~/Pictures", "intent": "empty_dirs", "lang": "en", "shell": "zsh", "os": "darwin", "spans": [["PATH", "~/Pictures"]]}
+{"text": "are there any empty directories in ./build", "intent": "empty_dirs", "lang": "en", "shell": "bash", "os": "linux", "spans": [["PATH", "./build"]]}
+{"text": "find duplicate files in ~/Photos", "intent": "duplicate_files", "lang": "en", "shell": "zsh", "os": "darwin", "spans": [["PATH", "~/Photos"]]}
+{"text": "detect files with identical content under E:\\Photos", "intent": "duplicate_files", "lang": "en", "shell": "powershell", "os": "win32", "spans": [["PATH", "E:\\Photos"]]}
+{"text": "list all symlinks in /usr/local/bin", "intent": "find_symlinks", "lang": "en", "shell": "bash", "os": "linux", "spans": [["PATH", "/usr/local/bin"]]}
+{"text": "show symbolic links in the current folder", "intent": "find_symlinks", "lang": "en", "shell": "fish", "os": "linux", "spans": []}
+{"text": "find broken symlinks in /etc", "intent": "broken_symlinks", "lang": "en", "shell": "bash", "os": "linux", "spans": [["PATH", "/etc"]]}
+{"text": "any dangling links in ~/.config?", "intent": "broken_symlinks", "lang": "en", "shell": "zsh", "os": "darwin", "spans": [["PATH", "~/.config"]]}
+{"text": "detailed listing of /opt with sizes", "intent": "list_files", "lang": "en", "shell": "bash", "os": "linux", "spans": [["PATH", "/opt"]]}
+{"text": "show me whats in this folder with sizes and permisions", "intent": "list_files", "lang": "en", "shell": "bash", "os": "linux", "spans": []}
+{"text": "list the contents of C:\\Users\\anna\\Desktop", "intent": "list_files", "lang": "en", "shell": "cmd", "os": "win32", "spans": [["PATH", "C:\\Users\\anna\\Desktop"]]}
+{"text": "show the directory tree of C:\\dev\\app", "intent": "list_tree", "lang": "en", "shell": "cmd", "os": "win32", "spans": [["PATH", "C:\\dev\\app"]]}
+{"text": "tree view 3 levels deep of ~/projects/shop", "intent": "list_tree", "lang": "en", "shell": "zsh", "os": "darwin", "spans": [["NUM", "3"], ["PATH", "~/projects/shop"]]}
+{"text": "show hidden files in my home directory", "intent": "hidden_files", "lang": "en", "shell": "powershell", "os": "win32", "spans": [["PATH", "home directory"]]}
+{"text": "list dotfiles", "intent": "hidden_files", "lang": "en", "shell": "zsh", "os": "darwin", "spans": []}
+{"text": "what kind of file is data.bin", "intent": "file_type", "lang": "en", "shell": "powershell", "os": "win32", "spans": [["PATH", "data.bin"]]}
+{"text": "detect the file type of mystery_download", "intent": "file_type", "lang": "en", "shell": "zsh", "os": "darwin", "spans": [["PATH", "mystery_download"]]}
+{"text": "show metadata of report.pdf, permissions and timestamps", "intent": "file_stat", "lang": "en", "shell": "zsh", "os": "darwin", "spans": [["PATH", "report.pdf"]]}
+{"text": "stat info for /etc/passwd", "intent": "file_stat", "lang": "en", "shell": "bash", "os": "linux", "spans": [["PATH", "/etc/passwd"]]}
+{"text": "first 5 lines of data.csv", "intent": "head_file", "lang": "en", "shell": "bash", "os": "linux", "spans": [["NUM", "5"], ["PATH", "data.csv"]]}
+{"text": "show the beginning of server.log", "intent": "head_file", "lang": "en", "shell": "powershell", "os": "win32", "spans": [["PATH", "server.log"]]}
+{"text": "peek at the top twenty lines of users.json", "intent": "head_file", "lang": "en", "shell": "fish", "os": "linux", "spans": [["NUM", "twenty"], ["PATH", "users.json"]]}
+{"text": "last 50 lines of /var/log/syslog", "intent": "tail_file", "lang": "en", "shell": "bash", "os": "linux", "spans": [["NUM", "50"], ["PATH", "/var/log/syslog"]]}
+{"text": "show me the end of build.log", "intent": "tail_file", "lang": "en", "shell": "zsh", "os": "darwin", "spans": [["PATH", "build.log"]]}
+{"text": "follow /var/log/nginx/error.log live", "intent": "tail_follow", "lang": "en", "shell": "bash", "os": "linux", "spans": [["PATH", "/var/log/nginx/error.log"]]}
+{"text": "watch app.log as new lines come in", "intent": "tail_follow", "lang": "en", "shell": "zsh", "os": "darwin", "spans": [["PATH", "app.log"]]}
+{"text": "keep streaming the auth log /var/log/auth.log", "intent": "tail_follow", "lang": "en", "shell": "sh", "os": "linux", "spans": [["PATH", "/var/log/auth.log"]]}
+{"text": "print teh contents of /etc/hosts", "intent": "cat_file", "lang": "en", "shell": "bash", "os": "linux", "spans": [["PATH", "/etc/hosts"]]}
+{"text": "disply notes.txt", "intent": "cat_file", "lang": "en", "shell": "powershell", "os": "win32", "spans": [["PATH", "notes.txt"]]}
+{"text": "make a tar.gz of the logs folder called logs.tar.gz", "intent": "compress_targz", "lang": "en", "shell": "bash", "os": "linux", "spans": [["PATH", "logs"], ["PATH", "logs.tar.gz"]]}
+{"text": "compress ~/projects/blog into blog-backup.tar.gz", "intent": "compress_targz", "lang": "en", "shell": "zsh", "os": "darwin", "spans": [["PATH", "~/projects/blog"], ["PATH", "blog-backup.tar.gz"]]}
+{"text": "tarball the dist directory with gzip", "intent": "compress_targz", "lang": "en", "shell": "fish", "os": "linux", "spans": [["PATH", "dist"]]}
+{"text": "extract node-v20.tar.gz", "intent": "extract_targz", "lang": "en", "shell": "bash", "os": "darwin", "spans": [["PATH", "node-v20.tar.gz"]]}
+{"text": "unpack backup.tgz into /tmp/restore", "intent": "extract_targz", "lang": "en", "shell": "sh", "os": "linux", "spans": [["PATH", "backup.tgz"], ["PATH", "/tmp/restore"]]}
+{"text": "zip up the photos folder as photos.zip", "intent": "compress_zip", "lang": "en", "shell": "zsh", "os": "darwin", "spans": [["PATH", "photos"], ["PATH", "photos.zip"]]}
+{"text": "create a zip archive of C:\\work\\report named report.zip", "intent": "compress_zip", "lang": "en", "shell": "powershell", "os": "win32", "spans": [["PATH", "C:\\work\\report"], ["PATH", "report.zip"]]}
+{"text": "unzip archive.zip into D:\\extracted", "intent": "extract_zip", "lang": "en", "shell": "powershell", "os": "win32", "spans": [["PATH", "archive.zip"], ["PATH", "D:\\extracted"]]}
+{"text": "extract fonts.zip to ~/.fonts", "intent": "extract_zip", "lang": "en", "shell": "zsh", "os": "darwin", "spans": [["PATH", "fonts.zip"], ["PATH", "~/.fonts"]]}
+{"text": "what's inside release.tar.gz without extracting it", "intent": "list_archive", "lang": "en", "shell": "bash", "os": "linux", "spans": [["PATH", "release.tar.gz"]]}
+{"text": "list files in the zip dataset.zip", "intent": "list_archive", "lang": "en", "shell": "powershell", "os": "win32", "spans": [["PATH", "dataset.zip"]]}
+{"text": "set permisions of deploy.sh to 755", "intent": "chmod", "lang": "en", "shell": "bash", "os": "linux", "spans": [["PATH", "deploy.sh"], ["MODE", "755"]]}
+{"text": "chmod 600 on ~/.ssh/id_rsa", "intent": "chmod", "lang": "en", "shell": "zsh", "os": "darwin", "spans": [["MODE", "600"], ["PATH", "~/.ssh/id_rsa"]]}
+{"text": "give the group write access to shared.txt (g+w)", "intent": "chmod", "lang": "en", "shell": "sh", "os": "linux", "spans": [["PATH", "shared.txt"], ["MODE", "g+w"]]}
+{"text": "make run.sh executable", "intent": "make_executable", "lang": "en", "shell": "bash", "os": "linux", "spans": [["PATH", "run.sh"]]}
+{"text": "make install.py runnable as a program", "intent": "make_executable", "lang": "en", "shell": "zsh", "os": "darwin", "spans": [["PATH", "install.py"]]}
+{"text": "change owner of /var/www/html to www-data", "intent": "chown", "lang": "en", "shell": "bash", "os": "linux", "spans": [["PATH", "/var/www/html"], ["USER", "www-data"]]}
+{"text": "make kasia the owner of /srv/share", "intent": "chown", "lang": "en", "shell": "sh", "os": "linux", "spans": [["USER", "kasia"], ["PATH", "/srv/share"]]}
+{"text": "copy config.json to config.backup.json", "intent": "copy", "lang": "en", "shell": "cmd", "os": "win32", "spans": [["PATH", "config.json"], ["PATH", "config.backup.json"]]}
+{"text": "cp the whole assets folder into /var/www/static", "intent": "copy", "lang": "en", "shell": "zsh", "os": "darwin", "spans": [["PATH", "assets"], ["PATH", "/var/www/static"]]}
+{"text": "copy C:\\Users\\anna\\Documents\\cv.docx to D:\\backup", "intent": "copy", "lang": "en", "shell": "powershell", "os": "win32", "spans": [["PATH", "C:\\Users\\anna\\Documents\\cv.docx"], ["PATH", "D:\\backup"]]}
+{"text": "rename draft.md to final.md", "intent": "move_rename", "lang": "en", "shell": "zsh", "os": "darwin", "spans": [["PATH", "draft.md"], ["PATH", "final.md"]]}
+{"text": "move all.zip to ~/Archive", "intent": "move_rename", "lang": "en", "shell": "bash", "os": "linux", "spans": [["PATH", "all.zip"], ["PATH", "~/Archive"]]}
+{"text": "move C:\\temp\\setup.log to D:\\logs", "intent": "move_rename", "lang": "en", "shell": "cmd", "os": "win32", "spans": [["PATH", "C:\\temp\\setup.log"], ["PATH", "D:\\logs"]]}
+{"text": "delete temp.txt", "intent": "delete_file", "lang": "en", "shell": "powershell", "os": "win32", "spans": [["PATH", "temp.txt"]]}
+{"text": "del the file C:\\temp\\debug.log", "intent": "delete_file", "lang": "en", "shell": "cmd", "os": "win32", "spans": [["PATH", "C:\\temp\\debug.log"]]}
+{"text": "nuke error.log", "intent": "delete_file", "lang": "en", "shell": "zsh", "os": "darwin", "spans": [["PATH", "error.log"]]}
+{"text": "delete the build directory and all subfolders", "intent": "delete_dir", "lang": "en", "shell": "cmd", "os": "win32", "spans": [["PATH", "build"]]}
+{"text": "remove folder old_project and everything in it", "intent": "delete_dir", "lang": "en", "shell": "powershell", "os": "win32", "spans": [["PATH", "old_project"]]}
+{"text": "delete all .tmp files in /var/tmp", "intent": "delete_by_ext", "lang": "en", "shell": "bash", "os": "linux", "spans": [["EXT", ".tmp"], ["PATH", "/var/tmp"]]}
+{"text": "get rid of every pyc file in this project", "intent": "delete_by_ext", "lang": "en", "shell": "zsh", "os": "darwin", "spans": [["EXT", "pyc"]]}
+{"text": "create a directory called reports\\2024\\q3", "intent": "mkdir", "lang": "en", "shell": "powershell", "os": "win32", "spans": [["PATH", "reports\\2024\\q3"]]}
+{"text": "make a new folder ~/projects/api-v2", "intent": "mkdir", "lang": "en", "shell": "zsh", "os": "darwin", "spans": [["PATH", "~/projects/api-v2"]]}
+{"text": "create an empty file named .env", "intent": "touch_file", "lang": "en", "shell": "bash", "os": "linux", "spans": [["PATH", ".env"]]}
+{"text": "touch notes.md", "intent": "touch_file", "lang": "en", "shell": "fish", "os": "linux", "spans": [["PATH", "notes.md"]]}
+{"text": "where am i", "intent": "current_dir", "lang": "en", "shell": "bash", "os": "linux", "spans": []}
+{"text": "what directory am I in right now?", "intent": "current_dir", "lang": "en", "shell": "powershell", "os": "win32", "spans": []}
+{"text": "create a symlink from /opt/node/bin/node to /usr/local/bin/node", "intent": "create_symlink", "lang": "en", "shell": "bash", "os": "linux", "spans": [["PATH", "/opt/node/bin/node"], ["PATH", "/usr/local/bin/node"]]}
+{"text": "symlink ~/dotfiles/vimrc to ~/.vimrc", "intent": "create_symlink", "lang": "en", "shell": "zsh", "os": "darwin", "spans": [["PATH", "~/dotfiles/vimrc"], ["PATH", "~/.vimrc"]]}
+{"text": "compare old.conf and new.conf", "intent": "diff_files", "lang": "en", "shell": "powershell", "os": "win32", "spans": [["PATH", "old.conf"], ["PATH", "new.conf"]]}
+{"text": "show the differences between v1.txt and v2.txt", "intent": "diff_files", "lang": "en", "shell": "zsh", "os": "darwin", "spans": [["PATH", "v1.txt"], ["PATH", "v2.txt"]]}
+{"text": "replace foo with bar in config.ini", "intent": "replace_text", "lang": "en", "shell": "bash", "os": "linux", "spans": [["PATTERN", "foo"], ["REPL", "bar"], ["PATH", "config.ini"]]}
+{"text": "in index.html change every 'http://' to 'https://'", "intent": "replace_text", "lang": "en", "shell": "zsh", "os": "darwin", "spans": [["PATTERN", "http://"], ["REPL", "https://"], ["PATH", "index.html"]]}
+{"text": "swap localhost for 127.0.0.1 in settings.py using sed", "intent": "replace_text", "lang": "en", "shell": "sh", "os": "linux", "spans": [["PATTERN", "localhost"], ["REPL", "127.0.0.1"], ["PATH", "settings.py"]]}
+{"text": "show mounted filesystems", "intent": "disk_mounts", "lang": "en", "shell": "bash", "os": "linux", "spans": []}
+{"text": "what's mounted where", "intent": "disk_mounts", "lang": "en", "shell": "zsh", "os": "linux", "spans": []}
+{"text": "list my disks and partitions", "intent": "block_devices", "lang": "en", "shell": "bash", "os": "linux", "spans": []}
+{"text": "show all block devices", "intent": "block_devices", "lang": "en", "shell": "fish", "os": "linux", "spans": []}
+{"text": "sha256 checksum of ubuntu-24.04.iso", "intent": "hash_sha256", "lang": "en", "shell": "cmd", "os": "win32", "spans": [["PATH", "ubuntu-24.04.iso"]]}
+{"text": "verify the sha-256 hash of installer.exe", "intent": "hash_sha256", "lang": "en", "shell": "powershell", "os": "win32", "spans": [["PATH", "installer.exe"]]}
+{"text": "md5 of backup.tar", "intent": "hash_md5", "lang": "en", "shell": "powershell", "os": "win32", "spans": [["PATH", "backup.tar"]]}
+{"text": "compute md5sum for firmware.bin", "intent": "hash_md5", "lang": "en", "shell": "zsh", "os": "darwin", "spans": [["PATH", "firmware.bin"]]}
+{"text": "base64 encode hello world", "intent": "base64_encode", "lang": "en", "shell": "bash", "os": "linux", "spans": [["TEXT", "hello world"]]}
+{"text": "encode the file logo.png in base64", "intent": "base64_encode", "lang": "en", "shell": "zsh", "os": "darwin", "spans": [["PATH", "logo.png"]]}
+{"text": "decode this base64: aGVsbG8gdGhlcmU=", "intent": "base64_decode", "lang": "en", "shell": "bash", "os": "linux", "spans": [["TEXT", "aGVsbG8gdGhlcmU="]]}
+{"text": "base64 decode token.txt", "intent": "base64_decode", "lang": "en", "shell": "fish", "os": "linux", "spans": [["PATH", "token.txt"]]}
+{"text": "which proceses are using the most cpu", "intent": "top_cpu", "lang": "en", "shell": "powershell", "os": "win32", "spans": []}
+{"text": "top 5 cpu hogs", "intent": "top_cpu", "lang": "en", "shell": "bash", "os": "linux", "spans": [["NUM", "5"]]}
+{"text": "what's eating all my RAM", "intent": "top_mem", "lang": "en", "shell": "cmd", "os": "win32", "spans": []}
+{"text": "show the 15 processes using the most memory", "intent": "top_mem", "lang": "en", "shell": "powershell", "os": "win32", "spans": [["NUM", "15"]]}
+{"text": "is nginx runing?", "intent": "find_process", "lang": "en", "shell": "bash", "os": "linux", "spans": [["NAME", "nginx"]]}
+{"text": "find the process for postgres", "intent": "find_process", "lang": "en", "shell": "sh", "os": "linux", "spans": [["NAME", "postgres"]]}
+{"text": "show me any java processes", "intent": "find_process", "lang": "en", "shell": "zsh", "os": "darwin", "spans": [["NAME", "java"]]}
+{"text": "kill firefox", "intent": "kill_by_name", "lang": "en", "shell": "cmd", "os": "win32", "spans": [["NAME", "firefox"]]}
+{"text": "kill all node processes", "intent": "kill_by_name", "lang": "en", "shell": "zsh", "os": "darwin", "spans": [["NAME", "node"]]}
+{"text": "terminate the slack process", "intent": "kill_by_name", "lang": "en", "shell": "powershell", "os": "win32", "spans": [["NAME", "slack"]]}
+{"text": "force kill chrome, it's not responding", "intent": "kill_force", "lang": "en", "shell": "powershell", "os": "win32", "spans": [["NAME", "chrome"]]}
+{"text": "kill -9 every python3 process", "intent": "kill_force", "lang": "en", "shell": "fish", "os": "linux", "spans": [["NAME", "python3"]]}
+{"text": "zoom is frozen, kill it hard with sigkill", "intent": "kill_force", "lang": "en", "shell": "zsh", "os": "darwin", "spans": [["NAME", "zoom"]]}
+{"text": "kill process 4521", "intent": "kill_by_pid", "lang": "en", "shell": "bash", "os": "linux", "spans": [["PID", "4521"]]}
+{"text": "terminate pid 1337", "intent": "kill_by_pid", "lang": "en", "shell": "sh", "os": "linux", "spans": [["PID", "1337"]]}
+{"text": "kill whatever is running on port 3000", "intent": "kill_by_port", "lang": "en", "shell": "bash", "os": "linux", "spans": [["PORT", "3000"]]}
+{"text": "free up port 8080, something is hogging it", "intent": "kill_by_port", "lang": "en", "shell": "zsh", "os": "darwin", "spans": [["PORT", "8080"]]}
+{"text": "show listening ports", "intent": "listening_ports", "lang": "en", "shell": "cmd", "os": "win32", "spans": []}
+{"text": "which ports are open on this machine", "intent": "listening_ports", "lang": "en", "shell": "powershell", "os": "win32", "spans": []}
+{"text": "what proccess is using port 5432", "intent": "process_on_port", "lang": "en", "shell": "bash", "os": "linux", "spans": [["PORT", "5432"]]}
+{"text": "who's listening on 443?", "intent": "process_on_port", "lang": "en", "shell": "zsh", "os": "darwin", "spans": [["PORT", "443"]]}
+{"text": "show active network connections", "intent": "established_connections", "lang": "en", "shell": "powershell", "os": "win32", "spans": []}
+{"text": "list established tcp connections", "intent": "established_connections", "lang": "en", "shell": "fish", "os": "linux", "spans": []}
+{"text": "show the process tree", "intent": "process_tree", "lang": "en", "shell": "bash", "os": "darwin", "spans": []}
+{"text": "display processes as a hierarchy with parents and children", "intent": "process_tree", "lang": "en", "shell": "zsh", "os": "darwin", "spans": []}
+{"text": "show system info", "intent": "system_info", "lang": "en", "shell": "cmd", "os": "win32", "spans": []}
+{"text": "give me general info about this machine", "intent": "system_info", "lang": "en", "shell": "powershell", "os": "win32", "spans": []}
+{"text": "which linux distro is this", "intent": "os_release", "lang": "en", "shell": "bash", "os": "linux", "spans": []}
+{"text": "what OS version am I running", "intent": "os_release", "lang": "en", "shell": "zsh", "os": "darwin", "spans": []}
+{"text": "what kernal version do i have", "intent": "kernel_version", "lang": "en", "shell": "bash", "os": "linux", "spans": []}
+{"text": "kernel release?", "intent": "kernel_version", "lang": "en", "shell": "sh", "os": "linux", "spans": []}
+{"text": "how much ram is free", "intent": "memory_usage", "lang": "en", "shell": "powershell", "os": "win32", "spans": []}
+{"text": "show memory usage", "intent": "memory_usage", "lang": "en", "shell": "powershell", "os": "linux", "spans": []}
+{"text": "wat cpu does this machine have", "intent": "cpu_info", "lang": "en", "shell": "bash", "os": "linux", "spans": []}
+{"text": "show processor model and details", "intent": "cpu_info", "lang": "en", "shell": "powershell", "os": "win32", "spans": []}
+{"text": "how many cores do I have", "intent": "cpu_cores", "lang": "en", "shell": "bash", "os": "linux", "spans": []}
+{"text": "number of cpu cores", "intent": "cpu_cores", "lang": "en", "shell": "bash", "os": "linux", "spans": []}
+{"text": "how long has the sever been up", "intent": "uptime", "lang": "en", "shell": "bash", "os": "linux", "spans": []}
+{"text": "show load average", "intent": "uptime", "lang": "en", "shell": "sh", "os": "linux", "spans": []}
+{"text": "what's the hostname of this box", "intent": "hostname", "lang": "en", "shell": "bash", "os": "linux", "spans": []}
+{"text": "show computer name", "intent": "hostname", "lang": "en", "shell": "cmd", "os": "win32", "spans": []}
+{"text": "who am i logged in as", "intent": "whoami", "lang": "en", "shell": "bash", "os": "linux", "spans": []}
+{"text": "what's my username", "intent": "whoami", "lang": "en", "shell": "powershell", "os": "win32", "spans": []}
+{"text": "who is logged in right now", "intent": "users_logged_in", "lang": "en", "shell": "bash", "os": "linux", "spans": []}
+{"text": "list users currently logged on", "intent": "users_logged_in", "lang": "en", "shell": "sh", "os": "linux", "spans": []}
+{"text": "show recent logins", "intent": "last_logins", "lang": "en", "shell": "bash", "os": "linux", "spans": []}
+{"text": "last 20 logins on the server", "intent": "last_logins", "lang": "en", "shell": "zsh", "os": "linux", "spans": [["NUM", "20"]]}
+{"text": "list all enviroment variables", "intent": "env_vars", "lang": "en", "shell": "cmd", "os": "win32", "spans": []}
+{"text": "show my env pls", "intent": "env_vars", "lang": "en", "shell": "bash", "os": "linux", "spans": []}
+{"text": "whats the value of JAVA_HOME", "intent": "env_var_get", "lang": "en", "shell": "bash", "os": "linux", "spans": [["VAR", "JAVA_HOME"]]}
+{"text": "print $EDITOR", "intent": "env_var_get", "lang": "en", "shell": "zsh", "os": "darwin", "spans": [["VAR", "EDITOR"]]}
+{"text": "show env var NODE_ENV", "intent": "env_var_get", "lang": "en", "shell": "powershell", "os": "win32", "spans": [["VAR", "NODE_ENV"]]}
+{"text": "where is python installed", "intent": "which_cmd", "lang": "en", "shell": "powershell", "os": "win32", "spans": [["NAME", "python"]]}
+{"text": "which docker binary am I using", "intent": "which_cmd", "lang": "en", "shell": "zsh", "os": "darwin", "spans": [["NAME", "docker"]]}
+{"text": "print my PATH one entry per line", "intent": "show_path", "lang": "en", "shell": "bash", "os": "linux", "spans": []}
+{"text": "show the directories in my path variable", "intent": "show_path", "lang": "en", "shell": "fish", "os": "linux", "spans": []}
+{"text": "search my shell history for docker run", "intent": "history_search", "lang": "en", "shell": "bash", "os": "linux", "spans": [["PATTERN", "docker run"]]}
+{"text": "when did I last run ssh-keygen? check history", "intent": "history_search", "lang": "en", "shell": "zsh", "os": "darwin", "spans": [["PATTERN", "ssh-keygen"]]}
+{"text": "what time is it", "intent": "date_time", "lang": "en", "shell": "cmd", "os": "win32", "spans": []}
+{"text": "current date and time", "intent": "date_time", "lang": "en", "shell": "powershell", "os": "win32", "spans": []}
+{"text": "what timezone is this system set to", "intent": "timezone", "lang": "en", "shell": "bash", "os": "linux", "spans": []}
+{"text": "show the time zone", "intent": "timezone", "lang": "en", "shell": "bash", "os": "linux", "spans": []}
+{"text": "show a calendar", "intent": "calendar", "lang": "en", "shell": "bash", "os": "linux", "spans": []}
+{"text": "display this month's calendar", "intent": "calendar", "lang": "en", "shell": "fish", "os": "linux", "spans": []}
+{"text": "could you please list all the cron jobs that are scheduled for my user?", "intent": "cron_list", "lang": "en", "shell": "bash", "os": "linux", "spans": []}
+{"text": "show my crontab", "intent": "cron_list", "lang": "en", "shell": "sh", "os": "linux", "spans": []}
+{"text": "edit my crontab", "intent": "cron_edit", "lang": "en", "shell": "bash", "os": "linux", "spans": []}
+{"text": "i'd like to add a new cron job, open the editor", "intent": "cron_edit", "lang": "en", "shell": "bash", "os": "linux", "spans": []}
+{"text": "show logs for the nginx service", "intent": "journal_service", "lang": "en", "shell": "bash", "os": "linux", "spans": [["NAME", "nginx"]]}
+{"text": "journal logs of sshd from the past 2 hours", "intent": "journal_service", "lang": "en", "shell": "bash", "os": "linux", "spans": [["NAME", "sshd"], ["TIME", "2 hours"]]}
+{"text": "last 100 log lines of docker.service", "intent": "journal_service", "lang": "en", "shell": "zsh", "os": "linux", "spans": [["NUM", "100"], ["NAME", "docker.service"]]}
+{"text": "show me system eror logs from this boot", "intent": "journal_errors", "lang": "en", "shell": "bash", "os": "linux", "spans": []}
+{"text": "any errors in the journal since boot?", "intent": "journal_errors", "lang": "en", "shell": "sh", "os": "linux", "spans": []}
+{"text": "hey, can you check the status of the nginx service for me?", "intent": "service_status", "lang": "en", "shell": "bash", "os": "linux", "spans": [["NAME", "nginx"]]}
+{"text": "show service status for postgresql", "intent": "service_status", "lang": "en", "shell": "zsh", "os": "linux", "spans": [["NAME", "postgresql"]]}
+{"text": "restart apache2 its hanging", "intent": "service_restart", "lang": "en", "shell": "bash", "os": "linux", "spans": [["NAME", "apache2"]]}
+{"text": "restart the docker service", "intent": "service_restart", "lang": "en", "shell": "fish", "os": "linux", "spans": [["NAME", "docker"]]}
+{"text": "stop the mysql service", "intent": "service_stop", "lang": "en", "shell": "bash", "os": "linux", "spans": [["NAME", "mysql"]]}
+{"text": "shut down redis-server service", "intent": "service_stop", "lang": "en", "shell": "sh", "os": "linux", "spans": [["NAME", "redis-server"]]}
+{"text": "nginx service start", "intent": "service_start", "lang": "en", "shell": "bash", "os": "linux", "spans": [["NAME", "nginx"]]}
+{"text": "bring up the cups service", "intent": "service_start", "lang": "en", "shell": "zsh", "os": "linux", "spans": [["NAME", "cups"]]}
+{"text": "I'd like sshd to be enabled at boot so it comes up after every restart", "intent": "service_enable", "lang": "en", "shell": "bash", "os": "linux", "spans": [["NAME", "sshd"]]}
+{"text": "make postgresql start automatically on startup", "intent": "service_enable", "lang": "en", "shell": "sh", "os": "linux", "spans": [["NAME", "postgresql"]]}
+{"text": "running services list", "intent": "list_services", "lang": "en", "shell": "bash", "os": "linux", "spans": []}
+{"text": "what services are active right now", "intent": "list_services", "lang": "en", "shell": "fish", "os": "linux", "spans": []}
+{"text": "failed services?", "intent": "failed_services", "lang": "en", "shell": "bash", "os": "linux", "spans": []}
+{"text": "which systemd units failed", "intent": "failed_services", "lang": "en", "shell": "zsh", "os": "linux", "spans": []}
+{"text": "show kernel ring buffer messages", "intent": "dmesg", "lang": "en", "shell": "bash", "os": "linux", "spans": []}
+{"text": "last 30 lines of dmesg", "intent": "dmesg", "lang": "en", "shell": "sh", "os": "linux", "spans": [["NUM", "30"]]}
+{"text": "battery level", "intent": "battery", "lang": "en", "shell": "zsh", "os": "darwin", "spans": []}
+{"text": "how much battery do i have left", "intent": "battery", "lang": "en", "shell": "bash", "os": "linux", "spans": []}
+{"text": "cpu temp", "intent": "temperature", "lang": "en", "shell": "bash", "os": "linux", "spans": []}
+{"text": "is my laptop overheating? show sensors", "intent": "temperature", "lang": "en", "shell": "fish", "os": "linux", "spans": []}
+{"text": "what graphics card do I hav", "intent": "gpu_info", "lang": "en", "shell": "bash", "os": "linux", "spans": []}
+{"text": "show gpu info", "intent": "gpu_info", "lang": "en", "shell": "powershell", "os": "win32", "spans": []}
+{"text": "lsit usb devices", "intent": "usb_devices", "lang": "en", "shell": "bash", "os": "linux", "spans": []}
+{"text": "what's plugged in via usb", "intent": "usb_devices", "lang": "en", "shell": "bash", "os": "linux", "spans": []}
+{"text": "install htop", "intent": "install_package", "lang": "en", "shell": "bash", "os": "linux", "spans": [["NAME", "htop"]]}
+{"text": "please install the package ffmpeg", "intent": "install_package", "lang": "en", "shell": "zsh", "os": "darwin", "spans": [["NAME", "ffmpeg"]]}
+{"text": "i need jq installed", "intent": "install_package", "lang": "en", "shell": "fish", "os": "linux", "spans": [["NAME", "jq"]]}
+{"text": "is curl installed?", "intent": "package_installed", "lang": "en", "shell": "bash", "os": "linux", "spans": [["NAME", "curl"]]}
+{"text": "check if the package libssl-dev is installed", "intent": "package_installed", "lang": "en", "shell": "sh", "os": "linux", "spans": [["NAME", "libssl-dev"]]}
+{"text": "pls updte the system packages", "intent": "system_update", "lang": "en", "shell": "bash", "os": "linux", "spans": []}
+{"text": "upgrade all packages", "intent": "system_update", "lang": "en", "shell": "zsh", "os": "linux", "spans": []}
+{"text": "whats my local ip", "intent": "ip_addresses", "lang": "en", "shell": "cmd", "os": "win32", "spans": []}
+{"text": "show ip addresses of my network interfaces", "intent": "ip_addresses", "lang": "en", "shell": "powershell", "os": "win32", "spans": []}
+{"text": "what is my publc ip", "intent": "public_ip", "lang": "en", "shell": "bash", "os": "linux", "spans": []}
+{"text": "external IP address?", "intent": "public_ip", "lang": "en", "shell": "zsh", "os": "darwin", "spans": []}
+{"text": "ping google.com", "intent": "ping_host", "lang": "en", "shell": "cmd", "os": "win32", "spans": [["HOST", "google.com"]]}
+{"text": "ping 8.8.8.8 five times", "intent": "ping_host", "lang": "en", "shell": "powershell", "os": "win32", "spans": [["HOST", "8.8.8.8"], ["NUM", "five"]]}
+{"text": "is 192.168.1.1 reachable?", "intent": "ping_host", "lang": "en", "shell": "fish", "os": "linux", "spans": [["HOST", "192.168.1.1"]]}
+{"text": "dns lookup for example.org", "intent": "dns_lookup", "lang": "en", "shell": "powershell", "os": "win32", "spans": [["HOST", "example.org"]]}
+{"text": "what ip does github.com resolve to", "intent": "dns_lookup", "lang": "en", "shell": "zsh", "os": "darwin", "spans": [["HOST", "github.com"]]}
+{"text": "tracert cloudflare.com", "intent": "traceroute", "lang": "en", "shell": "cmd", "os": "win32", "spans": [["HOST", "cloudflare.com"]]}
+{"text": "trace the route to 1.1.1.1", "intent": "traceroute", "lang": "en", "shell": "sh", "os": "linux", "spans": [["HOST", "1.1.1.1"]]}
+{"text": "show routing table", "intent": "routes", "lang": "en", "shell": "powershell", "os": "win32", "spans": []}
+{"text": "what's my default gateway", "intent": "routes", "lang": "en", "shell": "bash", "os": "linux", "spans": []}
+{"text": "check if port 22 is open on 10.0.0.12", "intent": "port_check", "lang": "en", "shell": "bash", "os": "linux", "spans": [["PORT", "22"], ["HOST", "10.0.0.12"]]}
+{"text": "can I reach db.internal on 5432?", "intent": "port_check", "lang": "en", "shell": "zsh", "os": "darwin", "spans": [["HOST", "db.internal"], ["PORT", "5432"]]}
+{"text": "http headers https://example.com", "intent": "curl_headers", "lang": "en", "shell": "bash", "os": "linux", "spans": [["URL", "https://example.com"]]}
+{"text": "get response headers for https://api.github.com", "intent": "curl_headers", "lang": "en", "shell": "powershell", "os": "win32", "spans": [["URL", "https://api.github.com"]]}
+{"text": "what status code does https://shop.example.net return", "intent": "http_status", "lang": "en", "shell": "bash", "os": "linux", "spans": [["URL", "https://shop.example.net"]]}
+{"text": "check http status of http://localhost:8080/health", "intent": "http_status", "lang": "en", "shell": "zsh", "os": "darwin", "spans": [["URL", "http://localhost:8080/health"]]}
+{"text": "download https://releases.example.com/app-1.2.tar.gz", "intent": "download_file", "lang": "en", "shell": "powershell", "os": "win32", "spans": [["URL", "https://releases.example.com/app-1.2.tar.gz"]]}
+{"text": "grab the file at https://cdn.site.io/data.json", "intent": "download_file", "lang": "en", "shell": "fish", "os": "linux", "spans": [["URL", "https://cdn.site.io/data.json"]]}
+{"text": "ssh into 192.168.0.50", "intent": "ssh_connect", "lang": "en", "shell": "bash", "os": "linux", "spans": [["HOST", "192.168.0.50"]]}
+{"text": "connect to deploy@prod.example.com over ssh", "intent": "ssh_connect", "lang": "en", "shell": "zsh", "os": "darwin", "spans": [["USER", "deploy"], ["HOST", "prod.example.com"]]}
+{"text": "what's the git status", "intent": "git_status", "lang": "en", "shell": "powershell", "os": "win32", "spans": []}
+{"text": "show changed files in the repo", "intent": "git_status", "lang": "en", "shell": "zsh", "os": "darwin", "spans": []}
+{"text": "show the last five commits", "intent": "git_log", "lang": "en", "shell": "bash", "os": "linux", "spans": [["NUM", "five"]]}
+{"text": "show git history", "intent": "git_log", "lang": "en", "shell": "bash", "os": "linux", "spans": []}
+{"text": "show unstaged changes", "intent": "git_diff", "lang": "en", "shell": "cmd", "os": "win32", "spans": []}
+{"text": "what did I change in app.py since last commit", "intent": "git_diff", "lang": "en", "shell": "zsh", "os": "darwin", "spans": [["PATH", "app.py"]]}
+{"text": "show me the staged chnages", "intent": "git_diff_staged", "lang": "en", "shell": "bash", "os": "linux", "spans": []}
+{"text": "diff of what's in the index", "intent": "git_diff_staged", "lang": "en", "shell": "powershell", "os": "win32", "spans": []}
+{"text": "list all branches", "intent": "git_branches", "lang": "en", "shell": "cmd", "os": "win32", "spans": []}
+{"text": "what branches exist in this repo", "intent": "git_branches", "lang": "en", "shell": "bash", "os": "darwin", "spans": []}
+{"text": "which branch am i on", "intent": "git_current_branch", "lang": "en", "shell": "bash", "os": "linux", "spans": []}
+{"text": "current git branch?", "intent": "git_current_branch", "lang": "en", "shell": "fish", "os": "linux", "spans": []}
+{"text": "create a new branch feature/login", "intent": "git_new_branch", "lang": "en", "shell": "bash", "os": "linux", "spans": [["BRANCH", "feature/login"]]}
+{"text": "make and switch to branch fix-123", "intent": "git_new_branch", "lang": "en", "shell": "zsh", "os": "darwin", "spans": [["BRANCH", "fix-123"]]}
+{"text": "switch to the develop branch", "intent": "git_switch_branch", "lang": "en", "shell": "powershell", "os": "win32", "spans": [["BRANCH", "develop"]]}
+{"text": "checkout main", "intent": "git_switch_branch", "lang": "en", "shell": "bash", "os": "linux", "spans": [["BRANCH", "main"]]}
+{"text": "delete the branch old-feature, it's merged already", "intent": "git_delete_branch", "lang": "en", "shell": "bash", "os": "linux", "spans": [["BRANCH", "old-feature"]]}
+{"text": "remove the local branch hotfix/2.1", "intent": "git_delete_branch", "lang": "en", "shell": "powershell", "os": "win32", "spans": [["BRANCH", "hotfix/2.1"]]}
+{"text": "undo my last commit but keep the changes", "intent": "git_undo_commit", "lang": "en", "shell": "powershell", "os": "win32", "spans": []}
+{"text": "soft reset the last commit", "intent": "git_undo_commit", "lang": "en", "shell": "zsh", "os": "darwin", "spans": []}
+{"text": "discard all my uncomitted changes", "intent": "git_discard_changes", "lang": "en", "shell": "bash", "os": "linux", "spans": []}
+{"text": "throw away changes to index.js", "intent": "git_discard_changes", "lang": "en", "shell": "zsh", "os": "darwin", "spans": [["PATH", "index.js"]]}
+{"text": "stash my changes", "intent": "git_stash", "lang": "en", "shell": "cmd", "os": "win32", "spans": []}
+{"text": "put my work aside temporarily with git stash", "intent": "git_stash", "lang": "en", "shell": "fish", "os": "linux", "spans": []}
+{"text": "pop the stash", "intent": "git_stash_pop", "lang": "en", "shell": "powershell", "os": "win32", "spans": []}
+{"text": "bring back my stashed changes", "intent": "git_stash_pop", "lang": "en", "shell": "bash", "os": "linux", "spans": []}
+{"text": "pull latest changes", "intent": "git_pull", "lang": "en", "shell": "cmd", "os": "win32", "spans": []}
+{"text": "git pull from origin", "intent": "git_pull", "lang": "en", "shell": "powershell", "os": "win32", "spans": []}
+{"text": "push my comits", "intent": "git_push", "lang": "en", "shell": "bash", "os": "linux", "spans": []}
+{"text": "push to origin feature/payments", "intent": "git_push", "lang": "en", "shell": "zsh", "os": "darwin", "spans": [["BRANCH", "feature/payments"]]}
+{"text": "clone https://github.com/torvalds/linux.git", "intent": "git_clone", "lang": "en", "shell": "powershell", "os": "win32", "spans": [["URL", "https://github.com/torvalds/linux.git"]]}
+{"text": "git clone git@github.com:acme/webapp.git", "intent": "git_clone", "lang": "en", "shell": "zsh", "os": "darwin", "spans": [["URL", "git@github.com:acme/webapp.git"]]}
+{"text": "stage everything", "intent": "git_add_all", "lang": "en", "shell": "bash", "os": "linux", "spans": []}
+{"text": "add all changes to git", "intent": "git_add_all", "lang": "en", "shell": "powershell", "os": "win32", "spans": []}
+{"text": "commit everything with message 'fix login bug'", "intent": "git_commit", "lang": "en", "shell": "powershell", "os": "win32", "spans": [["MSG", "fix login bug"]]}
+{"text": "commit all with the message initial import", "intent": "git_commit", "lang": "en", "shell": "zsh", "os": "darwin", "spans": [["MSG", "initial import"]]}
+{"text": "show git remotes", "intent": "git_remote", "lang": "en", "shell": "bash", "os": "linux", "spans": []}
+{"text": "what's the remote url of this repo", "intent": "git_remote", "lang": "en", "shell": "bash", "os": "linux", "spans": []}
+{"text": "who changed each line in utils.py", "intent": "git_blame", "lang": "en", "shell": "bash", "os": "linux", "spans": [["PATH", "utils.py"]]}
+{"text": "git blame src/main.rs", "intent": "git_blame", "lang": "en", "shell": "fish", "os": "linux", "spans": [["PATH", "src/main.rs"]]}
+{"text": "initialize a git repo here", "intent": "git_init", "lang": "en", "shell": "bash", "os": "linux", "spans": []}
+{"text": "start a new git repository", "intent": "git_init", "lang": "en", "shell": "bash", "os": "linux", "spans": []}
+{"text": "list running containers", "intent": "docker_ps", "lang": "en", "shell": "powershell", "os": "win32", "spans": []}
+{"text": "which docker containers are up", "intent": "docker_ps", "lang": "en", "shell": "bash", "os": "linux", "spans": []}
+{"text": "show all containers including stopped ones", "intent": "docker_ps_all", "lang": "en", "shell": "bash", "os": "linux", "spans": []}
+{"text": "list every container, even exited", "intent": "docker_ps_all", "lang": "en", "shell": "powershell", "os": "win32", "spans": []}
+{"text": "show logs of container web", "intent": "docker_logs", "lang": "en", "shell": "cmd", "os": "win32", "spans": [["NAME", "web"]]}
+{"text": "tail the logs of the redis container", "intent": "docker_logs", "lang": "en", "shell": "zsh", "os": "darwin", "spans": [["NAME", "redis"]]}
+{"text": "last 200 log lines from api-gateway container", "intent": "docker_logs", "lang": "en", "shell": "zsh", "os": "linux", "spans": [["NUM", "200"], ["NAME", "api-gateway"]]}
+{"text": "list docker images", "intent": "docker_images", "lang": "en", "shell": "bash", "os": "linux", "spans": []}
+{"text": "what images do I have locally", "intent": "docker_images", "lang": "en", "shell": "bash", "os": "linux", "spans": []}
+{"text": "stop container postgres-dev", "intent": "docker_stop", "lang": "en", "shell": "bash", "os": "linux", "spans": [["NAME", "postgres-dev"]]}
+{"text": "stop the nginx_proxy container", "intent": "docker_stop", "lang": "en", "shell": "powershell", "os": "win32", "spans": [["NAME", "nginx_proxy"]]}
+{"text": "stop all running containers", "intent": "docker_stop_all", "lang": "en", "shell": "powershell", "os": "win32", "spans": []}
+{"text": "shut down all my docker containers", "intent": "docker_stop_all", "lang": "en", "shell": "zsh", "os": "darwin", "spans": []}
+{"text": "clean up unused docker data", "intent": "docker_prune", "lang": "en", "shell": "bash", "os": "linux", "spans": []}
+{"text": "docker is taking too much space, prune everything unused", "intent": "docker_prune", "lang": "en", "shell": "zsh", "os": "darwin", "spans": []}
+{"text": "open a shell in container app", "intent": "docker_exec", "lang": "en", "shell": "powershell", "os": "win32", "spans": [["NAME", "app"]]}
+{"text": "get into the mongo container", "intent": "docker_exec", "lang": "en", "shell": "bash", "os": "linux", "spans": [["NAME", "mongo"]]}
+{"text": "container resorce usage", "intent": "docker_stats", "lang": "en", "shell": "bash", "os": "linux", "spans": []}
+{"text": "how much cpu are my containers using", "intent": "docker_stats", "lang": "en", "shell": "powershell", "os": "win32", "spans": []}
+{"text": "start docker compose", "intent": "docker_compose_up", "lang": "en", "shell": "powershell", "os": "win32", "spans": []}
+{"text": "bring up the compose stack in the background", "intent": "docker_compose_up", "lang": "en", "shell": "zsh", "os": "darwin", "spans": []}
+{"text": "stop docker compose services", "intent": "docker_compose_down", "lang": "en", "shell": "cmd", "os": "win32", "spans": []}
+{"text": "tear down the compose stack", "intent": "docker_compose_down", "lang": "en", "shell": "powershell", "os": "linux", "spans": []}

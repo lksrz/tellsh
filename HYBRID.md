@@ -1,0 +1,329 @@
+# tellsh hybrid: linear cascade + small neural models (v0.3 study)
+
+Branch `hybrid`. Question: does a real small language model help tellsh at runtime, and which one is worth shipping?
+Everything below was measured on one shared 8-vCPU box (Xeon Sapphire Rapids, heavily loaded by other jobs during the
+work); **all latency numbers are pinned to one core (`taskset -c 0`)**.
+
+## TL;DR
+
+* **A+B is the one to ship (opt-in).** The cascade answers alone when its score is >= 0.9 (70–85% of requests, ~0.3 ms);
+  otherwise a 6-layer, PL+EN-vocabulary-pruned multilingual-e5-small (26.7 MB int8 ONNX, ~3.5 ms on one core) re-ranks
+  A's top-5. Intent accuracy on `data/eval` goes from **94.0% to 95.9%**; shell-phrased requests from 94.6% to **97.9%**; end-to-end exact command
+  on relexicalised `data/eval` from 82.8% to **87.7%**; on the noisy private real-history set from 48.5% to 67.1%. On the new blind set it stays the same (98.8% → 98.9%; A is already near the ceiling there).
+  The price: out-of-domain rejection falls from 92.4% to 85.9% (`data/ood_eval`). A "safe" mode keeps A's rejections, so OOD is unchanged, but it gains much less (94.0% → 94.4%).
+* **B alone is worse than A** (85.9% vs 94.0%): the small encoder complements the n-gram cascade but doesn't replace it.
+  Its BIO tagger is no better than A's tagger + regex (slot F1 95.2% vs 95.7%), so the hybrid keeps A's slots.
+* **C (Qwen2.5-0.5B, option-letter scoring in one forward pass)**: SmolLM2 is at chance. Qwen zero-shot picks the right option 65% of the time, 2-shot 79%.
+  A **LoRA fine-tune on CPU** (800 × 8 examples, ~55 min) makes it the most accurate re-ranker (A+C-ft **97.1%** on `data/eval`, 99.1% on blind).
+  But it costs 0.24 s warm / 1.7 s cold per deferred request on one core and 531 MB (q8_0 GGUF), needs a native llama.cpp runtime, and
+  rejects OOD worst (83.7%). Don't ship it in v0.3; use it as a teacher.
+* Latency (1 core): warm A 0.34 ms p50; warm A+B 0.38 ms p50 / 8.3 ms p95 (30% of `data/eval` deferred); cold CLI A 153 ms,
+  A+B 157 ms p50 overall and 340 ms when the encoder has to be loaded (lazy, only for deferred requests).
+
+## Systems
+
+| | what | runtime | size |
+|---|---|---|---|
+| **A** | v0.2 linear cascade (tool -> intent -> BIO tagger, hashed n-grams, int8) — unchanged | pure JS, zero deps | 2.7 MB |
+| **B** | `intfloat/multilingual-e5-small`, vocabulary pruned to PL+EN pieces (250k -> 36k), bottom 6 of 12 layers, fine-tuned as joint tool (55) + intent (149) classifier + BIO slot tagger (37 labels); int8 ONNX | `onnxruntime-node` (or `-web`), own SentencePiece-Unigram tokenizer in JS (`src/rerank/tokenizer.js`, 12 364/12 364 sequences identical to HF) | 26.7 MB (21.7 MB .tgz) |
+| **C** | System-1 decision model: Qwen2.5-0.5B-Instruct scores A's top-k candidates in **one forward pass** (prompt lists options A..E with catalog descriptions; next-token logits of the letters). Few-shot (2 examples, no training) and **C-ft** (LoRA r=16 fine-tuned on CPU, 800 steps × 8, plain prompt) | llama.cpp GGUF q8_0 (1 thread) | 531 MB |
+| **A+B / A+C** | A answers when its cascade score >= tau; otherwise B/C re-ranks A's top-k: `alpha·log pA + (1-alpha)·log pX` | | |
+| **…-safe** | same, but re-ranking only requests A would answer anyway (A's rejections are never turned into answers) | | |
+
+SmolLM2-135M/360M-Instruct were also tried for C: chance-level (15–24%) zero-shot on the option task, Polish is
+essentially unsupported, so they were dropped. basal-1.5-mini was not used.
+
+## Method
+
+* **Same held-out sets as v0.2**: `data/eval` (2384, written independently of training), `data/shell/eval`
+  (336 shell-phrased), relexicalised `data/eval` for end-to-end exact commands (1326, held-out value pools, same seed as
+  `scripts/eval.js`), `data/slots/gold` (208), `data/history/eval` (48), `data/ood_eval` (92).
+* **New blind set** `data/hybrid/blind/` (681 rows: 331 EN, 310 PL, 40 OOD; bash/zsh/sh/PowerShell/fish/cmd with matching OS,
+  Windows paths, typos, Polish without diacritics, slang, gold slot spans). Written by a separate agent that saw only
+  the intent catalog (ids, descriptions, templates), **before any model result was looked at**; never used for training,
+  calibration or any modelling decision. 59 of its texts turned out to also occur in A's training data (short generic
+  queries such as "install htop"); B/C training drops them, and the "blind, novel texts only" rows (527) exclude every
+  blind text that occurs in any training file.
+* **Private real-history set** (`/workspace/tellsh-data`, not committed, aggregate numbers only): 6865 PL/EN paraphrases of
+  real shell-history commands whose catalog intent was assigned by an LLM pipeline (labels not human-verified; many
+  rows are short or literal command-like texts). Treat as a noisy robustness signal.
+* **Calibration on training data only.** A 10% group-wise *dev split* of the training sentences (`export_data.js`, hash of
+  the normalised text) is never used to fit B or C. Because the shipped A was trained on those sentences, a shadow
+  **A_dev** (`scripts/hybrid/train_a_dev.sh`: identical pipeline minus the dev split) provides honest cascade scores on
+  dev; tau / k / alpha / accept / none / keepNone are grid-searched there (objective: decision accuracy = correct intent,
+  or rejection for out-of-domain) and the resulting policy is applied to the shipped A.
+* *Disclosure:* the first calibration ignored OOD (only 48 of 2669 dev rows) and the first held-out run showed the
+  rerankers answering almost every OOD request (A+B 47.8%, A+C 0% rejection on `data/ood_eval`). Two OOD safeguards were
+  then added to the *procedure* (dev OOD rejection may not drop more than ~2 rows below A_dev's; option to keep A's
+  rejection when stage 1 says `__none__`), plus the "safe" variants. No other change was informed by held-out results.
+* **C cost control:** C was scored (Python, same prompts/weights) on every row A would defer at tau <= 0.9 plus a 10%
+  uniform sample (for "C alone"); calibration of A+C is restricted to tau <= 0.9. "C alone" rows are therefore smaller
+  samples (n shown).
+
+## Results
+
+<!-- hybrid:start -->
+### Classification (full pipeline; a rejected request counts as wrong)
+
+| set | system | n | tool | intent | intent EN | intent PL | answered | precision | deferred to B/C |
+|---|---|---|---|---|---|---|---|---|---|
+| `data/eval` (bash) | A cascade (v0.2) | 2384 | 97.2% | **94.0%** | 94.4% | 93.6% | 97.7% | 96.3% | – |
+| `data/eval` (bash) | B encoder alone | 2384 | 94.5% | **85.9%** | 86.6% | 85.3% | 99.7% | 86.2% | 100.0% |
+| `data/eval` (bash) | A+B hybrid | 2384 | 98.1% | **95.9%** | 96.1% | 95.7% | 99.7% | 96.2% | 28.3% |
+| `data/eval` (bash) | A+B safe (no rescue) | 2384 | 97.8% | **94.4%** | 94.7% | 94.1% | 97.6% | 96.7% | 28.3% |
+| `data/eval` (bash) | C LM rerank alone | 222 | 91.0% | **82.0%** | 84.8% | 79.5% | 99.5% | 82.4% | 100.0% |
+| `data/eval` (bash) | A+C hybrid | 2384 | 97.6% | **96.1%** | 96.7% | 95.5% | 99.8% | 96.3% | 28.3% |
+| `data/eval` (bash) | A+C safe (no rescue) | 2384 | 97.4% | **94.7%** | 95.4% | 94.0% | 97.7% | 97.0% | 28.3% |
+| `data/eval` (bash) | C-ft LM rerank alone (LoRA) | 231 | 96.5% | **95.2%** | 93.6% | 96.7% | 99.6% | 95.7% | 100.0% |
+| `data/eval` (bash) | A+C-ft hybrid | 2384 | 98.4% | **97.1%** | 97.4% | 96.9% | 99.8% | 97.4% | 28.3% |
+| `data/eval` (bash) | A+C-ft safe (no rescue) | 2384 | 97.8% | **95.2%** | 96.1% | 94.3% | 97.7% | 97.5% | 28.3% |
+| `data/shell/eval` (shell-phrased) | A cascade (v0.2) | 336 | 97.9% | **94.6%** | 95.1% | 94.2% | 96.4% | 98.1% | – |
+| `data/shell/eval` (shell-phrased) | B encoder alone | 336 | 96.4% | **92.0%** | 91.5% | 92.4% | 100.0% | 92.0% | 100.0% |
+| `data/shell/eval` (shell-phrased) | A+B hybrid | 336 | 98.5% | **97.9%** | 98.2% | 97.7% | 100.0% | 97.9% | 23.2% |
+| `data/shell/eval` (shell-phrased) | A+B safe (no rescue) | 336 | 97.9% | **94.9%** | 95.7% | 94.2% | 96.4% | 98.5% | 23.2% |
+| `data/shell/eval` (shell-phrased) | C LM rerank alone | 36 | 91.7% | **80.6%** | 81.3% | 80.0% | 100.0% | 80.6% | 100.0% |
+| `data/shell/eval` (shell-phrased) | A+C hybrid | 336 | 97.6% | **96.7%** | 97.6% | 95.9% | 100.0% | 96.7% | 23.2% |
+| `data/shell/eval` (shell-phrased) | A+C safe (no rescue) | 336 | 97.6% | **94.3%** | 95.1% | 93.6% | 96.4% | 97.8% | 23.2% |
+| `data/shell/eval` (shell-phrased) | C-ft LM rerank alone (LoRA) | 36 | 91.7% | **91.7%** | 87.5% | 95.0% | 100.0% | 91.7% | 100.0% |
+| `data/shell/eval` (shell-phrased) | A+C-ft hybrid | 336 | 97.9% | **97.9%** | 98.8% | 97.1% | 100.0% | 97.9% | 23.2% |
+| `data/shell/eval` (shell-phrased) | A+C-ft safe (no rescue) | 336 | 97.9% | **94.9%** | 95.7% | 94.2% | 96.4% | 98.5% | 23.2% |
+| blind (all) | A cascade (v0.2) | 641 | 98.9% | **98.8%** | 98.5% | 99.0% | 99.8% | 98.9% | – |
+| blind (all) | B encoder alone | 641 | 95.8% | **89.4%** | 89.7% | 89.0% | 100.0% | 89.4% | 100.0% |
+| blind (all) | A+B hybrid | 641 | 99.4% | **98.9%** | 98.8% | 99.0% | 100.0% | 98.9% | 14.7% |
+| blind (all) | A+B safe (no rescue) | 641 | 99.4% | **98.8%** | 98.8% | 98.7% | 99.8% | 98.9% | 14.7% |
+| blind (all) | C LM rerank alone | 63 | 92.1% | **77.8%** | 91.2% | 62.1% | 100.0% | 77.8% | 100.0% |
+| blind (all) | A+C hybrid | 641 | 99.5% | **99.4%** | 99.1% | 99.7% | 100.0% | 99.4% | 14.7% |
+| blind (all) | A+C safe (no rescue) | 641 | 99.5% | **99.2%** | 99.1% | 99.4% | 99.8% | 99.4% | 14.7% |
+| blind (all) | C-ft LM rerank alone (LoRA) | 63 | 100.0% | **98.4%** | 100.0% | 96.6% | 100.0% | 98.4% | 100.0% |
+| blind (all) | A+C-ft hybrid | 641 | 99.5% | **99.1%** | 99.1% | 99.0% | 100.0% | 99.1% | 14.7% |
+| blind (all) | A+C-ft safe (no rescue) | 641 | 99.4% | **98.6%** | 98.8% | 98.4% | 99.8% | 98.8% | 14.7% |
+| blind, novel texts only | A cascade (v0.2) | 527 | 98.9% | **98.7%** | 98.2% | 99.2% | 99.8% | 98.9% | – |
+| blind, novel texts only | B encoder alone | 527 | 95.6% | **89.9%** | 90.9% | 88.9% | 100.0% | 89.9% | 100.0% |
+| blind, novel texts only | A+B hybrid | 527 | 99.4% | **98.9%** | 98.5% | 99.2% | 100.0% | 98.9% | 15.4% |
+| blind, novel texts only | A+B safe (no rescue) | 527 | 99.4% | **98.7%** | 98.5% | 98.8% | 99.8% | 98.9% | 15.4% |
+| blind, novel texts only | C LM rerank alone | 47 | 93.6% | **78.7%** | 96.2% | 57.1% | 100.0% | 78.7% | 100.0% |
+| blind, novel texts only | A+C hybrid | 527 | 99.4% | **99.2%** | 98.9% | 99.6% | 100.0% | 99.2% | 15.4% |
+| blind, novel texts only | A+C safe (no rescue) | 527 | 99.4% | **99.1%** | 98.9% | 99.2% | 99.8% | 99.2% | 15.4% |
+| blind, novel texts only | C-ft LM rerank alone (LoRA) | 47 | 100.0% | **97.9%** | 100.0% | 95.2% | 100.0% | 97.9% | 100.0% |
+| blind, novel texts only | A+C-ft hybrid | 527 | 99.6% | **99.1%** | 98.9% | 99.2% | 100.0% | 99.1% | 15.4% |
+| blind, novel texts only | A+C-ft safe (no rescue) | 527 | 99.4% | **98.5%** | 98.5% | 98.4% | 99.8% | 98.7% | 15.4% |
+| private real-history (unverified labels) | A cascade (v0.2) | 6865 | 65.8% | **48.5%** | 49.6% | 47.5% | 61.1% | 79.5% | – |
+| private real-history (unverified labels) | B encoder alone | 6865 | 59.9% | **52.9%** | 54.1% | 51.6% | 99.2% | 53.3% | 100.0% |
+| private real-history (unverified labels) | A+B hybrid | 6865 | 71.8% | **67.1%** | 67.8% | 66.4% | 99.2% | 67.6% | 82.4% |
+| private real-history (unverified labels) | A+B safe (no rescue) | 6865 | 67.5% | **49.7%** | 51.3% | 48.1% | 61.1% | 81.3% | 82.4% |
+
+### Per shell
+
+Blind set, intent accuracy by the row's shell (n in header); `data/eval` re-scored under each shell/OS context.
+
+| system | blind bash (n=226) | blind zsh (n=142) | blind sh (n=44) | blind powershell (n=125) | blind fish (n=50) | blind cmd (n=54) | data/eval as bash | data/eval as zsh | data/eval as sh | data/eval as powershell | data/eval as fish | data/eval as cmd |
+|---|---|---|---|---|---|---|---|---|---|---|---|---|
+| A cascade (v0.2) | 98.7% | 97.9% | 100.0% | 99.2% | 98.0% | 100.0% | 94.0% | 94.1% | 93.9% | 93.8% | 93.8% | 93.5% |
+| B encoder alone | 91.6% | 86.6% | 90.9% | 90.4% | 88.0% | 85.2% | 85.9% | 86.3% | 86.3% | 85.9% | 85.8% | 86.1% |
+| A+B hybrid | 99.1% | 97.9% | 100.0% | 99.2% | 98.0% | 100.0% | 95.9% | 96.3% | 95.9% | 96.1% | 96.1% | 95.7% |
+| A+B safe (no rescue) | 98.7% | 97.9% | 100.0% | 99.2% | 98.0% | 100.0% | 94.4% | 94.8% | 94.6% | 94.4% | 94.5% | 94.4% |
+| C LM rerank alone | 75.0% | 61.5% | 100.0% | 100.0% | 100.0% | 80.0% | n/a | n/a | n/a | n/a | n/a | n/a |
+| A+C hybrid | 99.6% | 98.6% | 100.0% | 100.0% | 98.0% | 100.0% | n/a | n/a | n/a | n/a | n/a | n/a |
+| A+C safe (no rescue) | 99.1% | 98.6% | 100.0% | 100.0% | 98.0% | 100.0% | n/a | n/a | n/a | n/a | n/a | n/a |
+| C-ft LM rerank alone (LoRA) | 100.0% | 92.3% | 100.0% | 100.0% | 100.0% | 100.0% | n/a | n/a | n/a | n/a | n/a | n/a |
+| A+C-ft hybrid | 99.1% | 97.9% | 97.7% | 100.0% | 100.0% | 100.0% | n/a | n/a | n/a | n/a | n/a | n/a |
+| A+C-ft safe (no rescue) | 98.7% | 97.2% | 97.7% | 100.0% | 98.0% | 100.0% | n/a | n/a | n/a | n/a | n/a | n/a |
+
+### Out-of-domain rejection
+
+| system | `data/ood_eval` | blind OOD |
+|---|---|---|
+| A cascade (v0.2) | 92.4% (n=92) | 95.0% (n=40) |
+| B encoder alone | 85.9% (n=92) | 90.0% (n=40) |
+| A+B hybrid | 85.9% (n=92) | 90.0% (n=40) |
+| A+B safe (no rescue) | 92.4% (n=92) | 95.0% (n=40) |
+| C LM rerank alone | 83.3% (n=12) | 100.0% (n=3) |
+| A+C hybrid | 83.7% (n=92) | 90.0% (n=40) |
+| A+C safe (no rescue) | 92.4% (n=92) | 95.0% (n=40) |
+| C-ft LM rerank alone (LoRA) | 83.3% (n=12) | 100.0% (n=3) |
+| A+C-ft hybrid | 83.7% (n=92) | 90.0% (n=40) |
+| A+C-ft safe (no rescue) | 92.4% (n=92) | 95.0% (n=40) |
+
+### Slots (stage 3, gold intent given)
+
+| set | tagger | precision | recall | F1 | F1 EN | F1 PL |
+|---|---|---|---|---|---|---|
+| `data/slots/gold` (208) | A tagger + regex (shipped) | 94.9% | 96.4% | **95.7%** | 95.9% | 95.4% |
+| `data/slots/gold` (208) | A tagger only | 98.9% | 90.0% | **94.2%** | 95.0% | 93.4% |
+| `data/slots/gold` (208) | B tagger + regex | 94.3% | 96.1% | **95.2%** | 96.5% | 93.8% |
+| `data/slots/gold` (208) | B tagger only | 98.5% | 84.8% | **91.1%** | 93.2% | 89.0% |
+| blind (641) | A tagger + regex (shipped) | 89.3% | 94.5% | **91.8%** | 91.0% | 92.7% |
+| blind (641) | A tagger only | 96.6% | 90.2% | **93.3%** | 93.9% | 92.7% |
+| blind (641) | B tagger + regex | 88.9% | 94.3% | **91.5%** | 90.7% | 92.5% |
+| blind (641) | B tagger only | 98.7% | 86.5% | **92.2%** | 91.7% | 92.7% |
+
+### End-to-end exact command (bash for relex; the row's own shell for blind)
+
+| system | relex `data/eval` (EN / PL) | blind (EN / PL) | blind novel | history refs |
+|---|---|---|---|---|
+| A cascade (v0.2) | 82.8% (82.2% / 83.4%) | 94.4% (94.0% / 94.8%) | 93.4% | 47/48 |
+| B encoder alone | 83.0% (83.2% / 82.7%) | 85.3% (85.5% / 85.2%) | 85.0% | 47/48 |
+| A+B hybrid | 87.7% (86.9% / 88.5%) | 94.4% (94.3% / 94.5%) | 93.4% | 47/48 |
+| A+B safe (no rescue) | 84.5% (83.8% / 85.3%) | 94.4% (94.3% / 94.5%) | 93.4% | 47/48 |
+| C LM rerank alone | n/a (n=6) | 74.6% (88.2% / 58.6%) | 74.5% | 47/48 |
+| A+C hybrid | 85.7% (84.9% / 86.5%) | 94.5% (94.0% / 95.2%) | 93.4% | 47/48 |
+| A+C safe (no rescue) | 83.0% (82.2% / 83.9%) | 94.5% (94.0% / 95.2%) | 93.4% | 47/48 |
+| C-ft LM rerank alone (LoRA) | n/a (n=132) | 93.7% (97.1% / 89.7%) | 91.5% | 47/48 |
+| A+C-ft hybrid | 87.8% (87.4% / 88.2%) | 94.2% (94.0% / 94.5%) | 93.2% | 47/48 |
+| A+C-ft safe (no rescue) | 84.7% (84.4% / 85.0%) | 94.1% (94.0% / 94.2%) | 93.0% | 47/48 |
+
+### Calibrated policies (training dev split, A_dev)
+
+Dev rows: 2669 (in-domain + OOD; A_dev accept threshold 0.29). Objective: decision accuracy (correct intent, or rejection for OOD).
+
+| system | tau (A conf to answer alone) | k | alpha (weight of log pA) | accept | none | dev decision acc | dev deferred |
+|---|---|---|---|---|---|---|---|
+| A_dev alone | – | – | – | – | – | 81.8% | – |
+| B | Infinity | 0 | 0 | 0 | 0.5, keepNone | 80.2% (n=2669) | 100.0% |
+| A+B | 0.9 | 5 | 0.5 | 0 | 0.5, keepNone | 87.9% (n=2669) | 57.0% |
+| A+B-safe | 0.9 | 5 | 0.5 | 0 | 0.5 | 84.9% (n=2669) | 57.0% |
+| C | Infinity | 3 | 0 | 0 | 1.01, keepNone | 67.2% (n=1522) | 100.0% |
+| A+C | 0.9 | 5 | 0.75 | 0 | 1.01, keepNone | 87.6% (n=2669) | 57.0% |
+| A+C-safe | 0.9 | 5 | 0.75 | 0 | 1.01 | 84.5% (n=2669) | 57.0% |
+| C-ft | Infinity | 3 | 0 | 0 | 1.01, keepNone | 82.9% (n=1522) | 100.0% |
+| A+C-ft | 0.9 | 5 | 0.75 | 0 | 1.01, keepNone | 91.3% (n=2669) | 57.0% |
+| A+C-ft-safe | 0.9 | 5 | 0.5 | 0 | 1.01 | 87.7% (n=2669) | 57.0% |
+
+### C: zero-/few-shot choice accuracy (gold forced among 5 shuffled candidates, 100 dev rows)
+
+| model | prompt | letters | acc | EN | PL | prompt tokens |
+|---|---|---|---|---|---|---|
+| SmolLM2-135M-Instruct (float32) | 0-shot chat | "A" | 20% | 15% | 26% | 125.7 |
+| SmolLM2-135M-Instruct (float32) | 0-shot chat | " A" | 24% | 27% | 20% | 125.7 |
+| Qwen2.5-0.5B-Instruct (bfloat16) | 0-shot chat | "A" | 65% | 70% | 59% | 111.5 |
+| SmolLM2-360M-Instruct (float32) | 0-shot chat | "A" | 18% | 15% | 22% | 125.7 |
+| Qwen2.5-0.5B-Instruct (bfloat16) | 0-shot chat | " A" | 66% | 72% | 59% | 111.5 |
+| Qwen2.5-0.5B-Instruct (bfloat16) | 2-shot chat | "A" | 79% | 87% | 70% | 307.5 |
+| SmolLM2-360M-Instruct (float32) | 0-shot chat | " A" | 15% | 13% | 17% | 125.7 |
+
+### Latency (one core: `taskset -c 0`; Intel(R) Xeon(R) Processor, Node v20.19.2; shared machine under load)
+
+| measurement | p50 / p95 ms |
+|---|---|
+| warm A (full pipeline, composer off) | 0.34 / 4.399 |
+| warm B encoder inference only (onnxruntime-node) | 3.547 / 5.669 |
+| warm B alone, full pipeline (onnxruntime-node) | 4.653 / 9.477 |
+| warm A+B, full pipeline (onnxruntime-node; 30.3% deferred) | 0.376 / 8.338 |
+| B bundle load + session create (onnxruntime-node) | 189 |
+| warm B encoder inference only (onnxruntime-web) | 32.59 / 44.271 |
+| warm B alone, full pipeline (onnxruntime-web) | 32.403 / 41.737 |
+| warm A+B, full pipeline (onnxruntime-web; 30.3% deferred) | 0.418 / 37.804 |
+| B bundle load + session create (onnxruntime-web) | 1099.2 |
+| cold `node -e 0` | 90.335 / 106.408 |
+| cold A (new process, one query) | 152.678 / 165.871 |
+| cold A+B (lazy encoder only when deferred; 9/20 deferred) | 156.715 / 349.333 |
+| cold A+B, deferred queries only | 340.429 / 349.333 |
+| cold B (always loads the encoder) | 341.633 / 355.12 |
+| C qwen05-q8_0.gguf: 112-token prompt (llama.cpp, 1 thread, 474 tok/s) | 236 |
+| C qwen05-q8_0.gguf: 308-token prompt (llama.cpp, 1 thread, 422 tok/s) | 731 |
+| C cold qwen05-q8_0.gguf: new llama-completion process, load + 300-token prompt | 1665.217 / 1698.228 |
+| C qwen05-q4_k_m.gguf: 112-token prompt (llama.cpp, 1 thread, 119 tok/s) | 942 |
+| C qwen05-q4_k_m.gguf: 308-token prompt (llama.cpp, 1 thread, 118 tok/s) | 2617 |
+| C cold qwen05-q4_k_m.gguf: new llama-completion process, load + 300-token prompt | 3425.443 / 3426.963 |
+
+B bundle files: encoder.int8.onnx 26.7 MB, export_report.json 0.0 MB, labels.json 0.0 MB, manifest.json 0.0 MB, vocab.json 0.7 MB.
+
+### B quantisation (dev split, 600 rows; 1-core onnxruntime-node p50)
+
+| variant | size MB | dev intent acc | argmax agreement with fp32 | p50 ms |
+|---|---|---|---|---|
+| PyTorch fp32 (reference) | 99.7 | 83.7% | 100.0% | n/a |
+| dynamic int8 (QOperator), per-tensor, int8 embeddings, fp32 heads | 25.4 | 74.7% | 85.7% | n/a |
+| dynamic int8, per-channel, int8 embeddings | 25.3 | n/a | 95.7% | 1.86 |
+| weight-only 4-bit (MatMulNBits + 4-bit embeddings), fp32 compute | 16.1 | 81.7% | 94.5% | n/a |
+| weight-only 8-bit MatMulNBits, int8 embeddings, fp32 compute | 26.7 | 84.2% | 99.0% | 17.3 |
+| weight-only 8-bit MatMulNBits accuracy_level=4 (int8 compute), int8 embeddings  [shipped] | 26.7 | 84.3% | 98.7% | 4.25 |
+
+### Sizes
+
+| artefact | size |
+|---|---|
+| tellsh npm package (A, zero dependencies) | 1.1 MB packed (model.bin 2.71 MB) |
+| B bundle (tellsh-model-enc): encoder.int8.onnx + vocab.json | 26.72 + 0.73 MB (21.7 MB .tgz) |
+| B params: e5-small 117.6M -> PL+EN vocab 250002 -> 36357 pieces 35.6M -> 6 layers 25M | |
+| onnxruntime-node (runtime for B) | 113.5 MB .tgz, 301 MB unpacked (all platforms), + 272.1 MB CUDA EP downloaded by its postinstall on linux-x64 (skip: `--onnxruntime-node-install=skip`); linux-x64 lib alone 45.8 MB |
+| onnxruntime-web (WASM alternative) | 33.1 MB .tgz (one .wasm 14.2 MB) |
+| C: Qwen2.5-0.5B GGUF | q8_0 531 MB, Q4_K_M 398 MB (+ llama.cpp CPU build 17.8 MB) |
+<!-- hybrid:end -->
+
+## Discussion
+
+**Where the gain comes from.** A+B rescues requests A gets wrong or rejects. Its picks come from A's own top-5, mixed
+50/50 in log space with B's distribution (alpha = 0.5). The two models make different errors: hashed character n-grams
+handle typos, inflection and rare tokens; the encoder handles paraphrase and word order. The largest gains are on
+shell-phrased requests (+3.3 pt) and on the noisy real-history paraphrases (+18.6 pt; these labels are unverified). All six shells
+improve by about 2 points on `data/eval` (95.7–96.3% vs 93.5–94.1%). EN and PL improve alike (EN 94.4 → 96.1, PL 93.6 → 95.7).
+
+**The blind set is near the ceiling for every system** (A 98.8%). The rows were written from the catalog descriptions
+and are therefore closer to the training style than `data/eval`. It still confirms there is no regression from the
+hybrid. With only ~8 wrong rows for A, differences of ±0.3 pt are noise.
+
+**OOD is the real trade-off.** Rescue means "answer when A would have rejected". The 8 extra OOD requests A+B
+accepts (6 of 92 in `data/ood_eval`, 2 of 40 blind) are keyword collisions: "how do I stop procrastinating" → kill_by_name,
+"which phone has the best camera" → which_cmd, "who founded microsoft" → users_logged_in, "kim był alan turing" → whoami,
+"dzięki, to wszystko" → git_add_all. The dev split has only 48 OOD rows, all easy, so it cannot
+calibrate this well; the constraint + `keepNone` safeguards were added after the first held-out run (see Method). Options for v0.3:
+ship `--hybrid` (rescue) as opt-in; users who prefer rejections use `TELLSH_HYBRID=safe`. `--yes` never auto-runs a
+re-ranked answer. Better OOD in B needs more `__none__` training data (only ~400 OOD training rows today).
+
+**C.** One forward pass over a ~100-token prompt is cheap for a GPU but not for one CPU core: 0.24 s with q8_0 (AMX int8
+helps a lot; Q4_K_M is 4× slower on this CPU), plus 1.4 s to load 531 MB. Zero-shot quality is too low (65%, Polish 59%).
+After LoRA fine-tuning C-ft is excellent as a chooser (C-ft alone 95.2% on the `data/eval` sample, 98.4% on blind), but
+inside the hybrid it adds only +1.2 pt over A+B on `data/eval` and nothing elsewhere, at 60–70× B's warm latency and 20× its
+size. C was scored with PyTorch bf16; the q8_0 GGUF used for latency was not re-validated for accuracy (q8_0 is usually
+lossless at this scale, but this was not measured).
+
+**Quantisation matters for B.** Standard dynamic int8 (per-tensor activations) cost 9 points of accuracy (83.7% → 74.7% on dev).
+Weight-only 8-bit `MatMulNBits` with `accuracy_level=4` (int8 compute) + int8 embeddings keeps fp32 accuracy at 26.7 MB and 4.3 ms
+(smoke test) / 3.5 ms (bench). 4-bit weights shrink it to 16 MB but lose 2 points. Pruning the vocabulary to Polish+English pieces
+(250k → 36k; segmentation identical on all corpus texts) and keeping 6 of 12 layers took the encoder from 117.6M to 25M parameters.
+
+**Runtime packaging is the main cost of B, not the model.** `onnxruntime-node` is a 113.5 MB download (all platforms in
+one tarball), and on linux-x64 its postinstall fetches another 272 MB of CUDA providers unless
+`--onnxruntime-node-install=skip` is given. `onnxruntime-web` (33 MB, WASM) also works but is ~9× slower (33 ms
+inference, 1.1 s session load), which is still acceptable for a fallback that runs on ~30% of requests.
+
+**Caveats.** The machine was shared and heavily loaded (load average 30–65 on 8 vCPUs) during all runs, so absolute
+latencies are pessimistic and p95 is noisy; relative comparisons were run back-to-back. B was trained once
+(no seed variance). The "C alone" rows are 10% uniform samples (n shown). C was not scored on the history-reference queries
+(those rows fall back to A), so the C/C-ft history column equals A's.
+
+## Recommendation for v0.3
+
+1. **Default stays A** (pure JS, zero dependencies, 2.7 MB, 0.3 ms, best OOD rejection). Nothing changes for users who don't opt in.
+2. **Ship B as an opt-in fallback**: `tellsh --hybrid` / `TELLSH_HYBRID=1` (A+B rescue, calibrated: tau 0.9, top-5,
+   alpha 0.5, keepNone, B none < 0.5) and `TELLSH_HYBRID=safe` (no rescue).
+   * Model as a separate package `tellsh-model-enc` (22 MB .tgz; skeleton in `hybrid/package/`) or a one-time download into
+     `~/.cache/tellsh/enc-v1` (`scripts/hybrid/fetch_model.js`, sha256-verified, offline afterwards).
+   * `onnxruntime-node` as an **optional peer dependency** (already set in `package.json`; not installed by default).
+     Recommend `npm i -g tellsh-model-enc onnxruntime-node --onnxruntime-node-install=skip`. `onnxruntime-web` also works.
+   * The CLI falls back to A when either is missing; re-ranked answers are never auto-run with `--yes`.
+3. **Don't ship C in v0.3.** Keep `scripts/hybrid/lm_rerank.py` / `train_lm_gpu.py`, and use C-ft as a **teacher**:
+   label real-history / unlabelled requests with A+C-ft and distil into B (and A's training data) for v0.4. That should
+   capture most of the remaining +1.2 pt at B's cost.
+4. Before promoting `--hybrid` to default: add `__none__` training data for B (OOD), verify the private real-history labels,
+   and train the encoder on a GPU (12 layers, several seeds) to check whether the 6-layer truncation leaves accuracy on the table.
+
+## Reproduce
+
+```sh
+node scripts/hybrid/export_data.js                         # raw-text training data + dev split -> build/hybrid/
+python3 scripts/hybrid/prune_vocab.py                      # PL+EN vocabulary pruning of multilingual-e5-small
+python3 scripts/hybrid/train_encoder.py --layers 6 --epochs 2.5   # B (resumable; ~1.2 h on 2 busy CPU threads)
+python3 scripts/hybrid/export_encoder.py --wq 8 --gather --acc-level 4 --out hybrid/models/enc
+node scripts/hybrid/fetch_model.js --manifest hybrid/models/enc   # + `--from <dir|https-url>` installs to ~/.cache/tellsh/enc-v1
+scripts/hybrid/train_a_dev.sh                              # A_dev (cascade without the dev split) for calibration
+node scripts/hybrid/dump_cascade.js --tag=ship             # A's top-k for every set (and --model=build/adev/model/model.bin --tag=adev)
+python3 scripts/hybrid/lm_rerank.py zeroshot|train|score   # C (see build/hybrid/run_lm_*.sh); GPU: scripts/hybrid/train_lm_gpu.py
+node scripts/hybrid/eval_hybrid.js --calibrate --lm=adev:qwenfs && node scripts/hybrid/eval_hybrid.js --lm=ship:qwenfs
+node scripts/hybrid/eval_hybrid.js --calibrate --lm=adev:qwenft --tag=_ft && node scripts/hybrid/eval_hybrid.js --lm=ship:qwenft --tag=_ft --systems=A,C,A+C,A+C-safe
+taskset -c 0 node scripts/hybrid/bench_hybrid.js           # LLAMA_BIN=… LLAMA_MODELS=…gguf for C
+node scripts/hybrid/report_hybrid.js                       # tables above
+```
+Runtime: `tellsh --hybrid …` (or `TELLSH_HYBRID=1`) uses A+B with the encoder loaded lazily only when the cascade defers;
+without `onnxruntime-node` / the bundle it silently falls back to A. Re-ranked answers are never auto-run with `--yes`.
