@@ -15,8 +15,11 @@ import { suggestHybrid } from '../../src/rerank/hybrid.js';
 const ROOT = fileURLToPath(new URL('../..', import.meta.url));
 const q = (a, p) => { const s = [...a].sort((x, y) => x - y); return s[Math.min(s.length - 1, Math.floor(p * s.length))]; };
 const stat = (a) => ({ p50: +q(a, 0.5).toFixed(3), p95: +q(a, 0.95).toFixed(3), n: a.length });
-const queries = readdirSync(join(ROOT, 'data/eval')).filter((f) => f.endsWith('.jsonl')).sort()
-  .flatMap((f) => readFileSync(join(ROOT, 'data/eval', f), 'utf8').split('\n').filter(Boolean).map((l) => JSON.parse(l).text));
+// BENCH_SET=real: the private real-usage eval split (build/real/rows.jsonl) instead of data/eval
+const queries = process.env.BENCH_SET === 'real'
+  ? readFileSync(join(ROOT, 'build/real/rows.jsonl'), 'utf8').split('\n').filter(Boolean).map((l) => JSON.parse(l)).filter((r) => r.split === 'eval').map((r) => r.text)
+  : readdirSync(join(ROOT, 'data/eval')).filter((f) => f.endsWith('.jsonl')).sort()
+    .flatMap((f) => readFileSync(join(ROOT, 'data/eval', f), 'utf8').split('\n').filter(Boolean).map((l) => JSON.parse(l).text));
 const N = +(process.env.WARM_N || 600);
 const sample = Array.from({ length: N }, (_, i) => queries[(i * 7919) % queries.length]);
 const env = { shell: 'bash', os: 'linux', coreutils: 'gnu' };
@@ -67,5 +70,5 @@ if (LB && existsSync(join(LB, 'llama-bench'))) {
     out[`C_cold_${f.split('/').pop()}`] = stat(ts);
   }
 }
-writeFileSync(join(ROOT, 'build/hybrid/bench.json'), JSON.stringify(out, null, 1));
+writeFileSync(join(ROOT, process.env.BENCH_OUT || 'build/hybrid/bench.json'), JSON.stringify(out, null, 1));
 console.log(JSON.stringify(out, null, 1));

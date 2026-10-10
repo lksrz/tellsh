@@ -1,6 +1,6 @@
 // (B) Hybrid encoder runtime: pruned multilingual-e5 (int8 ONNX) -> tool / intent distributions + BIO slot spans.
 // Optional: onnxruntime is lazy-loaded (onnxruntime-node, else onnxruntime-web/WASM) and the model bundle is looked up
-// in $TELLSH_MODEL_DIR, ~/.cache/tellsh/enc-v1, the `tellsh-model-enc` package, or hybrid/models/enc (development).
+// in $TELLSH_MODEL_DIR, ~/.cache/tellsh/enc-v2, the `tellsh-model-enc` package, or hybrid/models/enc (development).
 // Nothing here touches the network: the bundle has to be installed once (scripts/hybrid/fetch_model.js or npm).
 import { readFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
@@ -11,7 +11,7 @@ import { UnigramTokenizer } from './tokenizer.js';
 import { allowedTags } from '../tagger.js';
 
 const require = createRequire(import.meta.url);
-export const BUNDLE = 'enc-v1';
+export const BUNDLE = 'enc-v2'; // v0.4 labels (173 intents); enc-v1 was the v0.3 bundle (149)
 
 export function findModelDir(explicit) {
   const cands = [explicit, process.env.TELLSH_MODEL_DIR, join(homedir(), '.cache', 'tellsh', BUNDLE)];

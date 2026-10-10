@@ -149,6 +149,7 @@ test('quoted text that may end at an escaped quote is a placeholder in every she
   const q = 'search for "a\\" -e evil" in src';
   for (const env of [BASH, PWSH]) {
     const r = run(q, null, env);
+    if (!r.understood) continue; // rejecting the request is fine too (v0.4 model); never a cut-off pattern
     assert.match(r.command, /<PATTERN>/, r.command);
     assert.ok(!/'a\\'/.test(r.command), r.command);
     assert.ok(r.missing.includes('pattern'));

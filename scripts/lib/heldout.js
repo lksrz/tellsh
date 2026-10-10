@@ -9,6 +9,7 @@ import { normalize } from '../../src/features.js';
 import { CONTRAST_RULES } from './confusable.js';
 import { SLOT_CASES } from '../../test/slot-cases.js';
 import { EVAL_VALUES } from './silver.js';
+import { readReal, realEvalTexts } from '../real/real_rows.js';
 
 const readJsonl = (p) => (existsSync(p) ? readFileSync(p, 'utf8').split('\n').filter((l) => l.trim()).map((l) => JSON.parse(l)) : []);
 const readDir = (d) => (existsSync(d) ? readdirSync(d).filter((f) => f.endsWith('.jsonl')).sort().flatMap((f) => readJsonl(join(d, f))) : []);
@@ -40,7 +41,11 @@ export function heldOutTexts(root, extra = []) {
     ...r('slots', 'gold.jsonl').map((x) => x.text),
     ...r('ood_eval.jsonl').map((x) => x.text),
     ...readDir(join(root, 'data', 'blind')).map((x) => x.text ?? x.query),
+    ...readDir(join(root, 'data', 'eval_v04')).map((x) => x.text),
+    ...readDir(join(root, 'data', 'hybrid', 'blind')).map((x) => x.text),
     ...SLOT_CASES.map((c) => c[1]),
+    // private real-usage eval split (build/real/rows.jsonl, if present)
+    ...realEvalTexts(readReal(root)),
     ...extra,
   ].filter(Boolean);
 }

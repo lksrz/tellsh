@@ -1,0 +1,1625 @@
+{"text": "run the dev server", "intent": "npm_run_script", "lang": "en"}
+{"text": "npm run dev", "intent": "npm_run_script", "lang": "en"}
+{"text": "start the build script", "intent": "npm_run_script", "lang": "en"}
+{"text": "run npm build", "intent": "npm_run_script", "lang": "en"}
+{"text": "run the tests with npm", "intent": "npm_run_script", "lang": "en"}
+{"text": "npm test script please", "intent": "npm_run_script", "lang": "en"}
+{"text": "run lint", "intent": "npm_run_script", "lang": "en"}
+{"text": "how do I run the typecheck script from package.json?", "intent": "npm_run_script", "lang": "en"}
+{"text": "kick off the storybook script", "intent": "npm_run_script", "lang": "en"}
+{"text": "run the e2e script", "intent": "npm_run_script", "lang": "en"}
+{"text": "run the format script so prettier fixes everything", "intent": "npm_run_script", "lang": "en"}
+{"text": "start the preview script", "intent": "npm_run_script", "lang": "en"}
+{"text": "execute the \"start\" script from package.json", "intent": "npm_run_script", "lang": "en"}
+{"text": "run the build:prod script", "intent": "npm_run_script", "lang": "en"}
+{"text": "can you run the test:watch script for me", "intent": "npm_run_script", "lang": "en"}
+{"text": "fire up the dev script in this project", "intent": "npm_run_script", "lang": "en"}
+{"text": "run script dev", "intent": "npm_run_script", "lang": "en"}
+{"text": "launch the vite dev server via npm", "intent": "npm_run_script", "lang": "en"}
+{"text": "npm script lint:fix", "intent": "npm_run_script", "lang": "en"}
+{"text": "run the package.json script called generate", "intent": "npm_run_script", "lang": "en"}
+{"text": "build the frontend with npm run build", "intent": "npm_run_script", "lang": "en"}
+{"text": "I want to run the db:migrate npm script", "intent": "npm_run_script", "lang": "en"}
+{"text": "run the \"serve\" script", "intent": "npm_run_script", "lang": "en"}
+{"text": "please run npm's typecheck script", "intent": "npm_run_script", "lang": "en"}
+{"text": "how do I start my next.js app in dev mode with npm", "intent": "npm_run_script", "lang": "en"}
+{"text": "run the seed script from package.json", "intent": "npm_run_script", "lang": "en"}
+{"text": "execute npm script \"test:unit\"", "intent": "npm_run_script", "lang": "en"}
+{"text": "run the docs:build script", "intent": "npm_run_script", "lang": "en"}
+{"text": "spin up the local dev server (npm)", "intent": "npm_run_script", "lang": "en"}
+{"text": "run my npm clean script", "intent": "npm_run_script", "lang": "en"}
+{"text": "run the codegen script defined in package.json", "intent": "npm_run_script", "lang": "en"}
+{"text": "npm run storybook", "intent": "npm_run_script", "lang": "en"}
+{"text": "hey, run the bundle script", "intent": "npm_run_script", "lang": "en"}
+{"text": "run prettier via the format npm script", "intent": "npm_run_script", "lang": "en"}
+{"text": "start the watch script", "intent": "npm_run_script", "lang": "en"}
+{"text": "run the release script with npm", "intent": "npm_run_script", "lang": "en"}
+{"text": "compile the project using the compile npm script", "intent": "npm_run_script", "lang": "en"}
+{"text": "how can I execute a script defined in package.json?", "intent": "npm_run_script", "lang": "en"}
+{"text": "run the dev script in PowerShell", "intent": "npm_run_script", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "npm run e2e on my mac", "intent": "npm_run_script", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "run the build script", "intent": "npm_run_script", "lang": "en", "shell": "fish", "os": "linux"}
+{"text": "run npm test from cmd", "intent": "npm_run_script", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "odpal deva", "intent": "npm_run_script", "lang": "pl"}
+{"text": "uruchom serwer deweloperski", "intent": "npm_run_script", "lang": "pl"}
+{"text": "npm run build", "intent": "npm_run_script", "lang": "pl"}
+{"text": "odpal builda", "intent": "npm_run_script", "lang": "pl"}
+{"text": "puść testy przez npm", "intent": "npm_run_script", "lang": "pl"}
+{"text": "uruchom skrypt lint", "intent": "npm_run_script", "lang": "pl"}
+{"text": "odpal skrypt typecheck z package.json", "intent": "npm_run_script", "lang": "pl"}
+{"text": "jak uruchomić skrypt dev z package.json?", "intent": "npm_run_script", "lang": "pl"}
+{"text": "uruchom skrypt storybook", "intent": "npm_run_script", "lang": "pl"}
+{"text": "odpal e2e", "intent": "npm_run_script", "lang": "pl"}
+{"text": "zbuduj projekt przez npm run build", "intent": "npm_run_script", "lang": "pl"}
+{"text": "uruchom skrypt format", "intent": "npm_run_script", "lang": "pl"}
+{"text": "odpal preview", "intent": "npm_run_script", "lang": "pl"}
+{"text": "uruchom skrypt start", "intent": "npm_run_script", "lang": "pl"}
+{"text": "odpal skrypt test:watch", "intent": "npm_run_script", "lang": "pl"}
+{"text": "uruchom skrypt npm o nazwie generate", "intent": "npm_run_script", "lang": "pl"}
+{"text": "odpal lokalny serwer devowy", "intent": "npm_run_script", "lang": "pl"}
+{"text": "odpal skrypt lint:fix", "intent": "npm_run_script", "lang": "pl"}
+{"text": "uruchom skrypt db:migrate z npm", "intent": "npm_run_script", "lang": "pl"}
+{"text": "puść skrypt serve", "intent": "npm_run_script", "lang": "pl"}
+{"text": "jak odpalić aplikację w trybie dev przez npm", "intent": "npm_run_script", "lang": "pl"}
+{"text": "odpal skrypt seed", "intent": "npm_run_script", "lang": "pl"}
+{"text": "uruchom testy jednostkowe skryptem test:unit", "intent": "npm_run_script", "lang": "pl"}
+{"text": "zbuduj dokumentację skryptem docs:build", "intent": "npm_run_script", "lang": "pl"}
+{"text": "odpal dev serwer vite", "intent": "npm_run_script", "lang": "pl"}
+{"text": "uruchom skrypt clean z npm", "intent": "npm_run_script", "lang": "pl"}
+{"text": "wygeneruj typy skryptem codegen", "intent": "npm_run_script", "lang": "pl"}
+{"text": "odpal storybooka", "intent": "npm_run_script", "lang": "pl"}
+{"text": "uruchom skrypt bundle", "intent": "npm_run_script", "lang": "pl"}
+{"text": "odpal skrypt watch", "intent": "npm_run_script", "lang": "pl"}
+{"text": "uruchom skrypt release przez npm", "intent": "npm_run_script", "lang": "pl"}
+{"text": "skompiluj projekt skryptem compile z npm", "intent": "npm_run_script", "lang": "pl"}
+{"text": "jak wykonać skrypt zdefiniowany w package.json?", "intent": "npm_run_script", "lang": "pl"}
+{"text": "odpal deva prosze", "intent": "npm_run_script", "lang": "pl"}
+{"text": "uruchom skrypt testow", "intent": "npm_run_script", "lang": "pl"}
+{"text": "odpal lint na projekcie przez npm", "intent": "npm_run_script", "lang": "pl"}
+{"text": "npm run typecheck", "intent": "npm_run_script", "lang": "pl"}
+{"text": "odpal skrypt dev w PowerShellu", "intent": "npm_run_script", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "uruchom npm run build na macu", "intent": "npm_run_script", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "odpal skrypt test", "intent": "npm_run_script", "lang": "pl", "shell": "fish", "os": "linux"}
+{"text": "uruchom skrypt start w cmd", "intent": "npm_run_script", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "install the dependencies", "intent": "npm_install", "lang": "en"}
+{"text": "npm install", "intent": "npm_install", "lang": "en"}
+{"text": "install project deps", "intent": "npm_install", "lang": "en"}
+{"text": "install all packages from package.json", "intent": "npm_install", "lang": "en"}
+{"text": "I just cloned the repo, install the node modules", "intent": "npm_install", "lang": "en"}
+{"text": "add lodash to this project", "intent": "npm_install", "lang": "en"}
+{"text": "npm install zod", "intent": "npm_install", "lang": "en"}
+{"text": "install axios as a dependency", "intent": "npm_install", "lang": "en"}
+{"text": "how do I install the dependencies of this node project?", "intent": "npm_install", "lang": "en"}
+{"text": "restore node_modules", "intent": "npm_install", "lang": "en"}
+{"text": "install react-router into this project", "intent": "npm_install", "lang": "en"}
+{"text": "install dayjs locally in the project", "intent": "npm_install", "lang": "en"}
+{"text": "install packages for this repo", "intent": "npm_install", "lang": "en"}
+{"text": "add express to the project dependencies", "intent": "npm_install", "lang": "en"}
+{"text": "npm i", "intent": "npm_install", "lang": "en"}
+{"text": "get the node modules installed", "intent": "npm_install", "lang": "en"}
+{"text": "install the npm deps please", "intent": "npm_install", "lang": "en"}
+{"text": "the node_modules folder is missing, reinstall it", "intent": "npm_install", "lang": "en"}
+{"text": "add the chalk package to this project", "intent": "npm_install", "lang": "en"}
+{"text": "install vitest into the project", "intent": "npm_install", "lang": "en"}
+{"text": "set up the project dependencies with npm", "intent": "npm_install", "lang": "en"}
+{"text": "install dotenv in this project", "intent": "npm_install", "lang": "en"}
+{"text": "install tailwindcss locally with npm", "intent": "npm_install", "lang": "en"}
+{"text": "pull in all the npm packages for this app", "intent": "npm_install", "lang": "en"}
+{"text": "install @tanstack/react-query", "intent": "npm_install", "lang": "en"}
+{"text": "local npm install of prettier into the project", "intent": "npm_install", "lang": "en"}
+{"text": "install node dependencies in PowerShell", "intent": "npm_install", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "npm install the project deps on my macbook", "intent": "npm_install", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "install all npm dependencies", "intent": "npm_install", "lang": "en", "shell": "fish", "os": "linux"}
+{"text": "npm install in this folder", "intent": "npm_install", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "zainstaluj zależności", "intent": "npm_install", "lang": "pl"}
+{"text": "zainstaluj zaleznosci projektu", "intent": "npm_install", "lang": "pl"}
+{"text": "npm install w tym projekcie", "intent": "npm_install", "lang": "pl"}
+{"text": "zainstaluj paczki z package.json", "intent": "npm_install", "lang": "pl"}
+{"text": "sklonowałem repo, zainstaluj node_modules", "intent": "npm_install", "lang": "pl"}
+{"text": "dodaj lodash do projektu", "intent": "npm_install", "lang": "pl"}
+{"text": "zainstaluj zod w projekcie", "intent": "npm_install", "lang": "pl"}
+{"text": "dodaj axios jako zależność", "intent": "npm_install", "lang": "pl"}
+{"text": "jak zainstalować zależności projektu node?", "intent": "npm_install", "lang": "pl"}
+{"text": "odtwórz node_modules", "intent": "npm_install", "lang": "pl"}
+{"text": "zainstaluj react-router do tego projektu", "intent": "npm_install", "lang": "pl"}
+{"text": "doinstaluj dayjs lokalnie", "intent": "npm_install", "lang": "pl"}
+{"text": "zainstaluj paczki dla tego repo", "intent": "npm_install", "lang": "pl"}
+{"text": "dodaj expressa do zależności", "intent": "npm_install", "lang": "pl"}
+{"text": "npm i prosze", "intent": "npm_install", "lang": "pl"}
+{"text": "zainstaluj moduły node", "intent": "npm_install", "lang": "pl"}
+{"text": "zaciągnij deps npm", "intent": "npm_install", "lang": "pl"}
+{"text": "nie ma folderu node_modules, zainstaluj go", "intent": "npm_install", "lang": "pl"}
+{"text": "dodaj paczkę chalk do projektu", "intent": "npm_install", "lang": "pl"}
+{"text": "zainstaluj vitest w projekcie", "intent": "npm_install", "lang": "pl"}
+{"text": "postaw zależności projektu przez npm", "intent": "npm_install", "lang": "pl"}
+{"text": "zainstaluj dotenv lokalnie", "intent": "npm_install", "lang": "pl"}
+{"text": "zainstaluj tailwindcss w projekcie", "intent": "npm_install", "lang": "pl"}
+{"text": "pobierz wszystkie paczki npm dla aplikacji", "intent": "npm_install", "lang": "pl"}
+{"text": "zainstaluj @tanstack/react-query", "intent": "npm_install", "lang": "pl"}
+{"text": "doinstaluj prettiera do projektu", "intent": "npm_install", "lang": "pl"}
+{"text": "zainstaluj zależności node w PowerShellu", "intent": "npm_install", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "npm install w projekcie na macu", "intent": "npm_install", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "zainstaluj zaleznosci npm", "intent": "npm_install", "lang": "pl", "shell": "fish", "os": "linux"}
+{"text": "zainstaluj paczki npm w cmd", "intent": "npm_install", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "install typescript globally", "intent": "npm_install_global", "lang": "en"}
+{"text": "npm install -g pnpm", "intent": "npm_install_global", "lang": "en"}
+{"text": "install vercel cli globally", "intent": "npm_install_global", "lang": "en"}
+{"text": "globally install @angular/cli", "intent": "npm_install_global", "lang": "en"}
+{"text": "how do I install yarn globally with npm?", "intent": "npm_install_global", "lang": "en"}
+{"text": "install nodemon as a global package", "intent": "npm_install_global", "lang": "en"}
+{"text": "install the netlify-cli npm package globally", "intent": "npm_install_global", "lang": "en"}
+{"text": "make tsc available everywhere by installing typescript globally", "intent": "npm_install_global", "lang": "en"}
+{"text": "global install of eslint", "intent": "npm_install_global", "lang": "en"}
+{"text": "install wrangler globally via npm", "intent": "npm_install_global", "lang": "en"}
+{"text": "install http-server globally", "intent": "npm_install_global", "lang": "en"}
+{"text": "install @nestjs/cli system-wide with npm", "intent": "npm_install_global", "lang": "en"}
+{"text": "install npm-check-updates globally", "intent": "npm_install_global", "lang": "en"}
+{"text": "I want the serve package installed globally", "intent": "npm_install_global", "lang": "en"}
+{"text": "install pm2 globally", "intent": "npm_install_global", "lang": "en"}
+{"text": "add create-react-app as a global npm tool", "intent": "npm_install_global", "lang": "en"}
+{"text": "install firebase-tools globally", "intent": "npm_install_global", "lang": "en"}
+{"text": "install the latest npm itself globally", "intent": "npm_install_global", "lang": "en"}
+{"text": "global npm package: prettier", "intent": "npm_install_global", "lang": "en"}
+{"text": "install ts-node globally", "intent": "npm_install_global", "lang": "en"}
+{"text": "npm global install @vue/cli", "intent": "npm_install_global", "lang": "en"}
+{"text": "please install corepack globally with npm", "intent": "npm_install_global", "lang": "en"}
+{"text": "install lerna globally", "intent": "npm_install_global", "lang": "en"}
+{"text": "how to install a node cli tool globally, say tldr", "intent": "npm_install_global", "lang": "en"}
+{"text": "install the expo-cli globally", "intent": "npm_install_global", "lang": "en"}
+{"text": "install json-server as a global npm package", "intent": "npm_install_global", "lang": "en"}
+{"text": "globally install degit", "intent": "npm_install_global", "lang": "en"}
+{"text": "install @githubnext/github-copilot-cli globally", "intent": "npm_install_global", "lang": "en"}
+{"text": "put gatsby-cli in the global npm packages", "intent": "npm_install_global", "lang": "en"}
+{"text": "install the aws-cdk npm package globally", "intent": "npm_install_global", "lang": "en"}
+{"text": "global install of npx-free tool zx", "intent": "npm_install_global", "lang": "en"}
+{"text": "install the typescript compiler globally so I can call tsc anywhere", "intent": "npm_install_global", "lang": "en"}
+{"text": "install bun via npm globally", "intent": "npm_install_global", "lang": "en"}
+{"text": "install neovim npm package globally", "intent": "npm_install_global", "lang": "en"}
+{"text": "install the @biomejs/biome cli globally", "intent": "npm_install_global", "lang": "en"}
+{"text": "install surge globally", "intent": "npm_install_global", "lang": "en"}
+{"text": "install pnpm globally in PowerShell", "intent": "npm_install_global", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "npm install -g vercel on macOS", "intent": "npm_install_global", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "install the typescript package globally", "intent": "npm_install_global", "lang": "en", "shell": "fish", "os": "linux"}
+{"text": "install yarn globally from cmd", "intent": "npm_install_global", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "zainstaluj globalnie typescript", "intent": "npm_install_global", "lang": "pl"}
+{"text": "zainstaluj pnpm globalnie", "intent": "npm_install_global", "lang": "pl"}
+{"text": "zainstaluj vercel cli globalnie przez npm", "intent": "npm_install_global", "lang": "pl"}
+{"text": "globalnie zainstaluj @angular/cli", "intent": "npm_install_global", "lang": "pl"}
+{"text": "jak zainstalować yarna globalnie przez npm?", "intent": "npm_install_global", "lang": "pl"}
+{"text": "zainstaluj nodemona jako globalną paczkę", "intent": "npm_install_global", "lang": "pl"}
+{"text": "zainstaluj globalnie netlify-cli", "intent": "npm_install_global", "lang": "pl"}
+{"text": "chcę mieć tsc wszędzie, zainstaluj typescript globalnie", "intent": "npm_install_global", "lang": "pl"}
+{"text": "globalna instalacja eslint", "intent": "npm_install_global", "lang": "pl"}
+{"text": "zainstaluj wranglera globalnie przez npm", "intent": "npm_install_global", "lang": "pl"}
+{"text": "zainstaluj http-server globalnie", "intent": "npm_install_global", "lang": "pl"}
+{"text": "zainstaluj @nestjs/cli globalnie", "intent": "npm_install_global", "lang": "pl"}
+{"text": "zainstaluj npm-check-updates globalnie", "intent": "npm_install_global", "lang": "pl"}
+{"text": "zainstaluj serve jako paczkę globalną", "intent": "npm_install_global", "lang": "pl"}
+{"text": "zainstaluj pm2 globalnie", "intent": "npm_install_global", "lang": "pl"}
+{"text": "dodaj create-react-app jako globalne narzędzie npm", "intent": "npm_install_global", "lang": "pl"}
+{"text": "zainstaluj globalnie firebase-tools", "intent": "npm_install_global", "lang": "pl"}
+{"text": "zainstaluj globalnie najnowszego npm", "intent": "npm_install_global", "lang": "pl"}
+{"text": "globalna paczka npm: prettier", "intent": "npm_install_global", "lang": "pl"}
+{"text": "zainstaluj ts-node globalnie", "intent": "npm_install_global", "lang": "pl"}
+{"text": "npm install -g @vue/cli", "intent": "npm_install_global", "lang": "pl"}
+{"text": "zainstaluj corepack globalnie przez npm", "intent": "npm_install_global", "lang": "pl"}
+{"text": "zainstaluj lernę globalnie", "intent": "npm_install_global", "lang": "pl"}
+{"text": "jak zainstalować globalnie narzędzie cli z npm, np. tldr", "intent": "npm_install_global", "lang": "pl"}
+{"text": "zainstaluj expo-cli globalnie", "intent": "npm_install_global", "lang": "pl"}
+{"text": "zainstaluj json-server globalnie", "intent": "npm_install_global", "lang": "pl"}
+{"text": "zainstaluj degit globalnie", "intent": "npm_install_global", "lang": "pl"}
+{"text": "wrzuć gatsby-cli do globalnych paczek npm", "intent": "npm_install_global", "lang": "pl"}
+{"text": "zainstaluj aws-cdk globalnie z npm", "intent": "npm_install_global", "lang": "pl"}
+{"text": "zainstaluj zx globalnie", "intent": "npm_install_global", "lang": "pl"}
+{"text": "zainstaluj kompilator typescript globalnie żeby tsc działał wszędzie", "intent": "npm_install_global", "lang": "pl"}
+{"text": "zainstaluj globalnie paczke surge", "intent": "npm_install_global", "lang": "pl"}
+{"text": "zainstaluj globalnie @biomejs/biome", "intent": "npm_install_global", "lang": "pl"}
+{"text": "zainstaluj globalnie paczkę npm o nazwie serverless", "intent": "npm_install_global", "lang": "pl"}
+{"text": "instalacja globalna pnpm przez npm", "intent": "npm_install_global", "lang": "pl"}
+{"text": "zainstaluj globalnie vite", "intent": "npm_install_global", "lang": "pl"}
+{"text": "zainstaluj globalnie pnpm w PowerShellu", "intent": "npm_install_global", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "npm install -g vercel na macu", "intent": "npm_install_global", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "zainstaluj typescript globalnie", "intent": "npm_install_global", "lang": "pl", "shell": "fish", "os": "linux"}
+{"text": "zainstaluj yarna globalnie w cmd", "intent": "npm_install_global", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "pip install requests", "intent": "pip_install", "lang": "en"}
+{"text": "install numpy with pip", "intent": "pip_install", "lang": "en"}
+{"text": "install the fastapi python package", "intent": "pip_install", "lang": "en"}
+{"text": "how do I install opencv-python?", "intent": "pip_install", "lang": "en"}
+{"text": "install pandas for python", "intent": "pip_install", "lang": "en"}
+{"text": "pip install flask please", "intent": "pip_install", "lang": "en"}
+{"text": "add the python library httpx", "intent": "pip_install", "lang": "en"}
+{"text": "install matplotlib via pip", "intent": "pip_install", "lang": "en"}
+{"text": "install the uvicorn package", "intent": "pip_install", "lang": "en"}
+{"text": "install scikit-learn", "intent": "pip_install", "lang": "en"}
+{"text": "install python package pydantic", "intent": "pip_install", "lang": "en"}
+{"text": "I need beautifulsoup4 for my script, install it", "intent": "pip_install", "lang": "en"}
+{"text": "pip install torch", "intent": "pip_install", "lang": "en"}
+{"text": "install the black formatter with pip", "intent": "pip_install", "lang": "en"}
+{"text": "install pytest using pip", "intent": "pip_install", "lang": "en"}
+{"text": "install sqlalchemy python lib", "intent": "pip_install", "lang": "en"}
+{"text": "install python-dotenv", "intent": "pip_install", "lang": "en"}
+{"text": "get me the rich package for python", "intent": "pip_install", "lang": "en"}
+{"text": "install jupyter with pip", "intent": "pip_install", "lang": "en"}
+{"text": "install the boto3 package", "intent": "pip_install", "lang": "en"}
+{"text": "pip install pillow", "intent": "pip_install", "lang": "en"}
+{"text": "install the openai python package", "intent": "pip_install", "lang": "en"}
+{"text": "install python module pyyaml", "intent": "pip_install", "lang": "en"}
+{"text": "install selenium for python", "intent": "pip_install", "lang": "en"}
+{"text": "install ruff via pip", "intent": "pip_install", "lang": "en"}
+{"text": "install psycopg2-binary", "intent": "pip_install", "lang": "en"}
+{"text": "install the django package with pip", "intent": "pip_install", "lang": "en"}
+{"text": "install tqdm into my python env", "intent": "pip_install", "lang": "en"}
+{"text": "python3 -m pip install aiohttp", "intent": "pip_install", "lang": "en"}
+{"text": "install the python lib lxml", "intent": "pip_install", "lang": "en"}
+{"text": "install polars using pip", "intent": "pip_install", "lang": "en"}
+{"text": "install the click package for python", "intent": "pip_install", "lang": "en"}
+{"text": "how to install the python package \"scipy\"?", "intent": "pip_install", "lang": "en"}
+{"text": "install python's paramiko module", "intent": "pip_install", "lang": "en"}
+{"text": "install transformers with pip", "intent": "pip_install", "lang": "en"}
+{"text": "install mypy as a python package", "intent": "pip_install", "lang": "en"}
+{"text": "pip install requests in PowerShell", "intent": "pip_install", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "install numpy with pip on macOS", "intent": "pip_install", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "pip install fastapi in fish", "intent": "pip_install", "lang": "en", "shell": "fish", "os": "linux"}
+{"text": "install flask with pip in cmd", "intent": "pip_install", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "zainstaluj requests przez pip", "intent": "pip_install", "lang": "pl"}
+{"text": "pip install numpy", "intent": "pip_install", "lang": "pl"}
+{"text": "zainstaluj paczkę fastapi dla pythona", "intent": "pip_install", "lang": "pl"}
+{"text": "jak zainstalować opencv-python?", "intent": "pip_install", "lang": "pl"}
+{"text": "zainstaluj pandas do pythona", "intent": "pip_install", "lang": "pl"}
+{"text": "zainstaluj flaska przez pip", "intent": "pip_install", "lang": "pl"}
+{"text": "dodaj bibliotekę pythona httpx", "intent": "pip_install", "lang": "pl"}
+{"text": "zainstaluj matplotlib pipem", "intent": "pip_install", "lang": "pl"}
+{"text": "zainstaluj paczkę uvicorn", "intent": "pip_install", "lang": "pl"}
+{"text": "zainstaluj scikit-learn", "intent": "pip_install", "lang": "pl"}
+{"text": "zainstaluj pydantic dla pythona", "intent": "pip_install", "lang": "pl"}
+{"text": "potrzebuję beautifulsoup4 do skryptu, zainstaluj", "intent": "pip_install", "lang": "pl"}
+{"text": "pip install torch do pythona", "intent": "pip_install", "lang": "pl"}
+{"text": "zainstaluj formatter black przez pip", "intent": "pip_install", "lang": "pl"}
+{"text": "zainstaluj pytest pipem", "intent": "pip_install", "lang": "pl"}
+{"text": "zainstaluj sqlalchemy", "intent": "pip_install", "lang": "pl"}
+{"text": "zainstaluj python-dotenv", "intent": "pip_install", "lang": "pl"}
+{"text": "zainstaluj paczkę rich do pythona", "intent": "pip_install", "lang": "pl"}
+{"text": "zainstaluj jupytera przez pip", "intent": "pip_install", "lang": "pl"}
+{"text": "zainstaluj boto3", "intent": "pip_install", "lang": "pl"}
+{"text": "doinstaluj pillow pipem", "intent": "pip_install", "lang": "pl"}
+{"text": "zainstaluj pythonową paczkę openai", "intent": "pip_install", "lang": "pl"}
+{"text": "zainstaluj moduł pyyaml", "intent": "pip_install", "lang": "pl"}
+{"text": "zainstaluj selenium do pythona", "intent": "pip_install", "lang": "pl"}
+{"text": "zainstaluj ruffa przez pip", "intent": "pip_install", "lang": "pl"}
+{"text": "zainstaluj psycopg2-binary", "intent": "pip_install", "lang": "pl"}
+{"text": "zainstaluj django pipem", "intent": "pip_install", "lang": "pl"}
+{"text": "doinstaluj tqdm do pythona", "intent": "pip_install", "lang": "pl"}
+{"text": "python3 -m pip install aiohttp prosze", "intent": "pip_install", "lang": "pl"}
+{"text": "zainstaluj bibliotekę lxml", "intent": "pip_install", "lang": "pl"}
+{"text": "zainstaluj polars przez pip", "intent": "pip_install", "lang": "pl"}
+{"text": "zainstaluj paczke click do pythona", "intent": "pip_install", "lang": "pl"}
+{"text": "jak zainstalowac pakiet pythona scipy?", "intent": "pip_install", "lang": "pl"}
+{"text": "zainstaluj moduł paramiko", "intent": "pip_install", "lang": "pl"}
+{"text": "zainstaluj transformers przez pip", "intent": "pip_install", "lang": "pl"}
+{"text": "zainstaluj mypy jako paczkę pythona", "intent": "pip_install", "lang": "pl"}
+{"text": "zainstaluj requests pipem w PowerShellu", "intent": "pip_install", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "zainstaluj numpy przez pip na macu", "intent": "pip_install", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "pip install fastapi we fishu", "intent": "pip_install", "lang": "pl", "shell": "fish", "os": "linux"}
+{"text": "zainstaluj flaska pipem w cmd", "intent": "pip_install", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "activate the virtualenv", "intent": "activate_venv", "lang": "en"}
+{"text": "activate .venv", "intent": "activate_venv", "lang": "en"}
+{"text": "source venv/bin/activate", "intent": "activate_venv", "lang": "en"}
+{"text": "how do I activate my python virtual environment?", "intent": "activate_venv", "lang": "en"}
+{"text": "turn on the venv in this project", "intent": "activate_venv", "lang": "en"}
+{"text": "activate the env folder virtual environment", "intent": "activate_venv", "lang": "en"}
+{"text": "enter the python venv", "intent": "activate_venv", "lang": "en"}
+{"text": "activate virtual env in ./venv", "intent": "activate_venv", "lang": "en"}
+{"text": "switch into the .venv environment", "intent": "activate_venv", "lang": "en"}
+{"text": "activate the python environment located in env", "intent": "activate_venv", "lang": "en"}
+{"text": "use the project's virtualenv", "intent": "activate_venv", "lang": "en"}
+{"text": "activate my venv please", "intent": "activate_venv", "lang": "en"}
+{"text": "load the virtual environment from ~/projects/api/.venv", "intent": "activate_venv", "lang": "en"}
+{"text": "activate venv", "intent": "activate_venv", "lang": "en"}
+{"text": "get into the virtualenv so pip installs go there", "intent": "activate_venv", "lang": "en"}
+{"text": "how to activate a venv on linux", "intent": "activate_venv", "lang": "en"}
+{"text": "activate the virtual environment at ./backend/.venv", "intent": "activate_venv", "lang": "en"}
+{"text": "enable the python venv", "intent": "activate_venv", "lang": "en"}
+{"text": "step into the .venv", "intent": "activate_venv", "lang": "en"}
+{"text": "source the activate script of my virtualenv", "intent": "activate_venv", "lang": "en"}
+{"text": "activate the py venv in ml-env", "intent": "activate_venv", "lang": "en"}
+{"text": "I created a venv, now activate it", "intent": "activate_venv", "lang": "en"}
+{"text": "activate .venv before running the script", "intent": "activate_venv", "lang": "en"}
+{"text": "activate virtualenv called venv311", "intent": "activate_venv", "lang": "en"}
+{"text": "start using the virtual environment in this repo", "intent": "activate_venv", "lang": "en"}
+{"text": "activate the venv on my mac", "intent": "activate_venv", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "activate .venv in fish", "intent": "activate_venv", "lang": "en", "shell": "fish", "os": "linux"}
+{"text": "activate the venv in PowerShell", "intent": "activate_venv", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "run .venv\\Scripts\\Activate.ps1", "intent": "activate_venv", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "activate the virtual environment in cmd", "intent": "activate_venv", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "aktywuj virtualenva", "intent": "activate_venv", "lang": "pl"}
+{"text": "aktywuj .venv", "intent": "activate_venv", "lang": "pl"}
+{"text": "zrób source venv/bin/activate", "intent": "activate_venv", "lang": "pl"}
+{"text": "jak aktywować wirtualne środowisko pythona?", "intent": "activate_venv", "lang": "pl"}
+{"text": "włącz venva w tym projekcie", "intent": "activate_venv", "lang": "pl"}
+{"text": "aktywuj środowisko wirtualne z folderu env", "intent": "activate_venv", "lang": "pl"}
+{"text": "wejdź do venva", "intent": "activate_venv", "lang": "pl"}
+{"text": "aktywuj venv w ./venv", "intent": "activate_venv", "lang": "pl"}
+{"text": "przełącz się na środowisko .venv", "intent": "activate_venv", "lang": "pl"}
+{"text": "aktywuj srodowisko wirtualne pythona", "intent": "activate_venv", "lang": "pl"}
+{"text": "użyj virtualenva projektu", "intent": "activate_venv", "lang": "pl"}
+{"text": "aktywuj mój venv", "intent": "activate_venv", "lang": "pl"}
+{"text": "załaduj środowisko z ~/projekty/api/.venv", "intent": "activate_venv", "lang": "pl"}
+{"text": "aktywuj venv", "intent": "activate_venv", "lang": "pl"}
+{"text": "wejdź w virtualenva żeby pip instalował tam", "intent": "activate_venv", "lang": "pl"}
+{"text": "jak aktywowac venv na linuksie", "intent": "activate_venv", "lang": "pl"}
+{"text": "aktywuj środowisko wirtualne w ./backend/.venv", "intent": "activate_venv", "lang": "pl"}
+{"text": "odpal venva", "intent": "activate_venv", "lang": "pl"}
+{"text": "aktywuj .venv przed uruchomieniem skryptu", "intent": "activate_venv", "lang": "pl"}
+{"text": "zrobiłem venva, teraz go aktywuj", "intent": "activate_venv", "lang": "pl"}
+{"text": "aktywuj virtualenva o nazwie venv311", "intent": "activate_venv", "lang": "pl"}
+{"text": "aktywuj pythonowe środowisko ml-env", "intent": "activate_venv", "lang": "pl"}
+{"text": "włącz wirtualne środowisko", "intent": "activate_venv", "lang": "pl"}
+{"text": "zacznij używać venva z tego repo", "intent": "activate_venv", "lang": "pl"}
+{"text": "source aktywatora venva", "intent": "activate_venv", "lang": "pl"}
+{"text": "aktywuj venva na macu", "intent": "activate_venv", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "aktywuj .venv we fishu", "intent": "activate_venv", "lang": "pl", "shell": "fish", "os": "linux"}
+{"text": "aktywuj venva w PowerShellu", "intent": "activate_venv", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "uruchom .venv\\Scripts\\Activate.ps1", "intent": "activate_venv", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "aktywuj środowisko wirtualne w cmd", "intent": "activate_venv", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "what version of node do I have?", "intent": "tool_version", "lang": "en"}
+{"text": "node --version", "intent": "tool_version", "lang": "en"}
+{"text": "check python3 version", "intent": "tool_version", "lang": "en"}
+{"text": "which git version is installed", "intent": "tool_version", "lang": "en"}
+{"text": "docker version", "intent": "tool_version", "lang": "en"}
+{"text": "show the wrangler version", "intent": "tool_version", "lang": "en"}
+{"text": "what's my gh cli version", "intent": "tool_version", "lang": "en"}
+{"text": "go version", "intent": "tool_version", "lang": "en"}
+{"text": "rustc version please", "intent": "tool_version", "lang": "en"}
+{"text": "cargo --version", "intent": "tool_version", "lang": "en"}
+{"text": "which java version is on this machine", "intent": "tool_version", "lang": "en"}
+{"text": "kubectl version", "intent": "tool_version", "lang": "en"}
+{"text": "terraform version", "intent": "tool_version", "lang": "en"}
+{"text": "ffmpeg version", "intent": "tool_version", "lang": "en"}
+{"text": "what version of npm am I running", "intent": "tool_version", "lang": "en"}
+{"text": "check the installed version of pnpm", "intent": "tool_version", "lang": "en"}
+{"text": "how do I check which version of typescript (tsc) I have", "intent": "tool_version", "lang": "en"}
+{"text": "version of curl", "intent": "tool_version", "lang": "en"}
+{"text": "print the deno version", "intent": "tool_version", "lang": "en"}
+{"text": "which bun version is installed?", "intent": "tool_version", "lang": "en"}
+{"text": "what's the ansible version here", "intent": "tool_version", "lang": "en"}
+{"text": "check the helm version", "intent": "tool_version", "lang": "en"}
+{"text": "show me the version of pip", "intent": "tool_version", "lang": "en"}
+{"text": "is my aws cli up to date? show its version", "intent": "tool_version", "lang": "en"}
+{"text": "what version is the installed ripgrep", "intent": "tool_version", "lang": "en"}
+{"text": "display the jq version", "intent": "tool_version", "lang": "en"}
+{"text": "which version of make do I have", "intent": "tool_version", "lang": "en"}
+{"text": "gcc version", "intent": "tool_version", "lang": "en"}
+{"text": "show the cmake version", "intent": "tool_version", "lang": "en"}
+{"text": "version of the php binary", "intent": "tool_version", "lang": "en"}
+{"text": "check ruby version", "intent": "tool_version", "lang": "en"}
+{"text": "what version of yarn is installed globally", "intent": "tool_version", "lang": "en"}
+{"text": "tell me the version of vim", "intent": "tool_version", "lang": "en"}
+{"text": "current version of tmux", "intent": "tool_version", "lang": "en"}
+{"text": "which version of postgres client psql do I have", "intent": "tool_version", "lang": "en"}
+{"text": "what version of node do I have in PowerShell", "intent": "tool_version", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "show git version on windows", "intent": "tool_version", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "check python3 version on macOS", "intent": "tool_version", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "what's my go version", "intent": "tool_version", "lang": "en", "shell": "fish", "os": "linux"}
+{"text": "node version in cmd", "intent": "tool_version", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "jaką mam wersję node?", "intent": "tool_version", "lang": "pl"}
+{"text": "jaką mam wersję? node --version", "intent": "tool_version", "lang": "pl"}
+{"text": "sprawdź wersję python3", "intent": "tool_version", "lang": "pl"}
+{"text": "która wersja gita jest zainstalowana", "intent": "tool_version", "lang": "pl"}
+{"text": "wersja dockera", "intent": "tool_version", "lang": "pl"}
+{"text": "pokaż wersję wranglera", "intent": "tool_version", "lang": "pl"}
+{"text": "jaka jest wersja gh cli", "intent": "tool_version", "lang": "pl"}
+{"text": "sprawdz go version", "intent": "tool_version", "lang": "pl"}
+{"text": "wersja rustc", "intent": "tool_version", "lang": "pl"}
+{"text": "pokaż cargo --version", "intent": "tool_version", "lang": "pl"}
+{"text": "jaka wersja javy jest na tej maszynie", "intent": "tool_version", "lang": "pl"}
+{"text": "wersja kubectl", "intent": "tool_version", "lang": "pl"}
+{"text": "jaka wersja terraforma", "intent": "tool_version", "lang": "pl"}
+{"text": "wersja ffmpeg", "intent": "tool_version", "lang": "pl"}
+{"text": "jakiej wersji npm używam", "intent": "tool_version", "lang": "pl"}
+{"text": "sprawdź zainstalowaną wersję pnpm", "intent": "tool_version", "lang": "pl"}
+{"text": "jak sprawdzić jaką mam wersję typescripta (tsc)", "intent": "tool_version", "lang": "pl"}
+{"text": "wersja curla", "intent": "tool_version", "lang": "pl"}
+{"text": "wypisz wersję deno", "intent": "tool_version", "lang": "pl"}
+{"text": "jaka wersja buna jest zainstalowana?", "intent": "tool_version", "lang": "pl"}
+{"text": "jaka wersja ansible tu jest", "intent": "tool_version", "lang": "pl"}
+{"text": "sprawdz wersje helma", "intent": "tool_version", "lang": "pl"}
+{"text": "pokaż wersję pipa", "intent": "tool_version", "lang": "pl"}
+{"text": "jaką wersję ma aws cli", "intent": "tool_version", "lang": "pl"}
+{"text": "jaka wersja ripgrepa", "intent": "tool_version", "lang": "pl"}
+{"text": "wyświetl wersję jq", "intent": "tool_version", "lang": "pl"}
+{"text": "jaką mam wersję make", "intent": "tool_version", "lang": "pl"}
+{"text": "wersja gcc", "intent": "tool_version", "lang": "pl"}
+{"text": "pokaż wersję cmake", "intent": "tool_version", "lang": "pl"}
+{"text": "wersja php", "intent": "tool_version", "lang": "pl"}
+{"text": "sprawdź wersję rubiego", "intent": "tool_version", "lang": "pl"}
+{"text": "jaka wersja yarna jest zainstalowana", "intent": "tool_version", "lang": "pl"}
+{"text": "podaj wersję vima", "intent": "tool_version", "lang": "pl"}
+{"text": "aktualna wersja tmuxa", "intent": "tool_version", "lang": "pl"}
+{"text": "którą wersję psql mam", "intent": "tool_version", "lang": "pl"}
+{"text": "jaką mam wersję node w PowerShellu", "intent": "tool_version", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "pokaż wersję gita na windowsie", "intent": "tool_version", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "sprawdź wersję python3 na macu", "intent": "tool_version", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "jaka jest wersja go", "intent": "tool_version", "lang": "pl", "shell": "fish", "os": "linux"}
+{"text": "wersja node w cmd", "intent": "tool_version", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "show help for tar", "intent": "cli_help", "lang": "en"}
+{"text": "curl --help", "intent": "cli_help", "lang": "en"}
+{"text": "how do I use rsync? show its help", "intent": "cli_help", "lang": "en"}
+{"text": "what options does grep have", "intent": "cli_help", "lang": "en"}
+{"text": "print the help of ffmpeg", "intent": "cli_help", "lang": "en"}
+{"text": "git --help", "intent": "cli_help", "lang": "en"}
+{"text": "show usage of docker", "intent": "cli_help", "lang": "en"}
+{"text": "list the flags for kubectl", "intent": "cli_help", "lang": "en"}
+{"text": "what are the options of the find command", "intent": "cli_help", "lang": "en"}
+{"text": "help for wrangler", "intent": "cli_help", "lang": "en"}
+{"text": "show gh help", "intent": "cli_help", "lang": "en"}
+{"text": "display the help text of npm", "intent": "cli_help", "lang": "en"}
+{"text": "how do I use jq, show the help page", "intent": "cli_help", "lang": "en"}
+{"text": "what flags does ssh accept", "intent": "cli_help", "lang": "en"}
+{"text": "print usage information for terraform", "intent": "cli_help", "lang": "en"}
+{"text": "show me the built-in help of cargo", "intent": "cli_help", "lang": "en"}
+{"text": "help for the sed command", "intent": "cli_help", "lang": "en"}
+{"text": "what arguments does python3 take", "intent": "cli_help", "lang": "en"}
+{"text": "show the help output of rg", "intent": "cli_help", "lang": "en"}
+{"text": "options for the ls command", "intent": "cli_help", "lang": "en"}
+{"text": "show the help of the zip command", "intent": "cli_help", "lang": "en"}
+{"text": "how does the cut command work, show help", "intent": "cli_help", "lang": "en"}
+{"text": "help screen for docker compose", "intent": "cli_help", "lang": "en"}
+{"text": "display xargs options", "intent": "cli_help", "lang": "en"}
+{"text": "what parameters does openssl support? show help", "intent": "cli_help", "lang": "en"}
+{"text": "print the usage of wget", "intent": "cli_help", "lang": "en"}
+{"text": "show available options for tmux", "intent": "cli_help", "lang": "en"}
+{"text": "help for the awk command", "intent": "cli_help", "lang": "en"}
+{"text": "what switches does node accept", "intent": "cli_help", "lang": "en"}
+{"text": "how to use the pip command, show help", "intent": "cli_help", "lang": "en"}
+{"text": "show command help for helm", "intent": "cli_help", "lang": "en"}
+{"text": "what does chmod accept as flags", "intent": "cli_help", "lang": "en"}
+{"text": "show help for the deno cli", "intent": "cli_help", "lang": "en"}
+{"text": "I forgot the flags of scp, show help", "intent": "cli_help", "lang": "en"}
+{"text": "help text for the head command", "intent": "cli_help", "lang": "en"}
+{"text": "show help for git in PowerShell", "intent": "cli_help", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "what flags does node have on windows", "intent": "cli_help", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "show help for brew", "intent": "cli_help", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "show the help of fd", "intent": "cli_help", "lang": "en", "shell": "fish", "os": "linux"}
+{"text": "curl help in cmd", "intent": "cli_help", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "pokaż pomoc dla tar", "intent": "cli_help", "lang": "pl"}
+{"text": "pokaż curl --help", "intent": "cli_help", "lang": "pl"}
+{"text": "jak używać rsync? pokaż pomoc", "intent": "cli_help", "lang": "pl"}
+{"text": "jakie opcje ma grep", "intent": "cli_help", "lang": "pl"}
+{"text": "wypisz pomoc ffmpeg", "intent": "cli_help", "lang": "pl"}
+{"text": "git --help prosze", "intent": "cli_help", "lang": "pl"}
+{"text": "pokaż użycie dockera", "intent": "cli_help", "lang": "pl"}
+{"text": "wylistuj flagi kubectl", "intent": "cli_help", "lang": "pl"}
+{"text": "jakie są opcje polecenia find", "intent": "cli_help", "lang": "pl"}
+{"text": "pomoc do wranglera", "intent": "cli_help", "lang": "pl"}
+{"text": "pokaż pomoc gh", "intent": "cli_help", "lang": "pl"}
+{"text": "wyświetl help npm", "intent": "cli_help", "lang": "pl"}
+{"text": "jak używać jq, pokaż pomoc", "intent": "cli_help", "lang": "pl"}
+{"text": "jakie flagi przyjmuje ssh", "intent": "cli_help", "lang": "pl"}
+{"text": "wypisz instrukcję użycia terraform", "intent": "cli_help", "lang": "pl"}
+{"text": "pokaż wbudowaną pomoc cargo", "intent": "cli_help", "lang": "pl"}
+{"text": "pomoc do komendy sed", "intent": "cli_help", "lang": "pl"}
+{"text": "jakie argumenty przyjmuje python3", "intent": "cli_help", "lang": "pl"}
+{"text": "pokaż help dla rg", "intent": "cli_help", "lang": "pl"}
+{"text": "opcje polecenia ls", "intent": "cli_help", "lang": "pl"}
+{"text": "pokaż pomoc komendy zip", "intent": "cli_help", "lang": "pl"}
+{"text": "jak działa cut, pokaż pomoc", "intent": "cli_help", "lang": "pl"}
+{"text": "ekran pomocy docker compose", "intent": "cli_help", "lang": "pl"}
+{"text": "wyswietl opcje xargs", "intent": "cli_help", "lang": "pl"}
+{"text": "jakie parametry ma openssl? pokaż help", "intent": "cli_help", "lang": "pl"}
+{"text": "wypisz użycie wget", "intent": "cli_help", "lang": "pl"}
+{"text": "pokaż dostępne opcje tmuxa", "intent": "cli_help", "lang": "pl"}
+{"text": "pomoc do awk", "intent": "cli_help", "lang": "pl"}
+{"text": "jakie przełączniki przyjmuje node", "intent": "cli_help", "lang": "pl"}
+{"text": "jak użyć pip, pokaż pomoc", "intent": "cli_help", "lang": "pl"}
+{"text": "pokaż help helma", "intent": "cli_help", "lang": "pl"}
+{"text": "jakie flagi przyjmuje chmod", "intent": "cli_help", "lang": "pl"}
+{"text": "pokaż pomoc dla deno", "intent": "cli_help", "lang": "pl"}
+{"text": "zapomniałem flag scp, pokaż pomoc", "intent": "cli_help", "lang": "pl"}
+{"text": "help dla komendy head", "intent": "cli_help", "lang": "pl"}
+{"text": "pokaż pomoc gita w PowerShellu", "intent": "cli_help", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "jakie flagi ma node na windowsie", "intent": "cli_help", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "pokaż pomoc brew", "intent": "cli_help", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "pokaż pomoc fd", "intent": "cli_help", "lang": "pl", "shell": "fish", "os": "linux"}
+{"text": "pomoc curla w cmd", "intent": "cli_help", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "show lines 120-180 of src/app.js", "intent": "print_line_range", "lang": "en"}
+{"text": "print lines 10 to 25 of config.yaml", "intent": "print_line_range", "lang": "en"}
+{"text": "lines 50 through 75 of main.py", "intent": "print_line_range", "lang": "en"}
+{"text": "display lines 1-40 of README.md", "intent": "print_line_range", "lang": "en"}
+{"text": "show me line 200 to line 260 of server.log", "intent": "print_line_range", "lang": "en"}
+{"text": "sed lines 30-60 of index.ts", "intent": "print_line_range", "lang": "en"}
+{"text": "print rows 5 to 15 of data.csv", "intent": "print_line_range", "lang": "en"}
+{"text": "I need lines 300-320 of the nginx.conf", "intent": "print_line_range", "lang": "en"}
+{"text": "output lines 88 to 102 of utils.go", "intent": "print_line_range", "lang": "en"}
+{"text": "show the range of lines 12..34 in Makefile", "intent": "print_line_range", "lang": "en"}
+{"text": "what's between line 400 and 450 in app.log", "intent": "print_line_range", "lang": "en"}
+{"text": "view lines 7 through 19 of .env.example", "intent": "print_line_range", "lang": "en"}
+{"text": "extract lines 1000-1100 from dump.sql", "intent": "print_line_range", "lang": "en"}
+{"text": "show lines 45 to 60 in /etc/ssh/sshd_config", "intent": "print_line_range", "lang": "en"}
+{"text": "print line range 60-90 of Dockerfile", "intent": "print_line_range", "lang": "en"}
+{"text": "show lines 140 through 160 of lib/parser.rs", "intent": "print_line_range", "lang": "en"}
+{"text": "cut out lines 20 to 35 from notes.txt", "intent": "print_line_range", "lang": "en"}
+{"text": "lines 3-9 of package.json", "intent": "print_line_range", "lang": "en"}
+{"text": "from line 250 to 270 of src/routes/api.ts show me", "intent": "print_line_range", "lang": "en"}
+{"text": "display the lines between 15 and 30 of docker-compose.yml", "intent": "print_line_range", "lang": "en"}
+{"text": "show me lines 500 to 540 in access.log", "intent": "print_line_range", "lang": "en"}
+{"text": "print lines 77-95 of tests/test_api.py", "intent": "print_line_range", "lang": "en"}
+{"text": "can you print lines 9 to 22 of schema.prisma", "intent": "print_line_range", "lang": "en"}
+{"text": "show lines 31-48 of the file src/components/Header.tsx", "intent": "print_line_range", "lang": "en"}
+{"text": "print just lines 600 through 640 of big.csv", "intent": "print_line_range", "lang": "en"}
+{"text": "show me the middle part of report.txt, lines 100-130", "intent": "print_line_range", "lang": "en"}
+{"text": "output lines 18 to 26 of /etc/hosts", "intent": "print_line_range", "lang": "en"}
+{"text": "show text from line 70 to 85 of styles.css", "intent": "print_line_range", "lang": "en"}
+{"text": "display lines 210-230 of build.gradle", "intent": "print_line_range", "lang": "en"}
+{"text": "print lines 5 through 12 of ~/.bashrc", "intent": "print_line_range", "lang": "en"}
+{"text": "show lines 1 to 50 of CHANGELOG.md", "intent": "print_line_range", "lang": "en"}
+{"text": "view lines 333-350 of migrations/0004.sql", "intent": "print_line_range", "lang": "en"}
+{"text": "print line numbers 40-44 of main.c", "intent": "print_line_range", "lang": "en"}
+{"text": "show lines 120 to 135 of webpack.config.js", "intent": "print_line_range", "lang": "en"}
+{"text": "grab lines 8-16 from settings.toml", "intent": "print_line_range", "lang": "en"}
+{"text": "how do I print only lines 25 to 40 of a file, say app.rb", "intent": "print_line_range", "lang": "en"}
+{"text": "show lines 10-30 of C:\\logs\\app.log", "intent": "print_line_range", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "print lines 60 to 80 of ~/.zshrc", "intent": "print_line_range", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "show lines 20-40 of config.fish", "intent": "print_line_range", "lang": "en", "shell": "fish", "os": "linux"}
+{"text": "lines 100 to 120 of build.txt in cmd", "intent": "print_line_range", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "pokaż linie 120-180 z src/app.js", "intent": "print_line_range", "lang": "pl"}
+{"text": "od 10 do 25 linii w config.yaml", "intent": "print_line_range", "lang": "pl"}
+{"text": "linie 50-75 z main.py", "intent": "print_line_range", "lang": "pl"}
+{"text": "wyświetl linie od 1 do 40 pliku README.md", "intent": "print_line_range", "lang": "pl"}
+{"text": "pokaż od linii 200 do 260 w server.log", "intent": "print_line_range", "lang": "pl"}
+{"text": "wypisz linie 30-60 z index.ts", "intent": "print_line_range", "lang": "pl"}
+{"text": "pokaż wiersze 5 do 15 z data.csv", "intent": "print_line_range", "lang": "pl"}
+{"text": "potrzebuję linii 300-320 z nginx.conf", "intent": "print_line_range", "lang": "pl"}
+{"text": "wypisz linie od 88 do 102 z utils.go", "intent": "print_line_range", "lang": "pl"}
+{"text": "pokaż zakres linii 12-34 w Makefile", "intent": "print_line_range", "lang": "pl"}
+{"text": "co jest między linią 400 a 450 w app.log", "intent": "print_line_range", "lang": "pl"}
+{"text": "zobacz linie od 7 do 19 w .env.example", "intent": "print_line_range", "lang": "pl"}
+{"text": "wytnij linie 1000-1100 z dump.sql", "intent": "print_line_range", "lang": "pl"}
+{"text": "pokaż linie 45 do 60 w /etc/ssh/sshd_config", "intent": "print_line_range", "lang": "pl"}
+{"text": "zakres linii 60-90 z Dockerfile", "intent": "print_line_range", "lang": "pl"}
+{"text": "pokaz linie 140-160 z lib/parser.rs", "intent": "print_line_range", "lang": "pl"}
+{"text": "wyciągnij linie od 20 do 35 z notatki.txt", "intent": "print_line_range", "lang": "pl"}
+{"text": "linie 3-9 z package.json", "intent": "print_line_range", "lang": "pl"}
+{"text": "od linii 250 do 270 w src/routes/api.ts", "intent": "print_line_range", "lang": "pl"}
+{"text": "wyświetl linie między 15 a 30 w docker-compose.yml", "intent": "print_line_range", "lang": "pl"}
+{"text": "pokaż linie 500-540 w access.log", "intent": "print_line_range", "lang": "pl"}
+{"text": "wypisz linijki 77-95 z tests/test_api.py", "intent": "print_line_range", "lang": "pl"}
+{"text": "wypisz linie od 9 do 22 pliku schema.prisma", "intent": "print_line_range", "lang": "pl"}
+{"text": "pokaż linie 31-48 pliku src/components/Header.tsx", "intent": "print_line_range", "lang": "pl"}
+{"text": "wypisz tylko linie od 600 do 640 z big.csv", "intent": "print_line_range", "lang": "pl"}
+{"text": "pokaż środek raport.txt, linie 100-130", "intent": "print_line_range", "lang": "pl"}
+{"text": "linie od 18 do 26 w /etc/hosts", "intent": "print_line_range", "lang": "pl"}
+{"text": "pokaż tekst od linii 70 do 85 w styles.css", "intent": "print_line_range", "lang": "pl"}
+{"text": "wyswietl linie 210-230 z build.gradle", "intent": "print_line_range", "lang": "pl"}
+{"text": "wypisz linie 5-12 z ~/.bashrc", "intent": "print_line_range", "lang": "pl"}
+{"text": "pokaż linijki od 1 do 50 w CHANGELOG.md", "intent": "print_line_range", "lang": "pl"}
+{"text": "zobacz linie 333-350 z migrations/0004.sql", "intent": "print_line_range", "lang": "pl"}
+{"text": "wypisz linie 40-44 z main.c", "intent": "print_line_range", "lang": "pl"}
+{"text": "pokaż wiersze od 120 do 135 w webpack.config.js", "intent": "print_line_range", "lang": "pl"}
+{"text": "wyciągnij linijki 8-16 z settings.toml", "intent": "print_line_range", "lang": "pl"}
+{"text": "jak wypisać tylko linie od 25 do 40 z pliku app.rb", "intent": "print_line_range", "lang": "pl"}
+{"text": "pokaż linie 10-30 z C:\\logs\\app.log", "intent": "print_line_range", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "wypisz linie od 60 do 80 z ~/.zshrc", "intent": "print_line_range", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "pokaż linie 20-40 z config.fish", "intent": "print_line_range", "lang": "pl", "shell": "fish", "os": "linux"}
+{"text": "linie od 100 do 120 z build.txt w cmd", "intent": "print_line_range", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "tunnel port 5432 from db.example.com", "intent": "ssh_port_forward", "lang": "en"}
+{"text": "forward local port 8080 to the same port on user@10.0.0.5", "intent": "ssh_port_forward", "lang": "en"}
+{"text": "ssh tunnel to 3306 on admin@mysql.internal", "intent": "ssh_port_forward", "lang": "en"}
+{"text": "port forward 6379 over ssh to redis-box", "intent": "ssh_port_forward", "lang": "en"}
+{"text": "make an ssh tunnel for port 9200 via elastic@search.lan", "intent": "ssh_port_forward", "lang": "en"}
+{"text": "I want to reach postgres on prod-db locally, forward port 5432 over ssh", "intent": "ssh_port_forward", "lang": "en"}
+{"text": "forward port 3000 from deploy@staging.example.org", "intent": "ssh_port_forward", "lang": "en"}
+{"text": "set up local port forwarding of 27017 through ssh to mongo.example.net", "intent": "ssh_port_forward", "lang": "en"}
+{"text": "open an ssh tunnel on port 8888 to jupyter@gpu-server", "intent": "ssh_port_forward", "lang": "en"}
+{"text": "ssh -L 5000 to ubuntu@192.168.1.50", "intent": "ssh_port_forward", "lang": "en"}
+{"text": "how do I forward port 15672 from rabbit.internal to my machine via ssh?", "intent": "ssh_port_forward", "lang": "en"}
+{"text": "tunnel 9090 through ssh from monitor@10.1.2.3", "intent": "ssh_port_forward", "lang": "en"}
+{"text": "local port forward 8443 to root@vps.example.com", "intent": "ssh_port_forward", "lang": "en"}
+{"text": "bind localhost 5601 to kibana host over ssh", "intent": "ssh_port_forward", "lang": "en"}
+{"text": "create an ssh tunnel to pi@raspberrypi.local on port 8123", "intent": "ssh_port_forward", "lang": "en"}
+{"text": "expose remote port 4000 locally using ssh -L, host ops@bastion", "intent": "ssh_port_forward", "lang": "en"}
+{"text": "forward 11434 from the gpu box (me@gpu01) over ssh", "intent": "ssh_port_forward", "lang": "en"}
+{"text": "tunnel the grafana port 3001 from ec2-user@3.120.45.6", "intent": "ssh_port_forward", "lang": "en"}
+{"text": "access port 8000 on dev@devbox through an ssh tunnel", "intent": "ssh_port_forward", "lang": "en"}
+{"text": "ssh port forwarding 5433 to analytics@warehouse.lan", "intent": "ssh_port_forward", "lang": "en"}
+{"text": "forward port 9000 over ssh to minio.example.com", "intent": "ssh_port_forward", "lang": "en"}
+{"text": "need the remote 7474 neo4j port locally, ssh to graph@10.0.5.9", "intent": "ssh_port_forward", "lang": "en"}
+{"text": "set up a tunnel for port 2375 via ssh to docker@buildhost", "intent": "ssh_port_forward", "lang": "en"}
+{"text": "forward the remote 8081 port to localhost through admin@nexus.corp", "intent": "ssh_port_forward", "lang": "en"}
+{"text": "ssh tunnel port 6006 tensorboard from lab@192.168.0.42", "intent": "ssh_port_forward", "lang": "en"}
+{"text": "forward port 5432 over ssh to db.example.com from PowerShell", "intent": "ssh_port_forward", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "tunnel port 3306 from my mac to admin@db1", "intent": "ssh_port_forward", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "port forward 8080 via ssh to web@10.0.0.7", "intent": "ssh_port_forward", "lang": "en", "shell": "fish", "os": "linux"}
+{"text": "ssh tunnel on 1433 to sql@winhost in cmd", "intent": "ssh_port_forward", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "mirror remote port 8200 (vault) locally over ssh via sec@vault01", "intent": "ssh_port_forward", "lang": "en"}
+{"text": "tunel na port 5432 z db.example.com", "intent": "ssh_port_forward", "lang": "pl"}
+{"text": "przekieruj lokalny port 8080 na ten sam port na user@10.0.0.5", "intent": "ssh_port_forward", "lang": "pl"}
+{"text": "tunel ssh do 3306 na admin@mysql.internal", "intent": "ssh_port_forward", "lang": "pl"}
+{"text": "port forward 6379 przez ssh do redis-box", "intent": "ssh_port_forward", "lang": "pl"}
+{"text": "zrób tunel ssh na port 9200 przez elastic@search.lan", "intent": "ssh_port_forward", "lang": "pl"}
+{"text": "chcę mieć lokalnie postgresa z prod-db, przekieruj port 5432 po ssh", "intent": "ssh_port_forward", "lang": "pl"}
+{"text": "przekieruj port 3000 z deploy@staging.example.org", "intent": "ssh_port_forward", "lang": "pl"}
+{"text": "ustaw przekierowanie portu 27017 przez ssh do mongo.example.net", "intent": "ssh_port_forward", "lang": "pl"}
+{"text": "otwórz tunel ssh na porcie 8888 do jupyter@gpu-server", "intent": "ssh_port_forward", "lang": "pl"}
+{"text": "ssh -L 5000 do ubuntu@192.168.1.50", "intent": "ssh_port_forward", "lang": "pl"}
+{"text": "jak przekierować port 15672 z rabbit.internal na mój komputer przez ssh?", "intent": "ssh_port_forward", "lang": "pl"}
+{"text": "tunel 9090 przez ssh z monitor@10.1.2.3", "intent": "ssh_port_forward", "lang": "pl"}
+{"text": "przekierowanie portu 8443 do root@vps.example.com", "intent": "ssh_port_forward", "lang": "pl"}
+{"text": "podepnij lokalnie port 5601 z hosta kibany po ssh", "intent": "ssh_port_forward", "lang": "pl"}
+{"text": "zrób tunel ssh do pi@raspberrypi.local na porcie 8123", "intent": "ssh_port_forward", "lang": "pl"}
+{"text": "wystaw zdalny port 4000 lokalnie przez ssh -L, host ops@bastion", "intent": "ssh_port_forward", "lang": "pl"}
+{"text": "przekieruj 11434 z serwera gpu (me@gpu01) po ssh", "intent": "ssh_port_forward", "lang": "pl"}
+{"text": "tunel do grafany na porcie 3001 z ec2-user@3.120.45.6", "intent": "ssh_port_forward", "lang": "pl"}
+{"text": "dostęp do portu 8000 na dev@devbox przez tunel ssh", "intent": "ssh_port_forward", "lang": "pl"}
+{"text": "przekierowanie portu 5433 do analytics@warehouse.lan przez ssh", "intent": "ssh_port_forward", "lang": "pl"}
+{"text": "przekieruj port 9000 po ssh do minio.example.com", "intent": "ssh_port_forward", "lang": "pl"}
+{"text": "potrzebuję zdalnego portu 7474 lokalnie, ssh do graph@10.0.5.9", "intent": "ssh_port_forward", "lang": "pl"}
+{"text": "tunel na port 2375 przez ssh do docker@buildhost", "intent": "ssh_port_forward", "lang": "pl"}
+{"text": "przekieruj zdalny port 8081 na localhost przez admin@nexus.corp", "intent": "ssh_port_forward", "lang": "pl"}
+{"text": "tunel ssh port 6006 z lab@192.168.0.42", "intent": "ssh_port_forward", "lang": "pl"}
+{"text": "zestaw tunel ssh na port 8200 do sec@vault01", "intent": "ssh_port_forward", "lang": "pl"}
+{"text": "przekieruj port 5432 przez ssh do db.example.com w PowerShellu", "intent": "ssh_port_forward", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "tunel na port 3306 z maca do admin@db1", "intent": "ssh_port_forward", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "przekierowanie portu 8080 po ssh do web@10.0.0.7", "intent": "ssh_port_forward", "lang": "pl", "shell": "fish", "os": "linux"}
+{"text": "tunel ssh na 1433 do sql@winhost w cmd", "intent": "ssh_port_forward", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "deploy the worker", "intent": "wrangler_deploy", "lang": "en"}
+{"text": "wrangler deploy", "intent": "wrangler_deploy", "lang": "en"}
+{"text": "publish my cloudflare worker", "intent": "wrangler_deploy", "lang": "en"}
+{"text": "push this worker live on Cloudflare", "intent": "wrangler_deploy", "lang": "en"}
+{"text": "deploy to cloudflare workers", "intent": "wrangler_deploy", "lang": "en"}
+{"text": "how do I deploy my Cloudflare Worker?", "intent": "wrangler_deploy", "lang": "en"}
+{"text": "ship the worker to production with wrangler", "intent": "wrangler_deploy", "lang": "en"}
+{"text": "deploy the current wrangler project", "intent": "wrangler_deploy", "lang": "en"}
+{"text": "upload the worker to cloudflare", "intent": "wrangler_deploy", "lang": "en"}
+{"text": "redeploy my worker", "intent": "wrangler_deploy", "lang": "en"}
+{"text": "npx wrangler deploy", "intent": "wrangler_deploy", "lang": "en"}
+{"text": "roll out the new version of the worker", "intent": "wrangler_deploy", "lang": "en"}
+{"text": "deploy this to the edge with wrangler", "intent": "wrangler_deploy", "lang": "en"}
+{"text": "release the worker on cloudflare now", "intent": "wrangler_deploy", "lang": "en"}
+{"text": "put the latest worker code on Cloudflare", "intent": "wrangler_deploy", "lang": "en"}
+{"text": "deploy my CF worker", "intent": "wrangler_deploy", "lang": "en"}
+{"text": "wrangler publish", "intent": "wrangler_deploy", "lang": "en"}
+{"text": "go live with the worker", "intent": "wrangler_deploy", "lang": "en"}
+{"text": "deploy the api worker to cloudflare", "intent": "wrangler_deploy", "lang": "en"}
+{"text": "I changed the worker, deploy it", "intent": "wrangler_deploy", "lang": "en"}
+{"text": "deploy workers project", "intent": "wrangler_deploy", "lang": "en"}
+{"text": "push the cloudflare worker to prod", "intent": "wrangler_deploy", "lang": "en"}
+{"text": "make a fresh deploy of the worker", "intent": "wrangler_deploy", "lang": "en"}
+{"text": "deploy using wrangler please", "intent": "wrangler_deploy", "lang": "en"}
+{"text": "get the worker deployed", "intent": "wrangler_deploy", "lang": "en"}
+{"text": "deploy the cloudflare worker from PowerShell", "intent": "wrangler_deploy", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "wrangler deploy from my mac", "intent": "wrangler_deploy", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "deploy the worker with wrangler", "intent": "wrangler_deploy", "lang": "en", "shell": "fish", "os": "linux"}
+{"text": "publish the worker in cmd", "intent": "wrangler_deploy", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "can you deploy the worker after my changes", "intent": "wrangler_deploy", "lang": "en"}
+{"text": "zdeployuj workera", "intent": "wrangler_deploy", "lang": "pl"}
+{"text": "wrangler deploy teraz", "intent": "wrangler_deploy", "lang": "pl"}
+{"text": "opublikuj mojego workera na cloudflare", "intent": "wrangler_deploy", "lang": "pl"}
+{"text": "wypchnij workera na Cloudflare", "intent": "wrangler_deploy", "lang": "pl"}
+{"text": "deploy na cloudflare workers", "intent": "wrangler_deploy", "lang": "pl"}
+{"text": "jak zdeployować workera Cloudflare?", "intent": "wrangler_deploy", "lang": "pl"}
+{"text": "wrzuć workera na produkcję wranglerem", "intent": "wrangler_deploy", "lang": "pl"}
+{"text": "wdróż aktualny projekt wranglera", "intent": "wrangler_deploy", "lang": "pl"}
+{"text": "wgraj workera na cloudflare", "intent": "wrangler_deploy", "lang": "pl"}
+{"text": "zrób redeploy workera", "intent": "wrangler_deploy", "lang": "pl"}
+{"text": "odpal npx wrangler deploy", "intent": "wrangler_deploy", "lang": "pl"}
+{"text": "wypuść nową wersję workera", "intent": "wrangler_deploy", "lang": "pl"}
+{"text": "zdeployuj to na edge wranglerem", "intent": "wrangler_deploy", "lang": "pl"}
+{"text": "wydaj workera na cloudflare teraz", "intent": "wrangler_deploy", "lang": "pl"}
+{"text": "wrzuć najnowszy kod workera na Cloudflare", "intent": "wrangler_deploy", "lang": "pl"}
+{"text": "deploy mojego CF workera", "intent": "wrangler_deploy", "lang": "pl"}
+{"text": "zrób wrangler publish", "intent": "wrangler_deploy", "lang": "pl"}
+{"text": "puść workera na produkcję", "intent": "wrangler_deploy", "lang": "pl"}
+{"text": "zdeployuj workera api na cloudflare", "intent": "wrangler_deploy", "lang": "pl"}
+{"text": "zmieniłem workera, wdróż go", "intent": "wrangler_deploy", "lang": "pl"}
+{"text": "wdróż projekt workers", "intent": "wrangler_deploy", "lang": "pl"}
+{"text": "wypchnij workera cloudflare na proda", "intent": "wrangler_deploy", "lang": "pl"}
+{"text": "zrób świeży deploy workera", "intent": "wrangler_deploy", "lang": "pl"}
+{"text": "zdeployuj przez wranglera", "intent": "wrangler_deploy", "lang": "pl"}
+{"text": "wdroz workera", "intent": "wrangler_deploy", "lang": "pl"}
+{"text": "zdeployuj workera z PowerShella", "intent": "wrangler_deploy", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "wrangler deploy z maca", "intent": "wrangler_deploy", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "wdróż workera wranglerem", "intent": "wrangler_deploy", "lang": "pl", "shell": "fish", "os": "linux"}
+{"text": "opublikuj workera w cmd", "intent": "wrangler_deploy", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "możesz zdeployować workera po moich zmianach", "intent": "wrangler_deploy", "lang": "pl"}
+{"text": "run the worker locally", "intent": "wrangler_dev", "lang": "en"}
+{"text": "wrangler dev", "intent": "wrangler_dev", "lang": "en"}
+{"text": "start a local dev server for my cloudflare worker", "intent": "wrangler_dev", "lang": "en"}
+{"text": "test the worker on localhost", "intent": "wrangler_dev", "lang": "en"}
+{"text": "how do I run my Cloudflare Worker locally?", "intent": "wrangler_dev", "lang": "en"}
+{"text": "spin up wrangler dev", "intent": "wrangler_dev", "lang": "en"}
+{"text": "serve the worker locally with hot reload", "intent": "wrangler_dev", "lang": "en"}
+{"text": "npx wrangler dev", "intent": "wrangler_dev", "lang": "en"}
+{"text": "local preview of the worker", "intent": "wrangler_dev", "lang": "en"}
+{"text": "run the cloudflare worker in dev mode", "intent": "wrangler_dev", "lang": "en"}
+{"text": "start the workers dev environment", "intent": "wrangler_dev", "lang": "en"}
+{"text": "emulate the worker locally", "intent": "wrangler_dev", "lang": "en"}
+{"text": "I want to try the worker before deploying, run it locally", "intent": "wrangler_dev", "lang": "en"}
+{"text": "launch the worker dev server", "intent": "wrangler_dev", "lang": "en"}
+{"text": "run wrangler in development mode", "intent": "wrangler_dev", "lang": "en"}
+{"text": "start local workerd for this project", "intent": "wrangler_dev", "lang": "en"}
+{"text": "dev mode for the CF worker", "intent": "wrangler_dev", "lang": "en"}
+{"text": "run the edge function locally with wrangler", "intent": "wrangler_dev", "lang": "en"}
+{"text": "fire up the worker on my machine", "intent": "wrangler_dev", "lang": "en"}
+{"text": "local wrangler session please", "intent": "wrangler_dev", "lang": "en"}
+{"text": "start wrangler's local server", "intent": "wrangler_dev", "lang": "en"}
+{"text": "test my worker changes locally", "intent": "wrangler_dev", "lang": "en"}
+{"text": "boot the worker locally on port 8787", "intent": "wrangler_dev", "lang": "en"}
+{"text": "run the worker on localhost:8787", "intent": "wrangler_dev", "lang": "en"}
+{"text": "run this workers project locally", "intent": "wrangler_dev", "lang": "en"}
+{"text": "run wrangler dev in PowerShell", "intent": "wrangler_dev", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "start the worker locally on my mac", "intent": "wrangler_dev", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "wrangler dev in fish shell", "intent": "wrangler_dev", "lang": "en", "shell": "fish", "os": "linux"}
+{"text": "run the worker locally from cmd", "intent": "wrangler_dev", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "open a local dev instance of the worker", "intent": "wrangler_dev", "lang": "en"}
+{"text": "odpal workera lokalnie", "intent": "wrangler_dev", "lang": "pl"}
+{"text": "odpal wrangler dev lokalnie", "intent": "wrangler_dev", "lang": "pl"}
+{"text": "uruchom lokalny serwer dla workera cloudflare", "intent": "wrangler_dev", "lang": "pl"}
+{"text": "przetestuj workera na localhoście", "intent": "wrangler_dev", "lang": "pl"}
+{"text": "jak uruchomić workera Cloudflare lokalnie?", "intent": "wrangler_dev", "lang": "pl"}
+{"text": "odpal wrangler dev", "intent": "wrangler_dev", "lang": "pl"}
+{"text": "serwuj workera lokalnie z hot reloadem", "intent": "wrangler_dev", "lang": "pl"}
+{"text": "uruchom npx wrangler dev", "intent": "wrangler_dev", "lang": "pl"}
+{"text": "lokalny podgląd workera", "intent": "wrangler_dev", "lang": "pl"}
+{"text": "uruchom workera cloudflare w trybie dev", "intent": "wrangler_dev", "lang": "pl"}
+{"text": "odpal środowisko dev dla workers", "intent": "wrangler_dev", "lang": "pl"}
+{"text": "emuluj workera lokalnie", "intent": "wrangler_dev", "lang": "pl"}
+{"text": "chcę sprawdzić workera przed deployem, odpal go lokalnie", "intent": "wrangler_dev", "lang": "pl"}
+{"text": "uruchom serwer deweloperski workera", "intent": "wrangler_dev", "lang": "pl"}
+{"text": "odpal wranglera w trybie developerskim", "intent": "wrangler_dev", "lang": "pl"}
+{"text": "uruchom lokalnie workerd dla projektu", "intent": "wrangler_dev", "lang": "pl"}
+{"text": "tryb dev dla CF workera", "intent": "wrangler_dev", "lang": "pl"}
+{"text": "odpal funkcję edge lokalnie wranglerem", "intent": "wrangler_dev", "lang": "pl"}
+{"text": "uruchom workera u mnie na maszynie", "intent": "wrangler_dev", "lang": "pl"}
+{"text": "lokalna sesja wranglera", "intent": "wrangler_dev", "lang": "pl"}
+{"text": "odpal lokalny serwer wranglera", "intent": "wrangler_dev", "lang": "pl"}
+{"text": "przetestuj zmiany w workerze lokalnie", "intent": "wrangler_dev", "lang": "pl"}
+{"text": "odpal workera lokalnie na porcie 8787", "intent": "wrangler_dev", "lang": "pl"}
+{"text": "uruchom workera na localhost:8787", "intent": "wrangler_dev", "lang": "pl"}
+{"text": "odpal ten projekt workers lokalnie", "intent": "wrangler_dev", "lang": "pl"}
+{"text": "uruchom wrangler dev w PowerShellu", "intent": "wrangler_dev", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "odpal workera lokalnie na macu", "intent": "wrangler_dev", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "wrangler dev we fishu", "intent": "wrangler_dev", "lang": "pl", "shell": "fish", "os": "linux"}
+{"text": "odpal workera lokalnie w cmd", "intent": "wrangler_dev", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "uruchom lokalna instancje workera", "intent": "wrangler_dev", "lang": "pl"}
+{"text": "wrangler tail", "intent": "wrangler_tail", "lang": "en"}
+{"text": "stream the worker logs", "intent": "wrangler_tail", "lang": "en"}
+{"text": "show live logs of my cloudflare worker", "intent": "wrangler_tail", "lang": "en"}
+{"text": "tail the production worker logs", "intent": "wrangler_tail", "lang": "en"}
+{"text": "how can I see console.log output from the deployed worker?", "intent": "wrangler_tail", "lang": "en"}
+{"text": "follow cloudflare worker logs in real time", "intent": "wrangler_tail", "lang": "en"}
+{"text": "watch the worker's requests live", "intent": "wrangler_tail", "lang": "en"}
+{"text": "npx wrangler tail", "intent": "wrangler_tail", "lang": "en"}
+{"text": "live log stream for the worker", "intent": "wrangler_tail", "lang": "en"}
+{"text": "show me what the deployed worker is logging", "intent": "wrangler_tail", "lang": "en"}
+{"text": "tail logs from cloudflare workers", "intent": "wrangler_tail", "lang": "en"}
+{"text": "I need to debug the prod worker, stream its logs", "intent": "wrangler_tail", "lang": "en"}
+{"text": "see errors from the deployed worker as they happen", "intent": "wrangler_tail", "lang": "en"}
+{"text": "attach to the worker log stream", "intent": "wrangler_tail", "lang": "en"}
+{"text": "real-time logs of my CF worker", "intent": "wrangler_tail", "lang": "en"}
+{"text": "tail my worker", "intent": "wrangler_tail", "lang": "en"}
+{"text": "watch exceptions thrown by the live worker", "intent": "wrangler_tail", "lang": "en"}
+{"text": "follow the worker output on cloudflare", "intent": "wrangler_tail", "lang": "en"}
+{"text": "open the log tail for the deployed worker", "intent": "wrangler_tail", "lang": "en"}
+{"text": "show workers logs live", "intent": "wrangler_tail", "lang": "en"}
+{"text": "monitor the worker logs", "intent": "wrangler_tail", "lang": "en"}
+{"text": "print live logs from the edge worker", "intent": "wrangler_tail", "lang": "en"}
+{"text": "display streaming logs of the cloudflare worker", "intent": "wrangler_tail", "lang": "en"}
+{"text": "get a live feed of the worker's console", "intent": "wrangler_tail", "lang": "en"}
+{"text": "stream logs from the worker in production", "intent": "wrangler_tail", "lang": "en"}
+{"text": "tail the worker logs in PowerShell", "intent": "wrangler_tail", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "wrangler tail on mac", "intent": "wrangler_tail", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "stream worker logs", "intent": "wrangler_tail", "lang": "en", "shell": "fish", "os": "linux"}
+{"text": "show live worker logs in cmd", "intent": "wrangler_tail", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "what's my worker logging right now", "intent": "wrangler_tail", "lang": "en"}
+{"text": "odpal wrangler tail", "intent": "wrangler_tail", "lang": "pl"}
+{"text": "strumieniuj logi workera", "intent": "wrangler_tail", "lang": "pl"}
+{"text": "pokaż logi na żywo z workera cloudflare", "intent": "wrangler_tail", "lang": "pl"}
+{"text": "podglądaj logi produkcyjnego workera", "intent": "wrangler_tail", "lang": "pl"}
+{"text": "jak zobaczyć console.log z zdeployowanego workera?", "intent": "wrangler_tail", "lang": "pl"}
+{"text": "śledź logi workera w czasie rzeczywistym", "intent": "wrangler_tail", "lang": "pl"}
+{"text": "obserwuj requesty do workera na żywo", "intent": "wrangler_tail", "lang": "pl"}
+{"text": "uruchom npx wrangler tail", "intent": "wrangler_tail", "lang": "pl"}
+{"text": "live logi workera", "intent": "wrangler_tail", "lang": "pl"}
+{"text": "pokaż co loguje zdeployowany worker", "intent": "wrangler_tail", "lang": "pl"}
+{"text": "tail logów z cloudflare workers", "intent": "wrangler_tail", "lang": "pl"}
+{"text": "muszę zdebugować workera na prodzie, pokaż logi na żywo", "intent": "wrangler_tail", "lang": "pl"}
+{"text": "pokazuj błędy z workera na bieżąco", "intent": "wrangler_tail", "lang": "pl"}
+{"text": "podepnij się pod logi workera", "intent": "wrangler_tail", "lang": "pl"}
+{"text": "logi CF workera w czasie rzeczywistym", "intent": "wrangler_tail", "lang": "pl"}
+{"text": "tailuj workera", "intent": "wrangler_tail", "lang": "pl"}
+{"text": "obserwuj wyjątki z działającego workera", "intent": "wrangler_tail", "lang": "pl"}
+{"text": "śledź output workera na cloudflare", "intent": "wrangler_tail", "lang": "pl"}
+{"text": "otwórz podgląd logów zdeployowanego workera", "intent": "wrangler_tail", "lang": "pl"}
+{"text": "pokaz logi workers na zywo", "intent": "wrangler_tail", "lang": "pl"}
+{"text": "monitoruj logi workera", "intent": "wrangler_tail", "lang": "pl"}
+{"text": "wypisuj logi na żywo z workera na edge", "intent": "wrangler_tail", "lang": "pl"}
+{"text": "wyświetl strumień logów workera cloudflare", "intent": "wrangler_tail", "lang": "pl"}
+{"text": "daj mi podgląd konsoli workera na żywo", "intent": "wrangler_tail", "lang": "pl"}
+{"text": "strumień logów z workera produkcyjnego", "intent": "wrangler_tail", "lang": "pl"}
+{"text": "podglądaj logi workera w PowerShellu", "intent": "wrangler_tail", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "wrangler tail na macu", "intent": "wrangler_tail", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "logi workera na żywo", "intent": "wrangler_tail", "lang": "pl", "shell": "fish", "os": "linux"}
+{"text": "pokaż logi workera na żywo w cmd", "intent": "wrangler_tail", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "co teraz loguje mój worker", "intent": "wrangler_tail", "lang": "pl"}
+{"text": "set the API_KEY secret on the worker", "intent": "wrangler_secret_put", "lang": "en"}
+{"text": "wrangler secret put STRIPE_SECRET", "intent": "wrangler_secret_put", "lang": "en"}
+{"text": "add a secret DATABASE_URL to my cloudflare worker", "intent": "wrangler_secret_put", "lang": "en"}
+{"text": "how do I set an environment secret for a worker, called OPENAI_API_KEY?", "intent": "wrangler_secret_put", "lang": "en"}
+{"text": "store JWT_SECRET as a worker secret", "intent": "wrangler_secret_put", "lang": "en"}
+{"text": "put the secret SENDGRID_KEY into the worker", "intent": "wrangler_secret_put", "lang": "en"}
+{"text": "set worker secret GITHUB_TOKEN", "intent": "wrangler_secret_put", "lang": "en"}
+{"text": "add secret env var R2_ACCESS_KEY to the worker", "intent": "wrangler_secret_put", "lang": "en"}
+{"text": "create a cloudflare worker secret named WEBHOOK_SECRET", "intent": "wrangler_secret_put", "lang": "en"}
+{"text": "update the worker secret AUTH_TOKEN", "intent": "wrangler_secret_put", "lang": "en"}
+{"text": "save SLACK_BOT_TOKEN as a secret for the worker", "intent": "wrangler_secret_put", "lang": "en"}
+{"text": "wrangler secret for SUPABASE_KEY", "intent": "wrangler_secret_put", "lang": "en"}
+{"text": "set a secret variable ANTHROPIC_API_KEY on cloudflare workers", "intent": "wrangler_secret_put", "lang": "en"}
+{"text": "I need to add the MAILGUN_API_KEY secret to the worker", "intent": "wrangler_secret_put", "lang": "en"}
+{"text": "configure the secret TURNSTILE_SECRET on my worker", "intent": "wrangler_secret_put", "lang": "en"}
+{"text": "add encrypted variable SESSION_KEY to the worker", "intent": "wrangler_secret_put", "lang": "en"}
+{"text": "push a new secret PRIVATE_KEY to the worker", "intent": "wrangler_secret_put", "lang": "en"}
+{"text": "set the worker's ADMIN_PASSWORD secret", "intent": "wrangler_secret_put", "lang": "en"}
+{"text": "register secret S3_SECRET with wrangler", "intent": "wrangler_secret_put", "lang": "en"}
+{"text": "add the secret CLIENT_SECRET to cloudflare", "intent": "wrangler_secret_put", "lang": "en"}
+{"text": "rotate the worker secret API_TOKEN", "intent": "wrangler_secret_put", "lang": "en"}
+{"text": "npx wrangler secret put SENTRY_DSN", "intent": "wrangler_secret_put", "lang": "en"}
+{"text": "put DISCORD_TOKEN as a wrangler secret", "intent": "wrangler_secret_put", "lang": "en"}
+{"text": "set the env secret POSTMARK_TOKEN for this worker", "intent": "wrangler_secret_put", "lang": "en"}
+{"text": "add a secret called ENCRYPTION_KEY to the cf worker", "intent": "wrangler_secret_put", "lang": "en"}
+{"text": "set the API_KEY worker secret in PowerShell", "intent": "wrangler_secret_put", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "wrangler secret put STRIPE_WEBHOOK_SECRET on my mac", "intent": "wrangler_secret_put", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "add worker secret REDIS_PASSWORD", "intent": "wrangler_secret_put", "lang": "en", "shell": "fish", "os": "linux"}
+{"text": "set secret TWILIO_AUTH_TOKEN for the worker in cmd", "intent": "wrangler_secret_put", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "give the worker a secret named HMAC_KEY", "intent": "wrangler_secret_put", "lang": "en"}
+{"text": "ustaw sekret API_KEY na workerze", "intent": "wrangler_secret_put", "lang": "pl"}
+{"text": "ustaw wrangler secret put STRIPE_SECRET", "intent": "wrangler_secret_put", "lang": "pl"}
+{"text": "dodaj sekret DATABASE_URL do workera cloudflare", "intent": "wrangler_secret_put", "lang": "pl"}
+{"text": "jak ustawić sekretną zmienną OPENAI_API_KEY dla workera?", "intent": "wrangler_secret_put", "lang": "pl"}
+{"text": "zapisz JWT_SECRET jako sekret workera", "intent": "wrangler_secret_put", "lang": "pl"}
+{"text": "wrzuć sekret SENDGRID_KEY do workera", "intent": "wrangler_secret_put", "lang": "pl"}
+{"text": "ustaw sekret workera GITHUB_TOKEN", "intent": "wrangler_secret_put", "lang": "pl"}
+{"text": "dodaj sekretną zmienną R2_ACCESS_KEY do workera", "intent": "wrangler_secret_put", "lang": "pl"}
+{"text": "utwórz sekret cloudflare workera o nazwie WEBHOOK_SECRET", "intent": "wrangler_secret_put", "lang": "pl"}
+{"text": "zaktualizuj sekret workera AUTH_TOKEN", "intent": "wrangler_secret_put", "lang": "pl"}
+{"text": "zapisz SLACK_BOT_TOKEN jako sekret workera", "intent": "wrangler_secret_put", "lang": "pl"}
+{"text": "sekret wranglera dla SUPABASE_KEY", "intent": "wrangler_secret_put", "lang": "pl"}
+{"text": "ustaw sekret ANTHROPIC_API_KEY na cloudflare workers", "intent": "wrangler_secret_put", "lang": "pl"}
+{"text": "muszę dodać sekret MAILGUN_API_KEY do workera", "intent": "wrangler_secret_put", "lang": "pl"}
+{"text": "skonfiguruj sekret TURNSTILE_SECRET na workerze", "intent": "wrangler_secret_put", "lang": "pl"}
+{"text": "dodaj zaszyfrowaną zmienną SESSION_KEY do workera", "intent": "wrangler_secret_put", "lang": "pl"}
+{"text": "wypchnij nowy sekret PRIVATE_KEY do workera", "intent": "wrangler_secret_put", "lang": "pl"}
+{"text": "ustaw sekret ADMIN_PASSWORD workera", "intent": "wrangler_secret_put", "lang": "pl"}
+{"text": "zarejestruj sekret S3_SECRET wranglerem", "intent": "wrangler_secret_put", "lang": "pl"}
+{"text": "dodaj sekret CLIENT_SECRET do cloudflare", "intent": "wrangler_secret_put", "lang": "pl"}
+{"text": "zrotuj sekret workera API_TOKEN", "intent": "wrangler_secret_put", "lang": "pl"}
+{"text": "odpal npx wrangler secret put SENTRY_DSN", "intent": "wrangler_secret_put", "lang": "pl"}
+{"text": "wrzuć DISCORD_TOKEN jako sekret wranglera", "intent": "wrangler_secret_put", "lang": "pl"}
+{"text": "ustaw sekret POSTMARK_TOKEN dla tego workera", "intent": "wrangler_secret_put", "lang": "pl"}
+{"text": "dodaj sekret o nazwie ENCRYPTION_KEY do cf workera", "intent": "wrangler_secret_put", "lang": "pl"}
+{"text": "ustaw sekret API_KEY workera w PowerShellu", "intent": "wrangler_secret_put", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "wrangler secret put STRIPE_WEBHOOK_SECRET na macu", "intent": "wrangler_secret_put", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "dodaj sekret workera REDIS_PASSWORD", "intent": "wrangler_secret_put", "lang": "pl", "shell": "fish", "os": "linux"}
+{"text": "ustaw sekret TWILIO_AUTH_TOKEN dla workera w cmd", "intent": "wrangler_secret_put", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "daj workerowi sekret HMAC_KEY", "intent": "wrangler_secret_put", "lang": "pl"}
+{"text": "wrangler login", "intent": "wrangler_login", "lang": "en"}
+{"text": "log in to cloudflare", "intent": "wrangler_login", "lang": "en"}
+{"text": "authenticate wrangler with my cloudflare account", "intent": "wrangler_login", "lang": "en"}
+{"text": "how do I log into Cloudflare from the terminal?", "intent": "wrangler_login", "lang": "en"}
+{"text": "sign in to cloudflare with wrangler", "intent": "wrangler_login", "lang": "en"}
+{"text": "npx wrangler login", "intent": "wrangler_login", "lang": "en"}
+{"text": "connect wrangler to cloudflare", "intent": "wrangler_login", "lang": "en"}
+{"text": "login to my CF account via wrangler", "intent": "wrangler_login", "lang": "en"}
+{"text": "wrangler says I'm not authenticated, log me in", "intent": "wrangler_login", "lang": "en"}
+{"text": "authorize wrangler", "intent": "wrangler_login", "lang": "en"}
+{"text": "sign into Cloudflare Workers cli", "intent": "wrangler_login", "lang": "en"}
+{"text": "do the cloudflare oauth login", "intent": "wrangler_login", "lang": "en"}
+{"text": "log in to cloudflare so I can deploy", "intent": "wrangler_login", "lang": "en"}
+{"text": "wrangler auth login", "intent": "wrangler_login", "lang": "en"}
+{"text": "re-login to cloudflare with wrangler", "intent": "wrangler_login", "lang": "en"}
+{"text": "I need to authenticate with Cloudflare first", "intent": "wrangler_login", "lang": "en"}
+{"text": "open the cloudflare login in the browser via wrangler", "intent": "wrangler_login", "lang": "en"}
+{"text": "log wrangler into my account", "intent": "wrangler_login", "lang": "en"}
+{"text": "cloudflare cli login", "intent": "wrangler_login", "lang": "en"}
+{"text": "my wrangler token expired, log in again", "intent": "wrangler_login", "lang": "en"}
+{"text": "set up wrangler authentication", "intent": "wrangler_login", "lang": "en"}
+{"text": "sign in wrangler", "intent": "wrangler_login", "lang": "en"}
+{"text": "give wrangler access to my cloudflare account", "intent": "wrangler_login", "lang": "en"}
+{"text": "login to workers", "intent": "wrangler_login", "lang": "en"}
+{"text": "authenticate the cloudflare cli", "intent": "wrangler_login", "lang": "en"}
+{"text": "log in to cloudflare with wrangler in PowerShell", "intent": "wrangler_login", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "wrangler login on my mac", "intent": "wrangler_login", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "log into cloudflare", "intent": "wrangler_login", "lang": "en", "shell": "fish", "os": "linux"}
+{"text": "npx wrangler login in cmd", "intent": "wrangler_login", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "please log me into cloudflare", "intent": "wrangler_login", "lang": "en"}
+{"text": "wrangler login prosze", "intent": "wrangler_login", "lang": "pl"}
+{"text": "zaloguj się do cloudflare", "intent": "wrangler_login", "lang": "pl"}
+{"text": "uwierzytelnij wranglera kontem cloudflare", "intent": "wrangler_login", "lang": "pl"}
+{"text": "jak się zalogować do Cloudflare z terminala?", "intent": "wrangler_login", "lang": "pl"}
+{"text": "zaloguj się do cloudflare wranglerem", "intent": "wrangler_login", "lang": "pl"}
+{"text": "uruchom npx wrangler login", "intent": "wrangler_login", "lang": "pl"}
+{"text": "połącz wranglera z cloudflare", "intent": "wrangler_login", "lang": "pl"}
+{"text": "zaloguj do mojego konta CF przez wranglera", "intent": "wrangler_login", "lang": "pl"}
+{"text": "wrangler mówi że nie jestem zalogowany, zaloguj mnie", "intent": "wrangler_login", "lang": "pl"}
+{"text": "autoryzuj wranglera", "intent": "wrangler_login", "lang": "pl"}
+{"text": "zaloguj się do cli Cloudflare Workers", "intent": "wrangler_login", "lang": "pl"}
+{"text": "zrób logowanie oauth do cloudflare", "intent": "wrangler_login", "lang": "pl"}
+{"text": "zaloguj do cloudflare żebym mógł deployować", "intent": "wrangler_login", "lang": "pl"}
+{"text": "zrób wrangler auth login", "intent": "wrangler_login", "lang": "pl"}
+{"text": "zaloguj ponownie do cloudflare wranglerem", "intent": "wrangler_login", "lang": "pl"}
+{"text": "najpierw muszę się uwierzytelnić w Cloudflare", "intent": "wrangler_login", "lang": "pl"}
+{"text": "otwórz logowanie cloudflare w przeglądarce przez wranglera", "intent": "wrangler_login", "lang": "pl"}
+{"text": "zaloguj wranglera na moje konto", "intent": "wrangler_login", "lang": "pl"}
+{"text": "logowanie do cloudflare cli", "intent": "wrangler_login", "lang": "pl"}
+{"text": "token wranglera wygasł, zaloguj jeszcze raz", "intent": "wrangler_login", "lang": "pl"}
+{"text": "skonfiguruj logowanie wranglera", "intent": "wrangler_login", "lang": "pl"}
+{"text": "zaloguj wranglera", "intent": "wrangler_login", "lang": "pl"}
+{"text": "daj wranglerowi dostęp do konta cloudflare", "intent": "wrangler_login", "lang": "pl"}
+{"text": "zaloguj sie do workers", "intent": "wrangler_login", "lang": "pl"}
+{"text": "uwierzytelnij cli cloudflare", "intent": "wrangler_login", "lang": "pl"}
+{"text": "zaloguj się do cloudflare wranglerem w PowerShellu", "intent": "wrangler_login", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "wrangler login na macu", "intent": "wrangler_login", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "zaloguj do cloudflare", "intent": "wrangler_login", "lang": "pl", "shell": "fish", "os": "linux"}
+{"text": "npx wrangler login w cmd", "intent": "wrangler_login", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "zaloguj mnie do cloudflare prosze", "intent": "wrangler_login", "lang": "pl"}
+{"text": "wrangler whoami", "intent": "wrangler_whoami", "lang": "en"}
+{"text": "which cloudflare account am I logged into?", "intent": "wrangler_whoami", "lang": "en"}
+{"text": "who am I on cloudflare", "intent": "wrangler_whoami", "lang": "en"}
+{"text": "show the wrangler account", "intent": "wrangler_whoami", "lang": "en"}
+{"text": "check which CF account wrangler uses", "intent": "wrangler_whoami", "lang": "en"}
+{"text": "am I logged in to cloudflare?", "intent": "wrangler_whoami", "lang": "en"}
+{"text": "npx wrangler whoami", "intent": "wrangler_whoami", "lang": "en"}
+{"text": "what cloudflare user is wrangler authenticated as", "intent": "wrangler_whoami", "lang": "en"}
+{"text": "verify my wrangler login", "intent": "wrangler_whoami", "lang": "en"}
+{"text": "show my cloudflare account id", "intent": "wrangler_whoami", "lang": "en"}
+{"text": "which account will wrangler deploy to", "intent": "wrangler_whoami", "lang": "en"}
+{"text": "is wrangler authenticated?", "intent": "wrangler_whoami", "lang": "en"}
+{"text": "display the current cloudflare identity", "intent": "wrangler_whoami", "lang": "en"}
+{"text": "check cloudflare auth status", "intent": "wrangler_whoami", "lang": "en"}
+{"text": "whose cloudflare account is this wrangler using", "intent": "wrangler_whoami", "lang": "en"}
+{"text": "show the email wrangler is logged in with", "intent": "wrangler_whoami", "lang": "en"}
+{"text": "confirm the cloudflare account before deploying", "intent": "wrangler_whoami", "lang": "en"}
+{"text": "wrangler which account", "intent": "wrangler_whoami", "lang": "en"}
+{"text": "list my cloudflare account details from wrangler", "intent": "wrangler_whoami", "lang": "en"}
+{"text": "tell me which cloudflare login is active", "intent": "wrangler_whoami", "lang": "en"}
+{"text": "check if my wrangler session is still valid", "intent": "wrangler_whoami", "lang": "en"}
+{"text": "what account is configured in wrangler", "intent": "wrangler_whoami", "lang": "en"}
+{"text": "show cloudflare whoami", "intent": "wrangler_whoami", "lang": "en"}
+{"text": "am I signed in to Workers cli", "intent": "wrangler_whoami", "lang": "en"}
+{"text": "which CF org am I using in the terminal", "intent": "wrangler_whoami", "lang": "en"}
+{"text": "wrangler whoami in PowerShell", "intent": "wrangler_whoami", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "check my cloudflare login on mac", "intent": "wrangler_whoami", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "which cloudflare account am I on", "intent": "wrangler_whoami", "lang": "en", "shell": "fish", "os": "linux"}
+{"text": "show the wrangler account in cmd", "intent": "wrangler_whoami", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "before deploying, who am I logged in as on cloudflare", "intent": "wrangler_whoami", "lang": "en"}
+{"text": "sprawdź wrangler whoami", "intent": "wrangler_whoami", "lang": "pl"}
+{"text": "na jakie konto cloudflare jestem zalogowany?", "intent": "wrangler_whoami", "lang": "pl"}
+{"text": "kim jestem w cloudflare", "intent": "wrangler_whoami", "lang": "pl"}
+{"text": "pokaż konto wranglera", "intent": "wrangler_whoami", "lang": "pl"}
+{"text": "sprawdź jakiego konta CF używa wrangler", "intent": "wrangler_whoami", "lang": "pl"}
+{"text": "czy jestem zalogowany do cloudflare?", "intent": "wrangler_whoami", "lang": "pl"}
+{"text": "odpal npx wrangler whoami", "intent": "wrangler_whoami", "lang": "pl"}
+{"text": "jako kto jest zalogowany wrangler", "intent": "wrangler_whoami", "lang": "pl"}
+{"text": "sprawdź moje logowanie wranglera", "intent": "wrangler_whoami", "lang": "pl"}
+{"text": "pokaż id mojego konta cloudflare", "intent": "wrangler_whoami", "lang": "pl"}
+{"text": "na które konto wrangler będzie deployował", "intent": "wrangler_whoami", "lang": "pl"}
+{"text": "czy wrangler jest zalogowany?", "intent": "wrangler_whoami", "lang": "pl"}
+{"text": "wyświetl aktualną tożsamość cloudflare", "intent": "wrangler_whoami", "lang": "pl"}
+{"text": "sprawdź status logowania cloudflare", "intent": "wrangler_whoami", "lang": "pl"}
+{"text": "czyjego konta cloudflare używa wrangler", "intent": "wrangler_whoami", "lang": "pl"}
+{"text": "pokaż maila na który zalogowany jest wrangler", "intent": "wrangler_whoami", "lang": "pl"}
+{"text": "potwierdź konto cloudflare przed deployem", "intent": "wrangler_whoami", "lang": "pl"}
+{"text": "wrangler jakie konto", "intent": "wrangler_whoami", "lang": "pl"}
+{"text": "pokaż szczegóły konta cloudflare z wranglera", "intent": "wrangler_whoami", "lang": "pl"}
+{"text": "powiedz które logowanie cloudflare jest aktywne", "intent": "wrangler_whoami", "lang": "pl"}
+{"text": "sprawdź czy sesja wranglera jest ważna", "intent": "wrangler_whoami", "lang": "pl"}
+{"text": "jakie konto jest skonfigurowane we wranglerze", "intent": "wrangler_whoami", "lang": "pl"}
+{"text": "pokaz cloudflare whoami", "intent": "wrangler_whoami", "lang": "pl"}
+{"text": "czy jestem zalogowany do cli Workers", "intent": "wrangler_whoami", "lang": "pl"}
+{"text": "jakiej organizacji CF używam w terminalu", "intent": "wrangler_whoami", "lang": "pl"}
+{"text": "wrangler whoami w PowerShellu", "intent": "wrangler_whoami", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "sprawdź logowanie cloudflare na macu", "intent": "wrangler_whoami", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "na jakim koncie cloudflare jestem", "intent": "wrangler_whoami", "lang": "pl", "shell": "fish", "os": "linux"}
+{"text": "pokaż konto wranglera w cmd", "intent": "wrangler_whoami", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "przed deployem: jako kto jestem zalogowany w cloudflare", "intent": "wrangler_whoami", "lang": "pl"}
+{"text": "gh auth status", "intent": "gh_auth_status", "lang": "en"}
+{"text": "am I logged in to github cli?", "intent": "gh_auth_status", "lang": "en"}
+{"text": "check my github login status", "intent": "gh_auth_status", "lang": "en"}
+{"text": "which github account is gh using", "intent": "gh_auth_status", "lang": "en"}
+{"text": "is the gh cli authenticated", "intent": "gh_auth_status", "lang": "en"}
+{"text": "show github cli auth status", "intent": "gh_auth_status", "lang": "en"}
+{"text": "who am I on github in the terminal", "intent": "gh_auth_status", "lang": "en"}
+{"text": "verify gh login", "intent": "gh_auth_status", "lang": "en"}
+{"text": "check if my github token in gh is valid", "intent": "gh_auth_status", "lang": "en"}
+{"text": "what scopes does my gh token have", "intent": "gh_auth_status", "lang": "en"}
+{"text": "github auth status please", "intent": "gh_auth_status", "lang": "en"}
+{"text": "am I signed in to GitHub with gh?", "intent": "gh_auth_status", "lang": "en"}
+{"text": "show which user gh is logged in as", "intent": "gh_auth_status", "lang": "en"}
+{"text": "is gh still logged in", "intent": "gh_auth_status", "lang": "en"}
+{"text": "check the github cli session", "intent": "gh_auth_status", "lang": "en"}
+{"text": "display gh authentication info", "intent": "gh_auth_status", "lang": "en"}
+{"text": "confirm I'm authenticated with github cli", "intent": "gh_auth_status", "lang": "en"}
+{"text": "which github host is gh logged into", "intent": "gh_auth_status", "lang": "en"}
+{"text": "gh whoami", "intent": "gh_auth_status", "lang": "en"}
+{"text": "tell me if github cli has credentials", "intent": "gh_auth_status", "lang": "en"}
+{"text": "does gh have a working login", "intent": "gh_auth_status", "lang": "en"}
+{"text": "check github authentication for the cli", "intent": "gh_auth_status", "lang": "en"}
+{"text": "status of my github cli login", "intent": "gh_auth_status", "lang": "en"}
+{"text": "is my gh token expired?", "intent": "gh_auth_status", "lang": "en"}
+{"text": "show me gh auth details", "intent": "gh_auth_status", "lang": "en"}
+{"text": "gh auth status in PowerShell", "intent": "gh_auth_status", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "check gh login on my mac", "intent": "gh_auth_status", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "am I logged into gh", "intent": "gh_auth_status", "lang": "en", "shell": "fish", "os": "linux"}
+{"text": "github cli auth status in cmd", "intent": "gh_auth_status", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "before creating a PR, check that gh is authenticated", "intent": "gh_auth_status", "lang": "en"}
+{"text": "sprawdź gh auth status", "intent": "gh_auth_status", "lang": "pl"}
+{"text": "czy jestem zalogowany do github cli?", "intent": "gh_auth_status", "lang": "pl"}
+{"text": "sprawdź status logowania do githuba", "intent": "gh_auth_status", "lang": "pl"}
+{"text": "jakiego konta githuba używa gh", "intent": "gh_auth_status", "lang": "pl"}
+{"text": "czy gh cli jest uwierzytelnione", "intent": "gh_auth_status", "lang": "pl"}
+{"text": "pokaż status autoryzacji github cli", "intent": "gh_auth_status", "lang": "pl"}
+{"text": "kim jestem na githubie w terminalu", "intent": "gh_auth_status", "lang": "pl"}
+{"text": "sprawdź logowanie gh", "intent": "gh_auth_status", "lang": "pl"}
+{"text": "sprawdź czy token githuba w gh jest ważny", "intent": "gh_auth_status", "lang": "pl"}
+{"text": "jakie scope'y ma mój token gh", "intent": "gh_auth_status", "lang": "pl"}
+{"text": "status autoryzacji githuba", "intent": "gh_auth_status", "lang": "pl"}
+{"text": "czy jestem zalogowany do GitHuba przez gh?", "intent": "gh_auth_status", "lang": "pl"}
+{"text": "pokaż jako kto jest zalogowane gh", "intent": "gh_auth_status", "lang": "pl"}
+{"text": "czy gh jest dalej zalogowane", "intent": "gh_auth_status", "lang": "pl"}
+{"text": "sprawdź sesję github cli", "intent": "gh_auth_status", "lang": "pl"}
+{"text": "wyświetl info o uwierzytelnieniu gh", "intent": "gh_auth_status", "lang": "pl"}
+{"text": "potwierdź że jestem zalogowany w github cli", "intent": "gh_auth_status", "lang": "pl"}
+{"text": "do jakiego hosta githuba jest zalogowane gh", "intent": "gh_auth_status", "lang": "pl"}
+{"text": "gh whoami, kim jestem?", "intent": "gh_auth_status", "lang": "pl"}
+{"text": "czy github cli ma dane logowania", "intent": "gh_auth_status", "lang": "pl"}
+{"text": "czy gh ma działające logowanie", "intent": "gh_auth_status", "lang": "pl"}
+{"text": "sprawdz autoryzacje githuba dla cli", "intent": "gh_auth_status", "lang": "pl"}
+{"text": "stan logowania github cli", "intent": "gh_auth_status", "lang": "pl"}
+{"text": "czy mój token gh wygasł?", "intent": "gh_auth_status", "lang": "pl"}
+{"text": "pokaż szczegóły gh auth", "intent": "gh_auth_status", "lang": "pl"}
+{"text": "gh auth status w PowerShellu", "intent": "gh_auth_status", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "sprawdź logowanie gh na macu", "intent": "gh_auth_status", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "czy jestem zalogowany do gh", "intent": "gh_auth_status", "lang": "pl", "shell": "fish", "os": "linux"}
+{"text": "status logowania github cli w cmd", "intent": "gh_auth_status", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "zanim zrobię PR, sprawdź czy gh jest zalogowane", "intent": "gh_auth_status", "lang": "pl"}
+{"text": "gh auth login", "intent": "gh_auth_login", "lang": "en"}
+{"text": "log in to github cli", "intent": "gh_auth_login", "lang": "en"}
+{"text": "authenticate gh with my github account", "intent": "gh_auth_login", "lang": "en"}
+{"text": "how do I log into GitHub from the terminal with gh?", "intent": "gh_auth_login", "lang": "en"}
+{"text": "sign in to github cli", "intent": "gh_auth_login", "lang": "en"}
+{"text": "connect gh to github", "intent": "gh_auth_login", "lang": "en"}
+{"text": "login to github via gh", "intent": "gh_auth_login", "lang": "en"}
+{"text": "gh says I'm not logged in, log me in", "intent": "gh_auth_login", "lang": "en"}
+{"text": "authorize the github cli", "intent": "gh_auth_login", "lang": "en"}
+{"text": "set up github cli authentication", "intent": "gh_auth_login", "lang": "en"}
+{"text": "log in to GitHub so I can make PRs from the terminal", "intent": "gh_auth_login", "lang": "en"}
+{"text": "re-authenticate gh", "intent": "gh_auth_login", "lang": "en"}
+{"text": "my gh token expired, log in again", "intent": "gh_auth_login", "lang": "en"}
+{"text": "github cli login please", "intent": "gh_auth_login", "lang": "en"}
+{"text": "sign into github with the gh tool", "intent": "gh_auth_login", "lang": "en"}
+{"text": "do the github device login in gh", "intent": "gh_auth_login", "lang": "en"}
+{"text": "log gh into my work github account", "intent": "gh_auth_login", "lang": "en"}
+{"text": "authenticate to github.com with gh", "intent": "gh_auth_login", "lang": "en"}
+{"text": "give gh access to my github account", "intent": "gh_auth_login", "lang": "en"}
+{"text": "login gh", "intent": "gh_auth_login", "lang": "en"}
+{"text": "set up gh with my github credentials", "intent": "gh_auth_login", "lang": "en"}
+{"text": "start gh login flow", "intent": "gh_auth_login", "lang": "en"}
+{"text": "I need to log in with gh before cloning private repos", "intent": "gh_auth_login", "lang": "en"}
+{"text": "log in to github enterprise with gh", "intent": "gh_auth_login", "lang": "en"}
+{"text": "first-time setup: authenticate github cli", "intent": "gh_auth_login", "lang": "en"}
+{"text": "gh auth login in PowerShell", "intent": "gh_auth_login", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "log into github cli on my mac", "intent": "gh_auth_login", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "run gh auth login in fish", "intent": "gh_auth_login", "lang": "en", "shell": "fish", "os": "linux"}
+{"text": "authenticate gh in cmd", "intent": "gh_auth_login", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "sign me in to github cli", "intent": "gh_auth_login", "lang": "en"}
+{"text": "odpal gh auth login", "intent": "gh_auth_login", "lang": "pl"}
+{"text": "zaloguj się do github cli", "intent": "gh_auth_login", "lang": "pl"}
+{"text": "uwierzytelnij gh moim kontem githuba", "intent": "gh_auth_login", "lang": "pl"}
+{"text": "jak się zalogować do GitHuba z terminala przez gh?", "intent": "gh_auth_login", "lang": "pl"}
+{"text": "zaloguj do github cli", "intent": "gh_auth_login", "lang": "pl"}
+{"text": "połącz gh z githubem", "intent": "gh_auth_login", "lang": "pl"}
+{"text": "zaloguj się do githuba przez gh", "intent": "gh_auth_login", "lang": "pl"}
+{"text": "gh mówi że nie jestem zalogowany, zaloguj mnie", "intent": "gh_auth_login", "lang": "pl"}
+{"text": "autoryzuj github cli", "intent": "gh_auth_login", "lang": "pl"}
+{"text": "skonfiguruj logowanie github cli", "intent": "gh_auth_login", "lang": "pl"}
+{"text": "zaloguj do GitHuba żebym mógł robić PR z terminala", "intent": "gh_auth_login", "lang": "pl"}
+{"text": "zaloguj gh ponownie", "intent": "gh_auth_login", "lang": "pl"}
+{"text": "token gh wygasł, zaloguj jeszcze raz", "intent": "gh_auth_login", "lang": "pl"}
+{"text": "logowanie do github cli", "intent": "gh_auth_login", "lang": "pl"}
+{"text": "zaloguj się do githuba narzędziem gh", "intent": "gh_auth_login", "lang": "pl"}
+{"text": "zrób logowanie urządzenia do githuba w gh", "intent": "gh_auth_login", "lang": "pl"}
+{"text": "zaloguj gh na firmowe konto githuba", "intent": "gh_auth_login", "lang": "pl"}
+{"text": "uwierzytelnij się w github.com przez gh", "intent": "gh_auth_login", "lang": "pl"}
+{"text": "daj gh dostęp do mojego konta githuba", "intent": "gh_auth_login", "lang": "pl"}
+{"text": "zaloguj gh", "intent": "gh_auth_login", "lang": "pl"}
+{"text": "skonfiguruj gh z moimi danymi githuba", "intent": "gh_auth_login", "lang": "pl"}
+{"text": "odpal logowanie gh", "intent": "gh_auth_login", "lang": "pl"}
+{"text": "muszę się zalogować gh przed klonowaniem prywatnych repo", "intent": "gh_auth_login", "lang": "pl"}
+{"text": "zaloguj do github enterprise przez gh", "intent": "gh_auth_login", "lang": "pl"}
+{"text": "pierwsza konfiguracja: zaloguj github cli", "intent": "gh_auth_login", "lang": "pl"}
+{"text": "gh auth login w PowerShellu", "intent": "gh_auth_login", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "zaloguj do github cli na macu", "intent": "gh_auth_login", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "zaloguj przez gh auth login we fishu", "intent": "gh_auth_login", "lang": "pl", "shell": "fish", "os": "linux"}
+{"text": "zaloguj gh w cmd", "intent": "gh_auth_login", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "zaloguj mnie do github cli", "intent": "gh_auth_login", "lang": "pl"}
+{"text": "gh pr list", "intent": "gh_pr_list", "lang": "en"}
+{"text": "list pull requests", "intent": "gh_pr_list", "lang": "en"}
+{"text": "show open PRs in this repo", "intent": "gh_pr_list", "lang": "en"}
+{"text": "what pull requests are open?", "intent": "gh_pr_list", "lang": "en"}
+{"text": "list the PRs", "intent": "gh_pr_list", "lang": "en"}
+{"text": "show me all open pull requests on github", "intent": "gh_pr_list", "lang": "en"}
+{"text": "which PRs are waiting for review", "intent": "gh_pr_list", "lang": "en"}
+{"text": "list github pull requests for this repository", "intent": "gh_pr_list", "lang": "en"}
+{"text": "any open PRs?", "intent": "gh_pr_list", "lang": "en"}
+{"text": "show pr list", "intent": "gh_pr_list", "lang": "en"}
+{"text": "display the pull requests of the repo", "intent": "gh_pr_list", "lang": "en"}
+{"text": "what PRs do we have right now", "intent": "gh_pr_list", "lang": "en"}
+{"text": "list open merge requests on github", "intent": "gh_pr_list", "lang": "en"}
+{"text": "show the current pull requests", "intent": "gh_pr_list", "lang": "en"}
+{"text": "how do I list pull requests from the terminal?", "intent": "gh_pr_list", "lang": "en"}
+{"text": "enumerate open PRs", "intent": "gh_pr_list", "lang": "en"}
+{"text": "pull requests in this repo, please", "intent": "gh_pr_list", "lang": "en"}
+{"text": "see the open PRs on GitHub", "intent": "gh_pr_list", "lang": "en"}
+{"text": "list prs", "intent": "gh_pr_list", "lang": "en"}
+{"text": "what's in the PR queue", "intent": "gh_pr_list", "lang": "en"}
+{"text": "show github PRs for the project", "intent": "gh_pr_list", "lang": "en"}
+{"text": "list all the pull requests that are still open", "intent": "gh_pr_list", "lang": "en"}
+{"text": "are there pull requests I should look at", "intent": "gh_pr_list", "lang": "en"}
+{"text": "show outstanding PRs", "intent": "gh_pr_list", "lang": "en"}
+{"text": "list pull requests with gh", "intent": "gh_pr_list", "lang": "en"}
+{"text": "list pull requests in PowerShell", "intent": "gh_pr_list", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "gh pr list on mac", "intent": "gh_pr_list", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "show open PRs", "intent": "gh_pr_list", "lang": "en", "shell": "fish", "os": "linux"}
+{"text": "list PRs in cmd", "intent": "gh_pr_list", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "give me a list of the repo's open pull requests", "intent": "gh_pr_list", "lang": "en"}
+{"text": "odpal gh pr list", "intent": "gh_pr_list", "lang": "pl"}
+{"text": "wylistuj pull requesty", "intent": "gh_pr_list", "lang": "pl"}
+{"text": "pokaż otwarte PR-y w tym repo", "intent": "gh_pr_list", "lang": "pl"}
+{"text": "jakie są otwarte pull requesty?", "intent": "gh_pr_list", "lang": "pl"}
+{"text": "lista PRów", "intent": "gh_pr_list", "lang": "pl"}
+{"text": "pokaż wszystkie otwarte pull requesty na githubie", "intent": "gh_pr_list", "lang": "pl"}
+{"text": "które PR czekają na review", "intent": "gh_pr_list", "lang": "pl"}
+{"text": "wylistuj pull requesty tego repozytorium", "intent": "gh_pr_list", "lang": "pl"}
+{"text": "są jakieś otwarte PR?", "intent": "gh_pr_list", "lang": "pl"}
+{"text": "pokaż listę pr", "intent": "gh_pr_list", "lang": "pl"}
+{"text": "wyświetl pull requesty repo", "intent": "gh_pr_list", "lang": "pl"}
+{"text": "jakie mamy teraz PR-y", "intent": "gh_pr_list", "lang": "pl"}
+{"text": "lista otwartych merge requestów na githubie", "intent": "gh_pr_list", "lang": "pl"}
+{"text": "pokaż aktualne pull requesty", "intent": "gh_pr_list", "lang": "pl"}
+{"text": "jak wylistować pull requesty z terminala?", "intent": "gh_pr_list", "lang": "pl"}
+{"text": "wymień otwarte PRy", "intent": "gh_pr_list", "lang": "pl"}
+{"text": "pull requesty w tym repo", "intent": "gh_pr_list", "lang": "pl"}
+{"text": "zobacz otwarte PR na GitHubie", "intent": "gh_pr_list", "lang": "pl"}
+{"text": "daj liste prów", "intent": "gh_pr_list", "lang": "pl"}
+{"text": "co jest w kolejce PR", "intent": "gh_pr_list", "lang": "pl"}
+{"text": "pokaż PR z githuba dla projektu", "intent": "gh_pr_list", "lang": "pl"}
+{"text": "wylistuj wszystkie pull requesty które są jeszcze otwarte", "intent": "gh_pr_list", "lang": "pl"}
+{"text": "czy są pull requesty do przejrzenia", "intent": "gh_pr_list", "lang": "pl"}
+{"text": "pokaz otwarte pr", "intent": "gh_pr_list", "lang": "pl"}
+{"text": "lista pull requestów przez gh", "intent": "gh_pr_list", "lang": "pl"}
+{"text": "wylistuj pull requesty w PowerShellu", "intent": "gh_pr_list", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "gh pr list na macu", "intent": "gh_pr_list", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "pokaż otwarte PR", "intent": "gh_pr_list", "lang": "pl", "shell": "fish", "os": "linux"}
+{"text": "lista PR w cmd", "intent": "gh_pr_list", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "daj listę otwartych pull requestów repo", "intent": "gh_pr_list", "lang": "pl"}
+{"text": "gh pr view 42", "intent": "gh_pr_view", "lang": "en"}
+{"text": "show PR 42", "intent": "gh_pr_view", "lang": "en"}
+{"text": "open pull request 117 details", "intent": "gh_pr_view", "lang": "en"}
+{"text": "view pull request #8", "intent": "gh_pr_view", "lang": "en"}
+{"text": "what's in PR 256?", "intent": "gh_pr_view", "lang": "en"}
+{"text": "show the description of PR 73", "intent": "gh_pr_view", "lang": "en"}
+{"text": "show my current branch's pull request", "intent": "gh_pr_view", "lang": "en"}
+{"text": "view the pr for this branch", "intent": "gh_pr_view", "lang": "en"}
+{"text": "details of pull request 1024", "intent": "gh_pr_view", "lang": "en"}
+{"text": "gh pr view", "intent": "gh_pr_view", "lang": "en"}
+{"text": "who opened PR 19 and what does it change", "intent": "gh_pr_view", "lang": "en"}
+{"text": "show pr #301", "intent": "gh_pr_view", "lang": "en"}
+{"text": "display pull request 64", "intent": "gh_pr_view", "lang": "en"}
+{"text": "read the PR 88 description", "intent": "gh_pr_view", "lang": "en"}
+{"text": "look at pull request 5", "intent": "gh_pr_view", "lang": "en"}
+{"text": "show info about PR 4410", "intent": "gh_pr_view", "lang": "en"}
+{"text": "what's the status of PR 150", "intent": "gh_pr_view", "lang": "en"}
+{"text": "view github PR 37", "intent": "gh_pr_view", "lang": "en"}
+{"text": "open the pull request number 12 in the terminal", "intent": "gh_pr_view", "lang": "en"}
+{"text": "show me the PR associated with this branch", "intent": "gh_pr_view", "lang": "en"}
+{"text": "summary of pull request 999", "intent": "gh_pr_view", "lang": "en"}
+{"text": "show the PR I'm working on", "intent": "gh_pr_view", "lang": "en"}
+{"text": "pr 61 details", "intent": "gh_pr_view", "lang": "en"}
+{"text": "print pull request 230", "intent": "gh_pr_view", "lang": "en"}
+{"text": "view PR 1502 on github", "intent": "gh_pr_view", "lang": "en"}
+{"text": "show PR 42 in PowerShell", "intent": "gh_pr_view", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "gh pr view 77 on mac", "intent": "gh_pr_view", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "view pull request 15", "intent": "gh_pr_view", "lang": "en", "shell": "fish", "os": "linux"}
+{"text": "show pr 3 in cmd", "intent": "gh_pr_view", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "can you show pull request 2048", "intent": "gh_pr_view", "lang": "en"}
+{"text": "zobacz gh pr view 42", "intent": "gh_pr_view", "lang": "pl"}
+{"text": "pokaż PR 42", "intent": "gh_pr_view", "lang": "pl"}
+{"text": "szczegóły pull requesta 117", "intent": "gh_pr_view", "lang": "pl"}
+{"text": "zobacz pull request #8", "intent": "gh_pr_view", "lang": "pl"}
+{"text": "co jest w PR 256?", "intent": "gh_pr_view", "lang": "pl"}
+{"text": "pokaż opis PR 73", "intent": "gh_pr_view", "lang": "pl"}
+{"text": "pokaż pull request mojego bieżącego brancha", "intent": "gh_pr_view", "lang": "pl"}
+{"text": "zobacz pr dla tego brancha", "intent": "gh_pr_view", "lang": "pl"}
+{"text": "szczegóły pull requesta 1024", "intent": "gh_pr_view", "lang": "pl"}
+{"text": "odpal gh pr view", "intent": "gh_pr_view", "lang": "pl"}
+{"text": "kto otworzył PR 19 i co zmienia", "intent": "gh_pr_view", "lang": "pl"}
+{"text": "pokaż pr #301", "intent": "gh_pr_view", "lang": "pl"}
+{"text": "wyświetl pull request 64", "intent": "gh_pr_view", "lang": "pl"}
+{"text": "przeczytaj opis PR 88", "intent": "gh_pr_view", "lang": "pl"}
+{"text": "zerknij na pull request 5", "intent": "gh_pr_view", "lang": "pl"}
+{"text": "pokaż info o PR 4410", "intent": "gh_pr_view", "lang": "pl"}
+{"text": "jaki jest status PR 150", "intent": "gh_pr_view", "lang": "pl"}
+{"text": "zobacz PR 37 na githubie", "intent": "gh_pr_view", "lang": "pl"}
+{"text": "otwórz w terminalu pull request numer 12", "intent": "gh_pr_view", "lang": "pl"}
+{"text": "pokaż PR powiązany z tym branchem", "intent": "gh_pr_view", "lang": "pl"}
+{"text": "podsumowanie pull requesta 999", "intent": "gh_pr_view", "lang": "pl"}
+{"text": "pokaż PR nad którym pracuję", "intent": "gh_pr_view", "lang": "pl"}
+{"text": "szczegoly pr 61", "intent": "gh_pr_view", "lang": "pl"}
+{"text": "wypisz pull request 230", "intent": "gh_pr_view", "lang": "pl"}
+{"text": "zobacz PR 1502 na githubie", "intent": "gh_pr_view", "lang": "pl"}
+{"text": "pokaż PR 42 w PowerShellu", "intent": "gh_pr_view", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "gh pr view 77 na macu", "intent": "gh_pr_view", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "zobacz pull request 15", "intent": "gh_pr_view", "lang": "pl", "shell": "fish", "os": "linux"}
+{"text": "pokaż pr 3 w cmd", "intent": "gh_pr_view", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "możesz pokazać pull request 2048", "intent": "gh_pr_view", "lang": "pl"}
+{"text": "create a pull request", "intent": "gh_pr_create", "lang": "en"}
+{"text": "gh pr create", "intent": "gh_pr_create", "lang": "en"}
+{"text": "open a PR from this branch", "intent": "gh_pr_create", "lang": "en"}
+{"text": "make a pull request for my changes", "intent": "gh_pr_create", "lang": "en"}
+{"text": "how do I create a PR from the terminal?", "intent": "gh_pr_create", "lang": "en"}
+{"text": "submit a pull request", "intent": "gh_pr_create", "lang": "en"}
+{"text": "open a pull request on github for the current branch", "intent": "gh_pr_create", "lang": "en"}
+{"text": "raise a PR", "intent": "gh_pr_create", "lang": "en"}
+{"text": "create PR", "intent": "gh_pr_create", "lang": "en"}
+{"text": "I'm done with the feature, open a pull request", "intent": "gh_pr_create", "lang": "en"}
+{"text": "send my branch as a pull request", "intent": "gh_pr_create", "lang": "en"}
+{"text": "new pull request from current branch", "intent": "gh_pr_create", "lang": "en"}
+{"text": "file a PR with the commit messages as description", "intent": "gh_pr_create", "lang": "en"}
+{"text": "create a github pull request", "intent": "gh_pr_create", "lang": "en"}
+{"text": "open a PR against main", "intent": "gh_pr_create", "lang": "en"}
+{"text": "start a pull request for this work", "intent": "gh_pr_create", "lang": "en"}
+{"text": "make a PR", "intent": "gh_pr_create", "lang": "en"}
+{"text": "propose these changes as a pull request", "intent": "gh_pr_create", "lang": "en"}
+{"text": "put up a pull request", "intent": "gh_pr_create", "lang": "en"}
+{"text": "open a new PR on github", "intent": "gh_pr_create", "lang": "en"}
+{"text": "create the pull request for feature/login", "intent": "gh_pr_create", "lang": "en"}
+{"text": "turn this branch into a PR", "intent": "gh_pr_create", "lang": "en"}
+{"text": "please open a pull request", "intent": "gh_pr_create", "lang": "en"}
+{"text": "draft a pull request from what I pushed", "intent": "gh_pr_create", "lang": "en"}
+{"text": "open pr", "intent": "gh_pr_create", "lang": "en"}
+{"text": "create a pull request in PowerShell", "intent": "gh_pr_create", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "gh pr create on my mac", "intent": "gh_pr_create", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "open a PR", "intent": "gh_pr_create", "lang": "en", "shell": "fish", "os": "linux"}
+{"text": "create a PR in cmd", "intent": "gh_pr_create", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "ok tests pass, now create the PR", "intent": "gh_pr_create", "lang": "en"}
+{"text": "utwórz pull request", "intent": "gh_pr_create", "lang": "pl"}
+{"text": "odpal gh pr create", "intent": "gh_pr_create", "lang": "pl"}
+{"text": "otwórz PR z tego brancha", "intent": "gh_pr_create", "lang": "pl"}
+{"text": "zrób pull requesta z moich zmian", "intent": "gh_pr_create", "lang": "pl"}
+{"text": "jak utworzyć PR z terminala?", "intent": "gh_pr_create", "lang": "pl"}
+{"text": "wyślij pull request", "intent": "gh_pr_create", "lang": "pl"}
+{"text": "otwórz pull request na githubie dla bieżącego brancha", "intent": "gh_pr_create", "lang": "pl"}
+{"text": "wystaw PR", "intent": "gh_pr_create", "lang": "pl"}
+{"text": "stwórz PR", "intent": "gh_pr_create", "lang": "pl"}
+{"text": "skończyłem ficzer, otwórz pull requesta", "intent": "gh_pr_create", "lang": "pl"}
+{"text": "wyślij mój branch jako pull request", "intent": "gh_pr_create", "lang": "pl"}
+{"text": "nowy pull request z obecnego brancha", "intent": "gh_pr_create", "lang": "pl"}
+{"text": "załóż PR z opisem z commitów", "intent": "gh_pr_create", "lang": "pl"}
+{"text": "utwórz pull request na githubie", "intent": "gh_pr_create", "lang": "pl"}
+{"text": "otwórz PR do maina", "intent": "gh_pr_create", "lang": "pl"}
+{"text": "zacznij pull request dla tej pracy", "intent": "gh_pr_create", "lang": "pl"}
+{"text": "zrób PRa", "intent": "gh_pr_create", "lang": "pl"}
+{"text": "zaproponuj te zmiany jako pull request", "intent": "gh_pr_create", "lang": "pl"}
+{"text": "wrzuć pull requesta", "intent": "gh_pr_create", "lang": "pl"}
+{"text": "otwórz nowy PR na githubie", "intent": "gh_pr_create", "lang": "pl"}
+{"text": "utwórz pull request dla feature/login", "intent": "gh_pr_create", "lang": "pl"}
+{"text": "zamień ten branch w PR", "intent": "gh_pr_create", "lang": "pl"}
+{"text": "otwórz proszę pull request", "intent": "gh_pr_create", "lang": "pl"}
+{"text": "zrób pull request z tego co wypchnąłem", "intent": "gh_pr_create", "lang": "pl"}
+{"text": "otworz pr", "intent": "gh_pr_create", "lang": "pl"}
+{"text": "utwórz pull request w PowerShellu", "intent": "gh_pr_create", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "gh pr create na macu", "intent": "gh_pr_create", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "otwórz PR", "intent": "gh_pr_create", "lang": "pl", "shell": "fish", "os": "linux"}
+{"text": "stwórz PR w cmd", "intent": "gh_pr_create", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "ok testy przechodzą, teraz utwórz PR", "intent": "gh_pr_create", "lang": "pl"}
+{"text": "gh pr checks", "intent": "gh_pr_checks", "lang": "en"}
+{"text": "did CI pass on my PR?", "intent": "gh_pr_checks", "lang": "en"}
+{"text": "show the checks for PR 42", "intent": "gh_pr_checks", "lang": "en"}
+{"text": "check CI status of pull request 118", "intent": "gh_pr_checks", "lang": "en"}
+{"text": "are the tests green on this pull request", "intent": "gh_pr_checks", "lang": "en"}
+{"text": "status of github checks for PR 7", "intent": "gh_pr_checks", "lang": "en"}
+{"text": "is CI failing on PR 300?", "intent": "gh_pr_checks", "lang": "en"}
+{"text": "show the CI results for my current PR", "intent": "gh_pr_checks", "lang": "en"}
+{"text": "which checks failed on pull request 55", "intent": "gh_pr_checks", "lang": "en"}
+{"text": "pr checks 91", "intent": "gh_pr_checks", "lang": "en"}
+{"text": "are the actions checks done on PR 23", "intent": "gh_pr_checks", "lang": "en"}
+{"text": "show build status of pull request 512", "intent": "gh_pr_checks", "lang": "en"}
+{"text": "did the pipeline pass for PR 64", "intent": "gh_pr_checks", "lang": "en"}
+{"text": "check if the PR is green", "intent": "gh_pr_checks", "lang": "en"}
+{"text": "how are the CI checks doing on pr 1400", "intent": "gh_pr_checks", "lang": "en"}
+{"text": "list the status checks of the pull request", "intent": "gh_pr_checks", "lang": "en"}
+{"text": "show me whether lint passed on PR 12", "intent": "gh_pr_checks", "lang": "en"}
+{"text": "ci status for this branch's PR", "intent": "gh_pr_checks", "lang": "en"}
+{"text": "are all checks passing on pull request 808", "intent": "gh_pr_checks", "lang": "en"}
+{"text": "watch checks for PR 76", "intent": "gh_pr_checks", "lang": "en"}
+{"text": "check github actions results for PR 205", "intent": "gh_pr_checks", "lang": "en"}
+{"text": "is pull request 3 ready, checks-wise", "intent": "gh_pr_checks", "lang": "en"}
+{"text": "status checks of PR 47", "intent": "gh_pr_checks", "lang": "en"}
+{"text": "what's the CI saying about my pull request", "intent": "gh_pr_checks", "lang": "en"}
+{"text": "show failing checks on PR 999", "intent": "gh_pr_checks", "lang": "en"}
+{"text": "show PR checks in PowerShell", "intent": "gh_pr_checks", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "did CI pass on PR 88, on my mac", "intent": "gh_pr_checks", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "gh pr checks 14", "intent": "gh_pr_checks", "lang": "en", "shell": "fish", "os": "linux"}
+{"text": "checks for pull request 6 in cmd", "intent": "gh_pr_checks", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "are checks still running on my PR", "intent": "gh_pr_checks", "lang": "en"}
+{"text": "sprawdź gh pr checks", "intent": "gh_pr_checks", "lang": "pl"}
+{"text": "czy CI przeszło na moim PR?", "intent": "gh_pr_checks", "lang": "pl"}
+{"text": "pokaż checki dla PR 42", "intent": "gh_pr_checks", "lang": "pl"}
+{"text": "sprawdź status CI pull requesta 118", "intent": "gh_pr_checks", "lang": "pl"}
+{"text": "czy testy są zielone na tym pull requeście", "intent": "gh_pr_checks", "lang": "pl"}
+{"text": "status checków githuba dla PR 7", "intent": "gh_pr_checks", "lang": "pl"}
+{"text": "czy CI wywala się na PR 300?", "intent": "gh_pr_checks", "lang": "pl"}
+{"text": "pokaż wyniki CI dla mojego aktualnego PR", "intent": "gh_pr_checks", "lang": "pl"}
+{"text": "które checki padły na pull requeście 55", "intent": "gh_pr_checks", "lang": "pl"}
+{"text": "pokaż pr checks 91", "intent": "gh_pr_checks", "lang": "pl"}
+{"text": "czy checki actions skończyły się na PR 23", "intent": "gh_pr_checks", "lang": "pl"}
+{"text": "pokaż status builda pull requesta 512", "intent": "gh_pr_checks", "lang": "pl"}
+{"text": "czy pipeline przeszedł dla PR 64", "intent": "gh_pr_checks", "lang": "pl"}
+{"text": "sprawdź czy PR jest zielony", "intent": "gh_pr_checks", "lang": "pl"}
+{"text": "jak idą checki CI na pr 1400", "intent": "gh_pr_checks", "lang": "pl"}
+{"text": "wylistuj status checki pull requesta", "intent": "gh_pr_checks", "lang": "pl"}
+{"text": "pokaż czy lint przeszedł na PR 12", "intent": "gh_pr_checks", "lang": "pl"}
+{"text": "status ci dla PR tego brancha", "intent": "gh_pr_checks", "lang": "pl"}
+{"text": "czy wszystkie checki przechodzą na pull requeście 808", "intent": "gh_pr_checks", "lang": "pl"}
+{"text": "obserwuj checki PR 76", "intent": "gh_pr_checks", "lang": "pl"}
+{"text": "sprawdź wyniki github actions dla PR 205", "intent": "gh_pr_checks", "lang": "pl"}
+{"text": "czy pull request 3 jest gotowy pod kątem checków", "intent": "gh_pr_checks", "lang": "pl"}
+{"text": "status checki PR 47", "intent": "gh_pr_checks", "lang": "pl"}
+{"text": "co mówi CI o moim pull requeście", "intent": "gh_pr_checks", "lang": "pl"}
+{"text": "pokaż padające checki na PR 999", "intent": "gh_pr_checks", "lang": "pl"}
+{"text": "pokaż checki PR w PowerShellu", "intent": "gh_pr_checks", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "czy CI przeszło na PR 88, na macu", "intent": "gh_pr_checks", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "sprawdź gh pr checks 14", "intent": "gh_pr_checks", "lang": "pl", "shell": "fish", "os": "linux"}
+{"text": "checki pull requesta 6 w cmd", "intent": "gh_pr_checks", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "czy checki dalej się kręcą na moim PR", "intent": "gh_pr_checks", "lang": "pl"}
+{"text": "merge PR 42", "intent": "gh_pr_merge", "lang": "en"}
+{"text": "gh pr merge 118", "intent": "gh_pr_merge", "lang": "en"}
+{"text": "merge pull request #7", "intent": "gh_pr_merge", "lang": "en"}
+{"text": "merge the pull request for this branch", "intent": "gh_pr_merge", "lang": "en"}
+{"text": "how do I merge a PR from the terminal?", "intent": "gh_pr_merge", "lang": "en"}
+{"text": "merge pr 300 on github", "intent": "gh_pr_merge", "lang": "en"}
+{"text": "land pull request 55", "intent": "gh_pr_merge", "lang": "en"}
+{"text": "merge my PR", "intent": "gh_pr_merge", "lang": "en"}
+{"text": "go ahead and merge PR 91", "intent": "gh_pr_merge", "lang": "en"}
+{"text": "checks passed, merge pull request 23", "intent": "gh_pr_merge", "lang": "en"}
+{"text": "merge the current pull request", "intent": "gh_pr_merge", "lang": "en"}
+{"text": "merge github PR 512", "intent": "gh_pr_merge", "lang": "en"}
+{"text": "accept and merge PR 64", "intent": "gh_pr_merge", "lang": "en"}
+{"text": "complete pull request 1400", "intent": "gh_pr_merge", "lang": "en"}
+{"text": "merge pr #12", "intent": "gh_pr_merge", "lang": "en"}
+{"text": "ship PR 808 into main", "intent": "gh_pr_merge", "lang": "en"}
+{"text": "merge the approved PR 76", "intent": "gh_pr_merge", "lang": "en"}
+{"text": "squash-merge pull request 205", "intent": "gh_pr_merge", "lang": "en"}
+{"text": "please merge PR 3", "intent": "gh_pr_merge", "lang": "en"}
+{"text": "gh pr merge", "intent": "gh_pr_merge", "lang": "en"}
+{"text": "merge pull request 47 now", "intent": "gh_pr_merge", "lang": "en"}
+{"text": "merge this PR into the base branch", "intent": "gh_pr_merge", "lang": "en"}
+{"text": "finalize and merge PR 999", "intent": "gh_pr_merge", "lang": "en"}
+{"text": "merge the PR from feature/payments", "intent": "gh_pr_merge", "lang": "en"}
+{"text": "close it out by merging PR 610", "intent": "gh_pr_merge", "lang": "en"}
+{"text": "merge PR 42 in PowerShell", "intent": "gh_pr_merge", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "gh pr merge 88 on mac", "intent": "gh_pr_merge", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "merge pull request 14", "intent": "gh_pr_merge", "lang": "en", "shell": "fish", "os": "linux"}
+{"text": "merge pr 6 in cmd", "intent": "gh_pr_merge", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "the review is done, merge pull request 1234", "intent": "gh_pr_merge", "lang": "en"}
+{"text": "zmerguj PR 42", "intent": "gh_pr_merge", "lang": "pl"}
+{"text": "odpal gh pr merge 118", "intent": "gh_pr_merge", "lang": "pl"}
+{"text": "zmerguj pull request #7", "intent": "gh_pr_merge", "lang": "pl"}
+{"text": "zmerguj pull requesta dla tego brancha", "intent": "gh_pr_merge", "lang": "pl"}
+{"text": "jak zmergować PR z terminala?", "intent": "gh_pr_merge", "lang": "pl"}
+{"text": "zmerguj pr 300 na githubie", "intent": "gh_pr_merge", "lang": "pl"}
+{"text": "wmerguj pull request 55", "intent": "gh_pr_merge", "lang": "pl"}
+{"text": "zmerguj mój PR", "intent": "gh_pr_merge", "lang": "pl"}
+{"text": "śmiało zmerguj PR 91", "intent": "gh_pr_merge", "lang": "pl"}
+{"text": "checki przeszły, zmerguj pull request 23", "intent": "gh_pr_merge", "lang": "pl"}
+{"text": "zmerguj bieżący pull request", "intent": "gh_pr_merge", "lang": "pl"}
+{"text": "zmerguj PR 512 na githubie", "intent": "gh_pr_merge", "lang": "pl"}
+{"text": "zaakceptuj i zmerguj PR 64", "intent": "gh_pr_merge", "lang": "pl"}
+{"text": "domknij pull request 1400 mergem", "intent": "gh_pr_merge", "lang": "pl"}
+{"text": "zmerguj pr #12", "intent": "gh_pr_merge", "lang": "pl"}
+{"text": "wrzuć PR 808 do maina", "intent": "gh_pr_merge", "lang": "pl"}
+{"text": "zmerguj zatwierdzony PR 76", "intent": "gh_pr_merge", "lang": "pl"}
+{"text": "zrób squash merge pull requesta 205", "intent": "gh_pr_merge", "lang": "pl"}
+{"text": "zmerguj proszę PR 3", "intent": "gh_pr_merge", "lang": "pl"}
+{"text": "zrób gh pr merge", "intent": "gh_pr_merge", "lang": "pl"}
+{"text": "zmerguj teraz pull request 47", "intent": "gh_pr_merge", "lang": "pl"}
+{"text": "scal ten PR z gałęzią bazową", "intent": "gh_pr_merge", "lang": "pl"}
+{"text": "sfinalizuj i zmerguj PR 999", "intent": "gh_pr_merge", "lang": "pl"}
+{"text": "zmerguj PR z feature/payments", "intent": "gh_pr_merge", "lang": "pl"}
+{"text": "zamknij temat mergując PR 610", "intent": "gh_pr_merge", "lang": "pl"}
+{"text": "zmerguj PR 42 w PowerShellu", "intent": "gh_pr_merge", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "gh pr merge 88 na macu", "intent": "gh_pr_merge", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "zmerguj pull request 14", "intent": "gh_pr_merge", "lang": "pl", "shell": "fish", "os": "linux"}
+{"text": "zmerguj pr 6 w cmd", "intent": "gh_pr_merge", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "review zrobione, zmerguj pull request 1234", "intent": "gh_pr_merge", "lang": "pl"}
+{"text": "gh run list", "intent": "gh_run_list", "lang": "en"}
+{"text": "list github actions runs", "intent": "gh_run_list", "lang": "en"}
+{"text": "show recent github workflow runs", "intent": "gh_run_list", "lang": "en"}
+{"text": "what CI runs happened lately?", "intent": "gh_run_list", "lang": "en"}
+{"text": "list the latest actions runs for this repo", "intent": "gh_run_list", "lang": "en"}
+{"text": "show the workflow run history", "intent": "gh_run_list", "lang": "en"}
+{"text": "did the last github actions run succeed? list runs", "intent": "gh_run_list", "lang": "en"}
+{"text": "recent CI runs", "intent": "gh_run_list", "lang": "en"}
+{"text": "list workflow runs on github", "intent": "gh_run_list", "lang": "en"}
+{"text": "show actions runs", "intent": "gh_run_list", "lang": "en"}
+{"text": "how do I see recent GitHub Actions runs from the terminal?", "intent": "gh_run_list", "lang": "en"}
+{"text": "which workflows ran today", "intent": "gh_run_list", "lang": "en"}
+{"text": "list the pipeline runs", "intent": "gh_run_list", "lang": "en"}
+{"text": "show me the last few CI builds on github", "intent": "gh_run_list", "lang": "en"}
+{"text": "display recent action runs and their status", "intent": "gh_run_list", "lang": "en"}
+{"text": "run list for github actions", "intent": "gh_run_list", "lang": "en"}
+{"text": "list runs of the deploy workflow", "intent": "gh_run_list", "lang": "en"}
+{"text": "what's the status of recent workflow runs", "intent": "gh_run_list", "lang": "en"}
+{"text": "show the CI history", "intent": "gh_run_list", "lang": "en"}
+{"text": "list all recent github workflow executions", "intent": "gh_run_list", "lang": "en"}
+{"text": "any failed actions runs recently?", "intent": "gh_run_list", "lang": "en"}
+{"text": "show the actions run list", "intent": "gh_run_list", "lang": "en"}
+{"text": "list the last builds in github actions", "intent": "gh_run_list", "lang": "en"}
+{"text": "see recent runs in actions", "intent": "gh_run_list", "lang": "en"}
+{"text": "latest workflow runs please", "intent": "gh_run_list", "lang": "en"}
+{"text": "list github actions runs in PowerShell", "intent": "gh_run_list", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "gh run list on mac", "intent": "gh_run_list", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "show recent workflow runs", "intent": "gh_run_list", "lang": "en", "shell": "fish", "os": "linux"}
+{"text": "list CI runs in cmd", "intent": "gh_run_list", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "give me an overview of recent actions runs", "intent": "gh_run_list", "lang": "en"}
+{"text": "odpal gh run list", "intent": "gh_run_list", "lang": "pl"}
+{"text": "wylistuj runy github actions", "intent": "gh_run_list", "lang": "pl"}
+{"text": "pokaż ostatnie uruchomienia workflow", "intent": "gh_run_list", "lang": "pl"}
+{"text": "jakie były ostatnio przebiegi CI?", "intent": "gh_run_list", "lang": "pl"}
+{"text": "lista najnowszych runów actions w tym repo", "intent": "gh_run_list", "lang": "pl"}
+{"text": "pokaż historię uruchomień workflow", "intent": "gh_run_list", "lang": "pl"}
+{"text": "czy ostatni run github actions przeszedł? pokaż listę", "intent": "gh_run_list", "lang": "pl"}
+{"text": "ostatnie runy CI", "intent": "gh_run_list", "lang": "pl"}
+{"text": "wylistuj workflow runy na githubie", "intent": "gh_run_list", "lang": "pl"}
+{"text": "pokaż runy actions", "intent": "gh_run_list", "lang": "pl"}
+{"text": "jak zobaczyć ostatnie uruchomienia GitHub Actions z terminala?", "intent": "gh_run_list", "lang": "pl"}
+{"text": "które workflowy dziś się odpaliły", "intent": "gh_run_list", "lang": "pl"}
+{"text": "lista przebiegów pipeline", "intent": "gh_run_list", "lang": "pl"}
+{"text": "pokaż kilka ostatnich buildów CI na githubie", "intent": "gh_run_list", "lang": "pl"}
+{"text": "wyświetl ostatnie runy actions z ich statusem", "intent": "gh_run_list", "lang": "pl"}
+{"text": "lista runów github actions", "intent": "gh_run_list", "lang": "pl"}
+{"text": "wylistuj runy workflow deploy", "intent": "gh_run_list", "lang": "pl"}
+{"text": "jaki jest status ostatnich runów workflow", "intent": "gh_run_list", "lang": "pl"}
+{"text": "pokaż historię CI", "intent": "gh_run_list", "lang": "pl"}
+{"text": "wylistuj wszystkie ostatnie wykonania workflow githuba", "intent": "gh_run_list", "lang": "pl"}
+{"text": "były ostatnio jakieś padnięte runy actions?", "intent": "gh_run_list", "lang": "pl"}
+{"text": "pokaż listę runów actions", "intent": "gh_run_list", "lang": "pl"}
+{"text": "lista ostatnich buildów w github actions", "intent": "gh_run_list", "lang": "pl"}
+{"text": "zobacz ostatnie runy w actions", "intent": "gh_run_list", "lang": "pl"}
+{"text": "najnowsze uruchomienia workflow", "intent": "gh_run_list", "lang": "pl"}
+{"text": "wylistuj runy github actions w PowerShellu", "intent": "gh_run_list", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "gh run list na macu", "intent": "gh_run_list", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "pokaż ostatnie runy workflow", "intent": "gh_run_list", "lang": "pl", "shell": "fish", "os": "linux"}
+{"text": "lista runów CI w cmd", "intent": "gh_run_list", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "daj przegląd ostatnich runów actions", "intent": "gh_run_list", "lang": "pl"}
+{"text": "gh run view 812345", "intent": "gh_run_view", "lang": "en"}
+{"text": "show run 812345", "intent": "gh_run_view", "lang": "en"}
+{"text": "view github actions run 4471230", "intent": "gh_run_view", "lang": "en"}
+{"text": "why did run 9900112 fail?", "intent": "gh_run_view", "lang": "en"}
+{"text": "show the logs of the failed workflow run 7012", "intent": "gh_run_view", "lang": "en"}
+{"text": "details of actions run 55512", "intent": "gh_run_view", "lang": "en"}
+{"text": "view the latest workflow run", "intent": "gh_run_view", "lang": "en"}
+{"text": "show me the failed steps of run 300400", "intent": "gh_run_view", "lang": "en"}
+{"text": "open CI run 6655443 in the terminal", "intent": "gh_run_view", "lang": "en"}
+{"text": "what happened in run 1234567", "intent": "gh_run_view", "lang": "en"}
+{"text": "view workflow run 88001", "intent": "gh_run_view", "lang": "en"}
+{"text": "show the failed log for actions run 2468024", "intent": "gh_run_view", "lang": "en"}
+{"text": "inspect github run 13579", "intent": "gh_run_view", "lang": "en"}
+{"text": "gh run view", "intent": "gh_run_view", "lang": "en"}
+{"text": "look at actions run 765432 output", "intent": "gh_run_view", "lang": "en"}
+{"text": "display workflow run 4040404", "intent": "gh_run_view", "lang": "en"}
+{"text": "show the jobs of run 112233", "intent": "gh_run_view", "lang": "en"}
+{"text": "check the summary of run 990011", "intent": "gh_run_view", "lang": "en"}
+{"text": "view the last CI run's details", "intent": "gh_run_view", "lang": "en"}
+{"text": "show failing job logs from run 5551234", "intent": "gh_run_view", "lang": "en"}
+{"text": "debug the failed actions run 3141592", "intent": "gh_run_view", "lang": "en"}
+{"text": "show run details for 777888", "intent": "gh_run_view", "lang": "en"}
+{"text": "status of workflow run 246810", "intent": "gh_run_view", "lang": "en"}
+{"text": "show run #600700", "intent": "gh_run_view", "lang": "en"}
+{"text": "what went wrong in the pipeline run 8080808", "intent": "gh_run_view", "lang": "en"}
+{"text": "view actions run 812345 in PowerShell", "intent": "gh_run_view", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "gh run view 4471230 on mac", "intent": "gh_run_view", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "show run 9900112", "intent": "gh_run_view", "lang": "en", "shell": "fish", "os": "linux"}
+{"text": "view workflow run 7012 in cmd", "intent": "gh_run_view", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "drill into actions run 1928374", "intent": "gh_run_view", "lang": "en"}
+{"text": "odpal gh run view 812345", "intent": "gh_run_view", "lang": "pl"}
+{"text": "pokaż run 812345", "intent": "gh_run_view", "lang": "pl"}
+{"text": "zobacz run github actions 4471230", "intent": "gh_run_view", "lang": "pl"}
+{"text": "czemu run 9900112 się wywalił?", "intent": "gh_run_view", "lang": "pl"}
+{"text": "pokaż logi padniętego runa workflow 7012", "intent": "gh_run_view", "lang": "pl"}
+{"text": "szczegóły runa actions 55512", "intent": "gh_run_view", "lang": "pl"}
+{"text": "zobacz ostatni run workflow", "intent": "gh_run_view", "lang": "pl"}
+{"text": "pokaż które kroki padły w runie 300400", "intent": "gh_run_view", "lang": "pl"}
+{"text": "otwórz run CI 6655443 w terminalu", "intent": "gh_run_view", "lang": "pl"}
+{"text": "co się stało w runie 1234567", "intent": "gh_run_view", "lang": "pl"}
+{"text": "zobacz uruchomienie workflow 88001", "intent": "gh_run_view", "lang": "pl"}
+{"text": "pokaż log błędu z runa actions 2468024", "intent": "gh_run_view", "lang": "pl"}
+{"text": "obejrzyj run githuba 13579", "intent": "gh_run_view", "lang": "pl"}
+{"text": "zobacz gh run view", "intent": "gh_run_view", "lang": "pl"}
+{"text": "zerknij na output runa actions 765432", "intent": "gh_run_view", "lang": "pl"}
+{"text": "wyświetl run workflow 4040404", "intent": "gh_run_view", "lang": "pl"}
+{"text": "pokaż joby runa 112233", "intent": "gh_run_view", "lang": "pl"}
+{"text": "sprawdź podsumowanie runa 990011", "intent": "gh_run_view", "lang": "pl"}
+{"text": "zobacz szczegóły ostatniego runa CI", "intent": "gh_run_view", "lang": "pl"}
+{"text": "pokaż logi padniętego joba z runa 5551234", "intent": "gh_run_view", "lang": "pl"}
+{"text": "zdebuguj nieudany run actions 3141592", "intent": "gh_run_view", "lang": "pl"}
+{"text": "pokaz szczegoly runa 777888", "intent": "gh_run_view", "lang": "pl"}
+{"text": "status uruchomienia workflow 246810", "intent": "gh_run_view", "lang": "pl"}
+{"text": "pokaż run #600700", "intent": "gh_run_view", "lang": "pl"}
+{"text": "co poszło nie tak w runie pipeline 8080808", "intent": "gh_run_view", "lang": "pl"}
+{"text": "zobacz run actions 812345 w PowerShellu", "intent": "gh_run_view", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "gh run view 4471230 na macu", "intent": "gh_run_view", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "pokaż run 9900112", "intent": "gh_run_view", "lang": "pl", "shell": "fish", "os": "linux"}
+{"text": "zobacz run workflow 7012 w cmd", "intent": "gh_run_view", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "wejdź w szczegóły runa actions 1928374", "intent": "gh_run_view", "lang": "pl"}
+{"text": "install btop", "intent": "install_package", "lang": "en"}
+{"text": "install ffmpeg on the system", "intent": "install_package", "lang": "en"}
+{"text": "apt install jq", "intent": "install_package", "lang": "en"}
+{"text": "install the nginx package", "intent": "install_package", "lang": "en"}
+{"text": "install tmux with the package manager", "intent": "install_package", "lang": "en"}
+{"text": "brew install wget", "intent": "install_package", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "zainstaluj btop", "intent": "install_package", "lang": "pl"}
+{"text": "zainstaluj ffmpeg w systemie", "intent": "install_package", "lang": "pl"}
+{"text": "zainstaluj pakiet nginx", "intent": "install_package", "lang": "pl"}
+{"text": "zainstaluj tmuxa menedżerem pakietów", "intent": "install_package", "lang": "pl"}
+{"text": "brew install wget na macu", "intent": "install_package", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "where is node installed", "intent": "which_cmd", "lang": "en"}
+{"text": "which python3 binary is on my PATH", "intent": "which_cmd", "lang": "en"}
+{"text": "where does the git executable live", "intent": "which_cmd", "lang": "en"}
+{"text": "path to the docker binary", "intent": "which_cmd", "lang": "en"}
+{"text": "which gh am I running, full path", "intent": "which_cmd", "lang": "en"}
+{"text": "gdzie jest zainstalowany node", "intent": "which_cmd", "lang": "pl"}
+{"text": "gdzie leży plik wykonywalny gita", "intent": "which_cmd", "lang": "pl"}
+{"text": "ścieżka do binarki dockera", "intent": "which_cmd", "lang": "pl"}
+{"text": "który python3 jest w PATH", "intent": "which_cmd", "lang": "pl"}
+{"text": "skąd się bierze komenda gh, pełna ścieżka", "intent": "which_cmd", "lang": "pl"}
+{"text": "show first 20 lines of log.txt", "intent": "head_file", "lang": "en"}
+{"text": "first 50 lines of data.csv", "intent": "head_file", "lang": "en"}
+{"text": "top of README.md, 15 lines", "intent": "head_file", "lang": "en"}
+{"text": "pokaż pierwsze 20 linii log.txt", "intent": "head_file", "lang": "pl"}
+{"text": "początek pliku data.csv, 50 linii", "intent": "head_file", "lang": "pl"}
+{"text": "pierwsze 15 linijek README.md", "intent": "head_file", "lang": "pl"}
+{"text": "last 30 lines of app.log", "intent": "tail_file", "lang": "en"}
+{"text": "show the end of server.log, 100 lines", "intent": "tail_file", "lang": "en"}
+{"text": "ostatnie 30 linii app.log", "intent": "tail_file", "lang": "pl"}
+{"text": "pokaż koniec server.log, 100 linii", "intent": "tail_file", "lang": "pl"}
+{"text": "print the whole package.json", "intent": "cat_file", "lang": "en"}
+{"text": "show the entire contents of config.yaml", "intent": "cat_file", "lang": "en"}
+{"text": "wyświetl cały package.json", "intent": "cat_file", "lang": "pl"}
+{"text": "pokaż całą zawartość config.yaml", "intent": "cat_file", "lang": "pl"}
+{"text": "ssh into prod", "intent": "ssh_connect", "lang": "en"}
+{"text": "connect to deploy@staging.example.org", "intent": "ssh_connect", "lang": "en"}
+{"text": "log into the server 10.0.0.5 over ssh", "intent": "ssh_connect", "lang": "en"}
+{"text": "zaloguj się po ssh na prod", "intent": "ssh_connect", "lang": "pl"}
+{"text": "połącz się z deploy@staging.example.org", "intent": "ssh_connect", "lang": "pl"}
+{"text": "wejdź na serwer 10.0.0.5 przez ssh", "intent": "ssh_connect", "lang": "pl"}
+{"text": "push my branch", "intent": "git_push", "lang": "en"}
+{"text": "git push to origin", "intent": "git_push", "lang": "en"}
+{"text": "push the commits to the remote", "intent": "git_push", "lang": "en"}
+{"text": "wypchnij mój branch", "intent": "git_push", "lang": "pl"}
+{"text": "wypchnij commity na remote", "intent": "git_push", "lang": "pl"}
+{"text": "push do origina", "intent": "git_push", "lang": "pl"}
+{"text": "pull the latest changes from github", "intent": "git_pull", "lang": "en"}
+{"text": "zaciągnij najnowsze zmiany z githuba", "intent": "git_pull", "lang": "pl"}
+{"text": "show the last commits on this branch", "intent": "git_log", "lang": "en"}
+{"text": "pokaż ostatnie commity na tym branchu", "intent": "git_log", "lang": "pl"}
+{"text": "list all branches", "intent": "git_branches", "lang": "en"}
+{"text": "wylistuj wszystkie branche", "intent": "git_branches", "lang": "pl"}
+{"text": "commit everything with message \"fix login\"", "intent": "git_commit", "lang": "en"}
+{"text": "zacommituj wszystko z wiadomością \"fix wranglera\"", "intent": "git_commit", "lang": "pl"}
+{"text": "what did I change, git status", "intent": "git_status", "lang": "en"}
+{"text": "co zmieniłem, status gita", "intent": "git_status", "lang": "pl"}
+{"text": "clone github.com/cloudflare/workers-sdk", "intent": "git_clone", "lang": "en"}
+{"text": "sklonuj repo github.com/cli/cli", "intent": "git_clone", "lang": "pl"}
+{"text": "install python3-venv via apt", "intent": "install_package", "lang": "en"}
+{"text": "zainstaluj git przez apt", "intent": "install_package", "lang": "pl"}
+{"text": "where is npm installed on windows", "intent": "which_cmd", "lang": "en", "shell": "powershell", "os": "win32"}

@@ -23,6 +23,8 @@ import { normalize } from '../../src/features.js';
 import { silverSpans, relex, mulberry32 } from '../lib/silver.js';
 import { Encoder } from '../../src/rerank/encoder.js';
 import { POLICY, rerank, suggestHybrid } from '../../src/rerank/hybrid.js';
+import { evalSets, NEW_INTENTS, NEW_FAMILY } from './sets.js';
+import { sameCmd } from '../lib/cmdnorm.js';
 
 const ROOT = fileURLToPath(new URL('../..', import.meta.url));
 const argv = process.argv.slice(2);
@@ -144,32 +146,22 @@ async function run(sys, text, env, extra = {}) {
   return r;
 }
 
-const blindRaw = readDir(join(ROOT, 'data/hybrid/blind'));
+const SET = evalSets(ROOT);
 const trainTexts = new Set(readJsonl(join(ROOT, 'build/hybrid/train.jsonl')).map((r) => normalize(r.text)));
-// texts the shipped A model may have trained on (gen_data does not know the blind dir): data/intents + data/shell/train
+// texts the shipped A model may have trained on: data/intents + data/shell/train
 const aTrain = new Set([...readDir(join(ROOT, 'data/intents')), ...readJsonl(join(ROOT, 'data/shell/train.jsonl'))].map((r) => normalize(r.text)));
-const blind = blindRaw.filter((r) => r.intent).map((r) => ({ ...r, novel: !aTrain.has(normalize(r.text)) && !trainTexts.has(normalize(r.text)) }));
-const blindOod = blindRaw.filter((r) => !r.intent);
-const evalRows = readDir(join(ROOT, 'data/eval')).map((r) => ({ ...r, shell: 'bash', os: 'linux' }));
-const shellEval = readJsonl(join(ROOT, 'data/shell/eval.jsonl'));
-const oodEval = readJsonl(join(ROOT, 'data/ood_eval.jsonl'));
+const blind = SET.blind().map((r) => ({ ...r, novel: !aTrain.has(normalize(r.text)) && !trainTexts.has(normalize(r.text)) }));
+const blindOod = SET.blind_ood();
+const evalRows = SET.eval();
+const shellEval = SET.shell();
+const oodEval = SET.ood();
 const hist = readJsonl(join(ROOT, 'data/history/eval.jsonl'));
 const gold = readJsonl(join(ROOT, 'data/slots/gold.jsonl'));
-// private real-history set (never committed): LLM paraphrases of real shell-history commands mapped to catalog intents
-const privRows = [];
-if (!has('no-private')) {
-  const dir = '/workspace/tellsh-data/work/gen';
-  if (existsSync(dir)) {
-    for (const f of readdirSync(dir).filter((x) => x.endsWith('.json')).sort()) {
-      let d; try { d = JSON.parse(readFileSync(join(dir, f), 'utf8')); } catch { continue; }
-      for (const r of d) {
-        if (!r.intent || !BY_ID[r.intent]) continue;
-        const os = r.shell === 'powershell' ? 'win32' : r.shell === 'zsh' ? 'darwin' : 'linux';
-        for (const lang of ['en', 'pl']) for (const t of r[lang] || []) if (t && t !== r.cmd_redacted) privRows.push({ text: t, intent: r.intent, lang, shell: r.shell || 'bash', os });
-      }
-    }
-  }
-}
+// private real-usage eval split (scripts/real/prepare_real.js; never committed), held out by command group
+const realRows = has('no-private') ? [] : SET.real();
+const realOoc = has('no-private') ? [] : SET.real_ooc();
+// gold tool family (intents unknown to this tree's catalog, e.g. when evaluating the v0.3 code: NEW_FAMILY)
+const famOf = (i) => FAMILY_OF[i] || NEW_FAMILY[i];
 
 const R = {};
 const md = [];
@@ -186,10 +178,11 @@ async function clsSet(name, rows) {
       if (sys === 'C' && !LM_SAMPLE.has(key(r.text, env))) continue;
       const s = await run(sys, r.text, env);
       if (/C/.test(sys) && s.hybrid?.deferred && !LM.has(key(r.text, env))) { bump('all', 'missing'); continue; }
-      const ks = ['all', r.lang, 'sh:' + env.shell];
+      const ks = ['all', r.lang, 'sh:' + env.shell, NEW_INTENTS.has(r.intent) ? 'new' : 'old'];
+      if (r.literal !== undefined) ks.push(r.literal ? 'lit' : 'nat');
       for (const k of ks) {
         bump(k, 'n');
-        if ((s.tool || FAMILY_OF[s.intent]) === FAMILY_OF[r.intent]) bump(k, 'tool');
+        if ((s.tool || FAMILY_OF[s.intent]) === famOf(r.intent)) bump(k, 'tool');
         if (s.understood && s.intent === r.intent) bump(k, 'intent');
         if (s.understood) { bump(k, 'ans'); if (s.intent === r.intent) bump(k, 'ansOk'); }
         if (s.hybrid?.deferred) bump(k, 'deferred');
@@ -212,11 +205,37 @@ async function oodSet(name, rows) {
     R[name][sys] = { n, rej };
   }
 }
-const SETS = [['eval', evalRows], ['shell', shellEval], ['blind', blind], ['blind_novel', blind.filter((r) => r.novel)]];
-if (privRows.length) SETS.push(['private', privRows]);
+const SETS = [['eval', evalRows], ['shell', shellEval], ['blind', blind], ['blind_novel', blind.filter((r) => r.novel)],
+  ['blind3', SET.blind3()], ['devtools', SET.devtools()]];
+if (realRows.length) SETS.push(['real', realRows]);
 for (const [n, rows] of SETS) { await clsSet(n, rows); console.error(`cls ${n} done ${((Date.now() - t0) / 1000).toFixed(0)}s`); }
 await oodSet('ood', oodEval);
 await oodSet('blind_ood', blindOod);
+await oodSet('blind3_ood', SET.blind3_ood());
+if (realOoc.length) await oodSet('real_ooc', realOoc);
+
+// 1b. real usage, stage 3: slot values of correctly classified requests that occur in the real command, and exact
+// (normalised) equality with the real command (real commands often carry extra flags, so this is a lower bound)
+R.realSlots = {};
+for (const sys of active.filter((x) => x !== 'C')) {
+  const S = { n: 0, filled: 0, found: 0, exact: 0 };
+  for (const r of realRows) {
+    const env = envOf(r);
+    const s = await run(sys, r.text, env);
+    if (/C/.test(sys) && s.hybrid?.deferred && !LM.has(key(r.text, env))) continue;
+    if (!(s.understood && s.intent === r.intent)) continue;
+    S.n++;
+    const defaults = BY_ID[r.intent]?.slots || {};
+    const cmd = r.cmd.replace(/["']/g, '');
+    for (const [k, v] of Object.entries(s.slots || {})) {
+      if (v == null || String(v) === String(defaults[k]) || ['glob', 'namepat', 'sedexpr', 'age', 'since', 'minutes', 'sizeBytes'].includes(k)) continue;
+      S.filled++;
+      if (cmd.includes(String(v))) S.found++;
+    }
+    try { if (s.command && sameCmd(s.command, r.cmd)) S.exact++; } catch { /* unparsable */ }
+  }
+  R.realSlots[sys] = S;
+}
 
 // 2. data/eval under every shell context (intent accuracy)
 const ENVS = { bash: BASH, zsh: { shell: 'zsh', os: 'darwin', coreutils: 'bsd' }, sh: { shell: 'sh', os: 'linux', coreutils: 'gnu' },
@@ -301,8 +320,10 @@ for (const r of evalRows) {
   relexRows.push({ text: rx.text, lang: r.lang, intent: r.intent, gold: buildCommand(r.intent, rx.text, { env: BASH, resolved: gs }).command, shell: 'bash', os: 'linux' });
 }
 const blindE2E = blind.map((r) => ({ ...r, gold: buildCommand(r.intent, r.text, { env: envOf(r), resolved: goldSlots(r) }).command }));
+const blind3E2E = readJsonl(join(ROOT, 'data/blind/e2e.jsonl')).map((r) => ({ ...r, shell: r.shell || 'bash', os: r.os || 'linux', gold: r.expect_command }));
+const devE2E = SET.devtools().filter((r) => r.expect_command).map((r) => ({ ...r, gold: r.expect_command }));
 R.e2e = {};
-for (const [name, rows] of [['relex', relexRows], ['blind', blindE2E], ['blind_novel', blindE2E.filter((r) => r.novel)]]) {
+for (const [name, rows] of [['relex', relexRows], ['blind', blindE2E], ['blind_novel', blindE2E.filter((r) => r.novel)], ['blind3', blind3E2E], ['devtools', devE2E]]) {
   R.e2e[name] = {};
   for (const sys of active) {
     const S = { all: [0, 0], en: [0, 0], pl: [0, 0] };
@@ -326,5 +347,5 @@ for (const sys of active) {
   R.history[sys] = [hist.length, ok];
 }
 
-writeFileSync(join(ROOT, `build/hybrid/results${TAG}.json`), JSON.stringify({ R, policies: Object.fromEntries(active.map((s) => [s, policyOf(s)])), lmRows: LM.size, privateRows: privRows.length }, (k, v) => (v === Infinity ? 'Infinity' : v), 1));
+writeFileSync(join(ROOT, `build/hybrid/results${TAG}.json`), JSON.stringify({ R, policies: Object.fromEntries(active.map((s) => [s, policyOf(s)])), lmRows: LM.size, realRows: realRows.length, realOoc: realOoc.length }, (k, v) => (v === Infinity ? 'Infinity' : v), 1));
 console.error(`wrote build/hybrid/results.json in ${((Date.now() - t0) / 1000).toFixed(0)}s`);

@@ -1,0 +1,424 @@
+{"text": "run the dev script", "intent": "npm_run_script", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "npm run dev"}
+{"text": "start the dev server with npm", "intent": "npm_run_script", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "npm run dev"}
+{"text": "npm run build please", "intent": "npm_run_script", "lang": "en", "shell": "zsh", "os": "linux", "expect_command": "npm run build"}
+{"text": "how do I run the lint script from package.json?", "intent": "npm_run_script", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "npm run lint"}
+{"text": "execute the \"test:e2e\" npm script", "intent": "npm_run_script", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "npm run test:e2e"}
+{"text": "kick off the storybook script", "intent": "npm_run_script", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "run the start script via npm", "intent": "npm_run_script", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "run my package.json format script", "intent": "npm_run_script", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "npm run format"}
+{"text": "odpal skrypt dev", "intent": "npm_run_script", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "npm run dev"}
+{"text": "uruchom npm run build", "intent": "npm_run_script", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "npm run build"}
+{"text": "jak uruchomic skrypt test z package.json?", "intent": "npm_run_script", "lang": "pl", "shell": "zsh", "os": "linux", "expect_command": "npm run test"}
+{"text": "odpal skrypt preview przez npm", "intent": "npm_run_script", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "npm run preview"}
+{"text": "uruchom skrypt typecheck z package.json", "intent": "npm_run_script", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "npm run typecheck"}
+{"text": "włącz skrypt watch w npm", "intent": "npm_run_script", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "zbuduj projekt skryptem build z package.json", "intent": "npm_run_script", "lang": "pl", "shell": "fish", "os": "linux"}
+{"text": "wykonaj skrypt \"migrate\" w npmie", "intent": "npm_run_script", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "npm run migrate"}
+{"text": "install the project dependencies", "intent": "npm_install", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "npm install"}
+{"text": "npm install the deps for this repo", "intent": "npm_install", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "npm install"}
+{"text": "add express to the project with npm", "intent": "npm_install", "lang": "en", "shell": "zsh", "os": "linux", "expect_command": "npm install express"}
+{"text": "install lodash via npm", "intent": "npm_install", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "npm install lodash"}
+{"text": "i just cloned this, install node modules", "intent": "npm_install", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "npm install"}
+{"text": "install dependencies from package.json", "intent": "npm_install", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "add the zod package to my node project", "intent": "npm_install", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "instal axios with npm", "intent": "npm_install", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "npm install axios"}
+{"text": "zainstaluj zaleznosci projektu", "intent": "npm_install", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "npm install"}
+{"text": "doinstaluj paczke dotenv przez npm", "intent": "npm_install", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "npm install dotenv"}
+{"text": "zainstaluj node_modules", "intent": "npm_install", "lang": "pl", "shell": "zsh", "os": "linux", "expect_command": "npm install"}
+{"text": "dodaj react-router do projektu npmem", "intent": "npm_install", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "npm install react-router"}
+{"text": "pobierz wszystkie zależności z package.json", "intent": "npm_install", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "npm install"}
+{"text": "zainstaluj zależności npm w tym projekcie", "intent": "npm_install", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "dodaj pakiet vitest przez npm", "intent": "npm_install", "lang": "pl", "shell": "fish", "os": "linux"}
+{"text": "npm zainstaluj prettier do projektu", "intent": "npm_install", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "npm install prettier"}
+{"text": "install typescript globally with npm", "intent": "npm_install_global", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "npm install -g typescript"}
+{"text": "globally install pnpm", "intent": "npm_install_global", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "npm install -g pnpm"}
+{"text": "npm global install of nodemon", "intent": "npm_install_global", "lang": "en", "shell": "zsh", "os": "linux", "expect_command": "npm install -g nodemon"}
+{"text": "how do i install the vercel cli globally?", "intent": "npm_install_global", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "npm install -g vercel"}
+{"text": "install wrangler as a global npm package", "intent": "npm_install_global", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "npm install -g wrangler"}
+{"text": "install http-server globally so I can use it anywhere", "intent": "npm_install_global", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "install yarn globally via npm", "intent": "npm_install_global", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "put eslint in the global npm packages", "intent": "npm_install_global", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "npm install -g eslint"}
+{"text": "zainstaluj globalnie typescript", "intent": "npm_install_global", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "npm install -g typescript"}
+{"text": "zainstaluj pnpm globalnie przez npm", "intent": "npm_install_global", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "npm install -g pnpm"}
+{"text": "globalna instalacja pakietu npm-check-updates", "intent": "npm_install_global", "lang": "pl", "shell": "zsh", "os": "linux", "expect_command": "npm install -g npm-check-updates"}
+{"text": "jak zainstalowac globalnie nodemon?", "intent": "npm_install_global", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "npm install -g nodemon"}
+{"text": "dodaj serve jako globalny pakiet npm", "intent": "npm_install_global", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "npm install -g serve"}
+{"text": "zainstaluj firebase-tools globalnie npmem", "intent": "npm_install_global", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "zainstaluj globalnie pakiet tsx", "intent": "npm_install_global", "lang": "pl", "shell": "fish", "os": "linux"}
+{"text": "potrzebuje globalnie @angular/cli z npm", "intent": "npm_install_global", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "npm install -g @angular/cli"}
+{"text": "pip install requests", "intent": "pip_install", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "python3 -m pip install requests"}
+{"text": "install numpy with pip", "intent": "pip_install", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "python3 -m pip install numpy"}
+{"text": "install the python package pandas", "intent": "pip_install", "lang": "en", "shell": "zsh", "os": "linux", "expect_command": "python3 -m pip install pandas"}
+{"text": "how do I install flask for python?", "intent": "pip_install", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "python3 -m pip install flask"}
+{"text": "add the httpx python library", "intent": "pip_install", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "python3 -m pip install httpx"}
+{"text": "pip install black", "intent": "pip_install", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "install the python package openpyxl", "intent": "pip_install", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "instal pytest via pip", "intent": "pip_install", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "python3 -m pip install pytest"}
+{"text": "zainstaluj requests przez pip", "intent": "pip_install", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "python3 -m pip install requests"}
+{"text": "zainstaluj pakiet pythona numpy", "intent": "pip_install", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "python3 -m pip install numpy"}
+{"text": "doinstaluj biblioteke matplotlib do pythona", "intent": "pip_install", "lang": "pl", "shell": "zsh", "os": "linux", "expect_command": "python3 -m pip install matplotlib"}
+{"text": "pip zainstaluj fastapi", "intent": "pip_install", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "python3 -m pip install fastapi"}
+{"text": "jak zainstalować pakiet beautifulsoup4 w pythonie?", "intent": "pip_install", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "python3 -m pip install beautifulsoup4"}
+{"text": "zainstaluj pakiet pythona pyyaml", "intent": "pip_install", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "dodaj bibliotekę scipy przez pipa", "intent": "pip_install", "lang": "pl", "shell": "fish", "os": "linux"}
+{"text": "zainstaluj pipem paczke rich", "intent": "pip_install", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "python3 -m pip install rich"}
+{"text": "activate the virtualenv", "intent": "activate_venv", "lang": "en", "shell": "bash", "os": "linux", "expect_command": ". .venv/bin/activate"}
+{"text": "activate my python venv in venv", "intent": "activate_venv", "lang": "en", "shell": "bash", "os": "linux", "expect_command": ". venv/bin/activate"}
+{"text": "source the virtual environment", "intent": "activate_venv", "lang": "en", "shell": "zsh", "os": "linux", "expect_command": ". .venv/bin/activate"}
+{"text": "how do I activate the python virtual environment in env?", "intent": "activate_venv", "lang": "en", "shell": "bash", "os": "linux", "expect_command": ". env/bin/activate"}
+{"text": "turn on the venv", "intent": "activate_venv", "lang": "en", "shell": "bash", "os": "linux", "expect_command": ". .venv/bin/activate"}
+{"text": "activate the .venv virtualenv", "intent": "activate_venv", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "activate python virtual environment", "intent": "activate_venv", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "enter the venv in ./venv", "intent": "activate_venv", "lang": "en", "shell": "fish", "os": "linux"}
+{"text": "aktywuj virtualenv", "intent": "activate_venv", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": ". .venv/bin/activate"}
+{"text": "włącz środowisko wirtualne pythona", "intent": "activate_venv", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": ". .venv/bin/activate"}
+{"text": "aktywuj venv w katalogu venv", "intent": "activate_venv", "lang": "pl", "shell": "zsh", "os": "linux", "expect_command": ". venv/bin/activate"}
+{"text": "jak aktywowac srodowisko wirtualne?", "intent": "activate_venv", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": ". .venv/bin/activate"}
+{"text": "wejdz do wirtualnego srodowiska .venv", "intent": "activate_venv", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": ". .venv/bin/activate"}
+{"text": "aktywuj środowisko wirtualne pythona", "intent": "activate_venv", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "aktywuj venv z folderu env", "intent": "activate_venv", "lang": "pl", "shell": "sh", "os": "linux"}
+{"text": "odpal venva", "intent": "activate_venv", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": ". .venv/bin/activate"}
+{"text": "what version of node do I have?", "intent": "tool_version", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "node --version"}
+{"text": "show the git version", "intent": "tool_version", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "git --version"}
+{"text": "which version of docker is installed", "intent": "tool_version", "lang": "en", "shell": "zsh", "os": "linux", "expect_command": "docker --version"}
+{"text": "python3 version?", "intent": "tool_version", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "python3 --version"}
+{"text": "check the installed terraform version", "intent": "tool_version", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "terraform --version"}
+{"text": "what version is my ffmpeg", "intent": "tool_version", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "show me the npm version", "intent": "tool_version", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "whats the version of rustc", "intent": "tool_version", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "rustc --version"}
+{"text": "jaka mam wersje node?", "intent": "tool_version", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "node --version"}
+{"text": "pokaż wersję gita", "intent": "tool_version", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "git --version"}
+{"text": "sprawdz wersje kubectl", "intent": "tool_version", "lang": "pl", "shell": "zsh", "os": "linux", "expect_command": "kubectl --version"}
+{"text": "która wersja pythona3 jest zainstalowana?", "intent": "tool_version", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "python3 --version"}
+{"text": "wersja go", "intent": "tool_version", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "go --version"}
+{"text": "jaka wersja npm jest zainstalowana", "intent": "tool_version", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "pokaz wersje cargo", "intent": "tool_version", "lang": "pl", "shell": "fish", "os": "linux"}
+{"text": "sprawdź jaką wersję ma wrangler", "intent": "tool_version", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "wrangler --version"}
+{"text": "show the help for rsync", "intent": "cli_help", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "rsync --help"}
+{"text": "what options does curl have?", "intent": "cli_help", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "curl --help"}
+{"text": "print the --help of tar", "intent": "cli_help", "lang": "en", "shell": "zsh", "os": "linux", "expect_command": "tar --help"}
+{"text": "how do I use jq, show its help", "intent": "cli_help", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "jq --help"}
+{"text": "ffmpeg help", "intent": "cli_help", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "ffmpeg --help"}
+{"text": "show me the usage of rg", "intent": "cli_help", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "display help for git", "intent": "cli_help", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "list the flags of grep", "intent": "cli_help", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "grep --help"}
+{"text": "pokaż pomoc dla rsync", "intent": "cli_help", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "rsync --help"}
+{"text": "jakie opcje ma curl?", "intent": "cli_help", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "curl --help"}
+{"text": "wyswietl --help dla tar", "intent": "cli_help", "lang": "pl", "shell": "zsh", "os": "linux", "expect_command": "tar --help"}
+{"text": "pomoc polecenia jq", "intent": "cli_help", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "jq --help"}
+{"text": "jak używać polecenia find, pokaż pomoc", "intent": "cli_help", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "find --help"}
+{"text": "pokaż pomoc programu docker", "intent": "cli_help", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "wyswietl liste opcji polecenia sed", "intent": "cli_help", "lang": "pl", "shell": "fish", "os": "linux"}
+{"text": "jakie flagi ma wget", "intent": "cli_help", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "wget --help"}
+{"text": "deploy the worker", "intent": "wrangler_deploy", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "npx wrangler deploy"}
+{"text": "deploy this cloudflare worker with wrangler", "intent": "wrangler_deploy", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "npx wrangler deploy"}
+{"text": "push my worker to cloudflare", "intent": "wrangler_deploy", "lang": "en", "shell": "zsh", "os": "linux", "expect_command": "npx wrangler deploy"}
+{"text": "wrangler deploy", "intent": "wrangler_deploy", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "npx wrangler deploy"}
+{"text": "how do I publish my Worker to production?", "intent": "wrangler_deploy", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "npx wrangler deploy"}
+{"text": "ship the cloudflare worker", "intent": "wrangler_deploy", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "deploy worker to cloudflare", "intent": "wrangler_deploy", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "deplyo the worker pls", "intent": "wrangler_deploy", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "npx wrangler deploy"}
+{"text": "wdróż workera", "intent": "wrangler_deploy", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "npx wrangler deploy"}
+{"text": "zdeployuj workera na cloudflare", "intent": "wrangler_deploy", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "npx wrangler deploy"}
+{"text": "opublikuj worker cloudflare przez wranglera", "intent": "wrangler_deploy", "lang": "pl", "shell": "zsh", "os": "linux", "expect_command": "npx wrangler deploy"}
+{"text": "jak wrzucic workera na cloudflare?", "intent": "wrangler_deploy", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "npx wrangler deploy"}
+{"text": "wrangler deploy zrob", "intent": "wrangler_deploy", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "npx wrangler deploy"}
+{"text": "wdrożenie workera na produkcję", "intent": "wrangler_deploy", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "wypchnij workera do cloudflare", "intent": "wrangler_deploy", "lang": "pl", "shell": "fish", "os": "linux"}
+{"text": "zrob deploy cloudflare workera", "intent": "wrangler_deploy", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "npx wrangler deploy"}
+{"text": "run the worker locally", "intent": "wrangler_dev", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "npx wrangler dev"}
+{"text": "start wrangler dev", "intent": "wrangler_dev", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "npx wrangler dev"}
+{"text": "test my cloudflare worker on localhost", "intent": "wrangler_dev", "lang": "en", "shell": "zsh", "os": "linux", "expect_command": "npx wrangler dev"}
+{"text": "spin up a local dev server for the worker", "intent": "wrangler_dev", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "npx wrangler dev"}
+{"text": "how can I run my Worker locally before deploying?", "intent": "wrangler_dev", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "npx wrangler dev"}
+{"text": "local wrangler dev server", "intent": "wrangler_dev", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "run cloudflare worker locally", "intent": "wrangler_dev", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "wrangler dev mode", "intent": "wrangler_dev", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "npx wrangler dev"}
+{"text": "uruchom workera lokalnie", "intent": "wrangler_dev", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "npx wrangler dev"}
+{"text": "odpal wrangler dev", "intent": "wrangler_dev", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "npx wrangler dev"}
+{"text": "jak przetestowac workera lokalnie?", "intent": "wrangler_dev", "lang": "pl", "shell": "zsh", "os": "linux", "expect_command": "npx wrangler dev"}
+{"text": "lokalny serwer deweloperski dla workera cloudflare", "intent": "wrangler_dev", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "npx wrangler dev"}
+{"text": "odpal workera na localhoscie", "intent": "wrangler_dev", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "npx wrangler dev"}
+{"text": "uruchom cloudflare worker u mnie lokalnie", "intent": "wrangler_dev", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "wrangler w trybie dev", "intent": "wrangler_dev", "lang": "pl", "shell": "fish", "os": "linux"}
+{"text": "puść workera lokalnie przez wranglera", "intent": "wrangler_dev", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "npx wrangler dev"}
+{"text": "stream the worker logs", "intent": "wrangler_tail", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "npx wrangler tail"}
+{"text": "tail logs of my deployed cloudflare worker", "intent": "wrangler_tail", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "npx wrangler tail"}
+{"text": "show live logs from the worker in production", "intent": "wrangler_tail", "lang": "en", "shell": "zsh", "os": "linux", "expect_command": "npx wrangler tail"}
+{"text": "wrangler tail", "intent": "wrangler_tail", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "npx wrangler tail"}
+{"text": "how do I see console.log output of my deployed Worker?", "intent": "wrangler_tail", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "npx wrangler tail"}
+{"text": "follow the cloudflare worker logs live", "intent": "wrangler_tail", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "watch worker logs in real time", "intent": "wrangler_tail", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "live logs for the worker pls", "intent": "wrangler_tail", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "npx wrangler tail"}
+{"text": "pokaż logi workera na żywo", "intent": "wrangler_tail", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "npx wrangler tail"}
+{"text": "strumieniuj logi wdrożonego workera", "intent": "wrangler_tail", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "npx wrangler tail"}
+{"text": "sledz logi cloudflare workera", "intent": "wrangler_tail", "lang": "pl", "shell": "zsh", "os": "linux", "expect_command": "npx wrangler tail"}
+{"text": "jak zobaczyc logi workera z produkcji?", "intent": "wrangler_tail", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "npx wrangler tail"}
+{"text": "wrangler tail logi", "intent": "wrangler_tail", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "npx wrangler tail"}
+{"text": "logi workera cloudflare na zywo", "intent": "wrangler_tail", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "podglądaj logi workera w czasie rzeczywistym", "intent": "wrangler_tail", "lang": "pl", "shell": "fish", "os": "linux"}
+{"text": "co loguje mój worker na produkcji, pokaż na bieżąco", "intent": "wrangler_tail", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "npx wrangler tail"}
+{"text": "set the API_KEY secret on the worker", "intent": "wrangler_secret_put", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "npx wrangler secret put API_KEY"}
+{"text": "add a secret DATABASE_URL to my cloudflare worker", "intent": "wrangler_secret_put", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "npx wrangler secret put DATABASE_URL"}
+{"text": "wrangler secret put STRIPE_SECRET", "intent": "wrangler_secret_put", "lang": "en", "shell": "zsh", "os": "linux", "expect_command": "npx wrangler secret put STRIPE_SECRET"}
+{"text": "how do I store OPENAI_API_KEY as a worker secret?", "intent": "wrangler_secret_put", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "npx wrangler secret put OPENAI_API_KEY"}
+{"text": "put secret JWT_SECRET in the worker", "intent": "wrangler_secret_put", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "npx wrangler secret put JWT_SECRET"}
+{"text": "set worker secret SENTRY_DSN", "intent": "wrangler_secret_put", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "add the secret GITHUB_TOKEN to the cloudflare worker", "intent": "wrangler_secret_put", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "update the worker secret AUTH_TOKEN", "intent": "wrangler_secret_put", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "npx wrangler secret put AUTH_TOKEN"}
+{"text": "ustaw sekret API_KEY w workerze", "intent": "wrangler_secret_put", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "npx wrangler secret put API_KEY"}
+{"text": "dodaj sekret DATABASE_URL do workera cloudflare", "intent": "wrangler_secret_put", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "npx wrangler secret put DATABASE_URL"}
+{"text": "zapisz STRIPE_KEY jako sekret workera", "intent": "wrangler_secret_put", "lang": "pl", "shell": "zsh", "os": "linux", "expect_command": "npx wrangler secret put STRIPE_KEY"}
+{"text": "jak ustawic zmienna sekretna RESEND_API_KEY w workerze?", "intent": "wrangler_secret_put", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "npx wrangler secret put RESEND_API_KEY"}
+{"text": "wrangler secret put SLACK_WEBHOOK", "intent": "wrangler_secret_put", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "npx wrangler secret put SLACK_WEBHOOK"}
+{"text": "ustaw sekret MAILGUN_KEY na workerze", "intent": "wrangler_secret_put", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "dodaj sekretną zmienną JWT_SECRET do workera", "intent": "wrangler_secret_put", "lang": "pl", "shell": "fish", "os": "linux"}
+{"text": "zmień sekret ADMIN_PASSWORD w cloudflare workerze", "intent": "wrangler_secret_put", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "npx wrangler secret put ADMIN_PASSWORD"}
+{"text": "log in to cloudflare", "intent": "wrangler_login", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "npx wrangler login"}
+{"text": "wrangler login", "intent": "wrangler_login", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "npx wrangler login"}
+{"text": "authenticate wrangler with my cloudflare account", "intent": "wrangler_login", "lang": "en", "shell": "zsh", "os": "linux", "expect_command": "npx wrangler login"}
+{"text": "how do I sign in to Cloudflare from the terminal?", "intent": "wrangler_login", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "npx wrangler login"}
+{"text": "login to wrangler", "intent": "wrangler_login", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "npx wrangler login"}
+{"text": "sign in to cloudflare with wrangler", "intent": "wrangler_login", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "log into cloudflare", "intent": "wrangler_login", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "connect wrangler to cloudflare account", "intent": "wrangler_login", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "npx wrangler login"}
+{"text": "zaloguj sie do cloudflare", "intent": "wrangler_login", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "npx wrangler login"}
+{"text": "zaloguj wranglera", "intent": "wrangler_login", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "npx wrangler login"}
+{"text": "uwierzytelnij wranglera na moim koncie cloudflare", "intent": "wrangler_login", "lang": "pl", "shell": "zsh", "os": "linux", "expect_command": "npx wrangler login"}
+{"text": "jak się zalogować do cloudflare z terminala?", "intent": "wrangler_login", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "npx wrangler login"}
+{"text": "wrangler logowanie", "intent": "wrangler_login", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "npx wrangler login"}
+{"text": "zaloguj mnie do cloudflare przez wranglera", "intent": "wrangler_login", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "logowanie do konta cloudflare", "intent": "wrangler_login", "lang": "pl", "shell": "fish", "os": "linux"}
+{"text": "podłącz wranglera do konta cloudflare", "intent": "wrangler_login", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "npx wrangler login"}
+{"text": "which cloudflare account am I logged in as?", "intent": "wrangler_whoami", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "npx wrangler whoami"}
+{"text": "wrangler whoami", "intent": "wrangler_whoami", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "npx wrangler whoami"}
+{"text": "show my cloudflare account in wrangler", "intent": "wrangler_whoami", "lang": "en", "shell": "zsh", "os": "linux", "expect_command": "npx wrangler whoami"}
+{"text": "am I logged in to cloudflare?", "intent": "wrangler_whoami", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "npx wrangler whoami"}
+{"text": "which account is wrangler using", "intent": "wrangler_whoami", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "npx wrangler whoami"}
+{"text": "check who wrangler is authenticated as", "intent": "wrangler_whoami", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "show current cloudflare user", "intent": "wrangler_whoami", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "what cf account id am i on", "intent": "wrangler_whoami", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "npx wrangler whoami"}
+{"text": "na jakim koncie cloudflare jestem zalogowany?", "intent": "wrangler_whoami", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "npx wrangler whoami"}
+{"text": "wrangler whoami - na kogo jestem zalogowany", "intent": "wrangler_whoami", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "npx wrangler whoami"}
+{"text": "pokaz konto cloudflare we wranglerze", "intent": "wrangler_whoami", "lang": "pl", "shell": "zsh", "os": "linux", "expect_command": "npx wrangler whoami"}
+{"text": "czy jestem zalogowany do cloudflare?", "intent": "wrangler_whoami", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "npx wrangler whoami"}
+{"text": "jakiego konta używa wrangler", "intent": "wrangler_whoami", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "npx wrangler whoami"}
+{"text": "sprawdź jako kto jest zalogowany wrangler", "intent": "wrangler_whoami", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "kim jestem w cloudflare", "intent": "wrangler_whoami", "lang": "pl", "shell": "fish", "os": "linux"}
+{"text": "pokaż id konta cloudflare", "intent": "wrangler_whoami", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "npx wrangler whoami"}
+{"text": "am I logged in to github cli?", "intent": "gh_auth_status", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "gh auth status"}
+{"text": "gh auth status", "intent": "gh_auth_status", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "gh auth status"}
+{"text": "check my github cli login", "intent": "gh_auth_status", "lang": "en", "shell": "zsh", "os": "linux", "expect_command": "gh auth status"}
+{"text": "which github account is gh using?", "intent": "gh_auth_status", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "gh auth status"}
+{"text": "show github authentication status", "intent": "gh_auth_status", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "gh auth status"}
+{"text": "is gh authenticated", "intent": "gh_auth_status", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "check github cli auth", "intent": "gh_auth_status", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "verify my gh token is still valid", "intent": "gh_auth_status", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "gh auth status"}
+{"text": "czy jestem zalogowany do github cli?", "intent": "gh_auth_status", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "gh auth status"}
+{"text": "status logowania gh", "intent": "gh_auth_status", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "gh auth status"}
+{"text": "sprawdz logowanie do githuba w gh", "intent": "gh_auth_status", "lang": "pl", "shell": "zsh", "os": "linux", "expect_command": "gh auth status"}
+{"text": "na jakie konto githuba jest zalogowany gh?", "intent": "gh_auth_status", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "gh auth status"}
+{"text": "pokaż status uwierzytelnienia github", "intent": "gh_auth_status", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "gh auth status"}
+{"text": "sprawdź czy gh jest zalogowany", "intent": "gh_auth_status", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "status autoryzacji github cli", "intent": "gh_auth_status", "lang": "pl", "shell": "fish", "os": "linux"}
+{"text": "czy token gh jeszcze dziala", "intent": "gh_auth_status", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "gh auth status"}
+{"text": "log in to github with gh", "intent": "gh_auth_login", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "gh auth login"}
+{"text": "gh auth login", "intent": "gh_auth_login", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "gh auth login"}
+{"text": "authenticate the github cli", "intent": "gh_auth_login", "lang": "en", "shell": "zsh", "os": "linux", "expect_command": "gh auth login"}
+{"text": "how do I sign in to GitHub from the terminal?", "intent": "gh_auth_login", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "gh auth login"}
+{"text": "login to github cli", "intent": "gh_auth_login", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "gh auth login"}
+{"text": "sign into github using gh", "intent": "gh_auth_login", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "log into github cli", "intent": "gh_auth_login", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "connect gh to my github account", "intent": "gh_auth_login", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "gh auth login"}
+{"text": "zaloguj się do githuba przez gh", "intent": "gh_auth_login", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "gh auth login"}
+{"text": "gh logowanie", "intent": "gh_auth_login", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "gh auth login"}
+{"text": "uwierzytelnij github cli", "intent": "gh_auth_login", "lang": "pl", "shell": "zsh", "os": "linux", "expect_command": "gh auth login"}
+{"text": "jak zalogowac sie do githuba z terminala?", "intent": "gh_auth_login", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "gh auth login"}
+{"text": "zaloguj gh na moje konto", "intent": "gh_auth_login", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "gh auth login"}
+{"text": "zaloguj mnie do github cli", "intent": "gh_auth_login", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "logowanie do githuba w gh", "intent": "gh_auth_login", "lang": "pl", "shell": "fish", "os": "linux"}
+{"text": "podlacz gh do konta github", "intent": "gh_auth_login", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "gh auth login"}
+{"text": "list pull requests", "intent": "gh_pr_list", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "gh pr list"}
+{"text": "show open PRs in this repo", "intent": "gh_pr_list", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "gh pr list"}
+{"text": "gh pr list", "intent": "gh_pr_list", "lang": "en", "shell": "zsh", "os": "linux", "expect_command": "gh pr list"}
+{"text": "what pull requests are open?", "intent": "gh_pr_list", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "gh pr list"}
+{"text": "show me the PRs on github", "intent": "gh_pr_list", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "gh pr list"}
+{"text": "list the repo's pull requests", "intent": "gh_pr_list", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "show open pull requests", "intent": "gh_pr_list", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "any open prs?", "intent": "gh_pr_list", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "gh pr list"}
+{"text": "pokaż pull requesty", "intent": "gh_pr_list", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "gh pr list"}
+{"text": "lista otwartych PR-ów", "intent": "gh_pr_list", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "gh pr list"}
+{"text": "jakie sa otwarte pull requesty?", "intent": "gh_pr_list", "lang": "pl", "shell": "zsh", "os": "linux", "expect_command": "gh pr list"}
+{"text": "wylistuj PR w tym repo", "intent": "gh_pr_list", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "gh pr list"}
+{"text": "pokaz prki na githubie", "intent": "gh_pr_list", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "gh pr list"}
+{"text": "lista pull requestów w repozytorium", "intent": "gh_pr_list", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "jakie PR czekają na review", "intent": "gh_pr_list", "lang": "pl", "shell": "fish", "os": "linux"}
+{"text": "wyświetl otwarte pull requesty", "intent": "gh_pr_list", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "gh pr list"}
+{"text": "show PR 42", "intent": "gh_pr_view", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "gh pr view 42"}
+{"text": "view pull request #118", "intent": "gh_pr_view", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "gh pr view 118"}
+{"text": "open the details of pr 7", "intent": "gh_pr_view", "lang": "en", "shell": "zsh", "os": "linux", "expect_command": "gh pr view 7"}
+{"text": "show the pull request for this branch", "intent": "gh_pr_view", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "gh pr view"}
+{"text": "what's in PR 2031?", "intent": "gh_pr_view", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "gh pr view 2031"}
+{"text": "view pull request 15", "intent": "gh_pr_view", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "show details of PR 88", "intent": "gh_pr_view", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "gh pr view 305", "intent": "gh_pr_view", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "gh pr view 305"}
+{"text": "pokaż PR 42", "intent": "gh_pr_view", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "gh pr view 42"}
+{"text": "wyświetl pull request nr 118", "intent": "gh_pr_view", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "gh pr view 118"}
+{"text": "szczegoly PR 7", "intent": "gh_pr_view", "lang": "pl", "shell": "zsh", "os": "linux", "expect_command": "gh pr view 7"}
+{"text": "pokaz pull request dla tej galezi", "intent": "gh_pr_view", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "gh pr view"}
+{"text": "co jest w PR 2031?", "intent": "gh_pr_view", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "gh pr view 2031"}
+{"text": "pokaż pull request numer 15", "intent": "gh_pr_view", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "opis prka 64", "intent": "gh_pr_view", "lang": "pl", "shell": "fish", "os": "linux"}
+{"text": "zobacz pr #9", "intent": "gh_pr_view", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "gh pr view 9"}
+{"text": "create a pull request", "intent": "gh_pr_create", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "gh pr create --fill"}
+{"text": "open a PR from this branch", "intent": "gh_pr_create", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "gh pr create --fill"}
+{"text": "make a pull request for my current branch", "intent": "gh_pr_create", "lang": "en", "shell": "zsh", "os": "linux", "expect_command": "gh pr create --fill"}
+{"text": "gh pr create", "intent": "gh_pr_create", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "gh pr create --fill"}
+{"text": "how do I open a pull request from the terminal?", "intent": "gh_pr_create", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "gh pr create --fill"}
+{"text": "submit a PR for these changes", "intent": "gh_pr_create", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "create pull request on github", "intent": "gh_pr_create", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "raise a pr", "intent": "gh_pr_create", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "gh pr create --fill"}
+{"text": "utwórz pull request", "intent": "gh_pr_create", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "gh pr create --fill"}
+{"text": "otwórz PR z tej gałęzi", "intent": "gh_pr_create", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "gh pr create --fill"}
+{"text": "zrob pull requesta z obecnego brancha", "intent": "gh_pr_create", "lang": "pl", "shell": "zsh", "os": "linux", "expect_command": "gh pr create --fill"}
+{"text": "jak zalozyc PR z terminala?", "intent": "gh_pr_create", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "gh pr create --fill"}
+{"text": "wystaw PRa", "intent": "gh_pr_create", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "gh pr create --fill"}
+{"text": "stwórz pull request na githubie", "intent": "gh_pr_create", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "nowy pull request z mojej gałęzi", "intent": "gh_pr_create", "lang": "pl", "shell": "fish", "os": "linux"}
+{"text": "zgłoś pull request dla tych zmian", "intent": "gh_pr_create", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "gh pr create --fill"}
+{"text": "show CI checks for PR 42", "intent": "gh_pr_checks", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "gh pr checks 42"}
+{"text": "did the checks pass on my pull request?", "intent": "gh_pr_checks", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "gh pr checks"}
+{"text": "status of CI on pr 118", "intent": "gh_pr_checks", "lang": "en", "shell": "zsh", "os": "linux", "expect_command": "gh pr checks 118"}
+{"text": "gh pr checks", "intent": "gh_pr_checks", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "gh pr checks"}
+{"text": "are the github actions checks green for PR 7?", "intent": "gh_pr_checks", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "gh pr checks 7"}
+{"text": "check CI status of the current PR", "intent": "gh_pr_checks", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "show checks for pull request 55", "intent": "gh_pr_checks", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "is the build passing on pr 230", "intent": "gh_pr_checks", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "gh pr checks 230"}
+{"text": "pokaż status CI dla PR 42", "intent": "gh_pr_checks", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "gh pr checks 42"}
+{"text": "czy testy przeszły na moim pull requeście?", "intent": "gh_pr_checks", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "gh pr checks"}
+{"text": "stan checkow na PR 118", "intent": "gh_pr_checks", "lang": "pl", "shell": "zsh", "os": "linux", "expect_command": "gh pr checks 118"}
+{"text": "czy CI jest zielone na PR 7?", "intent": "gh_pr_checks", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "gh pr checks 7"}
+{"text": "sprawdz checki pull requesta", "intent": "gh_pr_checks", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "gh pr checks"}
+{"text": "status sprawdzeń CI dla PR 55", "intent": "gh_pr_checks", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "czy build przechodzi na prku 230", "intent": "gh_pr_checks", "lang": "pl", "shell": "fish", "os": "linux"}
+{"text": "wyniki checków PR nr 19", "intent": "gh_pr_checks", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "gh pr checks 19"}
+{"text": "merge PR 42", "intent": "gh_pr_merge", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "gh pr merge 42"}
+{"text": "merge this pull request", "intent": "gh_pr_merge", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "gh pr merge"}
+{"text": "merge pull request #118", "intent": "gh_pr_merge", "lang": "en", "shell": "zsh", "os": "linux", "expect_command": "gh pr merge 118"}
+{"text": "gh pr merge 7", "intent": "gh_pr_merge", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "gh pr merge 7"}
+{"text": "how do I merge the PR from the command line?", "intent": "gh_pr_merge", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "gh pr merge"}
+{"text": "merge pr 55 on github", "intent": "gh_pr_merge", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "merge pull request 230", "intent": "gh_pr_merge", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "land pr 19", "intent": "gh_pr_merge", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "gh pr merge 19"}
+{"text": "zmerguj PR 42", "intent": "gh_pr_merge", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "gh pr merge 42"}
+{"text": "scal ten pull request", "intent": "gh_pr_merge", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "gh pr merge"}
+{"text": "zmerguj pull request nr 118", "intent": "gh_pr_merge", "lang": "pl", "shell": "zsh", "os": "linux", "expect_command": "gh pr merge 118"}
+{"text": "jak zmergowac PR z terminala?", "intent": "gh_pr_merge", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "gh pr merge"}
+{"text": "scal PR 7", "intent": "gh_pr_merge", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "gh pr merge 7"}
+{"text": "zmerguj pull request 55", "intent": "gh_pr_merge", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "połącz prka 230 do maina", "intent": "gh_pr_merge", "lang": "pl", "shell": "fish", "os": "linux"}
+{"text": "zmerdżuj pr #19", "intent": "gh_pr_merge", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "gh pr merge 19"}
+{"text": "list recent github actions runs", "intent": "gh_run_list", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "gh run list"}
+{"text": "show the latest workflow runs", "intent": "gh_run_list", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "gh run list"}
+{"text": "gh run list", "intent": "gh_run_list", "lang": "en", "shell": "zsh", "os": "linux", "expect_command": "gh run list"}
+{"text": "what CI runs happened recently?", "intent": "gh_run_list", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "gh run list"}
+{"text": "show me github actions history", "intent": "gh_run_list", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "gh run list"}
+{"text": "list workflow runs for this repo", "intent": "gh_run_list", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "show recent github actions runs", "intent": "gh_run_list", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "did the last actions runs fail?", "intent": "gh_run_list", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "gh run list"}
+{"text": "pokaż ostatnie uruchomienia github actions", "intent": "gh_run_list", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "gh run list"}
+{"text": "lista workflow runów", "intent": "gh_run_list", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "gh run list"}
+{"text": "jakie byly ostatnie przebiegi CI?", "intent": "gh_run_list", "lang": "pl", "shell": "zsh", "os": "linux", "expect_command": "gh run list"}
+{"text": "historia github actions", "intent": "gh_run_list", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "gh run list"}
+{"text": "wylistuj ostatnie runy akcji", "intent": "gh_run_list", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "gh run list"}
+{"text": "ostatnie uruchomienia workflowów", "intent": "gh_run_list", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "pokaż listę runów github actions", "intent": "gh_run_list", "lang": "pl", "shell": "fish", "os": "linux"}
+{"text": "czy ostatnie akcje na githubie przeszly", "intent": "gh_run_list", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "gh run list"}
+{"text": "show github actions run 9876543210", "intent": "gh_run_view", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "gh run view 9876543210"}
+{"text": "view the workflow run 4521337", "intent": "gh_run_view", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "gh run view 4521337"}
+{"text": "why did actions run 123456789 fail? show the logs", "intent": "gh_run_view", "lang": "en", "shell": "zsh", "os": "linux", "expect_command": "gh run view 123456789"}
+{"text": "gh run view", "intent": "gh_run_view", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "gh run view"}
+{"text": "open the details of the last workflow run", "intent": "gh_run_view", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "gh run view"}
+{"text": "show the failed logs of run 555000111", "intent": "gh_run_view", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "view github actions run 8001234", "intent": "gh_run_view", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "details of ci run 7766554433", "intent": "gh_run_view", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "gh run view 7766554433"}
+{"text": "pokaż run github actions 9876543210", "intent": "gh_run_view", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "gh run view 9876543210"}
+{"text": "szczegóły przebiegu workflow 4521337", "intent": "gh_run_view", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "gh run view 4521337"}
+{"text": "dlaczego padl run 123456789? pokaz logi", "intent": "gh_run_view", "lang": "pl", "shell": "zsh", "os": "linux", "expect_command": "gh run view 123456789"}
+{"text": "pokaz uruchomienie github actions", "intent": "gh_run_view", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "gh run view"}
+{"text": "wyświetl logi nieudanego runa 66778899", "intent": "gh_run_view", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "gh run view 66778899"}
+{"text": "szczegóły runa 555000111", "intent": "gh_run_view", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "pokaz workflow run 8001234", "intent": "gh_run_view", "lang": "pl", "shell": "fish", "os": "linux"}
+{"text": "zobacz przebieg akcji nr 31415926", "intent": "gh_run_view", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "gh run view 31415926"}
+{"text": "forward port 5432 from db.example.com over ssh", "intent": "ssh_port_forward", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "ssh -N -L 5432:localhost:5432 db.example.com"}
+{"text": "ssh tunnel port 8080 to deploy@10.0.0.12", "intent": "ssh_port_forward", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "ssh -N -L 8080:localhost:8080 deploy@10.0.0.12"}
+{"text": "make port 3000 on staging.acme.io available locally through ssh", "intent": "ssh_port_forward", "lang": "en", "shell": "zsh", "os": "linux", "expect_command": "ssh -N -L 3000:localhost:3000 staging.acme.io"}
+{"text": "how do I tunnel postgres port 5432 from prod-db to my machine?", "intent": "ssh_port_forward", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "ssh -N -L 5432:localhost:5432 prod-db"}
+{"text": "local port forward 6379 via ssh to redis.internal", "intent": "ssh_port_forward", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "ssh -N -L 6379:localhost:6379 redis.internal"}
+{"text": "open an ssh tunnel for port 9200 to ubuntu@search01", "intent": "ssh_port_forward", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "forward local port 3306 to mysql.lan through ssh", "intent": "ssh_port_forward", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "set up ssh port forwarding for 8888 to admin@jupyter.lab", "intent": "ssh_port_forward", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "ssh -N -L 8888:localhost:8888 admin@jupyter.lab"}
+{"text": "przekieruj port 5432 z db.example.com przez ssh", "intent": "ssh_port_forward", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "ssh -N -L 5432:localhost:5432 db.example.com"}
+{"text": "tunel ssh na port 8080 do deploy@10.0.0.12", "intent": "ssh_port_forward", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "ssh -N -L 8080:localhost:8080 deploy@10.0.0.12"}
+{"text": "udostepnij lokalnie port 3000 z serwera staging.acme.io przez ssh", "intent": "ssh_port_forward", "lang": "pl", "shell": "zsh", "os": "linux", "expect_command": "ssh -N -L 3000:localhost:3000 staging.acme.io"}
+{"text": "jak zrobić tunel ssh do portu 6379 na redis.internal?", "intent": "ssh_port_forward", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "ssh -N -L 6379:localhost:6379 redis.internal"}
+{"text": "forward portu 9000 przez ssh z root@minio01", "intent": "ssh_port_forward", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "ssh -N -L 9000:localhost:9000 root@minio01"}
+{"text": "przekierowanie portu 3306 z mysql.lan przez ssh", "intent": "ssh_port_forward", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "zestaw tunel ssh dla portu 27017 do mongo.prod", "intent": "ssh_port_forward", "lang": "pl", "shell": "fish", "os": "linux"}
+{"text": "tunel ssh port 15672 do rabbit.local", "intent": "ssh_port_forward", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "ssh -N -L 15672:localhost:15672 rabbit.local"}
+{"text": "show lines 10 to 20 of app.log", "intent": "print_line_range", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "sed -n '10,20p' app.log"}
+{"text": "print lines 100-150 from server.py", "intent": "print_line_range", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "sed -n '100,150p' server.py"}
+{"text": "display lines 1 through 40 of README.md", "intent": "print_line_range", "lang": "en", "shell": "zsh", "os": "linux", "expect_command": "sed -n '1,40p' README.md"}
+{"text": "what's on lines 230 to 260 in /var/log/syslog?", "intent": "print_line_range", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "sed -n '230,260p' /var/log/syslog"}
+{"text": "lines 55-70 of src/index.js", "intent": "print_line_range", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "sed -n '55,70p' src/index.js"}
+{"text": "show me lines 12 to 30 of config.yaml", "intent": "print_line_range", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "print lines 200 through 220 of error.log", "intent": "print_line_range", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "output line 5 thru line 9 of notes.txt", "intent": "print_line_range", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "sed -n '5,9p' notes.txt"}
+{"text": "pokaż linie od 10 do 20 z app.log", "intent": "print_line_range", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "sed -n '10,20p' app.log"}
+{"text": "wyświetl linie 100-150 pliku server.py", "intent": "print_line_range", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "sed -n '100,150p' server.py"}
+{"text": "wypisz wiersze 1-40 z README.md", "intent": "print_line_range", "lang": "pl", "shell": "zsh", "os": "linux", "expect_command": "sed -n '1,40p' README.md"}
+{"text": "co jest w liniach 230 do 260 w /var/log/syslog?", "intent": "print_line_range", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "sed -n '230,260p' /var/log/syslog"}
+{"text": "linie 55-70 z src/index.js", "intent": "print_line_range", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "sed -n '55,70p' src/index.js"}
+{"text": "pokaz linie od 12 do 30 pliku config.yaml", "intent": "print_line_range", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "wyswietl wiersze od 300 do 320 z dump.sql", "intent": "print_line_range", "lang": "pl", "shell": "fish", "os": "linux"}
+{"text": "pokaz fragment main.go od linii 80 do 95", "intent": "print_line_range", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "sed -n '80,95p' main.go"}
+{"text": "install htop", "intent": "install_package", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "sudo apt install htop"}
+{"text": "install the jq package on the system", "intent": "install_package", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "sudo apt install jq"}
+{"text": "apt install ripgrep", "intent": "install_package", "lang": "en", "shell": "zsh", "os": "linux", "expect_command": "sudo apt install ripgrep"}
+{"text": "zainstaluj pakiet curl w systemie", "intent": "install_package", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "sudo apt install curl"}
+{"text": "zainstaluj nginx", "intent": "install_package", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "sudo apt install nginx"}
+{"text": "brew install wget", "intent": "install_package", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "doinstaluj python3-venv z apt", "intent": "install_package", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "sudo apt install python3-venv"}
+{"text": "where is the node binary located?", "intent": "which_cmd", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "which -a node"}
+{"text": "which python3 am I running", "intent": "which_cmd", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "which -a python3"}
+{"text": "gdzie jest plik wykonywalny npm?", "intent": "which_cmd", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "which -a npm"}
+{"text": "ktory gh jest w PATH", "intent": "which_cmd", "lang": "pl", "shell": "zsh", "os": "linux", "expect_command": "which -a gh"}
+{"text": "path to the wrangler executable", "intent": "which_cmd", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "which -a wrangler"}
+{"text": "show the first 20 lines of app.log", "intent": "head_file", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "head -n 20 app.log"}
+{"text": "first lines of package.json", "intent": "head_file", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "head -n 10 package.json"}
+{"text": "pokaż pierwsze 30 linii server.py", "intent": "head_file", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "head -n 30 server.py"}
+{"text": "poczatek pliku README.md", "intent": "head_file", "lang": "pl", "shell": "zsh", "os": "linux", "expect_command": "head -n 10 README.md"}
+{"text": "show the last 50 lines of error.log", "intent": "tail_file", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "tail -n 50 error.log"}
+{"text": "last 15 lines of build.log", "intent": "tail_file", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "tail -n 15 build.log"}
+{"text": "pokaż ostatnie 100 linii z app.log", "intent": "tail_file", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "tail -n 100 app.log"}
+{"text": "koncowka pliku nginx.log, 25 linii", "intent": "tail_file", "lang": "pl", "shell": "zsh", "os": "linux", "expect_command": "tail -n 25 nginx.log"}
+{"text": "print the contents of package.json", "intent": "cat_file", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "cat package.json"}
+{"text": "show me the whole .env file", "intent": "cat_file", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "cat .env"}
+{"text": "wyświetl zawartość pliku requirements.txt", "intent": "cat_file", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "cat requirements.txt"}
+{"text": "show the contents of wrangler.toml", "intent": "cat_file", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "ssh into db.example.com", "intent": "ssh_connect", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "ssh db.example.com"}
+{"text": "connect to deploy@10.0.0.12 over ssh", "intent": "ssh_connect", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "ssh deploy@10.0.0.12"}
+{"text": "połącz się przez ssh z staging.acme.io", "intent": "ssh_connect", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "ssh staging.acme.io"}
+{"text": "zaloguj sie na serwer ubuntu@search01 po ssh", "intent": "ssh_connect", "lang": "pl", "shell": "zsh", "os": "linux", "expect_command": "ssh ubuntu@search01"}
+{"text": "push my commits", "intent": "git_push", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "git push"}
+{"text": "push branch feature/login to origin", "intent": "git_push", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "git push origin feature/login"}
+{"text": "wypchnij zmiany na serwer", "intent": "git_push", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "git push"}
+{"text": "wypchnij galaz main do origin", "intent": "git_push", "lang": "pl", "shell": "zsh", "os": "linux", "expect_command": "git push origin main"}
+{"text": "show the last 5 commits", "intent": "git_log", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "git log --oneline --graph --decorate -n 5"}
+{"text": "recent commit history", "intent": "git_log", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "git log --oneline --graph --decorate -n 10"}
+{"text": "pokaż historię commitów", "intent": "git_log", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "git log --oneline --graph --decorate -n 10"}
+{"text": "ostatnie 20 commitow", "intent": "git_log", "lang": "pl", "shell": "zsh", "os": "linux", "expect_command": "git log --oneline --graph --decorate -n 20"}
+{"text": "what files did I change?", "intent": "git_status", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "git status"}
+{"text": "show git status", "intent": "git_status", "lang": "en", "shell": "bash", "os": "linux", "expect_command": "git status"}
+{"text": "jakie pliki są zmienione w repo?", "intent": "git_status", "lang": "pl", "shell": "bash", "os": "linux", "expect_command": "git status"}
+{"text": "status repozytorium gita", "intent": "git_status", "lang": "pl", "shell": "fish", "os": "linux"}

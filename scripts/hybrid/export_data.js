@@ -14,6 +14,8 @@ import { INTENTS } from '../../src/catalog.js';
 import { FAMILIES, FAMILY_OF, NONE, TAG_TYPES } from '../../src/tools.js';
 import { normalize, fnv1a } from '../../src/features.js';
 import { silverSpans, relex, mulberry32 } from '../lib/silver.js';
+import { exclusionIndex } from '../lib/heldout.js';
+import { readReal, realTrain } from '../real/real_rows.js';
 
 const ROOT = fileURLToPath(new URL('../..', import.meta.url));
 const OUT = join(ROOT, 'build', 'hybrid');
@@ -50,25 +52,21 @@ export const isDev = (text) => fnv1a('dev:' + normalize(text)) % 10 === 0;
 function main() {
   mkdirSync(OUT, { recursive: true });
   const ids = new Set(INTENTS.map((i) => i.id));
-  const heldOut = new Set([
-    ...readDir(join(ROOT, 'data', 'eval')).map((r) => r.text),
-    ...readJsonl(join(ROOT, 'data', 'shell', 'eval.jsonl')).map((r) => r.text),
-    ...readJsonl(join(ROOT, 'data', 'history', 'eval.jsonl')).map((r) => r.query),
-    ...readJsonl(join(ROOT, 'data', 'compose', 'eval.jsonl')).map((r) => r.text),
-    ...readJsonl(join(ROOT, 'data', 'slots', 'gold.jsonl')).map((r) => r.text),
-    ...readJsonl(join(ROOT, 'data', 'ood_eval.jsonl')).map((r) => r.text),
-    ...readDir(join(ROOT, 'data', 'hybrid', 'blind')).map((r) => r.text),
-  ].map(normalize));
+  // the same held-out index as gen_data.js (eval / blind sets, near-duplicates, eval-only values, real-usage eval split)
+  const real = process.argv.includes('--no-real') ? [] : readReal(ROOT);
+  const excl = exclusionIndex(ROOT);
+  const heldOut = { has: (n) => excl.has(n) };
   const intentRows = [...readDir(join(ROOT, 'data', 'intents')), ...readJsonl(join(ROOT, 'data', 'train.jsonl'))].map((r) => ({ ...r, src: 'intents' }));
   const shellRows = readJsonl(join(ROOT, 'data', 'shell', 'train.jsonl')).map((r) => ({ ...r, src: 'shell' }));
   const decisions = readJsonl(join(ROOT, 'data', 'teacher', 'decisions.jsonl')).filter((d) => d.text && d.field !== 'risk');
   const decide = new Map(decisions.map((d) => [normalize(d.text), d]));
   const seen = new Set();
   const base = [];
-  for (const r0 of [...intentRows, ...shellRows]) {
+  const realRows = realTrain(real, ids);
+  for (const r0 of [...intentRows, ...shellRows, ...realRows]) {
     if (!ids.has(r0.intent)) throw new Error(`unknown intent ${r0.intent}`);
     const n = normalize(r0.text);
-    if (heldOut.has(n)) continue;
+    if (heldOut.has(r0.text)) continue;
     const d = decide.get(n);
     if (d?.action === 'drop') continue;
     const r = d?.action === 'relabel' && d.intent ? { ...r0, intent: d.intent } : r0;
@@ -98,14 +96,14 @@ function main() {
   const tldr = readJsonl(join(ROOT, 'data', 'tldr', 'tools.jsonl'));
   const cap = {};
   for (const r of tldr.sort(() => rng() - 0.5)) {
-    if (!FAMILIES[r.tool] || !r.text || r.text.length < 8 || heldOut.has(normalize(r.text))) continue;
+    if (!FAMILIES[r.tool] || !r.text || r.text.length < 8 || heldOut.has(r.text)) continue;
     const key = r.tool + r.lang;
     if ((cap[key] = (cap[key] || 0) + 1) > (r.lang === 'pl' ? 60 : 80)) continue;
     const win = /^windows\//.test(r.page || '');
     push({ text: r.text, tool: r.tool, intent: '', lang: r.lang, ...(win ? { shell: 'powershell', os: 'win32' } : sampleEnv()), spans: null, gid: gid++, src: 'tldr', split: isDev(r.text) ? 'dev' : 'train', kind: 'orig' });
   }
   for (const r of readJsonl(join(ROOT, 'data', 'ood.jsonl'))) {
-    if (heldOut.has(normalize(r.text))) continue;
+    if (heldOut.has(r.text)) continue;
     const g = gid++;
     const split = isDev(r.text) ? 'dev' : 'train';
     push({ text: r.text, tool: NONE, intent: '', lang: r.lang, ...sampleEnv(), spans: [], gid: g, src: 'ood', split, kind: 'orig' });
@@ -121,6 +119,6 @@ function main() {
   };
   writeFileSync(join(OUT, 'meta.json'), JSON.stringify(meta, null, 1));
   const c = (f) => rows.filter(f).length;
-  console.log(`export_data: ${base.length} base, ${rows.length} rows (train ${c((r) => r.split === 'train')}, dev ${c((r) => r.split === 'dev')}), tldr ${c((r) => r.src === 'tldr')}, ood ${c((r) => r.src === 'ood')}`);
+  console.log(`export_data: ${base.length} base (${base.filter((r) => r.src === 'real').length} real), ${rows.length} rows (train ${c((r) => r.split === 'train')}, dev ${c((r) => r.split === 'dev')}), tldr ${c((r) => r.src === 'tldr')}, ood ${c((r) => r.src === 'ood')}`);
 }
 main();

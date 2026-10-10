@@ -14,7 +14,7 @@ export const FAMILIES = {
   sort: ['sort_uniq'],
   ls: ['list_files'],
   fileinfo: ['file_type', 'file_stat'],
-  head: ['head_file'],
+  head: ['head_file', 'print_line_range'],
   tail: ['tail_file', 'tail_follow'],
   cat: ['cat_file'],
   tar: ['compress_targz', 'extract_targz', 'list_archive'],
@@ -58,13 +58,19 @@ export const FAMILIES = {
   dig: ['dns_lookup'],
   traceroute: ['traceroute'],
   nc: ['port_check'],
-  ssh: ['ssh_connect'],
+  ssh: ['ssh_connect', 'ssh_port_forward'],
   git: ['git_status', 'git_log', 'git_diff', 'git_diff_staged', 'git_branches', 'git_current_branch',
     'git_new_branch', 'git_switch_branch', 'git_delete_branch', 'git_undo_commit', 'git_discard_changes',
     'git_stash', 'git_stash_pop', 'git_pull', 'git_push', 'git_clone', 'git_add_all', 'git_commit',
     'git_remote', 'git_blame', 'git_init'],
   docker: ['docker_ps', 'docker_ps_all', 'docker_logs', 'docker_images', 'docker_stop', 'docker_stop_all',
     'docker_prune', 'docker_exec', 'docker_stats', 'docker_compose_up', 'docker_compose_down'],
+  npm: ['npm_run_script', 'npm_install', 'npm_install_global'],
+  python: ['pip_install', 'activate_venv'],
+  cli: ['tool_version', 'cli_help'],
+  wrangler: ['wrangler_deploy', 'wrangler_dev', 'wrangler_tail', 'wrangler_secret_put', 'wrangler_login', 'wrangler_whoami'],
+  gh: ['gh_auth_status', 'gh_auth_login', 'gh_pr_list', 'gh_pr_view', 'gh_pr_create', 'gh_pr_checks', 'gh_pr_merge',
+    'gh_run_list', 'gh_run_view'],
 };
 
 /** Label used by stage 1 for requests that are not shell tasks at all (chit-chat). */
@@ -82,7 +88,7 @@ export const SLOT_TAG = {
   path: 'PATH', file: 'PATH', src: 'PATH', dst: 'PATH', dest: 'PATH', archive: 'PATH',
   count: 'NUM', depth: 'NUM', size: 'SIZE', age: 'TIME', days: 'TIME', since: 'TIME',
   port: 'PORT', pid: 'PID', mode: 'MODE', ext: 'EXT', glob: 'EXT', url: 'URL', host: 'HOST', target: 'HOST',
-  name: 'NAME', service: 'NAME', container: 'NAME', pkg: 'NAME', cmd: 'NAME', branch: 'BRANCH', user: 'USER',
+  name: 'NAME', service: 'NAME', container: 'NAME', pkg: 'NAME', cmd: 'NAME', script: 'NAME', start: 'NUM', end: 'NUM', num: 'NUM', branch: 'BRANCH', user: 'USER',
   pattern: 'PATTERN', old: 'PATTERN', new: 'REPL', message: 'MSG', var: 'VAR', text: 'TEXT',
 };
 

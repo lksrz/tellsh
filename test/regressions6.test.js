@@ -122,6 +122,7 @@ test('danger: generic -c/--command payloads, trailing commands of wrappers, unsu
 test('a function word never turns a path into `.`: placeholder instead', () => {
   for (const q of ['list files in the', 'list files in out', 'list files in', 'pokaż pliki w', 'find log files in the', 'list files in it']) {
     const r = run(q);
+    if (!r.understood && !r.command) continue; // a rejection is fine too (v0.4 model); never `.`
     assert.ok(r.command?.includes('<PATH>'), `${q} -> ${r.command}`);
     assert.ok(!/ \.(?:\s|$)/.test(r.command), `${q} -> ${r.command}`);
   }

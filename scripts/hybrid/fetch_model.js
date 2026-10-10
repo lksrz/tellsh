@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Install the hybrid encoder bundle once into ~/.cache/tellsh/enc-v1 (afterwards tellsh works fully offline).
+// Install the hybrid encoder bundle once into ~/.cache/tellsh/enc-v2 (afterwards tellsh works fully offline).
 //   node scripts/hybrid/fetch_model.js --from <dir>          copy a local bundle (e.g. hybrid/models/enc)
 //   node scripts/hybrid/fetch_model.js --from <https-url>    download <url>/manifest.json and the files it lists
 // Every file is verified against manifest.json (sha256). Write a manifest for a bundle:  --manifest <dir>

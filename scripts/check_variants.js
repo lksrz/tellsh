@@ -17,8 +17,8 @@ const KEYS = new Set(['bsd', 'gnuMac', 'busybox', 'fish', 'pwsh', 'cmd', 'gaps']
 const SHELL_KEYS = ['bsd', 'gnuMac', 'busybox', 'fish', 'pwsh', 'cmd'];
 const SLOTS = new Set(['path', 'file', 'src', 'dst', 'dest', 'archive', 'count', 'depth', 'days', 'size', 'age', 'since',
   'name', 'service', 'container', 'pkg', 'cmd', 'var', 'branch', 'user', 'pattern', 'host', 'target', 'message', 'url',
-  'port', 'pid', 'mode', 'old', 'new', 'sedexpr', 'text', 'glob', 'namepat', 'ext', 'minutes', 'sizeBytes']);
-const RAW_OK = new Set(['count', 'depth', 'days', 'pid', 'port', 'size', 'age', 'mode', 'var', 'minutes', 'sizeBytes']);
+  'port', 'pid', 'mode', 'old', 'new', 'sedexpr', 'text', 'glob', 'namepat', 'ext', 'minutes', 'sizeBytes', 'script', 'start', 'end', 'num']);
+const RAW_OK = new Set(['count', 'depth', 'days', 'pid', 'port', 'size', 'age', 'mode', 'var', 'minutes', 'sizeBytes', 'start', 'end', 'num']);
 const NOT_SLOTS = new Set(['http_code']); // literal braces that look like slots (curl -w '%{http_code}')
 // a required catalog slot may be satisfied by a derived slot
 const ALIASES = { ext: ['ext', 'glob'], name: ['name', 'namepat'], old: ['old', 'sedexpr'], new: ['new', 'sedexpr'] };
@@ -30,6 +30,7 @@ const SAMPLE = {
   user: 'bob o', pattern: "it's here", host: 'example.com', target: 'me@host x', message: 'fix: "it"', url: 'https://e.x/?a=1&b',
   port: '8080', pid: '4242', mode: '755', old: 'fo o', new: 'ba r', sedexpr: 's/fo o/ba r/g', text: 'hello world',
   glob: '*.pdf', namepat: '*fo o*', ext: 'pdf', minutes: '4320', sizeBytes: '104857600',
+  script: 'build:prod x', start: '10', end: '20', num: '42',
 };
 
 const psQuote = (v) => `'${String(v).replace(/'/g, "''")}'`;

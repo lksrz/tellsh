@@ -316,7 +316,8 @@ test('eval normalisation keeps behaviour-relevant differences', () => {
 test('existing danger behaviour for catalog templates: every safe intent still renders safe on bash', () => {
   const SAMPLE = { path: '/tmp/d', file: 'f.txt', name: 'node', pattern: 'x', service: 'nginx', container: 'web', pkg: 'htop', cmd: 'git',
     var: 'HOME', branch: 'main', user: 'bob', host: 'example.com', target: 'example.com', url: 'https://x.org', port: 8080, pid: 4242,
-    mode: '755', text: 'hi', glob: '*.log', ext: 'log', message: 'm', old: 'a', new: 'b', src: 'a.txt', dst: 'b.txt', archive: 'a.tar.gz' };
+    mode: '755', text: 'hi', glob: '*.log', ext: 'log', message: 'm', old: 'a', new: 'b', src: 'a.txt', dst: 'b.txt', archive: 'a.tar.gz',
+    start: 10, end: 20, num: 42, script: 'build' };
   const bad = [];
   for (const it of INTENTS) {
     if (it.risk !== 'safe') continue;

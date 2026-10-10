@@ -1,0 +1,137 @@
+{
+ "commands": 3242,
+ "skippedNotGeneric": 12476,
+ "skippedUnverified": 187,
+ "byLabelSource": {
+  "pattern": 838,
+  "dataset": 928,
+  "outOfCatalog": 1476
+ },
+ "relabelled": 184,
+ "droppedCompound": 170,
+ "droppedTrainTextInEval": 65,
+ "rows": 19381,
+ "train": {
+  "rows": 7608,
+  "oocRows": 6603
+ },
+ "eval": {
+  "rows": 2957,
+  "oocRows": 2213,
+  "en": 1478,
+  "pl": 1479,
+  "literal": 251,
+  "newIntents": 1242,
+  "byShell": {
+   "bash": 1464,
+   "zsh": 1433,
+   "powershell": 60
+  }
+ },
+ "labels": {
+  "train": 99,
+  "eval": 72
+ },
+ "groups": {
+  "total": 1301,
+  "eval": 360
+ },
+ "perNewIntent": {
+  "wrangler_deploy": {
+   "train": 18,
+   "eval": 6
+  },
+  "wrangler_dev": {
+   "train": 6,
+   "eval": 0
+  },
+  "wrangler_tail": {
+   "train": 24,
+   "eval": 12
+  },
+  "wrangler_secret_put": {
+   "train": 48,
+   "eval": 0
+  },
+  "wrangler_login": {
+   "train": 24,
+   "eval": 0
+  },
+  "wrangler_whoami": {
+   "train": 12,
+   "eval": 12
+  },
+  "gh_auth_status": {
+   "train": 50,
+   "eval": 54
+  },
+  "gh_auth_login": {
+   "train": 12,
+   "eval": 6
+  },
+  "gh_pr_list": {
+   "train": 36,
+   "eval": 18
+  },
+  "gh_pr_view": {
+   "train": 114,
+   "eval": 18
+  },
+  "gh_pr_create": {
+   "train": 0,
+   "eval": 0
+  },
+  "gh_pr_checks": {
+   "train": 12,
+   "eval": 6
+  },
+  "gh_pr_merge": {
+   "train": 12,
+   "eval": 12
+  },
+  "gh_run_list": {
+   "train": 0,
+   "eval": 0
+  },
+  "gh_run_view": {
+   "train": 59,
+   "eval": 24
+  },
+  "npm_install_global": {
+   "train": 79,
+   "eval": 60
+  },
+  "npm_install": {
+   "train": 96,
+   "eval": 36
+  },
+  "npm_run_script": {
+   "train": 330,
+   "eval": 186
+  },
+  "pip_install": {
+   "train": 186,
+   "eval": 66
+  },
+  "activate_venv": {
+   "train": 12,
+   "eval": 6
+  },
+  "ssh_port_forward": {
+   "train": 12,
+   "eval": 12
+  },
+  "print_line_range": {
+   "train": 2490,
+   "eval": 654
+  },
+  "tool_version": {
+   "train": 89,
+   "eval": 30
+  },
+  "cli_help": {
+   "train": 54,
+   "eval": 24
+  }
+ }
+}
