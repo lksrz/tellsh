@@ -42,3 +42,9 @@ test('composer: grep compositions validate (`--` before the pattern)', () => {
   assert.equal(s.method, 'composed');
   assert.match(s.command, /^grep -i -n -- error app\.log$/);
 });
+
+test('CLI: output piped into a closed pipe exits cleanly (no EPIPE crash)', async () => {
+  const { spawnSync } = await import('node:child_process');
+  const r = spawnSync('sh', ['-c', 'node bin/tellsh.js --dry-run show disk usage | head -c 1 >/dev/null; echo $?'], { encoding: 'utf8' });
+  assert.doesNotMatch(r.stderr, /EPIPE/);
+});
