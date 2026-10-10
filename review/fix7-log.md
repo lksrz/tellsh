@@ -1,43 +1,41 @@
-History references now use only the previous command, and every open finding in `review/r6-claude.md` and `review/r6-codex.md` is fixed. Everything is committed as `142fa6f` on `master`. All 295 tests pass, eval and bench were re-run, and nothing was pushed or published.
+I've fixed every finding in `review/r7-claude.md` and `review/r7-codex.md`, each with regression tests. Everything is committed as `3538ae3` on `master`. All 306 tests pass, eval and the hybrid evaluation were re-run, and nothing was pushed or published. History still reads only the previous command.
 
-**One line of history**
-- `buildContext` (`src/history.js`) reads only the most recent command. It first drops the current `tellsh` call, which zsh, fish and PowerShell write to the history file before it runs. The CLI now reads 2 lines instead of 10.
-- All the logic that compared or combined older lines is gone. Rules within one compound line (`cat a.txt; ls`, `cd X && make`) still work.
-- If the previous command has nothing of the needed type ("delete it" after `ls`), or can't be read, the reference is refused: you get a placeholder and a note, never an older value. "same for X" or "same but …" after a command that can't be repeated is refused the same way.
-- Destructive requests still need confirmation. "delete that branch" is refused when the previous command checked that branch out. "delete that backups folder" is refused when the previous command named a different folder.
-
-**Review findings fixed**
-- **Blocker, both reviews:** a quoted path with a space is no longer cut. `tellsh delete folder "/tmp/a b"` gives `rm -r '/tmp/a b'`, both from the command line and from an earlier `tellsh` line in history. A request passed as one quoted argument is used as is.
-- **Blocker, codex:** a history value that fails validation (e.g. a 265-character path) becomes a placeholder, never `find .`.
-- **Major:** "delete all log files in this folder" with a refused reference now gives `find <PATH> … -delete`, never `rm -r .`.
-- **Major:** "in the previous folder", "in the last directory", "the directory I listed" and "w poprzednim katalogu" are now treated like "there". A file named next to "there" ("delete notes.txt there") becomes a placeholder, with or without history.
-- **Major, codex:** `git -C /tmp status` and `docker --context prod ps` count as listings again.
+**Findings fixed**
+- **Major, quoted request text read as the path:** a multi-word argument is now treated as the request when it comes first (`tellsh "delete folder" /tmp/x` gives `rm -r /tmp/x`). It is treated as a value when it looks like a path (`"/tmp/my data"`, `"My Notes.txt"`). Anything else (`tellsh delete folder "my data"`) gets a placeholder plus a warning when the command changes something. Earlier `tellsh` lines in history are read the same way. All four of the reviewer's examples work, and the `.log` filter is kept.
+- **Major, current `tellsh` call matched too loosely (both reviews):** it is now dropped from history only when it is an exact match for the request.
+- **Major, composer filling withheld values:** `` `pwd` ``, `$(…)` and paths with line breaks are no longer composed into the command. The catalog command keeps its placeholder.
+- **Major, `fetch_model.js` could write outside its directory:** the manifest must list exactly the three bundle files with checksums. Everything is downloaded and verified before anything is written.
+- **Major, held-out texts in the hybrid training data:** all rows, including typo and reworded copies, are now checked against the held-out sets. That removed 143 rows, including the ones the reviewer named. I retrained the encoder (B) and recalibrated the A+B policies (A+B now: `tau` 0.8, `alpha` 0.75, `none` 0.5).
+- **Major, `--top` changing hybrid results:** the reranker now always looks at its own 5 candidates. `--top` only limits how many are shown.
 - **Minor:**
-  - "its contents", "what is in it" and "usuń jego zawartość" no longer target the directory itself.
-  - "move it there" is refused.
-  - A request naming more paths than the command takes, or a path inside `` `…` `` or `$(…)`, gets a placeholder and a warning.
-  - The danger checker now catches here-strings and heredocs, `sh -c 'rm -rf "$1"' _ /`, and truncating or overwriting system files (now critical).
-  - A NUL byte in the request no longer crashes `suggest()`.
+  - "delete them" after `touch a.txt b.txt` (or after `rm a b`, `ls /a /b`) now gives a placeholder, not the last file.
+  - `rm /etc/passwd`, `sed -i … /etc/passwd` and `tee /etc/passwd` are critical; `tee -a` stays high.
+  - "delete it" after `cat a.txt; cd /srv` is refused.
+  - "move it there" is now marked refused with a note.
+  - `npm install @types/node` keeps the package; an invalid package name becomes `<PKG>` instead of disappearing.
+- **EVAL.md:** it now notes that the blind history scores from round 7 on aren't directly comparable with earlier rounds.
 
-**Data, eval and docs**
-- I changed 3 gold rows where the expected answer referenced an older line:
-  - dev: "start it again" → `sudo systemctl start <SERVICE>`
-  - blind: "push it" → `git push`
-  - blind: "delete that branch" → `git branch -d <BRANCH>`
-- I added 5 dev rows checking that an older line is never used. Their queries were already in the held-out set, so training data is unaffected.
+**Results**
+- **Main model (A):** unchanged. Every eval number is identical to before, apart from the new-intents set's exact command (90.7% → 91.0%, from the scoped-package fix).
+- **Hybrid after retraining:**
 
-| History eval | Before | After |
+| | Before | After |
 |---|---|---|
-| Dev set | 91.7% (48 rows) | **92.5%** (53 rows) |
-| Blind set | 79.7% | **82.3%** |
+| Real usage, A+B | 88.8% | 88.3% |
+| `data/eval`, A+B | 96.7% | 96.8% |
+| Hybrid blind set, A+B | 98.9% | 99.4% |
+| Blind out-of-domain rejected, A+B | 98.4% | 96.9% |
+| End-to-end exact command (relexicalised `data/eval`), A+B | 86.8% | 85.4% |
 
-Both rows gained on the blind set come from rule changes, not the gold edits. All other eval numbers are unchanged. In the bench, the history case went from 1.6 to 0.74 ms. EVAL.md, the README history section, the CLI help and `review/fix7-log.md` are updated.
+  The hybrid now hands fewer requests to the encoder, so real-usage queries are faster (p50 12.2 → 1.3 ms). HYBRID.md, EVAL.md, README and the results files are updated.
 
-Things to check:
-- **Blind set edits:** I edited 2 gold rows in a set described as "never used for tuning". EVAL.md lists each change, but you may prefer to keep those rows untouched.
-- **"push it" after `git commit`:** it gives `git push`, which pushes the current branch, rather than a `<BRANCH>` placeholder. I judged that the right answer; say if you'd rather have the placeholder.
-- **Training data vs `build/`:** regenerating the training data gives 43,564 classifier rows against 43,574 in the shipped model. HEAD without my changes gives the same 43,564, so this predates the round. It is probably the private real-usage data differing on this machine. I restored `build/` and did not retrain.
-- **Commit identity:** git had no identity configured, so I committed as `lksrz <lukasz@wearfits.com>`, matching earlier commits, without changing git config.
-- **Uncommitted files:** `review/STATUS` and `review/.hdone` look like review-tool markers, so I left them out.
-edates this round, `build/` was restored, the model was not retrained.
-- Bench re-run (EVAL.md): cold p50 177 ms, warm 0.40 ms, history case 0.74 ms (was 1.6 ms).
+**Things to check**
+- **The tiny-LM reranker (C) was not retrained.** Its training data had the same leak, and retraining needs a GPU, which isn't available here. HYBRID.md says its numbers may be slightly optimistic. It isn't shipped.
+- **The bundle version went from 0.4.0 to 0.4.1** in `hybrid/package/tellsh-model-enc/package.json`, because the model files changed. It hasn't been published.
+- **The reviewer's typo example changed answer.** `clnoe https://github.com/sharkdp/bat` now gives `curl -fLO …` for every `--top`, where the old encoder gave `git clone` at `--top 5`. The answer no longer depends on `--top`, but the retrained encoder prefers `curl` here.
+- **One older test changed on purpose:** "show it" or "delete it" after `ls /a /b` or `du -sh /a /b` now gives a placeholder, as the plural finding requires.
+- **Problems I found but didn't fix**, because they exist in the previous commit too and are outside these findings:
+  - `npm i -g typescript` gives `npm run typescript`.
+  - `npm install all deps` gives `npm install all`.
+- **Commit identity:** git has no identity configured, so I committed as `lksrz <lukasz@wearfits.com>`, matching earlier commits.
+- **Left out of the commit:** the uncommitted edit to `review/fix7-log.md` was already there; I didn't stage or touch it.
