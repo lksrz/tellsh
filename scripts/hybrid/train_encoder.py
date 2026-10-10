@@ -9,7 +9,7 @@ Rows with intent '' (tldr descriptions, OOD) train the tool head only; typo copi
 Only split=='train' rows are used; split=='dev' is kept for threshold calibration.
 Resumable: a checkpoint (model + optimizer + step) is written every --ckpt-every steps and at each epoch end.
 
-Usage: python3 scripts/hybrid/train_encoder.py [--epochs 4] [--threads 4] [--out build/hybrid/enc]
+Usage: python3 scripts/hybrid/train_encoder.py [--layers 6] [--epochs 2.5] [--threads 2] [--out build/hybrid/enc]
 """
 import argparse, json, math, os, random, time
 import torch
@@ -20,9 +20,12 @@ ROOT = os.path.dirname(os.path.dirname(os.path.dirname(os.path.abspath(__file__)
 
 
 class Joint(nn.Module):
-    def __init__(self, base, n_tool, n_intent, n_tag):
+    def __init__(self, base, n_tool, n_intent, n_tag, layers=None):
         super().__init__()
         self.enc = AutoModel.from_pretrained(base) if isinstance(base, str) else base
+        if layers and layers < len(self.enc.encoder.layer):  # keep the bottom `layers` transformer blocks
+            self.enc.encoder.layer = self.enc.encoder.layer[:layers]
+            self.enc.config.num_hidden_layers = layers
         h = self.enc.config.hidden_size
         self.drop = nn.Dropout(0.1)
         self.tool = nn.Linear(h, n_tool)
@@ -96,6 +99,7 @@ def main():
     ap.add_argument('--threads', type=int, default=4)
     ap.add_argument('--ckpt-every', type=int, default=500)
     ap.add_argument('--seed', type=int, default=17)
+    ap.add_argument('--layers', type=int, default=6, help='truncate the encoder to its bottom N layers (12 = full)')
     ap.add_argument('--all', action='store_true', help='also train on the dev split (final model; no calibration data left)')
     a = ap.parse_args()
     torch.set_num_threads(a.threads)
@@ -106,7 +110,7 @@ def main():
     rows = [r for r in rows if a.all or r['split'] == 'train']
     tok = AutoTokenizer.from_pretrained(a.base)
     data = encode(tok, rows, meta)
-    model = Joint(a.base, len(meta['tools']), len(meta['intents']), len(meta['tagLabels']))
+    model = Joint(a.base, len(meta['tools']), len(meta['intents']), len(meta['tagLabels']), a.layers)
     head_params = [p for n, p in model.named_parameters() if not n.startswith('enc.')]
     enc_params = [p for n, p in model.named_parameters() if n.startswith('enc.')]
     opt = torch.optim.AdamW([{'params': enc_params, 'lr': a.lr}, {'params': head_params, 'lr': a.lr * 10}], weight_decay=0.01)
@@ -155,7 +159,7 @@ def main():
     model.eval()
     torch.save(model.state_dict(), os.path.join(a.out, 'final.pt'))
     tok.save_pretrained(a.out)
-    json.dump({'base': a.base, 'epochs': a.epochs, 'rows': len(data), 'all': a.all, 'meta': meta}, open(os.path.join(a.out, 'train_info.json'), 'w'))
+    json.dump({'base': a.base, 'layers': a.layers, 'epochs': a.epochs, 'rows': len(data), 'all': a.all, 'meta': meta}, open(os.path.join(a.out, 'train_info.json'), 'w'))
     print('done', flush=True)
 
 
