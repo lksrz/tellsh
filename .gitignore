@@ -5,3 +5,9 @@ __pycache__/
 .DS_Store
 data/external/
 build/
+
+# hybrid: private real-history data and model caches are never committed
+hybrid/private/
+hybrid/models/
+*.onnx
+*.gguf
