@@ -95,7 +95,7 @@ def letter_logits(m, tok, prompts, letter_ids, bs=8):
     out = []
     for i in range(0, len(prompts), bs):
         enc = tok(prompts[i:i + bs], return_tensors='pt', padding=True, add_special_tokens=False)
-        lg = m(**enc).logits[:, -1, :]
+        lg = m(**enc, logits_to_keep=1).logits[:, -1, :]
         out += lg[:, letter_ids].float().tolist()
     return out
 
@@ -106,7 +106,7 @@ def read_cands(path, sets=None):
 
 
 def cmd_zeroshot(a):
-    tok, m = load(a.model)
+    tok, m = load(a.model, getattr(torch, a.dtype))
     chat = tok.chat_template is not None and not a.plain
     P = Prompter(tok, chat, a.fewshot)
     rows = [r for r in read_cands(a.cands, {a.set}) if r['intent']]
@@ -124,7 +124,7 @@ def cmd_zeroshot(a):
         langs = {}
         for r, c, l in zip(rows, lists, lg):
             langs.setdefault(r['lang'], []).append(c[max(range(K), key=lambda j: l[j])] == r['intent'])
-        res = {'model': a.model, 'set': a.set, 'n': len(rows), 'fewshot': a.fewshot, 'chat': chat, 'letters': name, 'acc': round(acc, 4),
+        res = {'model': a.model, 'dtype': a.dtype, 'set': a.set, 'n': len(rows), 'fewshot': a.fewshot, 'chat': chat, 'letters': name, 'acc': round(acc, 4),
                **{f'acc_{k}': round(sum(v) / len(v), 4) for k, v in langs.items()}, 'prompt_tokens': round(ntok, 1),
                'sec_per_row_multithread': round((time.time() - t0) / len(rows), 3)}
         print(json.dumps(res), flush=True)
@@ -168,7 +168,7 @@ def cmd_train(a):
         prompts = [P(r['text'], r['shell'], r['os'], c) for r, c in zip(batch, lists)]
         y = torch.tensor([c.index(r['intent']) for r, c in zip(batch, lists)])
         enc = tok(prompts, return_tensors='pt', padding=True, add_special_tokens=False)
-        lg = m(**enc).logits[:, -1, :][:, lid]  # cross-entropy over the 5 letters only
+        lg = m(**enc, logits_to_keep=1).logits[:, -1, :][:, lid]  # cross-entropy over the 5 letters only
         loss = torch.nn.functional.cross_entropy(lg, y)
         for g in opt.param_groups:
             g['lr'] = a.lr * sched(step)
@@ -185,7 +185,7 @@ def cmd_train(a):
 
 
 def cmd_score(a):
-    tok, m = load(a.model)
+    tok, m = load(a.model, getattr(torch, a.dtype))
     chat = (tok.chat_template is not None) and not a.plain
     P = Prompter(tok, chat, a.fewshot)
     rows = read_cands(a.cands, set(a.sets.split(',')))
@@ -216,7 +216,7 @@ def cmd_export(a):
             super().__init__(); s.m = m
 
         def forward(s, input_ids, attention_mask):
-            out = s.m(input_ids=input_ids, attention_mask=attention_mask, use_cache=False).logits
+            out = s.m(input_ids=input_ids, attention_mask=attention_mask, use_cache=False, logits_to_keep=1).logits
             return out[:, -1, :][:, lid]
 
     m.config.use_cache = False
@@ -244,6 +244,7 @@ if __name__ == '__main__':
     ap.add_argument('--bs', type=int, default=8)
     ap.add_argument('--lr', type=float, default=1e-4)
     ap.add_argument('--threads', type=int, default=2)
+    ap.add_argument('--dtype', default='float32', help='bfloat16 halves memory (inference)')
     ap.add_argument('--out', default=os.path.join(ROOT, 'build/hybrid/lm'))
     a = ap.parse_args()
     torch.set_num_threads(a.threads)
