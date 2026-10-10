@@ -8,16 +8,25 @@ import { fileURLToPath } from 'node:url';
 import { mkdtempSync, writeFileSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { suggest } from '../src/pipeline.js';
+import { suggest, validSlot } from '../src/pipeline.js';
 import { extractSlots, trimPathPunct } from '../src/slots.js';
-import { normPath, exFromSpans } from '../src/tagger.js';
+import { normPath, exFromSpans, tagFeatureSets } from '../src/tagger.js';
+import { tagTokens, tagFeatures } from '../src/features.js';
 import { checkDanger } from '../src/danger.js';
+import { buildCommand, finalizeSlots } from '../src/fill.js';
+import { BY_ID } from '../src/catalog.js';
+import { shQuote, psQuote, cmdQuote, pwshNativeSlots } from '../src/render.js';
+import { shellInvocation } from '../src/cli.js';
+import { splitCommand, isAmbiguous } from '../src/shellwords.js';
+import { buildContext } from '../src/history.js';
+import { parseModel, getModel, DEFAULT_MODEL } from '../src/model.js';
 
 const BIN = fileURLToPath(new URL('../bin/tellsh.js', import.meta.url));
 const cli = (args, opts = {}) => spawnSync(process.execPath, [BIN, ...args], { encoding: 'utf8', env: { ...process.env, NO_COLOR: '1' }, ...opts });
 const BASH = { shell: 'bash', os: 'linux', coreutils: 'gnu' };
 const PS_WIN = { shell: 'powershell', os: 'win32', coreutils: 'gnu' };
 const CMD = { shell: 'cmd', os: 'win32', coreutils: 'gnu' };
+const PS_LINUX = { shell: 'powershell', os: 'linux', coreutils: 'gnu' };
 const run = (q, history, env = BASH) => suggest(q, { env, history });
 
 // ---------------------------------------------------------------------------------------------
@@ -192,4 +201,122 @@ test('history: "same for" does not take pronouns or filler words as values', () 
     assert.ok(!r.command || !/\b(this|force|it)\b/.test(r.command), `${q}: ${r.command}`);
   }
   assert.equal(run('same for build', ['rm -r olddir']).command, 'rm -r build');
+});
+
+// ---------------------------------------------------------------------------------------------
+// quoting per shell (r1-claude major 3/4, minor 5/6/7/9)
+
+test('composer is never offered to fish (its single quotes treat \\ as an escape)', () => {
+  const q = 'pokaż pliki w a\\ szczegółowo posortowane po rozmiarze';
+  for (const compose of ['auto', 'force']) {
+    const r = suggest(q, { env: { shell: 'fish', os: 'linux', coreutils: 'gnu' }, compose });
+    assert.notEqual(r.method, 'composed', compose);
+  }
+});
+
+test('PowerShell: values with " are refused for native programs, not for cmdlets', () => {
+  const r = buildCommand('git_commit', '', { env: PS_WIN, resolved: { message: 'a" --amend "b' } });
+  assert.equal(r.command, null);
+  assert.match(r.gap, /PowerShell < 7\.3/);
+  for (const [id, s] of [['extract_targz', { file: 'a".tar.gz' }], ['download_file', { url: 'https://x.org/"a' }], ['git_switch_branch', { branch: 'x"y' }]]) {
+    assert.equal(buildCommand(id, '', { env: PS_WIN, resolved: s }).command, null, id);
+  }
+  assert.equal(buildCommand('git_commit', '', { env: PS_WIN, resolved: { message: 'fix it' } }).command, "git add -A; if ($LASTEXITCODE -eq 0) { git commit -m 'fix it' }");
+  // cmdlets receive the single-quoted literal unchanged
+  assert.equal(buildCommand('cat_file', '', { env: PS_WIN, resolved: { file: 'a"b.txt' } }).command, "Get-Content -LiteralPath 'a\"b.txt'");
+  assert.deepEqual([...pwshNativeSlots('git add -A; if ($LASTEXITCODE -eq 0) { git commit -m {message} }')], ['message']);
+  assert.deepEqual([...pwshNativeSlots("(Get-Content -LiteralPath {file} -Raw).Replace({old}, {new})")], []);
+});
+
+test('cmd: values starting with / are refused (switches); /s /c gets wrapping quotes', () => {
+  const r = suggest('delete directory /q', { env: CMD });
+  assert.equal(r.command, null);
+  assert.match(r.gap, /switch/);
+  assert.throws(() => cmdQuote('/q'), /switch/);
+  assert.deepEqual(shellInvocation('"C:\\Program Files\\x.exe" "a b"', 'cmd'), ['cmd.exe', ['/d', '/s', '/c', '""C:\\Program Files\\x.exe" "a b""']]);
+});
+
+test('function templates: only path values get ./, other values starting with - become placeholders', () => {
+  const b = buildCommand('base64_encode', '', { env: BASH, resolved: { text: '-n hello' } });
+  assert.ok(!/\.\/-n/.test(b.command), b.command);
+  assert.ok(b.missing.includes('text'));
+  const f = buildCommand('grep_text', '', { env: CMD, resolved: { pattern: '-x', path: 'src' } });
+  assert.ok(!/\.\/-x/.test(f.command || ''), f.command);
+  const k = buildCommand('kill_by_name', '', { env: CMD, resolved: { name: '-f' } });
+  assert.ok(!/\.\/-f/.test(k.command || ''), k.command);
+  // a path still gets ./
+  assert.equal(buildCommand('base64_encode', '', { env: BASH, resolved: { file: '-x.txt' } }).command, 'base64 ./-x.txt');
+});
+
+test('tilde expansion only for path slots', () => {
+  assert.equal(buildCommand('git_commit', '', { env: BASH, resolved: { message: '~' } }).command, "git add -A && git commit -m '~'");
+  assert.match(buildCommand('grep_text', '', { env: BASH, resolved: { pattern: '~/x', path: '~/src' } }).command, /-- '~\/x' ~\/src/);
+  assert.equal(buildCommand('git_commit', '', { env: PS_LINUX, resolved: { message: '~' } }).command.includes("'~'"), true);
+  assert.match(buildCommand('replace_text', '', { env: PS_WIN, resolved: { file: 'a.txt', old: '~', new: 'x' } }).command, /\.Replace\('~', 'x'\)/);
+  assert.equal(shQuote('~/a b'), "~/'a b'");
+  assert.equal(shQuote('~', { tilde: false }), "'~'");
+  assert.equal(psQuote('~/x', { tilde: false }), "'~/x'");
+});
+
+test('"kill process named -9" is not kill 9; sed old text with a newline is escaped/refused', () => {
+  const r = run('kill process named -9');
+  assert.ok(!/\b9\b/.test(r.command), r.command);
+  const s = buildCommand('replace_text', '', { env: BASH, resolved: finalizeSlots(BY_ID.replace_text, { file: 'a.txt', old: 'a\nb', new: 'c' }) });
+  assert.ok(!s.command.includes('\n'), s.command);
+  assert.equal(validSlot('old', 'a\nb'), false);
+});
+
+// ---------------------------------------------------------------------------------------------
+// CLI / parsing / model robustness (r1-claude minor 2, 4, 11, 13)
+
+test('--threshold must be a number in [0, 1]', () => {
+  for (const v of ['foo', 'NaN', '2', '-1', '']) {
+    const r = cli(['--threshold', v, '--json', 'bake', 'me', 'a', 'cake']);
+    assert.equal(r.status, 2, v);
+    assert.match(r.stderr, /--threshold/);
+  }
+  assert.equal(cli(['--threshold=0.5', '--json', 'list', 'files']).status, 0);
+});
+
+test('shellwords: &> is a redirection, $(...) and backticks are one ambiguous word', () => {
+  const r = splitCommand('cat a.txt &> log.txt', 'posix', { keepRedirects: true });
+  assert.deepEqual(r.segments.map((s) => s.words), [['cat', 'a.txt', '&>', 'log.txt']]);
+  const d = splitCommand('echo $(cat a; ls) done', 'posix');
+  assert.equal(d.segments.length, 1);
+  assert.equal(d.segments[0].words.length, 3);
+  assert.ok(isAmbiguous(d.segments[0].words[1]));
+  const b = splitCommand('echo `cat a; ls` x', 'posix');
+  assert.equal(b.segments.length, 1);
+  assert.ok(isAmbiguous(b.segments[0].words[1]));
+  assert.equal(run('delete it', ['make &> build.log']).command, 'rm build.log');
+});
+
+test('history parsing does not backtrack exponentially on long \\ or quote runs', () => {
+  for (const [line, kind] of [['cat ' + '\\\\'.repeat(300) + ' ;', 'posix'], ['Get-Content -LiteralPath ' + "''".repeat(300) + ' ;', 'pwsh'], ['Get-Content -LiteralPath ' + '""'.repeat(300) + ' ;', 'pwsh']]) {
+    const t = Date.now();
+    buildContext([line], { kind });
+    assert.ok(Date.now() - t < 2000, `${kind}: ${Date.now() - t} ms`);
+  }
+});
+
+test('model.bin is validated: truncated or corrupt files give a clear error', () => {
+  const buf = readFileSync(DEFAULT_MODEL);
+  assert.ok(parseModel(buf).models.tagger);
+  assert.throws(() => parseModel(buf.subarray(0, 6)), /bad model file/);
+  assert.throws(() => parseModel(buf.subarray(0, buf.length - 1000)), /exceeds the file/);
+  const hdr = Buffer.from(buf);
+  hdr.writeUInt32LE(buf.length * 2, 4);
+  assert.throws(() => parseModel(hdr), /header length/);
+  const junk = Buffer.concat([Buffer.from('TSH2'), Buffer.from([3, 0, 0, 0]), Buffer.from('{x}')]);
+  assert.throws(() => parseModel(junk), /not valid JSON/);
+});
+
+test('tagger features are deduplicated per token like training (set of indices)', () => {
+  const dim = getModel().tagDim;
+  for (const q of ['pokaż 10 największych plików w ~/Pobrane', 'kill nginx nginx', 'grep -rn foo foo /etc /etc']) {
+    const toks = tagTokens(q);
+    const raw = tagFeatures(toks, 'grep', dim);
+    const sets = tagFeatureSets(toks, 'grep', dim);
+    sets.forEach((f, i) => { assert.equal(new Set(f).size, f.length); assert.deepEqual([...new Set(raw[i])].sort(), [...f].sort()); });
+  }
 });

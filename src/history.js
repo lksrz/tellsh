@@ -115,9 +115,12 @@ const GLOB_SLOTS = new Set(['namepat', 'glob', 'pattern', 'sedexpr', 'old', 'new
 
 // template inversion: catalog/variant template -> regex that recovers intent + slot values from a command
 const BT = '`';
+// The alternatives must never overlap, or matching a long run of \\ or '' against a template that
+// does not fit backtracks exponentially: a backslash is only ever consumed by `\\.`, and a quoted
+// PowerShell string cannot end right before another quote (`''''` is one string, not two).
 const WORD_RE = {
-  posix: String.raw`((?:'[^']*'|"(?:\\.|[^"\\])*"|\\.|[^\s'"\;&|<>()])+)`,
-  pwsh: `((?:['‘-‛](?:[^'‘-‛]|['‘-‛]{2})*['‘-‛]|["“-„](?:${BT}.|["“-„]{2}|[^"“-„${BT}])*["“-„]|${BT}.|[^\\s'"‘-„${BT};|(){}<>])+)`,
+  posix: String.raw`((?:'[^']*'|"(?:\\.|[^"\\])*"|\\.|[^\s'"\\;&|<>()])+)`,
+  pwsh: `((?:['‘-‛](?:[^'‘-‛]|['‘-‛]{2})*['‘-‛](?!['‘-‛])|["“-„](?:${BT}.|["“-„]{2}|[^"“-„${BT}])*["“-„](?!["“-„])|${BT}.|[^\\s'"‘-„${BT};|(){}<>])+)`,
 };
 let INV = null;
 function inverters() {

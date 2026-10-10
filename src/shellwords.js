@@ -20,6 +20,20 @@ export const rawOf = (w) => (isAmbiguous(w) ? w.slice(1) : w);
 const PS_SQ = /['‘’‚‛]/;
 const PS_DQ = /["“”„]/;
 
+// index of the `)` closing the `(` at `open` (quotes skipped), or -1
+function matchParen(s, open) {
+  let depth = 0;
+  for (let j = open; j < s.length; j++) {
+    const d = s[j];
+    if (d === "'") { const e = s.indexOf("'", j + 1); if (e < 0) return -1; j = e; continue; }
+    if (d === '"') { let e = j + 1; while (e < s.length && s[e] !== '"') e += s[e] === '\\' ? 2 : 1; if (e >= s.length) return -1; j = e; continue; }
+    if (d === '\\') { j++; continue; }
+    if (d === '(') depth++;
+    else if (d === ')' && --depth === 0) return j;
+  }
+  return -1;
+}
+
 export function splitCommand(line, kind = 'posix', { keepRedirects = false } = {}) {
   const ps = kind === 'pwsh' || kind === 'powershell';
   const s = String(line);
@@ -86,7 +100,16 @@ export function splitCommand(line, kind = 'posix', { keepRedirects = false } = {
     } else if (ps && c === '`') {
       if (i + 1 >= s.length) return fail();
       w = (w ?? '') + s[++i];
-    } else if (c === '\n' || c === ';' || c === '|' || c === '(' || c === ')' || (c === '&' && (!ps || s[i + 1] === '&'))) {
+    } else if (c === '$' && s[i + 1] === '(') {
+      // command substitution / PowerShell subexpression: one (ambiguous) word, not a separator at `(`
+      const end = matchParen(s, i + 1);
+      if (end < 0) return fail();
+      w = (w ?? '') + s.slice(i, end + 1); amb = true; i = end;
+    } else if (!ps && c === '`') {
+      const end = s.indexOf('`', i + 1);
+      if (end < 0) return fail();
+      w = (w ?? '') + s.slice(i, end + 1); amb = true; i = end;
+    } else if (c === '\n' || c === ';' || c === '|' || c === '(' || c === ')' || (c === '&' && (ps ? s[i + 1] === '&' : s[i + 1] !== '>'))) {
       let sep = c === '\n' ? ';' : c;
       if ((c === '&' || c === '|') && s[i + 1] === c) { i++; sep += c; }
       flushSeg(sep);
