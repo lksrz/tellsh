@@ -10,7 +10,7 @@
 //   5. history reference cases (data/history/eval.jsonl)
 //   6. second pass / composer on out-of-catalogue requests (data/compose/eval.jsonl)
 //   7. OOD rejection (data/ood_eval.jsonl)
-import { readFileSync, readdirSync, statSync, existsSync } from 'node:fs';
+import { readFileSync, readdirSync, statSync, existsSync, writeFileSync, mkdirSync } from 'node:fs';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
 import { join } from 'node:path';
@@ -32,7 +32,7 @@ import { pwshParses } from './lib/pwsh_parse.js';
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
 const VERBOSE = process.argv.includes('--verbose');
 const readJsonl = (p) => (existsSync(p) ? readFileSync(p, 'utf8').split('\n').filter((l) => l.trim()).map((l) => JSON.parse(l)) : []);
-const readDir = (d) => readdirSync(d).filter((f) => f.endsWith('.jsonl')).sort().flatMap((f) => readJsonl(join(d, f)));
+const readDir = (d) => (existsSync(d) ? readdirSync(d) : []).filter((f) => f.endsWith('.jsonl')).sort().flatMap((f) => readJsonl(join(d, f)));
 const pct = (a, b) => (b ? `${((100 * a) / b).toFixed(1)}%` : 'n/a');
 const model = getModel();
 const thr = model.thresholds.accept;
@@ -44,6 +44,9 @@ const ENVS = {
 };
 const out = [];
 const md = (s = '') => out.push(s);
+const SUM = {}; // machine-readable summary -> build/eval_summary.json (before/after table)
+const rate = (a, b) => (b ? +(a / b).toFixed(4) : null);
+const PLACEHOLDER = /<[A-Z][A-Z_]*>/;
 const t0 = Date.now();
 
 // ------------------------------------------------------------------------------------------
@@ -144,7 +147,7 @@ for (const [sh, env] of Object.entries(ENVS)) {
     checked++;
     if (ok) synOk++; else if (VERBOSE) console.log(`  syntax ✗ ${sh}: ${b.command}`);
   }
-  shellRes[sh] = { acc: cs.S.all.top1 / cs.S.all.n, rendered, n: seen.size, checked, synOk };
+  shellRes[sh] = { acc: cs.S.all.top1 / cs.S.all.n, phrased: ss.S.all ? ss.S.all.top1 / ss.S.all.n : null, rendered, n: seen.size, checked, synOk };
   const s = ss.S.all;
   md(`| ${sh} (${env.os}${env.coreutils === 'bsd' ? ', BSD' : ''}) | ${pct(cs.S.all.top1, cs.S.all.n)} | ${s ? s.n : 0} | ${s ? `${pct(s.top1, s.n)} (${pct(ss.S.en?.top1 || 0, ss.S.en?.n || 0)} / ${pct(ss.S.pl?.top1 || 0, ss.S.pl?.n || 0)})` : 'n/a'} | ${rendered}/${seen.size} | ${checked ? `${synOk}/${checked}` : 'n/a (not installed)'} |`);
 }
@@ -243,29 +246,47 @@ for (const [intent, q, expected] of SLOT_CASES) {
 const rng = mulberry32(7);
 const e2e = { all: { n: 0, ok: 0, okGoldIntent: 0 }, en: { n: 0, ok: 0, okGoldIntent: 0 }, pl: { n: 0, ok: 0, okGoldIntent: 0 } };
 const e2eFails = [];
+let e2eIncompleteGold = 0;
+let e2eKept = 0;
+let e2eSpans = 0;
+// a suggestion only counts when it is complete: no <PLACEHOLDER> and no missing required slot
+const complete = (s) => s.understood && s.command && !PLACEHOLDER.test(s.command) && !(s.missing || []).length;
 for (const r of evalRows) {
   const { spans } = silverSpans(r.text, r.intent);
   if (!spans.length) continue;
   const rx = relex(r.text, spans, { lang: r.lang, rng, split: 'eval', keepProb: 0 });
+  e2eSpans += rx.spans.length;
+  e2eKept += rx.spans.filter((x) => !x.replaced).length;
   const it = BY_ID[r.intent];
   const goldSlots = finalizeSlots(it, resolveSlots(it, exFromSpans(rx.text, rx.spans.map((s) => ({ ...s, text: rx.text.slice(s.start, s.end) })))));
   // regex-only values the silver labeler did not mark (e.g. defaults) are not part of the gold
-  const goldCmd = buildCommand(r.intent, rx.text, { env: BASH, resolved: goldSlots }).command;
+  const gb = buildCommand(r.intent, rx.text, { env: BASH, resolved: goldSlots });
+  const goldCmd = gb.command;
+  // an incomplete gold command (a required value the silver spans missed) cannot be scored: excluded
+  if (!goldCmd || PLACEHOLDER.test(goldCmd) || gb.missing?.length) { e2eIncompleteGold++; continue; }
   const s = suggest(rx.text, { env: BASH, model, compose: 'off' });
-  const okGi = buildCommand(r.intent, rx.text, { env: BASH, resolved: resolveWithTagger(r.intent, rx.text, { model }).slots }).command === goldCmd;
+  const bi = buildCommand(r.intent, rx.text, { env: BASH, resolved: resolveWithTagger(r.intent, rx.text, { model }).slots });
+  const okGi = bi.command === goldCmd && !bi.missing?.length;
+  const ok = complete(s) && s.command === goldCmd;
   for (const k of ['all', r.lang]) {
     e2e[k].n++;
-    if (s.understood && s.command === goldCmd) e2e[k].ok++;
+    if (ok) e2e[k].ok++;
     if (okGi) e2e[k].okGoldIntent++;
   }
-  if (!(s.understood && s.command === goldCmd) && e2eFails.length < 400) e2eFails.push({ text: rx.text, gold: goldCmd, got: s.command, intent: r.intent, pred: s.intent });
+  if (!ok && e2eFails.length < 400) e2eFails.push({ text: rx.text, gold: goldCmd, got: s.command, intent: r.intent, pred: s.intent });
 }
+SUM.e2e_relex = rate(e2e.all.ok, e2e.all.n);
+SUM.e2e_relex_gold_intent = rate(e2e.all.okGoldIntent, e2e.all.n);
 md('## 4. End-to-end exact command (bash, linux)');
 md();
 md(`* \`test/slot-cases.js\` (${SLOT_CASES.length} hand-written request → command pairs, gold intent): ` +
   `**${slotCase.merge}/${SLOT_CASES.length}** shipped (tagger + regex fallback), ${slotCase.tagger}/${SLOT_CASES.length} tagger only, ${slotCase.regex}/${SLOT_CASES.length} regex only.`);
-md(`* Relexicalised \`data/eval\` (${e2e.all.n} requests that contain slot values; every value replaced from a *held-out* value pool never used in training; ` +
-  'gold command rendered from the inserted spans; full pipeline incl. classification):');
+md(`* Relexicalised \`data/eval\` (${e2e.all.n} requests that contain slot values; values replaced from an eval-only pool that never occurs in any ` +
+  `training text (\`gen_data.js\` drops training rows mentioning one), numbers from ranges disjoint from the training relexicalisation; ` +
+  `${e2eKept}/${e2eSpans} spans could not be replaced and keep their original value (named locations like "Pobrane", extension aliases like "python"). ` +
+  'Gold command rendered by the production code from the inserted spans, so this measures classification + slot recovery, not template correctness ' +
+  `(the hand-written \`data/blind/e2e.jsonl\` below does). A prediction counts only when complete (no placeholder, no missing slot); ` +
+  `${e2eIncompleteGold} rows whose gold would be incomplete are excluded):`);
 md();
 md('| split | n | exact command (full pipeline) | exact command given gold intent |');
 md('|---|---|---|---|');
@@ -274,100 +295,213 @@ md();
 
 // ------------------------------------------------------------------------------------------
 // 5. history
-const hist = readJsonl(join(ROOT, 'data', 'history', 'eval.jsonl'));
-const H = { all: { n: 0, intent: 0, cmd: 0, noHist: 0 }, en: { n: 0, intent: 0, cmd: 0, noHist: 0 }, pl: { n: 0, intent: 0, cmd: 0, noHist: 0 } };
-const histFails = [];
-for (const r of hist) {
-  const s = suggest(r.query, { env: BASH, model, history: r.history, compose: 'off' });
-  const s0 = suggest(r.query, { env: BASH, model, compose: 'off' });
-  for (const k of ['all', r.lang]) {
-    H[k].n++;
-    if (s.intent === r.expect_intent) H[k].intent++;
-    if (s.command === r.expect_command) H[k].cmd++;
-    if (s0.command === r.expect_command) H[k].noHist++;
+function histEval(rows) {
+  const H = { all: { n: 0, intent: 0, cmd: 0, noHist: 0 }, en: { n: 0, intent: 0, cmd: 0, noHist: 0 }, pl: { n: 0, intent: 0, cmd: 0, noHist: 0 } };
+  const fails = [];
+  for (const r of rows) {
+    const s = suggest(r.query, { env: BASH, model, history: r.history, compose: 'off' });
+    const s0 = suggest(r.query, { env: BASH, model, compose: 'off' });
+    for (const k of ['all', r.lang]) {
+      H[k].n++;
+      if (s.intent === r.expect_intent) H[k].intent++;
+      if (s.command === r.expect_command) H[k].cmd++;
+      if (s0.command === r.expect_command) H[k].noHist++;
+    }
+    if (s.command !== r.expect_command) fails.push({ q: r.query, h: r.history.slice(-2), exp: r.expect_command, got: s.command, rule: s.context?.rule });
   }
-  if (s.command !== r.expect_command) histFails.push({ q: r.query, h: r.history.slice(-2), exp: r.expect_command, got: s.command, rule: s.context?.rule });
+  return { H, fails };
 }
-md('## 5. History references (`data/history/eval.jsonl`)');
+const histTable = (H) => {
+  md('| split | n | intent | exact command | exact command without history |');
+  md('|---|---|---|---|---|');
+  for (const k of ['all', 'en', 'pl']) md(`| ${k.toUpperCase()} | ${H[k].n} | ${pct(H[k].intent, H[k].n)} | ${pct(H[k].cmd, H[k].n)} | ${pct(H[k].noHist, H[k].n)} |`);
+  md();
+};
+const hist = readJsonl(join(ROOT, 'data', 'history', 'eval.jsonl'));
+const HO = histEval(hist);
+const histBlind = readJsonl(join(ROOT, 'data', 'blind', 'history.jsonl'));
+const HB = histBlind.length ? histEval(histBlind) : null;
+const H = HO.H;
+const histFails = [...HO.fails, ...(HB ? HB.fails.map((f) => ({ ...f, blind: true })) : [])];
+SUM.history_dev = rate(H.all.cmd, H.all.n);
+if (HB) SUM.history_blind = rate(HB.H.all.cmd, HB.H.all.n);
+md('## 5. History references');
 md();
-md('"delete it" / "usuń to", "same for /var" / "to samo dla /var", "logs of that container" / "logi tego kontenera", "kill it", … with the last shell-history lines given (raw commands and earlier `tellsh` queries).');
+md('"delete it" / "usuń to", "same for /var" / "to samo dla /var", "logs of that container" / "logi tego kontenera", "kill it", … with the last shell-history lines given (raw commands and earlier `tellsh` queries). ' +
+  'Some rows expect a placeholder: the right answer is to refuse a stale, ambiguous or missing reference.');
 md();
-md('| split | n | intent | exact command | exact command without history |');
-md('|---|---|---|---|---|');
-for (const k of ['all', 'en', 'pl']) md(`| ${k.toUpperCase()} | ${H[k].n} | ${pct(H[k].intent, H[k].n)} | ${pct(H[k].cmd, H[k].n)} | ${pct(H[k].noHist, H[k].n)} |`);
+md(`**Development set** \`data/history/eval.jsonl\` (${hist.length} rows). Written independently of the rules but then used while developing them ` +
+  '(v0.2: first run 60.4% exact), so it is **not a blind score**:');
 md();
-md('*Development note:* this set was written independently of the rules, but it was then used while developing them: the first ' +
-  '(blind) run scored **60.4%** exact; the failures led to general fixes (more Polish pronoun forms, `ps -p`/`wget` entities, ' +
-  'blame/extract verbs, "same but …", implicit required-slot fill). The number above is therefore not a blind score.');
-md();
-md('*Review fixes:* history lines are now split with a shell-aware tokenizer (`a\\ b.txt`, quoted `;`/`|`, PowerShell `\'\'`/backtick escapes, ' +
-  'native cmdlets such as `Get-Content -LiteralPath`), and a reference whose latest value depends on the shell state (`$F`, `*.txt`, ' +
-  'unparseable or unknown-command lines) is refused (placeholder) instead of falling back to an older value. Two gold commands ' +
-  '(`kill_by_port`) were updated for the `-sTCP:LISTEN` fix; no other row changed.');
-md();
+histTable(H);
+if (HB) {
+  md(`**Blind set** \`data/blind/history.jsonl\` (${histBlind.length} rows, written for v0.3 by a separate author before any result was seen, never used for tuning):`);
+  md();
+  histTable(HB.H);
+}
 
 // ------------------------------------------------------------------------------------------
 // 6. composer
-const comp = readJsonl(join(ROOT, 'data', 'compose', 'eval.jsonl'));
-const CP = { all: { n: 0, composed: 0, exact: 0, acc: 0, e2eAcc: 0 }, en: { n: 0, composed: 0, exact: 0, acc: 0, e2eAcc: 0 }, pl: { n: 0, composed: 0, exact: 0, acc: 0, e2eAcc: 0 } };
-const compFails = [];
-for (const r of comp) {
-  const s = suggest(r.text, { env: BASH, model });
-  const cands = [r.gold, ...(r.acceptable || [])];
-  const isComposed = s.method === 'composed';
-  const exact = isComposed && sameCmd(s.command, r.gold);
-  const acc = isComposed && cands.some((c) => sameCmd(s.command, c));
-  const e2eAcc = s.understood && cands.some((c) => sameCmd(s.command, c));
-  for (const k of ['all', r.lang]) {
-    CP[k].n++;
-    if (isComposed) CP[k].composed++;
-    if (exact) CP[k].exact++;
-    if (acc) CP[k].acc++;
-    if (e2eAcc) CP[k].e2eAcc++;
+function compEval(rows) {
+  const CP = { all: { n: 0, composed: 0, exact: 0, acc: 0, e2eAcc: 0 }, en: { n: 0, composed: 0, exact: 0, acc: 0, e2eAcc: 0 }, pl: { n: 0, composed: 0, exact: 0, acc: 0, e2eAcc: 0 } };
+  const fails = [];
+  for (const r of rows) {
+    const s = suggest(r.text, { env: BASH, model });
+    const cands = [r.gold, ...(r.acceptable || [])];
+    const isComposed = s.method === 'composed';
+    const exact = isComposed && sameCmd(s.command, r.gold);
+    const acc = isComposed && cands.some((c) => sameCmd(s.command, c));
+    const e2eAcc = s.understood && cands.some((c) => sameCmd(s.command, c));
+    for (const k of ['all', r.lang]) {
+      CP[k].n++;
+      if (isComposed) CP[k].composed++;
+      if (exact) CP[k].exact++;
+      if (acc) CP[k].acc++;
+      if (e2eAcc) CP[k].e2eAcc++;
+    }
+    if (!e2eAcc) fails.push({ q: r.text, gold: r.gold, got: s.understood ? s.command : '(not understood)', method: s.method });
   }
-  if (!e2eAcc) compFails.push({ q: r.text, gold: r.gold, got: s.understood ? s.command : '(not understood)', method: s.method });
+  return { CP, fails };
 }
+const compTable = (CP) => {
+  md('| split | n | composer fired | composed exact | composed acceptable | any answer acceptable (catalog or composed) |');
+  md('|---|---|---|---|---|---|');
+  for (const k of ['all', 'en', 'pl']) md(`| ${k.toUpperCase()} | ${CP[k].n} | ${pct(CP[k].composed, CP[k].n)} | ${pct(CP[k].exact, CP[k].n)} | ${pct(CP[k].acc, CP[k].n)} | ${pct(CP[k].e2eAcc, CP[k].n)} |`);
+  md();
+};
+const comp = readJsonl(join(ROOT, 'data', 'compose', 'eval.jsonl'));
+const CO = compEval(comp);
+const CP = CO.CP;
+const compBlind = readJsonl(join(ROOT, 'data', 'blind', 'compose.jsonl'));
+const CB = compBlind.length ? compEval(compBlind) : null;
+const compFails = [...CO.fails, ...(CB ? CB.fails.map((f) => ({ ...f, blind: true })) : [])];
 let falseCompose = 0;
 for (const r of evalRows) if (suggest(r.text, { env: BASH, model }).method === 'composed') falseCompose++;
-md('## 6. Second pass: experimental composer (`data/compose/eval.jsonl`)');
+SUM.compose_dev_any = rate(CP.all.e2eAcc, CP.all.n);
+SUM.compose_dev_composed_acc = rate(CP.all.acc, CP.all.n);
+if (CB) { SUM.compose_blind_any = rate(CB.CP.all.e2eAcc, CB.CP.all.n); SUM.compose_blind_composed_acc = rate(CB.CP.all.acc, CB.CP.all.n); }
+SUM.compose_false_fire = rate(falseCompose, evalRows.length);
+md('## 6. Second pass: experimental composer');
 md();
-md(`${comp.length} out-of-catalogue requests (a tool with a flag combination that no catalog template has), written independently of the composer vocabulary. ` +
+md('Out-of-catalogue requests (a tool with a flag combination that no catalog template has). ' +
   'Commands are compared after shell unquoting with only behaviour-preserving normalisation: option bundling/order for ordinary ' +
-  'commands (`ls -ltr` = `ls -l -t -r`, `head -n5` = `head -5`); argument boundaries, case (`-name` ≠ `-iname`), find\'s expression order, ' +
-  'redirections and pipeline separators must match. *exact* = the gold command, *acceptable* = gold or a listed alternative. ' +
-  '(Before the review the comparison lowercased find predicates and mapped `-iname` to `-name`; that credited one catalog answer: ' +
-  '"any answer acceptable" was 33.3%, now 31.4%.)');
+  'commands (`ls -ltr` = `ls -l -t -r`, `head -n5` = `head -5`); argument boundaries, case (`-name` ≠ `-iname`), quoting that changes ' +
+  'expansion (`*.log` ≠ `\'*.log\'`), find\'s expression order, redirections and pipeline separators must match. ' +
+  '*exact* = the gold command, *acceptable* = gold or a listed alternative.');
 md();
-md('| split | n | composer fired | composed exact | composed acceptable | any answer acceptable (catalog or composed) |');
-md('|---|---|---|---|---|---|');
-for (const k of ['all', 'en', 'pl']) md(`| ${k.toUpperCase()} | ${CP[k].n} | ${pct(CP[k].composed, CP[k].n)} | ${pct(CP[k].exact, CP[k].n)} | ${pct(CP[k].acc, CP[k].n)} | ${pct(CP[k].e2eAcc, CP[k].n)} |`);
+md(`**Development set** \`data/compose/eval.jsonl\` (${comp.length} rows; used while developing the composer since v0.2 — not blind):`);
 md();
-md('*Development note:* the flag vocabulary was written before looking at this set; the first (blind) run fired on 11.8% ' +
-  'and was acceptable on **3.9%**. After inspecting the failures, general fixes were made (firing on unexplained modifiers, ' +
-  'value flags, tar compression from the archive name, the data-driven explained-flag table) — the numbers above include them.');
-md();
+compTable(CP);
+if (CB) {
+  md(`**Blind set** \`data/blind/compose.jsonl\` (${compBlind.length} rows, written for v0.3 by a separate author without seeing the composer vocabulary or any result):`);
+  md();
+  compTable(CB.CP);
+}
 md(`False fires on in-catalogue requests (\`data/eval\`, composer replaced a catalog answer): **${pct(falseCompose, evalRows.length)}** (${falseCompose}/${evalRows.length}).`);
 md();
 
 // ------------------------------------------------------------------------------------------
 // 7. OOD
-const ood = readJsonl(join(ROOT, 'data', 'ood_eval.jsonl'));
-const oodLang = { en: [0, 0], pl: [0, 0] };
-let rejected = 0;
-for (const r of ood) {
-  const s = suggest(r.text, { env: BASH, model });
-  const rej = !s.understood;
-  if (rej) rejected++;
-  oodLang[r.lang] ??= [0, 0];
-  oodLang[r.lang][0]++;
-  if (rej) oodLang[r.lang][1]++;
-  else if (VERBOSE) console.log(`  OOD accepted: ${r.text} -> ${s.command}`);
+function oodEval(rows) {
+  const L = { en: [0, 0], pl: [0, 0] };
+  let rej = 0;
+  for (const r of rows) {
+    const s = suggest(r.text, { env: BASH, model });
+    const ok = !s.understood;
+    if (ok) rej++;
+    L[r.lang] ??= [0, 0];
+    L[r.lang][0]++;
+    if (ok) L[r.lang][1]++;
+    else if (VERBOSE) console.log(`  OOD accepted: ${r.text} -> ${s.command}`);
+  }
+  return { rej, L };
 }
-md('## 7. Out-of-domain rejection (`data/ood_eval.jsonl`)');
+const ood = readJsonl(join(ROOT, 'data', 'ood_eval.jsonl'));
+const OO = oodEval(ood);
+const rejected = OO.rej;
+const oodBlind = readJsonl(join(ROOT, 'data', 'blind', 'ood.jsonl'));
+const OB = oodBlind.length ? oodEval(oodBlind) : null;
+SUM.ood_rejected = rate(rejected, ood.length);
+if (OB) SUM.ood_blind_rejected = rate(OB.rej, oodBlind.length);
+md('## 7. Out-of-domain rejection');
 md();
-md(`**${pct(rejected, ood.length)}** (${rejected}/${ood.length}) answered "I don't understand" (EN ${pct(oodLang.en[1], oodLang.en[0])}, PL ${pct(oodLang.pl[1], oodLang.pl[0])}), including the composer path.`);
+md(`\`data/ood_eval.jsonl\`: **${pct(rejected, ood.length)}** (${rejected}/${ood.length}) answered "I don't understand" (EN ${pct(OO.L.en[1], OO.L.en[0])}, PL ${pct(OO.L.pl[1], OO.L.pl[0])}), including the composer path.`);
+if (OB) md(`Blind \`data/blind/ood.jsonl\`: **${pct(OB.rej, oodBlind.length)}** (${OB.rej}/${oodBlind.length}; EN ${pct(OB.L.en[1], OB.L.en[0])}, PL ${pct(OB.L.pl[1], OB.L.pl[0])}).`);
+md();
+
+// ------------------------------------------------------------------------------------------
+// 8. blind sets for v0.3 (written by a separate author before any v0.3 result was seen)
+const blindInt = readJsonl(join(ROOT, 'data', 'blind', 'intents.jsonl'));
+const blindE2e = readJsonl(join(ROOT, 'data', 'blind', 'e2e.jsonl'));
+if (blindInt.length || blindE2e.length) {
+  md('## 8. Blind sets (v0.3)');
+  md();
+  md('Written by a separate author for v0.3 from the catalog descriptions/templates only, without access to the training data, the existing eval sets, ' +
+    'the model or any result; excluded from training (`gen_data.js`) and never used for tuning.');
+  md();
+}
+const DISK = /(na (całym |calym )?dysku|całego dysku|calego dysku|w całym systemie|w calym systemie|on (the )?(whole |entire )?(disk|drive)|(whole|entire) (disk|drive|system))/i;
+if (blindInt.length) {
+  const CBI = clsStats(blindInt, BASH);
+  const disk = blindInt.filter((r) => DISK.test(r.text));
+  const CD = disk.length ? clsStats(disk, BASH) : null;
+  SUM.blind_intent = rate(CBI.S.all.top1, CBI.S.all.n);
+  SUM.blind_intent_en = rate(CBI.S.en?.top1 || 0, CBI.S.en?.n || 0);
+  SUM.blind_intent_pl = rate(CBI.S.pl?.top1 || 0, CBI.S.pl?.n || 0);
+  md(`**Intent** \`data/blind/intents.jsonl\` (${blindInt.length} rows, each with its own shell/OS context; extra weight on confusable pairs):`);
+  md();
+  md('| split | n | tool top-1 | tool top-3 | intent top-1 | intent top-3 | answered (p ≥ thr) | precision when answered |');
+  md('|---|---|---|---|---|---|---|---|');
+  for (const k of ['all', 'en', 'pl']) if (CBI.S[k]) md(row(k.toUpperCase(), CBI.S[k]));
+  md();
+  const byShell = {};
+  for (const r of blindInt) (byShell[r.shell || 'bash'] ??= []).push(r);
+  md('Per shell (intent top-1): ' + Object.entries(byShell).map(([sh, rs]) => { const c = clsStats(rs, BASH).S.all; SUM[`blind_intent_${sh}`] = rate(c.top1, c.n); return `${sh} ${pct(c.top1, c.n)} (n=${c.n})`; }).join(', ') + '.');
+  md();
+  const worstB = [...CBI.per.entries()].filter(([, v]) => v.n >= 4).map(([k, v]) => [k, v.ok / v.n, v.n]).sort((a, b) => a[1] - b[1]).slice(0, 8);
+  md('Weakest intents (n ≥ 4): ' + worstB.map(([k, a, n]) => `${k} ${(a * 100).toFixed(0)}% (n=${n})`).join(', ') + '.');
+  md('Top confusions: ' + [...CBI.conf.entries()].sort((a, b) => b[1] - a[1]).slice(0, 8).map(([k, v]) => `${k} ×${v}`).join(', ') + '.');
+  if (CD) { SUM.blind_intent_disk = rate(CD.S.all.top1, CD.S.all.n); md(`Rows that name the whole disk as location ("na całym dysku", "entire drive", …): intent top-1 ${pct(CD.S.all.top1, CD.S.all.n)} (n=${CD.S.all.n}).`); }
+  md();
+  if (VERBOSE) for (const r of blindInt) { const c = cascade(r.text, { model, extras: envFeatures({ shell: r.shell, os: r.os }) }); if (c.intent !== r.intent) console.log(`  blind ✗ [${r.intent} → ${c.intent}] (${r.shell}) ${r.text}`); }
+}
+const blindE2eFails = [];
+if (blindE2e.length) {
+  const E = { all: { n: 0, ok: 0, okGi: 0 }, en: { n: 0, ok: 0, okGi: 0 }, pl: { n: 0, ok: 0, okGi: 0 } };
+  let diskN = 0; let diskOk = 0;
+  for (const r of blindE2e) {
+    const s = suggest(r.text, { env: BASH, model, compose: 'off' });
+    const ok = complete(s) && sameCmd(s.command, r.expect_command);
+    const bi = buildCommand(r.intent, r.text, { env: BASH, resolved: resolveWithTagger(r.intent, r.text, { model }).slots });
+    const okGi = !bi.missing?.length && sameCmd(bi.command, r.expect_command);
+    for (const k of ['all', r.lang]) { E[k].n++; if (ok) E[k].ok++; if (okGi) E[k].okGi++; }
+    if (DISK.test(r.text)) { diskN++; if (ok) diskOk++; }
+    if (!ok) blindE2eFails.push({ text: r.text, gold: r.expect_command, got: s.command, intent: r.intent, pred: s.intent });
+  }
+  SUM.blind_e2e = rate(E.all.ok, E.all.n);
+  SUM.blind_e2e_gold_intent = rate(E.all.okGi, E.all.n);
+  md(`**End-to-end** \`data/blind/e2e.jsonl\` (${blindE2e.length} requests with a hand-written complete bash command; compared with the same normalisation as §6):`);
+  md();
+  md('| split | n | exact command (full pipeline) | exact command given gold intent |');
+  md('|---|---|---|---|');
+  for (const k of ['all', 'en', 'pl']) md(`| ${k.toUpperCase()} | ${E[k].n} | ${pct(E[k].ok, E[k].n)} | ${pct(E[k].okGi, E[k].n)} |`);
+  md();
+  if (diskN) { SUM.blind_e2e_disk = rate(diskOk, diskN); md(`Whole-disk location rows: ${diskOk}/${diskN} exact.`); md(); }
+}
 
 updateSection('eval', out.join('\n'));
+SUM.intent_top1 = rate(C1.S.all.top1, C1.S.all.n);
+SUM.intent_top1_en = rate(C1.S.en.top1, C1.S.en.n);
+SUM.intent_top1_pl = rate(C1.S.pl.top1, C1.S.pl.n);
+SUM.tool_top1 = rate(C1.S.all.tool1, C1.S.all.n);
+SUM.answered = rate(C1.S.all.ans, C1.S.all.n);
+SUM.precision_answered = rate(C1.S.all.ansOk, C1.S.all.ans);
+SUM.slot_f1 = +F.merge.f1.toFixed(4);
+SUM.slot_cases = rate(slotCase.merge, SLOT_CASES.length);
+SUM.shell_phrased = Object.fromEntries(Object.entries(shellRes).map(([k, v]) => [k, v.phrased == null ? null : +v.phrased.toFixed(4)]));
+SUM.weak = Object.fromEntries([...C1.per.entries()].filter(([k]) => /^(find_symlinks|broken_symlinks|find_process|service_status|git_push|git_pull|empty_files|list_files|disk_free|block_devices|users_logged_in|show_path)$/.test(k)).map(([k, v]) => [k, rate(v.ok, v.n)]));
+mkdirSync(join(ROOT, 'build'), { recursive: true });
+writeFileSync(join(ROOT, 'build', 'eval_summary.json'), JSON.stringify(SUM, null, 1));
 const s = C1.S.all;
 console.log(`stage1 tool top1=${pct(s.tool1, s.n)} top3=${pct(s.tool3, s.n)} | intent top1=${pct(s.top1, s.n)} (EN ${pct(C1.S.en.top1, C1.S.en.n)} PL ${pct(C1.S.pl.top1, C1.S.pl.n)}) answered=${pct(s.ans, s.n)} prec=${pct(s.ansOk, s.ans)}`);
 console.log('per shell: ' + Object.entries(shellRes).map(([k, v]) => `${k} ${(v.acc * 100).toFixed(1)}% render ${v.rendered}/${v.n} syntax ${v.checked ? v.synOk + '/' + v.checked : 'n/a'}`).join(' | '));
@@ -377,6 +511,7 @@ if (VERBOSE) {
   for (const f of slotFails) console.log(`  slot-case ✗ ${f.intent}: ${f.q}\n      got ${f.got}\n      exp ${f.expected}`);
   for (const f of histFails) console.log(`  hist ✗ ${f.q} [${f.h.join(' ; ')}] rule=${f.rule}\n      got ${f.got}\n      exp ${f.exp}`);
   for (const f of compFails) console.log(`  comp ✗ (${f.method}) ${f.q}\n      got ${f.got}\n      exp ${f.gold}`);
+  for (const f of blindE2eFails) console.log(`  blind-e2e ✗ [${f.intent}→${f.pred}] ${f.text}\n      got ${f.got}\n      exp ${f.gold}`);
   for (const f of e2eFails.slice(0, 60)) console.log(`  e2e ✗ [${f.intent}→${f.pred}] ${f.text}\n      got ${f.got}\n      exp ${f.gold}`);
 }
 console.log(`wrote EVAL.md (eval section) in ${((Date.now() - t0) / 1000).toFixed(1)}s`);

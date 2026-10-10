@@ -1,0 +1,1220 @@
+{"text":"what's this machine called","intent":"hostname","lang":"en","shell":"bash","os":"linux"}
+{"text":"print hostname","intent":"hostname","lang":"en","shell":"bash","os":"linux"}
+{"text":"whats the name of this mac on the network","intent":"hostname","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"$env:COMPUTERNAME? just tell me the computer name","intent":"hostname","lang":"en","shell":"powershell","os":"win32"}
+{"text":"what is the hostname of this windows box","intent":"hostname","lang":"en","shell":"powershell","os":"win32"}
+{"text":"hostname pls","intent":"hostname","lang":"en","shell":"fish","os":"linux"}
+{"text":"show computer name","intent":"hostname","lang":"en","shell":"cmd","os":"win32"}
+{"text":"jak się nazywa ten serwer","intent":"hostname","lang":"pl","shell":"bash","os":"linux"}
+{"text":"podaj nazwe hosta","intent":"hostname","lang":"pl","shell":"bash","os":"linux"}
+{"text":"jaka jest nazwa tego maca w sieci?","intent":"hostname","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"pokaż nazwę komputera","intent":"hostname","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"hostname tej maszyny","intent":"hostname","lang":"pl","shell":"sh","os":"linux"}
+{"text":"na jakim hoście jestem teraz?","intent":"hostname","lang":"pl","shell":"bash","os":"linux"}
+{"text":"jak sie nazywa ten komputer z windowsem","intent":"hostname","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"who am i logged in as","intent":"whoami","lang":"en","shell":"bash","os":"linux"}
+{"text":"whoami","intent":"whoami","lang":"en","shell":"bash","os":"linux"}
+{"text":"which user account is this shell running under","intent":"whoami","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"what's my current windows username","intent":"whoami","lang":"en","shell":"powershell","os":"win32"}
+{"text":"current user?","intent":"whoami","lang":"en","shell":"sh","os":"linux"}
+{"text":"show my user name","intent":"whoami","lang":"en","shell":"cmd","os":"win32"}
+{"text":"am i root right now?","intent":"whoami","lang":"en","shell":"bash","os":"linux"}
+{"text":"jako kto jestem zalogowany","intent":"whoami","lang":"pl","shell":"bash","os":"linux"}
+{"text":"ktory to user","intent":"whoami","lang":"pl","shell":"bash","os":"linux"}
+{"text":"jaki mam login w tym terminalu","intent":"whoami","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"pokaż nazwę bieżącego użytkownika","intent":"whoami","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"na jakim koncie siedze","intent":"whoami","lang":"pl","shell":"fish","os":"linux"}
+{"text":"czy jestem rootem czy zwyklym userem?","intent":"whoami","lang":"pl","shell":"bash","os":"linux"}
+{"text":"kim jestem w tym cmd","intent":"whoami","lang":"pl","shell":"cmd","os":"win32"}
+{"text":"who else is logged in right now","intent":"users_logged_in","lang":"en","shell":"bash","os":"linux"}
+{"text":"list users currently on this box","intent":"users_logged_in","lang":"en","shell":"bash","os":"linux"}
+{"text":"show active sessions on this mac","intent":"users_logged_in","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"which users are logged on to this server","intent":"users_logged_in","lang":"en","shell":"powershell","os":"win32"}
+{"text":"anyone else connected via ssh at the moment?","intent":"users_logged_in","lang":"en","shell":"bash","os":"linux"}
+{"text":"logged in users","intent":"users_logged_in","lang":"en","shell":"sh","os":"linux"}
+{"text":"who's on the system","intent":"users_logged_in","lang":"en","shell":"fish","os":"linux"}
+{"text":"kto jest teraz zalogowany","intent":"users_logged_in","lang":"pl","shell":"bash","os":"linux"}
+{"text":"pokaz zalogowanych userow","intent":"users_logged_in","lang":"pl","shell":"bash","os":"linux"}
+{"text":"jacy użytkownicy mają teraz otwarte sesje","intent":"users_logged_in","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"kto jest zalogowany na tym serwerze windows","intent":"users_logged_in","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"czy ktoś jeszcze siedzi na tej maszynie?","intent":"users_logged_in","lang":"pl","shell":"bash","os":"linux"}
+{"text":"lista aktualnie zalogowanych","intent":"users_logged_in","lang":"pl","shell":"bash","os":"linux"}
+{"text":"kto jest zalogowany","intent":"users_logged_in","lang":"pl","shell":"cmd","os":"win32"}
+{"text":"show the last 15 logins","intent":"last_logins","lang":"en","shell":"bash","os":"linux"}
+{"text":"who logged in recently","intent":"last_logins","lang":"en","shell":"bash","os":"linux"}
+{"text":"recent login history please","intent":"last_logins","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"show recent logon events","intent":"last_logins","lang":"en","shell":"powershell","os":"win32"}
+{"text":"last 50 logins on this server","intent":"last_logins","lang":"en","shell":"bash","os":"linux"}
+{"text":"when did people last log in","intent":"last_logins","lang":"en","shell":"bash","os":"linux"}
+{"text":"login history","intent":"last_logins","lang":"en","shell":"sh","os":"linux"}
+{"text":"ostatnie logowania","intent":"last_logins","lang":"pl","shell":"bash","os":"linux"}
+{"text":"pokaz 20 ostatnich logowan","intent":"last_logins","lang":"pl","shell":"bash","os":"linux"}
+{"text":"historia logowań do tego maca","intent":"last_logins","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"kto się ostatnio logował na ten serwer","intent":"last_logins","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"daj mi 10 ostatnich sesji logowania","intent":"last_logins","lang":"pl","shell":"bash","os":"linux"}
+{"text":"kiedy ktos ostatnio sie logowal","intent":"last_logins","lang":"pl","shell":"fish","os":"linux"}
+{"text":"ostatnie 30 loginów","intent":"last_logins","lang":"pl","shell":"bash","os":"linux"}
+{"text":"list all environment variables","intent":"env_vars","lang":"en","shell":"bash","os":"linux"}
+{"text":"dump my env","intent":"env_vars","lang":"en","shell":"bash","os":"linux"}
+{"text":"show every env var sorted","intent":"env_vars","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"Get-ChildItem env: - list all environment variables","intent":"env_vars","lang":"en","shell":"powershell","os":"win32"}
+{"text":"show environment variables","intent":"env_vars","lang":"en","shell":"powershell","os":"win32"}
+{"text":"print all env vars","intent":"env_vars","lang":"en","shell":"cmd","os":"win32"}
+{"text":"what env variables are set in this shell","intent":"env_vars","lang":"en","shell":"bash","os":"linux"}
+{"text":"pokaż wszystkie zmienne środowiskowe","intent":"env_vars","lang":"pl","shell":"bash","os":"linux"}
+{"text":"wypisz env","intent":"env_vars","lang":"pl","shell":"bash","os":"linux"}
+{"text":"jakie mam ustawione zmienne srodowiskowe","intent":"env_vars","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"lista zmiennych środowiskowych","intent":"env_vars","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"zmienne srodowiskowe pls","intent":"env_vars","lang":"pl","shell":"fish","os":"linux"}
+{"text":"pokaz całe środowisko posortowane","intent":"env_vars","lang":"pl","shell":"bash","os":"linux"}
+{"text":"wszystkie zmienne środowiska","intent":"env_vars","lang":"pl","shell":"cmd","os":"win32"}
+{"text":"what is JAVA_HOME set to","intent":"env_var_get","lang":"en","shell":"bash","os":"linux"}
+{"text":"value of $EDITOR","intent":"env_var_get","lang":"en","shell":"bash","os":"linux"}
+{"text":"print the GOPATH variable","intent":"env_var_get","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"show $env:USERPROFILE","intent":"env_var_get","lang":"en","shell":"powershell","os":"win32"}
+{"text":"what's the value of TEMP env var","intent":"env_var_get","lang":"en","shell":"powershell","os":"win32"}
+{"text":"echo HOME var value","intent":"env_var_get","lang":"en","shell":"sh","os":"linux"}
+{"text":"show me the DATABASE_URL env variable","intent":"env_var_get","lang":"en","shell":"bash","os":"linux"}
+{"text":"jaka jest wartosc zmiennej LANG","intent":"env_var_get","lang":"pl","shell":"bash","os":"linux"}
+{"text":"pokaż zmienną KUBECONFIG","intent":"env_var_get","lang":"pl","shell":"bash","os":"linux"}
+{"text":"co jest w zmiennej SHELL","intent":"env_var_get","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"wartość zmiennej środowiskowej APPDATA","intent":"env_var_get","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"ile wynosi zmienna PAGER","intent":"env_var_get","lang":"pl","shell":"fish","os":"linux"}
+{"text":"sprawdź zmienną NODE_ENV","intent":"env_var_get","lang":"pl","shell":"bash","os":"linux"}
+{"text":"pokaz zmienna PATHEXT","intent":"env_var_get","lang":"pl","shell":"cmd","os":"win32"}
+{"text":"where is python3 installed","intent":"which_cmd","lang":"en","shell":"bash","os":"linux"}
+{"text":"which node binary am i using","intent":"which_cmd","lang":"en","shell":"bash","os":"linux"}
+{"text":"path to the brew executable","intent":"which_cmd","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"where is git.exe located","intent":"which_cmd","lang":"en","shell":"powershell","os":"win32"}
+{"text":"Get-Command kubectl - where does it live","intent":"which_cmd","lang":"en","shell":"powershell","os":"win32"}
+{"text":"which rg","intent":"which_cmd","lang":"en","shell":"fish","os":"linux"}
+{"text":"locate the docker executable","intent":"which_cmd","lang":"en","shell":"bash","os":"linux"}
+{"text":"gdzie jest zainstalowany python","intent":"which_cmd","lang":"pl","shell":"bash","os":"linux"}
+{"text":"ktory gcc jest uzywany","intent":"which_cmd","lang":"pl","shell":"bash","os":"linux"}
+{"text":"ścieżka do pliku wykonywalnego terraform","intent":"which_cmd","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"gdzie leży code.exe","intent":"which_cmd","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"skąd się bierze komenda java","intent":"which_cmd","lang":"pl","shell":"bash","os":"linux"}
+{"text":"which psql","intent":"which_cmd","lang":"pl","shell":"sh","os":"linux"}
+{"text":"gdzie jest npm","intent":"which_cmd","lang":"pl","shell":"cmd","os":"win32"}
+{"text":"show my PATH one entry per line","intent":"show_path","lang":"en","shell":"bash","os":"linux"}
+{"text":"print the PATH variable split by line","intent":"show_path","lang":"en","shell":"bash","os":"linux"}
+{"text":"what directories are in my PATH","intent":"show_path","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"list the entries of $env:Path","intent":"show_path","lang":"en","shell":"powershell","os":"win32"}
+{"text":"show path folders","intent":"show_path","lang":"en","shell":"powershell","os":"win32"}
+{"text":"split PATH into lines","intent":"show_path","lang":"en","shell":"fish","os":"linux"}
+{"text":"is /usr/local/bin in my path? show the path entries","intent":"show_path","lang":"en","shell":"bash","os":"linux"}
+{"text":"pokaż PATH linia po linii","intent":"show_path","lang":"pl","shell":"bash","os":"linux"}
+{"text":"wypisz katalogi z PATH","intent":"show_path","lang":"pl","shell":"bash","os":"linux"}
+{"text":"jakie katalogi mam w PATH","intent":"show_path","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"pokaż zawartość zmiennej Path, każdy wpis osobno","intent":"show_path","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"wypisz sciezki z PATH","intent":"show_path","lang":"pl","shell":"cmd","os":"win32"}
+{"text":"rozbij PATH na osobne linie","intent":"show_path","lang":"pl","shell":"bash","os":"linux"}
+{"text":"pokaz path","intent":"show_path","lang":"pl","shell":"sh","os":"linux"}
+{"text":"search my shell history for rsync","intent":"history_search","lang":"en","shell":"bash","os":"linux"}
+{"text":"when did I last run docker build, grep history","intent":"history_search","lang":"en","shell":"bash","os":"linux"}
+{"text":"find \"kubectl apply\" in history","intent":"history_search","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"search command history for Invoke-WebRequest","intent":"history_search","lang":"en","shell":"powershell","os":"win32"}
+{"text":"grep history for ssh deploy@","intent":"history_search","lang":"en","shell":"bash","os":"linux"}
+{"text":"history search ffmpeg","intent":"history_search","lang":"en","shell":"fish","os":"linux"}
+{"text":"which commands with 'scp' did i run before","intent":"history_search","lang":"en","shell":"bash","os":"linux"}
+{"text":"przeszukaj historię poleceń pod kątem git rebase","intent":"history_search","lang":"pl","shell":"bash","os":"linux"}
+{"text":"znajdz w historii komende z certbot","intent":"history_search","lang":"pl","shell":"bash","os":"linux"}
+{"text":"szukaj w historii \"npm publish\"","intent":"history_search","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"przeszukaj historię PowerShella pod kątem Set-ExecutionPolicy","intent":"history_search","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"jak ostatnio odpalałem tar? poszukaj w historii","intent":"history_search","lang":"pl","shell":"bash","os":"linux"}
+{"text":"grep po historii: iptables","intent":"history_search","lang":"pl","shell":"sh","os":"linux"}
+{"text":"znajdź w historii basha polecenia z mysqldump","intent":"history_search","lang":"pl","shell":"bash","os":"linux"}
+{"text":"what time is it","intent":"date_time","lang":"en","shell":"bash","os":"linux"}
+{"text":"current date and time","intent":"date_time","lang":"en","shell":"bash","os":"linux"}
+{"text":"show today's date","intent":"date_time","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"Get-Date","intent":"date_time","lang":"en","shell":"powershell","os":"win32"}
+{"text":"what's the date today","intent":"date_time","lang":"en","shell":"powershell","os":"win32"}
+{"text":"show current time","intent":"date_time","lang":"en","shell":"cmd","os":"win32"}
+{"text":"date","intent":"date_time","lang":"en","shell":"sh","os":"linux"}
+{"text":"która godzina","intent":"date_time","lang":"pl","shell":"bash","os":"linux"}
+{"text":"jaka jest dzisiaj data","intent":"date_time","lang":"pl","shell":"bash","os":"linux"}
+{"text":"pokaz date i godzine","intent":"date_time","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"aktualna data i czas","intent":"date_time","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"ktora jest","intent":"date_time","lang":"pl","shell":"fish","os":"linux"}
+{"text":"jaki mamy dzień","intent":"date_time","lang":"pl","shell":"bash","os":"linux"}
+{"text":"podaj obecny czas","intent":"date_time","lang":"pl","shell":"cmd","os":"win32"}
+{"text":"what timezone is this server in","intent":"timezone","lang":"en","shell":"bash","os":"linux"}
+{"text":"show system time zone","intent":"timezone","lang":"en","shell":"bash","os":"linux"}
+{"text":"which tz is configured on my mac","intent":"timezone","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"Get-TimeZone","intent":"timezone","lang":"en","shell":"powershell","os":"win32"}
+{"text":"what time zone is windows set to","intent":"timezone","lang":"en","shell":"powershell","os":"win32"}
+{"text":"is this box on UTC?","intent":"timezone","lang":"en","shell":"bash","os":"linux"}
+{"text":"current timezone","intent":"timezone","lang":"en","shell":"fish","os":"linux"}
+{"text":"jaka strefa czasowa jest ustawiona","intent":"timezone","lang":"pl","shell":"bash","os":"linux"}
+{"text":"w jakiej strefie czasowej jest serwer","intent":"timezone","lang":"pl","shell":"bash","os":"linux"}
+{"text":"pokaż strefę czasową systemu","intent":"timezone","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"jaka strefa czasowa na tym komputerze","intent":"timezone","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"czy serwer jest na UTC?","intent":"timezone","lang":"pl","shell":"bash","os":"linux"}
+{"text":"strefa czasowa","intent":"timezone","lang":"pl","shell":"sh","os":"linux"}
+{"text":"sprawdz timezone","intent":"timezone","lang":"pl","shell":"bash","os":"linux"}
+{"text":"show a calendar","intent":"calendar","lang":"en","shell":"bash","os":"linux"}
+{"text":"calendar for this month","intent":"calendar","lang":"en","shell":"bash","os":"linux"}
+{"text":"print the cal for march 2027","intent":"calendar","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"show me a calendar","intent":"calendar","lang":"en","shell":"powershell","os":"win32"}
+{"text":"what day of week is the 1st of next month, show calendar","intent":"calendar","lang":"en","shell":"bash","os":"linux"}
+{"text":"cal","intent":"calendar","lang":"en","shell":"fish","os":"linux"}
+{"text":"monthly calendar","intent":"calendar","lang":"en","shell":"sh","os":"linux"}
+{"text":"pokaż kalendarz","intent":"calendar","lang":"pl","shell":"bash","os":"linux"}
+{"text":"kalendarz na ten miesiąc","intent":"calendar","lang":"pl","shell":"bash","os":"linux"}
+{"text":"wyświetl kalendarz na grudzien","intent":"calendar","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"pokaz kalendarz","intent":"calendar","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"kalendarz na caly rok 2027","intent":"calendar","lang":"pl","shell":"bash","os":"linux"}
+{"text":"kalendarz","intent":"calendar","lang":"pl","shell":"fish","os":"linux"}
+{"text":"pokaż kalendarz bieżącego miesiąca","intent":"calendar","lang":"pl","shell":"cmd","os":"win32"}
+{"text":"list my cron jobs","intent":"cron_list","lang":"en","shell":"bash","os":"linux"}
+{"text":"show crontab","intent":"cron_list","lang":"en","shell":"bash","os":"linux"}
+{"text":"what cron entries do i have","intent":"cron_list","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"show my scheduled tasks","intent":"cron_list","lang":"en","shell":"powershell","os":"win32"}
+{"text":"which jobs are scheduled in cron for me","intent":"cron_list","lang":"en","shell":"bash","os":"linux"}
+{"text":"crontab -l","intent":"cron_list","lang":"en","shell":"sh","os":"linux"}
+{"text":"do i have any cronjobs set up?","intent":"cron_list","lang":"en","shell":"bash","os":"linux"}
+{"text":"pokaż moje zadania crona","intent":"cron_list","lang":"pl","shell":"bash","os":"linux"}
+{"text":"wylistuj crontab","intent":"cron_list","lang":"pl","shell":"bash","os":"linux"}
+{"text":"jakie mam wpisy w cronie","intent":"cron_list","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"pokaż zaplanowane zadania","intent":"cron_list","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"co mam w crontabie","intent":"cron_list","lang":"pl","shell":"bash","os":"linux"}
+{"text":"lista cronow","intent":"cron_list","lang":"pl","shell":"fish","os":"linux"}
+{"text":"sprawdz czy jest jakis cron od backupu","intent":"cron_list","lang":"pl","shell":"bash","os":"linux"}
+{"text":"edit my crontab","intent":"cron_edit","lang":"en","shell":"bash","os":"linux"}
+{"text":"i want to add a cron job","intent":"cron_edit","lang":"en","shell":"bash","os":"linux"}
+{"text":"open crontab for editing","intent":"cron_edit","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"edit scheduled jobs","intent":"cron_edit","lang":"en","shell":"powershell","os":"win32"}
+{"text":"modify cron entries","intent":"cron_edit","lang":"en","shell":"bash","os":"linux"}
+{"text":"crontab -e","intent":"cron_edit","lang":"en","shell":"fish","os":"linux"}
+{"text":"schedule a new job in cron that runs nightly","intent":"cron_edit","lang":"en","shell":"bash","os":"linux"}
+{"text":"edytuj crontab","intent":"cron_edit","lang":"pl","shell":"bash","os":"linux"}
+{"text":"chcę dodać zadanie do crona","intent":"cron_edit","lang":"pl","shell":"bash","os":"linux"}
+{"text":"otworz crona do edycji","intent":"cron_edit","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"zmień zaplanowane zadania","intent":"cron_edit","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"dopisz nowy wpis do crontaba","intent":"cron_edit","lang":"pl","shell":"bash","os":"linux"}
+{"text":"edytuj crony","intent":"cron_edit","lang":"pl","shell":"sh","os":"linux"}
+{"text":"zmodyfikuj harmonogram crona","intent":"cron_edit","lang":"pl","shell":"bash","os":"linux"}
+{"text":"show logs for the nginx service","intent":"journal_service","lang":"en","shell":"bash","os":"linux"}
+{"text":"journalctl for docker last 200 lines","intent":"journal_service","lang":"en","shell":"bash","os":"linux"}
+{"text":"logs of the postgresql unit since yesterday","intent":"journal_service","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"show logs of the sshd service","intent":"journal_service","lang":"en","shell":"powershell","os":"win32"}
+{"text":"what did the kubelet service log in the last hour","intent":"journal_service","lang":"en","shell":"bash","os":"linux"}
+{"text":"last 50 log lines from cron.service","intent":"journal_service","lang":"en","shell":"sh","os":"linux"}
+{"text":"tail logs of my-api.service","intent":"journal_service","lang":"en","shell":"bash","os":"linux"}
+{"text":"pokaż logi usługi nginx","intent":"journal_service","lang":"pl","shell":"bash","os":"linux"}
+{"text":"logi serwisu redis z ostatnich 2 godzin","intent":"journal_service","lang":"pl","shell":"bash","os":"linux"}
+{"text":"journal dla jednostki mysql, ostatnie 100 linii","intent":"journal_service","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"logi usługi sshd","intent":"journal_service","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"co logowal serwis gunicorn od wczoraj","intent":"journal_service","lang":"pl","shell":"bash","os":"linux"}
+{"text":"logi z usługi containerd","intent":"journal_service","lang":"pl","shell":"fish","os":"linux"}
+{"text":"daj 300 linii journala z unitu php8.2-fpm","intent":"journal_service","lang":"pl","shell":"bash","os":"linux"}
+{"text":"show system errors from the journal","intent":"journal_errors","lang":"en","shell":"bash","os":"linux"}
+{"text":"any error logs since boot?","intent":"journal_errors","lang":"en","shell":"bash","os":"linux"}
+{"text":"last 40 system error messages","intent":"journal_errors","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"show recent system errors in event log","intent":"journal_errors","lang":"en","shell":"powershell","os":"win32"}
+{"text":"journal errors only","intent":"journal_errors","lang":"en","shell":"bash","os":"linux"}
+{"text":"list error-level log entries","intent":"journal_errors","lang":"en","shell":"sh","os":"linux"}
+{"text":"what went wrong at boot, show errors","intent":"journal_errors","lang":"en","shell":"bash","os":"linux"}
+{"text":"pokaż błędy systemowe z journala","intent":"journal_errors","lang":"pl","shell":"bash","os":"linux"}
+{"text":"jakie są błędy w logach systemu","intent":"journal_errors","lang":"pl","shell":"bash","os":"linux"}
+{"text":"ostatnie 30 błędów systemowych","intent":"journal_errors","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"pokaż błędy z dziennika zdarzeń systemu","intent":"journal_errors","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"bledy od startu systemu","intent":"journal_errors","lang":"pl","shell":"bash","os":"linux"}
+{"text":"logi z priorytetem err","intent":"journal_errors","lang":"pl","shell":"fish","os":"linux"}
+{"text":"czy w logach systemu sa jakies errory?","intent":"journal_errors","lang":"pl","shell":"bash","os":"linux"}
+{"text":"status of the nginx service","intent":"service_status","lang":"en","shell":"bash","os":"linux"}
+{"text":"is the sshd service active?","intent":"service_status","lang":"en","shell":"bash","os":"linux"}
+{"text":"systemctl status postgresql","intent":"service_status","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"Get-Service Spooler - is it running?","intent":"service_status","lang":"en","shell":"powershell","os":"win32"}
+{"text":"what's the status of the W32Time service","intent":"service_status","lang":"en","shell":"powershell","os":"win32"}
+{"text":"check if the docker daemon service is up","intent":"service_status","lang":"en","shell":"bash","os":"linux"}
+{"text":"status of cron service","intent":"service_status","lang":"en","shell":"sh","os":"linux"}
+{"text":"status usługi nginx","intent":"service_status","lang":"pl","shell":"bash","os":"linux"}
+{"text":"czy usluga mysql dziala?","intent":"service_status","lang":"pl","shell":"bash","os":"linux"}
+{"text":"sprawdź stan serwisu redis","intent":"service_status","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"jaki jest status usługi wuauserv","intent":"service_status","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"Get-Service MSSQLSERVER, czy chodzi?","intent":"service_status","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"czy demon sshd jest aktywny","intent":"service_status","lang":"pl","shell":"bash","os":"linux"}
+{"text":"stan usługi bluetooth","intent":"service_status","lang":"pl","shell":"fish","os":"linux"}
+{"text":"restart nginx","intent":"service_restart","lang":"en","shell":"bash","os":"linux"}
+{"text":"bounce the postgresql service","intent":"service_restart","lang":"en","shell":"bash","os":"linux"}
+{"text":"please restart the php-fpm service","intent":"service_restart","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"Restart-Service Spooler","intent":"service_restart","lang":"en","shell":"powershell","os":"win32"}
+{"text":"restart the IIS W3SVC service","intent":"service_restart","lang":"en","shell":"powershell","os":"win32"}
+{"text":"reload by restarting apache2 service","intent":"service_restart","lang":"en","shell":"bash","os":"linux"}
+{"text":"restart the mysql service","intent":"service_restart","lang":"en","shell":"cmd","os":"win32"}
+{"text":"zrestartuj nginxa","intent":"service_restart","lang":"pl","shell":"bash","os":"linux"}
+{"text":"restartnij usluge redis","intent":"service_restart","lang":"pl","shell":"bash","os":"linux"}
+{"text":"uruchom ponownie serwis docker","intent":"service_restart","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"zrestartuj usługę wuauserv","intent":"service_restart","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"przeładuj (restart) usługę gunicorn","intent":"service_restart","lang":"pl","shell":"bash","os":"linux"}
+{"text":"restart serwisu cron","intent":"service_restart","lang":"pl","shell":"sh","os":"linux"}
+{"text":"zrób restart sshd","intent":"service_restart","lang":"pl","shell":"bash","os":"linux"}
+{"text":"stop the apache2 service","intent":"service_stop","lang":"en","shell":"bash","os":"linux"}
+{"text":"shut down the mongodb service","intent":"service_stop","lang":"en","shell":"bash","os":"linux"}
+{"text":"please stop the nginx daemon","intent":"service_stop","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"Stop-Service -Name Spooler","intent":"service_stop","lang":"en","shell":"powershell","os":"win32"}
+{"text":"stop the windows update service","intent":"service_stop","lang":"en","shell":"powershell","os":"win32"}
+{"text":"halt the cups service","intent":"service_stop","lang":"en","shell":"bash","os":"linux"}
+{"text":"stop bluetooth service","intent":"service_stop","lang":"en","shell":"fish","os":"linux"}
+{"text":"zatrzymaj usługę nginx","intent":"service_stop","lang":"pl","shell":"bash","os":"linux"}
+{"text":"wyłącz serwis postgresql (stop)","intent":"service_stop","lang":"pl","shell":"bash","os":"linux"}
+{"text":"stopnij usluge redis","intent":"service_stop","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"zatrzymaj usługę BITS","intent":"service_stop","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"zastopuj demona docker","intent":"service_stop","lang":"pl","shell":"bash","os":"linux"}
+{"text":"zatrzymaj usluge MSSQLSERVER","intent":"service_stop","lang":"pl","shell":"cmd","os":"win32"}
+{"text":"wylacz teraz usluge cups","intent":"service_stop","lang":"pl","shell":"bash","os":"linux"}
+{"text":"start the nginx service","intent":"service_start","lang":"en","shell":"bash","os":"linux"}
+{"text":"bring up the redis service","intent":"service_start","lang":"en","shell":"bash","os":"linux"}
+{"text":"start postgresql please","intent":"service_start","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"Start-Service W32Time","intent":"service_start","lang":"en","shell":"powershell","os":"win32"}
+{"text":"start the print spooler service","intent":"service_start","lang":"en","shell":"powershell","os":"win32"}
+{"text":"launch the docker daemon","intent":"service_start","lang":"en","shell":"bash","os":"linux"}
+{"text":"start sshd service","intent":"service_start","lang":"en","shell":"sh","os":"linux"}
+{"text":"uruchom usługę nginx","intent":"service_start","lang":"pl","shell":"bash","os":"linux"}
+{"text":"odpal serwis mysql","intent":"service_start","lang":"pl","shell":"bash","os":"linux"}
+{"text":"wystartuj usluge redis","intent":"service_start","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"uruchom usługę Spooler","intent":"service_start","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"startnij demona containerd","intent":"service_start","lang":"pl","shell":"bash","os":"linux"}
+{"text":"włącz teraz usługę cron","intent":"service_start","lang":"pl","shell":"fish","os":"linux"}
+{"text":"podnies serwis rabbitmq-server","intent":"service_start","lang":"pl","shell":"bash","os":"linux"}
+{"text":"enable nginx at boot","intent":"service_enable","lang":"en","shell":"bash","os":"linux"}
+{"text":"make the docker service start automatically on boot","intent":"service_enable","lang":"en","shell":"bash","os":"linux"}
+{"text":"enable and start the postgresql service","intent":"service_enable","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"Set-Service sshd -StartupType Automatic","intent":"service_enable","lang":"en","shell":"powershell","os":"win32"}
+{"text":"set the spooler service to start automatically","intent":"service_enable","lang":"en","shell":"powershell","os":"win32"}
+{"text":"autostart redis service on reboot","intent":"service_enable","lang":"en","shell":"bash","os":"linux"}
+{"text":"systemctl enable fail2ban","intent":"service_enable","lang":"en","shell":"sh","os":"linux"}
+{"text":"włącz nginx przy starcie systemu","intent":"service_enable","lang":"pl","shell":"bash","os":"linux"}
+{"text":"niech usługa docker startuje automatycznie","intent":"service_enable","lang":"pl","shell":"bash","os":"linux"}
+{"text":"dodaj redis do autostartu","intent":"service_enable","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"ustaw usługę sshd na automatyczne uruchamianie","intent":"service_enable","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"wlacz usluge chronyd na stale","intent":"service_enable","lang":"pl","shell":"bash","os":"linux"}
+{"text":"enable serwisu tailscaled żeby wstawał po reboocie","intent":"service_enable","lang":"pl","shell":"bash","os":"linux"}
+{"text":"aktywuj usluge cups przy bootowaniu","intent":"service_enable","lang":"pl","shell":"fish","os":"linux"}
+{"text":"list running services","intent":"list_services","lang":"en","shell":"bash","os":"linux"}
+{"text":"what services are running on this box","intent":"list_services","lang":"en","shell":"bash","os":"linux"}
+{"text":"show all active services","intent":"list_services","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"Get-Service | where Status -eq Running","intent":"list_services","lang":"en","shell":"powershell","os":"win32"}
+{"text":"which services are running","intent":"list_services","lang":"en","shell":"powershell","os":"win32"}
+{"text":"show running systemd units of type service","intent":"list_services","lang":"en","shell":"bash","os":"linux"}
+{"text":"running daemons","intent":"list_services","lang":"en","shell":"sh","os":"linux"}
+{"text":"lista działających usług","intent":"list_services","lang":"pl","shell":"bash","os":"linux"}
+{"text":"jakie serwisy sa uruchomione","intent":"list_services","lang":"pl","shell":"bash","os":"linux"}
+{"text":"pokaz aktywne uslugi","intent":"list_services","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"pokaż uruchomione usługi","intent":"list_services","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"wylistuj wszystkie dzialajace demony","intent":"list_services","lang":"pl","shell":"bash","os":"linux"}
+{"text":"lista uruchomionych uslug","intent":"list_services","lang":"pl","shell":"cmd","os":"win32"}
+{"text":"co za usługi teraz chodzą w systemie","intent":"list_services","lang":"pl","shell":"bash","os":"linux"}
+{"text":"which services failed","intent":"failed_services","lang":"en","shell":"bash","os":"linux"}
+{"text":"list failed systemd units","intent":"failed_services","lang":"en","shell":"bash","os":"linux"}
+{"text":"show crashed services","intent":"failed_services","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"which services failed to start","intent":"failed_services","lang":"en","shell":"powershell","os":"win32"}
+{"text":"did any service fail on boot?","intent":"failed_services","lang":"en","shell":"bash","os":"linux"}
+{"text":"systemctl --failed","intent":"failed_services","lang":"en","shell":"sh","os":"linux"}
+{"text":"failed units?","intent":"failed_services","lang":"en","shell":"bash","os":"linux"}
+{"text":"które usługi padły","intent":"failed_services","lang":"pl","shell":"bash","os":"linux"}
+{"text":"pokaz usługi w stanie failed","intent":"failed_services","lang":"pl","shell":"bash","os":"linux"}
+{"text":"jakie serwisy się nie uruchomiły","intent":"failed_services","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"które usługi nie wystartowały","intent":"failed_services","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"lista usług z błędem","intent":"failed_services","lang":"pl","shell":"bash","os":"linux"}
+{"text":"failed services","intent":"failed_services","lang":"pl","shell":"fish","os":"linux"}
+{"text":"czy jakiś unit jest failed?","intent":"failed_services","lang":"pl","shell":"bash","os":"linux"}
+{"text":"show kernel messages","intent":"dmesg","lang":"en","shell":"bash","os":"linux"}
+{"text":"dmesg last 100 lines","intent":"dmesg","lang":"en","shell":"bash","os":"linux"}
+{"text":"kernel ring buffer tail","intent":"dmesg","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"show the kernel log","intent":"dmesg","lang":"en","shell":"powershell","os":"win32"}
+{"text":"what did the kernel say about the usb drive, show dmesg","intent":"dmesg","lang":"en","shell":"bash","os":"linux"}
+{"text":"recent kernel messages","intent":"dmesg","lang":"en","shell":"sh","os":"linux"}
+{"text":"last 40 lines of dmesg","intent":"dmesg","lang":"en","shell":"bash","os":"linux"}
+{"text":"pokaż komunikaty jądra","intent":"dmesg","lang":"pl","shell":"bash","os":"linux"}
+{"text":"dmesg ostatnie 50 linii","intent":"dmesg","lang":"pl","shell":"bash","os":"linux"}
+{"text":"logi kernela","intent":"dmesg","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"pokaż log jądra systemu","intent":"dmesg","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"co pisze kernel, daj dmesg","intent":"dmesg","lang":"pl","shell":"bash","os":"linux"}
+{"text":"komunikaty kernela","intent":"dmesg","lang":"pl","shell":"fish","os":"linux"}
+{"text":"ostatnie wpisy z bufora jadra","intent":"dmesg","lang":"pl","shell":"bash","os":"linux"}
+{"text":"battery level","intent":"battery","lang":"en","shell":"bash","os":"linux"}
+{"text":"how much battery do i have left","intent":"battery","lang":"en","shell":"bash","os":"linux"}
+{"text":"what's my battery percentage","intent":"battery","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"show battery status","intent":"battery","lang":"en","shell":"powershell","os":"win32"}
+{"text":"Get-CimInstance Win32_Battery charge","intent":"battery","lang":"en","shell":"powershell","os":"win32"}
+{"text":"is the laptop charging?","intent":"battery","lang":"en","shell":"bash","os":"linux"}
+{"text":"battery %","intent":"battery","lang":"en","shell":"fish","os":"linux"}
+{"text":"ile mam baterii","intent":"battery","lang":"pl","shell":"bash","os":"linux"}
+{"text":"poziom naładowania baterii","intent":"battery","lang":"pl","shell":"bash","os":"linux"}
+{"text":"stan baterii","intent":"battery","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"ile procent baterii zostało","intent":"battery","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"czy laptop sie laduje","intent":"battery","lang":"pl","shell":"bash","os":"linux"}
+{"text":"stan baterii laptopa","intent":"battery","lang":"pl","shell":"cmd","os":"win32"}
+{"text":"pokaz poziom baterii","intent":"battery","lang":"pl","shell":"bash","os":"linux"}
+{"text":"cpu temperature","intent":"temperature","lang":"en","shell":"bash","os":"linux"}
+{"text":"how hot is the processor","intent":"temperature","lang":"en","shell":"bash","os":"linux"}
+{"text":"show temperature sensors","intent":"temperature","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"what's the cpu temp","intent":"temperature","lang":"en","shell":"powershell","os":"win32"}
+{"text":"check the cpu temps, fans are loud","intent":"temperature","lang":"en","shell":"bash","os":"linux"}
+{"text":"sensors","intent":"temperature","lang":"en","shell":"sh","os":"linux"}
+{"text":"is the cpu overheating?","intent":"temperature","lang":"en","shell":"bash","os":"linux"}
+{"text":"temperatura procesora","intent":"temperature","lang":"pl","shell":"bash","os":"linux"}
+{"text":"jak gorący jest cpu","intent":"temperature","lang":"pl","shell":"bash","os":"linux"}
+{"text":"pokaż czujniki temperatury","intent":"temperature","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"jaka jest temperatura procesora","intent":"temperature","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"czy procesor sie przegrzewa","intent":"temperature","lang":"pl","shell":"bash","os":"linux"}
+{"text":"temp cpu","intent":"temperature","lang":"pl","shell":"fish","os":"linux"}
+{"text":"odczyt z sensorow temperatury","intent":"temperature","lang":"pl","shell":"bash","os":"linux"}
+{"text":"what graphics card do i have","intent":"gpu_info","lang":"en","shell":"bash","os":"linux"}
+{"text":"show gpu info","intent":"gpu_info","lang":"en","shell":"bash","os":"linux"}
+{"text":"which gpu is in this machine","intent":"gpu_info","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"Get-CimInstance Win32_VideoController","intent":"gpu_info","lang":"en","shell":"powershell","os":"win32"}
+{"text":"show my video card model","intent":"gpu_info","lang":"en","shell":"powershell","os":"win32"}
+{"text":"list display adapters","intent":"gpu_info","lang":"en","shell":"bash","os":"linux"}
+{"text":"gpu model?","intent":"gpu_info","lang":"en","shell":"fish","os":"linux"}
+{"text":"jaka mam karte graficzna","intent":"gpu_info","lang":"pl","shell":"bash","os":"linux"}
+{"text":"pokaż informacje o GPU","intent":"gpu_info","lang":"pl","shell":"bash","os":"linux"}
+{"text":"jaki procesor graficzny jest w tym komputerze","intent":"gpu_info","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"model karty graficznej","intent":"gpu_info","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"wylistuj karty graficzne","intent":"gpu_info","lang":"pl","shell":"bash","os":"linux"}
+{"text":"jaka karta graficzna","intent":"gpu_info","lang":"pl","shell":"cmd","os":"win32"}
+{"text":"czy mam nvidie czy amd?","intent":"gpu_info","lang":"pl","shell":"bash","os":"linux"}
+{"text":"list usb devices","intent":"usb_devices","lang":"en","shell":"bash","os":"linux"}
+{"text":"what's plugged into usb","intent":"usb_devices","lang":"en","shell":"bash","os":"linux"}
+{"text":"show connected usb devices","intent":"usb_devices","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"Get-PnpDevice -Class USB","intent":"usb_devices","lang":"en","shell":"powershell","os":"win32"}
+{"text":"list usb devices connected to this pc","intent":"usb_devices","lang":"en","shell":"powershell","os":"win32"}
+{"text":"is my usb stick detected? list usb","intent":"usb_devices","lang":"en","shell":"bash","os":"linux"}
+{"text":"lsusb","intent":"usb_devices","lang":"en","shell":"sh","os":"linux"}
+{"text":"lista urządzeń USB","intent":"usb_devices","lang":"pl","shell":"bash","os":"linux"}
+{"text":"co jest podpięte pod usb","intent":"usb_devices","lang":"pl","shell":"bash","os":"linux"}
+{"text":"pokaż podłączone urządzenia usb","intent":"usb_devices","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"wylistuj urządzenia USB","intent":"usb_devices","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"czy widzi pendrive'a? pokaz usb","intent":"usb_devices","lang":"pl","shell":"bash","os":"linux"}
+{"text":"urzadzenia usb","intent":"usb_devices","lang":"pl","shell":"fish","os":"linux"}
+{"text":"jakie urządzenia są na porcie usb","intent":"usb_devices","lang":"pl","shell":"bash","os":"linux"}
+{"text":"install htop","intent":"install_package","lang":"en","shell":"bash","os":"linux"}
+{"text":"apt install ripgrep","intent":"install_package","lang":"en","shell":"bash","os":"linux"}
+{"text":"install jq please","intent":"install_package","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"install 7zip","intent":"install_package","lang":"en","shell":"powershell","os":"win32"}
+{"text":"winget install Git.Git","intent":"install_package","lang":"en","shell":"powershell","os":"win32"}
+{"text":"i need ffmpeg installed","intent":"install_package","lang":"en","shell":"bash","os":"linux"}
+{"text":"install curl","intent":"install_package","lang":"en","shell":"sh","os":"linux"}
+{"text":"zainstaluj htop","intent":"install_package","lang":"pl","shell":"bash","os":"linux"}
+{"text":"doinstaluj pakiet tmux","intent":"install_package","lang":"pl","shell":"bash","os":"linux"}
+{"text":"zainstaluj wget","intent":"install_package","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"zainstaluj notepad++","intent":"install_package","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"potrzebuje zainstalowac neovim","intent":"install_package","lang":"pl","shell":"bash","os":"linux"}
+{"text":"instaluj fzf","intent":"install_package","lang":"pl","shell":"fish","os":"linux"}
+{"text":"zainstaluj python3","intent":"install_package","lang":"pl","shell":"cmd","os":"win32"}
+{"text":"is nginx installed?","intent":"package_installed","lang":"en","shell":"bash","os":"linux"}
+{"text":"check if the openssl package is installed","intent":"package_installed","lang":"en","shell":"bash","os":"linux"}
+{"text":"do i have imagemagick installed","intent":"package_installed","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"is python installed on this machine","intent":"package_installed","lang":"en","shell":"powershell","os":"win32"}
+{"text":"check whether git is installed","intent":"package_installed","lang":"en","shell":"powershell","os":"win32"}
+{"text":"is the package libpq-dev present","intent":"package_installed","lang":"en","shell":"bash","os":"linux"}
+{"text":"is tmux installed","intent":"package_installed","lang":"en","shell":"fish","os":"linux"}
+{"text":"czy jest zainstalowany nginx","intent":"package_installed","lang":"pl","shell":"bash","os":"linux"}
+{"text":"sprawdz czy mam pakiet curl","intent":"package_installed","lang":"pl","shell":"bash","os":"linux"}
+{"text":"czy pakiet ffmpeg jest zainstalowany","intent":"package_installed","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"czy mam zainstalowanego gita","intent":"package_installed","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"sprawdź czy jest pakiet build-essential","intent":"package_installed","lang":"pl","shell":"bash","os":"linux"}
+{"text":"czy zainstalowany jest rsync","intent":"package_installed","lang":"pl","shell":"sh","os":"linux"}
+{"text":"mam zainstalowany docker.io?","intent":"package_installed","lang":"pl","shell":"bash","os":"linux"}
+{"text":"update the system","intent":"system_update","lang":"en","shell":"bash","os":"linux"}
+{"text":"upgrade all packages","intent":"system_update","lang":"en","shell":"bash","os":"linux"}
+{"text":"update everything","intent":"system_update","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"install windows updates","intent":"system_update","lang":"en","shell":"powershell","os":"win32"}
+{"text":"update all packages with winget","intent":"system_update","lang":"en","shell":"powershell","os":"win32"}
+{"text":"apt update and upgrade","intent":"system_update","lang":"en","shell":"bash","os":"linux"}
+{"text":"update system packages","intent":"system_update","lang":"en","shell":"sh","os":"linux"}
+{"text":"zaktualizuj system","intent":"system_update","lang":"pl","shell":"bash","os":"linux"}
+{"text":"zrob apt update i upgrade","intent":"system_update","lang":"pl","shell":"bash","os":"linux"}
+{"text":"aktualizacja wszystkich pakietów","intent":"system_update","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"zainstaluj aktualizacje systemu","intent":"system_update","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"upgrade wszystkich paczek","intent":"system_update","lang":"pl","shell":"bash","os":"linux"}
+{"text":"zaktualizuj pakiety","intent":"system_update","lang":"pl","shell":"fish","os":"linux"}
+{"text":"aktualizuj system","intent":"system_update","lang":"pl","shell":"cmd","os":"win32"}
+{"text":"what is my local ip address","intent":"ip_addresses","lang":"en","shell":"bash","os":"linux"}
+{"text":"show ip addresses of all interfaces","intent":"ip_addresses","lang":"en","shell":"bash","os":"linux"}
+{"text":"my lan ip on this mac","intent":"ip_addresses","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"Get-NetIPAddress","intent":"ip_addresses","lang":"en","shell":"powershell","os":"win32"}
+{"text":"ipconfig - show my local ip","intent":"ip_addresses","lang":"en","shell":"powershell","os":"win32"}
+{"text":"which ip does eth0 have","intent":"ip_addresses","lang":"en","shell":"bash","os":"linux"}
+{"text":"list interface addresses","intent":"ip_addresses","lang":"en","shell":"sh","os":"linux"}
+{"text":"jaki mam lokalny adres ip","intent":"ip_addresses","lang":"pl","shell":"bash","os":"linux"}
+{"text":"pokaż adresy IP interfejsów","intent":"ip_addresses","lang":"pl","shell":"bash","os":"linux"}
+{"text":"adres ip w sieci lokalnej","intent":"ip_addresses","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"pokaż moje adresy IP","intent":"ip_addresses","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"jaki adres ma wlan0","intent":"ip_addresses","lang":"pl","shell":"bash","os":"linux"}
+{"text":"ipconfig, pokaz moj adres","intent":"ip_addresses","lang":"pl","shell":"cmd","os":"win32"}
+{"text":"adresy ip na wszystkich kartach sieciowych","intent":"ip_addresses","lang":"pl","shell":"bash","os":"linux"}
+{"text":"what's my public ip","intent":"public_ip","lang":"en","shell":"bash","os":"linux"}
+{"text":"show my external ip address","intent":"public_ip","lang":"en","shell":"bash","os":"linux"}
+{"text":"what ip do i have on the internet","intent":"public_ip","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"what is my public IP address","intent":"public_ip","lang":"en","shell":"powershell","os":"win32"}
+{"text":"show external ip","intent":"public_ip","lang":"en","shell":"powershell","os":"win32"}
+{"text":"which ip do websites see me as","intent":"public_ip","lang":"en","shell":"bash","os":"linux"}
+{"text":"wan ip","intent":"public_ip","lang":"en","shell":"fish","os":"linux"}
+{"text":"jaki mam publiczny adres ip","intent":"public_ip","lang":"pl","shell":"bash","os":"linux"}
+{"text":"pokaż zewnętrzne IP","intent":"public_ip","lang":"pl","shell":"bash","os":"linux"}
+{"text":"jakie mam ip w internecie","intent":"public_ip","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"sprawdź mój publiczny adres IP","intent":"public_ip","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"z jakiego ip wychodze na swiat","intent":"public_ip","lang":"pl","shell":"bash","os":"linux"}
+{"text":"zewnetrzny adres ip","intent":"public_ip","lang":"pl","shell":"cmd","os":"win32"}
+{"text":"jakie IP widzą strony gdy wchodzę","intent":"public_ip","lang":"pl","shell":"bash","os":"linux"}
+{"text":"ping google.com","intent":"ping_host","lang":"en","shell":"bash","os":"linux"}
+{"text":"ping 10.0.0.12 five times","intent":"ping_host","lang":"en","shell":"bash","os":"linux"}
+{"text":"is 192.168.1.1 reachable? ping it","intent":"ping_host","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"Test-Connection github.com","intent":"ping_host","lang":"en","shell":"powershell","os":"win32"}
+{"text":"ping db01.corp.local 4 times","intent":"ping_host","lang":"en","shell":"powershell","os":"win32"}
+{"text":"can i reach api.example.org, ping 3 times","intent":"ping_host","lang":"en","shell":"bash","os":"linux"}
+{"text":"ping 8.8.8.8","intent":"ping_host","lang":"en","shell":"sh","os":"linux"}
+{"text":"pingnij onet.pl","intent":"ping_host","lang":"pl","shell":"bash","os":"linux"}
+{"text":"zrob ping do 10.1.2.3 10 razy","intent":"ping_host","lang":"pl","shell":"bash","os":"linux"}
+{"text":"sprawdź pingiem czy router 192.168.0.1 odpowiada","intent":"ping_host","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"pinguj serwer fs01.firma.local","intent":"ping_host","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"ping na 1.1.1.1","intent":"ping_host","lang":"pl","shell":"bash","os":"linux"}
+{"text":"pingnij nas.local 5 razy","intent":"ping_host","lang":"pl","shell":"fish","os":"linux"}
+{"text":"ping wp.pl","intent":"ping_host","lang":"pl","shell":"cmd","os":"win32"}
+{"text":"resolve example.com","intent":"dns_lookup","lang":"en","shell":"bash","os":"linux"}
+{"text":"dns lookup for api.stripe.com","intent":"dns_lookup","lang":"en","shell":"bash","os":"linux"}
+{"text":"what ip does github.com resolve to","intent":"dns_lookup","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"Resolve-DnsName microsoft.com","intent":"dns_lookup","lang":"en","shell":"powershell","os":"win32"}
+{"text":"nslookup intranet.corp.local","intent":"dns_lookup","lang":"en","shell":"powershell","os":"win32"}
+{"text":"dig mail.wearfits.com","intent":"dns_lookup","lang":"en","shell":"bash","os":"linux"}
+{"text":"resolve gitlab.com","intent":"dns_lookup","lang":"en","shell":"fish","os":"linux"}
+{"text":"rozwiąż dns dla allegro.pl","intent":"dns_lookup","lang":"pl","shell":"bash","os":"linux"}
+{"text":"na jakie ip wskazuje domena example.org","intent":"dns_lookup","lang":"pl","shell":"bash","os":"linux"}
+{"text":"sprawdz dns dla api.github.com","intent":"dns_lookup","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"jaki adres ma domena intranet.firma.pl","intent":"dns_lookup","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"zrob dig na cdn.jsdelivr.net","intent":"dns_lookup","lang":"pl","shell":"bash","os":"linux"}
+{"text":"nslookup onet.pl","intent":"dns_lookup","lang":"pl","shell":"sh","os":"linux"}
+{"text":"sprawdz rekord A dla shop.mojsklep.pl","intent":"dns_lookup","lang":"pl","shell":"bash","os":"linux"}
+{"text":"traceroute to google.com","intent":"traceroute","lang":"en","shell":"bash","os":"linux"}
+{"text":"trace the route to 8.8.8.8","intent":"traceroute","lang":"en","shell":"bash","os":"linux"}
+{"text":"show network hops to github.com","intent":"traceroute","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"tracert cloudflare.com","intent":"traceroute","lang":"en","shell":"powershell","os":"win32"}
+{"text":"Test-NetConnection 1.1.1.1 -TraceRoute","intent":"traceroute","lang":"en","shell":"powershell","os":"win32"}
+{"text":"where does traffic to api.example.com get lost, trace it","intent":"traceroute","lang":"en","shell":"bash","os":"linux"}
+{"text":"traceroute 10.20.0.1","intent":"traceroute","lang":"en","shell":"sh","os":"linux"}
+{"text":"traceroute do onet.pl","intent":"traceroute","lang":"pl","shell":"bash","os":"linux"}
+{"text":"pokaż trasę pakietów do 8.8.4.4","intent":"traceroute","lang":"pl","shell":"bash","os":"linux"}
+{"text":"przez jakie hopy idzie ruch do github.com","intent":"traceroute","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"tracert do serwera vpn.firma.pl","intent":"traceroute","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"sledz trase do 192.168.10.1","intent":"traceroute","lang":"pl","shell":"bash","os":"linux"}
+{"text":"tracert wp.pl","intent":"traceroute","lang":"pl","shell":"cmd","os":"win32"}
+{"text":"gdzie gubią się pakiety do db.example.net","intent":"traceroute","lang":"pl","shell":"bash","os":"linux"}
+{"text":"show routing table","intent":"routes","lang":"en","shell":"bash","os":"linux"}
+{"text":"what's my default gateway","intent":"routes","lang":"en","shell":"bash","os":"linux"}
+{"text":"show the routes on this mac","intent":"routes","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"Get-NetRoute","intent":"routes","lang":"en","shell":"powershell","os":"win32"}
+{"text":"route print","intent":"routes","lang":"en","shell":"powershell","os":"win32"}
+{"text":"which gateway is the traffic going through","intent":"routes","lang":"en","shell":"bash","os":"linux"}
+{"text":"ip route","intent":"routes","lang":"en","shell":"sh","os":"linux"}
+{"text":"pokaż tablicę routingu","intent":"routes","lang":"pl","shell":"bash","os":"linux"}
+{"text":"jaka jest brama domyslna","intent":"routes","lang":"pl","shell":"bash","os":"linux"}
+{"text":"tablica tras","intent":"routes","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"pokaż trasy sieciowe","intent":"routes","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"przez jaki gateway idzie ruch","intent":"routes","lang":"pl","shell":"bash","os":"linux"}
+{"text":"routing table","intent":"routes","lang":"pl","shell":"fish","os":"linux"}
+{"text":"route print, brama domyślna","intent":"routes","lang":"pl","shell":"cmd","os":"win32"}
+{"text":"is port 443 open on example.com","intent":"port_check","lang":"en","shell":"bash","os":"linux"}
+{"text":"check if 10.0.0.5 port 22 is reachable","intent":"port_check","lang":"en","shell":"bash","os":"linux"}
+{"text":"can i connect to db.internal on 5432","intent":"port_check","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"Test-NetConnection sql01 -Port 1433","intent":"port_check","lang":"en","shell":"powershell","os":"win32"}
+{"text":"is port 3389 open on 192.168.1.50","intent":"port_check","lang":"en","shell":"powershell","os":"win32"}
+{"text":"nc -zv redis.local 6379","intent":"port_check","lang":"en","shell":"bash","os":"linux"}
+{"text":"check port 80 on 172.16.0.4","intent":"port_check","lang":"en","shell":"sh","os":"linux"}
+{"text":"czy port 22 na serwerze 10.0.0.7 jest otwarty","intent":"port_check","lang":"pl","shell":"bash","os":"linux"}
+{"text":"sprawdz czy dziala port 443 na google.com","intent":"port_check","lang":"pl","shell":"bash","os":"linux"}
+{"text":"czy da sie polaczyc z db.local na porcie 3306","intent":"port_check","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"sprawdź port 1433 na sql02.firma.local","intent":"port_check","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"czy zdalny port 8080 na 192.168.1.20 odpowiada","intent":"port_check","lang":"pl","shell":"bash","os":"linux"}
+{"text":"czy otwarty port 25 na mail.example.pl","intent":"port_check","lang":"pl","shell":"fish","os":"linux"}
+{"text":"sprawdz czy na 10.1.1.1 jest otwarty port 21","intent":"port_check","lang":"pl","shell":"cmd","os":"win32"}
+{"text":"show http headers of https://example.com","intent":"curl_headers","lang":"en","shell":"bash","os":"linux"}
+{"text":"get response headers for api.github.com","intent":"curl_headers","lang":"en","shell":"bash","os":"linux"}
+{"text":"curl -I https://wearfits.com","intent":"curl_headers","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"show headers returned by https://microsoft.com","intent":"curl_headers","lang":"en","shell":"powershell","os":"win32"}
+{"text":"Invoke-WebRequest -Method Head https://bing.com headers","intent":"curl_headers","lang":"en","shell":"powershell","os":"win32"}
+{"text":"what headers does https://cdn.example.org/app.js return","intent":"curl_headers","lang":"en","shell":"bash","os":"linux"}
+{"text":"headers of https://httpbin.org/get","intent":"curl_headers","lang":"en","shell":"fish","os":"linux"}
+{"text":"pokaż nagłówki http dla https://onet.pl","intent":"curl_headers","lang":"pl","shell":"bash","os":"linux"}
+{"text":"jakie naglowki zwraca https://api.example.pl","intent":"curl_headers","lang":"pl","shell":"bash","os":"linux"}
+{"text":"nagłówki odpowiedzi z https://allegro.pl","intent":"curl_headers","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"pokaż nagłówki HTTP strony https://firma.pl","intent":"curl_headers","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"sprawdz czy https://shop.pl zwraca cache-control w naglowkach","intent":"curl_headers","lang":"pl","shell":"bash","os":"linux"}
+{"text":"naglowki https://example.com","intent":"curl_headers","lang":"pl","shell":"sh","os":"linux"}
+{"text":"pokaz naglowki odpowiedzi https://wp.pl","intent":"curl_headers","lang":"pl","shell":"cmd","os":"win32"}
+{"text":"what status code does https://example.com return","intent":"http_status","lang":"en","shell":"bash","os":"linux"}
+{"text":"http status of https://api.example.com/health","intent":"http_status","lang":"en","shell":"bash","os":"linux"}
+{"text":"is https://wearfits.com returning 200?","intent":"http_status","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"status code of https://intranet.corp.local","intent":"http_status","lang":"en","shell":"powershell","os":"win32"}
+{"text":"check http code for https://github.com","intent":"http_status","lang":"en","shell":"powershell","os":"win32"}
+{"text":"does https://old.example.org give a 404","intent":"http_status","lang":"en","shell":"bash","os":"linux"}
+{"text":"http code https://localhost:8080/ready","intent":"http_status","lang":"en","shell":"sh","os":"linux"}
+{"text":"jaki kod http zwraca https://onet.pl","intent":"http_status","lang":"pl","shell":"bash","os":"linux"}
+{"text":"sprawdz status http dla https://api.mojapp.pl/health","intent":"http_status","lang":"pl","shell":"bash","os":"linux"}
+{"text":"czy https://sklep.pl zwraca 200","intent":"http_status","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"kod odpowiedzi HTTP z https://portal.firma.pl","intent":"http_status","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"jaki status ma endpoint https://localhost:3000/api","intent":"http_status","lang":"pl","shell":"bash","os":"linux"}
+{"text":"kod statusu https://example.pl","intent":"http_status","lang":"pl","shell":"fish","os":"linux"}
+{"text":"czy https://stara.strona.pl daje 500?","intent":"http_status","lang":"pl","shell":"bash","os":"linux"}
+{"text":"download https://example.com/file.tar.gz","intent":"download_file","lang":"en","shell":"bash","os":"linux"}
+{"text":"fetch https://releases.example.org/v2.1/app.zip","intent":"download_file","lang":"en","shell":"bash","os":"linux"}
+{"text":"grab https://nodejs.org/dist/v20.11.0/node-v20.11.0.pkg","intent":"download_file","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"Invoke-WebRequest https://aka.ms/vs/17/release/vs_community.exe -OutFile vs.exe","intent":"download_file","lang":"en","shell":"powershell","os":"win32"}
+{"text":"download https://download.example.com/setup.msi","intent":"download_file","lang":"en","shell":"powershell","os":"win32"}
+{"text":"save https://raw.githubusercontent.com/user/repo/main/install.sh locally","intent":"download_file","lang":"en","shell":"bash","os":"linux"}
+{"text":"download https://example.com/data.csv","intent":"download_file","lang":"en","shell":"cmd","os":"win32"}
+{"text":"pobierz plik https://example.com/backup.sql.gz","intent":"download_file","lang":"pl","shell":"bash","os":"linux"}
+{"text":"ściągnij https://cdn.example.pl/obraz.iso","intent":"download_file","lang":"pl","shell":"bash","os":"linux"}
+{"text":"pobierz https://github.com/user/app/releases/download/v1.0/app.dmg","intent":"download_file","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"pobierz plik https://firma.pl/instalator.exe","intent":"download_file","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"sciagnij mi ten plik https://data.gov.pl/dane.csv","intent":"download_file","lang":"pl","shell":"bash","os":"linux"}
+{"text":"pobierz https://example.org/a.txt","intent":"download_file","lang":"pl","shell":"sh","os":"linux"}
+{"text":"zapisz na dysk https://files.example.net/model.bin","intent":"download_file","lang":"pl","shell":"bash","os":"linux"}
+{"text":"ssh into deploy@10.0.0.5","intent":"ssh_connect","lang":"en","shell":"bash","os":"linux"}
+{"text":"connect to web01.example.com over ssh","intent":"ssh_connect","lang":"en","shell":"bash","os":"linux"}
+{"text":"ssh to pi@raspberrypi.local","intent":"ssh_connect","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"ssh admin@192.168.1.10","intent":"ssh_connect","lang":"en","shell":"powershell","os":"win32"}
+{"text":"connect to the server ubuntu@ec2-3-12-4-5.compute.amazonaws.com","intent":"ssh_connect","lang":"en","shell":"powershell","os":"win32"}
+{"text":"log into root@vps.mydomain.io","intent":"ssh_connect","lang":"en","shell":"bash","os":"linux"}
+{"text":"ssh git@build-server","intent":"ssh_connect","lang":"en","shell":"fish","os":"linux"}
+{"text":"połącz się przez ssh z admin@10.1.1.20","intent":"ssh_connect","lang":"pl","shell":"bash","os":"linux"}
+{"text":"zaloguj sie na serwer ubuntu@51.68.10.3","intent":"ssh_connect","lang":"pl","shell":"bash","os":"linux"}
+{"text":"ssh na pi@malina.local","intent":"ssh_connect","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"połącz się z serwerem deploy@app02.firma.pl przez ssh","intent":"ssh_connect","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"wejdz po ssh na root@backup.local","intent":"ssh_connect","lang":"pl","shell":"bash","os":"linux"}
+{"text":"ssh do user@192.168.0.40","intent":"ssh_connect","lang":"pl","shell":"cmd","os":"win32"}
+{"text":"podłącz się do jump.example.com","intent":"ssh_connect","lang":"pl","shell":"bash","os":"linux"}
+{"text":"git status","intent":"git_status","lang":"en","shell":"bash","os":"linux"}
+{"text":"what files have i changed","intent":"git_status","lang":"en","shell":"bash","os":"linux"}
+{"text":"show working tree status","intent":"git_status","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"what's the state of my repo","intent":"git_status","lang":"en","shell":"powershell","os":"win32"}
+{"text":"any uncommitted changes in C:\\src\\api?","intent":"git_status","lang":"en","shell":"powershell","os":"win32"}
+{"text":"which files are modified or untracked","intent":"git_status","lang":"en","shell":"bash","os":"linux"}
+{"text":"repo status","intent":"git_status","lang":"en","shell":"fish","os":"linux"}
+{"text":"status gita","intent":"git_status","lang":"pl","shell":"bash","os":"linux"}
+{"text":"jakie pliki zmieniłem","intent":"git_status","lang":"pl","shell":"bash","os":"linux"}
+{"text":"pokaż stan repozytorium","intent":"git_status","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"co jest niezacommitowane","intent":"git_status","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"czy mam jakies zmiany w repo","intent":"git_status","lang":"pl","shell":"bash","os":"linux"}
+{"text":"git status pls","intent":"git_status","lang":"pl","shell":"sh","os":"linux"}
+{"text":"pokaz zmodyfikowane i nieśledzone pliki","intent":"git_status","lang":"pl","shell":"bash","os":"linux"}
+{"text":"show recent commits","intent":"git_log","lang":"en","shell":"bash","os":"linux"}
+{"text":"git log last 20","intent":"git_log","lang":"en","shell":"bash","os":"linux"}
+{"text":"last 5 commits as a graph","intent":"git_log","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"show commit history","intent":"git_log","lang":"en","shell":"powershell","os":"win32"}
+{"text":"what were the last 10 commits","intent":"git_log","lang":"en","shell":"powershell","os":"win32"}
+{"text":"show the recent history of this repo","intent":"git_log","lang":"en","shell":"bash","os":"linux"}
+{"text":"git log oneline","intent":"git_log","lang":"en","shell":"sh","os":"linux"}
+{"text":"ostatnie commity","intent":"git_log","lang":"pl","shell":"bash","os":"linux"}
+{"text":"pokaż historię commitów","intent":"git_log","lang":"pl","shell":"bash","os":"linux"}
+{"text":"daj 15 ostatnich commitow","intent":"git_log","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"pokaż log gita","intent":"git_log","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"co ostatnio commitowano","intent":"git_log","lang":"pl","shell":"bash","os":"linux"}
+{"text":"historia commitów","intent":"git_log","lang":"pl","shell":"cmd","os":"win32"}
+{"text":"graf ostatnich 30 commitów","intent":"git_log","lang":"pl","shell":"bash","os":"linux"}
+{"text":"show my unstaged changes","intent":"git_diff","lang":"en","shell":"bash","os":"linux"}
+{"text":"git diff","intent":"git_diff","lang":"en","shell":"bash","os":"linux"}
+{"text":"what changed in src/app.ts","intent":"git_diff","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"diff of README.md","intent":"git_diff","lang":"en","shell":"powershell","os":"win32"}
+{"text":"show uncommitted diff","intent":"git_diff","lang":"en","shell":"powershell","os":"win32"}
+{"text":"what did i change but not staged yet","intent":"git_diff","lang":"en","shell":"bash","os":"linux"}
+{"text":"diff for lib/utils.py","intent":"git_diff","lang":"en","shell":"fish","os":"linux"}
+{"text":"pokaż różnice w niezastage'owanych plikach","intent":"git_diff","lang":"pl","shell":"bash","os":"linux"}
+{"text":"co sie zmienilo w pliku index.js","intent":"git_diff","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"pokaż diff pliku config.json","intent":"git_diff","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"jakie zmiany nie są jeszcze w stage","intent":"git_diff","lang":"pl","shell":"bash","os":"linux"}
+{"text":"pokaz diff","intent":"git_diff","lang":"pl","shell":"sh","os":"linux"}
+{"text":"różnice w src/main.go","intent":"git_diff","lang":"pl","shell":"bash","os":"linux"}
+{"text":"show staged changes","intent":"git_diff_staged","lang":"en","shell":"bash","os":"linux"}
+{"text":"git diff --cached","intent":"git_diff_staged","lang":"en","shell":"bash","os":"linux"}
+{"text":"what am i about to commit","intent":"git_diff_staged","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"show the staged diff","intent":"git_diff_staged","lang":"en","shell":"powershell","os":"win32"}
+{"text":"diff of staged files","intent":"git_diff_staged","lang":"en","shell":"powershell","os":"win32"}
+{"text":"what's in the index right now","intent":"git_diff_staged","lang":"en","shell":"bash","os":"linux"}
+{"text":"staged diff","intent":"git_diff_staged","lang":"en","shell":"sh","os":"linux"}
+{"text":"pokaż zmiany w stage","intent":"git_diff_staged","lang":"pl","shell":"bash","os":"linux"}
+{"text":"co jest dodane do commita","intent":"git_diff_staged","lang":"pl","shell":"bash","os":"linux"}
+{"text":"diff staged","intent":"git_diff_staged","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"pokaż zastage'owane różnice","intent":"git_diff_staged","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"co wejdzie do następnego commita","intent":"git_diff_staged","lang":"pl","shell":"bash","os":"linux"}
+{"text":"diff z indeksu","intent":"git_diff_staged","lang":"pl","shell":"fish","os":"linux"}
+{"text":"pokaz diff tego co juz dodalem git addem","intent":"git_diff_staged","lang":"pl","shell":"bash","os":"linux"}
+{"text":"list git branches","intent":"git_branches","lang":"en","shell":"bash","os":"linux"}
+{"text":"show all branches including remote","intent":"git_branches","lang":"en","shell":"bash","os":"linux"}
+{"text":"what branches exist","intent":"git_branches","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"list branches in this repo","intent":"git_branches","lang":"en","shell":"powershell","os":"win32"}
+{"text":"git branch -a","intent":"git_branches","lang":"en","shell":"powershell","os":"win32"}
+{"text":"which branches are there on origin","intent":"git_branches","lang":"en","shell":"bash","os":"linux"}
+{"text":"branches","intent":"git_branches","lang":"en","shell":"sh","os":"linux"}
+{"text":"lista gałęzi","intent":"git_branches","lang":"pl","shell":"bash","os":"linux"}
+{"text":"pokaż wszystkie branche","intent":"git_branches","lang":"pl","shell":"bash","os":"linux"}
+{"text":"jakie mam branche lokalnie i na remote","intent":"git_branches","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"wylistuj gałęzie","intent":"git_branches","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"pokaz galezie","intent":"git_branches","lang":"pl","shell":"bash","os":"linux"}
+{"text":"wszystkie branche","intent":"git_branches","lang":"pl","shell":"fish","os":"linux"}
+{"text":"lista branchy","intent":"git_branches","lang":"pl","shell":"cmd","os":"win32"}
+{"text":"which branch am i on","intent":"git_current_branch","lang":"en","shell":"bash","os":"linux"}
+{"text":"current git branch","intent":"git_current_branch","lang":"en","shell":"bash","os":"linux"}
+{"text":"what's the name of this branch","intent":"git_current_branch","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"show current branch","intent":"git_current_branch","lang":"en","shell":"powershell","os":"win32"}
+{"text":"what branch is checked out","intent":"git_current_branch","lang":"en","shell":"powershell","os":"win32"}
+{"text":"am i on main or develop?","intent":"git_current_branch","lang":"en","shell":"bash","os":"linux"}
+{"text":"current branch?","intent":"git_current_branch","lang":"en","shell":"fish","os":"linux"}
+{"text":"na jakim branchu jestem","intent":"git_current_branch","lang":"pl","shell":"bash","os":"linux"}
+{"text":"jaka jest aktualna gałąź","intent":"git_current_branch","lang":"pl","shell":"bash","os":"linux"}
+{"text":"nazwa bieżącego brancha","intent":"git_current_branch","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"na której gałęzi jestem","intent":"git_current_branch","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"czy jestem na mainie?","intent":"git_current_branch","lang":"pl","shell":"bash","os":"linux"}
+{"text":"obecny branch","intent":"git_current_branch","lang":"pl","shell":"sh","os":"linux"}
+{"text":"pokaz aktualny branch","intent":"git_current_branch","lang":"pl","shell":"bash","os":"linux"}
+{"text":"create a new branch feature/login","intent":"git_new_branch","lang":"en","shell":"bash","os":"linux"}
+{"text":"make branch fix/null-pointer and switch to it","intent":"git_new_branch","lang":"en","shell":"bash","os":"linux"}
+{"text":"new branch called release-2.3","intent":"git_new_branch","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"create branch hotfix/payment","intent":"git_new_branch","lang":"en","shell":"powershell","os":"win32"}
+{"text":"git checkout -b chore/deps","intent":"git_new_branch","lang":"en","shell":"powershell","os":"win32"}
+{"text":"start a new branch experiment-cache","intent":"git_new_branch","lang":"en","shell":"bash","os":"linux"}
+{"text":"create branch docs-update","intent":"git_new_branch","lang":"en","shell":"sh","os":"linux"}
+{"text":"utwórz nowy branch feature/koszyk","intent":"git_new_branch","lang":"pl","shell":"bash","os":"linux"}
+{"text":"zrob nowa galaz bugfix/logowanie i przelacz sie","intent":"git_new_branch","lang":"pl","shell":"bash","os":"linux"}
+{"text":"stworz brancha release/1.4","intent":"git_new_branch","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"nowa gałąź hotfix/faktury","intent":"git_new_branch","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"załóż branch refactor-api","intent":"git_new_branch","lang":"pl","shell":"bash","os":"linux"}
+{"text":"nowy branch test/e2e","intent":"git_new_branch","lang":"pl","shell":"fish","os":"linux"}
+{"text":"zrob galaz feature/eksport-csv","intent":"git_new_branch","lang":"pl","shell":"bash","os":"linux"}
+{"text":"switch to develop","intent":"git_switch_branch","lang":"en","shell":"bash","os":"linux"}
+{"text":"checkout main","intent":"git_switch_branch","lang":"en","shell":"bash","os":"linux"}
+{"text":"go to the branch feature/search","intent":"git_switch_branch","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"switch to branch release/2.0","intent":"git_switch_branch","lang":"en","shell":"powershell","os":"win32"}
+{"text":"git checkout staging","intent":"git_switch_branch","lang":"en","shell":"powershell","os":"win32"}
+{"text":"change branch to fix/typo","intent":"git_switch_branch","lang":"en","shell":"bash","os":"linux"}
+{"text":"checkout develop branch","intent":"git_switch_branch","lang":"en","shell":"cmd","os":"win32"}
+{"text":"przełącz się na develop","intent":"git_switch_branch","lang":"pl","shell":"bash","os":"linux"}
+{"text":"zmien branch na main","intent":"git_switch_branch","lang":"pl","shell":"bash","os":"linux"}
+{"text":"przejdz na galaz feature/platnosci","intent":"git_switch_branch","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"przełącz na gałąź staging","intent":"git_switch_branch","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"checkoutnij release/3.1","intent":"git_switch_branch","lang":"pl","shell":"bash","os":"linux"}
+{"text":"przelacz na master","intent":"git_switch_branch","lang":"pl","shell":"sh","os":"linux"}
+{"text":"wróć na brancha dev","intent":"git_switch_branch","lang":"pl","shell":"bash","os":"linux"}
+{"text":"delete branch feature/old-ui","intent":"git_delete_branch","lang":"en","shell":"bash","os":"linux"}
+{"text":"remove the local branch fix/temp","intent":"git_delete_branch","lang":"en","shell":"bash","os":"linux"}
+{"text":"delete branch experiment","intent":"git_delete_branch","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"git branch -d hotfix/123","intent":"git_delete_branch","lang":"en","shell":"powershell","os":"win32"}
+{"text":"remove local branch spike-graphql","intent":"git_delete_branch","lang":"en","shell":"powershell","os":"win32"}
+{"text":"get rid of the merged branch release/1.0","intent":"git_delete_branch","lang":"en","shell":"bash","os":"linux"}
+{"text":"delete local branch tmp","intent":"git_delete_branch","lang":"en","shell":"fish","os":"linux"}
+{"text":"usuń brancha feature/stary-koszyk","intent":"git_delete_branch","lang":"pl","shell":"bash","os":"linux"}
+{"text":"skasuj galaz test-ci","intent":"git_delete_branch","lang":"pl","shell":"bash","os":"linux"}
+{"text":"usun lokalny branch bugfix/42","intent":"git_delete_branch","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"usuń gałąź hotfix/vat","intent":"git_delete_branch","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"wywal brancha experiment-redis","intent":"git_delete_branch","lang":"pl","shell":"bash","os":"linux"}
+{"text":"usun branch old","intent":"git_delete_branch","lang":"pl","shell":"sh","os":"linux"}
+{"text":"skasuj zmergowany branch release/2.2","intent":"git_delete_branch","lang":"pl","shell":"bash","os":"linux"}
+{"text":"undo the last commit but keep my changes","intent":"git_undo_commit","lang":"en","shell":"bash","os":"linux"}
+{"text":"revert last commit softly","intent":"git_undo_commit","lang":"en","shell":"bash","os":"linux"}
+{"text":"uncommit the latest commit","intent":"git_undo_commit","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"undo my last commit","intent":"git_undo_commit","lang":"en","shell":"powershell","os":"win32"}
+{"text":"git reset --soft HEAD~1","intent":"git_undo_commit","lang":"en","shell":"powershell","os":"win32"}
+{"text":"i committed too early, undo it but keep files","intent":"git_undo_commit","lang":"en","shell":"bash","os":"linux"}
+{"text":"undo last commit","intent":"git_undo_commit","lang":"en","shell":"sh","os":"linux"}
+{"text":"cofnij ostatni commit ale zostaw zmiany","intent":"git_undo_commit","lang":"pl","shell":"bash","os":"linux"}
+{"text":"odkomituj ostatni commit","intent":"git_undo_commit","lang":"pl","shell":"bash","os":"linux"}
+{"text":"cofnij commita, zmiany zostaw","intent":"git_undo_commit","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"wycofaj ostatni commit zachowując zmiany","intent":"git_undo_commit","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"za wczesnie zrobilem commit, cofnij go","intent":"git_undo_commit","lang":"pl","shell":"bash","os":"linux"}
+{"text":"undo ostatniego commita","intent":"git_undo_commit","lang":"pl","shell":"fish","os":"linux"}
+{"text":"soft reset o jeden commit","intent":"git_undo_commit","lang":"pl","shell":"bash","os":"linux"}
+{"text":"discard all my uncommitted changes","intent":"git_discard_changes","lang":"en","shell":"bash","os":"linux"}
+{"text":"throw away changes to src/config.js","intent":"git_discard_changes","lang":"en","shell":"bash","os":"linux"}
+{"text":"revert local modifications","intent":"git_discard_changes","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"discard changes in app.py","intent":"git_discard_changes","lang":"en","shell":"powershell","os":"win32"}
+{"text":"undo all local edits","intent":"git_discard_changes","lang":"en","shell":"powershell","os":"win32"}
+{"text":"reset the file Makefile to the last commit","intent":"git_discard_changes","lang":"en","shell":"bash","os":"linux"}
+{"text":"discard changes","intent":"git_discard_changes","lang":"en","shell":"cmd","os":"win32"}
+{"text":"odrzuć wszystkie niezacommitowane zmiany","intent":"git_discard_changes","lang":"pl","shell":"bash","os":"linux"}
+{"text":"wycofaj zmiany w pliku index.html","intent":"git_discard_changes","lang":"pl","shell":"bash","os":"linux"}
+{"text":"porzuc lokalne zmiany","intent":"git_discard_changes","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"przywróć plik settings.json do ostatniego commita","intent":"git_discard_changes","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"wywal moje zmiany w repo","intent":"git_discard_changes","lang":"pl","shell":"bash","os":"linux"}
+{"text":"odrzuc zmiany","intent":"git_discard_changes","lang":"pl","shell":"sh","os":"linux"}
+{"text":"cofnij edycje w pliku README.md","intent":"git_discard_changes","lang":"pl","shell":"bash","os":"linux"}
+{"text":"stash my changes","intent":"git_stash","lang":"en","shell":"bash","os":"linux"}
+{"text":"git stash","intent":"git_stash","lang":"en","shell":"bash","os":"linux"}
+{"text":"put my work aside temporarily","intent":"git_stash","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"stash current changes","intent":"git_stash","lang":"en","shell":"powershell","os":"win32"}
+{"text":"save uncommitted work to stash","intent":"git_stash","lang":"en","shell":"powershell","os":"win32"}
+{"text":"shelve these changes for now","intent":"git_stash","lang":"en","shell":"bash","os":"linux"}
+{"text":"stash","intent":"git_stash","lang":"en","shell":"fish","os":"linux"}
+{"text":"schowaj zmiany do stasha","intent":"git_stash","lang":"pl","shell":"bash","os":"linux"}
+{"text":"zrób git stash","intent":"git_stash","lang":"pl","shell":"bash","os":"linux"}
+{"text":"odłóż zmiany na bok","intent":"git_stash","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"stashnij zmiany","intent":"git_stash","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"zachowaj tymczasowo moje zmiany w schowku","intent":"git_stash","lang":"pl","shell":"bash","os":"linux"}
+{"text":"stash zmian","intent":"git_stash","lang":"pl","shell":"sh","os":"linux"}
+{"text":"wrzuc zmiany do stash","intent":"git_stash","lang":"pl","shell":"bash","os":"linux"}
+{"text":"pop the stash","intent":"git_stash_pop","lang":"en","shell":"bash","os":"linux"}
+{"text":"restore my stashed changes","intent":"git_stash_pop","lang":"en","shell":"bash","os":"linux"}
+{"text":"bring back stashed work","intent":"git_stash_pop","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"git stash pop","intent":"git_stash_pop","lang":"en","shell":"powershell","os":"win32"}
+{"text":"apply and drop latest stash","intent":"git_stash_pop","lang":"en","shell":"powershell","os":"win32"}
+{"text":"unstash","intent":"git_stash_pop","lang":"en","shell":"bash","os":"linux"}
+{"text":"stash pop","intent":"git_stash_pop","lang":"en","shell":"sh","os":"linux"}
+{"text":"przywróć zmiany ze stasha","intent":"git_stash_pop","lang":"pl","shell":"bash","os":"linux"}
+{"text":"zrob stash pop","intent":"git_stash_pop","lang":"pl","shell":"bash","os":"linux"}
+{"text":"wyciagnij zmiany ze schowka","intent":"git_stash_pop","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"odzyskaj zestashowane zmiany","intent":"git_stash_pop","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"unstashnij","intent":"git_stash_pop","lang":"pl","shell":"bash","os":"linux"}
+{"text":"pop stasha","intent":"git_stash_pop","lang":"pl","shell":"fish","os":"linux"}
+{"text":"przywroc ostatni stash","intent":"git_stash_pop","lang":"pl","shell":"bash","os":"linux"}
+{"text":"pull latest changes","intent":"git_pull","lang":"en","shell":"bash","os":"linux"}
+{"text":"git pull","intent":"git_pull","lang":"en","shell":"bash","os":"linux"}
+{"text":"update my branch from origin","intent":"git_pull","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"get the newest commits from the remote","intent":"git_pull","lang":"en","shell":"powershell","os":"win32"}
+{"text":"sync with remote (pull)","intent":"git_pull","lang":"en","shell":"powershell","os":"win32"}
+{"text":"bring my local copy up to date with the server","intent":"git_pull","lang":"en","shell":"bash","os":"linux"}
+{"text":"pull from remote","intent":"git_pull","lang":"en","shell":"sh","os":"linux"}
+{"text":"ściągnij zmiany z repo","intent":"git_pull","lang":"pl","shell":"bash","os":"linux"}
+{"text":"zrob pulla","intent":"git_pull","lang":"pl","shell":"bash","os":"linux"}
+{"text":"pobierz najnowsze zmiany z origin","intent":"git_pull","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"zaktualizuj repo z remote","intent":"git_pull","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"pullnij","intent":"git_pull","lang":"pl","shell":"bash","os":"linux"}
+{"text":"zsynchronizuj z originem, pull","intent":"git_pull","lang":"pl","shell":"fish","os":"linux"}
+{"text":"pobierz zmiany kolegow z serwera","intent":"git_pull","lang":"pl","shell":"bash","os":"linux"}
+{"text":"push my commits","intent":"git_push","lang":"en","shell":"bash","os":"linux"}
+{"text":"git push origin feature/login","intent":"git_push","lang":"en","shell":"bash","os":"linux"}
+{"text":"upload my changes to the remote","intent":"git_push","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"push to origin main","intent":"git_push","lang":"en","shell":"powershell","os":"win32"}
+{"text":"send my local commits to github","intent":"git_push","lang":"en","shell":"powershell","os":"win32"}
+{"text":"push branch hotfix/42","intent":"git_push","lang":"en","shell":"bash","os":"linux"}
+{"text":"push","intent":"git_push","lang":"en","shell":"fish","os":"linux"}
+{"text":"wypchnij zmiany","intent":"git_push","lang":"pl","shell":"bash","os":"linux"}
+{"text":"pushnij na origin develop","intent":"git_push","lang":"pl","shell":"bash","os":"linux"}
+{"text":"wyślij commity na serwer","intent":"git_push","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"wypchnij brancha release/2.0","intent":"git_push","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"zrób pusha","intent":"git_push","lang":"pl","shell":"bash","os":"linux"}
+{"text":"push na remote","intent":"git_push","lang":"pl","shell":"sh","os":"linux"}
+{"text":"wrzuc moje commity na githuba","intent":"git_push","lang":"pl","shell":"bash","os":"linux"}
+{"text":"clone https://github.com/torvalds/linux.git","intent":"git_clone","lang":"en","shell":"bash","os":"linux"}
+{"text":"git clone git@github.com:user/dotfiles.git","intent":"git_clone","lang":"en","shell":"bash","os":"linux"}
+{"text":"clone the repo https://gitlab.com/group/project","intent":"git_clone","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"clone https://github.com/microsoft/vscode","intent":"git_clone","lang":"en","shell":"powershell","os":"win32"}
+{"text":"download the repository https://github.com/org/api.git","intent":"git_clone","lang":"en","shell":"powershell","os":"win32"}
+{"text":"make a local copy of https://bitbucket.org/team/app.git","intent":"git_clone","lang":"en","shell":"bash","os":"linux"}
+{"text":"clone git@gitlab.com:me/infra.git","intent":"git_clone","lang":"en","shell":"sh","os":"linux"}
+{"text":"sklonuj https://github.com/user/projekt.git","intent":"git_clone","lang":"pl","shell":"bash","os":"linux"}
+{"text":"zrob clone repo git@github.com:firma/backend.git","intent":"git_clone","lang":"pl","shell":"bash","os":"linux"}
+{"text":"pobierz repozytorium https://gitlab.com/zespol/frontend","intent":"git_clone","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"sklonuj repo https://github.com/org/narzedzia","intent":"git_clone","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"klonuj https://github.com/fastapi/fastapi","intent":"git_clone","lang":"pl","shell":"bash","os":"linux"}
+{"text":"sklonuj https://github.com/user/skrypty.git","intent":"git_clone","lang":"pl","shell":"cmd","os":"win32"}
+{"text":"skopiuj lokalnie repo git@bitbucket.org:team/mobile.git","intent":"git_clone","lang":"pl","shell":"bash","os":"linux"}
+{"text":"stage all changes","intent":"git_add_all","lang":"en","shell":"bash","os":"linux"}
+{"text":"git add everything","intent":"git_add_all","lang":"en","shell":"bash","os":"linux"}
+{"text":"add all files to the index","intent":"git_add_all","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"stage everything","intent":"git_add_all","lang":"en","shell":"powershell","os":"win32"}
+{"text":"git add -A","intent":"git_add_all","lang":"en","shell":"powershell","os":"win32"}
+{"text":"add all modified and new files","intent":"git_add_all","lang":"en","shell":"bash","os":"linux"}
+{"text":"stage all","intent":"git_add_all","lang":"en","shell":"fish","os":"linux"}
+{"text":"dodaj wszystkie zmiany do stage","intent":"git_add_all","lang":"pl","shell":"bash","os":"linux"}
+{"text":"zrob git add wszystkiego","intent":"git_add_all","lang":"pl","shell":"bash","os":"linux"}
+{"text":"zastage'uj wszystko","intent":"git_add_all","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"dodaj wszystkie pliki do indeksu","intent":"git_add_all","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"git add all","intent":"git_add_all","lang":"pl","shell":"bash","os":"linux"}
+{"text":"stage wszystkich plikow","intent":"git_add_all","lang":"pl","shell":"sh","os":"linux"}
+{"text":"dodaj nowe i zmienione pliki","intent":"git_add_all","lang":"pl","shell":"bash","os":"linux"}
+{"text":"commit everything with message \"fix login bug\"","intent":"git_commit","lang":"en","shell":"bash","os":"linux"}
+{"text":"commit all changes as \"add tests\"","intent":"git_commit","lang":"en","shell":"bash","os":"linux"}
+{"text":"commit with message wip","intent":"git_commit","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"commit \"update readme\"","intent":"git_commit","lang":"en","shell":"powershell","os":"win32"}
+{"text":"make a commit \"bump version to 1.2.0\"","intent":"git_commit","lang":"en","shell":"powershell","os":"win32"}
+{"text":"save my work as a commit: refactor parser","intent":"git_commit","lang":"en","shell":"bash","os":"linux"}
+{"text":"commit all \"initial import\"","intent":"git_commit","lang":"en","shell":"cmd","os":"win32"}
+{"text":"zacommituj wszystko z opisem \"poprawka logowania\"","intent":"git_commit","lang":"pl","shell":"bash","os":"linux"}
+{"text":"zrob commit \"dodane testy\"","intent":"git_commit","lang":"pl","shell":"bash","os":"linux"}
+{"text":"commit z wiadomoscia \"wip\"","intent":"git_commit","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"zacommituj zmiany \"aktualizacja README\"","intent":"git_commit","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"zkomituj ze \"refaktor parsera\"","intent":"git_commit","lang":"pl","shell":"bash","os":"linux"}
+{"text":"commit \"fix literowki\"","intent":"git_commit","lang":"pl","shell":"fish","os":"linux"}
+{"text":"commituj z message \"nowa wersja API\"","intent":"git_commit","lang":"pl","shell":"bash","os":"linux"}
+{"text":"show git remotes","intent":"git_remote","lang":"en","shell":"bash","os":"linux"}
+{"text":"what's the origin url","intent":"git_remote","lang":"en","shell":"bash","os":"linux"}
+{"text":"list remotes with urls","intent":"git_remote","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"git remote -v","intent":"git_remote","lang":"en","shell":"powershell","os":"win32"}
+{"text":"which remote repositories are configured","intent":"git_remote","lang":"en","shell":"powershell","os":"win32"}
+{"text":"where does this repo push to","intent":"git_remote","lang":"en","shell":"bash","os":"linux"}
+{"text":"remotes","intent":"git_remote","lang":"en","shell":"sh","os":"linux"}
+{"text":"pokaż remote'y gita","intent":"git_remote","lang":"pl","shell":"bash","os":"linux"}
+{"text":"jaki jest adres origin","intent":"git_remote","lang":"pl","shell":"bash","os":"linux"}
+{"text":"lista zdalnych repozytoriow","intent":"git_remote","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"jakie remote są skonfigurowane","intent":"git_remote","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"gdzie wskazuje origin","intent":"git_remote","lang":"pl","shell":"bash","os":"linux"}
+{"text":"pokaz remote","intent":"git_remote","lang":"pl","shell":"cmd","os":"win32"}
+{"text":"url zdalnego repo","intent":"git_remote","lang":"pl","shell":"bash","os":"linux"}
+{"text":"git blame src/server.js","intent":"git_blame","lang":"en","shell":"bash","os":"linux"}
+{"text":"who changed each line of main.py","intent":"git_blame","lang":"en","shell":"bash","os":"linux"}
+{"text":"blame README.md","intent":"git_blame","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"who wrote the lines in app/Controller.cs","intent":"git_blame","lang":"en","shell":"powershell","os":"win32"}
+{"text":"show blame for package.json","intent":"git_blame","lang":"en","shell":"powershell","os":"win32"}
+{"text":"who last touched lines in lib/auth.rb","intent":"git_blame","lang":"en","shell":"bash","os":"linux"}
+{"text":"blame config.yaml","intent":"git_blame","lang":"en","shell":"fish","os":"linux"}
+{"text":"kto zmienial linie w pliku index.ts","intent":"git_blame","lang":"pl","shell":"bash","os":"linux"}
+{"text":"git blame na utils.go","intent":"git_blame","lang":"pl","shell":"bash","os":"linux"}
+{"text":"pokaz blame dla Dockerfile","intent":"git_blame","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"kto napisał poszczególne linie w Program.cs","intent":"git_blame","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"kto jest autorem linijek w routes.py","intent":"git_blame","lang":"pl","shell":"bash","os":"linux"}
+{"text":"blame Makefile","intent":"git_blame","lang":"pl","shell":"sh","os":"linux"}
+{"text":"sprawdz kto zepsul linie w src/db.js","intent":"git_blame","lang":"pl","shell":"bash","os":"linux"}
+{"text":"init a git repo here","intent":"git_init","lang":"en","shell":"bash","os":"linux"}
+{"text":"git init","intent":"git_init","lang":"en","shell":"bash","os":"linux"}
+{"text":"make this folder a git repository","intent":"git_init","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"initialize a new repository","intent":"git_init","lang":"en","shell":"powershell","os":"win32"}
+{"text":"create an empty git repo in this directory","intent":"git_init","lang":"en","shell":"powershell","os":"win32"}
+{"text":"start version control in this project","intent":"git_init","lang":"en","shell":"bash","os":"linux"}
+{"text":"init repo","intent":"git_init","lang":"en","shell":"sh","os":"linux"}
+{"text":"zainicjuj repozytorium gita","intent":"git_init","lang":"pl","shell":"bash","os":"linux"}
+{"text":"zrob git init","intent":"git_init","lang":"pl","shell":"bash","os":"linux"}
+{"text":"utworz nowe repo w tym katalogu","intent":"git_init","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"inicjalizuj repozytorium","intent":"git_init","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"niech ten folder bedzie repo gita","intent":"git_init","lang":"pl","shell":"bash","os":"linux"}
+{"text":"nowe repo git","intent":"git_init","lang":"pl","shell":"fish","os":"linux"}
+{"text":"stworz puste repozytorium tutaj","intent":"git_init","lang":"pl","shell":"bash","os":"linux"}
+{"text":"list running containers","intent":"docker_ps","lang":"en","shell":"bash","os":"linux"}
+{"text":"docker ps","intent":"docker_ps","lang":"en","shell":"bash","os":"linux"}
+{"text":"which containers are up","intent":"docker_ps","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"show running docker containers","intent":"docker_ps","lang":"en","shell":"powershell","os":"win32"}
+{"text":"what containers are running right now","intent":"docker_ps","lang":"en","shell":"powershell","os":"win32"}
+{"text":"is my postgres container running? list containers","intent":"docker_ps","lang":"en","shell":"bash","os":"linux"}
+{"text":"running containers","intent":"docker_ps","lang":"en","shell":"sh","os":"linux"}
+{"text":"lista działających kontenerów","intent":"docker_ps","lang":"pl","shell":"bash","os":"linux"}
+{"text":"jakie kontenery chodza","intent":"docker_ps","lang":"pl","shell":"bash","os":"linux"}
+{"text":"pokaz uruchomione kontenery","intent":"docker_ps","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"co mi teraz chodzi w dockerze","intent":"docker_ps","lang":"pl","shell":"bash","os":"linux"}
+{"text":"aktywne kontenery","intent":"docker_ps","lang":"pl","shell":"fish","os":"linux"}
+{"text":"pokaz uruchomione kontenery dockera","intent":"docker_ps","lang":"pl","shell":"bash","os":"linux"}
+{"text":"list all containers including stopped ones","intent":"docker_ps_all","lang":"en","shell":"bash","os":"linux"}
+{"text":"docker ps -a","intent":"docker_ps_all","lang":"en","shell":"bash","os":"linux"}
+{"text":"show every container even exited","intent":"docker_ps_all","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"all docker containers","intent":"docker_ps_all","lang":"en","shell":"powershell","os":"win32"}
+{"text":"show stopped containers too","intent":"docker_ps_all","lang":"en","shell":"powershell","os":"win32"}
+{"text":"which containers exist on this host","intent":"docker_ps_all","lang":"en","shell":"bash","os":"linux"}
+{"text":"all containers","intent":"docker_ps_all","lang":"en","shell":"sh","os":"linux"}
+{"text":"wszystkie kontenery łącznie z zatrzymanymi","intent":"docker_ps_all","lang":"pl","shell":"bash","os":"linux"}
+{"text":"pokaz tez zatrzymane kontenery","intent":"docker_ps_all","lang":"pl","shell":"bash","os":"linux"}
+{"text":"lista wszystkich kontenerow","intent":"docker_ps_all","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"jakie kontenery istnieja, tez te exited","intent":"docker_ps_all","lang":"pl","shell":"bash","os":"linux"}
+{"text":"wszystkie kontenery","intent":"docker_ps_all","lang":"pl","shell":"cmd","os":"win32"}
+{"text":"pokaż kontenery które się wywaliły i te działające","intent":"docker_ps_all","lang":"pl","shell":"bash","os":"linux"}
+{"text":"logs of the container web","intent":"docker_logs","lang":"en","shell":"bash","os":"linux"}
+{"text":"follow logs for api-1","intent":"docker_logs","lang":"en","shell":"bash","os":"linux"}
+{"text":"docker logs for postgres last 200 lines","intent":"docker_logs","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"show logs of container nginx-proxy","intent":"docker_logs","lang":"en","shell":"powershell","os":"win32"}
+{"text":"tail the redis container logs","intent":"docker_logs","lang":"en","shell":"powershell","os":"win32"}
+{"text":"what is container worker printing","intent":"docker_logs","lang":"en","shell":"bash","os":"linux"}
+{"text":"docker logs app","intent":"docker_logs","lang":"en","shell":"sh","os":"linux"}
+{"text":"logi kontenera web","intent":"docker_logs","lang":"pl","shell":"bash","os":"linux"}
+{"text":"pokaz logi kontenera api ostatnie 100 linii","intent":"docker_logs","lang":"pl","shell":"bash","os":"linux"}
+{"text":"sledz logi kontenera mongo","intent":"docker_logs","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"logi z kontenera backend","intent":"docker_logs","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"co wypisuje kontener celery","intent":"docker_logs","lang":"pl","shell":"bash","os":"linux"}
+{"text":"logi kontenera db","intent":"docker_logs","lang":"pl","shell":"fish","os":"linux"}
+{"text":"ostatnie 50 linii logów z kontenera traefik","intent":"docker_logs","lang":"pl","shell":"bash","os":"linux"}
+{"text":"list docker images","intent":"docker_images","lang":"en","shell":"bash","os":"linux"}
+{"text":"docker images","intent":"docker_images","lang":"en","shell":"bash","os":"linux"}
+{"text":"what images do i have locally","intent":"docker_images","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"show docker images","intent":"docker_images","lang":"en","shell":"powershell","os":"win32"}
+{"text":"which container images are downloaded","intent":"docker_images","lang":"en","shell":"powershell","os":"win32"}
+{"text":"how big are my docker images","intent":"docker_images","lang":"en","shell":"bash","os":"linux"}
+{"text":"images list","intent":"docker_images","lang":"en","shell":"sh","os":"linux"}
+{"text":"lista obrazów dockera","intent":"docker_images","lang":"pl","shell":"bash","os":"linux"}
+{"text":"jakie mam obrazy","intent":"docker_images","lang":"pl","shell":"bash","os":"linux"}
+{"text":"pokaż lokalne obrazy docker","intent":"docker_images","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"wylistuj image dockera","intent":"docker_images","lang":"pl","shell":"bash","os":"linux"}
+{"text":"obrazy dockera","intent":"docker_images","lang":"pl","shell":"fish","os":"linux"}
+{"text":"jakie obrazy są pobrane na tym hoście","intent":"docker_images","lang":"pl","shell":"bash","os":"linux"}
+{"text":"stop container web","intent":"docker_stop","lang":"en","shell":"bash","os":"linux"}
+{"text":"docker stop api-1","intent":"docker_stop","lang":"en","shell":"bash","os":"linux"}
+{"text":"stop the postgres container","intent":"docker_stop","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"stop container nginx-proxy","intent":"docker_stop","lang":"en","shell":"powershell","os":"win32"}
+{"text":"halt the redis container","intent":"docker_stop","lang":"en","shell":"powershell","os":"win32"}
+{"text":"shut down container worker","intent":"docker_stop","lang":"en","shell":"bash","os":"linux"}
+{"text":"stop container db","intent":"docker_stop","lang":"en","shell":"cmd","os":"win32"}
+{"text":"zatrzymaj kontener web","intent":"docker_stop","lang":"pl","shell":"bash","os":"linux"}
+{"text":"zastopuj kontener api","intent":"docker_stop","lang":"pl","shell":"bash","os":"linux"}
+{"text":"wylacz kontener mongo","intent":"docker_stop","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"zatrzymaj kontener backend","intent":"docker_stop","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"stopnij kontener celery","intent":"docker_stop","lang":"pl","shell":"bash","os":"linux"}
+{"text":"stop kontenera grafana","intent":"docker_stop","lang":"pl","shell":"sh","os":"linux"}
+{"text":"zatrzymaj kontener o nazwie traefik","intent":"docker_stop","lang":"pl","shell":"bash","os":"linux"}
+{"text":"stop all running containers","intent":"docker_stop_all","lang":"en","shell":"bash","os":"linux"}
+{"text":"stop every docker container","intent":"docker_stop_all","lang":"en","shell":"bash","os":"linux"}
+{"text":"kill all my containers (stop them)","intent":"docker_stop_all","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"stop all containers","intent":"docker_stop_all","lang":"en","shell":"powershell","os":"win32"}
+{"text":"halt every running container","intent":"docker_stop_all","lang":"en","shell":"powershell","os":"win32"}
+{"text":"shut down all docker containers","intent":"docker_stop_all","lang":"en","shell":"bash","os":"linux"}
+{"text":"zatrzymaj wszystkie kontenery","intent":"docker_stop_all","lang":"pl","shell":"bash","os":"linux"}
+{"text":"zastopuj wszystkie działające kontenery","intent":"docker_stop_all","lang":"pl","shell":"bash","os":"linux"}
+{"text":"wylacz wszystkie kontenery","intent":"docker_stop_all","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"zatrzymaj każdy kontener","intent":"docker_stop_all","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"stop wszystkich kontenerow","intent":"docker_stop_all","lang":"pl","shell":"bash","os":"linux"}
+{"text":"zatrzymaj wszystkie","intent":"docker_stop_all","lang":"pl","shell":"fish","os":"linux"}
+{"text":"wyłącz cały docker, wszystkie kontenery","intent":"docker_stop_all","lang":"pl","shell":"bash","os":"linux"}
+{"text":"clean up docker","intent":"docker_prune","lang":"en","shell":"bash","os":"linux"}
+{"text":"remove unused docker images and containers","intent":"docker_prune","lang":"en","shell":"bash","os":"linux"}
+{"text":"docker system prune","intent":"docker_prune","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"free disk space used by docker","intent":"docker_prune","lang":"en","shell":"powershell","os":"win32"}
+{"text":"prune all unused docker data","intent":"docker_prune","lang":"en","shell":"powershell","os":"win32"}
+{"text":"docker is eating my disk, clean it","intent":"docker_prune","lang":"en","shell":"bash","os":"linux"}
+{"text":"prune docker","intent":"docker_prune","lang":"en","shell":"sh","os":"linux"}
+{"text":"wyczyść dockera","intent":"docker_prune","lang":"pl","shell":"bash","os":"linux"}
+{"text":"usun nieuzywane obrazy i kontenery","intent":"docker_prune","lang":"pl","shell":"bash","os":"linux"}
+{"text":"docker zajmuje za duzo miejsca, posprzataj","intent":"docker_prune","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"wyczyść nieużywane dane dockera","intent":"docker_prune","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"zrob prune dockera","intent":"docker_prune","lang":"pl","shell":"bash","os":"linux"}
+{"text":"posprzataj dockera","intent":"docker_prune","lang":"pl","shell":"fish","os":"linux"}
+{"text":"usuń śmieci po dockerze","intent":"docker_prune","lang":"pl","shell":"bash","os":"linux"}
+{"text":"open a shell in container web","intent":"docker_exec","lang":"en","shell":"bash","os":"linux"}
+{"text":"exec into api-1","intent":"docker_exec","lang":"en","shell":"bash","os":"linux"}
+{"text":"get a shell inside the postgres container","intent":"docker_exec","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"docker exec into nginx-proxy","intent":"docker_exec","lang":"en","shell":"powershell","os":"win32"}
+{"text":"enter container redis","intent":"docker_exec","lang":"en","shell":"powershell","os":"win32"}
+{"text":"shell into worker container","intent":"docker_exec","lang":"en","shell":"bash","os":"linux"}
+{"text":"exec sh in container db","intent":"docker_exec","lang":"en","shell":"cmd","os":"win32"}
+{"text":"wejdź do kontenera web","intent":"docker_exec","lang":"pl","shell":"bash","os":"linux"}
+{"text":"otworz shella w kontenerze api","intent":"docker_exec","lang":"pl","shell":"bash","os":"linux"}
+{"text":"zaloguj sie do kontenera mongo","intent":"docker_exec","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"wejdź do środka kontenera backend","intent":"docker_exec","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"execnij sie do celery","intent":"docker_exec","lang":"pl","shell":"bash","os":"linux"}
+{"text":"shell w kontenerze grafana","intent":"docker_exec","lang":"pl","shell":"sh","os":"linux"}
+{"text":"odpal terminal w kontenerze traefik","intent":"docker_exec","lang":"pl","shell":"bash","os":"linux"}
+{"text":"container resource usage","intent":"docker_stats","lang":"en","shell":"bash","os":"linux"}
+{"text":"docker stats","intent":"docker_stats","lang":"en","shell":"bash","os":"linux"}
+{"text":"how much cpu and ram are containers using","intent":"docker_stats","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"show container cpu and memory usage","intent":"docker_stats","lang":"en","shell":"powershell","os":"win32"}
+{"text":"which container uses the most memory","intent":"docker_stats","lang":"en","shell":"powershell","os":"win32"}
+{"text":"resource consumption per container","intent":"docker_stats","lang":"en","shell":"bash","os":"linux"}
+{"text":"container stats","intent":"docker_stats","lang":"en","shell":"sh","os":"linux"}
+{"text":"zużycie zasobów przez kontenery","intent":"docker_stats","lang":"pl","shell":"bash","os":"linux"}
+{"text":"ile ramu zjadaja kontenery","intent":"docker_stats","lang":"pl","shell":"bash","os":"linux"}
+{"text":"pokaż użycie CPU i pamięci przez kontenery","intent":"docker_stats","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"który kontener zżera cpu","intent":"docker_stats","lang":"pl","shell":"bash","os":"linux"}
+{"text":"statystyki kontenerow","intent":"docker_stats","lang":"pl","shell":"fish","os":"linux"}
+{"text":"obciążenie kontenerów","intent":"docker_stats","lang":"pl","shell":"bash","os":"linux"}
+{"text":"docker compose up","intent":"docker_compose_up","lang":"en","shell":"bash","os":"linux"}
+{"text":"start the compose stack","intent":"docker_compose_up","lang":"en","shell":"bash","os":"linux"}
+{"text":"bring up services from docker-compose.yml","intent":"docker_compose_up","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"start docker compose in background","intent":"docker_compose_up","lang":"en","shell":"powershell","os":"win32"}
+{"text":"run compose services detached","intent":"docker_compose_up","lang":"en","shell":"powershell","os":"win32"}
+{"text":"spin up the dev environment with compose","intent":"docker_compose_up","lang":"en","shell":"bash","os":"linux"}
+{"text":"compose up -d","intent":"docker_compose_up","lang":"en","shell":"sh","os":"linux"}
+{"text":"uruchom docker compose","intent":"docker_compose_up","lang":"pl","shell":"bash","os":"linux"}
+{"text":"podnieś stack compose","intent":"docker_compose_up","lang":"pl","shell":"bash","os":"linux"}
+{"text":"odpal docker-compose w tle","intent":"docker_compose_up","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"wystartuj usługi z docker compose","intent":"docker_compose_up","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"postaw srodowisko z compose","intent":"docker_compose_up","lang":"pl","shell":"bash","os":"linux"}
+{"text":"compose up","intent":"docker_compose_up","lang":"pl","shell":"fish","os":"linux"}
+{"text":"odpal kontenery z docker-compose.yml","intent":"docker_compose_up","lang":"pl","shell":"bash","os":"linux"}
+{"text":"docker compose down","intent":"docker_compose_down","lang":"en","shell":"bash","os":"linux"}
+{"text":"stop the compose stack","intent":"docker_compose_down","lang":"en","shell":"bash","os":"linux"}
+{"text":"tear down compose services","intent":"docker_compose_down","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"shut down docker compose","intent":"docker_compose_down","lang":"en","shell":"powershell","os":"win32"}
+{"text":"bring the compose environment down","intent":"docker_compose_down","lang":"en","shell":"powershell","os":"win32"}
+{"text":"stop and remove compose containers","intent":"docker_compose_down","lang":"en","shell":"bash","os":"linux"}
+{"text":"compose down","intent":"docker_compose_down","lang":"en","shell":"sh","os":"linux"}
+{"text":"zatrzymaj docker compose","intent":"docker_compose_down","lang":"pl","shell":"bash","os":"linux"}
+{"text":"zrob compose down","intent":"docker_compose_down","lang":"pl","shell":"bash","os":"linux"}
+{"text":"wylacz stack compose","intent":"docker_compose_down","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"zatrzymaj usługi docker compose","intent":"docker_compose_down","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"zgaś środowisko z compose","intent":"docker_compose_down","lang":"pl","shell":"bash","os":"linux"}
+{"text":"położ stack z docker-compose","intent":"docker_compose_down","lang":"pl","shell":"bash","os":"linux"}
+{"text":"is a java process running?","intent":"find_process","lang":"en","shell":"bash","os":"linux"}
+{"text":"find the node process","intent":"find_process","lang":"en","shell":"bash","os":"linux"}
+{"text":"pgrep -a python","intent":"find_process","lang":"en","shell":"bash","os":"linux"}
+{"text":"is there a process called Slack running","intent":"find_process","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"Get-Process chrome - is it running?","intent":"find_process","lang":"en","shell":"powershell","os":"win32"}
+{"text":"find any running process named notepad","intent":"find_process","lang":"en","shell":"powershell","os":"win32"}
+{"text":"is the nginx process alive (ps)","intent":"find_process","lang":"en","shell":"bash","os":"linux"}
+{"text":"check whether a process named gunicorn is running","intent":"find_process","lang":"en","shell":"bash","os":"linux"}
+{"text":"is any process named rsync running right now","intent":"find_process","lang":"en","shell":"sh","os":"linux"}
+{"text":"find process firefox","intent":"find_process","lang":"en","shell":"fish","os":"linux"}
+{"text":"systemctl status nginx","intent":"service_status","lang":"en","shell":"bash","os":"linux"}
+{"text":"status of the docker service","intent":"service_status","lang":"en","shell":"bash","os":"linux"}
+{"text":"is the postgresql daemon service enabled and running?","intent":"service_status","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"Get-Service Spooler status","intent":"service_status","lang":"en","shell":"powershell","os":"win32"}
+{"text":"what's the status of the wuauserv service","intent":"service_status","lang":"en","shell":"powershell","os":"win32"}
+{"text":"is the cron service up?","intent":"service_status","lang":"en","shell":"bash","os":"linux"}
+{"text":"show the status of the redis-server unit","intent":"service_status","lang":"en","shell":"bash","os":"linux"}
+{"text":"status of the ssh service","intent":"service_status","lang":"en","shell":"sh","os":"linux"}
+{"text":"czy chodzi proces java","intent":"find_process","lang":"pl","shell":"bash","os":"linux"}
+{"text":"znajdź proces node","intent":"find_process","lang":"pl","shell":"bash","os":"linux"}
+{"text":"czy działa proces python3","intent":"find_process","lang":"pl","shell":"bash","os":"linux"}
+{"text":"czy jest uruchomiony proces Spotify","intent":"find_process","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"znajdź proces o nazwie explorer","intent":"find_process","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"czy działa proces chrome","intent":"find_process","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"pgrep firefox","intent":"find_process","lang":"pl","shell":"bash","os":"linux"}
+{"text":"czy jest jakis proces o nazwie gunicorn","intent":"find_process","lang":"pl","shell":"bash","os":"linux"}
+{"text":"szukaj procesu vim","intent":"find_process","lang":"pl","shell":"fish","os":"linux"}
+{"text":"czy dziala proces notepad.exe","intent":"find_process","lang":"pl","shell":"cmd","os":"win32"}
+{"text":"czy usługa nginx działa?","intent":"service_status","lang":"pl","shell":"bash","os":"linux"}
+{"text":"systemctl status sshd","intent":"service_status","lang":"pl","shell":"bash","os":"linux"}
+{"text":"czy serwis postgresql jest aktywny","intent":"service_status","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"status usługi Spooler","intent":"service_status","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"czy usługa wuauserv jest uruchomiona","intent":"service_status","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"stan usługi docker","intent":"service_status","lang":"pl","shell":"bash","os":"linux"}
+{"text":"czy usluga cron dziala","intent":"service_status","lang":"pl","shell":"bash","os":"linux"}
+{"text":"status serwisu ssh","intent":"service_status","lang":"pl","shell":"sh","os":"linux"}
+{"text":"sprawdź status unitu redis-server","intent":"service_status","lang":"pl","shell":"bash","os":"linux"}
+{"text":"push my commits to origin","intent":"git_push","lang":"en","shell":"bash","os":"linux"}
+{"text":"upload local commits to the remote","intent":"git_push","lang":"en","shell":"bash","os":"linux"}
+{"text":"send my changes to github","intent":"git_push","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"git push origin main","intent":"git_push","lang":"en","shell":"powershell","os":"win32"}
+{"text":"pull the latest changes from origin","intent":"git_pull","lang":"en","shell":"bash","os":"linux"}
+{"text":"update my local branch from the remote","intent":"git_pull","lang":"en","shell":"bash","os":"linux"}
+{"text":"fetch and merge from upstream","intent":"git_pull","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"get my teammates' changes from the server","intent":"git_pull","lang":"en","shell":"powershell","os":"win32"}
+{"text":"clone https://github.com/org/service.git","intent":"git_clone","lang":"en","shell":"bash","os":"linux"}
+{"text":"download the repo git@github.com:me/notes.git to this machine","intent":"git_clone","lang":"en","shell":"bash","os":"linux"}
+{"text":"git clone https://gitlab.com/team/web","intent":"git_clone","lang":"en","shell":"powershell","os":"win32"}
+{"text":"commit all changes with message \"fix tests\"","intent":"git_commit","lang":"en","shell":"bash","os":"linux"}
+{"text":"save my changes in a commit called \"cleanup\"","intent":"git_commit","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"commit everything \"release 2.0\"","intent":"git_commit","lang":"en","shell":"powershell","os":"win32"}
+{"text":"wypchnij zmiany na origin","intent":"git_push","lang":"pl","shell":"bash","os":"linux"}
+{"text":"pushnij commity","intent":"git_push","lang":"pl","shell":"bash","os":"linux"}
+{"text":"wyślij zmiany na serwer","intent":"git_push","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"zrob push na main","intent":"git_push","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"wrzuc moje lokalne commity na remote","intent":"git_push","lang":"pl","shell":"bash","os":"linux"}
+{"text":"zrób pulla","intent":"git_pull","lang":"pl","shell":"bash","os":"linux"}
+{"text":"zaktualizuj z origin","intent":"git_pull","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"pobierz to co koledzy wypchneli","intent":"git_pull","lang":"pl","shell":"bash","os":"linux"}
+{"text":"sklonuj repo https://github.com/firma/api.git","intent":"git_clone","lang":"pl","shell":"bash","os":"linux"}
+{"text":"pobierz całe repozytorium git@gitlab.com:zespol/app.git","intent":"git_clone","lang":"pl","shell":"bash","os":"linux"}
+{"text":"zrob klona https://github.com/user/narzedzia","intent":"git_clone","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"zacommituj wszystko \"poprawki\"","intent":"git_commit","lang":"pl","shell":"bash","os":"linux"}
+{"text":"zrób commit z opisem \"nowy feature\"","intent":"git_commit","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"zapisz zmiany w commicie \"refaktor\"","intent":"git_commit","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"kill all chrome processes","intent":"kill_by_name","lang":"en","shell":"bash","os":"linux"}
+{"text":"kill every process named node","intent":"kill_by_name","lang":"en","shell":"bash","os":"linux"}
+{"text":"force quit Slack","intent":"kill_by_name","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"Stop-Process -Name notepad","intent":"kill_by_name","lang":"en","shell":"powershell","os":"win32"}
+{"text":"is there a chrome process running?","intent":"find_process","lang":"en","shell":"bash","os":"linux"}
+{"text":"find the process named node","intent":"find_process","lang":"en","shell":"bash","os":"linux"}
+{"text":"Get-Process notepad","intent":"find_process","lang":"en","shell":"powershell","os":"win32"}
+{"text":"kill whatever is using port 3000","intent":"kill_by_port","lang":"en","shell":"bash","os":"linux"}
+{"text":"free up port 8080, kill the process on it","intent":"kill_by_port","lang":"en","shell":"bash","os":"linux"}
+{"text":"stop the process listening on port 5000","intent":"kill_by_port","lang":"en","shell":"powershell","os":"win32"}
+{"text":"kill the thing on port 4200","intent":"kill_by_port","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"pkill -f gunicorn","intent":"kill_by_name","lang":"en","shell":"bash","os":"linux"}
+{"text":"find process postgres","intent":"find_process","lang":"en","shell":"sh","os":"linux"}
+{"text":"zabij wszystkie procesy chrome","intent":"kill_by_name","lang":"pl","shell":"bash","os":"linux"}
+{"text":"skiluj node","intent":"kill_by_name","lang":"pl","shell":"bash","os":"linux"}
+{"text":"ubij Slacka","intent":"kill_by_name","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"zatrzymaj proces notepad","intent":"kill_by_name","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"killnij procesy python o nazwie worker.py","intent":"kill_by_name","lang":"pl","shell":"bash","os":"linux"}
+{"text":"czy chodzi proces chrome","intent":"find_process","lang":"pl","shell":"bash","os":"linux"}
+{"text":"znajdz proces node","intent":"find_process","lang":"pl","shell":"bash","os":"linux"}
+{"text":"pokaż proces notepad","intent":"find_process","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"zabij to co siedzi na porcie 3000","intent":"kill_by_port","lang":"pl","shell":"bash","os":"linux"}
+{"text":"zwolnij port 8080 zabijajac proces","intent":"kill_by_port","lang":"pl","shell":"bash","os":"linux"}
+{"text":"ubij proces nasłuchujący na porcie 5000","intent":"kill_by_port","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"skiluj to co blokuje port 4200","intent":"kill_by_port","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"znajdz proces redis","intent":"find_process","lang":"pl","shell":"fish","os":"linux"}
+{"text":"zabij proces po nazwie java","intent":"kill_by_name","lang":"pl","shell":"bash","os":"linux"}
+{"text":"which ports are listening on this machine","intent":"listening_ports","lang":"en","shell":"bash","os":"linux"}
+{"text":"list all listening ports","intent":"listening_ports","lang":"en","shell":"bash","os":"linux"}
+{"text":"what ports are open locally","intent":"listening_ports","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"Get-NetTCPConnection -State Listen","intent":"listening_ports","lang":"en","shell":"powershell","os":"win32"}
+{"text":"show listening tcp ports","intent":"listening_ports","lang":"en","shell":"powershell","os":"win32"}
+{"text":"what process is on port 8080","intent":"process_on_port","lang":"en","shell":"bash","os":"linux"}
+{"text":"who is using port 5432","intent":"process_on_port","lang":"en","shell":"bash","os":"linux"}
+{"text":"which app is listening on 3000","intent":"process_on_port","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"Get-NetTCPConnection -LocalPort 443 owning process","intent":"process_on_port","lang":"en","shell":"powershell","os":"win32"}
+{"text":"what program holds port 1433","intent":"process_on_port","lang":"en","shell":"powershell","os":"win32"}
+{"text":"is port 22 open on 10.0.0.9","intent":"port_check","lang":"en","shell":"bash","os":"linux"}
+{"text":"check if remote host db.example.com accepts connections on 5432","intent":"port_check","lang":"en","shell":"bash","os":"linux"}
+{"text":"can i reach api.internal:8443","intent":"port_check","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"Test-NetConnection web01 -Port 80","intent":"port_check","lang":"en","shell":"powershell","os":"win32"}
+{"text":"ss -tlnp, listening sockets","intent":"listening_ports","lang":"en","shell":"sh","os":"linux"}
+{"text":"jakie porty nasłuchują","intent":"listening_ports","lang":"pl","shell":"bash","os":"linux"}
+{"text":"lista otwartych portów na tym serwerze","intent":"listening_ports","lang":"pl","shell":"bash","os":"linux"}
+{"text":"pokaż porty w stanie LISTEN","intent":"listening_ports","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"pokaż nasłuchujące porty TCP","intent":"listening_ports","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"co słucha na porcie 8080","intent":"process_on_port","lang":"pl","shell":"bash","os":"linux"}
+{"text":"jaki proces zajmuje port 5432","intent":"process_on_port","lang":"pl","shell":"bash","os":"linux"}
+{"text":"kto siedzi na porcie 3000","intent":"process_on_port","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"jaki program trzyma port 1433","intent":"process_on_port","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"czy port 22 na 10.0.0.9 jest otwarty","intent":"port_check","lang":"pl","shell":"bash","os":"linux"}
+{"text":"sprawdz czy zdalny host db.example.pl odpowiada na porcie 5432","intent":"port_check","lang":"pl","shell":"bash","os":"linux"}
+{"text":"czy dojde do api.internal na 8443","intent":"port_check","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"sprawdź port 80 na web01","intent":"port_check","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"ktory proces uzywa portu 9000","intent":"process_on_port","lang":"pl","shell":"bash","os":"linux"}
+{"text":"na jakich portach cos nasluchuje","intent":"listening_ports","lang":"pl","shell":"bash","os":"linux"}
+{"text":"which containers are up right now","intent":"docker_ps","lang":"en","shell":"bash","os":"linux"}
+{"text":"list all containers, including stopped","intent":"docker_ps_all","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"show exited containers too","intent":"docker_ps_all","lang":"en","shell":"powershell","os":"win32"}
+{"text":"which images are on this host","intent":"docker_images","lang":"en","shell":"bash","os":"linux"}
+{"text":"show downloaded images","intent":"docker_images","lang":"en","shell":"powershell","os":"win32"}
+{"text":"container cpu and memory usage","intent":"docker_stats","lang":"en","shell":"bash","os":"linux"}
+{"text":"which container is using the most ram","intent":"docker_stats","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"docker stats for running containers","intent":"docker_stats","lang":"en","shell":"powershell","os":"win32"}
+{"text":"show me all containers ever created","intent":"docker_ps_all","lang":"en","shell":"bash","os":"linux"}
+{"text":"what images do i have pulled","intent":"docker_images","lang":"en","shell":"sh","os":"linux"}
+{"text":"jakie kontenery teraz działają","intent":"docker_ps","lang":"pl","shell":"bash","os":"linux"}
+{"text":"lista uruchomionych kontenerów","intent":"docker_ps","lang":"pl","shell":"bash","os":"linux"}
+{"text":"wszystkie kontenery, także zatrzymane","intent":"docker_ps_all","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"pokaż też kontenery exited","intent":"docker_ps_all","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"jakie obrazy mam pobrane","intent":"docker_images","lang":"pl","shell":"bash","os":"linux"}
+{"text":"pokaż ściągnięte image","intent":"docker_images","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"zużycie cpu i ramu przez kontenery","intent":"docker_stats","lang":"pl","shell":"bash","os":"linux"}
+{"text":"który kontener zjada najwięcej pamięci","intent":"docker_stats","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"statystyki działających kontenerów","intent":"docker_stats","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"pokaż wszystkie kontenery jakie istnieją","intent":"docker_ps_all","lang":"pl","shell":"bash","os":"linux"}
+{"text":"pokaz kontenery razem z tymi co padly","intent":"docker_ps_all","lang":"pl","shell":"bash","os":"linux"}
+{"text":"ile zasobów biorą kontenery","intent":"docker_stats","lang":"pl","shell":"bash","os":"linux"}
+{"text":"restart the nginx service","intent":"service_restart","lang":"en","shell":"bash","os":"linux"}
+{"text":"start the redis service","intent":"service_start","lang":"en","shell":"bash","os":"linux"}
+{"text":"stop the redis service","intent":"service_stop","lang":"en","shell":"bash","os":"linux"}
+{"text":"enable redis to start at boot","intent":"service_enable","lang":"en","shell":"bash","os":"linux"}
+{"text":"restart postgresql","intent":"service_restart","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"start postgresql","intent":"service_start","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"Stop-Service Spooler","intent":"service_stop","lang":"en","shell":"powershell","os":"win32"}
+{"text":"Start-Service Spooler","intent":"service_start","lang":"en","shell":"powershell","os":"win32"}
+{"text":"Set-Service Spooler -StartupType Automatic","intent":"service_enable","lang":"en","shell":"powershell","os":"win32"}
+{"text":"bounce apache2","intent":"service_restart","lang":"en","shell":"bash","os":"linux"}
+{"text":"turn off the cups service","intent":"service_stop","lang":"en","shell":"bash","os":"linux"}
+{"text":"make docker start automatically after reboot","intent":"service_enable","lang":"en","shell":"bash","os":"linux"}
+{"text":"bring up the ssh service","intent":"service_start","lang":"en","shell":"sh","os":"linux"}
+{"text":"stop the ssh service","intent":"service_stop","lang":"en","shell":"sh","os":"linux"}
+{"text":"zrestartuj nginx","intent":"service_restart","lang":"pl","shell":"bash","os":"linux"}
+{"text":"uruchom usługę redis","intent":"service_start","lang":"pl","shell":"bash","os":"linux"}
+{"text":"zatrzymaj usługę redis","intent":"service_stop","lang":"pl","shell":"bash","os":"linux"}
+{"text":"włącz redis przy starcie systemu","intent":"service_enable","lang":"pl","shell":"bash","os":"linux"}
+{"text":"wystartuj postgresql","intent":"service_start","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"zatrzymaj usługę Spooler","intent":"service_stop","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"zrestartuj usługę Spooler","intent":"service_restart","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"ustaw Spooler na start automatyczny","intent":"service_enable","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"zrob restart apache2","intent":"service_restart","lang":"pl","shell":"bash","os":"linux"}
+{"text":"wylacz usluge cups","intent":"service_stop","lang":"pl","shell":"bash","os":"linux"}
+{"text":"niech docker startuje sam po reboocie","intent":"service_enable","lang":"pl","shell":"bash","os":"linux"}
+{"text":"odpal usluge ssh","intent":"service_start","lang":"pl","shell":"sh","os":"linux"}
+{"text":"stopnij usluge ssh","intent":"service_stop","lang":"pl","shell":"sh","os":"linux"}
+{"text":"what is my local ip","intent":"ip_addresses","lang":"en","shell":"bash","os":"linux"}
+{"text":"show the ip of eth0","intent":"ip_addresses","lang":"en","shell":"bash","os":"linux"}
+{"text":"my lan address","intent":"ip_addresses","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"ipconfig, local addresses","intent":"ip_addresses","lang":"en","shell":"powershell","os":"win32"}
+{"text":"which ip does the internet see","intent":"public_ip","lang":"en","shell":"bash","os":"linux"}
+{"text":"external ip address","intent":"public_ip","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"my WAN ip please","intent":"public_ip","lang":"en","shell":"powershell","os":"win32"}
+{"text":"show the routing table","intent":"routes","lang":"en","shell":"bash","os":"linux"}
+{"text":"what's the default gateway","intent":"routes","lang":"en","shell":"bash","os":"linux"}
+{"text":"netstat -rn routes","intent":"routes","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"ip addr","intent":"ip_addresses","lang":"en","shell":"sh","os":"linux"}
+{"text":"curl ifconfig.me","intent":"public_ip","lang":"en","shell":"bash","os":"linux"}
+{"text":"adres ip interfejsu eth0","intent":"ip_addresses","lang":"pl","shell":"bash","os":"linux"}
+{"text":"mój adres w sieci lan","intent":"ip_addresses","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"lokalne adresy ip","intent":"ip_addresses","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"jakie ip widzi internet","intent":"public_ip","lang":"pl","shell":"bash","os":"linux"}
+{"text":"zewnętrzny adres IP","intent":"public_ip","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"moje ip WAN","intent":"public_ip","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"jaka jest brama domyślna","intent":"routes","lang":"pl","shell":"bash","os":"linux"}
+{"text":"trasy sieciowe","intent":"routes","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"sprawdz moje ip publiczne","intent":"public_ip","lang":"pl","shell":"bash","os":"linux"}

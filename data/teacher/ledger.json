@@ -1,0 +1,33 @@
+{
+ "model": "jev-latest",
+ "pricePerMtok": 0.042,
+ "tasks": {
+  "verify": {
+   "calls": 3292,
+   "failed": 0,
+   "retries": 0,
+   "inTok": 3641360,
+   "runs": 2
+  },
+  "label": {
+   "calls": 611,
+   "failed": 0,
+   "retries": 0,
+   "inTok": 519493,
+   "runs": 3
+  },
+  "mine": {
+   "calls": 279,
+   "failed": 0,
+   "retries": 0,
+   "inTok": 259891,
+   "runs": 2
+  }
+ },
+ "total": {
+  "calls": 4182,
+  "failed": 0,
+  "inTok": 4420744,
+  "usd": 0.18567
+ }
+}

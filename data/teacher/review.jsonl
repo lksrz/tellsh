@@ -1,40 +1,112 @@
-{"text":"proszę rozpakuj docs.zip","intent":"extract_zip","command":"unzip docs.zip","reasons":["teacher risk medium > ours safe"]}
-{"text":"zrób .zip z katalogu docs","intent":"compress_zip","command":"zip -r docs.zip docs","reasons":["teacher risk medium > ours safe"]}
-{"text":"załóż nowy branch refactor-api","intent":"git_new_branch","command":"git checkout -b refactor-api","reasons":["teacher risk medium > ours safe"]}
-{"text":"sklonuj https://github.com/user/repo.git","intent":"git_clone","command":"git clone https://github.com/user/repo.git","reasons":["teacher risk medium > ours safe"]}
-{"text":"open the tarball node-v20.tar.gz","intent":"extract_targz","command":"tar -xzvf node-v20.tar.gz","reasons":["teacher risk medium > ours safe"]}
-{"text":"przywroc schowane zmiany","intent":"git_stash_pop","command":"git stash pop","reasons":["teacher risk medium > ours safe"]}
-{"text":"stashnij to","intent":"git_stash","command":"git stash","reasons":["teacher risk medium > ours safe"]}
-{"text":"zdekoduj plik token.b64 z base64","intent":"base64_decode","command":"printf '%s' 'plik token.b64' | base64 -d","reasons":["command judged wrong (0.07)"]}
-{"text":"tar up the logs folder","intent":"compress_targz","command":"tar -czvf archive.tar.gz .","reasons":["command judged wrong (0.09)","teacher risk medium > ours safe"]}
-{"text":"ściągnij zmiany","intent":"git_pull","command":"git pull","reasons":["teacher risk medium > ours safe"]}
-{"text":"dodaj wszystko do indeksu bez commitowania","intent":"git_add_all","command":"git add -A","reasons":["teacher risk medium > ours safe"]}
-{"text":"zakodowac w base64 haslo qwerty","intent":"base64_encode","command":"printf '%s' 'w base64 haslo qwerty' | base64","reasons":["command judged wrong (0.05)"]}
-{"text":"pokaż właściwości pliku C:\\Windows\\notepad.exe (data utworzenia, rozmiar)","intent":"file_stat","command":"stat <FILE>","reasons":["command judged wrong (0.16)"]}
-{"text":"create empty git repo","intent":"git_init","command":"git init","reasons":["teacher risk medium > ours safe"]}
-{"text":"is there a file named .env somewhere here?","intent":"find_by_name","command":"find . -iname '*somewhere*'","reasons":["command judged wrong (0.03)","span NAME \"somewhere\" rejected (0.02)"]}
-{"text":"new empty file: src/utils.js","intent":"touch_file","command":"touch src/utils.js","reasons":["teacher risk medium > ours safe"]}
-{"text":"połącz się z moim raspberry pi przez ssh","intent":"ssh_connect","command":"ssh moim","reasons":["command judged wrong (0.1)"]}
-{"text":"jak utworzyć folder z podfolderami a/b/c naraz","intent":"mkdir","command":"mkdir -p a/b/c","reasons":["teacher risk medium > ours safe"]}
-{"text":"przejdź na istniejącą gałąź release/2.0","intent":"git_switch_branch","command":"git checkout 'istniejącą'","reasons":["command judged wrong (0.02)","teacher risk medium > ours safe","span BRANCH \"istniejącą\" rejected (0.16)"]}
-{"text":"pushuj na origin hotfix/payment","intent":"git_push","command":"git push origin origin","reasons":["command judged wrong (0.15)","span BRANCH \"origin\" rejected (0.21)"]}
-{"text":"napraw właściciela ~/Pobrane, ma być piotr","intent":"chown","command":"sudo chown -R ma ~/Pobrane","reasons":["command judged wrong (0.02)","span USER \"ma\" rejected (0.17)"]}
-{"text":"sprawdź czy katalog cargo jest w PATH","intent":"show_path","command":"echo \"$PATH\" | tr ':' '\\n'","reasons":["command judged wrong (0.29)"]}
-{"text":"make a fresh folder for my notes","intent":"mkdir","command":"mkdir -p notes","reasons":["teacher risk medium > ours safe"]}
-{"text":"find files named exactly Dockerfile under /srv","intent":"find_by_name","command":"find /srv -iname '*exactly*'","reasons":["command judged wrong (0.01)","span NAME \"exactly\" rejected (0.03)"]}
-{"text":"i want a new branch called feature/search","intent":"git_new_branch","command":"git checkout -b feature/search","reasons":["teacher risk medium > ours safe"]}
-{"text":"folder tree of /opt/app with depth one","intent":"list_tree","command":"find /opt/app -maxdepth 1 -not -path '*/.git/*' | sort","reasons":["span NUM \"one\" rejected (0.11)"]}
-{"text":"zabij procesy javy","intent":"kill_by_name","command":"pkill -f javy","reasons":["command judged wrong (0.21)"]}
-{"text":"zmien branch na fix-123","intent":"git_switch_branch","command":"git checkout fix-123","reasons":["teacher risk medium > ours safe"]}
-{"text":"copy C:\\Users\\me\\Desktop\\report.docx to D:\\backup","intent":"copy","command":"cp -ri ~/Desktop d","reasons":["command judged wrong (0.03)"]}
-{"text":"get the files out of backup.zip","intent":"extract_zip","command":"unzip backup.zip","reasons":["teacher risk medium > ours safe"]}
-{"text":"spulluj zmiany","intent":"git_pull","command":"git pull","reasons":["teacher risk medium > ours safe"]}
-{"text":"proszę zainicjować repozytorium w tym katalogu","intent":"git_init","command":"git init","reasons":["teacher risk medium > ours safe"]}
-{"text":"touch README.md","intent":"touch_file","command":"touch README.md","reasons":["teacher risk medium > ours safe"]}
-{"text":"stgae all changes","intent":"git_add_all","command":"git add -A","reasons":["teacher risk medium > ours safe"]}
-{"text":"sklonuj git@github.com:acme/api.git do katalogu","intent":"git_clone","command":"git clone git@github.com:acme/api.git","reasons":["teacher risk medium > ours safe"]}
-{"text":"turn the folder exports into a tar.gz","intent":"compress_targz","command":"tar -czvf exports.tar.gz exports","reasons":["teacher risk medium > ours safe"]}
-{"text":"zip up report.pdf","intent":"compress_zip","command":"zip -r report.pdf.zip report.pdf","reasons":["teacher risk medium > ours safe"]}
-{"text":"rozpakuj ~/backupy/home.tar.gz do ~/restore","intent":"extract_targz","command":"tar -xzvf ~/backupy/home.tar.gz -C ~/restore","reasons":["teacher risk medium > ours safe"]}
-{"text":"how to unstash changes","intent":"git_stash_pop","command":"git stash pop","reasons":["teacher risk medium > ours safe"]}
-{"text":"push changes onto the stash stack","intent":"git_stash","command":"git stash","reasons":["teacher risk medium > ours safe"]}
+{"text":"find all .jsno files","intent":"find_by_ext","src":"intents/g00.jsonl","teacher":"find_by_name","conf":0.64,"p_ours":0.26,"opts":["empty_files","find_smaller_than","empty_dirs","find_by_ext","find_by_name"]}
+{"text":"gdzie jest napisane 'Copyright 2023'","intent":"grep_text","src":"intents/g00.jsonl","teacher":"grep_files_containing","conf":0.65,"p_ours":0.26,"opts":["grep_text","find_by_name","grep_files_containing","which_cmd"]}
+{"text":"same nazwy plików zawierających 'deprecated' w ./src","intent":"grep_files_containing","src":"intents/g00.jsonl","teacher":"find_by_name","conf":0.64,"p_ours":0.24,"opts":["find_by_name","grep_files_containing","duplicate_files","grep_text"]}
+{"text":"tylko nazwy plików: 'timeout' w ./config","intent":"grep_files_containing","src":"intents/g00.jsonl","teacher":"find_by_name","conf":0.62,"p_ours":0.2,"opts":["grep_files_containing","grep_text","find_by_name","history_search"]}
+{"text":"loc of the project counting .py only","intent":"count_lines_code","src":"intents/g00.jsonl","teacher":"count_files","conf":0.94,"p_ours":0,"opts":["count_files","grep_text","count_lines_code","list_tree"]}
+{"text":"symlinki pod /usr/lib","intent":"find_symlinks","src":"intents/g01.jsonl","teacher":"create_symlink","conf":0.62,"p_ours":0.25,"opts":["largest_files","find_symlinks","create_symlink","list_tree","broken_symlinks"]}
+{"text":"wiszace linki w biezacym folderze","intent":"broken_symlinks","src":"intents/g01.jsonl","teacher":"find_symlinks","conf":0.83,"p_ours":0.11,"opts":["list_tree","empty_dirs","broken_symlinks","find_symlinks","create_symlink"]}
+{"text":"set +x on hooks/pre-commit","intent":"make_executable","src":"intents/g01.jsonl","teacher":"none","conf":0.85,"p_ours":0.04,"opts":["git_commit","make_executable","chmod","git_undo_commit"]}
+{"text":"jaka nazwe urzadzenia ma moj pendrive","intent":"block_devices","src":"intents/g02.jsonl","teacher":"usb_devices","conf":0.72,"p_ours":0.15,"opts":["disk_free","hostname","disk_mounts","usb_devices","block_devices"]}
+{"text":"wyświetl dyski z rozmiarami","intent":"block_devices","src":"intents/g02.jsonl","teacher":"disk_free","conf":0.75,"p_ours":0.19,"opts":["dir_size","list_files","disk_free","block_devices","disk_mounts"]}
+{"text":"co zjada procesor?","intent":"top_cpu","src":"intents/g02.jsonl","teacher":"cpu_info","conf":0.66,"p_ours":0.21000000000000002,"opts":["top_cpu","cpu_info","service_status","find_process","top_mem"]}
+{"text":"co zjada ram?","intent":"top_mem","src":"intents/g02.jsonl","teacher":"memory_usage","conf":0.94,"p_ours":0.01,"opts":["memory_usage","top_mem","top_cpu","find_process"]}
+{"text":"see whether the ssh daemon is running","intent":"find_process","src":"intents/g02.jsonl","teacher":"service_status","conf":0.8,"p_ours":0.17,"opts":["service_status","service_start","find_process","top_mem","kill_by_name"]}
+{"text":"chek if apache2 is running","intent":"find_process","src":"intents/g02.jsonl","teacher":"service_status","conf":0.9,"p_ours":0.08,"opts":["find_process","service_status","process_tree","top_mem","kill_by_name"]}
+{"text":"czy nginx działa?","intent":"find_process","src":"intents/g02.jsonl","teacher":"service_status","conf":0.89,"p_ours":0.09,"opts":["service_status","uptime","process_tree","kill_by_name","find_process"]}
+{"text":"sprawdź czy demon ssh jest uruchomiony","intent":"find_process","src":"intents/g02.jsonl","teacher":"service_status","conf":0.81,"p_ours":0.16,"opts":["service_status","service_start","process_tree","find_process","kill_by_name"]}
+{"text":"sprwadz czy apache2 chodzi","intent":"find_process","src":"intents/g02.jsonl","teacher":"service_status","conf":0.95,"p_ours":0.04,"opts":["top_mem","process_tree","kill_by_name","find_process","service_status"]}
+{"text":"stop the nginx process","intent":"kill_by_name","src":"intents/g02.jsonl","teacher":"service_stop","conf":0.82,"p_ours":0.15,"opts":["find_process","kill_by_name","kill_force","service_stop","service_status"]}
+{"text":"murder all the node processes","intent":"kill_by_name","src":"intents/g02.jsonl","teacher":"kill_force","conf":0.68,"p_ours":0.26,"opts":["top_cpu","kill_force","kill_by_name","service_status","find_process"]}
+{"text":"odblokuj port 3000","intent":"kill_by_port","src":"intents/g02.jsonl","teacher":"none","conf":0.93,"p_ours":0.02,"opts":["kill_force","port_check","listening_ports","kill_by_port","process_on_port"]}
+{"text":"who is connected to my machine","intent":"established_connections","src":"intents/g02.jsonl","teacher":"users_logged_in","conf":0.96,"p_ours":0.03,"opts":["users_logged_in","process_on_port","established_connections","temperature"]}
+{"text":"kto jest połączony z moim komputerem","intent":"established_connections","src":"intents/g02.jsonl","teacher":"users_logged_in","conf":0.75,"p_ours":0.19,"opts":["established_connections","process_on_port","users_logged_in","listening_ports"]}
+{"text":"kto jest teraz podłączony do serwera bazy","intent":"established_connections","src":"intents/g02.jsonl","teacher":"users_logged_in","conf":0.84,"p_ours":0.06,"opts":["process_on_port","established_connections","listening_ports","users_logged_in"]}
+{"text":"jaka to platforma","intent":"system_info","src":"intents/g02.jsonl","teacher":"os_release","conf":0.65,"p_ours":0.24,"opts":["kernel_version","os_release","system_info","file_type"]}
+{"text":"cat /etc/os-release","intent":"os_release","src":"intents/g02.jsonl","teacher":"cat_file","conf":0.65,"p_ours":0.28,"opts":["list_files","kernel_version","os_release","cat_file"]}
+{"text":"pokaz plik os-release","intent":"os_release","src":"intents/g02.jsonl","teacher":"cat_file","conf":0.77,"p_ours":0.18,"opts":["cat_file","os_release","system_info","kernel_version"]}
+{"text":"sprawdź czy swap jest używany","intent":"memory_usage","src":"intents/g03.jsonl","teacher":"none","conf":0.66,"p_ours":0.27,"opts":["find_process","top_mem","package_installed","memory_usage"]}
+{"text":"czy architektura to x86_64 czy arm","intent":"cpu_info","src":"intents/g03.jsonl","teacher":"system_info","conf":0.76,"p_ours":0.11,"opts":["cpu_cores","system_info","cpu_info","file_type"]}
+{"text":"how many corse do i have","intent":"cpu_cores","src":"intents/g03.jsonl","teacher":"none","conf":0.9,"p_ours":0.08,"opts":["cpu_cores","disk_free","count_words","cpu_info"]}
+{"text":"show my PATH","intent":"show_path","src":"intents/g03.jsonl","teacher":"env_var_get","conf":0.8,"p_ours":0.17,"opts":["env_var_get","current_dir","show_path","env_vars","which_cmd"]}
+{"text":"echo $PATH","intent":"show_path","src":"intents/g03.jsonl","teacher":"env_var_get","conf":0.98,"p_ours":0.02,"opts":["which_cmd","show_path","env_vars","env_var_get","current_dir"]}
+{"text":"print my search path","intent":"show_path","src":"intents/g03.jsonl","teacher":"env_var_get","conf":0.69,"p_ours":0.25,"opts":["which_cmd","history_search","show_path","env_var_get","grep_text"]}
+{"text":"what does my PATH look like","intent":"show_path","src":"intents/g03.jsonl","teacher":"env_var_get","conf":0.76,"p_ours":0.2,"opts":["env_var_get","show_path","journal_service","which_cmd","env_vars"]}
+{"text":"path variable contents","intent":"show_path","src":"intents/g03.jsonl","teacher":"env_var_get","conf":0.82,"p_ours":0.15,"opts":["cat_file","show_path","env_vars","env_var_get","which_cmd"]}
+{"text":"list dirs in path","intent":"show_path","src":"intents/g03.jsonl","teacher":"list_files","conf":0.71,"p_ours":0.08,"opts":["which_cmd","env_var_get","env_vars","show_path","list_files"]}
+{"text":"check whether cargo bin is in PATH","intent":"show_path","src":"intents/g03.jsonl","teacher":"which_cmd","conf":1,"p_ours":0,"opts":["which_cmd","show_path","env_var_get","file_type","file_stat"]}
+{"text":"pritn PATH","intent":"show_path","src":"intents/g03.jsonl","teacher":"env_var_get","conf":0.9,"p_ours":0.07,"opts":["which_cmd","env_var_get","env_vars","show_path","current_dir"]}
+{"text":"show PATH","intent":"show_path","src":"intents/g03.jsonl","teacher":"env_var_get","conf":0.75,"p_ours":0.21,"opts":["which_cmd","env_vars","show_path","current_dir","env_var_get"]}
+{"text":"pokaż PATH","intent":"show_path","src":"intents/g03.jsonl","teacher":"env_var_get","conf":0.83,"p_ours":0.14,"opts":["env_var_get","env_vars","current_dir","which_cmd","show_path"]}
+{"text":"pokaż echo $PATH","intent":"show_path","src":"intents/g03.jsonl","teacher":"env_var_get","conf":0.95,"p_ours":0.03,"opts":["env_var_get","show_path","which_cmd","env_vars","current_dir"]}
+{"text":"jak wyglada moj PATH","intent":"show_path","src":"intents/g03.jsonl","teacher":"env_var_get","conf":0.77,"p_ours":0.19,"opts":["show_path","which_cmd","env_vars","memory_usage","env_var_get"]}
+{"text":"zawartosc zmiennej PATH","intent":"show_path","src":"intents/g03.jsonl","teacher":"env_var_get","conf":0.95,"p_ours":0.04,"opts":["env_vars","show_path","cat_file","which_cmd","env_var_get"]}
+{"text":"moja sciezka PATH","intent":"show_path","src":"intents/g03.jsonl","teacher":"env_var_get","conf":0.89,"p_ours":0.09,"opts":["current_dir","env_vars","which_cmd","show_path","env_var_get"]}
+{"text":"co mam w zmiennej path","intent":"show_path","src":"intents/g03.jsonl","teacher":"env_var_get","conf":0.95,"p_ours":0.04,"opts":["env_vars","env_var_get","git_diff","show_path","which_cmd"]}
+{"text":"data systemowa","intent":"date_time","src":"intents/g03.jsonl","teacher":"system_info","conf":0.92,"p_ours":0.03,"opts":["timezone","system_info","date_time","journal_errors"]}
+{"text":"last 100 log lines for nginx","intent":"journal_service","src":"intents/g03.jsonl","teacher":"tail_file","conf":0.79,"p_ours":0.16,"opts":["tail_file","dmesg","journal_service","docker_logs"]}
+{"text":"service logs for docker","intent":"journal_service","src":"intents/g03.jsonl","teacher":"docker_logs","conf":0.64,"p_ours":0.26,"opts":["docker_logs","service_stop","service_restart","journal_service"]}
+{"text":"print fifty lines of docker logs from journald","intent":"journal_service","src":"intents/g03.jsonl","teacher":"docker_logs","conf":0.79,"p_ours":0.13,"opts":["docker_logs","journal_service","dmesg","journal_errors"]}
+{"text":"nginx logs last 200 lines","intent":"journal_service","src":"intents/g03.jsonl","teacher":"tail_file","conf":0.97,"p_ours":0.01,"opts":["tail_file","journal_service","docker_logs","dmesg"]}
+{"text":"logi usługi docker","intent":"journal_service","src":"intents/g03.jsonl","teacher":"docker_logs","conf":0.76,"p_ours":0.17,"opts":["docker_prune","journal_service","docker_logs","dmesg"]}
+{"text":"ostatnie 100 linii logów nginx","intent":"journal_service","src":"intents/g03.jsonl","teacher":"tail_file","conf":0.81,"p_ours":0.13,"opts":["tail_file","dmesg","journal_service","docker_logs"]}
+{"text":"logi serwisu docker","intent":"journal_service","src":"intents/g03.jsonl","teacher":"docker_logs","conf":0.96,"p_ours":0.02,"opts":["journal_service","docker_compose_up","docker_prune","docker_logs"]}
+{"text":"which gpu","intent":"gpu_info","src":"intents/g04.jsonl","teacher":"which_cmd","conf":0.99,"p_ours":0.01,"opts":["battery","usb_devices","gpu_info","which_cmd"]}
+{"text":"jaka mam grafike","intent":"gpu_info","src":"intents/g04.jsonl","teacher":"none","conf":0.8,"p_ours":0.06,"opts":["os_release","env_var_get","gpu_info","system_info"]}
+{"text":"find out if tmux is installed","intent":"package_installed","src":"intents/g04.jsonl","teacher":"which_cmd","conf":0.74,"p_ours":0.21,"opts":["disk_mounts","block_devices","which_cmd","package_installed"]}
+{"text":"installed packages matching python","intent":"package_installed","src":"intents/g04.jsonl","teacher":"none","conf":0.68,"p_ours":0.26,"opts":["package_installed","system_update","install_package","which_cmd"]}
+{"text":"list installed packages with openjdk in the name","intent":"package_installed","src":"intents/g04.jsonl","teacher":"none","conf":0.64,"p_ours":0.29,"opts":["install_package","system_update","replace_text","package_installed"]}
+{"text":"czy python3 jest zainstalowany czy nie","intent":"package_installed","src":"intents/g04.jsonl","teacher":"which_cmd","conf":0.68,"p_ours":0.25,"opts":["which_cmd","kernel_version","package_installed","os_release"]}
+{"text":"zainstalowane pakiety z python w nazwie","intent":"package_installed","src":"intents/g04.jsonl","teacher":"none","conf":0.66,"p_ours":0.26,"opts":["package_installed","install_package","system_update","which_cmd"]}
+{"text":"which files did i touch","intent":"git_status","src":"intents/g04.jsonl","teacher":"recent_files","conf":0.9,"p_ours":0.02,"opts":["grep_files_containing","git_status","recent_files","find_by_name"]}
+{"text":"ktore pliki ruszalem","intent":"git_status","src":"intents/g04.jsonl","teacher":"recent_files","conf":0.8,"p_ours":0.06,"opts":["largest_files","grep_files_containing","git_status","recent_files"]}
+{"text":"pokaz roznice w plikach","intent":"git_diff","src":"intents/g04.jsonl","teacher":"diff_files","conf":0.95,"p_ours":0,"opts":["git_diff","hidden_files","diff_files","find_by_ext"]}
+{"text":"preview the commit diff","intent":"git_diff_staged","src":"intents/g04.jsonl","teacher":"git_diff","conf":0.82,"p_ours":0.02,"opts":["git_diff_staged","git_undo_commit","git_commit","git_diff"]}
+{"text":"przejrzyj zmiany przed commitem","intent":"git_diff_staged","src":"intents/g04.jsonl","teacher":"none","conf":0.66,"p_ours":0.27,"opts":["git_stash","git_undo_commit","git_diff_staged","git_commit"]}
+{"text":"zmiany dodane ale niezacommitowane","intent":"git_diff_staged","src":"intents/g04.jsonl","teacher":"git_diff","conf":0.97,"p_ours":0,"opts":["git_diff_staged","git_discard_changes","git_diff","git_commit"]}
+{"text":"podgląd diffa commita","intent":"git_diff_staged","src":"intents/g04.jsonl","teacher":"none","conf":0.86,"p_ours":0.08,"opts":["git_undo_commit","git_diff_staged","git_commit","git_log"]}
+{"text":"pokaż diff wszystkiego w poczekalni","intent":"git_diff_staged","src":"intents/g04.jsonl","teacher":"git_diff","conf":0.7,"p_ours":0.09,"opts":["git_diff","git_discard_changes","git_branches","git_diff_staged"]}
+{"text":"open branch feature/api-v2","intent":"git_new_branch","src":"intents/g04.jsonl","teacher":"git_switch_branch","conf":0.95,"p_ours":0.03,"opts":["git_branches","git_new_branch","git_delete_branch","git_switch_branch"]}
+{"text":"restore index.html to its committed version","intent":"git_discard_changes","src":"intents/g05.jsonl","teacher":"none","conf":0.66,"p_ours":0.27,"opts":["git_log","git_diff_staged","git_discard_changes","git_commit"]}
+{"text":"przywróć plik src/app.js do ostatniego commita","intent":"git_discard_changes","src":"intents/g05.jsonl","teacher":"none","conf":0.65,"p_ours":0.28,"opts":["git_blame","git_undo_commit","git_stash_pop","git_discard_changes"]}
+{"text":"schowaj moje zmiany","intent":"git_stash","src":"intents/g05.jsonl","teacher":"git_diff","conf":0.96,"p_ours":0,"opts":["git_stash_pop","git_stash","git_discard_changes","git_diff"]}
+{"text":"schowaj zmodyfikowane pliki","intent":"git_stash","src":"intents/g05.jsonl","teacher":"git_status","conf":0.96,"p_ours":0,"opts":["git_add_all","git_stash","find_recent","git_status"]}
+{"text":"przechowaj moje bieżące edycje w schowku","intent":"git_stash","src":"intents/g05.jsonl","teacher":"none","conf":0.7,"p_ours":0.21,"opts":["git_diff","git_discard_changes","git_stash_pop","git_stash"]}
+{"text":"git stash poprosze","intent":"git_stash","src":"intents/g05.jsonl","teacher":"git_stash_pop","conf":0.96,"p_ours":0.02,"opts":["git_status","git_stash","git_stash_pop","git_init"]}
+{"text":"odstashuj","intent":"git_stash_pop","src":"intents/g05.jsonl","teacher":"git_stash","conf":0.8,"p_ours":0.14,"opts":["git_stash_pop","git_blame","git_push","git_stash"]}
+{"text":"pobierz aktualizacje","intent":"git_pull","src":"intents/g05.jsonl","teacher":"system_update","conf":0.92,"p_ours":0.05,"opts":["git_pull","git_current_branch","system_update","git_clone","git_push"]}
+{"text":"ściągnij to co jest na githubie","intent":"git_pull","src":"intents/g05.jsonl","teacher":"git_clone","conf":0.84,"p_ours":0.09,"opts":["git_clone","git_push","git_remote","git_current_branch","git_pull"]}
+{"text":"git add kropka","intent":"git_add_all","src":"intents/g05.jsonl","teacher":"none","conf":0.85,"p_ours":0.12,"opts":["git_clone","git_add_all","git_init","git_status"]}
+{"text":"co chodzi w dockerze","intent":"docker_ps","src":"intents/g05.jsonl","teacher":"none","conf":0.88,"p_ours":0.08,"opts":["docker_images","docker_ps","docker_ps_all","docker_prune","docker_exec"]}
+{"text":"show me the last 200 log lines of web","intent":"docker_logs","src":"intents/g05.jsonl","teacher":"tail_file","conf":0.81,"p_ours":0.02,"opts":["dmesg","docker_logs","journal_service","tail_file"]}
+{"text":"stream logs from postgres","intent":"docker_logs","src":"intents/g05.jsonl","teacher":"tail_follow","conf":0.7,"p_ours":0.07,"opts":["docker_stop","tail_follow","docker_logs","docker_compose_up"]}
+{"text":"show logs from db, last twenty lines","intent":"docker_logs","src":"intents/g05.jsonl","teacher":"tail_file","conf":0.73,"p_ours":0.02,"opts":["tail_file","dmesg","journal_service","docker_logs"]}
+{"text":"live log output from proxy","intent":"docker_logs","src":"intents/g05.jsonl","teacher":"tail_follow","conf":0.7,"p_ours":0.02,"opts":["dmesg","journal_service","tail_follow","docker_logs"]}
+{"text":"shwo logs for nginx","intent":"docker_logs","src":"intents/g05.jsonl","teacher":"journal_service","conf":0.73,"p_ours":0.01,"opts":["journal_service","docker_images","grep_text","docker_logs"]}
+{"text":"pokaz logi redisa na zywo","intent":"docker_logs","src":"intents/g05.jsonl","teacher":"tail_follow","conf":0.61,"p_ours":0.03,"opts":["tail_follow","journal_service","docker_images","docker_logs"]}
+{"text":"pokaż ostatnie 200 linii logów weba","intent":"docker_logs","src":"intents/g05.jsonl","teacher":"tail_file","conf":0.92,"p_ours":0,"opts":["docker_logs","tail_file","dmesg","journal_service"]}
+{"text":"strumieniuj logi z postgresa","intent":"docker_logs","src":"intents/g05.jsonl","teacher":"none","conf":0.69,"p_ours":0.09,"opts":["docker_logs","journal_service","docker_compose_up","docker_stop"]}
+{"text":"pokaż logi db, ostatnie dwadzieścia linii","intent":"docker_logs","src":"intents/g05.jsonl","teacher":"tail_file","conf":0.62,"p_ours":0.06,"opts":["journal_service","docker_logs","dmesg","tail_file"]}
+{"text":"śledź na bieżąco logi backend","intent":"docker_logs","src":"intents/g05.jsonl","teacher":"tail_follow","conf":0.95,"p_ours":0.03,"opts":["docker_stop","tail_follow","docker_logs","docker_images"]}
+{"text":"how much space do my images take, list them","intent":"docker_images","src":"intents/g05.jsonl","teacher":"dir_size","conf":0.69,"p_ours":0,"opts":["docker_ps_all","docker_ps","dir_size","disk_free","docker_images"]}
+{"text":"shut down my-app","intent":"docker_stop","src":"intents/g05.jsonl","teacher":"service_stop","conf":0.66,"p_ours":0.04,"opts":["service_stop","docker_stop","docker_stop_all","docker_compose_down"]}
+{"text":"bring down the db container","intent":"docker_stop","src":"intents/g05.jsonl","teacher":"docker_compose_down","conf":0.64,"p_ours":0.28,"opts":["docker_stop","docker_compose_down","docker_stop_all","docker_exec"]}
+{"text":"stop mongo","intent":"docker_stop","src":"intents/g05.jsonl","teacher":"service_stop","conf":0.85,"p_ours":0.01,"opts":["docker_stop_all","kill_by_name","docker_stop","service_stop"]}
+{"text":"stopnij nginxa","intent":"docker_stop","src":"intents/g05.jsonl","teacher":"service_stop","conf":0.84,"p_ours":0.01,"opts":["service_stop","docker_compose_down","docker_logs","docker_stop"]}
+{"text":"zatrzymaj mongo","intent":"docker_stop","src":"intents/g05.jsonl","teacher":"service_stop","conf":0.71,"p_ours":0.03,"opts":["service_stop","docker_stop_all","kill_by_name","docker_stop"]}
+{"text":"bring down all containers","intent":"docker_stop_all","src":"intents/g05.jsonl","teacher":"docker_compose_down","conf":0.74,"p_ours":0.2,"opts":["docker_ps_all","docker_compose_down","docker_stats","docker_stop_all"]}
+{"text":"sprunuj dockera","intent":"docker_prune","src":"intents/g05.jsonl","teacher":"none","conf":0.66,"p_ours":0.15,"opts":["docker_prune","docker_images","docker_stats","docker_ps"]}
+{"text":"shell into postgres","intent":"docker_exec","src":"intents/g05.jsonl","teacher":"none","conf":0.89,"p_ours":0.08,"opts":["docker_exec","service_start","service_stop","ssh_connect"]}
+{"text":"exec it into elastic","intent":"docker_exec","src":"intents/g05.jsonl","teacher":"none","conf":0.69,"p_ours":0.21,"opts":["docker_stop","make_executable","ssh_connect","docker_exec"]}
+{"text":"get shel in web","intent":"docker_exec","src":"intents/g05.jsonl","teacher":"none","conf":0.75,"p_ours":0.08,"opts":["env_var_get","docker_compose_up","show_path","docker_exec"]}
+{"text":"statsy dzialajacych kontenerow","intent":"docker_stats","src":"intents/g05.jsonl","teacher":"docker_ps","conf":0.78,"p_ours":0.15,"opts":["docker_stop_all","docker_ps_all","docker_ps","docker_exec","docker_stats"]}
+{"text":"up the stack","intent":"docker_compose_up","src":"intents/g05.jsonl","teacher":"none","conf":0.86,"p_ours":0.07,"opts":["docker_compose_up","git_stash_pop","docker_ps","docker_compose_down"]}
+{"text":"położ usługi compose","intent":"docker_compose_down","src":"intents/g05.jsonl","teacher":"docker_compose_up","conf":0.71,"p_ours":0.22,"opts":["listening_ports","journal_service","docker_compose_down","docker_compose_up"]}
+{"text":"położ stack docker compose","intent":"docker_compose_down","src":"intents/g05.jsonl","teacher":"docker_compose_up","conf":0.6,"p_ours":0.2,"opts":["docker_compose_up","docker_compose_down","docker_stats","docker_prune"]}
+{"text":"let me execute ./start","intent":"make_executable","src":"shell/train.jsonl","teacher":"none","conf":0.62,"p_ours":0.06,"opts":["docker_compose_up","service_start","chmod","make_executable"]}
+{"text":"$env:COMPUTERNAME","intent":"hostname","src":"shell/train.jsonl","teacher":"env_var_get","conf":0.73,"p_ours":0.22,"opts":["hostname","env_var_get","env_vars","system_info"]}
+{"text":"echo %PATH%","intent":"show_path","src":"shell/train.jsonl","teacher":"env_var_get","conf":0.98,"p_ours":0.02,"opts":["env_vars","env_var_get","show_path","current_dir","which_cmd"]}
+{"text":"pokaż PATH","intent":"show_path","src":"shell/train.jsonl","teacher":"env_var_get","conf":0.7,"p_ours":0.25,"opts":["env_var_get","which_cmd","env_vars","show_path","current_dir"]}
+{"text":"schtasks /query - list scheduled tasks","intent":"cron_list","src":"shell/train.jsonl","teacher":"none","conf":0.86,"p_ours":0.11,"opts":["gpu_info","usb_devices","cron_list","cron_edit"]}
+{"text":"pokaż zaplanowane zadania (Get-ScheduledTask)","intent":"cron_list","src":"shell/train.jsonl","teacher":"none","conf":0.66,"p_ours":0.27,"opts":["git_pull","cron_edit","temperature","cron_list"]}
+{"text":"event log entries for the W3SVC service","intent":"journal_service","src":"shell/train.jsonl","teacher":"none","conf":0.92,"p_ours":0.06,"opts":["dmesg","journal_errors","journal_service","tail_follow"]}
+{"text":"Get-NetTCPConnection nie ma na linuxie, ale sprawdź kto słucha na 8443","intent":"process_on_port","src":"shell/train.jsonl","teacher":"listening_ports","conf":0.76,"p_ours":0.2,"opts":["port_check","established_connections","process_on_port","users_logged_in","listening_ports"]}

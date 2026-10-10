@@ -1,0 +1,90 @@
+{
+ "rows": 9875,
+ "answered": 9875,
+ "failed": 0,
+ "intentAgree": 9636,
+ "flagged": 112,
+ "riskAgree": 9322,
+ "riskFlags": [
+  {
+   "intent": "mkdir",
+   "ours": "safe",
+   "teacher": "medium",
+   "share": 0.94,
+   "n": 67
+  },
+  {
+   "intent": "touch_file",
+   "ours": "safe",
+   "teacher": "medium",
+   "share": 0.94,
+   "n": 66
+  },
+  {
+   "intent": "git_add_all",
+   "ours": "safe",
+   "teacher": "medium",
+   "share": 0.8,
+   "n": 64
+  },
+  {
+   "intent": "git_init",
+   "ours": "safe",
+   "teacher": "medium",
+   "share": 0.95,
+   "n": 64
+  }
+ ],
+ "worstIntents": [
+  [
+   "docker_logs",
+   0.609,
+   69
+  ],
+  [
+   "show_path",
+   0.627,
+   67
+  ],
+  [
+   "git_diff_staged",
+   0.794,
+   63
+  ],
+  [
+   "package_installed",
+   0.803,
+   66
+  ],
+  [
+   "journal_service",
+   0.821,
+   67
+  ],
+  [
+   "make_executable",
+   0.894,
+   66
+  ],
+  [
+   "docker_stop",
+   0.894,
+   66
+  ],
+  [
+   "find_process",
+   0.914,
+   70
+  ],
+  [
+   "grep_text",
+   0.918,
+   73
+  ],
+  [
+   "git_stash",
+   0.922,
+   64
+  ]
+ ]
+}

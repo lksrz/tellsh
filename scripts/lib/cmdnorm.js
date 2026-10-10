@@ -1,10 +1,14 @@
 // Normalisation of simple commands for the composer eval. Only rewrites that keep the behaviour:
 //   option bundling / order for ordinary commands: "ls -ltr" == "ls -l -r -t"; "tar -tzvf a.tgz" == "tar -t -z -v -f a.tgz"
 //   attached values: "head -n5 f" == "head -n 5 f" == "head -5 f"
-//   quoting: 'a.txt' == a.txt (words are compared after shell unquoting)
+//   quoting: 'a.txt' == a.txt (words are compared after shell unquoting), but a word that the shell expands
+//   (unquoted glob *.log, $HOME, $(..)) is kept distinct from the quoted literal ('*.log', '$HOME')
 // Kept strict: argument boundaries ('a b' != a b), case (-name != -iname, '*.LOG' != '*.log'),
 // find's expression order (filters before -delete matter), and every pipeline stage in order.
-import { splitCommand, rawOf } from '../../src/shellwords.js';
+import { splitCommand, rawOf, isExpansion, isGlob } from '../../src/shellwords.js';
+
+// literal words compare by value; expanded/globbed words keep a marker so `*.log` != '*.log'
+const tok = (w) => (isExpansion(w) ? `\u27e8expand\u27e9${rawOf(w)}` : isGlob(w) ? `\u27e8glob\u27e9${rawOf(w)}` : w);
 
 const VALUE_FLAGS = {
   grep: ['-A', '-B', '-C', '-e', '-m', '-f'],
@@ -58,7 +62,7 @@ function normSegment(w) {
 export function normCmd(cmd) {
   const r = splitCommand(String(cmd).trim(), 'posix', { keepRedirects: true });
   if (!r.ok) return 'raw:' + String(cmd).trim();
-  return JSON.stringify(r.segments.map((g) => ({ ...normSegment(g.words.map(rawOf)), sep: g.sep })));
+  return JSON.stringify(r.segments.map((g) => ({ ...normSegment(g.words.map(tok)), sep: g.sep })));
 }
 
 export const sameCmd = (a, b) => normCmd(a) === normCmd(b);

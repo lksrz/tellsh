@@ -288,6 +288,11 @@ def head_sub(cmd):
 
 
 # --- main ---------------------------------------------------------------------------
+def is_inside(p, root):
+    rp, rr = os.path.realpath(p), os.path.realpath(root)
+    return rp == rr or rp.startswith(rr + os.sep)
+
+
 def main():
     tldr = os.path.abspath(sys.argv[1] if len(sys.argv) > 1 else DEFAULT_TLDR)
     os.makedirs(OUT_DIR, exist_ok=True)
@@ -296,10 +301,15 @@ def main():
     for lang, ldir in LANG_DIRS.items():
         for plat in PLATFORMS:
             d = os.path.join(tldr, ldir, plat)
-            if not os.path.isdir(d):
+            # the checkout is untrusted: never follow symlinked directories or pages out of the tree
+            if not os.path.isdir(d) or os.path.islink(d) or not is_inside(d, tldr):
                 continue
             for fn in sorted(os.listdir(d)):
                 if not fn.endswith('.md'):
+                    continue
+                fp = os.path.join(d, fn)
+                if os.path.islink(fp) or not os.path.isfile(fp) or not is_inside(fp, tldr):
+                    skipped[lang] += 1
                     continue
                 name = fn[:-3].lower()
                 fam = page_family(plat, name)

@@ -1,0 +1,1329 @@
+{"text":"what are the 20 biggest files under /opt/backups","intent":"largest_files","lang":"en","shell":"bash","os":"linux"}
+{"text":"list the heaviest files in /var/lib/postgresql","intent":"largest_files","lang":"en","shell":"bash","os":"linux"}
+{"text":"jakie pliki zajmują najwięcej miejsca w /home/kasia","intent":"largest_files","lang":"pl","shell":"bash","os":"linux"}
+{"text":"najwieksze pliki w /mnt/archiwum, top 25","intent":"largest_files","lang":"pl","shell":"bash","os":"linux"}
+{"text":"show me the largest files in ~/Library/Caches","intent":"largest_files","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"pokaż 5 największych plików w ~/Pictures/2023","intent":"largest_files","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"Get-ChildItem D:\\Media -Recurse sorted by size, biggest 12 files","intent":"largest_files","lang":"en","shell":"powershell","os":"win32"}
+{"text":"znajdź największe pliki w C:\\Users\\marek\\AppData\\Local","intent":"largest_files","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"which files hog the most space in C:\\ProgramData?","intent":"largest_files","lang":"en","shell":"powershell","os":"win32"}
+{"text":"gci -r E:\\Projekty | posortuj po rozmiarze i pokaż największe pliki","intent":"largest_files","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"biggst fils in /usr/share pls","intent":"largest_files","lang":"en","shell":"sh","os":"linux"}
+{"text":"najwiekszych plikow szukam w ~/torrenty","intent":"largest_files","lang":"pl","shell":"fish","os":"linux"}
+{"text":"show the top 8 largest files on D:\\games","intent":"largest_files","lang":"en","shell":"cmd","os":"win32"}
+{"text":"hej, mógłbyś wylistować 30 najcięższych plików w /data/ml?","intent":"largest_files","lang":"pl","shell":"bash","os":"linux"}
+{"text":"which subfolders of /var take the most space","intent":"largest_dirs","lang":"en","shell":"bash","os":"linux"}
+{"text":"biggest directories in /home/ubuntu, top 7","intent":"largest_dirs","lang":"en","shell":"bash","os":"linux"}
+{"text":"które katalogi w /srv zajmują najwięcej miejsca","intent":"largest_dirs","lang":"pl","shell":"bash","os":"linux"}
+{"text":"najwieksze foldery w /usr/local","intent":"largest_dirs","lang":"pl","shell":"bash","os":"linux"}
+{"text":"what directories are the heaviest in ~/Developer","intent":"largest_dirs","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"jakie podfoldery w ~/Documents są największe?","intent":"largest_dirs","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"largest folders inside C:\\Users\\anna\\OneDrive","intent":"largest_dirs","lang":"en","shell":"powershell","os":"win32"}
+{"text":"największe podkatalogi w D:\\Backup, pokaż 10","intent":"largest_dirs","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"which subdirectories of C:\\Windows\\WinSxS are biggest","intent":"largest_dirs","lang":"en","shell":"powershell","os":"win32"}
+{"text":"ktore foldery w C:\\inetpub zjadaja dysk","intent":"largest_dirs","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"top 15 largest dirs under ~/.local/share","intent":"largest_dirs","lang":"en","shell":"fish","os":"linux"}
+{"text":"najwieksze katalogi w /opt","intent":"largest_dirs","lang":"pl","shell":"sh","os":"linux"}
+{"text":"biggest folders in C:\\temp","intent":"largest_dirs","lang":"en","shell":"cmd","os":"win32"}
+{"text":"du na podkatalogach /var/log, posortowane, najwieksze na gorze","intent":"largest_dirs","lang":"pl","shell":"bash","os":"linux"}
+{"text":"how much free space is left on my disks","intent":"disk_free","lang":"en","shell":"bash","os":"linux"}
+{"text":"df -h please","intent":"disk_free","lang":"en","shell":"bash","os":"linux"}
+{"text":"ile miejsca zostało na dysku?","intent":"disk_free","lang":"pl","shell":"bash","os":"linux"}
+{"text":"ile wolnego miejsca na partycjach","intent":"disk_free","lang":"pl","shell":"bash","os":"linux"}
+{"text":"is my SSD almost full? show free space","intent":"disk_free","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"sprawdz wolne miejsce na dyskach","intent":"disk_free","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"how much free space do my drives have","intent":"disk_free","lang":"en","shell":"powershell","os":"win32"}
+{"text":"ile GB wolnego na C: i D:?","intent":"disk_free","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"Get-PSDrive free space","intent":"disk_free","lang":"en","shell":"powershell","os":"win32"}
+{"text":"pokaż zajęte i wolne miejsce na wszystkich woluminach","intent":"disk_free","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"disk usage per filesystem","intent":"disk_free","lang":"en","shell":"fish","os":"linux"}
+{"text":"ile miejsca wolnego na systemie plików","intent":"disk_free","lang":"pl","shell":"sh","os":"linux"}
+{"text":"free space on drive C","intent":"disk_free","lang":"en","shell":"cmd","os":"win32"}
+{"text":"am I running out of disk space?","intent":"disk_free","lang":"en","shell":"bash","os":"linux"}
+{"text":"how big is /var/cache/apt","intent":"dir_size","lang":"en","shell":"bash","os":"linux"}
+{"text":"total size of ~/projects/webapp","intent":"dir_size","lang":"en","shell":"bash","os":"linux"}
+{"text":"ile waży katalog /srv/www?","intent":"dir_size","lang":"pl","shell":"bash","os":"linux"}
+{"text":"rozmiar folderu /home/piotr/Wideo","intent":"dir_size","lang":"pl","shell":"bash","os":"linux"}
+{"text":"how much space does ~/Library/Mail take up","intent":"dir_size","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"ile zajmuje ~/Downloads łącznie","intent":"dir_size","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"what's the size of C:\\Users\\tomek\\Desktop folder","intent":"dir_size","lang":"en","shell":"powershell","os":"win32"}
+{"text":"jaki jest calkowity rozmiar D:\\Zdjecia\\2022","intent":"dir_size","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"total size of folder C:\\Program Files\\Adobe","intent":"dir_size","lang":"en","shell":"powershell","os":"win32"}
+{"text":"policz rozmiar katalogu E:\\VMs","intent":"dir_size","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"du -sh of ~/.cache","intent":"dir_size","lang":"en","shell":"fish","os":"linux"}
+{"text":"size of /etc","intent":"dir_size","lang":"en","shell":"sh","os":"linux"}
+{"text":"ile zajmuje folder C:\\dane","intent":"dir_size","lang":"pl","shell":"cmd","os":"win32"}
+{"text":"podsumuj rozmiar katalogu node_modules","intent":"dir_size","lang":"pl","shell":"bash","os":"linux"}
+{"text":"find files named config.yaml under /etc","intent":"find_by_name","lang":"en","shell":"bash","os":"linux"}
+{"text":"search for anything called invoice in ~/Documents","intent":"find_by_name","lang":"en","shell":"bash","os":"linux"}
+{"text":"znajdź plik o nazwie docker-compose.yml w /opt","intent":"find_by_name","lang":"pl","shell":"bash","os":"linux"}
+{"text":"szukam pliku raport_q3 w /home/ewa","intent":"find_by_name","lang":"pl","shell":"bash","os":"linux"}
+{"text":"where is the file called notes.md in ~/Notes","intent":"find_by_name","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"znajdz pliki z \"backup\" w nazwie w ~/Desktop","intent":"find_by_name","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"find a file named appsettings.json in C:\\inetpub\\wwwroot","intent":"find_by_name","lang":"en","shell":"powershell","os":"win32"}
+{"text":"gdzie jest plik hosts w C:\\Windows","intent":"find_by_name","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"locate files whose name contains \"faktura\" in D:\\Ksiegowosc","intent":"find_by_name","lang":"en","shell":"powershell","os":"win32"}
+{"text":"wyszukaj plik o nazwie setup.exe w C:\\Users\\jan\\Downloads","intent":"find_by_name","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"find files matching name readme in ~/src","intent":"find_by_name","lang":"en","shell":"fish","os":"linux"}
+{"text":"znajdz plik id_rsa w /root","intent":"find_by_name","lang":"pl","shell":"sh","os":"linux"}
+{"text":"find file called boot.ini on C:\\","intent":"find_by_name","lang":"en","shell":"cmd","os":"win32"}
+{"text":"look for files with 'Makefile' in their name inside ~/code","intent":"find_by_name","lang":"en","shell":"bash","os":"linux"}
+{"text":"find all .log files in /var/log/nginx","intent":"find_by_ext","lang":"en","shell":"bash","os":"linux"}
+{"text":"list every .py file under ~/repos/scraper","intent":"find_by_ext","lang":"en","shell":"bash","os":"linux"}
+{"text":"znajdź wszystkie pliki .pdf w /home/ola/Dokumenty","intent":"find_by_ext","lang":"pl","shell":"bash","os":"linux"}
+{"text":"wszystkie pliki z rozszerzeniem .csv w /data/exports","intent":"find_by_ext","lang":"pl","shell":"bash","os":"linux"}
+{"text":"find .heic photos in ~/Pictures","intent":"find_by_ext","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"pokaż pliki .mp4 w ~/Movies","intent":"find_by_ext","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"find all *.ps1 scripts in C:\\Scripts","intent":"find_by_ext","lang":"en","shell":"powershell","os":"win32"}
+{"text":"znajdz wszystkie pliki .docx w D:\\Biuro","intent":"find_by_ext","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"Get-ChildItem -Recurse -Filter *.dll in C:\\Tools","intent":"find_by_ext","lang":"en","shell":"powershell","os":"win32"}
+{"text":"wyszukaj pliki z rozszerzeniem .bak w E:\\SQL","intent":"find_by_ext","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"all .toml files in ~/.config","intent":"find_by_ext","lang":"en","shell":"fish","os":"linux"}
+{"text":"znajdz pliki *.conf w /etc/apache2","intent":"find_by_ext","lang":"pl","shell":"sh","os":"linux"}
+{"text":"find all .txt files in C:\\notes","intent":"find_by_ext","lang":"en","shell":"cmd","os":"win32"}
+{"text":"gimme every .json in ./fixtures","intent":"find_by_ext","lang":"en","shell":"bash","os":"linux"}
+{"text":"files changed in the last hour in /var/www","intent":"find_recent","lang":"en","shell":"bash","os":"linux"}
+{"text":"what was modified today in ~/work","intent":"find_recent","lang":"en","shell":"bash","os":"linux"}
+{"text":"pliki zmienione w ciągu ostatnich 2 dni w /etc","intent":"find_recent","lang":"pl","shell":"bash","os":"linux"}
+{"text":"co się zmieniło w /srv/app w ostatnich 30 minutach","intent":"find_recent","lang":"pl","shell":"bash","os":"linux"}
+{"text":"recently modified files in ~/Desktop from the last week","intent":"find_recent","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"ktore pliki byly modyfikowane wczoraj w ~/projekty","intent":"find_recent","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"files modified in the last 24 hours in C:\\Logs","intent":"find_recent","lang":"en","shell":"powershell","os":"win32"}
+{"text":"pliki zmodyfikowane w ostatnich 3 dniach w D:\\Repo","intent":"find_recent","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"show what changed in C:\\Users\\me\\Documents during the last 6 hours","intent":"find_recent","lang":"en","shell":"powershell","os":"win32"}
+{"text":"znajdz pliki edytowane dzisiaj w C:\\Projekty","intent":"find_recent","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"files touched in the past 10 minutes in /tmp","intent":"find_recent","lang":"en","shell":"fish","os":"linux"}
+{"text":"modified within last day in /home/build","intent":"find_recent","lang":"en","shell":"sh","os":"linux"}
+{"text":"pliki zmienione w ostatnim tygodniu w C:\\share","intent":"find_recent","lang":"pl","shell":"cmd","os":"win32"}
+{"text":"find files modified less than 15 min ago in ./logs","intent":"find_recent","lang":"en","shell":"bash","os":"linux"}
+{"text":"find files older than 90 days in /var/backups","intent":"find_older_than","lang":"en","shell":"bash","os":"linux"}
+{"text":"files not modified for 1 year in ~/archive","intent":"find_older_than","lang":"en","shell":"bash","os":"linux"}
+{"text":"pliki starsze niż 30 dni w /tmp","intent":"find_older_than","lang":"pl","shell":"bash","os":"linux"}
+{"text":"znajdz pliki starsze niz 7 dni w /var/log/app","intent":"find_older_than","lang":"pl","shell":"bash","os":"linux"}
+{"text":"files older than 60 days in ~/Downloads","intent":"find_older_than","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"pokaż pliki niezmieniane od 180 dni w ~/Documents/old","intent":"find_older_than","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"find files older than 45 days in C:\\Temp","intent":"find_older_than","lang":"en","shell":"powershell","os":"win32"}
+{"text":"pliki starsze niż 14 dni w D:\\Logi","intent":"find_older_than","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"which files in C:\\inetpub\\logs haven't changed in over 120 days","intent":"find_older_than","lang":"en","shell":"powershell","os":"win32"}
+{"text":"znajdz stare pliki, starsze niz 365 dni, w E:\\Backup","intent":"find_older_than","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"files older than 5 days in ~/screenshots","intent":"find_older_than","lang":"en","shell":"fish","os":"linux"}
+{"text":"pliki starsze niz 2 dni w /var/spool","intent":"find_older_than","lang":"pl","shell":"sh","os":"linux"}
+{"text":"files older than 30 days in C:\\Windows\\Temp","intent":"find_older_than","lang":"en","shell":"cmd","os":"win32"}
+{"text":"anything in /srv/uploads older than 10 days?","intent":"find_older_than","lang":"en","shell":"bash","os":"linux"}
+{"text":"find files bigger than 500M in /home","intent":"find_larger_than","lang":"en","shell":"bash","os":"linux"}
+{"text":"files over 2G in /var/lib/docker","intent":"find_larger_than","lang":"en","shell":"bash","os":"linux"}
+{"text":"pliki większe niż 100 MB w /srv","intent":"find_larger_than","lang":"pl","shell":"bash","os":"linux"}
+{"text":"znajdz pliki powyzej 1G w /mnt/dane","intent":"find_larger_than","lang":"pl","shell":"bash","os":"linux"}
+{"text":"files larger than 250MB in ~/Movies","intent":"find_larger_than","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"pokaż pliki większe od 50M w ~/Library","intent":"find_larger_than","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"find files larger than 1GB in D:\\","intent":"find_larger_than","lang":"en","shell":"powershell","os":"win32"}
+{"text":"pliki wieksze niz 300 MB w C:\\Users\\kuba","intent":"find_larger_than","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"Get-ChildItem files with Length greater than 4GB in E:\\ISO","intent":"find_larger_than","lang":"en","shell":"powershell","os":"win32"}
+{"text":"znajdź pliki ponad 10MB w C:\\Projekty\\web","intent":"find_larger_than","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"files bigger than 20M in ~/Downloads","intent":"find_larger_than","lang":"en","shell":"fish","os":"linux"}
+{"text":"pliki wieksze niz 5G w /backup","intent":"find_larger_than","lang":"pl","shell":"sh","os":"linux"}
+{"text":"znajdz pliki wieksze niz 700MB w D:\\filmy","intent":"find_larger_than","lang":"pl","shell":"cmd","os":"win32"}
+{"text":"anything over 50 megs in ./dist?","intent":"find_larger_than","lang":"en","shell":"bash","os":"linux"}
+{"text":"find files smaller than 1k in /etc","intent":"find_smaller_than","lang":"en","shell":"bash","os":"linux"}
+{"text":"files under 100 bytes in ~/notes","intent":"find_smaller_than","lang":"en","shell":"bash","os":"linux"}
+{"text":"pliki mniejsze niż 10 KB w /var/www/html","intent":"find_smaller_than","lang":"pl","shell":"bash","os":"linux"}
+{"text":"znajdz malutkie pliki ponizej 2k w /tmp","intent":"find_smaller_than","lang":"pl","shell":"bash","os":"linux"}
+{"text":"files smaller than 5k in ~/Desktop","intent":"find_smaller_than","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"pliki mniejsze niz 500 bajtow w ~/src","intent":"find_smaller_than","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"find files smaller than 4KB in C:\\Config","intent":"find_smaller_than","lang":"en","shell":"powershell","os":"win32"}
+{"text":"pliki mniejsze od 20 KB w D:\\Teksty","intent":"find_smaller_than","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"tiny files under 512 bytes in C:\\Users\\me\\AppData\\Roaming","intent":"find_smaller_than","lang":"en","shell":"powershell","os":"win32"}
+{"text":"znajdz pliki ponizej 1 MB w E:\\Zdjecia","intent":"find_smaller_than","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"files below 3k in ~/.config","intent":"find_smaller_than","lang":"en","shell":"fish","os":"linux"}
+{"text":"pliki mniejsze niz 50k w /opt/app","intent":"find_smaller_than","lang":"pl","shell":"sh","os":"linux"}
+{"text":"files smaller than 2KB in C:\\ini","intent":"find_smaller_than","lang":"en","shell":"cmd","os":"win32"}
+{"text":"which files in ./data are under 64 bytes","intent":"find_smaller_than","lang":"en","shell":"bash","os":"linux"}
+{"text":"search for \"TODO\" in ~/projects/api","intent":"grep_text","lang":"en","shell":"bash","os":"linux"}
+{"text":"grep -r 'connection refused' /var/log","intent":"grep_text","lang":"en","shell":"bash","os":"linux"}
+{"text":"wyszukaj tekst \"ERROR\" w plikach w /srv/logs","intent":"grep_text","lang":"pl","shell":"bash","os":"linux"}
+{"text":"zgrepuj \"password\" w /etc","intent":"grep_text","lang":"pl","shell":"bash","os":"linux"}
+{"text":"search for the string useEffect in ~/code/frontend","intent":"grep_text","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"znajdz wystapienia \"localhost:8080\" w ~/repo","intent":"grep_text","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"search for \"Exception\" in all files under C:\\Logs","intent":"grep_text","lang":"en","shell":"powershell","os":"win32"}
+{"text":"szukaj tekstu \"Invoke-WebRequest\" w C:\\Scripts","intent":"grep_text","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"Select-String -Pattern \"api_key\" recursively in D:\\dev","intent":"grep_text","lang":"en","shell":"powershell","os":"win32"}
+{"text":"gdzie w D:\\Projekty pojawia sie \"FIXME\"?","intent":"grep_text","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"grep for deprecated in ~/src","intent":"grep_text","lang":"en","shell":"fish","os":"linux"}
+{"text":"przeszukaj /etc/nginx pod kątem \"server_name\"","intent":"grep_text","lang":"pl","shell":"sh","os":"linux"}
+{"text":"szukaj \"timeout\" w plikach w C:\\conf","intent":"grep_text","lang":"pl","shell":"cmd","os":"win32"}
+{"text":"find occurrences of 'import pandas' in ./notebooks","intent":"grep_text","lang":"en","shell":"bash","os":"linux"}
+{"text":"which files contain \"DATABASE_URL\" in ~/app","intent":"grep_files_containing","lang":"en","shell":"bash","os":"linux"}
+{"text":"list the files that mention \"copyright 2019\" under ./src","intent":"grep_files_containing","lang":"en","shell":"bash","os":"linux"}
+{"text":"które pliki zawierają słowo \"deprecated\" w /opt/lib","intent":"grep_files_containing","lang":"pl","shell":"bash","os":"linux"}
+{"text":"nazwy plikow zawierajacych \"secret\" w /etc","intent":"grep_files_containing","lang":"pl","shell":"bash","os":"linux"}
+{"text":"list files containing \"TODO\" in ~/Notes","intent":"grep_files_containing","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"pokaż tylko nazwy plików, w których jest \"console.log\" w ~/web","intent":"grep_files_containing","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"which files contain \"ConnectionString\" in C:\\inetpub","intent":"grep_files_containing","lang":"en","shell":"powershell","os":"win32"}
+{"text":"ktore pliki w D:\\Kod zawieraja \"HttpClient\"","intent":"grep_files_containing","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"list files that have the text \"admin\" in C:\\Configs","intent":"grep_files_containing","lang":"en","shell":"powershell","os":"win32"}
+{"text":"wypisz pliki, w których występuje \"localhost\" w C:\\Projekty","intent":"grep_files_containing","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"files mentioning \"fish_greeting\" in ~/.config","intent":"grep_files_containing","lang":"en","shell":"fish","os":"linux"}
+{"text":"pliki zawierajace \"root\" w /etc/cron.d","intent":"grep_files_containing","lang":"pl","shell":"sh","os":"linux"}
+{"text":"which files in C:\\src contain \"main(\"","intent":"grep_files_containing","lang":"en","shell":"cmd","os":"win32"}
+{"text":"grep -l \"BEGIN RSA\" in /home","intent":"grep_files_containing","lang":"en","shell":"bash","os":"linux"}
+{"text":"how many lines are in server.log","intent":"count_lines","lang":"en","shell":"bash","os":"linux"}
+{"text":"count lines in /etc/passwd","intent":"count_lines","lang":"en","shell":"bash","os":"linux"}
+{"text":"ile linii ma plik dane.csv?","intent":"count_lines","lang":"pl","shell":"bash","os":"linux"}
+{"text":"policz wiersze w /var/log/syslog","intent":"count_lines","lang":"pl","shell":"bash","os":"linux"}
+{"text":"line count of ~/todo.txt","intent":"count_lines","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"ile wierszy ma notatki.md","intent":"count_lines","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"how many lines in C:\\data\\export.csv","intent":"count_lines","lang":"en","shell":"powershell","os":"win32"}
+{"text":"policz linie w pliku D:\\logi\\app.log","intent":"count_lines","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"Get-Content C:\\temp\\users.txt | Measure-Object -Line","intent":"count_lines","lang":"en","shell":"powershell","os":"win32"}
+{"text":"ile linijek jest w C:\\Users\\ola\\lista.txt","intent":"count_lines","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"wc -l on requirements.txt","intent":"count_lines","lang":"en","shell":"fish","os":"linux"}
+{"text":"liczba linii w /etc/hosts","intent":"count_lines","lang":"pl","shell":"sh","os":"linux"}
+{"text":"ile linii ma plik C:\\raport.txt","intent":"count_lines","lang":"pl","shell":"cmd","os":"win32"}
+{"text":"number of lines in main.go?","intent":"count_lines","lang":"en","shell":"bash","os":"linux"}
+{"text":"how many lines of python are in ./src","intent":"count_lines_code","lang":"en","shell":"bash","os":"linux"}
+{"text":"total lines of code in all .js files in ~/app","intent":"count_lines_code","lang":"en","shell":"bash","os":"linux"}
+{"text":"ile linii kodu w plikach .go w /home/dev/service","intent":"count_lines_code","lang":"pl","shell":"bash","os":"linux"}
+{"text":"policz wszystkie linie w plikach .java w ./backend","intent":"count_lines_code","lang":"pl","shell":"bash","os":"linux"}
+{"text":"count total lines across .swift files in ~/ios-app","intent":"count_lines_code","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"ile mam linii w plikach .ts w ~/projekty/front","intent":"count_lines_code","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"total line count of all .cs files in C:\\Source\\Api","intent":"count_lines_code","lang":"en","shell":"powershell","os":"win32"}
+{"text":"policz linie we wszystkich plikach .ps1 w C:\\Scripts","intent":"count_lines_code","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"how many lines of code in .cpp files in D:\\engine","intent":"count_lines_code","lang":"en","shell":"powershell","os":"win32"}
+{"text":"suma linii w plikach .sql w D:\\Bazy","intent":"count_lines_code","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"count lines in all .rs files in ~/rust/proj","intent":"count_lines_code","lang":"en","shell":"fish","os":"linux"}
+{"text":"ile linii w plikach .sh w /usr/local/bin","intent":"count_lines_code","lang":"pl","shell":"sh","os":"linux"}
+{"text":"total lines of all .bat files in C:\\tools","intent":"count_lines_code","lang":"en","shell":"cmd","os":"win32"}
+{"text":"LOC for .php files in /var/www/site","intent":"count_lines_code","lang":"en","shell":"bash","os":"linux"}
+{"text":"how many files are in /var/log","intent":"count_files","lang":"en","shell":"bash","os":"linux"}
+{"text":"count files in ~/Pictures recursively","intent":"count_files","lang":"en","shell":"bash","os":"linux"}
+{"text":"ile plików jest w /srv/media?","intent":"count_files","lang":"pl","shell":"bash","os":"linux"}
+{"text":"policz pliki w katalogu /home/ania/muzyka","intent":"count_files","lang":"pl","shell":"bash","os":"linux"}
+{"text":"number of files in ~/Downloads","intent":"count_files","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"ile jest plikow w ~/Documents razem z podfolderami","intent":"count_files","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"how many files does C:\\Users\\me\\Desktop have","intent":"count_files","lang":"en","shell":"powershell","os":"win32"}
+{"text":"policz pliki w D:\\Archiwum","intent":"count_files","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"count all files under C:\\Windows\\System32","intent":"count_files","lang":"en","shell":"powershell","os":"win32"}
+{"text":"ile plikow w folderze E:\\Foto","intent":"count_files","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"count files in ~/.cache","intent":"count_files","lang":"en","shell":"fish","os":"linux"}
+{"text":"liczba plikow w /etc","intent":"count_files","lang":"pl","shell":"sh","os":"linux"}
+{"text":"how many files in C:\\work","intent":"count_files","lang":"en","shell":"cmd","os":"win32"}
+{"text":"file count for ./node_modules?","intent":"count_files","lang":"en","shell":"bash","os":"linux"}
+{"text":"how many words in essay.txt","intent":"count_words","lang":"en","shell":"bash","os":"linux"}
+{"text":"word count of README.md","intent":"count_words","lang":"en","shell":"bash","os":"linux"}
+{"text":"ile słów ma plik artykul.txt?","intent":"count_words","lang":"pl","shell":"bash","os":"linux"}
+{"text":"policz slowa w /home/ola/praca.md","intent":"count_words","lang":"pl","shell":"bash","os":"linux"}
+{"text":"count words in ~/Documents/letter.txt","intent":"count_words","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"ile wyrazow jest w rozdzial1.txt","intent":"count_words","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"word count of C:\\docs\\thesis.txt","intent":"count_words","lang":"en","shell":"powershell","os":"win32"}
+{"text":"policz słowa w pliku D:\\teksty\\opowiadanie.txt","intent":"count_words","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"how many words does C:\\Users\\jan\\notes.txt contain","intent":"count_words","lang":"en","shell":"powershell","os":"win32"}
+{"text":"liczba slow w pliku C:\\cv.txt","intent":"count_words","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"wc -w speech.txt","intent":"count_words","lang":"en","shell":"fish","os":"linux"}
+{"text":"ile slow w /tmp/opis.txt","intent":"count_words","lang":"pl","shell":"sh","os":"linux"}
+{"text":"count words in C:\\readme.txt","intent":"count_words","lang":"en","shell":"cmd","os":"win32"}
+{"text":"words in chapter3.md?","intent":"count_words","lang":"en","shell":"bash","os":"linux"}
+{"text":"most frequent lines in access.log","intent":"sort_uniq","lang":"en","shell":"bash","os":"linux"}
+{"text":"top 20 most common lines in ips.txt","intent":"sort_uniq","lang":"en","shell":"bash","os":"linux"}
+{"text":"najczęściej powtarzające się linie w /var/log/auth.log","intent":"sort_uniq","lang":"pl","shell":"bash","os":"linux"}
+{"text":"ktore linie powtarzaja sie najczesciej w lista.txt","intent":"sort_uniq","lang":"pl","shell":"bash","os":"linux"}
+{"text":"count duplicate lines in ~/urls.txt, most common first","intent":"sort_uniq","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"policz unikalne linie w errors.log i posortuj wg liczby","intent":"sort_uniq","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"most common lines in C:\\logs\\requests.log","intent":"sort_uniq","lang":"en","shell":"powershell","os":"win32"}
+{"text":"najczestsze wiersze w D:\\dane\\emails.txt, top 15","intent":"sort_uniq","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"group and count repeated lines in C:\\temp\\words.txt","intent":"sort_uniq","lang":"en","shell":"powershell","os":"win32"}
+{"text":"ile razy powtarza się każda linia w C:\\export\\tags.txt","intent":"sort_uniq","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"sort | uniq -c on hosts.txt","intent":"sort_uniq","lang":"en","shell":"fish","os":"linux"}
+{"text":"najczestsze linie w /tmp/out.txt","intent":"sort_uniq","lang":"pl","shell":"sh","os":"linux"}
+{"text":"most frequent lines in C:\\data\\names.txt","intent":"sort_uniq","lang":"en","shell":"cmd","os":"win32"}
+{"text":"histogram of lines in useragents.txt, top 5","intent":"sort_uniq","lang":"en","shell":"bash","os":"linux"}
+{"text":"show the 10 most recently modified files in ~/work","intent":"recent_files","lang":"en","shell":"bash","os":"linux"}
+{"text":"latest changed files in /var/log","intent":"recent_files","lang":"en","shell":"bash","os":"linux"}
+{"text":"ostatnio zmienione pliki w /srv/app","intent":"recent_files","lang":"pl","shell":"bash","os":"linux"}
+{"text":"pokaz 5 najnowszych plikow w ~/Pobrane","intent":"recent_files","lang":"pl","shell":"bash","os":"linux"}
+{"text":"most recent files in ~/Desktop","intent":"recent_files","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"najświeższe pliki w ~/Documents, top 20","intent":"recent_files","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"newest files in C:\\Users\\me\\Downloads","intent":"recent_files","lang":"en","shell":"powershell","os":"win32"}
+{"text":"ostatnio modyfikowane pliki w D:\\Projekty","intent":"recent_files","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"list the 15 latest modified files in C:\\Logs","intent":"recent_files","lang":"en","shell":"powershell","os":"win32"}
+{"text":"które pliki w C:\\temp były ostatnio zmieniane?","intent":"recent_files","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"recently changed files in ~/src","intent":"recent_files","lang":"en","shell":"fish","os":"linux"}
+{"text":"najnowsze pliki w /var/spool/mail","intent":"recent_files","lang":"pl","shell":"sh","os":"linux"}
+{"text":"latest files in C:\\share","intent":"recent_files","lang":"en","shell":"cmd","os":"win32"}
+{"text":"what did I touch last in ./project, top 8","intent":"recent_files","lang":"en","shell":"bash","os":"linux"}
+{"text":"find empty files in ~/projects","intent":"empty_files","lang":"en","shell":"bash","os":"linux"}
+{"text":"list zero-byte files in /var/log","intent":"empty_files","lang":"en","shell":"bash","os":"linux"}
+{"text":"znajdź puste pliki w /srv/data","intent":"empty_files","lang":"pl","shell":"bash","os":"linux"}
+{"text":"pliki o rozmiarze 0 bajtow w /tmp","intent":"empty_files","lang":"pl","shell":"bash","os":"linux"}
+{"text":"any empty files in ~/Documents?","intent":"empty_files","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"pokaz puste pliki w ~/repo","intent":"empty_files","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"find empty files in C:\\Data","intent":"empty_files","lang":"en","shell":"powershell","os":"win32"}
+{"text":"puste pliki w D:\\Eksport","intent":"empty_files","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"files with Length 0 in C:\\Users\\me\\AppData","intent":"empty_files","lang":"en","shell":"powershell","os":"win32"}
+{"text":"znajdz pliki zerowej wielkosci w C:\\Logi","intent":"empty_files","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"empty files in ~/notes","intent":"empty_files","lang":"en","shell":"fish","os":"linux"}
+{"text":"puste pliki w /etc","intent":"empty_files","lang":"pl","shell":"sh","os":"linux"}
+{"text":"zero byte files in C:\\temp","intent":"empty_files","lang":"en","shell":"cmd","os":"win32"}
+{"text":"0-byte files under ./build?","intent":"empty_files","lang":"en","shell":"bash","os":"linux"}
+{"text":"find empty directories in ~/projects","intent":"empty_dirs","lang":"en","shell":"bash","os":"linux"}
+{"text":"list empty folders under /srv","intent":"empty_dirs","lang":"en","shell":"bash","os":"linux"}
+{"text":"znajdź puste katalogi w /home/marta","intent":"empty_dirs","lang":"pl","shell":"bash","os":"linux"}
+{"text":"puste foldery w /var/www","intent":"empty_dirs","lang":"pl","shell":"bash","os":"linux"}
+{"text":"empty dirs in ~/Downloads","intent":"empty_dirs","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"pokaż puste foldery w ~/Pictures","intent":"empty_dirs","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"find empty folders in C:\\Users\\me\\Documents","intent":"empty_dirs","lang":"en","shell":"powershell","os":"win32"}
+{"text":"puste katalogi w D:\\Muzyka","intent":"empty_dirs","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"list directories with no files in C:\\Projects","intent":"empty_dirs","lang":"en","shell":"powershell","os":"win32"}
+{"text":"znajdz puste foldery w E:\\Backup","intent":"empty_dirs","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"empty directories in ~/src","intent":"empty_dirs","lang":"en","shell":"fish","os":"linux"}
+{"text":"puste katalogi w /opt","intent":"empty_dirs","lang":"pl","shell":"sh","os":"linux"}
+{"text":"empty folders in C:\\work","intent":"empty_dirs","lang":"en","shell":"cmd","os":"win32"}
+{"text":"which dirs in ./assets are empty","intent":"empty_dirs","lang":"en","shell":"bash","os":"linux"}
+{"text":"find duplicate files in ~/Pictures","intent":"duplicate_files","lang":"en","shell":"bash","os":"linux"}
+{"text":"detect identical files by content in /srv/media","intent":"duplicate_files","lang":"en","shell":"bash","os":"linux"}
+{"text":"znajdź zduplikowane pliki w /home/adam/Zdjecia","intent":"duplicate_files","lang":"pl","shell":"bash","os":"linux"}
+{"text":"duplikaty plikow w /mnt/nas","intent":"duplicate_files","lang":"pl","shell":"bash","os":"linux"}
+{"text":"find duplicate photos in ~/Desktop","intent":"duplicate_files","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"pokaz powtorzone pliki w ~/Downloads","intent":"duplicate_files","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"find duplicate files in D:\\Photos","intent":"duplicate_files","lang":"en","shell":"powershell","os":"win32"}
+{"text":"duplikaty w C:\\Users\\ola\\Muzyka","intent":"duplicate_files","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"files with the same hash in C:\\Backup","intent":"duplicate_files","lang":"en","shell":"powershell","os":"win32"}
+{"text":"znajdz identyczne pliki w E:\\Archiwum","intent":"duplicate_files","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"duplicate files in ~/music","intent":"duplicate_files","lang":"en","shell":"fish","os":"linux"}
+{"text":"zduplikowane pliki w /data","intent":"duplicate_files","lang":"pl","shell":"sh","os":"linux"}
+{"text":"find duplicate files in C:\\docs","intent":"duplicate_files","lang":"en","shell":"cmd","os":"win32"}
+{"text":"which files in ./assets are dupes?","intent":"duplicate_files","lang":"en","shell":"bash","os":"linux"}
+{"text":"list symlinks in /usr/local/bin","intent":"find_symlinks","lang":"en","shell":"bash","os":"linux"}
+{"text":"find all symbolic links under /etc","intent":"find_symlinks","lang":"en","shell":"bash","os":"linux"}
+{"text":"pokaż dowiązania symboliczne w /opt","intent":"find_symlinks","lang":"pl","shell":"bash","os":"linux"}
+{"text":"znajdz symlinki w /home/dev","intent":"find_symlinks","lang":"pl","shell":"bash","os":"linux"}
+{"text":"find symlinks in ~/dotfiles","intent":"find_symlinks","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"wylistuj linki symboliczne w /usr/local","intent":"find_symlinks","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"find symbolic links in C:\\Users\\me","intent":"find_symlinks","lang":"en","shell":"powershell","os":"win32"}
+{"text":"pokaż symlinki w D:\\Projekty","intent":"find_symlinks","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"list reparse points / symlinks in C:\\ProgramData","intent":"find_symlinks","lang":"en","shell":"powershell","os":"win32"}
+{"text":"znajdz dowiazania symboliczne w C:\\tools","intent":"find_symlinks","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"symlinks in ~/.config","intent":"find_symlinks","lang":"en","shell":"fish","os":"linux"}
+{"text":"dowiazania w /lib","intent":"find_symlinks","lang":"pl","shell":"sh","os":"linux"}
+{"text":"list symlinks in C:\\links","intent":"find_symlinks","lang":"en","shell":"cmd","os":"win32"}
+{"text":"what symlinks are in ./node_modules/.bin","intent":"find_symlinks","lang":"en","shell":"bash","os":"linux"}
+{"text":"find broken symlinks in /usr/lib","intent":"broken_symlinks","lang":"en","shell":"bash","os":"linux"}
+{"text":"dangling symbolic links in ~/","intent":"broken_symlinks","lang":"en","shell":"bash","os":"linux"}
+{"text":"znajdź zepsute dowiązania symboliczne w /etc","intent":"broken_symlinks","lang":"pl","shell":"bash","os":"linux"}
+{"text":"martwe symlinki w /opt","intent":"broken_symlinks","lang":"pl","shell":"bash","os":"linux"}
+{"text":"broken links in ~/dotfiles","intent":"broken_symlinks","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"wiszące linki symboliczne w /usr/local/bin","intent":"broken_symlinks","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"find broken symlinks in C:\\Users\\me","intent":"broken_symlinks","lang":"en","shell":"powershell","os":"win32"}
+{"text":"zepsute symlinki w D:\\dev","intent":"broken_symlinks","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"symbolic links pointing to nonexistent targets in C:\\links","intent":"broken_symlinks","lang":"en","shell":"powershell","os":"win32"}
+{"text":"znajdz uszkodzone dowiazania w C:\\tools","intent":"broken_symlinks","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"dead symlinks in ~/.local/bin","intent":"broken_symlinks","lang":"en","shell":"fish","os":"linux"}
+{"text":"zepsute linki w /lib","intent":"broken_symlinks","lang":"pl","shell":"sh","os":"linux"}
+{"text":"broken symlinks in C:\\work","intent":"broken_symlinks","lang":"en","shell":"cmd","os":"win32"}
+{"text":"symlinks whose target is gone in ./vendor","intent":"broken_symlinks","lang":"en","shell":"bash","os":"linux"}
+{"text":"ls -la /etc/nginx","intent":"list_files","lang":"en","shell":"bash","os":"linux"}
+{"text":"list files in /var/www with details","intent":"list_files","lang":"en","shell":"bash","os":"linux"}
+{"text":"co jest w katalogu /opt/app?","intent":"list_files","lang":"pl","shell":"bash","os":"linux"}
+{"text":"pokaż zawartość folderu /home/zosia","intent":"list_files","lang":"pl","shell":"bash","os":"linux"}
+{"text":"list the contents of ~/Desktop","intent":"list_files","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"wylistuj pliki w ~/Downloads","intent":"list_files","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"what's in C:\\Users\\me\\Documents","intent":"list_files","lang":"en","shell":"powershell","os":"win32"}
+{"text":"pokaż pliki w D:\\Projekty","intent":"list_files","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"dir C:\\inetpub with sizes","intent":"list_files","lang":"en","shell":"powershell","os":"win32"}
+{"text":"zawartosc folderu C:\\temp","intent":"list_files","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"list files in ~/src","intent":"list_files","lang":"en","shell":"fish","os":"linux"}
+{"text":"ls /tmp","intent":"list_files","lang":"pl","shell":"sh","os":"linux"}
+{"text":"dir C:\\work","intent":"list_files","lang":"en","shell":"cmd","os":"win32"}
+{"text":"show me what's in this directory","intent":"list_files","lang":"en","shell":"bash","os":"linux"}
+{"text":"show the directory tree of ~/projects/api","intent":"list_tree","lang":"en","shell":"bash","os":"linux"}
+{"text":"tree view of /etc/systemd, 3 levels deep","intent":"list_tree","lang":"en","shell":"bash","os":"linux"}
+{"text":"pokaż drzewo katalogów w /srv/app","intent":"list_tree","lang":"pl","shell":"bash","os":"linux"}
+{"text":"struktura folderow /home/ola/projekt","intent":"list_tree","lang":"pl","shell":"bash","os":"linux"}
+{"text":"tree of ~/Developer/site","intent":"list_tree","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"drzewko katalogu ~/notes do 2 poziomów","intent":"list_tree","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"show folder structure of C:\\Projects\\Web","intent":"list_tree","lang":"en","shell":"powershell","os":"win32"}
+{"text":"drzewo folderów D:\\Repo","intent":"list_tree","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"tree /f C:\\inetpub","intent":"list_tree","lang":"en","shell":"powershell","os":"win32"}
+{"text":"pokaz strukture katalogow C:\\Users\\jan\\Dokumenty","intent":"list_tree","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"directory tree of ~/.config, depth 1","intent":"list_tree","lang":"en","shell":"fish","os":"linux"}
+{"text":"drzewo /opt","intent":"list_tree","lang":"pl","shell":"sh","os":"linux"}
+{"text":"tree C:\\work","intent":"list_tree","lang":"en","shell":"cmd","os":"win32"}
+{"text":"hierarchy of ./src as a tree","intent":"list_tree","lang":"en","shell":"bash","os":"linux"}
+{"text":"list hidden files in ~","intent":"hidden_files","lang":"en","shell":"bash","os":"linux"}
+{"text":"show dotfiles in /root","intent":"hidden_files","lang":"en","shell":"bash","os":"linux"}
+{"text":"pokaż ukryte pliki w /home/kasia","intent":"hidden_files","lang":"pl","shell":"bash","os":"linux"}
+{"text":"pliki ukryte w /etc/skel","intent":"hidden_files","lang":"pl","shell":"bash","os":"linux"}
+{"text":"show hidden files in ~/projects/blog","intent":"hidden_files","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"ukryte pliki zaczynające się od kropki w ~","intent":"hidden_files","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"list hidden files in C:\\Users\\me","intent":"hidden_files","lang":"en","shell":"powershell","os":"win32"}
+{"text":"pokaż ukryte pliki w D:\\Dane","intent":"hidden_files","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"Get-ChildItem -Force hidden items in C:\\ProgramData","intent":"hidden_files","lang":"en","shell":"powershell","os":"win32"}
+{"text":"ukryte pliki w C:\\Users\\ola","intent":"hidden_files","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"dotfiles in ~/repo","intent":"hidden_files","lang":"en","shell":"fish","os":"linux"}
+{"text":"ukryte pliki w /srv","intent":"hidden_files","lang":"pl","shell":"sh","os":"linux"}
+{"text":"hidden files in C:\\work","intent":"hidden_files","lang":"en","shell":"cmd","os":"win32"}
+{"text":"which dotfiles are in ./ ?","intent":"hidden_files","lang":"en","shell":"bash","os":"linux"}
+{"text":"what type of file is data.bin","intent":"file_type","lang":"en","shell":"bash","os":"linux"}
+{"text":"what kind of file is /usr/bin/python3","intent":"file_type","lang":"en","shell":"bash","os":"linux"}
+{"text":"jaki to typ pliku archiwum.dat?","intent":"file_type","lang":"pl","shell":"bash","os":"linux"}
+{"text":"sprawdź format pliku /tmp/x","intent":"file_type","lang":"pl","shell":"bash","os":"linux"}
+{"text":"what's the file type of ~/Downloads/unknown","intent":"file_type","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"jakiego typu jest plik zdjecie.heic","intent":"file_type","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"what type of file is C:\\temp\\blob","intent":"file_type","lang":"en","shell":"powershell","os":"win32"}
+{"text":"jaki typ ma plik D:\\pobrane\\plik_bez_rozszerzenia","intent":"file_type","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"detect the format of C:\\Users\\me\\Desktop\\mystery.dat","intent":"file_type","lang":"en","shell":"powershell","os":"win32"}
+{"text":"rozpoznaj typ pliku C:\\dane\\dump","intent":"file_type","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"file type of backup.img","intent":"file_type","lang":"en","shell":"fish","os":"linux"}
+{"text":"jaki typ pliku /bin/ls","intent":"file_type","lang":"pl","shell":"sh","os":"linux"}
+{"text":"what kind of file is C:\\file.xyz","intent":"file_type","lang":"en","shell":"cmd","os":"win32"}
+{"text":"is firmware.bin an ELF or what? check the file type","intent":"file_type","lang":"en","shell":"bash","os":"linux"}
+{"text":"show metadata of /etc/shadow","intent":"file_stat","lang":"en","shell":"bash","os":"linux"}
+{"text":"stat report.pdf","intent":"file_stat","lang":"en","shell":"bash","os":"linux"}
+{"text":"pokaż metadane pliku /var/log/syslog","intent":"file_stat","lang":"pl","shell":"bash","os":"linux"}
+{"text":"uprawnienia, rozmiar i daty pliku notatki.txt","intent":"file_stat","lang":"pl","shell":"bash","os":"linux"}
+{"text":"file info for ~/Desktop/image.png","intent":"file_stat","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"kiedy zmodyfikowano plik config.json i jakie ma prawa","intent":"file_stat","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"show file properties of C:\\Windows\\notepad.exe","intent":"file_stat","lang":"en","shell":"powershell","os":"win32"}
+{"text":"szczegoly pliku D:\\dok\\umowa.docx","intent":"file_stat","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"Get-Item C:\\data\\db.sqlite timestamps and size","intent":"file_stat","lang":"en","shell":"powershell","os":"win32"}
+{"text":"metadane pliku C:\\Users\\ola\\cv.pdf","intent":"file_stat","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"stat ~/.bashrc","intent":"file_stat","lang":"en","shell":"fish","os":"linux"}
+{"text":"informacje o pliku /etc/passwd","intent":"file_stat","lang":"pl","shell":"sh","os":"linux"}
+{"text":"file details of C:\\boot.ini","intent":"file_stat","lang":"en","shell":"cmd","os":"win32"}
+{"text":"when was main.c last modified and its permissions","intent":"file_stat","lang":"en","shell":"bash","os":"linux"}
+{"text":"show the first 20 lines of app.log","intent":"head_file","lang":"en","shell":"bash","os":"linux"}
+{"text":"head /etc/fstab","intent":"head_file","lang":"en","shell":"bash","os":"linux"}
+{"text":"pokaż pierwsze 10 linii pliku dane.csv","intent":"head_file","lang":"pl","shell":"bash","os":"linux"}
+{"text":"poczatek pliku /var/log/dpkg.log","intent":"head_file","lang":"pl","shell":"bash","os":"linux"}
+{"text":"first 5 lines of ~/notes.md","intent":"head_file","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"pierwsze 30 wierszy z output.txt","intent":"head_file","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"show first 15 lines of C:\\logs\\server.log","intent":"head_file","lang":"en","shell":"powershell","os":"win32"}
+{"text":"pierwsze linie pliku D:\\export\\users.csv","intent":"head_file","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"Get-Content C:\\temp\\a.txt -Head 25","intent":"head_file","lang":"en","shell":"powershell","os":"win32"}
+{"text":"wyswietl 8 pierwszych linii C:\\dane\\lista.txt","intent":"head_file","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"head -n 3 todo.txt","intent":"head_file","lang":"en","shell":"fish","os":"linux"}
+{"text":"pierwsze linie /etc/hosts","intent":"head_file","lang":"pl","shell":"sh","os":"linux"}
+{"text":"first 10 lines of C:\\readme.txt","intent":"head_file","lang":"en","shell":"cmd","os":"win32"}
+{"text":"peek at the top of results.tsv","intent":"head_file","lang":"en","shell":"bash","os":"linux"}
+{"text":"show the last 50 lines of /var/log/nginx/error.log","intent":"tail_file","lang":"en","shell":"bash","os":"linux"}
+{"text":"tail app.log","intent":"tail_file","lang":"en","shell":"bash","os":"linux"}
+{"text":"pokaż ostatnie 20 linii pliku syslog","intent":"tail_file","lang":"pl","shell":"bash","os":"linux"}
+{"text":"koncowka pliku /var/log/auth.log","intent":"tail_file","lang":"pl","shell":"bash","os":"linux"}
+{"text":"last 10 lines of ~/install.log","intent":"tail_file","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"ostatnie 100 wierszy z debug.txt","intent":"tail_file","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"show the last 30 lines of C:\\logs\\service.log","intent":"tail_file","lang":"en","shell":"powershell","os":"win32"}
+{"text":"ostatnie linie pliku D:\\logi\\api.log","intent":"tail_file","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"Get-Content C:\\temp\\out.txt -Tail 15","intent":"tail_file","lang":"en","shell":"powershell","os":"win32"}
+{"text":"wyswietl koniec pliku C:\\dane\\raport.txt","intent":"tail_file","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"tail -n 40 build.log","intent":"tail_file","lang":"en","shell":"fish","os":"linux"}
+{"text":"ostatnie linie /var/log/messages","intent":"tail_file","lang":"pl","shell":"sh","os":"linux"}
+{"text":"last lines of C:\\setup.log","intent":"tail_file","lang":"en","shell":"cmd","os":"win32"}
+{"text":"what's at the bottom of errors.txt","intent":"tail_file","lang":"en","shell":"bash","os":"linux"}
+{"text":"follow /var/log/nginx/access.log live","intent":"tail_follow","lang":"en","shell":"bash","os":"linux"}
+{"text":"tail -f app.log","intent":"tail_follow","lang":"en","shell":"bash","os":"linux"}
+{"text":"śledź na bieżąco /var/log/syslog","intent":"tail_follow","lang":"pl","shell":"bash","os":"linux"}
+{"text":"podglądaj log /var/log/mysql/error.log w czasie rzeczywistym","intent":"tail_follow","lang":"pl","shell":"bash","os":"linux"}
+{"text":"watch ~/server.log as it grows","intent":"tail_follow","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"obserwuj na zywo plik debug.log","intent":"tail_follow","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"follow C:\\logs\\iis.log in real time","intent":"tail_follow","lang":"en","shell":"powershell","os":"win32"}
+{"text":"śledź plik D:\\logi\\app.log na żywo","intent":"tail_follow","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"Get-Content C:\\temp\\job.log -Wait","intent":"tail_follow","lang":"en","shell":"powershell","os":"win32"}
+{"text":"podgladaj na biezaco C:\\serwis\\log.txt","intent":"tail_follow","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"live tail of worker.log","intent":"tail_follow","lang":"en","shell":"fish","os":"linux"}
+{"text":"tail -f /var/log/cron","intent":"tail_follow","lang":"pl","shell":"sh","os":"linux"}
+{"text":"follow C:\\logs\\build.log live","intent":"tail_follow","lang":"en","shell":"cmd","os":"win32"}
+{"text":"stream new lines from /var/log/kern.log","intent":"tail_follow","lang":"en","shell":"bash","os":"linux"}
+{"text":"print the contents of /etc/hosts","intent":"cat_file","lang":"en","shell":"bash","os":"linux"}
+{"text":"cat config.ini","intent":"cat_file","lang":"en","shell":"bash","os":"linux"}
+{"text":"wyświetl zawartość pliku notatki.txt","intent":"cat_file","lang":"pl","shell":"bash","os":"linux"}
+{"text":"pokaz co jest w pliku /etc/resolv.conf","intent":"cat_file","lang":"pl","shell":"bash","os":"linux"}
+{"text":"show me ~/.zshrc","intent":"cat_file","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"wypisz zawartosc pliku todo.md","intent":"cat_file","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"print C:\\Windows\\System32\\drivers\\etc\\hosts","intent":"cat_file","lang":"en","shell":"powershell","os":"win32"}
+{"text":"pokaż zawartość D:\\dane\\info.txt","intent":"cat_file","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"Get-Content C:\\temp\\settings.json","intent":"cat_file","lang":"en","shell":"powershell","os":"win32"}
+{"text":"wyswietl plik C:\\Users\\ola\\lista.txt","intent":"cat_file","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"cat ~/.config/fish/config.fish","intent":"cat_file","lang":"en","shell":"fish","os":"linux"}
+{"text":"wyswietl /etc/os-release","intent":"cat_file","lang":"pl","shell":"sh","os":"linux"}
+{"text":"type C:\\readme.txt","intent":"cat_file","lang":"en","shell":"cmd","os":"win32"}
+{"text":"dump the whole file version.txt to screen","intent":"cat_file","lang":"en","shell":"bash","os":"linux"}
+{"text":"compress /var/www into site.tar.gz","intent":"compress_targz","lang":"en","shell":"bash","os":"linux"}
+{"text":"make a tarball of ~/projects/blog","intent":"compress_targz","lang":"en","shell":"bash","os":"linux"}
+{"text":"spakuj katalog /home/ola/zdjecia do zdjecia.tar.gz","intent":"compress_targz","lang":"pl","shell":"bash","os":"linux"}
+{"text":"zrob archiwum tar.gz z /etc","intent":"compress_targz","lang":"pl","shell":"bash","os":"linux"}
+{"text":"tar.gz the folder ~/Documents/thesis","intent":"compress_targz","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"skompresuj ~/notes do notes.tar.gz","intent":"compress_targz","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"create a tar.gz of C:\\Projects\\api","intent":"compress_targz","lang":"en","shell":"powershell","os":"win32"}
+{"text":"spakuj D:\\Logi do logi.tar.gz","intent":"compress_targz","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"archive C:\\data as backup.tar.gz","intent":"compress_targz","lang":"en","shell":"powershell","os":"win32"}
+{"text":"zrob tar.gz z folderu C:\\Users\\jan\\praca","intent":"compress_targz","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"tar czf of ~/dotfiles","intent":"compress_targz","lang":"en","shell":"fish","os":"linux"}
+{"text":"spakuj /opt/app tarem z gzipem","intent":"compress_targz","lang":"pl","shell":"sh","os":"linux"}
+{"text":"make a tar.gz of C:\\work","intent":"compress_targz","lang":"en","shell":"cmd","os":"win32"}
+{"text":"gzip tarball of ./dist named release.tar.gz","intent":"compress_targz","lang":"en","shell":"bash","os":"linux"}
+{"text":"extract backup.tar.gz","intent":"extract_targz","lang":"en","shell":"bash","os":"linux"}
+{"text":"untar release-2.1.tar.gz","intent":"extract_targz","lang":"en","shell":"bash","os":"linux"}
+{"text":"rozpakuj archiwum dane.tar.gz","intent":"extract_targz","lang":"pl","shell":"bash","os":"linux"}
+{"text":"wypakuj plik /tmp/logs.tgz","intent":"extract_targz","lang":"pl","shell":"bash","os":"linux"}
+{"text":"unpack ~/Downloads/node-v20.tar.gz","intent":"extract_targz","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"rozpakuj projekt.tar.gz","intent":"extract_targz","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"extract C:\\Downloads\\tools.tar.gz","intent":"extract_targz","lang":"en","shell":"powershell","os":"win32"}
+{"text":"rozpakuj D:\\archiwa\\stare.tar.gz","intent":"extract_targz","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"untar C:\\temp\\pkg.tgz","intent":"extract_targz","lang":"en","shell":"powershell","os":"win32"}
+{"text":"wypakuj archiwum tar.gz C:\\Users\\ola\\zdjecia.tar.gz","intent":"extract_targz","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"extract dump.tar.gz","intent":"extract_targz","lang":"en","shell":"fish","os":"linux"}
+{"text":"rozpakuj /root/conf.tar.gz","intent":"extract_targz","lang":"pl","shell":"sh","os":"linux"}
+{"text":"extract C:\\files\\source.tar.gz","intent":"extract_targz","lang":"en","shell":"cmd","os":"win32"}
+{"text":"tar xzf the file site.tgz","intent":"extract_targz","lang":"en","shell":"bash","os":"linux"}
+{"text":"zip the folder ~/reports into reports.zip","intent":"compress_zip","lang":"en","shell":"bash","os":"linux"}
+{"text":"create a zip archive of /var/www/html","intent":"compress_zip","lang":"en","shell":"bash","os":"linux"}
+{"text":"spakuj do zip folder /home/ewa/faktury","intent":"compress_zip","lang":"pl","shell":"bash","os":"linux"}
+{"text":"zrob zipa z katalogu projekt","intent":"compress_zip","lang":"pl","shell":"bash","os":"linux"}
+{"text":"zip ~/Desktop/photos","intent":"compress_zip","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"skompresuj ~/Documents/cv do cv.zip","intent":"compress_zip","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"compress C:\\Users\\me\\Documents to docs.zip","intent":"compress_zip","lang":"en","shell":"powershell","os":"win32"}
+{"text":"spakuj D:\\Zdjecia do zdjecia.zip","intent":"compress_zip","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"Compress-Archive C:\\Projects\\app -DestinationPath app.zip","intent":"compress_zip","lang":"en","shell":"powershell","os":"win32"}
+{"text":"utworz archiwum zip z C:\\raporty","intent":"compress_zip","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"zip ~/music into music.zip","intent":"compress_zip","lang":"en","shell":"fish","os":"linux"}
+{"text":"spakuj /srv/data zipem","intent":"compress_zip","lang":"pl","shell":"sh","os":"linux"}
+{"text":"zip the folder C:\\work","intent":"compress_zip","lang":"en","shell":"cmd","os":"win32"}
+{"text":"make a .zip of ./build","intent":"compress_zip","lang":"en","shell":"bash","os":"linux"}
+{"text":"unzip archive.zip","intent":"extract_zip","lang":"en","shell":"bash","os":"linux"}
+{"text":"extract photos.zip into the current dir","intent":"extract_zip","lang":"en","shell":"bash","os":"linux"}
+{"text":"rozpakuj plik dane.zip","intent":"extract_zip","lang":"pl","shell":"bash","os":"linux"}
+{"text":"wypakuj /tmp/paczka.zip","intent":"extract_zip","lang":"pl","shell":"bash","os":"linux"}
+{"text":"unzip ~/Downloads/fonts.zip","intent":"extract_zip","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"rozpakuj zipa projekt.zip","intent":"extract_zip","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"extract C:\\Downloads\\driver.zip","intent":"extract_zip","lang":"en","shell":"powershell","os":"win32"}
+{"text":"rozpakuj D:\\pobrane\\gra.zip","intent":"extract_zip","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"Expand-Archive C:\\temp\\logs.zip","intent":"extract_zip","lang":"en","shell":"powershell","os":"win32"}
+{"text":"wypakuj archiwum C:\\Users\\ola\\faktury.zip","intent":"extract_zip","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"unzip theme.zip","intent":"extract_zip","lang":"en","shell":"fish","os":"linux"}
+{"text":"rozpakuj /root/backup.zip","intent":"extract_zip","lang":"pl","shell":"sh","os":"linux"}
+{"text":"extract C:\\files\\setup.zip","intent":"extract_zip","lang":"en","shell":"cmd","os":"win32"}
+{"text":"decompress the zip export-2024.zip","intent":"extract_zip","lang":"en","shell":"bash","os":"linux"}
+{"text":"list the contents of backup.tar.gz","intent":"list_archive","lang":"en","shell":"bash","os":"linux"}
+{"text":"what's inside archive.zip","intent":"list_archive","lang":"en","shell":"bash","os":"linux"}
+{"text":"co jest w archiwum dane.tar.gz?","intent":"list_archive","lang":"pl","shell":"bash","os":"linux"}
+{"text":"pokaz zawartosc zipa projekt.zip bez rozpakowywania","intent":"list_archive","lang":"pl","shell":"bash","os":"linux"}
+{"text":"list files in ~/Downloads/sdk.zip","intent":"list_archive","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"wylistuj zawartość archiwum logs.tgz","intent":"list_archive","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"show what's inside C:\\Downloads\\pack.zip","intent":"list_archive","lang":"en","shell":"powershell","os":"win32"}
+{"text":"co zawiera D:\\archiwa\\stare.zip","intent":"list_archive","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"list entries of C:\\temp\\release.tar.gz","intent":"list_archive","lang":"en","shell":"powershell","os":"win32"}
+{"text":"pokaz pliki w archiwum C:\\Users\\ola\\zdjecia.zip","intent":"list_archive","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"tar tzf site.tar.gz","intent":"list_archive","lang":"en","shell":"fish","os":"linux"}
+{"text":"zawartosc archiwum /tmp/a.tar.gz","intent":"list_archive","lang":"pl","shell":"sh","os":"linux"}
+{"text":"list the contents of C:\\files\\data.zip","intent":"list_archive","lang":"en","shell":"cmd","os":"win32"}
+{"text":"peek inside dist.zip without extracting","intent":"list_archive","lang":"en","shell":"bash","os":"linux"}
+{"text":"set permissions of script.sh to 755","intent":"chmod","lang":"en","shell":"bash","os":"linux"}
+{"text":"chmod 600 ~/.ssh/id_ed25519","intent":"chmod","lang":"en","shell":"bash","os":"linux"}
+{"text":"zmień uprawnienia pliku config.yml na 644","intent":"chmod","lang":"pl","shell":"bash","os":"linux"}
+{"text":"ustaw prawa 700 na katalogu /srv/private","intent":"chmod","lang":"pl","shell":"bash","os":"linux"}
+{"text":"change permissions of deploy.sh to 750","intent":"chmod","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"nadaj plikowi secret.txt uprawnienia 400","intent":"chmod","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"set file mode 644 on C:\\data\\file.txt","intent":"chmod","lang":"en","shell":"powershell","os":"win32"}
+{"text":"zmien uprawnienia D:\\skrypty\\run.sh na 755","intent":"chmod","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"chmod 640 on C:\\web\\config.php","intent":"chmod","lang":"en","shell":"powershell","os":"win32"}
+{"text":"ustaw uprawnienia 600 dla C:\\klucze\\key.pem","intent":"chmod","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"chmod 755 ~/bin/tool","intent":"chmod","lang":"en","shell":"fish","os":"linux"}
+{"text":"zmien prawa /etc/app.conf na 644","intent":"chmod","lang":"pl","shell":"sh","os":"linux"}
+{"text":"set permissions 700 on C:\\private","intent":"chmod","lang":"en","shell":"cmd","os":"win32"}
+{"text":"give notes.txt mode 664","intent":"chmod","lang":"en","shell":"bash","os":"linux"}
+{"text":"make deploy.sh executable","intent":"make_executable","lang":"en","shell":"bash","os":"linux"}
+{"text":"chmod +x run.py","intent":"make_executable","lang":"en","shell":"bash","os":"linux"}
+{"text":"nadaj prawo wykonywania plikowi install.sh","intent":"make_executable","lang":"pl","shell":"bash","os":"linux"}
+{"text":"zrob plik start.sh wykonywalnym","intent":"make_executable","lang":"pl","shell":"bash","os":"linux"}
+{"text":"make ~/bin/backup executable","intent":"make_executable","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"ustaw +x na skrypt.sh","intent":"make_executable","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"make C:\\scripts\\build.sh executable","intent":"make_executable","lang":"en","shell":"powershell","os":"win32"}
+{"text":"nadaj prawa wykonywania D:\\narzedzia\\setup.sh","intent":"make_executable","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"add execute permission to C:\\tools\\run","intent":"make_executable","lang":"en","shell":"powershell","os":"win32"}
+{"text":"uczyn plik C:\\bin\\update.sh wykonywalnym","intent":"make_executable","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"chmod +x ~/scripts/sync.fish","intent":"make_executable","lang":"en","shell":"fish","os":"linux"}
+{"text":"nadaj +x /usr/local/bin/hello","intent":"make_executable","lang":"pl","shell":"sh","os":"linux"}
+{"text":"make C:\\tools\\script.sh executable","intent":"make_executable","lang":"en","shell":"cmd","os":"win32"}
+{"text":"I can't run ./configure, permission denied, make it executable","intent":"make_executable","lang":"en","shell":"bash","os":"linux"}
+{"text":"change owner of /var/www to www-data","intent":"chown","lang":"en","shell":"bash","os":"linux"}
+{"text":"chown -R deploy /srv/app","intent":"chown","lang":"en","shell":"bash","os":"linux"}
+{"text":"zmień właściciela /home/shared na kasia","intent":"chown","lang":"pl","shell":"bash","os":"linux"}
+{"text":"ustaw wlasciciela pliku data.db na postgres","intent":"chown","lang":"pl","shell":"bash","os":"linux"}
+{"text":"change the owner of ~/project to admin","intent":"chown","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"zmien wlasciciela /usr/local/share na marek","intent":"chown","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"set owner of C:\\data to Administrator","intent":"chown","lang":"en","shell":"powershell","os":"win32"}
+{"text":"zmien wlasciciela folderu D:\\Wspolne na jan","intent":"chown","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"take ownership of C:\\Program Files\\App for user bob","intent":"chown","lang":"en","shell":"powershell","os":"win32"}
+{"text":"ustaw wlasciciela C:\\web na IIS_IUSRS","intent":"chown","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"chown nginx /var/cache/nginx","intent":"chown","lang":"en","shell":"fish","os":"linux"}
+{"text":"zmien wlasciciela /opt/app na appuser","intent":"chown","lang":"pl","shell":"sh","os":"linux"}
+{"text":"change owner of C:\\share to ola","intent":"chown","lang":"en","shell":"cmd","os":"win32"}
+{"text":"make user git the owner of /home/git/repos","intent":"chown","lang":"en","shell":"bash","os":"linux"}
+{"text":"copy notes.txt to /tmp/notes.bak","intent":"copy","lang":"en","shell":"bash","os":"linux"}
+{"text":"cp -r ~/project ~/project-backup","intent":"copy","lang":"en","shell":"bash","os":"linux"}
+{"text":"skopiuj plik raport.pdf do /home/ola/Dokumenty","intent":"copy","lang":"pl","shell":"bash","os":"linux"}
+{"text":"skopiuj katalog /etc/nginx do /root/nginx-kopia","intent":"copy","lang":"pl","shell":"bash","os":"linux"}
+{"text":"copy ~/Desktop/logo.png to ~/Pictures","intent":"copy","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"skopiuj config.json do config.old.json","intent":"copy","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"copy C:\\data\\db.sqlite to D:\\backup","intent":"copy","lang":"en","shell":"powershell","os":"win32"}
+{"text":"skopiuj D:\\Zdjecia do E:\\Kopia","intent":"copy","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"Copy-Item C:\\Users\\me\\file.txt C:\\temp","intent":"copy","lang":"en","shell":"powershell","os":"win32"}
+{"text":"kopiuj folder C:\\projekt do C:\\projekt2","intent":"copy","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"copy ~/.vimrc to ~/dotfiles/","intent":"copy","lang":"en","shell":"fish","os":"linux"}
+{"text":"skopiuj /etc/hosts do /tmp","intent":"copy","lang":"pl","shell":"sh","os":"linux"}
+{"text":"copy C:\\a.txt to D:\\a.txt","intent":"copy","lang":"en","shell":"cmd","os":"win32"}
+{"text":"duplicate main.py as main_old.py","intent":"copy","lang":"en","shell":"bash","os":"linux"}
+{"text":"rename report.txt to report-final.txt","intent":"move_rename","lang":"en","shell":"bash","os":"linux"}
+{"text":"move photo.jpg to ~/Pictures","intent":"move_rename","lang":"en","shell":"bash","os":"linux"}
+{"text":"zmień nazwę pliku stary.csv na nowy.csv","intent":"move_rename","lang":"pl","shell":"bash","os":"linux"}
+{"text":"przenieś /tmp/dump.sql do /var/backups","intent":"move_rename","lang":"pl","shell":"bash","os":"linux"}
+{"text":"move ~/Downloads/app.dmg to ~/Applications","intent":"move_rename","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"przenies notatki.md do ~/Documents","intent":"move_rename","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"rename C:\\data\\a.txt to b.txt","intent":"move_rename","lang":"en","shell":"powershell","os":"win32"}
+{"text":"przenieś D:\\pobrane\\film.mkv do E:\\Filmy","intent":"move_rename","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"Move-Item C:\\temp\\logs C:\\archive\\logs","intent":"move_rename","lang":"en","shell":"powershell","os":"win32"}
+{"text":"zmien nazwe folderu C:\\projekt na C:\\projekt_v2","intent":"move_rename","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"mv draft.md post.md","intent":"move_rename","lang":"en","shell":"fish","os":"linux"}
+{"text":"przenies /root/x.conf do /etc/x.conf","intent":"move_rename","lang":"pl","shell":"sh","os":"linux"}
+{"text":"rename C:\\work\\old.doc to new.doc","intent":"move_rename","lang":"en","shell":"cmd","os":"win32"}
+{"text":"mv the file build.log into ./logs","intent":"move_rename","lang":"en","shell":"bash","os":"linux"}
+{"text":"delete old.log","intent":"delete_file","lang":"en","shell":"bash","os":"linux"}
+{"text":"remove /tmp/session.lock","intent":"delete_file","lang":"en","shell":"bash","os":"linux"}
+{"text":"usuń plik notatki_stare.txt","intent":"delete_file","lang":"pl","shell":"bash","os":"linux"}
+{"text":"skasuj /var/tmp/cache.bin","intent":"delete_file","lang":"pl","shell":"bash","os":"linux"}
+{"text":"rm ~/Desktop/screenshot.png","intent":"delete_file","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"usun plik backup.sql","intent":"delete_file","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"delete C:\\temp\\setup.exe","intent":"delete_file","lang":"en","shell":"powershell","os":"win32"}
+{"text":"usuń plik D:\\pobrane\\smieci.zip","intent":"delete_file","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"Remove-Item C:\\Users\\me\\test.txt","intent":"delete_file","lang":"en","shell":"powershell","os":"win32"}
+{"text":"skasuj plik C:\\dane\\stary.csv","intent":"delete_file","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"remove core.dump","intent":"delete_file","lang":"en","shell":"fish","os":"linux"}
+{"text":"usun /tmp/x.pid","intent":"delete_file","lang":"pl","shell":"sh","os":"linux"}
+{"text":"del C:\\work\\tmp.txt","intent":"delete_file","lang":"en","shell":"cmd","os":"win32"}
+{"text":"get rid of the file nohup.out","intent":"delete_file","lang":"en","shell":"bash","os":"linux"}
+{"text":"delete the directory /tmp/build","intent":"delete_dir","lang":"en","shell":"bash","os":"linux"}
+{"text":"rm -rf ~/old-project","intent":"delete_dir","lang":"en","shell":"bash","os":"linux"}
+{"text":"usuń katalog /home/ola/stare razem z zawartością","intent":"delete_dir","lang":"pl","shell":"bash","os":"linux"}
+{"text":"skasuj folder node_modules","intent":"delete_dir","lang":"pl","shell":"bash","os":"linux"}
+{"text":"remove the folder ~/Downloads/extracted","intent":"delete_dir","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"usun katalog ~/tmp/test rekurencyjnie","intent":"delete_dir","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"delete folder C:\\temp\\cache","intent":"delete_dir","lang":"en","shell":"powershell","os":"win32"}
+{"text":"usuń folder D:\\Stare\\projekt","intent":"delete_dir","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"Remove-Item -Recurse C:\\Users\\me\\junk","intent":"delete_dir","lang":"en","shell":"powershell","os":"win32"}
+{"text":"skasuj caly katalog C:\\build","intent":"delete_dir","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"rm -r ~/.cache/pip","intent":"delete_dir","lang":"en","shell":"fish","os":"linux"}
+{"text":"usun katalog /opt/oldapp","intent":"delete_dir","lang":"pl","shell":"sh","os":"linux"}
+{"text":"rmdir /s C:\\work\\tmp","intent":"delete_dir","lang":"en","shell":"cmd","os":"win32"}
+{"text":"nuke the dist directory","intent":"delete_dir","lang":"en","shell":"bash","os":"linux"}
+{"text":"delete all .tmp files in /var/tmp","intent":"delete_by_ext","lang":"en","shell":"bash","os":"linux"}
+{"text":"remove every .pyc file under ./src","intent":"delete_by_ext","lang":"en","shell":"bash","os":"linux"}
+{"text":"usuń wszystkie pliki .log w /srv/app/logs","intent":"delete_by_ext","lang":"pl","shell":"bash","os":"linux"}
+{"text":"skasuj pliki z rozszerzeniem .bak w /etc","intent":"delete_by_ext","lang":"pl","shell":"bash","os":"linux"}
+{"text":"delete all .DS_Store files in ~/Projects","intent":"delete_by_ext","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"usun wszystkie pliki .orig w ~/repo","intent":"delete_by_ext","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"delete all .tmp files in C:\\Temp","intent":"delete_by_ext","lang":"en","shell":"powershell","os":"win32"}
+{"text":"usuń wszystkie pliki .log w D:\\Logi","intent":"delete_by_ext","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"remove every *.bak in C:\\SQL\\Backups","intent":"delete_by_ext","lang":"en","shell":"powershell","os":"win32"}
+{"text":"skasuj pliki .old w C:\\konfig","intent":"delete_by_ext","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"delete all .swp files in ~/","intent":"delete_by_ext","lang":"en","shell":"fish","os":"linux"}
+{"text":"usun pliki .o w /usr/src/proj","intent":"delete_by_ext","lang":"pl","shell":"sh","os":"linux"}
+{"text":"del all .chk files in C:\\","intent":"delete_by_ext","lang":"en","shell":"cmd","os":"win32"}
+{"text":"clean up all the .class files in ./target","intent":"delete_by_ext","lang":"en","shell":"bash","os":"linux"}
+{"text":"create the directory /srv/data/2024","intent":"mkdir","lang":"en","shell":"bash","os":"linux"}
+{"text":"mkdir -p ~/projects/new/src","intent":"mkdir","lang":"en","shell":"bash","os":"linux"}
+{"text":"utwórz katalog /home/ola/faktury/2025","intent":"mkdir","lang":"pl","shell":"bash","os":"linux"}
+{"text":"stworz folder backup w /mnt","intent":"mkdir","lang":"pl","shell":"bash","os":"linux"}
+{"text":"make a folder ~/Desktop/inbox","intent":"mkdir","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"utworz katalog ~/code/rust/demo z rodzicami","intent":"mkdir","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"create folder C:\\Projects\\NewApp","intent":"mkdir","lang":"en","shell":"powershell","os":"win32"}
+{"text":"utwórz folder D:\\Zdjecia\\Wakacje","intent":"mkdir","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"New-Item -ItemType Directory C:\\logs\\archive","intent":"mkdir","lang":"en","shell":"powershell","os":"win32"}
+{"text":"stworz katalog C:\\dane\\import","intent":"mkdir","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"mkdir ~/tmp/scratch","intent":"mkdir","lang":"en","shell":"fish","os":"linux"}
+{"text":"utworz katalog /var/www/site","intent":"mkdir","lang":"pl","shell":"sh","os":"linux"}
+{"text":"make directory C:\\work\\out","intent":"mkdir","lang":"en","shell":"cmd","os":"win32"}
+{"text":"new dir called assets/img please","intent":"mkdir","lang":"en","shell":"bash","os":"linux"}
+{"text":"create an empty file notes.txt","intent":"touch_file","lang":"en","shell":"bash","os":"linux"}
+{"text":"touch /tmp/ready.flag","intent":"touch_file","lang":"en","shell":"bash","os":"linux"}
+{"text":"utwórz pusty plik README.md","intent":"touch_file","lang":"pl","shell":"bash","os":"linux"}
+{"text":"stworz pusty plik /etc/app/override.conf","intent":"touch_file","lang":"pl","shell":"bash","os":"linux"}
+{"text":"touch ~/Desktop/todo.txt","intent":"touch_file","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"zrob pusty plik .env","intent":"touch_file","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"create an empty file C:\\temp\\placeholder.txt","intent":"touch_file","lang":"en","shell":"powershell","os":"win32"}
+{"text":"utworz pusty plik D:\\notatki\\nowy.txt","intent":"touch_file","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"New-Item C:\\data\\marker.txt","intent":"touch_file","lang":"en","shell":"powershell","os":"win32"}
+{"text":"stworz pusty plik C:\\Users\\ola\\lista.txt","intent":"touch_file","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"touch ~/.hushlogin","intent":"touch_file","lang":"en","shell":"fish","os":"linux"}
+{"text":"utworz pusty plik /var/run/app.lock","intent":"touch_file","lang":"pl","shell":"sh","os":"linux"}
+{"text":"create empty file C:\\work\\a.txt","intent":"touch_file","lang":"en","shell":"cmd","os":"win32"}
+{"text":"make a blank file index.html","intent":"touch_file","lang":"en","shell":"bash","os":"linux"}
+{"text":"where am I","intent":"current_dir","lang":"en","shell":"bash","os":"linux"}
+{"text":"pwd","intent":"current_dir","lang":"en","shell":"bash","os":"linux"}
+{"text":"w jakim katalogu jestem?","intent":"current_dir","lang":"pl","shell":"bash","os":"linux"}
+{"text":"pokaż bieżący katalog","intent":"current_dir","lang":"pl","shell":"bash","os":"linux"}
+{"text":"print the current working directory","intent":"current_dir","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"jaki jest aktualny folder","intent":"current_dir","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"what's my current directory","intent":"current_dir","lang":"en","shell":"powershell","os":"win32"}
+{"text":"w ktorym folderze teraz jestem","intent":"current_dir","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"Get-Location","intent":"current_dir","lang":"en","shell":"powershell","os":"win32"}
+{"text":"pokaz biezaca sciezke","intent":"current_dir","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"current dir?","intent":"current_dir","lang":"en","shell":"fish","os":"linux"}
+{"text":"gdzie jestem","intent":"current_dir","lang":"pl","shell":"sh","os":"linux"}
+{"text":"what folder am I in","intent":"current_dir","lang":"en","shell":"cmd","os":"win32"}
+{"text":"which directory is this shell in","intent":"current_dir","lang":"en","shell":"bash","os":"linux"}
+{"text":"create a symlink from /opt/app/current to /usr/local/app","intent":"create_symlink","lang":"en","shell":"bash","os":"linux"}
+{"text":"ln -s ~/dotfiles/vimrc ~/.vimrc","intent":"create_symlink","lang":"en","shell":"bash","os":"linux"}
+{"text":"utwórz dowiązanie symboliczne do /var/www/site w /srv/site","intent":"create_symlink","lang":"pl","shell":"bash","os":"linux"}
+{"text":"zrob symlink z /opt/node/bin/node do /usr/local/bin/node","intent":"create_symlink","lang":"pl","shell":"bash","os":"linux"}
+{"text":"make a symbolic link from ~/Dropbox/notes to ~/notes","intent":"create_symlink","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"stworz link symboliczny config.yml -> ../shared/config.yml","intent":"create_symlink","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"create a symlink C:\\link pointing to D:\\data","intent":"create_symlink","lang":"en","shell":"powershell","os":"win32"}
+{"text":"utworz dowiazanie symboliczne C:\\app wskazujace na D:\\Programy\\app","intent":"create_symlink","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"New-Item -ItemType SymbolicLink C:\\tools\\py -Target C:\\Python312","intent":"create_symlink","lang":"en","shell":"powershell","os":"win32"}
+{"text":"zrob symlink z D:\\Projekty do C:\\proj","intent":"create_symlink","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"symlink ~/.config/nvim to ~/dotfiles/nvim","intent":"create_symlink","lang":"en","shell":"fish","os":"linux"}
+{"text":"utworz link symboliczny /etc/nginx/sites-enabled/site do sites-available/site","intent":"create_symlink","lang":"pl","shell":"sh","os":"linux"}
+{"text":"mklink link to C:\\target","intent":"create_symlink","lang":"en","shell":"cmd","os":"win32"}
+{"text":"link libfoo.so.2 as libfoo.so","intent":"create_symlink","lang":"en","shell":"bash","os":"linux"}
+{"text":"compare config.old and config.new","intent":"diff_files","lang":"en","shell":"bash","os":"linux"}
+{"text":"diff a.txt b.txt","intent":"diff_files","lang":"en","shell":"bash","os":"linux"}
+{"text":"porównaj pliki wersja1.txt i wersja2.txt","intent":"diff_files","lang":"pl","shell":"bash","os":"linux"}
+{"text":"jakie sa roznice miedzy /etc/hosts a /tmp/hosts","intent":"diff_files","lang":"pl","shell":"bash","os":"linux"}
+{"text":"diff ~/old.json ~/new.json","intent":"diff_files","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"porownaj plik main.py z main_backup.py","intent":"diff_files","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"compare C:\\a\\settings.xml and C:\\b\\settings.xml","intent":"diff_files","lang":"en","shell":"powershell","os":"win32"}
+{"text":"porównaj pliki D:\\raport1.csv i D:\\raport2.csv","intent":"diff_files","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"Compare-Object of C:\\list1.txt and C:\\list2.txt","intent":"diff_files","lang":"en","shell":"powershell","os":"win32"}
+{"text":"roznice miedzy C:\\conf\\stary.ini a C:\\conf\\nowy.ini","intent":"diff_files","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"diff .env .env.example","intent":"diff_files","lang":"en","shell":"fish","os":"linux"}
+{"text":"porownaj /etc/fstab i /root/fstab.bak","intent":"diff_files","lang":"pl","shell":"sh","os":"linux"}
+{"text":"compare C:\\x.txt with C:\\y.txt","intent":"diff_files","lang":"en","shell":"cmd","os":"win32"}
+{"text":"what changed between schema_v1.sql and schema_v2.sql","intent":"diff_files","lang":"en","shell":"bash","os":"linux"}
+{"text":"replace foo with bar in config.txt","intent":"replace_text","lang":"en","shell":"bash","os":"linux"}
+{"text":"sed replace localhost with 127.0.0.1 in app.conf","intent":"replace_text","lang":"en","shell":"bash","os":"linux"}
+{"text":"zamień \"http\" na \"https\" w pliku linki.txt","intent":"replace_text","lang":"pl","shell":"bash","os":"linux"}
+{"text":"podmien tekst staryhost na nowyhost w /etc/hosts","intent":"replace_text","lang":"pl","shell":"bash","os":"linux"}
+{"text":"replace \"v1\" with \"v2\" in ~/api.yaml","intent":"replace_text","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"zamien wszystkie wystapienia \"Kowalski\" na \"Nowak\" w lista.txt","intent":"replace_text","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"replace \"dev\" with \"prod\" in C:\\app\\settings.json","intent":"replace_text","lang":"en","shell":"powershell","os":"win32"}
+{"text":"zamień \"2023\" na \"2024\" w D:\\dok\\umowa.txt","intent":"replace_text","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"in C:\\web\\web.config replace debug=\"true\" with debug=\"false\"","intent":"replace_text","lang":"en","shell":"powershell","os":"win32"}
+{"text":"podmien slowo kot na pies w pliku C:\\tekst.txt","intent":"replace_text","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"substitute old_name with new_name in main.fish","intent":"replace_text","lang":"en","shell":"fish","os":"linux"}
+{"text":"zamien 8080 na 9090 w /etc/app.conf","intent":"replace_text","lang":"pl","shell":"sh","os":"linux"}
+{"text":"replace \"test\" with \"live\" in C:\\conf.ini","intent":"replace_text","lang":"en","shell":"cmd","os":"win32"}
+{"text":"swap every TODO for DONE in tasks.md","intent":"replace_text","lang":"en","shell":"bash","os":"linux"}
+{"text":"show mounted filesystems","intent":"disk_mounts","lang":"en","shell":"bash","os":"linux"}
+{"text":"list all mount points","intent":"disk_mounts","lang":"en","shell":"bash","os":"linux"}
+{"text":"pokaż zamontowane systemy plików","intent":"disk_mounts","lang":"pl","shell":"bash","os":"linux"}
+{"text":"co jest zamontowane i gdzie?","intent":"disk_mounts","lang":"pl","shell":"bash","os":"linux"}
+{"text":"list mounts","intent":"disk_mounts","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"jakie woluminy są zamontowane","intent":"disk_mounts","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"show mounted volumes","intent":"disk_mounts","lang":"en","shell":"powershell","os":"win32"}
+{"text":"pokaz zamontowane dyski i punkty montowania","intent":"disk_mounts","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"list mount points of all filesystems","intent":"disk_mounts","lang":"en","shell":"powershell","os":"win32"}
+{"text":"wylistuj punkty montowania","intent":"disk_mounts","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"mount output please","intent":"disk_mounts","lang":"en","shell":"fish","os":"linux"}
+{"text":"zamontowane partycje","intent":"disk_mounts","lang":"pl","shell":"sh","os":"linux"}
+{"text":"which volumes are mounted","intent":"disk_mounts","lang":"en","shell":"cmd","os":"win32"}
+{"text":"is /mnt/nas mounted? show mounts","intent":"disk_mounts","lang":"en","shell":"bash","os":"linux"}
+{"text":"list disks and partitions","intent":"block_devices","lang":"en","shell":"bash","os":"linux"}
+{"text":"lsblk","intent":"block_devices","lang":"en","shell":"bash","os":"linux"}
+{"text":"jakie mam dyski podłączone?","intent":"block_devices","lang":"pl","shell":"bash","os":"linux"}
+{"text":"pokaż partycje i dyski","intent":"block_devices","lang":"pl","shell":"bash","os":"linux"}
+{"text":"list physical disks","intent":"block_devices","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"wylistuj dyski i partycje","intent":"block_devices","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"list all drives and partitions","intent":"block_devices","lang":"en","shell":"powershell","os":"win32"}
+{"text":"pokaż dyski fizyczne i ich partycje","intent":"block_devices","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"Get-Disk and Get-Partition","intent":"block_devices","lang":"en","shell":"powershell","os":"win32"}
+{"text":"jakie dyski sa w komputerze","intent":"block_devices","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"show block devices","intent":"block_devices","lang":"en","shell":"fish","os":"linux"}
+{"text":"lista urzadzen blokowych","intent":"block_devices","lang":"pl","shell":"sh","os":"linux"}
+{"text":"list disks","intent":"block_devices","lang":"en","shell":"cmd","os":"win32"}
+{"text":"is my new USB stick detected as a device?","intent":"block_devices","lang":"en","shell":"bash","os":"linux"}
+{"text":"sha256 of ubuntu.iso","intent":"hash_sha256","lang":"en","shell":"bash","os":"linux"}
+{"text":"compute the SHA-256 checksum of release.tar.gz","intent":"hash_sha256","lang":"en","shell":"bash","os":"linux"}
+{"text":"policz sumę kontrolną sha256 pliku obraz.img","intent":"hash_sha256","lang":"pl","shell":"bash","os":"linux"}
+{"text":"sha256 dla /tmp/pakiet.deb","intent":"hash_sha256","lang":"pl","shell":"bash","os":"linux"}
+{"text":"sha256sum ~/Downloads/installer.dmg","intent":"hash_sha256","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"suma sha256 pliku backup.zip","intent":"hash_sha256","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"get the SHA256 hash of C:\\Downloads\\setup.exe","intent":"hash_sha256","lang":"en","shell":"powershell","os":"win32"}
+{"text":"oblicz sha256 pliku D:\\iso\\win11.iso","intent":"hash_sha256","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"Get-FileHash C:\\tools\\app.msi","intent":"hash_sha256","lang":"en","shell":"powershell","os":"win32"}
+{"text":"hash sha-256 pliku C:\\dane\\plik.bin","intent":"hash_sha256","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"sha256 of firmware.bin","intent":"hash_sha256","lang":"en","shell":"fish","os":"linux"}
+{"text":"suma kontrolna sha256 /root/key","intent":"hash_sha256","lang":"pl","shell":"sh","os":"linux"}
+{"text":"sha256 of C:\\file.zip","intent":"hash_sha256","lang":"en","shell":"cmd","os":"win32"}
+{"text":"verify checksum (sha-256) of node.tar.xz","intent":"hash_sha256","lang":"en","shell":"bash","os":"linux"}
+{"text":"md5 of photo.jpg","intent":"hash_md5","lang":"en","shell":"bash","os":"linux"}
+{"text":"md5sum backup.sql","intent":"hash_md5","lang":"en","shell":"bash","os":"linux"}
+{"text":"policz md5 pliku archiwum.zip","intent":"hash_md5","lang":"pl","shell":"bash","os":"linux"}
+{"text":"suma md5 dla /var/data/dump.bin","intent":"hash_md5","lang":"pl","shell":"bash","os":"linux"}
+{"text":"md5 checksum of ~/song.mp3","intent":"hash_md5","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"hash md5 pliku dokument.pdf","intent":"hash_md5","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"get the MD5 hash of C:\\temp\\file.dat","intent":"hash_md5","lang":"en","shell":"powershell","os":"win32"}
+{"text":"oblicz md5 pliku D:\\pobrane\\gra.iso","intent":"hash_md5","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"Get-FileHash -Algorithm MD5 C:\\data\\x.bin","intent":"hash_md5","lang":"en","shell":"powershell","os":"win32"}
+{"text":"md5 dla C:\\Users\\ola\\obraz.png","intent":"hash_md5","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"md5 of video.mkv","intent":"hash_md5","lang":"en","shell":"fish","os":"linux"}
+{"text":"suma md5 /etc/passwd","intent":"hash_md5","lang":"pl","shell":"sh","os":"linux"}
+{"text":"md5 hash of C:\\setup.exe","intent":"hash_md5","lang":"en","shell":"cmd","os":"win32"}
+{"text":"what's the md5 of package.tgz","intent":"hash_md5","lang":"en","shell":"bash","os":"linux"}
+{"text":"base64 encode secret.txt","intent":"base64_encode","lang":"en","shell":"bash","os":"linux"}
+{"text":"encode the string hello world to base64","intent":"base64_encode","lang":"en","shell":"bash","os":"linux"}
+{"text":"zakoduj plik klucz.pem w base64","intent":"base64_encode","lang":"pl","shell":"bash","os":"linux"}
+{"text":"zamien tekst \"admin:haslo\" na base64","intent":"base64_encode","lang":"pl","shell":"bash","os":"linux"}
+{"text":"base64 encode ~/image.png","intent":"base64_encode","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"zakoduj base64 plik token.txt","intent":"base64_encode","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"encode C:\\temp\\cert.cer to base64","intent":"base64_encode","lang":"en","shell":"powershell","os":"win32"}
+{"text":"zakoduj w base64 plik D:\\dane\\plik.bin","intent":"base64_encode","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"convert the text \"user:pass\" to base64","intent":"base64_encode","lang":"en","shell":"powershell","os":"win32"}
+{"text":"przekonwertuj C:\\obraz.jpg na base64","intent":"base64_encode","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"base64 of config.json","intent":"base64_encode","lang":"en","shell":"fish","os":"linux"}
+{"text":"zakoduj base64 /tmp/a.txt","intent":"base64_encode","lang":"pl","shell":"sh","os":"linux"}
+{"text":"base64 encode C:\\data.txt","intent":"base64_encode","lang":"en","shell":"cmd","os":"win32"}
+{"text":"turn payload.json into a base64 string","intent":"base64_encode","lang":"en","shell":"bash","os":"linux"}
+{"text":"decode base64 in encoded.txt","intent":"base64_decode","lang":"en","shell":"bash","os":"linux"}
+{"text":"base64 -d this string aGVsbG8=","intent":"base64_decode","lang":"en","shell":"bash","os":"linux"}
+{"text":"zdekoduj base64 z pliku dane.b64","intent":"base64_decode","lang":"pl","shell":"bash","os":"linux"}
+{"text":"odkoduj tekst base64 dXNlcjpwYXNz","intent":"base64_decode","lang":"pl","shell":"bash","os":"linux"}
+{"text":"decode base64 file ~/blob.b64","intent":"base64_decode","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"rozkoduj base64 w token.txt","intent":"base64_decode","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"decode the base64 in C:\\temp\\cert.b64","intent":"base64_decode","lang":"en","shell":"powershell","os":"win32"}
+{"text":"zdekoduj base64 z pliku D:\\in.txt","intent":"base64_decode","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"convert from base64 the string SGVsbG8gV29ybGQ=","intent":"base64_decode","lang":"en","shell":"powershell","os":"win32"}
+{"text":"odkoduj base64 C:\\Users\\ola\\secret.b64","intent":"base64_decode","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"decode base64 payload.b64","intent":"base64_decode","lang":"en","shell":"fish","os":"linux"}
+{"text":"zdekoduj base64 /tmp/x.b64","intent":"base64_decode","lang":"pl","shell":"sh","os":"linux"}
+{"text":"base64 decode C:\\data.b64","intent":"base64_decode","lang":"en","shell":"cmd","os":"win32"}
+{"text":"what does this base64 say: Zm9vYmFy","intent":"base64_decode","lang":"en","shell":"bash","os":"linux"}
+{"text":"which processes use the most CPU","intent":"top_cpu","lang":"en","shell":"bash","os":"linux"}
+{"text":"top 5 cpu hogs","intent":"top_cpu","lang":"en","shell":"bash","os":"linux"}
+{"text":"które procesy zużywają najwięcej procesora?","intent":"top_cpu","lang":"pl","shell":"bash","os":"linux"}
+{"text":"co zjada cpu","intent":"top_cpu","lang":"pl","shell":"bash","os":"linux"}
+{"text":"what's eating my CPU","intent":"top_cpu","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"procesy z najwiekszym uzyciem procesora, top 15","intent":"top_cpu","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"show processes by CPU usage","intent":"top_cpu","lang":"en","shell":"powershell","os":"win32"}
+{"text":"ktore procesy najbardziej obciazaja procesor","intent":"top_cpu","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"Get-Process sorted by CPU descending, first 10","intent":"top_cpu","lang":"en","shell":"powershell","os":"win32"}
+{"text":"pokaż 8 procesów zużywających najwięcej CPU","intent":"top_cpu","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"top cpu processes","intent":"top_cpu","lang":"en","shell":"fish","os":"linux"}
+{"text":"najbardziej obciazajace procesy cpu","intent":"top_cpu","lang":"pl","shell":"sh","os":"linux"}
+{"text":"processes with highest CPU","intent":"top_cpu","lang":"en","shell":"cmd","os":"win32"}
+{"text":"why is the fan spinning, show top CPU processes","intent":"top_cpu","lang":"en","shell":"bash","os":"linux"}
+{"text":"which processes use the most memory","intent":"top_mem","lang":"en","shell":"bash","os":"linux"}
+{"text":"top 10 RAM hogs","intent":"top_mem","lang":"en","shell":"bash","os":"linux"}
+{"text":"które procesy zjadają najwięcej pamięci RAM?","intent":"top_mem","lang":"pl","shell":"bash","os":"linux"}
+{"text":"procesy z najwiekszym zuzyciem pamieci","intent":"top_mem","lang":"pl","shell":"bash","os":"linux"}
+{"text":"what's using all my memory","intent":"top_mem","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"top 5 procesow wg pamieci","intent":"top_mem","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"show processes by memory usage","intent":"top_mem","lang":"en","shell":"powershell","os":"win32"}
+{"text":"ktore procesy zuzywaja najwiecej RAMu","intent":"top_mem","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"Get-Process sort WorkingSet desc, top 12","intent":"top_mem","lang":"en","shell":"powershell","os":"win32"}
+{"text":"pokaż procesy zajmujące najwięcej pamięci","intent":"top_mem","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"top memory processes","intent":"top_mem","lang":"en","shell":"fish","os":"linux"}
+{"text":"procesy wg zuzycia pamieci","intent":"top_mem","lang":"pl","shell":"sh","os":"linux"}
+{"text":"processes using the most RAM","intent":"top_mem","lang":"en","shell":"cmd","os":"win32"}
+{"text":"biggest memory consumers right now","intent":"top_mem","lang":"en","shell":"bash","os":"linux"}
+{"text":"is nginx running?","intent":"find_process","lang":"en","shell":"bash","os":"linux"}
+{"text":"find the process named postgres","intent":"find_process","lang":"en","shell":"bash","os":"linux"}
+{"text":"czy działa proces java?","intent":"find_process","lang":"pl","shell":"bash","os":"linux"}
+{"text":"znajdz proces o nazwie redis","intent":"find_process","lang":"pl","shell":"bash","os":"linux"}
+{"text":"find running process Slack","intent":"find_process","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"sprawdz czy chodzi node","intent":"find_process","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"is chrome running","intent":"find_process","lang":"en","shell":"powershell","os":"win32"}
+{"text":"znajdź proces explorer","intent":"find_process","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"Get-Process -Name sqlservr","intent":"find_process","lang":"en","shell":"powershell","os":"win32"}
+{"text":"czy uruchomiony jest proces teams","intent":"find_process","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"pgrep firefox","intent":"find_process","lang":"en","shell":"fish","os":"linux"}
+{"text":"znajdz proces sshd","intent":"find_process","lang":"pl","shell":"sh","os":"linux"}
+{"text":"is notepad running?","intent":"find_process","lang":"en","shell":"cmd","os":"win32"}
+{"text":"ps aux | grep for mysqld","intent":"find_process","lang":"en","shell":"bash","os":"linux"}
+{"text":"kill all firefox processes","intent":"kill_by_name","lang":"en","shell":"bash","os":"linux"}
+{"text":"stop the process named node","intent":"kill_by_name","lang":"en","shell":"bash","os":"linux"}
+{"text":"zabij proces chrome","intent":"kill_by_name","lang":"pl","shell":"bash","os":"linux"}
+{"text":"zakończ wszystkie procesy python","intent":"kill_by_name","lang":"pl","shell":"bash","os":"linux"}
+{"text":"kill Spotify","intent":"kill_by_name","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"ubij proces Slack","intent":"kill_by_name","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"kill notepad","intent":"kill_by_name","lang":"en","shell":"powershell","os":"win32"}
+{"text":"zabij proces excel","intent":"kill_by_name","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"Stop-Process -Name teams","intent":"kill_by_name","lang":"en","shell":"powershell","os":"win32"}
+{"text":"zakoncz proces outlook","intent":"kill_by_name","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"pkill vlc","intent":"kill_by_name","lang":"en","shell":"fish","os":"linux"}
+{"text":"zabij proces nginx","intent":"kill_by_name","lang":"pl","shell":"sh","os":"linux"}
+{"text":"taskkill notepad.exe","intent":"kill_by_name","lang":"en","shell":"cmd","os":"win32"}
+{"text":"terminate every gunicorn process","intent":"kill_by_name","lang":"en","shell":"bash","os":"linux"}
+{"text":"force kill java","intent":"kill_force","lang":"en","shell":"bash","os":"linux"}
+{"text":"kill -9 all chrome processes","intent":"kill_force","lang":"en","shell":"bash","os":"linux"}
+{"text":"zabij siłowo proces firefox","intent":"kill_force","lang":"pl","shell":"bash","os":"linux"}
+{"text":"wymus zakonczenie procesu zoom","intent":"kill_force","lang":"pl","shell":"bash","os":"linux"}
+{"text":"force quit Xcode","intent":"kill_force","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"zabij na sile proces node","intent":"kill_force","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"force kill explorer","intent":"kill_force","lang":"en","shell":"powershell","os":"win32"}
+{"text":"wymuś zamknięcie procesu steam","intent":"kill_force","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"Stop-Process -Name code -Force","intent":"kill_force","lang":"en","shell":"powershell","os":"win32"}
+{"text":"zabij twardo proces mysqld","intent":"kill_force","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"pkill -9 electron","intent":"kill_force","lang":"en","shell":"fish","os":"linux"}
+{"text":"kill -9 na procesie java","intent":"kill_force","lang":"pl","shell":"sh","os":"linux"}
+{"text":"taskkill /f /im chrome.exe","intent":"kill_force","lang":"en","shell":"cmd","os":"win32"}
+{"text":"SIGKILL the hung python processes","intent":"kill_force","lang":"en","shell":"bash","os":"linux"}
+{"text":"kill pid 4821","intent":"kill_by_pid","lang":"en","shell":"bash","os":"linux"}
+{"text":"kill process 12345","intent":"kill_by_pid","lang":"en","shell":"bash","os":"linux"}
+{"text":"zabij proces o PID 9087","intent":"kill_by_pid","lang":"pl","shell":"bash","os":"linux"}
+{"text":"zakoncz proces nr 3310","intent":"kill_by_pid","lang":"pl","shell":"bash","os":"linux"}
+{"text":"kill process id 777","intent":"kill_by_pid","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"ubij proces 55021","intent":"kill_by_pid","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"kill process with id 6620","intent":"kill_by_pid","lang":"en","shell":"powershell","os":"win32"}
+{"text":"zakończ proces o identyfikatorze 1408","intent":"kill_by_pid","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"Stop-Process -Id 2984","intent":"kill_by_pid","lang":"en","shell":"powershell","os":"win32"}
+{"text":"zabij pid 8800","intent":"kill_by_pid","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"kill 4242","intent":"kill_by_pid","lang":"en","shell":"fish","os":"linux"}
+{"text":"zabij proces 101","intent":"kill_by_pid","lang":"pl","shell":"sh","os":"linux"}
+{"text":"taskkill /pid 5512","intent":"kill_by_pid","lang":"en","shell":"cmd","os":"win32"}
+{"text":"terminate PID 30001","intent":"kill_by_pid","lang":"en","shell":"bash","os":"linux"}
+{"text":"kill whatever is running on port 3000","intent":"kill_by_port","lang":"en","shell":"bash","os":"linux"}
+{"text":"free up port 8080","intent":"kill_by_port","lang":"en","shell":"bash","os":"linux"}
+{"text":"zabij proces na porcie 5432","intent":"kill_by_port","lang":"pl","shell":"bash","os":"linux"}
+{"text":"zwolnij port 80","intent":"kill_by_port","lang":"pl","shell":"bash","os":"linux"}
+{"text":"kill the process listening on 5173","intent":"kill_by_port","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"zabij to co siedzi na porcie 4200","intent":"kill_by_port","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"kill the process using port 443","intent":"kill_by_port","lang":"en","shell":"powershell","os":"win32"}
+{"text":"zabij proces na porcie 1433","intent":"kill_by_port","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"stop whatever is bound to port 9000","intent":"kill_by_port","lang":"en","shell":"powershell","os":"win32"}
+{"text":"zwolnij port 8081, zabij proces","intent":"kill_by_port","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"kill process on port 6379","intent":"kill_by_port","lang":"en","shell":"fish","os":"linux"}
+{"text":"zabij proces nasluchujacy na 22","intent":"kill_by_port","lang":"pl","shell":"sh","os":"linux"}
+{"text":"kill process on port 3389","intent":"kill_by_port","lang":"en","shell":"cmd","os":"win32"}
+{"text":"port 8000 is already in use, kill it","intent":"kill_by_port","lang":"en","shell":"bash","os":"linux"}
+{"text":"show listening ports","intent":"listening_ports","lang":"en","shell":"bash","os":"linux"}
+{"text":"which ports are open","intent":"listening_ports","lang":"en","shell":"bash","os":"linux"}
+{"text":"jakie porty nasłuchują?","intent":"listening_ports","lang":"pl","shell":"bash","os":"linux"}
+{"text":"pokaż otwarte porty","intent":"listening_ports","lang":"pl","shell":"bash","os":"linux"}
+{"text":"list listening sockets","intent":"listening_ports","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"na jakich portach cos slucha","intent":"listening_ports","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"pokaz porty nasluchujace","intent":"listening_ports","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"Get-NetTCPConnection -State Listen","intent":"listening_ports","lang":"en","shell":"powershell","os":"win32"}
+{"text":"jakie porty sa otwarte na tym komputerze","intent":"listening_ports","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"listening ports","intent":"listening_ports","lang":"en","shell":"fish","os":"linux"}
+{"text":"porty w stanie LISTEN","intent":"listening_ports","lang":"pl","shell":"sh","os":"linux"}
+{"text":"netstat listening ports","intent":"listening_ports","lang":"en","shell":"cmd","os":"win32"}
+{"text":"ss -tlnp","intent":"listening_ports","lang":"en","shell":"bash","os":"linux"}
+{"text":"which process is using port 8080","intent":"process_on_port","lang":"en","shell":"bash","os":"linux"}
+{"text":"what's listening on port 5432","intent":"process_on_port","lang":"en","shell":"bash","os":"linux"}
+{"text":"jaki proces używa portu 3000?","intent":"process_on_port","lang":"pl","shell":"bash","os":"linux"}
+{"text":"kto siedzi na porcie 443","intent":"process_on_port","lang":"pl","shell":"bash","os":"linux"}
+{"text":"what app is on port 5000","intent":"process_on_port","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"jaki program nasluchuje na 8888","intent":"process_on_port","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"which process uses port 80","intent":"process_on_port","lang":"en","shell":"powershell","os":"win32"}
+{"text":"jaki proces zajmuje port 1433","intent":"process_on_port","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"who owns port 3389","intent":"process_on_port","lang":"en","shell":"powershell","os":"win32"}
+{"text":"co nasluchuje na porcie 9200","intent":"process_on_port","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"what process is on port 6379","intent":"process_on_port","lang":"en","shell":"fish","os":"linux"}
+{"text":"jaki proces na porcie 25","intent":"process_on_port","lang":"pl","shell":"sh","os":"linux"}
+{"text":"which program is using port 445","intent":"process_on_port","lang":"en","shell":"cmd","os":"win32"}
+{"text":"lsof -i :27017","intent":"process_on_port","lang":"en","shell":"bash","os":"linux"}
+{"text":"show established network connections","intent":"established_connections","lang":"en","shell":"bash","os":"linux"}
+{"text":"active tcp connections","intent":"established_connections","lang":"en","shell":"bash","os":"linux"}
+{"text":"pokaż nawiązane połączenia sieciowe","intent":"established_connections","lang":"pl","shell":"bash","os":"linux"}
+{"text":"aktywne polaczenia tcp","intent":"established_connections","lang":"pl","shell":"bash","os":"linux"}
+{"text":"list established connections","intent":"established_connections","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"jakie mam aktywne polaczenia","intent":"established_connections","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"show established connections","intent":"established_connections","lang":"en","shell":"powershell","os":"win32"}
+{"text":"pokaz nawiazane polaczenia","intent":"established_connections","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"Get-NetTCPConnection -State Established","intent":"established_connections","lang":"en","shell":"powershell","os":"win32"}
+{"text":"z kim jest teraz polaczony komputer","intent":"established_connections","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"established connections","intent":"established_connections","lang":"en","shell":"fish","os":"linux"}
+{"text":"polaczenia ESTABLISHED","intent":"established_connections","lang":"pl","shell":"sh","os":"linux"}
+{"text":"active network connections","intent":"established_connections","lang":"en","shell":"cmd","os":"win32"}
+{"text":"who is my machine talking to right now","intent":"established_connections","lang":"en","shell":"bash","os":"linux"}
+{"text":"show the process tree","intent":"process_tree","lang":"en","shell":"bash","os":"linux"}
+{"text":"pstree","intent":"process_tree","lang":"en","shell":"bash","os":"linux"}
+{"text":"pokaż drzewo procesów","intent":"process_tree","lang":"pl","shell":"bash","os":"linux"}
+{"text":"hierarchia procesow","intent":"process_tree","lang":"pl","shell":"bash","os":"linux"}
+{"text":"process tree please","intent":"process_tree","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"drzewo procesow z rodzicami","intent":"process_tree","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"show process tree","intent":"process_tree","lang":"en","shell":"powershell","os":"win32"}
+{"text":"pokaz procesy w formie drzewa","intent":"process_tree","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"parent-child process hierarchy","intent":"process_tree","lang":"en","shell":"powershell","os":"win32"}
+{"text":"drzewo procesow","intent":"process_tree","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"process tree","intent":"process_tree","lang":"en","shell":"fish","os":"linux"}
+{"text":"ps forest view","intent":"process_tree","lang":"en","shell":"bash","os":"linux"}
+{"text":"show system information","intent":"system_info","lang":"en","shell":"bash","os":"linux"}
+{"text":"general info about this machine","intent":"system_info","lang":"en","shell":"bash","os":"linux"}
+{"text":"pokaż informacje o systemie","intent":"system_info","lang":"pl","shell":"bash","os":"linux"}
+{"text":"info o komputerze","intent":"system_info","lang":"pl","shell":"bash","os":"linux"}
+{"text":"system info","intent":"system_info","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"podstawowe informacje o systemie","intent":"system_info","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"systeminfo","intent":"system_info","lang":"en","shell":"powershell","os":"win32"}
+{"text":"pokaz informacje o tym komputerze","intent":"system_info","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"Get-ComputerInfo","intent":"system_info","lang":"en","shell":"powershell","os":"win32"}
+{"text":"ogolne informacje o systemie","intent":"system_info","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"system overview","intent":"system_info","lang":"en","shell":"fish","os":"linux"}
+{"text":"informacje o systemie","intent":"system_info","lang":"pl","shell":"sh","os":"linux"}
+{"text":"system information","intent":"system_info","lang":"en","shell":"cmd","os":"win32"}
+{"text":"give me a summary of this box","intent":"system_info","lang":"en","shell":"bash","os":"linux"}
+{"text":"what OS version is this","intent":"os_release","lang":"en","shell":"bash","os":"linux"}
+{"text":"which linux distro am I running","intent":"os_release","lang":"en","shell":"bash","os":"linux"}
+{"text":"jaka to dystrybucja?","intent":"os_release","lang":"pl","shell":"bash","os":"linux"}
+{"text":"jaka wersja systemu operacyjnego","intent":"os_release","lang":"pl","shell":"bash","os":"linux"}
+{"text":"what macOS version do I have","intent":"os_release","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"jaka wersja macOS","intent":"os_release","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"what Windows version is this","intent":"os_release","lang":"en","shell":"powershell","os":"win32"}
+{"text":"jaka wersja windowsa","intent":"os_release","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"which edition and build of Windows","intent":"os_release","lang":"en","shell":"powershell","os":"win32"}
+{"text":"sprawdz wersje systemu","intent":"os_release","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"os release info","intent":"os_release","lang":"en","shell":"fish","os":"linux"}
+{"text":"jaka dystrybucja linuxa","intent":"os_release","lang":"pl","shell":"sh","os":"linux"}
+{"text":"windows version","intent":"os_release","lang":"en","shell":"cmd","os":"win32"}
+{"text":"cat /etc/os-release","intent":"os_release","lang":"en","shell":"bash","os":"linux"}
+{"text":"what kernel version is this","intent":"kernel_version","lang":"en","shell":"bash","os":"linux"}
+{"text":"uname -r","intent":"kernel_version","lang":"en","shell":"bash","os":"linux"}
+{"text":"jaka wersja jądra?","intent":"kernel_version","lang":"pl","shell":"bash","os":"linux"}
+{"text":"wersja kernela","intent":"kernel_version","lang":"pl","shell":"bash","os":"linux"}
+{"text":"kernel version","intent":"kernel_version","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"jaka wersja jadra darwin","intent":"kernel_version","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"jaka wersja jadra systemu","intent":"kernel_version","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"show OS kernel build number","intent":"kernel_version","lang":"en","shell":"powershell","os":"win32"}
+{"text":"wersja kernela windows","intent":"kernel_version","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"kernel version please","intent":"kernel_version","lang":"en","shell":"fish","os":"linux"}
+{"text":"jaka wersja jadra","intent":"kernel_version","lang":"pl","shell":"sh","os":"linux"}
+{"text":"which linux kernel am I on","intent":"kernel_version","lang":"en","shell":"bash","os":"linux"}
+{"text":"how much RAM is free","intent":"memory_usage","lang":"en","shell":"bash","os":"linux"}
+{"text":"show memory usage","intent":"memory_usage","lang":"en","shell":"bash","os":"linux"}
+{"text":"ile wolnej pamięci RAM?","intent":"memory_usage","lang":"pl","shell":"bash","os":"linux"}
+{"text":"zuzycie pamieci","intent":"memory_usage","lang":"pl","shell":"bash","os":"linux"}
+{"text":"how much memory is used","intent":"memory_usage","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"ile ramu zostalo","intent":"memory_usage","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"ile mam wolnego RAM","intent":"memory_usage","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"free physical memory","intent":"memory_usage","lang":"en","shell":"powershell","os":"win32"}
+{"text":"pokaz zuzycie pamieci","intent":"memory_usage","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"free -h","intent":"memory_usage","lang":"en","shell":"fish","os":"linux"}
+{"text":"ile pamieci wolnej","intent":"memory_usage","lang":"pl","shell":"sh","os":"linux"}
+{"text":"how much RAM is available","intent":"memory_usage","lang":"en","shell":"cmd","os":"win32"}
+{"text":"am I out of memory?","intent":"memory_usage","lang":"en","shell":"bash","os":"linux"}
+{"text":"what CPU do I have","intent":"cpu_info","lang":"en","shell":"bash","os":"linux"}
+{"text":"show cpu model","intent":"cpu_info","lang":"en","shell":"bash","os":"linux"}
+{"text":"jaki mam procesor?","intent":"cpu_info","lang":"pl","shell":"bash","os":"linux"}
+{"text":"informacje o procesorze","intent":"cpu_info","lang":"pl","shell":"bash","os":"linux"}
+{"text":"cpu model","intent":"cpu_info","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"jaki procesor ma ten mac","intent":"cpu_info","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"what processor is in this PC","intent":"cpu_info","lang":"en","shell":"powershell","os":"win32"}
+{"text":"jaki procesor","intent":"cpu_info","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"Get-CimInstance Win32_Processor","intent":"cpu_info","lang":"en","shell":"powershell","os":"win32"}
+{"text":"szczegoly procesora","intent":"cpu_info","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"lscpu","intent":"cpu_info","lang":"en","shell":"fish","os":"linux"}
+{"text":"model procesora","intent":"cpu_info","lang":"pl","shell":"sh","os":"linux"}
+{"text":"cpu info","intent":"cpu_info","lang":"en","shell":"cmd","os":"win32"}
+{"text":"details about the processor","intent":"cpu_info","lang":"en","shell":"bash","os":"linux"}
+{"text":"how many CPU cores","intent":"cpu_cores","lang":"en","shell":"bash","os":"linux"}
+{"text":"nproc","intent":"cpu_cores","lang":"en","shell":"bash","os":"linux"}
+{"text":"ile rdzeni ma procesor?","intent":"cpu_cores","lang":"pl","shell":"bash","os":"linux"}
+{"text":"liczba rdzeni cpu","intent":"cpu_cores","lang":"pl","shell":"bash","os":"linux"}
+{"text":"how many cores does this mac have","intent":"cpu_cores","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"ile mam rdzeni","intent":"cpu_cores","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"number of CPU cores","intent":"cpu_cores","lang":"en","shell":"powershell","os":"win32"}
+{"text":"ile rdzeni procesora","intent":"cpu_cores","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"count logical processors","intent":"cpu_cores","lang":"en","shell":"powershell","os":"win32"}
+{"text":"ile watkow ma cpu","intent":"cpu_cores","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"core count","intent":"cpu_cores","lang":"en","shell":"fish","os":"linux"}
+{"text":"ile rdzeni","intent":"cpu_cores","lang":"pl","shell":"sh","os":"linux"}
+{"text":"how many cores","intent":"cpu_cores","lang":"en","shell":"cmd","os":"win32"}
+{"text":"number of cpus available","intent":"cpu_cores","lang":"en","shell":"bash","os":"linux"}
+{"text":"how long has the system been up","intent":"uptime","lang":"en","shell":"bash","os":"linux"}
+{"text":"uptime","intent":"uptime","lang":"en","shell":"bash","os":"linux"}
+{"text":"jak długo działa system?","intent":"uptime","lang":"pl","shell":"bash","os":"linux"}
+{"text":"od kiedy jest wlaczony serwer","intent":"uptime","lang":"pl","shell":"bash","os":"linux"}
+{"text":"uptime and load","intent":"uptime","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"ile czasu chodzi ten mac","intent":"uptime","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"how long since last boot","intent":"uptime","lang":"en","shell":"powershell","os":"win32"}
+{"text":"kiedy byl ostatni restart","intent":"uptime","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"system uptime","intent":"uptime","lang":"en","shell":"powershell","os":"win32"}
+{"text":"jak dlugo dziala komputer","intent":"uptime","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"czas dzialania systemu","intent":"uptime","lang":"pl","shell":"sh","os":"linux"}
+{"text":"how long has Windows been running","intent":"uptime","lang":"en","shell":"cmd","os":"win32"}
+{"text":"what's the load average","intent":"uptime","lang":"en","shell":"bash","os":"linux"}
+{"text":"list symlinks in /usr/bin","intent":"find_symlinks","lang":"en","shell":"bash","os":"linux"}
+{"text":"find all symbolic links in ~/bin","intent":"find_symlinks","lang":"en","shell":"bash","os":"linux"}
+{"text":"show me the links in /etc/alternatives","intent":"find_symlinks","lang":"en","shell":"bash","os":"linux"}
+{"text":"which files in /opt/tools are symlinks","intent":"find_symlinks","lang":"en","shell":"bash","os":"linux"}
+{"text":"list symlinks in ~/.config","intent":"find_symlinks","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"find symbolic links in C:\\dev","intent":"find_symlinks","lang":"en","shell":"powershell","os":"win32"}
+{"text":"show symlinks in ~/repos","intent":"find_symlinks","lang":"en","shell":"fish","os":"linux"}
+{"text":"pokaż dowiązania symboliczne w /usr/bin","intent":"find_symlinks","lang":"pl","shell":"bash","os":"linux"}
+{"text":"znajdź wszystkie symlinki w ~/bin","intent":"find_symlinks","lang":"pl","shell":"bash","os":"linux"}
+{"text":"wylistuj linki w /etc/alternatives","intent":"find_symlinks","lang":"pl","shell":"bash","os":"linux"}
+{"text":"ktore pliki w /opt/tools to dowiazania","intent":"find_symlinks","lang":"pl","shell":"bash","os":"linux"}
+{"text":"pokaz symlinki w ~/.config","intent":"find_symlinks","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"znajdz dowiazania symboliczne w C:\\dev","intent":"find_symlinks","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"lista dowiazan symbolicznych w /lib64","intent":"find_symlinks","lang":"pl","shell":"sh","os":"linux"}
+{"text":"list broken symlinks in /usr/bin","intent":"broken_symlinks","lang":"en","shell":"bash","os":"linux"}
+{"text":"find all dangling symbolic links in ~/bin","intent":"broken_symlinks","lang":"en","shell":"bash","os":"linux"}
+{"text":"show me the dead links in /etc/alternatives","intent":"broken_symlinks","lang":"en","shell":"bash","os":"linux"}
+{"text":"which symlinks in /opt/tools are broken","intent":"broken_symlinks","lang":"en","shell":"bash","os":"linux"}
+{"text":"list broken symlinks in ~/.config","intent":"broken_symlinks","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"find dangling symbolic links in C:\\dev","intent":"broken_symlinks","lang":"en","shell":"powershell","os":"win32"}
+{"text":"show dead symlinks in ~/repos","intent":"broken_symlinks","lang":"en","shell":"fish","os":"linux"}
+{"text":"pokaż zepsute dowiązania symboliczne w /usr/bin","intent":"broken_symlinks","lang":"pl","shell":"bash","os":"linux"}
+{"text":"znajdź wszystkie martwe symlinki w ~/bin","intent":"broken_symlinks","lang":"pl","shell":"bash","os":"linux"}
+{"text":"wylistuj wiszące linki w /etc/alternatives","intent":"broken_symlinks","lang":"pl","shell":"bash","os":"linux"}
+{"text":"ktore dowiazania w /opt/tools sa zepsute","intent":"broken_symlinks","lang":"pl","shell":"bash","os":"linux"}
+{"text":"pokaz uszkodzone symlinki w ~/.config","intent":"broken_symlinks","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"znajdz wiszace dowiazania symboliczne w C:\\dev","intent":"broken_symlinks","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"lista zepsutych dowiazan w /lib64","intent":"broken_symlinks","lang":"pl","shell":"sh","os":"linux"}
+{"text":"find empty files in /srv/uploads","intent":"empty_files","lang":"en","shell":"bash","os":"linux"}
+{"text":"list zero-byte files in ~/projects","intent":"empty_files","lang":"en","shell":"bash","os":"linux"}
+{"text":"empty files in ./data","intent":"empty_files","lang":"en","shell":"bash","os":"linux"}
+{"text":"znajdź puste pliki w /srv/uploads","intent":"empty_files","lang":"pl","shell":"bash","os":"linux"}
+{"text":"puste pliki w ~/projekty","intent":"empty_files","lang":"pl","shell":"bash","os":"linux"}
+{"text":"pliki o zerowym rozmiarze w ./data","intent":"empty_files","lang":"pl","shell":"bash","os":"linux"}
+{"text":"find empty files in D:\\Import","intent":"empty_files","lang":"en","shell":"powershell","os":"win32"}
+{"text":"puste pliki w D:\\Import","intent":"empty_files","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"which files are empty in ~/notes","intent":"empty_files","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"ktore pliki sa puste w ~/notatki","intent":"empty_files","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"find empty directories in /srv/uploads","intent":"empty_dirs","lang":"en","shell":"bash","os":"linux"}
+{"text":"list empty folders in ~/projects","intent":"empty_dirs","lang":"en","shell":"bash","os":"linux"}
+{"text":"empty dirs in ./data","intent":"empty_dirs","lang":"en","shell":"bash","os":"linux"}
+{"text":"znajdź puste katalogi w /srv/uploads","intent":"empty_dirs","lang":"pl","shell":"bash","os":"linux"}
+{"text":"puste foldery w ~/projekty","intent":"empty_dirs","lang":"pl","shell":"bash","os":"linux"}
+{"text":"katalogi bez zawartości w ./data","intent":"empty_dirs","lang":"pl","shell":"bash","os":"linux"}
+{"text":"find empty folders in D:\\Import","intent":"empty_dirs","lang":"en","shell":"powershell","os":"win32"}
+{"text":"puste foldery w D:\\Import","intent":"empty_dirs","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"which folders are empty in ~/notes","intent":"empty_dirs","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"ktore katalogi sa puste w ~/notatki","intent":"empty_dirs","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"find .txt files in /srv/uploads","intent":"find_by_ext","lang":"en","shell":"bash","os":"linux"}
+{"text":"list .json files in ~/projects","intent":"find_by_ext","lang":"en","shell":"bash","os":"linux"}
+{"text":".csv files in ./data","intent":"find_by_ext","lang":"en","shell":"bash","os":"linux"}
+{"text":"znajdź pliki .txt w /srv/uploads","intent":"find_by_ext","lang":"pl","shell":"bash","os":"linux"}
+{"text":"pliki .json w ~/projekty","intent":"find_by_ext","lang":"pl","shell":"bash","os":"linux"}
+{"text":"pliki z rozszerzeniem .csv w ./data","intent":"find_by_ext","lang":"pl","shell":"bash","os":"linux"}
+{"text":"find .xml files in D:\\Import","intent":"find_by_ext","lang":"en","shell":"powershell","os":"win32"}
+{"text":"pliki .xml w D:\\Import","intent":"find_by_ext","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"which files are .md in ~/notes","intent":"find_by_ext","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"ktore pliki maja rozszerzenie .md w ~/notatki","intent":"find_by_ext","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"ls all the .yaml files under /etc/kubernetes","intent":"find_by_ext","lang":"en","shell":"bash","os":"linux"}
+{"text":"wylistuj pliki .yaml w /etc/kubernetes","intent":"find_by_ext","lang":"pl","shell":"bash","os":"linux"}
+{"text":"ls /etc/kubernetes","intent":"list_files","lang":"en","shell":"bash","os":"linux"}
+{"text":"what's in /srv/uploads","intent":"list_files","lang":"en","shell":"bash","os":"linux"}
+{"text":"list the directory ~/projects","intent":"list_files","lang":"en","shell":"bash","os":"linux"}
+{"text":"show the contents of ./data","intent":"list_files","lang":"en","shell":"bash","os":"linux"}
+{"text":"wylistuj /etc/kubernetes","intent":"list_files","lang":"pl","shell":"bash","os":"linux"}
+{"text":"co jest w katalogu /srv/uploads","intent":"list_files","lang":"pl","shell":"bash","os":"linux"}
+{"text":"pokaż zawartość folderu ~/projekty","intent":"list_files","lang":"pl","shell":"bash","os":"linux"}
+{"text":"ls ./data","intent":"list_files","lang":"pl","shell":"bash","os":"linux"}
+{"text":"what's in D:\\Import","intent":"list_files","lang":"en","shell":"powershell","os":"win32"}
+{"text":"co jest w folderze D:\\Import","intent":"list_files","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"list everything in ~/notes","intent":"list_files","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"pokaz co jest w ~/notatki","intent":"list_files","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"dir D:\\Import","intent":"list_files","lang":"en","shell":"cmd","os":"win32"}
+{"text":"show the tree of /etc/kubernetes","intent":"list_tree","lang":"en","shell":"bash","os":"linux"}
+{"text":"tree view of ~/projects","intent":"list_tree","lang":"en","shell":"bash","os":"linux"}
+{"text":"pokaż drzewo katalogu /etc/kubernetes","intent":"list_tree","lang":"pl","shell":"bash","os":"linux"}
+{"text":"struktura katalogow ~/projekty jako drzewo","intent":"list_tree","lang":"pl","shell":"bash","os":"linux"}
+{"text":"drzewo folderu D:\\Import","intent":"list_tree","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"folder tree of D:\\Import","intent":"list_tree","lang":"en","shell":"powershell","os":"win32"}
+{"text":"list hidden files in /etc/kubernetes","intent":"hidden_files","lang":"en","shell":"bash","os":"linux"}
+{"text":"show dotfiles in ~/projects","intent":"hidden_files","lang":"en","shell":"bash","os":"linux"}
+{"text":"pokaż ukryte pliki w /etc/kubernetes","intent":"hidden_files","lang":"pl","shell":"bash","os":"linux"}
+{"text":"pliki z kropką na początku w ~/projekty","intent":"hidden_files","lang":"pl","shell":"bash","os":"linux"}
+{"text":"ukryte pliki w D:\\Import","intent":"hidden_files","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"hidden files in D:\\Import","intent":"hidden_files","lang":"en","shell":"powershell","os":"win32"}
+{"text":"how much space is left on the disk","intent":"disk_free","lang":"en","shell":"bash","os":"linux"}
+{"text":"free space on my partitions","intent":"disk_free","lang":"en","shell":"bash","os":"linux"}
+{"text":"df","intent":"disk_free","lang":"en","shell":"bash","os":"linux"}
+{"text":"is the disk full?","intent":"disk_free","lang":"en","shell":"bash","os":"linux"}
+{"text":"how much storage do I have left","intent":"disk_free","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"free space on drive D:","intent":"disk_free","lang":"en","shell":"powershell","os":"win32"}
+{"text":"ile miejsca zostało na dysku","intent":"disk_free","lang":"pl","shell":"bash","os":"linux"}
+{"text":"df -h","intent":"disk_free","lang":"pl","shell":"bash","os":"linux"}
+{"text":"czy dysk jest pełny?","intent":"disk_free","lang":"pl","shell":"bash","os":"linux"}
+{"text":"ile mam jeszcze miejsca","intent":"disk_free","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"ile wolnego miejsca na dysku D:","intent":"disk_free","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"what disks are connected","intent":"block_devices","lang":"en","shell":"bash","os":"linux"}
+{"text":"list partitions and drives","intent":"block_devices","lang":"en","shell":"bash","os":"linux"}
+{"text":"is the new disk detected?","intent":"block_devices","lang":"en","shell":"bash","os":"linux"}
+{"text":"which drives do I have attached","intent":"block_devices","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"jakie mam dyski podłączone","intent":"block_devices","lang":"pl","shell":"bash","os":"linux"}
+{"text":"wylistuj partycje i dyski","intent":"block_devices","lang":"pl","shell":"bash","os":"linux"}
+{"text":"lsblk pokaż","intent":"block_devices","lang":"pl","shell":"bash","os":"linux"}
+{"text":"czy nowy dysk jest wykryty?","intent":"block_devices","lang":"pl","shell":"bash","os":"linux"}
+{"text":"jakie dyski są podpięte","intent":"block_devices","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"lista dysków fizycznych","intent":"block_devices","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"where are the disks mounted","intent":"disk_mounts","lang":"en","shell":"bash","os":"linux"}
+{"text":"list mount points","intent":"disk_mounts","lang":"en","shell":"bash","os":"linux"}
+{"text":"mount","intent":"disk_mounts","lang":"en","shell":"bash","os":"linux"}
+{"text":"is the partition mounted?","intent":"disk_mounts","lang":"en","shell":"bash","os":"linux"}
+{"text":"gdzie są zamontowane dyski","intent":"disk_mounts","lang":"pl","shell":"bash","os":"linux"}
+{"text":"lista punktów montowania","intent":"disk_mounts","lang":"pl","shell":"bash","os":"linux"}
+{"text":"pokaż wynik mount","intent":"disk_mounts","lang":"pl","shell":"bash","os":"linux"}
+{"text":"czy partycja jest zamontowana?","intent":"disk_mounts","lang":"pl","shell":"bash","os":"linux"}
+{"text":"pokaż zamontowane woluminy","intent":"disk_mounts","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"what's in my PATH","intent":"show_path","lang":"en","shell":"bash","os":"linux"}
+{"text":"print the PATH variable","intent":"show_path","lang":"en","shell":"bash","os":"linux"}
+{"text":"echo $PATH","intent":"show_path","lang":"en","shell":"bash","os":"linux"}
+{"text":"show my PATH entries one per line","intent":"show_path","lang":"en","shell":"bash","os":"linux"}
+{"text":"which dirs are on my PATH","intent":"show_path","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"show $env:Path","intent":"show_path","lang":"en","shell":"powershell","os":"win32"}
+{"text":"print PATH","intent":"show_path","lang":"en","shell":"fish","os":"linux"}
+{"text":"co mam w PATH","intent":"show_path","lang":"pl","shell":"bash","os":"linux"}
+{"text":"pokaż zmienną PATH","intent":"show_path","lang":"pl","shell":"bash","os":"linux"}
+{"text":"wypisz $PATH","intent":"show_path","lang":"pl","shell":"bash","os":"linux"}
+{"text":"jakie katalogi są w PATH","intent":"show_path","lang":"pl","shell":"bash","os":"linux"}
+{"text":"pokaz sciezki z PATH","intent":"show_path","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"pokaż zawartość $env:Path","intent":"show_path","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"echo %PATH%","intent":"show_path","lang":"en","shell":"cmd","os":"win32"}
+{"text":"which python","intent":"which_cmd","lang":"en","shell":"bash","os":"linux"}
+{"text":"where is the git binary","intent":"which_cmd","lang":"en","shell":"bash","os":"linux"}
+{"text":"which command runs when I type node","intent":"which_cmd","lang":"en","shell":"bash","os":"linux"}
+{"text":"path to the docker executable","intent":"which_cmd","lang":"en","shell":"bash","os":"linux"}
+{"text":"where does brew live","intent":"which_cmd","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"where is pwsh.exe","intent":"which_cmd","lang":"en","shell":"powershell","os":"win32"}
+{"text":"which fish","intent":"which_cmd","lang":"en","shell":"fish","os":"linux"}
+{"text":"gdzie jest python","intent":"which_cmd","lang":"pl","shell":"bash","os":"linux"}
+{"text":"skąd jest uruchamiany git","intent":"which_cmd","lang":"pl","shell":"bash","os":"linux"}
+{"text":"ktora binarka node sie odpala","intent":"which_cmd","lang":"pl","shell":"bash","os":"linux"}
+{"text":"ścieżka do pliku wykonywalnego docker","intent":"which_cmd","lang":"pl","shell":"bash","os":"linux"}
+{"text":"gdzie jest brew","intent":"which_cmd","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"gdzie znajduje się pwsh.exe","intent":"which_cmd","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"where java","intent":"which_cmd","lang":"en","shell":"cmd","os":"win32"}
+{"text":"what's the value of HOME","intent":"env_var_get","lang":"en","shell":"bash","os":"linux"}
+{"text":"print the JAVA_HOME variable","intent":"env_var_get","lang":"en","shell":"bash","os":"linux"}
+{"text":"echo $EDITOR","intent":"env_var_get","lang":"en","shell":"bash","os":"linux"}
+{"text":"show the value of the LANG env var","intent":"env_var_get","lang":"en","shell":"bash","os":"linux"}
+{"text":"value of SHELL","intent":"env_var_get","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"show $env:USERPROFILE","intent":"env_var_get","lang":"en","shell":"powershell","os":"win32"}
+{"text":"print GOPATH","intent":"env_var_get","lang":"en","shell":"fish","os":"linux"}
+{"text":"jaka jest wartość zmiennej HOME","intent":"env_var_get","lang":"pl","shell":"bash","os":"linux"}
+{"text":"pokaż zmienną JAVA_HOME","intent":"env_var_get","lang":"pl","shell":"bash","os":"linux"}
+{"text":"wypisz $EDITOR","intent":"env_var_get","lang":"pl","shell":"bash","os":"linux"}
+{"text":"wartosc zmiennej srodowiskowej LANG","intent":"env_var_get","lang":"pl","shell":"bash","os":"linux"}
+{"text":"wartosc SHELL","intent":"env_var_get","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"pokaż $env:USERPROFILE","intent":"env_var_get","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"echo %TEMP%","intent":"env_var_get","lang":"en","shell":"cmd","os":"win32"}
+{"text":"who is logged in now","intent":"users_logged_in","lang":"en","shell":"bash","os":"linux"}
+{"text":"which users are logged in","intent":"users_logged_in","lang":"en","shell":"bash","os":"linux"}
+{"text":"who is currently on this server","intent":"users_logged_in","lang":"en","shell":"bash","os":"linux"}
+{"text":"show logged-in users","intent":"users_logged_in","lang":"en","shell":"bash","os":"linux"}
+{"text":"who is logged in","intent":"users_logged_in","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"list users currently signed in","intent":"users_logged_in","lang":"en","shell":"powershell","os":"win32"}
+{"text":"who","intent":"users_logged_in","lang":"en","shell":"fish","os":"linux"}
+{"text":"kto jest zalogowany","intent":"users_logged_in","lang":"pl","shell":"bash","os":"linux"}
+{"text":"którzy użytkownicy są teraz zalogowani","intent":"users_logged_in","lang":"pl","shell":"bash","os":"linux"}
+{"text":"kto teraz siedzi na serwerze","intent":"users_logged_in","lang":"pl","shell":"bash","os":"linux"}
+{"text":"pokaż zalogowanych użytkowników","intent":"users_logged_in","lang":"pl","shell":"bash","os":"linux"}
+{"text":"kto jest teraz zalogowany","intent":"users_logged_in","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"lista aktualnie zalogowanych uzytkownikow","intent":"users_logged_in","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"query user","intent":"users_logged_in","lang":"en","shell":"cmd","os":"win32"}
+{"text":"who logged in recently","intent":"last_logins","lang":"en","shell":"bash","os":"linux"}
+{"text":"show the login history","intent":"last_logins","lang":"en","shell":"bash","os":"linux"}
+{"text":"last logins on this server","intent":"last_logins","lang":"en","shell":"bash","os":"linux"}
+{"text":"when did users last log in","intent":"last_logins","lang":"en","shell":"bash","os":"linux"}
+{"text":"recent logins","intent":"last_logins","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"show login history","intent":"last_logins","lang":"en","shell":"powershell","os":"win32"}
+{"text":"last","intent":"last_logins","lang":"en","shell":"fish","os":"linux"}
+{"text":"kto się ostatnio logował","intent":"last_logins","lang":"pl","shell":"bash","os":"linux"}
+{"text":"historia logowań","intent":"last_logins","lang":"pl","shell":"bash","os":"linux"}
+{"text":"ostatnie logowania na serwerze","intent":"last_logins","lang":"pl","shell":"bash","os":"linux"}
+{"text":"kiedy uzytkownicy sie ostatnio logowali","intent":"last_logins","lang":"pl","shell":"bash","os":"linux"}
+{"text":"ostatnie logowania","intent":"last_logins","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"pokaz historie logowan","intent":"last_logins","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"who am I logged in as","intent":"whoami","lang":"en","shell":"bash","os":"linux"}
+{"text":"which user am I","intent":"whoami","lang":"en","shell":"bash","os":"linux"}
+{"text":"whoami","intent":"whoami","lang":"en","shell":"bash","os":"linux"}
+{"text":"what is my username","intent":"whoami","lang":"en","shell":"bash","os":"linux"}
+{"text":"who am i","intent":"whoami","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"current user name","intent":"whoami","lang":"en","shell":"powershell","os":"win32"}
+{"text":"jako kto jestem zalogowany","intent":"whoami","lang":"pl","shell":"bash","os":"linux"}
+{"text":"jakim użytkownikiem jestem","intent":"whoami","lang":"pl","shell":"bash","os":"linux"}
+{"text":"whoami pokaż","intent":"whoami","lang":"pl","shell":"bash","os":"linux"}
+{"text":"jaka jest moja nazwa użytkownika","intent":"whoami","lang":"pl","shell":"bash","os":"linux"}
+{"text":"kim jestem","intent":"whoami","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"nazwa bieżącego użytkownika","intent":"whoami","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"what type of file is image.dat","intent":"file_type","lang":"en","shell":"bash","os":"linux"}
+{"text":"what kind of file is setup.bin","intent":"file_type","lang":"en","shell":"bash","os":"linux"}
+{"text":"check the file type of dump.raw","intent":"file_type","lang":"en","shell":"bash","os":"linux"}
+{"text":"is archive.xyz a zip or a tar? check its type","intent":"file_type","lang":"en","shell":"bash","os":"linux"}
+{"text":"identify file type of ~/thing","intent":"file_type","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"what type of file is C:\\x\\blob.bin","intent":"file_type","lang":"en","shell":"powershell","os":"win32"}
+{"text":"file type of download.tmp","intent":"file_type","lang":"en","shell":"fish","os":"linux"}
+{"text":"jaki to typ pliku image.dat","intent":"file_type","lang":"pl","shell":"bash","os":"linux"}
+{"text":"jakiego rodzaju jest plik setup.bin","intent":"file_type","lang":"pl","shell":"bash","os":"linux"}
+{"text":"sprawdź typ pliku dump.raw","intent":"file_type","lang":"pl","shell":"bash","os":"linux"}
+{"text":"czy archive.xyz to zip czy tar? sprawdz typ pliku","intent":"file_type","lang":"pl","shell":"bash","os":"linux"}
+{"text":"rozpoznaj typ pliku ~/cos","intent":"file_type","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"jaki typ ma plik C:\\x\\blob.bin","intent":"file_type","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"typ pliku /tmp/pobrany","intent":"file_type","lang":"pl","shell":"sh","os":"linux"}
+{"text":"wylistuj symlinki w C:\\Users\\ola\\links","intent":"find_symlinks","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"list all the links in ~/.local/bin","intent":"find_symlinks","lang":"en","shell":"fish","os":"linux"}
+{"text":"wylistuj zepsute symlinki w C:\\Users\\ola\\links","intent":"broken_symlinks","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"list all the dangling links in ~/.local/bin","intent":"broken_symlinks","lang":"en","shell":"fish","os":"linux"}
+{"text":"what format is the file photo (no extension)","intent":"file_type","lang":"en","shell":"bash","os":"linux"}
+{"text":"tell me the type of ./a.out","intent":"file_type","lang":"en","shell":"bash","os":"linux"}
+{"text":"file report.docx - what type is it really","intent":"file_type","lang":"en","shell":"bash","os":"linux"}
+{"text":"is backup.img a disk image? show the file type","intent":"file_type","lang":"en","shell":"bash","os":"linux"}
+{"text":"what kind of file is ~/Downloads/document","intent":"file_type","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"detect file type of C:\\Users\\me\\video.bin","intent":"file_type","lang":"en","shell":"powershell","os":"win32"}
+{"text":"what's the mime type of logo","intent":"file_type","lang":"en","shell":"fish","os":"linux"}
+{"text":"jaki format ma plik zdjecie bez rozszerzenia","intent":"file_type","lang":"pl","shell":"bash","os":"linux"}
+{"text":"jakiego typu jest ./a.out","intent":"file_type","lang":"pl","shell":"bash","os":"linux"}
+{"text":"sprawdz czym naprawde jest raport.docx (typ pliku)","intent":"file_type","lang":"pl","shell":"bash","os":"linux"}
+{"text":"czy backup.img to obraz dysku? pokaz typ pliku","intent":"file_type","lang":"pl","shell":"bash","os":"linux"}
+{"text":"jaki typ pliku ma ~/Pobrane/dokument","intent":"file_type","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"wykryj typ pliku C:\\Users\\ola\\film.bin","intent":"file_type","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"jaki to rodzaj pliku: /usr/lib/libz.so","intent":"file_type","lang":"pl","shell":"sh","os":"linux"}
+{"text":"list docker images","intent":"docker_images","lang":"en","shell":"bash","os":"linux"}
+{"text":"pokaż obrazy dockera","intent":"docker_images","lang":"pl","shell":"bash","os":"linux"}
+{"text":"what docker images do I have","intent":"docker_images","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"jakie mam obrazy docker","intent":"docker_images","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"largest files on the whole disk","intent":"largest_files","lang":"en","shell":"bash","os":"linux"}
+{"text":"biggest files across the entire drive","intent":"largest_files","lang":"en","shell":"bash","os":"linux"}
+{"text":"największe pliki na całym dysku","intent":"largest_files","lang":"pl","shell":"bash","os":"linux"}
+{"text":"najwieksze pliki w calym systemie","intent":"largest_files","lang":"pl","shell":"bash","os":"linux"}
+{"text":"biggest files on the whole C: drive","intent":"largest_files","lang":"en","shell":"powershell","os":"win32"}
+{"text":"największe pliki na dysku C:","intent":"largest_files","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"largest files on disk","intent":"largest_files","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"najwieksze pliki na dysku","intent":"largest_files","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"which folders take the most space on the whole disk","intent":"largest_dirs","lang":"en","shell":"bash","os":"linux"}
+{"text":"które katalogi zajmują najwięcej miejsca na całym dysku","intent":"largest_dirs","lang":"pl","shell":"bash","os":"linux"}
+{"text":"najwieksze foldery na dysku D:","intent":"largest_dirs","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"biggest directories across the entire drive","intent":"largest_dirs","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"find all .iso files on the whole disk","intent":"find_by_ext","lang":"en","shell":"bash","os":"linux"}
+{"text":"every .mkv on the entire drive","intent":"find_by_ext","lang":"en","shell":"bash","os":"linux"}
+{"text":"znajdź wszystkie pliki .iso na całym dysku","intent":"find_by_ext","lang":"pl","shell":"bash","os":"linux"}
+{"text":"pliki .pst na dysku","intent":"find_by_ext","lang":"pl","shell":"bash","os":"linux"}
+{"text":"find all .vhdx files on the whole drive","intent":"find_by_ext","lang":"en","shell":"powershell","os":"win32"}
+{"text":"wszystkie pliki .pst na całym dysku C:","intent":"find_by_ext","lang":"pl","shell":"powershell","os":"win32"}
+{"text":".dmg files anywhere on disk","intent":"find_by_ext","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"pliki .flac w calym systemie","intent":"find_by_ext","lang":"pl","shell":"fish","os":"linux"}
+{"text":"find a file called wallet.dat anywhere on disk","intent":"find_by_name","lang":"en","shell":"bash","os":"linux"}
+{"text":"znajdź plik o nazwie wallet.dat na całym dysku","intent":"find_by_name","lang":"pl","shell":"bash","os":"linux"}
+{"text":"search the whole drive for a file named license.key","intent":"find_by_name","lang":"en","shell":"powershell","os":"win32"}
+{"text":"szukaj pliku license.key na calym dysku","intent":"find_by_name","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"find httpd.conf on the whole system","intent":"find_by_name","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"znajdz plik httpd.conf w całym systemie","intent":"find_by_name","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"files bigger than 5G on the whole disk","intent":"find_larger_than","lang":"en","shell":"bash","os":"linux"}
+{"text":"pliki większe niż 2 GB na całym dysku","intent":"find_larger_than","lang":"pl","shell":"bash","os":"linux"}
+{"text":"files over 1GB across the entire drive","intent":"find_larger_than","lang":"en","shell":"powershell","os":"win32"}
+{"text":"pliki powyzej 500MB na dysku C:","intent":"find_larger_than","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"files larger than 3G anywhere on disk","intent":"find_larger_than","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"pliki wieksze niz 1G w calym systemie","intent":"find_larger_than","lang":"pl","shell":"sh","os":"linux"}
+{"text":"files modified in the last hour on the whole disk","intent":"find_recent","lang":"en","shell":"bash","os":"linux"}
+{"text":"pliki zmienione w ciągu ostatniej godziny na całym dysku","intent":"find_recent","lang":"pl","shell":"bash","os":"linux"}
+{"text":"what changed today across the whole drive","intent":"find_recent","lang":"en","shell":"powershell","os":"win32"}
+{"text":"co sie zmienilo dzis w calym systemie","intent":"find_recent","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"empty files on the whole disk","intent":"empty_files","lang":"en","shell":"bash","os":"linux"}
+{"text":"puste pliki na całym dysku","intent":"empty_files","lang":"pl","shell":"bash","os":"linux"}
+{"text":"puste pliki na dysku D:","intent":"empty_files","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"zero-byte files across the entire drive","intent":"empty_files","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"list all symlinks on the whole disk","intent":"find_symlinks","lang":"en","shell":"bash","os":"linux"}
+{"text":"wszystkie dowiązania symboliczne w całym systemie","intent":"find_symlinks","lang":"pl","shell":"bash","os":"linux"}
+{"text":"symlinks across the entire C: drive","intent":"find_symlinks","lang":"en","shell":"powershell","os":"win32"}
+{"text":"symlinki na calym dysku","intent":"find_symlinks","lang":"pl","shell":"zsh","os":"darwin"}
+{"text":"broken symlinks on the whole disk","intent":"broken_symlinks","lang":"en","shell":"bash","os":"linux"}
+{"text":"zepsute dowiązania symboliczne na całym dysku","intent":"broken_symlinks","lang":"pl","shell":"bash","os":"linux"}
+{"text":"dangling links across the entire system","intent":"broken_symlinks","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"martwe symlinki na dysku C:","intent":"broken_symlinks","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"which files on the whole disk contain \"BEGIN PRIVATE KEY\"","intent":"grep_files_containing","lang":"en","shell":"bash","os":"linux"}
+{"text":"które pliki na całym dysku zawierają \"password=\"","intent":"grep_files_containing","lang":"pl","shell":"bash","os":"linux"}
+{"text":"files containing \"AKIA\" across the entire drive","intent":"grep_files_containing","lang":"en","shell":"powershell","os":"win32"}
+{"text":"pliki zawierające \"sekret\" na całym dysku D:","intent":"grep_files_containing","lang":"pl","shell":"powershell","os":"win32"}
+{"text":"files mentioning \"api_token\" anywhere on disk","intent":"grep_files_containing","lang":"en","shell":"zsh","os":"darwin"}
+{"text":"ktore pliki w calym systemie zawieraja \"TODO\"","intent":"grep_files_containing","lang":"pl","shell":"fish","os":"linux"}

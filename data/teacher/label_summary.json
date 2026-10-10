@@ -1,0 +1,23 @@
+{
+ "candidates": 1995,
+ "accepted": 1956,
+ "rejected": 39,
+ "modelDisagreedOnAccepted": 74,
+ "ood": {
+  "candidates": 445,
+  "accepted": 381,
+  "rejected": 64
+ },
+ "byLang": {
+  "en": 1025,
+  "pl": 931
+ },
+ "byShell": {
+  "bash": 810,
+  "zsh": 306,
+  "powershell": 511,
+  "sh": 118,
+  "fish": 115,
+  "cmd": 96
+ }
+}

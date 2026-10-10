@@ -1,0 +1,495 @@
+{"text":"locate broken soft links under /var/www","intent":"broken_symlinks","lang":"en","src":"hardneg"}
+{"text":"which files in /opt/tools are broken symlinks","intent":"broken_symlinks","lang":"en","shell":"bash","os":"linux","src":"hardneg"}
+{"text":"list broken symlinks / junctions in C:\\dev","intent":"broken_symlinks","lang":"en","shell":"powershell","os":"win32","src":"hardneg"}
+{"text":"list all broken symlinks here","intent":"broken_symlinks","lang":"en","src":"hardneg"}
+{"text":"I need to see all broken symlinks in /srv","intent":"broken_symlinks","lang":"en","src":"hardneg"}
+{"text":"find broken symbolic links in C:\\dev","intent":"broken_symlinks","lang":"en","shell":"powershell","os":"win32","src":"hardneg"}
+{"text":"show broken symbolic links in /usr/local/bin","intent":"broken_symlinks","lang":"en","src":"hardneg"}
+{"text":"find broken symlinks under ~/projects","intent":"broken_symlinks","lang":"en","src":"hardneg"}
+{"text":"show me the broken links in /etc/alternatives","intent":"broken_symlinks","lang":"en","shell":"bash","os":"linux","src":"hardneg"}
+{"text":"broken symlinks in current dir","intent":"broken_symlinks","lang":"en","src":"hardneg"}
+{"text":"which entries in /etc/alternatives are broken links?","intent":"broken_symlinks","lang":"en","src":"hardneg"}
+{"text":"show sym broken links in ~/.config","intent":"broken_symlinks","lang":"en","src":"hardneg"}
+{"text":"which files are broken symlinks in this folder?","intent":"broken_symlinks","lang":"en","src":"hardneg"}
+{"text":"broken symlinks in ~/.config","intent":"broken_symlinks","lang":"en","shell":"fish","os":"linux","src":"hardneg"}
+{"text":"list all the broken links in ~/.local/bin","intent":"broken_symlinks","lang":"en","shell":"fish","os":"linux","src":"hardneg"}
+{"text":"list broken soft links in /etc","intent":"broken_symlinks","lang":"en","src":"hardneg"}
+{"text":"list reparse points / broken symlinks in C:\\ProgramData","intent":"broken_symlinks","lang":"en","shell":"powershell","os":"win32","src":"hardneg"}
+{"text":"search for broken symlinks in /lib","intent":"broken_symlinks","lang":"en","src":"hardneg"}
+{"text":"any broken symbolic links in ./node_modules/.bin?","intent":"broken_symlinks","lang":"en","src":"hardneg"}
+{"text":"scan /usr/bin for broken symbolic links","intent":"broken_symlinks","lang":"en","src":"hardneg"}
+{"text":"find all ln -s broken links in this project","intent":"broken_symlinks","lang":"en","src":"hardneg"}
+{"text":"can you list the broken symlinks inside /usr/lib?","intent":"broken_symlinks","lang":"en","src":"hardneg"}
+{"text":"give me a list of broken symlinks under /data","intent":"broken_symlinks","lang":"en","src":"hardneg"}
+{"text":"show broken symlinks in ~/repos","intent":"broken_symlinks","lang":"en","shell":"fish","os":"linux","src":"hardneg"}
+{"text":"display all broken symbolic links and their targets","intent":"broken_symlinks","lang":"en","src":"hardneg"}
+{"text":"show broken links (symbolic ones) in this repo","intent":"broken_symlinks","lang":"en","src":"hardneg"}
+{"text":"list broken symlinks please","intent":"broken_symlinks","lang":"en","src":"hardneg"}
+{"text":"find all broken symlinks recursively","intent":"broken_symlinks","lang":"en","src":"hardneg"}
+{"text":"what are the broken symbolic links in ~/dotfiles and where do they point","intent":"broken_symlinks","lang":"en","src":"hardneg"}
+{"text":"enumerate broken symlinks under the current directory","intent":"broken_symlinks","lang":"en","src":"hardneg"}
+{"text":"show broken symbolic links in ../shared","intent":"broken_symlinks","lang":"en","src":"hardneg"}
+{"text":"list broken symlinks in /usr/local/bin","intent":"broken_symlinks","lang":"en","shell":"bash","os":"linux","src":"hardneg"}
+{"text":"find broken symbolic links in ./build","intent":"broken_symlinks","lang":"en","src":"hardneg"}
+{"text":"find broken symbolic links in C:\\Users\\me","intent":"broken_symlinks","lang":"en","shell":"powershell","os":"win32","src":"hardneg"}
+{"text":"list broken symlinks in C:\\links","intent":"broken_symlinks","lang":"en","shell":"cmd","os":"win32","src":"hardneg"}
+{"text":"list all broken symlinks on the whole disk","intent":"broken_symlinks","lang":"en","shell":"bash","os":"linux","src":"hardneg"}
+{"text":"find broken symlinks in ~/dotfiles","intent":"broken_symlinks","lang":"en","shell":"zsh","os":"darwin","src":"hardneg"}
+{"text":"are there any broken symlinks in /home/anna/bin","intent":"broken_symlinks","lang":"en","src":"hardneg"}
+{"text":"find all broken symbolic links under /etc","intent":"broken_symlinks","lang":"en","shell":"bash","os":"linux","src":"hardneg"}
+{"text":"what broken symlinks are in ./node_modules/.bin","intent":"broken_symlinks","lang":"en","shell":"bash","os":"linux","src":"hardneg"}
+{"text":"znajdź zepsute linki symboliczne w folderze build","intent":"broken_symlinks","lang":"pl","src":"hardneg"}
+{"text":"wszystkie zepsute dowiązania symboliczne w całym systemie","intent":"broken_symlinks","lang":"pl","shell":"bash","os":"linux","src":"hardneg"}
+{"text":"wyświetl wszystkie zepsute dowiązania i ich cele","intent":"broken_symlinks","lang":"pl","src":"hardneg"}
+{"text":"znajdź wszystkie zepsute symlinki w ~/bin","intent":"broken_symlinks","lang":"pl","shell":"bash","os":"linux","src":"hardneg"}
+{"text":"pokaż zepsute dowiązania w C:\\Users\\me","intent":"broken_symlinks","lang":"pl","shell":"cmd","os":"win32","src":"hardneg"}
+{"text":"wyszukaj zepsute dowiązania symboliczne w /var/www","intent":"broken_symlinks","lang":"pl","src":"hardneg"}
+{"text":"pokaz zepsute linki symboliczne w tym katalogu","intent":"broken_symlinks","lang":"pl","src":"hardneg"}
+{"text":"zepsute symlinki pod /usr/lib","intent":"broken_symlinks","lang":"pl","src":"hardneg"}
+{"text":"jakie są zepsute symlinki w ~/projects?","intent":"broken_symlinks","lang":"pl","src":"hardneg"}
+{"text":"wylistuj zepsute dowiązania symboliczne w /etc","intent":"broken_symlinks","lang":"pl","src":"hardneg"}
+{"text":"pokaż zepsute dowiązania symboliczne w /opt","intent":"broken_symlinks","lang":"pl","shell":"bash","os":"linux","src":"hardneg"}
+{"text":"jakie zepsute linki symboliczne są w ~/.config","intent":"broken_symlinks","lang":"pl","shell":"zsh","os":"darwin","src":"hardneg"}
+{"text":"jakie mam zepsute symlinki w dotfiles","intent":"broken_symlinks","lang":"pl","src":"hardneg"}
+{"text":"czy są jakieś zepsute symlinki w /srv?","intent":"broken_symlinks","lang":"pl","src":"hardneg"}
+{"text":"wypisz zepsute linki symboliczne w katalogu ../shared","intent":"broken_symlinks","lang":"pl","src":"hardneg"}
+{"text":"znajdź wszystkie zepsute dowiązania symboliczne w projekcie","intent":"broken_symlinks","lang":"pl","src":"hardneg"}
+{"text":"gdzie są zepsute linki symboliczne w /opt","intent":"broken_symlinks","lang":"pl","src":"hardneg"}
+{"text":"znajdź zepsute symlinki w /usr/local/bin","intent":"broken_symlinks","lang":"pl","src":"hardneg"}
+{"text":"ktore pliki w /opt/tools to zepsute dowiazania","intent":"broken_symlinks","lang":"pl","shell":"bash","os":"linux","src":"hardneg"}
+{"text":"znajdz zepsute dowiazania symboliczne w ./vendor","intent":"broken_symlinks","lang":"pl","src":"hardneg"}
+{"text":"wylistuj zepsute linki symboliczne w /usr/local","intent":"broken_symlinks","lang":"pl","shell":"zsh","os":"darwin","src":"hardneg"}
+{"text":"znajdz zepsute dowiazania symboliczne w C:\\tools","intent":"broken_symlinks","lang":"pl","shell":"powershell","os":"win32","src":"hardneg"}
+{"text":"które pliki w /usr/bin to zepsute dowiązania?","intent":"broken_symlinks","lang":"pl","src":"hardneg"}
+{"text":"gdzie w tym drzewie są zepsute symlinki?","intent":"broken_symlinks","lang":"pl","src":"hardneg"}
+{"text":"pokaż mi zepsute symlinki w /home/anna/bin","intent":"broken_symlinks","lang":"pl","src":"hardneg"}
+{"text":"pokaż wszystkie zepsute dowiązania symboliczne","intent":"broken_symlinks","lang":"pl","src":"hardneg"}
+{"text":"pokaż zepsute symlinki w D:\\Projekty","intent":"broken_symlinks","lang":"pl","shell":"powershell","os":"win32","src":"hardneg"}
+{"text":"znajdz zepsute dowiazania symboliczne w C:\\dev","intent":"broken_symlinks","lang":"pl","shell":"powershell","os":"win32","src":"hardneg"}
+{"text":"wylistuj zepsute symlinki w bieżącym katalogu proszę","intent":"broken_symlinks","lang":"pl","src":"hardneg"}
+{"text":"znajdz wszystkie zepsute symlinki rekurencyjnie","intent":"broken_symlinks","lang":"pl","src":"hardneg"}
+{"text":"listuj zepsute linki symboliczne w /lib","intent":"broken_symlinks","lang":"pl","src":"hardneg"}
+{"text":"zepsute symlinki w bieżącym folderze","intent":"broken_symlinks","lang":"pl","src":"hardneg"}
+{"text":"pokaz zepsute symlinki w ~/.config","intent":"broken_symlinks","lang":"pl","src":"hardneg"}
+{"text":"znajdz zepsute symlinki w /home/dev","intent":"broken_symlinks","lang":"pl","shell":"bash","os":"linux","src":"hardneg"}
+{"text":"find symlinks in /etc/nginx/sites-enabled","intent":"find_symlinks","lang":"en","shell":"bash","os":"linux","src":"hardneg"}
+{"text":"links in current folder","intent":"find_symlinks","lang":"en","src":"hardneg"}
+{"text":"find symlinks in C:\\Users\\me","intent":"find_symlinks","lang":"en","shell":"powershell","os":"win32","src":"hardneg"}
+{"text":"search for links in /etc/nginx/sites-enabled","intent":"find_symlinks","lang":"en","src":"hardneg"}
+{"text":"symlinks in /usr/lib","intent":"find_symlinks","lang":"en","src":"hardneg"}
+{"text":"locate symbolic links recursively","intent":"find_symlinks","lang":"en","src":"hardneg"}
+{"text":"show me symlinks that are in /home/marek","intent":"find_symlinks","lang":"en","src":"hardneg"}
+{"text":"links in ~/dotfiles","intent":"find_symlinks","lang":"en","shell":"zsh","os":"darwin","src":"hardneg"}
+{"text":"find symlinks in /data","intent":"find_symlinks","lang":"en","src":"hardneg"}
+{"text":"symlinks in ~/.local/bin","intent":"find_symlinks","lang":"en","shell":"fish","os":"linux","src":"hardneg"}
+{"text":"links under ~/bin","intent":"find_symlinks","lang":"en","shell":"fish","os":"linux","src":"hardneg"}
+{"text":"links across the entire system","intent":"find_symlinks","lang":"en","shell":"zsh","os":"darwin","src":"hardneg"}
+{"text":"find symlinks in /usr/lib","intent":"find_symlinks","lang":"en","shell":"bash","os":"linux","src":"hardneg"}
+{"text":"are there symbolic links in ~/bin?","intent":"find_symlinks","lang":"en","src":"hardneg"}
+{"text":"symbolic links in ~/","intent":"find_symlinks","lang":"en","shell":"bash","os":"linux","src":"hardneg"}
+{"text":"show symlinks in /etc/alternatives","intent":"find_symlinks","lang":"en","src":"hardneg"}
+{"text":"detect symlinks in /opt","intent":"find_symlinks","lang":"en","src":"hardneg"}
+{"text":"detect soft links in ../shared","intent":"find_symlinks","lang":"en","src":"hardneg"}
+{"text":"can you find all symlinks here?","intent":"find_symlinks","lang":"en","src":"hardneg"}
+{"text":"symlinks in C:\\work","intent":"find_symlinks","lang":"en","shell":"cmd","os":"win32","src":"hardneg"}
+{"text":"what symlinks are in /usr/share","intent":"find_symlinks","lang":"en","src":"hardneg"}
+{"text":"any links in this directory?","intent":"find_symlinks","lang":"en","src":"hardneg"}
+{"text":"show symbolic links in ./node_modules","intent":"find_symlinks","lang":"en","src":"hardneg"}
+{"text":"check for soft links in my home dir","intent":"find_symlinks","lang":"en","src":"hardneg"}
+{"text":"list links under /etc","intent":"find_symlinks","lang":"en","src":"hardneg"}
+{"text":"I think some links are in /srv, find them","intent":"find_symlinks","lang":"en","src":"hardneg"}
+{"text":"which symlinks are in ~/dotfiles?","intent":"find_symlinks","lang":"en","src":"hardneg"}
+{"text":"scan for links in ~/.config","intent":"find_symlinks","lang":"en","src":"hardneg"}
+{"text":"clean-up check: which symlinks are in ./vendor","intent":"find_symlinks","lang":"en","src":"hardneg"}
+{"text":"znajdź rekurencyjnie linki symboliczne","intent":"find_symlinks","lang":"pl","src":"hardneg"}
+{"text":"dowiązania symboliczne na całym dysku","intent":"find_symlinks","lang":"pl","shell":"bash","os":"linux","src":"hardneg"}
+{"text":"linki symboliczne w /usr/local","intent":"find_symlinks","lang":"pl","shell":"zsh","os":"darwin","src":"hardneg"}
+{"text":"symlinki w D:\\dev","intent":"find_symlinks","lang":"pl","shell":"powershell","os":"win32","src":"hardneg"}
+{"text":"znajdz symlinki w /opt","intent":"find_symlinks","lang":"pl","shell":"bash","os":"linux","src":"hardneg"}
+{"text":"znajdz linki w /etc","intent":"find_symlinks","lang":"pl","src":"hardneg"}
+{"text":"znajdź dowiązania symboliczne w /etc","intent":"find_symlinks","lang":"pl","shell":"bash","os":"linux","src":"hardneg"}
+{"text":"linki symboliczne w /usr/local/bin","intent":"find_symlinks","lang":"pl","shell":"zsh","os":"darwin","src":"hardneg"}
+{"text":"ktore symlinki sa w ~/dotfiles?","intent":"find_symlinks","lang":"pl","src":"hardneg"}
+{"text":"sprawdź czy w katalogu domowym są linki","intent":"find_symlinks","lang":"pl","src":"hardneg"}
+{"text":"pokaż dowiązania symboliczne w /usr/local/bin","intent":"find_symlinks","lang":"pl","src":"hardneg"}
+{"text":"linki w /lib","intent":"find_symlinks","lang":"pl","shell":"sh","os":"linux","src":"hardneg"}
+{"text":"znajdz dowiazania w C:\\tools","intent":"find_symlinks","lang":"pl","shell":"powershell","os":"win32","src":"hardneg"}
+{"text":"znajdz symlinki w /data","intent":"find_symlinks","lang":"pl","src":"hardneg"}
+{"text":"pokaz symlinki w /home/marek","intent":"find_symlinks","lang":"pl","src":"hardneg"}
+{"text":"wylistuj symlinki w ./build","intent":"find_symlinks","lang":"pl","src":"hardneg"}
+{"text":"czy w ~/bin są dowiązania symboliczne?","intent":"find_symlinks","lang":"pl","src":"hardneg"}
+{"text":"symlinki w /opt","intent":"find_symlinks","lang":"pl","shell":"bash","os":"linux","src":"hardneg"}
+{"text":"czy są jakieś linki w tym katalogu?","intent":"find_symlinks","lang":"pl","src":"hardneg"}
+{"text":"możesz znaleźć wszystkie symlinki tutaj?","intent":"find_symlinks","lang":"pl","src":"hardneg"}
+{"text":"symlinki na dysku C:","intent":"find_symlinks","lang":"pl","shell":"powershell","os":"win32","src":"hardneg"}
+{"text":"wykryj soft linki w ../shared","intent":"find_symlinks","lang":"pl","src":"hardneg"}
+{"text":"linki w biezacym folderze","intent":"find_symlinks","lang":"pl","src":"hardneg"}
+{"text":"wykryj dowiązania w /opt","intent":"find_symlinks","lang":"pl","src":"hardneg"}
+{"text":"symlinki w /usr/lib","intent":"find_symlinks","lang":"pl","src":"hardneg"}
+{"text":"pull changes","intent":"git_pull","lang":"en","src":"hardneg"}
+{"text":"git pull origin main","intent":"git_pull","lang":"en","shell":"powershell","os":"win32","src":"hardneg"}
+{"text":"pull my commits","intent":"git_pull","lang":"en","src":"hardneg"}
+{"text":"git pull origin feature/login","intent":"git_pull","lang":"en","shell":"bash","os":"linux","src":"hardneg"}
+{"text":"pull current branch","intent":"git_pull","lang":"en","src":"hardneg"}
+{"text":"can you pull my branch fix-123?","intent":"git_pull","lang":"en","src":"hardneg"}
+{"text":"pull origin hotfix/payment","intent":"git_pull","lang":"en","src":"hardneg"}
+{"text":"pull branch hotfix/42","intent":"git_pull","lang":"en","shell":"bash","os":"linux","src":"hardneg"}
+{"text":"please pull the latest commits","intent":"git_pull","lang":"en","src":"hardneg"}
+{"text":"sync with remote (push)","intent":"git_push","lang":"en","shell":"powershell","os":"win32","src":"hardneg"}
+{"text":"push latest changes","intent":"git_push","lang":"en","shell":"cmd","os":"win32","src":"hardneg"}
+{"text":"please push the latest version","intent":"git_push","lang":"en","src":"hardneg"}
+{"text":"i'm behind origin, push the changes","intent":"git_push","lang":"en","src":"hardneg"}
+{"text":"push updates","intent":"git_push","lang":"en","src":"hardneg"}
+{"text":"ściągnij brancha release/2.0","intent":"git_pull","lang":"pl","src":"hardneg"}
+{"text":"ściągnij commity","intent":"git_pull","lang":"pl","src":"hardneg"}
+{"text":"wypchnij to co koledzy wypchneli","intent":"git_push","lang":"pl","shell":"bash","os":"linux","src":"hardneg"}
+{"text":"wypchnij aktualizacje","intent":"git_push","lang":"pl","src":"hardneg"}
+{"text":"wypchnij zmiany kolegów","intent":"git_push","lang":"pl","src":"hardneg"}
+{"text":"wypchnij najnowszy kod","intent":"git_push","lang":"pl","src":"hardneg"}
+{"text":"wypchnij","intent":"git_push","lang":"pl","src":"hardneg"}
+{"text":"wypchnij to co jest na githubie","intent":"git_push","lang":"pl","src":"hardneg"}
+{"text":"Get-service -Name sqlservr","intent":"service_status","lang":"en","shell":"powershell","os":"win32","src":"hardneg"}
+{"text":"Get-service notepad","intent":"service_status","lang":"en","shell":"powershell","os":"win32","src":"hardneg"}
+{"text":"Get-service chrome - is it running?","intent":"service_status","lang":"en","shell":"powershell","os":"win32","src":"hardneg"}
+{"text":"is mysql up? check the service","intent":"service_status","lang":"en","src":"hardneg"}
+{"text":"look up the service for docker","intent":"service_status","lang":"en","src":"hardneg"}
+{"text":"Get-process sshd","intent":"find_process","lang":"en","shell":"powershell","os":"win32","src":"hardneg"}
+{"text":"Get-process Spooler - is it running?","intent":"find_process","lang":"en","shell":"powershell","os":"win32","src":"hardneg"}
+{"text":"is bluetooth process running","intent":"find_process","lang":"en","src":"hardneg"}
+{"text":"is the containerd process working","intent":"find_process","lang":"en","src":"hardneg"}
+{"text":"what's the status of the W32Time process","intent":"find_process","lang":"en","shell":"powershell","os":"win32","src":"hardneg"}
+{"text":"is the cups process running?","intent":"find_process","lang":"en","src":"hardneg"}
+{"text":"is the mysql process active","intent":"find_process","lang":"en","src":"hardneg"}
+{"text":"is the cron process up?","intent":"find_process","lang":"en","shell":"bash","os":"linux","src":"hardneg"}
+{"text":"show me if the docker process is up","intent":"find_process","lang":"en","src":"hardneg"}
+{"text":"status of the ssh process","intent":"find_process","lang":"en","shell":"sh","os":"linux","src":"hardneg"}
+{"text":"check ssh process status","intent":"find_process","lang":"en","src":"hardneg"}
+{"text":"is the sshd process active?","intent":"find_process","lang":"en","shell":"bash","os":"linux","src":"hardneg"}
+{"text":"Get-process Spooler status","intent":"find_process","lang":"en","shell":"powershell","os":"win32","src":"hardneg"}
+{"text":"czy działa usługa python3","intent":"service_status","lang":"pl","shell":"bash","os":"linux","src":"hardneg"}
+{"text":"pokaż usługa pasujące do 'gunicorn'","intent":"service_status","lang":"pl","src":"hardneg"}
+{"text":"czy chodzi usługa chrome","intent":"service_status","lang":"pl","shell":"bash","os":"linux","src":"hardneg"}
+{"text":"czy jest uruchomiony usługa teams","intent":"service_status","lang":"pl","shell":"powershell","os":"win32","src":"hardneg"}
+{"text":"pokaż usługa notepad","intent":"service_status","lang":"pl","shell":"powershell","os":"win32","src":"hardneg"}
+{"text":"czy chodzi usługa java","intent":"service_status","lang":"pl","shell":"bash","os":"linux","src":"hardneg"}
+{"text":"czy uruchomiony jest usługa teams","intent":"service_status","lang":"pl","shell":"powershell","os":"win32","src":"hardneg"}
+{"text":"znajdź usługa o nazwie explorer","intent":"service_status","lang":"pl","shell":"powershell","os":"win32","src":"hardneg"}
+{"text":"czy działa usługa java?","intent":"service_status","lang":"pl","shell":"bash","os":"linux","src":"hardneg"}
+{"text":"czy działa usługa chrome","intent":"service_status","lang":"pl","shell":"powershell","os":"win32","src":"hardneg"}
+{"text":"pokaż usługa o nazwie OUTLOOK","intent":"service_status","lang":"pl","shell":"powershell","os":"win32","src":"hardneg"}
+{"text":"czy usługa java jest odpalony","intent":"service_status","lang":"pl","src":"hardneg"}
+{"text":"czy chodzi usługa nginx","intent":"service_status","lang":"pl","shell":"bash","os":"linux","src":"hardneg"}
+{"text":"poszukaj usługa dockera","intent":"service_status","lang":"pl","src":"hardneg"}
+{"text":"czy mysql działa? sprawdź usługa","intent":"service_status","lang":"pl","src":"hardneg"}
+{"text":"czy proces postgresql jest aktywny","intent":"find_process","lang":"pl","shell":"zsh","os":"darwin","src":"hardneg"}
+{"text":"czy proces containerd działa","intent":"find_process","lang":"pl","src":"hardneg"}
+{"text":"czy proces cups jest uruchomiony","intent":"find_process","lang":"pl","src":"hardneg"}
+{"text":"sprawdź status proces","intent":"find_process","lang":"pl","src":"hardneg"}
+{"text":"czy proces mysql jest aktywna","intent":"find_process","lang":"pl","src":"hardneg"}
+{"text":"sprawdź status proces ssh","intent":"find_process","lang":"pl","src":"hardneg"}
+{"text":"empty directories in ./build please","intent":"empty_dirs","lang":"en","src":"hardneg"}
+{"text":"find directories containing nothing at all","intent":"empty_dirs","lang":"en","src":"hardneg"}
+{"text":"are there empty directories in ./config?","intent":"empty_dirs","lang":"en","src":"hardneg"}
+{"text":"find directories with 0 bytes","intent":"empty_dirs","lang":"en","src":"hardneg"}
+{"text":"empty directories on the whole disk","intent":"empty_dirs","lang":"en","shell":"bash","os":"linux","src":"hardneg"}
+{"text":"which directories are empty in /var/log","intent":"empty_dirs","lang":"en","src":"hardneg"}
+{"text":"0-byte directories under ./build?","intent":"empty_dirs","lang":"en","shell":"bash","os":"linux","src":"hardneg"}
+{"text":"list zero-byte directories in ~/projects","intent":"empty_dirs","lang":"en","shell":"bash","os":"linux","src":"hardneg"}
+{"text":"zero-byte directories, list them","intent":"empty_dirs","lang":"en","src":"hardneg"}
+{"text":"find 0-byte directories in Downloads","intent":"empty_dirs","lang":"en","src":"hardneg"}
+{"text":"show empty directories in ~/Documents","intent":"empty_dirs","lang":"en","src":"hardneg"}
+{"text":"where are the empty directories in this repo","intent":"empty_dirs","lang":"en","src":"hardneg"}
+{"text":"find empty directories in D:\\Import","intent":"empty_dirs","lang":"en","shell":"powershell","os":"win32","src":"hardneg"}
+{"text":"list zero-byte directories in ./src","intent":"empty_dirs","lang":"en","src":"hardneg"}
+{"text":"search for empty directories recursively in ~","intent":"empty_dirs","lang":"en","src":"hardneg"}
+{"text":"zero-byte directories across the entire drive","intent":"empty_dirs","lang":"en","shell":"zsh","os":"darwin","src":"hardneg"}
+{"text":"show empty directories","intent":"empty_dirs","lang":"en","src":"hardneg"}
+{"text":"show me empty directories under /opt/app","intent":"empty_dirs","lang":"en","src":"hardneg"}
+{"text":"directories with Length 0 in C:\\Users\\me\\AppData","intent":"empty_dirs","lang":"en","shell":"powershell","os":"win32","src":"hardneg"}
+{"text":"any empty directories under /etc?","intent":"empty_dirs","lang":"en","src":"hardneg"}
+{"text":"find zero byte directories in C:\\data","intent":"empty_dirs","lang":"en","shell":"powershell","os":"win32","src":"hardneg"}
+{"text":"zero size directories in /tmp","intent":"empty_dirs","lang":"en","src":"hardneg"}
+{"text":"zero byte directories in C:\\temp","intent":"empty_dirs","lang":"en","shell":"cmd","os":"win32","src":"hardneg"}
+{"text":"any empty directories in ~/Documents?","intent":"empty_dirs","lang":"en","shell":"zsh","os":"darwin","src":"hardneg"}
+{"text":"empty directories in ./data","intent":"empty_dirs","lang":"en","shell":"bash","os":"linux","src":"hardneg"}
+{"text":"empty directories in ~/notes","intent":"empty_dirs","lang":"en","shell":"fish","os":"linux","src":"hardneg"}
+{"text":"Could you find all empty directories in my project?","intent":"empty_dirs","lang":"en","src":"hardneg"}
+{"text":"list directories that have no content in ./data","intent":"empty_dirs","lang":"en","src":"hardneg"}
+{"text":"list all directories with size 0 in ./uploads","intent":"empty_dirs","lang":"en","src":"hardneg"}
+{"text":"find blank (empty) directories here","intent":"empty_dirs","lang":"en","src":"hardneg"}
+{"text":"list zero-byte directories in /var/log","intent":"empty_dirs","lang":"en","shell":"bash","os":"linux","src":"hardneg"}
+{"text":"find empty directories in C:\\Data","intent":"empty_dirs","lang":"en","shell":"powershell","os":"win32","src":"hardneg"}
+{"text":"find all zero-length directories","intent":"empty_dirs","lang":"en","src":"hardneg"}
+{"text":"find truncated empty directories in /var/spool","intent":"empty_dirs","lang":"en","src":"hardneg"}
+{"text":"which directories are empty in ~/notes","intent":"empty_dirs","lang":"en","shell":"zsh","os":"darwin","src":"hardneg"}
+{"text":"directories with nothing in them in ./notes","intent":"empty_dirs","lang":"en","src":"hardneg"}
+{"text":"find directories of size zero in /srv","intent":"empty_dirs","lang":"en","src":"hardneg"}
+{"text":"find empty .txt directories","intent":"empty_dirs","lang":"en","src":"hardneg"}
+{"text":"list directories that are 0 bytes in /mnt/backup","intent":"empty_dirs","lang":"en","src":"hardneg"}
+{"text":"empty directories in /tmp","intent":"empty_dirs","lang":"en","shell":"bash","os":"linux","src":"hardneg"}
+{"text":"which files are empty in /var","intent":"empty_files","lang":"en","src":"hardneg"}
+{"text":"list all empty files in ./uploads","intent":"empty_files","lang":"en","src":"hardneg"}
+{"text":"which files in ./assets are empty","intent":"empty_files","lang":"en","shell":"bash","os":"linux","src":"hardneg"}
+{"text":"find files containing nothing","intent":"empty_files","lang":"en","src":"hardneg"}
+{"text":"empty files in ./public please","intent":"empty_files","lang":"en","src":"hardneg"}
+{"text":"empty files under /tmp","intent":"empty_files","lang":"en","src":"hardneg"}
+{"text":"empty files in ~/src","intent":"empty_files","lang":"en","shell":"fish","os":"linux","src":"hardneg"}
+{"text":"which files are completely empty in /srv","intent":"empty_files","lang":"en","src":"hardneg"}
+{"text":"list files that are empty in ~/Pictures","intent":"empty_files","lang":"en","src":"hardneg"}
+{"text":"list empty files under /srv","intent":"empty_files","lang":"en","shell":"bash","os":"linux","src":"hardneg"}
+{"text":"find vacant files in ./build","intent":"empty_files","lang":"en","src":"hardneg"}
+{"text":"any empty files in /etc?","intent":"empty_files","lang":"en","src":"hardneg"}
+{"text":"empty files in ~/Downloads","intent":"empty_files","lang":"en","shell":"zsh","os":"darwin","src":"hardneg"}
+{"text":"list empty files in ~/projects","intent":"empty_files","lang":"en","shell":"bash","os":"linux","src":"hardneg"}
+{"text":"show me empty files under /mnt/backup","intent":"empty_files","lang":"en","src":"hardneg"}
+{"text":"find files with nothing in them","intent":"empty_files","lang":"en","src":"hardneg"}
+{"text":"list empty files under C:\\Users\\me\\Music","intent":"empty_files","lang":"en","shell":"powershell","os":"win32","src":"hardneg"}
+{"text":"find empty files in Downloads","intent":"empty_files","lang":"en","src":"hardneg"}
+{"text":"which files are empty in /srv/media","intent":"empty_files","lang":"en","shell":"bash","os":"linux","src":"hardneg"}
+{"text":"find all empty files so I can clean up","intent":"empty_files","lang":"en","src":"hardneg"}
+{"text":"find empty files left over in node_modules","intent":"empty_files","lang":"en","src":"hardneg"}
+{"text":"empty files in C:\\work","intent":"empty_files","lang":"en","shell":"cmd","os":"win32","src":"hardneg"}
+{"text":"are there any empty files in ./config?","intent":"empty_files","lang":"en","src":"hardneg"}
+{"text":"empty files, list them","intent":"empty_files","lang":"en","src":"hardneg"}
+{"text":"list empty files in ./src","intent":"empty_files","lang":"en","src":"hardneg"}
+{"text":"find empty files in C:\\Users\\me\\Documents","intent":"empty_files","lang":"en","shell":"powershell","os":"win32","src":"hardneg"}
+{"text":"pokaz puste katalogi w ~/repo","intent":"empty_dirs","lang":"pl","shell":"zsh","os":"darwin","src":"hardneg"}
+{"text":"puste katalogi na D:\\import","intent":"empty_dirs","lang":"pl","shell":"cmd","os":"win32","src":"hardneg"}
+{"text":"wypisz wszystkie katalogi o rozmiarze 0 w ./uploads","intent":"empty_dirs","lang":"pl","src":"hardneg"}
+{"text":"znajdz katalogi zerowej wielkosci w C:\\Logi","intent":"empty_dirs","lang":"pl","shell":"powershell","os":"win32","src":"hardneg"}
+{"text":"znajdź puste katalogi .txt","intent":"empty_dirs","lang":"pl","src":"hardneg"}
+{"text":"puste katalogi w D:\\Import","intent":"empty_dirs","lang":"pl","shell":"powershell","os":"win32","src":"hardneg"}
+{"text":"katalogi o zerowym rozmiarze w /tmp","intent":"empty_dirs","lang":"pl","src":"hardneg"}
+{"text":"Proszę znaleźć wszystkie puste katalogi w projekcie","intent":"empty_dirs","lang":"pl","src":"hardneg"}
+{"text":"znajdź katalogi 0-bajtowe w Pobranych","intent":"empty_dirs","lang":"pl","src":"hardneg"}
+{"text":"puste katalogi na dysku D:","intent":"empty_dirs","lang":"pl","shell":"powershell","os":"win32","src":"hardneg"}
+{"text":"katalogi o rozmiarze 0 bajtow w /tmp","intent":"empty_dirs","lang":"pl","shell":"bash","os":"linux","src":"hardneg"}
+{"text":"znajdź puste katalogi w /srv/data","intent":"empty_dirs","lang":"pl","shell":"bash","os":"linux","src":"hardneg"}
+{"text":"puste katalogi w D:\\Eksport","intent":"empty_dirs","lang":"pl","shell":"powershell","os":"win32","src":"hardneg"}
+{"text":"znajdz katalogi o rozmiarze 0 bajtow","intent":"empty_dirs","lang":"pl","src":"hardneg"}
+{"text":"katalogi zerobajtowe, wypisz je","intent":"empty_dirs","lang":"pl","src":"hardneg"}
+{"text":"puste katalogi w ./build prosze","intent":"empty_dirs","lang":"pl","src":"hardneg"}
+{"text":"znajdz katalogi o rozmiarze zero w /srv","intent":"empty_dirs","lang":"pl","src":"hardneg"}
+{"text":"znajdz puste katalogi tutaj","intent":"empty_dirs","lang":"pl","src":"hardneg"}
+{"text":"które katalogi są puste w /var/log","intent":"empty_dirs","lang":"pl","src":"hardneg"}
+{"text":"znajdz puste katalogi w /var/spool","intent":"empty_dirs","lang":"pl","src":"hardneg"}
+{"text":"gdzie są puste katalogi w tym repo","intent":"empty_dirs","lang":"pl","src":"hardneg"}
+{"text":"znajdź wszystkie katalogi o zerowej długości","intent":"empty_dirs","lang":"pl","src":"hardneg"}
+{"text":"katalogi o zerowym rozmiarze w ./data","intent":"empty_dirs","lang":"pl","shell":"bash","os":"linux","src":"hardneg"}
+{"text":"czy są puste katalogi w ./config?","intent":"empty_dirs","lang":"pl","src":"hardneg"}
+{"text":"znajdź puste katalogi w projekcie","intent":"empty_dirs","lang":"pl","shell":"zsh","os":"darwin","src":"hardneg"}
+{"text":"pokaz puste katalogi w /opt/app","intent":"empty_dirs","lang":"pl","src":"hardneg"}
+{"text":"katalogi, w których nic nie ma, w ./notatki","intent":"empty_dirs","lang":"pl","src":"hardneg"}
+{"text":"puste katalogi w /etc","intent":"empty_dirs","lang":"pl","shell":"sh","os":"linux","src":"hardneg"}
+{"text":"znajdź katalogi, które nic nie zawierają","intent":"empty_dirs","lang":"pl","src":"hardneg"}
+{"text":"puste pliki, wypisz je","intent":"empty_files","lang":"pl","src":"hardneg"}
+{"text":"które pliki są całkowicie puste w /srv","intent":"empty_files","lang":"pl","src":"hardneg"}
+{"text":"znajdz puste pliki w E:\\Backup","intent":"empty_files","lang":"pl","shell":"powershell","os":"win32","src":"hardneg"}
+{"text":"pokaz puste pliki w ~/projekty","intent":"empty_files","lang":"pl","shell":"fish","os":"linux","src":"hardneg"}
+{"text":"puste pliki w D:\\stare","intent":"empty_files","lang":"pl","shell":"powershell","os":"win32","src":"hardneg"}
+{"text":"znajdź puste pliki w /home/marta","intent":"empty_files","lang":"pl","shell":"bash","os":"linux","src":"hardneg"}
+{"text":"znajdź puste pliki w Pobranych","intent":"empty_files","lang":"pl","src":"hardneg"}
+{"text":"znajdź pliki bez zawartości w /opt","intent":"empty_files","lang":"pl","src":"hardneg"}
+{"text":"pliki bez zawartości w ./data","intent":"empty_files","lang":"pl","shell":"bash","os":"linux","src":"hardneg"}
+{"text":"pokaż puste pliki w ~/Pictures","intent":"empty_files","lang":"pl","shell":"zsh","os":"darwin","src":"hardneg"}
+{"text":"czy są jakieś puste pliki w ./config?","intent":"empty_files","lang":"pl","src":"hardneg"}
+{"text":"znajdz puste pliki w ./build","intent":"empty_files","lang":"pl","src":"hardneg"}
+{"text":"puste pliki w /opt","intent":"empty_files","lang":"pl","shell":"sh","os":"linux","src":"hardneg"}
+{"text":"znajdź puste pliki w node_modules","intent":"empty_files","lang":"pl","src":"hardneg"}
+{"text":"puste pliki w D:\\Muzyka","intent":"empty_files","lang":"pl","shell":"powershell","os":"win32","src":"hardneg"}
+{"text":"znajdz pliki, w ktorych nic nie ma","intent":"empty_files","lang":"pl","src":"hardneg"}
+{"text":"wypisz wszystkie puste pliki w ./uploads","intent":"empty_files","lang":"pl","src":"hardneg"}
+{"text":"wypisz pliki, które są puste w ~/Obrazy","intent":"empty_files","lang":"pl","src":"hardneg"}
+{"text":"puste pliki w ./public prosze","intent":"empty_files","lang":"pl","src":"hardneg"}
+{"text":"pokaż puste pliki","intent":"empty_files","lang":"pl","src":"hardneg"}
+{"text":"puste pliki w /tmp","intent":"empty_files","lang":"pl","src":"hardneg"}
+{"text":"pokaz puste pliki w /mnt/backup","intent":"empty_files","lang":"pl","src":"hardneg"}
+{"text":"puste pliki w /var/www","intent":"empty_files","lang":"pl","shell":"bash","os":"linux","src":"hardneg"}
+{"text":"znajdz wszystkie puste pliki, chce posprzatac","intent":"empty_files","lang":"pl","src":"hardneg"}
+{"text":"które pliki są puste w /var","intent":"empty_files","lang":"pl","src":"hardneg"}
+{"text":"disks and partitions on my partitions","intent":"block_devices","lang":"en","shell":"bash","os":"linux","src":"hardneg"}
+{"text":"what's the disks and partitions on / ?","intent":"block_devices","lang":"en","src":"hardneg"}
+{"text":"Get-PSDrive disks and partitions","intent":"block_devices","lang":"en","shell":"powershell","os":"win32","src":"hardneg"}
+{"text":"check disks and partitions on all drives","intent":"block_devices","lang":"en","src":"hardneg"}
+{"text":"dsik disks and partitions","intent":"block_devices","lang":"en","src":"hardneg"}
+{"text":"disks and partitions on drive D:","intent":"block_devices","lang":"en","shell":"powershell","os":"win32","src":"hardneg"}
+{"text":"disks and partitions on this box (pwsh on ubuntu)","intent":"block_devices","lang":"en","shell":"powershell","os":"linux","src":"hardneg"}
+{"text":"disks and partitions on drive C","intent":"block_devices","lang":"en","shell":"cmd","os":"win32","src":"hardneg"}
+{"text":"how much disks and partitions do my drives have","intent":"block_devices","lang":"en","shell":"powershell","os":"win32","src":"hardneg"}
+{"text":"disks and partitions on mounted filesystems","intent":"block_devices","lang":"en","src":"hardneg"}
+{"text":"list free space on the disks","intent":"disk_free","lang":"en","src":"hardneg"}
+{"text":"list free space on the disks and partitions","intent":"disk_free","lang":"en","src":"hardneg"}
+{"text":"lsit free space on the disks","intent":"disk_free","lang":"en","src":"hardneg"}
+{"text":"display free space on the disks with sizes","intent":"disk_free","lang":"en","src":"hardneg"}
+{"text":"how many free space on the disks are installed","intent":"disk_free","lang":"en","src":"hardneg"}
+{"text":"list physical free space on the disks","intent":"disk_free","lang":"en","src":"hardneg"}
+{"text":"which free space on the disks exist","intent":"disk_free","lang":"en","src":"hardneg"}
+{"text":"how do I see all free space on the disks on this machine","intent":"disk_free","lang":"en","src":"hardneg"}
+{"text":"show me the free space on the disks attached to this server","intent":"disk_free","lang":"en","src":"hardneg"}
+{"text":"which free space on the disks do I have","intent":"disk_free","lang":"en","src":"hardneg"}
+{"text":"view all free space on the disks and partitions with their sizes","intent":"disk_free","lang":"en","src":"hardneg"}
+{"text":"list free space on the disks and partitions pls","intent":"disk_free","lang":"en","src":"hardneg"}
+{"text":"what free space on the disks are on the external drive","intent":"disk_free","lang":"en","src":"hardneg"}
+{"text":"list all free space on the disks including unmounted ones","intent":"disk_free","lang":"en","src":"hardneg"}
+{"text":"list all free space on the disks and partitions","intent":"disk_free","lang":"en","shell":"powershell","os":"win32","src":"hardneg"}
+{"text":"what free space on the disks are connected","intent":"disk_free","lang":"en","src":"hardneg"}
+{"text":"list free space on the disks and drives","intent":"disk_free","lang":"en","shell":"bash","os":"linux","src":"hardneg"}
+{"text":"show all free space on the disks","intent":"disk_free","lang":"en","src":"hardneg"}
+{"text":"show free space on the disks","intent":"disk_free","lang":"en","src":"hardneg"}
+{"text":"enumerate free space on the disks","intent":"disk_free","lang":"en","src":"hardneg"}
+{"text":"show nvme free space on the disks and partitions","intent":"disk_free","lang":"en","src":"hardneg"}
+{"text":"show free space on the disks and partitions","intent":"disk_free","lang":"en","shell":"bash","os":"linux","src":"hardneg"}
+{"text":"show my hard free space on the disks and their partitions","intent":"disk_free","lang":"en","src":"hardneg"}
+{"text":"see which users logged in recently at present","intent":"last_logins","lang":"en","src":"hardneg"}
+{"text":"who logged in recently now","intent":"last_logins","lang":"en","shell":"bash","os":"linux","src":"hardneg"}
+{"text":"which users logged in recently","intent":"last_logins","lang":"en","shell":"bash","os":"linux","src":"hardneg"}
+{"text":"who else logged in recently right now","intent":"last_logins","lang":"en","shell":"bash","os":"linux","src":"hardneg"}
+{"text":"check who logged in recently at the moment","intent":"last_logins","lang":"en","src":"hardneg"}
+{"text":"kto się ostatnio logował na tym serwerze windows","intent":"last_logins","lang":"pl","shell":"powershell","os":"win32","src":"hardneg"}
+{"text":"sprawdź kto się ostatnio logował","intent":"last_logins","lang":"pl","src":"hardneg"}
+{"text":"czy ktoś inny się ostatnio logował","intent":"last_logins","lang":"pl","src":"hardneg"}
+{"text":"pokaz kto się ostatnio logował","intent":"last_logins","lang":"pl","src":"hardneg"}
+{"text":"kto się ostatnio logował na tym serwerze","intent":"last_logins","lang":"pl","shell":"cmd","os":"win32","src":"hardneg"}
+{"text":"what directories are in my PATH binary","intent":"show_path","lang":"en","src":"hardneg"}
+{"text":"what directories are in my PATH located","intent":"show_path","lang":"en","shell":"powershell","os":"win32","src":"hardneg"}
+{"text":"show hidden files in /var/log with details","intent":"hidden_files","lang":"en","src":"hardneg"}
+{"text":"show me the hidden files in my home directory","intent":"hidden_files","lang":"en","src":"hardneg"}
+{"text":"list all hidden files with permissions in current directory","intent":"hidden_files","lang":"en","src":"hardneg"}
+{"text":"list hidden files in /var/www with details","intent":"hidden_files","lang":"en","shell":"bash","os":"linux","src":"hardneg"}
+{"text":"list hidden files in /var/tmp with sizes","intent":"hidden_files","lang":"en","shell":"powershell","os":"linux","src":"hardneg"}
+{"text":"list hidden files here","intent":"hidden_files","lang":"en","src":"hardneg"}
+{"text":"lsit hidden files in /mnt/usb","intent":"hidden_files","lang":"en","src":"hardneg"}
+{"text":"what hidden files are in ~/Documents?","intent":"hidden_files","lang":"en","src":"hardneg"}
+{"text":"list the hidden files in ~/music please","intent":"hidden_files","lang":"en","src":"hardneg"}
+{"text":"list hidden files in . with owner and date","intent":"hidden_files","lang":"en","src":"hardneg"}
+{"text":"display hidden files in /data/exports","intent":"hidden_files","lang":"en","src":"hardneg"}
+{"text":"list hidden files in ~/src","intent":"hidden_files","lang":"en","shell":"fish","os":"linux","src":"hardneg"}
+{"text":"pokaż ukryte pliki i ich rozmiary w ./dist","intent":"hidden_files","lang":"pl","src":"hardneg"}
+{"text":"wylistuj ukryte pliki","intent":"hidden_files","lang":"pl","src":"hardneg"}
+{"text":"listuj ukryte pliki w bieżącym katalogu","intent":"hidden_files","lang":"pl","src":"hardneg"}
+{"text":"pokaz ukryte pliki w /tmp","intent":"hidden_files","lang":"pl","src":"hardneg"}
+{"text":"jakie ukryte pliki są w ~/Dokumenty?","intent":"hidden_files","lang":"pl","src":"hardneg"}
+{"text":"pokaż wszystkie ukryte pliki z właścicielem i datą","intent":"hidden_files","lang":"pl","src":"hardneg"}
+{"text":"pokaż ukryte pliki w /var/log ze szczegółami","intent":"hidden_files","lang":"pl","src":"hardneg"}
+{"text":"jakie ukryte pliki leżą w /var/lib/docker?","intent":"hidden_files","lang":"pl","src":"hardneg"}
+{"text":"wyswietl ukryte pliki w ../backup","intent":"hidden_files","lang":"pl","src":"hardneg"}
+{"text":"pokaż ukryte pliki w D:\\Projekty","intent":"hidden_files","lang":"pl","shell":"powershell","os":"win32","src":"hardneg"}
+{"text":"wylistuj ukryte pliki w ~/Downloads","intent":"hidden_files","lang":"pl","shell":"zsh","os":"darwin","src":"hardneg"}
+{"text":"wylistuj ukryte pliki w /etc/nginx","intent":"hidden_files","lang":"pl","shell":"bash","os":"linux","src":"hardneg"}
+{"text":"ukryte pliki w /data/exports","intent":"hidden_files","lang":"pl","src":"hardneg"}
+{"text":"wylsituj ukryte pliki w /mnt/usb","intent":"hidden_files","lang":"pl","src":"hardneg"}
+{"text":"list all containers, including stopped ones that are currently running","intent":"docker_ps_all","lang":"en","src":"hardneg"}
+{"text":"how do I see all containers, including stopped ones?","intent":"docker_ps_all","lang":"en","src":"hardneg"}
+{"text":"what docker all containers, including stopped ones are up at the moment","intent":"docker_ps_all","lang":"en","src":"hardneg"}
+{"text":"list started all containers, including stopped ones","intent":"docker_ps_all","lang":"en","src":"hardneg"}
+{"text":"show live all containers, including stopped ones","intent":"docker_ps_all","lang":"en","src":"hardneg"}
+{"text":"display all containers, including stopped ones only","intent":"docker_ps_all","lang":"en","src":"hardneg"}
+{"text":"show all containers, including stopped ones in up state","intent":"docker_ps_all","lang":"en","src":"hardneg"}
+{"text":"which all containers, including stopped ones are up right now","intent":"docker_ps_all","lang":"en","shell":"bash","os":"linux","src":"hardneg"}
+{"text":"show active docker all containers, including stopped ones","intent":"docker_ps_all","lang":"en","src":"hardneg"}
+{"text":"list running docker all containers, including stopped ones","intent":"docker_ps_all","lang":"en","shell":"bash","os":"linux","src":"hardneg"}
+{"text":"please list the all containers, including stopped ones that are running","intent":"docker_ps_all","lang":"en","src":"hardneg"}
+{"text":"which all containers, including stopped ones are up?","intent":"docker_ps_all","lang":"en","src":"hardneg"}
+{"text":"check what all containers, including stopped ones are running","intent":"docker_ps_all","lang":"en","src":"hardneg"}
+{"text":"which docker all containers, including stopped ones are alive","intent":"docker_ps_all","lang":"en","src":"hardneg"}
+{"text":"show runnign all containers, including stopped ones","intent":"docker_ps_all","lang":"en","src":"hardneg"}
+{"text":"list docker all containers, including stopped ones (running)","intent":"docker_ps_all","lang":"en","src":"hardneg"}
+{"text":"show up all containers, including stopped ones","intent":"docker_ps_all","lang":"en","src":"hardneg"}
+{"text":"view all containers, including stopped ones","intent":"docker_ps_all","lang":"en","src":"hardneg"}
+{"text":"is my postgres container running? list all containers, including stopped ones","intent":"docker_ps_all","lang":"en","shell":"bash","os":"linux","src":"hardneg"}
+{"text":"what all containers, including stopped ones are running right now?","intent":"docker_ps_all","lang":"en","src":"hardneg"}
+{"text":"how to list active all containers, including stopped ones in docker","intent":"docker_ps_all","lang":"en","src":"hardneg"}
+{"text":"currently all containers, including stopped ones?","intent":"docker_ps_all","lang":"en","src":"hardneg"}
+{"text":"show me the running docker all containers, including stopped ones","intent":"docker_ps_all","lang":"en","src":"hardneg"}
+{"text":"can you show all containers, including stopped ones?","intent":"docker_ps_all","lang":"en","src":"hardneg"}
+{"text":"jak zobaczyć wszystkie kontenery, także zatrzymane?","intent":"docker_ps_all","lang":"pl","src":"hardneg"}
+{"text":"czy możesz pokazać wszystkie kontenery, także zatrzymane?","intent":"docker_ps_all","lang":"pl","src":"hardneg"}
+{"text":"proszę wypisać wszystkie kontenery, także zatrzymane które działają","intent":"docker_ps_all","lang":"pl","src":"hardneg"}
+{"text":"wypisz uruchomione wszystkie kontenery, także zatrzymane","intent":"docker_ps_all","lang":"pl","src":"hardneg"}
+{"text":"pokaż wszystkie kontenery, także zatrzymane w stanie up","intent":"docker_ps_all","lang":"pl","src":"hardneg"}
+{"text":"wypisz aktualnie wszystkie kontenery, także zatrzymane","intent":"docker_ps_all","lang":"pl","src":"hardneg"}
+{"text":"pokaż aktywne wszystkie kontenery, także zatrzymane","intent":"docker_ps_all","lang":"pl","src":"hardneg"}
+{"text":"uruchomione wszystkie kontenery, także zatrzymane","intent":"docker_ps_all","lang":"pl","src":"hardneg"}
+{"text":"jakie wszystkie kontenery, także zatrzymane działają","intent":"docker_ps_all","lang":"pl","shell":"powershell","os":"win32","src":"hardneg"}
+{"text":"jak wylistowac aktywne wszystkie kontenery, także zatrzymane","intent":"docker_ps_all","lang":"pl","src":"hardneg"}
+{"text":"sprawdz jakie wszystkie kontenery, także zatrzymane sa uruchomione","intent":"docker_ps_all","lang":"pl","src":"hardneg"}
+{"text":"wszystkie kontenery, także zatrzymane które są up","intent":"docker_ps_all","lang":"pl","src":"hardneg"}
+{"text":"jakie wszystkie kontenery, także zatrzymane dockera są teraz up","intent":"docker_ps_all","lang":"pl","src":"hardneg"}
+{"text":"jakie wszystkie kontenery, także zatrzymane są włączone","intent":"docker_ps_all","lang":"pl","src":"hardneg"}
+{"text":"ktore wszystkie kontenery, także zatrzymane chodza?","intent":"docker_ps_all","lang":"pl","src":"hardneg"}
+{"text":"jakie wszystkie kontenery, także zatrzymane teraz działają?","intent":"docker_ps_all","lang":"pl","src":"hardneg"}
+{"text":"pokaż wszystkie kontenery, także zatrzymane","intent":"docker_ps_all","lang":"pl","src":"hardneg"}
+{"text":"pokaz uruchomione wszystkie kontenery, także zatrzymane dockera","intent":"docker_ps_all","lang":"pl","src":"hardneg"}
+{"text":"wyswietl tylko wszystkie kontenery, także zatrzymane","intent":"docker_ps_all","lang":"pl","src":"hardneg"}
+{"text":"wylistuj odpalone wszystkie kontenery, także zatrzymane","intent":"docker_ps_all","lang":"pl","src":"hardneg"}
+{"text":"ktore wszystkie kontenery, także zatrzymane zyja","intent":"docker_ps_all","lang":"pl","src":"hardneg"}
+{"text":"uruchomione wszystkie kontenery, także zatrzymane dockera","intent":"docker_ps_all","lang":"pl","shell":"zsh","os":"darwin","src":"hardneg"}
+{"text":"pokaz dzialajce wszystkie kontenery, także zatrzymane","intent":"docker_ps_all","lang":"pl","src":"hardneg"}
+{"text":"wszystkie kontenery, także zatrzymane dockera","intent":"docker_ps_all","lang":"pl","src":"hardneg"}
+{"text":"aktywne wszystkie kontenery, także zatrzymane dockera","intent":"docker_ps_all","lang":"pl","src":"hardneg"}
+{"text":"stop the grafana-server service now","intent":"service_stop","lang":"en","src":"hardneg"}
+{"text":"stop postgresql","intent":"service_stop","lang":"en","shell":"zsh","os":"darwin","src":"hardneg"}
+{"text":"stop apache2","intent":"service_stop","lang":"en","shell":"bash","os":"linux","src":"hardneg"}
+{"text":"please stop the my-app service","intent":"service_stop","lang":"en","src":"hardneg"}
+{"text":"systemctl stop apache2","intent":"service_stop","lang":"en","src":"hardneg"}
+{"text":"give apache a stop","intent":"service_stop","lang":"en","src":"hardneg"}
+{"text":"stop the IIS W3SVC service","intent":"service_stop","lang":"en","shell":"powershell","os":"win32","src":"hardneg"}
+{"text":"stop cron please","intent":"service_stop","lang":"en","src":"hardneg"}
+{"text":"redis stop","intent":"service_stop","lang":"en","src":"hardneg"}
+{"text":"stop the network manager service","intent":"service_stop","lang":"en","src":"hardneg"}
+{"text":"apply new config: stop nginx","intent":"service_stop","lang":"en","src":"hardneg"}
+{"text":"nginx needs a stop","intent":"service_stop","lang":"en","src":"hardneg"}
+{"text":"stop php8.2-fpm","intent":"service_stop","lang":"en","src":"hardneg"}
+{"text":"please stop the php-fpm service","intent":"service_stop","lang":"en","shell":"zsh","os":"darwin","src":"hardneg"}
+{"text":"stop the print spooler service","intent":"service_stop","lang":"en","shell":"cmd","os":"win32","src":"hardneg"}
+{"text":"can you stop mysql","intent":"service_stop","lang":"en","src":"hardneg"}
+{"text":"stop service cron","intent":"service_stop","lang":"en","src":"hardneg"}
+{"text":"could you stop the ssh service for me","intent":"service_stop","lang":"en","src":"hardneg"}
+{"text":"stop the mysql service","intent":"service_stop","lang":"en","shell":"cmd","os":"win32","src":"hardneg"}
+{"text":"stop sshd after config change","intent":"service_stop","lang":"en","src":"hardneg"}
+{"text":"brew services stop postgresql@15","intent":"service_stop","lang":"en","shell":"zsh","os":"darwin","src":"hardneg"}
+{"text":"brew services restart mysql","intent":"service_restart","lang":"en","shell":"zsh","os":"darwin","src":"hardneg"}
+{"text":"could you restart the networkmanager service","intent":"service_restart","lang":"en","src":"hardneg"}
+{"text":"restart the windows update service","intent":"service_restart","lang":"en","shell":"powershell","os":"win32","src":"hardneg"}
+{"text":"restart docker now","intent":"service_restart","lang":"en","src":"hardneg"}
+{"text":"restart the apache2 service","intent":"service_restart","lang":"en","shell":"bash","os":"linux","src":"hardneg"}
+{"text":"please restart mysql","intent":"service_restart","lang":"en","src":"hardneg"}
+{"text":"restart the ssh service","intent":"service_restart","lang":"en","shell":"sh","os":"linux","src":"hardneg"}
+{"text":"restart bluetooth service","intent":"service_restart","lang":"en","src":"hardneg"}
+{"text":"disable nginx for now, just restart it","intent":"service_restart","lang":"en","src":"hardneg"}
+{"text":"please restart the nginx daemon","intent":"service_restart","lang":"en","shell":"zsh","os":"darwin","src":"hardneg"}
+{"text":"i want to restart the ssh service","intent":"service_restart","lang":"en","src":"hardneg"}
+{"text":"restart the redis service","intent":"service_restart","lang":"en","shell":"bash","os":"linux","src":"hardneg"}
+{"text":"restart service apache2","intent":"service_restart","lang":"en","src":"hardneg"}
+{"text":"restart the docker daemon","intent":"service_restart","lang":"en","src":"hardneg"}
+{"text":"net restart wuauserv","intent":"service_restart","lang":"en","shell":"cmd","os":"win32","src":"hardneg"}
+{"text":"restart cron","intent":"service_restart","lang":"en","src":"hardneg"}
+{"text":"restart cups","intent":"service_restart","lang":"en","src":"hardneg"}
+{"text":"restart-Service -Name Spooler","intent":"service_restart","lang":"en","shell":"powershell","os":"win32","src":"hardneg"}
+{"text":"restart the cron daemon","intent":"service_restart","lang":"en","src":"hardneg"}
+{"text":"zatrzymaj usługę postgresql","intent":"service_stop","lang":"pl","src":"hardneg"}
+{"text":"nowa konfiguracja: zatrzymaj nginx","intent":"service_stop","lang":"pl","src":"hardneg"}
+{"text":"zatrzymaj usługę W3SVC","intent":"service_stop","lang":"pl","shell":"powershell","os":"win32","src":"hardneg"}
+{"text":"zatrzymaj usługę wuauserv","intent":"service_stop","lang":"pl","shell":"powershell","os":"win32","src":"hardneg"}
+{"text":"zatrzymaj php8.2-fpm","intent":"service_stop","lang":"pl","src":"hardneg"}
+{"text":"po prostu zatrzymaj dockera","intent":"service_stop","lang":"pl","src":"hardneg"}
+{"text":"zatrzymaj grafana-server teraz","intent":"service_stop","lang":"pl","src":"hardneg"}
+{"text":"zatrzymaj usługę networkmanager","intent":"service_stop","lang":"pl","src":"hardneg"}
+{"text":"zatrzymaj nginxa","intent":"service_stop","lang":"pl","shell":"bash","os":"linux","src":"hardneg"}
+{"text":"zatrzymaj prosze serwis my-app","intent":"service_stop","lang":"pl","src":"hardneg"}
+{"text":"zatrzymaj nginx przez brew services","intent":"service_stop","lang":"pl","shell":"zsh","os":"darwin","src":"hardneg"}
+{"text":"zrestartuj usługę mongodb-community","intent":"service_restart","lang":"pl","shell":"zsh","os":"darwin","src":"hardneg"}
+{"text":"zrestartuj demona cron","intent":"service_restart","lang":"pl","src":"hardneg"}
+{"text":"zrestartuj usługę bufora wydruku (Stop-Service)","intent":"service_restart","lang":"pl","shell":"powershell","os":"win32","src":"hardneg"}
+{"text":"zrestartuj serwis my-app","intent":"service_restart","lang":"pl","src":"hardneg"}
+{"text":"zrestartuj demona dockera","intent":"service_restart","lang":"pl","src":"hardneg"}
+{"text":"zrestartuj cups","intent":"service_restart","lang":"pl","src":"hardneg"}
+{"text":"zrestartuj dockera teraz","intent":"service_restart","lang":"pl","src":"hardneg"}
+{"text":"zrestartuj serwer redis","intent":"service_restart","lang":"pl","src":"hardneg"}
+{"text":"zrestartuj postgresa","intent":"service_restart","lang":"pl","src":"hardneg"}
+{"text":"zrestartuj usługę wyszukiwania WSearch","intent":"service_restart","lang":"pl","shell":"cmd","os":"win32","src":"hardneg"}
+{"text":"na razie zrestartuj nginxa","intent":"service_restart","lang":"pl","src":"hardneg"}
+{"text":"zrestartuj usluge bluetooth","intent":"service_restart","lang":"pl","src":"hardneg"}
+{"text":"zrestartuj usluge MSSQLSERVER","intent":"service_restart","lang":"pl","shell":"cmd","os":"win32","src":"hardneg"}
+{"text":"zrestartuj usługę BITS","intent":"service_restart","lang":"pl","shell":"powershell","os":"win32","src":"hardneg"}
+{"text":"zrestartuj containerd","intent":"service_restart","lang":"pl","src":"hardneg"}

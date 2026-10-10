@@ -1,0 +1,106 @@
+{"text":"pull the commits I just made","intent":"git_pull","lang":"en","from":"git_push","orig":"push the commits I just made","teacher":"git_pull","conf":0.38}
+{"text":"pull my changes up","intent":"git_pull","lang":"en","from":"git_push","orig":"push my changes up","teacher":"git_push","conf":0.84}
+{"text":"push down changes","intent":"git_push","lang":"en","from":"git_pull","orig":"pull down changes","teacher":"git_stash","conf":0.29}
+{"text":"how can i push changes my colleague pushed","intent":"git_push","lang":"en","from":"git_pull","orig":"how can i pull changes my colleague pushed","teacher":"git_pull","conf":0.8}
+{"text":"ściągnij develop","intent":"git_pull","lang":"pl","from":"git_push","orig":"pushnij develop","teacher":"git_switch_branch","conf":0.5}
+{"text":"proszę ściągnij ostatnie commity","intent":"git_pull","lang":"pl","from":"git_push","orig":"proszę wypchnij ostatnie commity","teacher":"git_pull","conf":0.45}
+{"text":"czy możesz ściągnij brancha fix-123?","intent":"git_pull","lang":"pl","from":"git_push","orig":"czy możesz wypchnąć brancha fix-123?","teacher":"git_pull","conf":0.46}
+{"text":"wypchnij i scal zdalne zmiany","intent":"git_push","lang":"pl","from":"git_pull","orig":"pobierz i scal zdalne zmiany","teacher":"none","conf":0.36}
+{"text":"list service named php-fpm","intent":"service_status","lang":"en","from":"find_process","orig":"list processes named php-fpm","teacher":"list_services","conf":0.54}
+{"text":"get pids of all node service","intent":"service_status","lang":"en","from":"find_process","orig":"get pids of all node processes","teacher":"find_process","conf":1}
+{"text":"is there a service called Slack running","intent":"service_status","lang":"en","shell":"zsh","os":"darwin","from":"find_process","orig":"is there a process called Slack running","teacher":"find_process","conf":0.66}
+{"text":"is the nginx service alive (ps)","intent":"service_status","lang":"en","shell":"bash","os":"linux","from":"find_process","orig":"is the nginx process alive (ps)","teacher":"find_process","conf":0.72}
+{"text":"find service named node","intent":"service_status","lang":"en","from":"find_process","orig":"find process named node","teacher":"find_process","conf":0.58}
+{"text":"find the java service with its full command line","intent":"service_status","lang":"en","from":"find_process","orig":"find the java process with its full command line","teacher":"find_process","conf":1}
+{"text":"find running service by name","intent":"service_status","lang":"en","from":"find_process","orig":"find running process by name","teacher":"find_process","conf":0.99}
+{"text":"find the service named node","intent":"service_status","lang":"en","shell":"bash","os":"linux","from":"find_process","orig":"find the process named node","teacher":"find_process","conf":0.51}
+{"text":"show pid and command for service like 'uvicorn'","intent":"service_status","lang":"en","from":"find_process","orig":"show pid and command for processes like 'uvicorn'","teacher":"find_process","conf":1}
+{"text":"find the node service","intent":"service_status","lang":"en","shell":"bash","os":"linux","from":"find_process","orig":"find the node process","teacher":"find_process","conf":0.99}
+{"text":"is there a postgres service running","intent":"service_status","lang":"en","shell":"fish","os":"linux","from":"find_process","orig":"is there a postgres process running","teacher":"find_process","conf":0.48}
+{"text":"is there a node service running","intent":"service_status","lang":"en","from":"find_process","orig":"is there a node process running","teacher":"find_process","conf":0.94}
+{"text":"find the service id of redis-server","intent":"service_status","lang":"en","from":"find_process","orig":"find the process id of redis-server","teacher":"find_process","conf":0.83}
+{"text":"show service matching 'gunicorn'","intent":"service_status","lang":"en","from":"find_process","orig":"show processes matching 'gunicorn'","teacher":"find_process","conf":0.42}
+{"text":"find running service Slack","intent":"service_status","lang":"en","shell":"zsh","os":"darwin","from":"find_process","orig":"find running process Slack","teacher":"find_process","conf":0.99}
+{"text":"search service for 'celery'","intent":"service_status","lang":"en","from":"find_process","orig":"search processes for 'celery'","teacher":"find_process","conf":0.59}
+{"text":"check whether a service named gunicorn is running","intent":"service_status","lang":"en","shell":"bash","os":"linux","from":"find_process","orig":"check whether a process named gunicorn is running","teacher":"find_process","conf":0.58}
+{"text":"Get-service -Name *node*","intent":"service_status","lang":"en","shell":"powershell","os":"win32","from":"find_process","orig":"Get-Process -Name *node*","teacher":"list_services","conf":0.68}
+{"text":"find service","intent":"service_status","lang":"en","from":"find_process","orig":"find process","teacher":"find_process","conf":0.6}
+{"text":"is a java service running?","intent":"service_status","lang":"en","shell":"bash","os":"linux","from":"find_process","orig":"is a java process running?","teacher":"find_process","conf":0.89}
+{"text":"grep running service for python","intent":"service_status","lang":"en","from":"find_process","orig":"grep running processes for python","teacher":"find_process","conf":0.98}
+{"text":"search for a running service called chrome","intent":"service_status","lang":"en","from":"find_process","orig":"search for a running process called chrome","teacher":"find_process","conf":0.98}
+{"text":"find service firefox","intent":"service_status","lang":"en","shell":"fish","os":"linux","from":"find_process","orig":"find process firefox","teacher":"find_process","conf":0.68}
+{"text":"find service postgres","intent":"service_status","lang":"en","shell":"sh","os":"linux","from":"find_process","orig":"find process postgres","teacher":"find_process","conf":0.87}
+{"text":"find the service named postgres","intent":"service_status","lang":"en","shell":"bash","os":"linux","from":"find_process","orig":"find the process named postgres","teacher":"find_process","conf":0.75}
+{"text":"is there a chrome service running?","intent":"service_status","lang":"en","shell":"bash","os":"linux","from":"find_process","orig":"is there a chrome process running?","teacher":"find_process","conf":0.82}
+{"text":"is any service named rsync running right now","intent":"service_status","lang":"en","shell":"sh","os":"linux","from":"find_process","orig":"is any process named rsync running right now","teacher":"find_process","conf":0.96}
+{"text":"what service are called httpd","intent":"service_status","lang":"en","from":"find_process","orig":"what processes are called httpd","teacher":"none","conf":0.45}
+{"text":"find any running service named notepad","intent":"service_status","lang":"en","shell":"powershell","os":"win32","from":"find_process","orig":"find any running process named notepad","teacher":"find_process","conf":0.7}
+{"text":"show status of the cron process","intent":"find_process","lang":"en","from":"service_status","orig":"show status of the cron service","teacher":"service_status","conf":0.74}
+{"text":"status of the nginx process","intent":"find_process","lang":"en","shell":"bash","os":"linux","from":"service_status","orig":"status of the nginx service","teacher":"service_status","conf":0.89}
+{"text":"process status docker","intent":"find_process","lang":"en","from":"service_status","orig":"service status docker","teacher":"service_status","conf":0.45}
+{"text":"status of cron process","intent":"find_process","lang":"en","shell":"sh","os":"linux","from":"service_status","orig":"status of cron service","teacher":"service_status","conf":0.57}
+{"text":"what's the state of the sshd process","intent":"find_process","lang":"en","from":"service_status","orig":"what's the state of the sshd daemon","teacher":"service_status","conf":0.5}
+{"text":"show the status of the redis-server process","intent":"find_process","lang":"en","shell":"bash","os":"linux","from":"service_status","orig":"show the status of the redis-server unit","teacher":"service_status","conf":0.63}
+{"text":"status of the postgresql process","intent":"find_process","lang":"en","shell":"zsh","os":"darwin","from":"service_status","orig":"status of the postgresql service","teacher":"find_process","conf":0.46}
+{"text":"what's the status of the wuauserv process","intent":"find_process","lang":"en","shell":"powershell","os":"win32","from":"service_status","orig":"what's the status of the wuauserv service","teacher":"service_status","conf":0.72}
+{"text":"has the nginx process crashed","intent":"find_process","lang":"en","from":"service_status","orig":"has the nginx service crashed","teacher":"service_status","conf":0.45}
+{"text":"look at the docker process status","intent":"find_process","lang":"en","from":"service_status","orig":"look at the docker service status","teacher":"service_status","conf":0.75}
+{"text":"check the status of a process","intent":"find_process","lang":"en","from":"service_status","orig":"check the status of a service","teacher":"find_process","conf":0.44}
+{"text":"is my-app.process healthy","intent":"find_process","lang":"en","from":"service_status","orig":"is my-app.service healthy","teacher":"service_status","conf":0.51}
+{"text":"check if the docker process service is up","intent":"find_process","lang":"en","shell":"bash","os":"linux","from":"service_status","orig":"check if the docker daemon service is up","teacher":"service_status","conf":0.92}
+{"text":"check if the firewall process ufw is active","intent":"find_process","lang":"en","from":"service_status","orig":"check if the firewall service ufw is active","teacher":"service_status","conf":0.98}
+{"text":"is the postgresql process service enabled and running?","intent":"find_process","lang":"en","shell":"zsh","os":"darwin","from":"service_status","orig":"is the postgresql daemon service enabled and running?","teacher":"service_status","conf":0.96}
+{"text":"status of the docker process","intent":"find_process","lang":"en","shell":"bash","os":"linux","from":"service_status","orig":"status of the docker service","teacher":"service_status","conf":0.81}
+{"text":"znajdz usługa redis","intent":"service_status","lang":"pl","shell":"fish","os":"linux","from":"find_process","orig":"znajdz proces redis","teacher":"find_process","conf":0.29}
+{"text":"znajdz usługa","intent":"service_status","lang":"pl","from":"find_process","orig":"znajdz proces","teacher":"list_services","conf":0.23}
+{"text":"pokaz pid usługa uvicorn","intent":"service_status","lang":"pl","from":"find_process","orig":"pokaz pid procesu uvicorn","teacher":"find_process","conf":1}
+{"text":"jakie usługa nazywają się httpd","intent":"service_status","lang":"pl","from":"find_process","orig":"jakie procesy nazywają się httpd","teacher":"none","conf":0.51}
+{"text":"wyszukaj uruchomiony usługa chrome","intent":"service_status","lang":"pl","from":"find_process","orig":"wyszukaj uruchomiony proces chrome","teacher":"find_process","conf":0.99}
+{"text":"podaj pidy wszystkich usługa node","intent":"service_status","lang":"pl","from":"find_process","orig":"podaj pidy wszystkich procesów node","teacher":"find_process","conf":1}
+{"text":"znajdz usługa nginx","intent":"service_status","lang":"pl","from":"find_process","orig":"znajdz proces nginx","teacher":"find_process","conf":0.35}
+{"text":"znajdź usługa node","intent":"service_status","lang":"pl","from":"find_process","orig":"znajdź proces node","teacher":"which_cmd","conf":0.34}
+{"text":"znajdź usługa javy z pełną linią poleceń","intent":"service_status","lang":"pl","from":"find_process","orig":"znajdź proces javy z pełną linią poleceń","teacher":"find_process","conf":0.69}
+{"text":"przeszukaj usługa pod kątem python","intent":"service_status","lang":"pl","from":"find_process","orig":"przeszukaj procesy pod kątem python","teacher":"find_process","conf":0.28}
+{"text":"szukaj usługa 'celery'","intent":"service_status","lang":"pl","from":"find_process","orig":"szukaj procesów 'celery'","teacher":"find_process","conf":0.41}
+{"text":"znajdź usługa explorer","intent":"service_status","lang":"pl","shell":"powershell","os":"win32","from":"find_process","orig":"znajdź proces explorer","teacher":"service_status","conf":0.24}
+{"text":"znajdz id usługa redis-server","intent":"service_status","lang":"pl","from":"find_process","orig":"znajdz id procesu redis-server","teacher":"find_process","conf":0.99}
+{"text":"szukaj usługa vim","intent":"service_status","lang":"pl","shell":"fish","os":"linux","from":"find_process","orig":"szukaj procesu vim","teacher":"find_process","conf":0.52}
+{"text":"czy chodzi jakiś usługa node","intent":"service_status","lang":"pl","from":"find_process","orig":"czy chodzi jakiś proces node","teacher":"find_process","conf":0.66}
+{"text":"czy dziala usługa notepad.exe","intent":"service_status","lang":"pl","shell":"cmd","os":"win32","from":"find_process","orig":"czy dziala proces notepad.exe","teacher":"find_process","conf":0.41}
+{"text":"znajdz usługa sshd","intent":"service_status","lang":"pl","shell":"sh","os":"linux","from":"find_process","orig":"znajdz proces sshd","teacher":"find_process","conf":0.71}
+{"text":"znajdź działający usługa po nazwie","intent":"service_status","lang":"pl","from":"find_process","orig":"znajdź działający proces po nazwie","teacher":"find_process","conf":0.47}
+{"text":"znajdz usługa o nazwie redis","intent":"service_status","lang":"pl","shell":"bash","os":"linux","from":"find_process","orig":"znajdz proces o nazwie redis","teacher":"find_by_name","conf":0.38}
+{"text":"czy jest jakis usługa o nazwie gunicorn","intent":"service_status","lang":"pl","shell":"bash","os":"linux","from":"find_process","orig":"czy jest jakis proces o nazwie gunicorn","teacher":"service_status","conf":0.3}
+{"text":"znajdź usługa python","intent":"service_status","lang":"pl","shell":"zsh","os":"darwin","from":"find_process","orig":"znajdź proces python","teacher":"which_cmd","conf":0.53}
+{"text":"czy jest uruchomiony usługa Spotify","intent":"service_status","lang":"pl","shell":"zsh","os":"darwin","from":"find_process","orig":"czy jest uruchomiony proces Spotify","teacher":"find_process","conf":0.7}
+{"text":"w jakim stanie jest proces nginx","intent":"find_process","lang":"pl","from":"service_status","orig":"w jakim stanie jest usługa nginx","teacher":"service_status","conf":0.93}
+{"text":"czy proces MSSQLSERVER działa (Get-Service)","intent":"find_process","lang":"pl","shell":"powershell","os":"win32","from":"service_status","orig":"czy usługa MSSQLSERVER działa (Get-Service)","teacher":"service_status","conf":0.99}
+{"text":"status proces nginx","intent":"find_process","lang":"pl","shell":"bash","os":"linux","from":"service_status","orig":"status usługi nginx","teacher":"service_status","conf":0.81}
+{"text":"stan proces bluetooth","intent":"find_process","lang":"pl","shell":"fish","os":"linux","from":"service_status","orig":"stan usługi bluetooth","teacher":"service_status","conf":0.76}
+{"text":"status proces cron","intent":"find_process","lang":"pl","shell":"bash","os":"linux","from":"service_status","orig":"status usługi cron","teacher":"service_status","conf":0.78}
+{"text":"pokaż status proces cron","intent":"find_process","lang":"pl","from":"service_status","orig":"pokaż status usługi cron","teacher":"service_status","conf":0.89}
+{"text":"stan proces docker","intent":"find_process","lang":"pl","shell":"bash","os":"linux","from":"service_status","orig":"stan usługi docker","teacher":"service_status","conf":0.84}
+{"text":"stan proces apache","intent":"find_process","lang":"pl","from":"service_status","orig":"stan usługi apache","teacher":"service_status","conf":0.89}
+{"text":"status proces Spooler","intent":"find_process","lang":"pl","shell":"powershell","os":"win32","from":"service_status","orig":"status usługi Spooler","teacher":"service_status","conf":0.56}
+{"text":"status proces wuauserv","intent":"find_process","lang":"pl","shell":"cmd","os":"win32","from":"service_status","orig":"status usługi wuauserv","teacher":"service_status","conf":0.68}
+{"text":"jaki jest status proces wuauserv","intent":"find_process","lang":"pl","shell":"powershell","os":"win32","from":"service_status","orig":"jaki jest status usługi wuauserv","teacher":"service_status","conf":0.77}
+{"text":"list files with no files in C:\\Projects","intent":"empty_files","lang":"en","shell":"powershell","os":"win32","from":"empty_dirs","orig":"list directories with no files in C:\\Projects","teacher":"empty_dirs","conf":0.64}
+{"text":"find files with no entries in /opt","intent":"empty_files","lang":"en","from":"empty_dirs","orig":"find directories with no entries in /opt","teacher":"empty_dirs","conf":0.38}
+{"text":"list files that contain no files in ./data","intent":"empty_files","lang":"en","from":"empty_dirs","orig":"list directories that contain no files in ./data","teacher":"empty_dirs","conf":0.86}
+{"text":"how much disks and partitions on /var partition","intent":"block_devices","lang":"en","from":"disk_free","orig":"how much free space on /var partition","teacher":"disk_free","conf":0.9}
+{"text":"is my SSD almost full? show disks and partitions","intent":"block_devices","lang":"en","shell":"zsh","os":"darwin","from":"disk_free","orig":"is my SSD almost full? show free space","teacher":"disk_free","conf":0.42}
+{"text":"show used and disks and partitions on partitions","intent":"block_devices","lang":"en","from":"disk_free","orig":"show used and available space on partitions","teacher":"disk_free","conf":0.52}
+{"text":"Get-PSDrive, how much disks and partitions is left","intent":"block_devices","lang":"en","shell":"powershell","os":"win32","from":"disk_free","orig":"Get-PSDrive, how much free space is left","teacher":"disk_free","conf":0.92}
+{"text":"how much disks and partitions is left on my disks","intent":"block_devices","lang":"en","shell":"bash","os":"linux","from":"disk_free","orig":"how much free space is left on my disks","teacher":"disk_free","conf":0.97}
+{"text":"wmic logicaldisk get freespace - show disks and partitions","intent":"block_devices","lang":"en","shell":"cmd","os":"win32","from":"disk_free","orig":"wmic logicaldisk get freespace - show free disk space","teacher":"disk_free","conf":0.81}
+{"text":"df please, disks and partitions on all filesystems","intent":"block_devices","lang":"en","shell":"sh","os":"linux","from":"disk_free","orig":"df please, free space on all filesystems","teacher":"disk_free","conf":0.96}
+{"text":"diskpart list disk - show my physical free space on the disks","intent":"disk_free","lang":"en","shell":"cmd","os":"win32","from":"block_devices","orig":"diskpart list disk - show my physical disks","teacher":"block_devices","conf":0.69}
+{"text":"how many people logged in recently right now","intent":"last_logins","lang":"en","from":"users_logged_in","orig":"how many people are logged in right now","teacher":"users_logged_in","conf":0.58}
+{"text":"query user - who logged in recently","intent":"last_logins","lang":"en","shell":"cmd","os":"win32","from":"users_logged_in","orig":"query user - who is logged in","teacher":"last_logins","conf":0.48}
+{"text":"what directories are in my PATH gcc executable","intent":"show_path","lang":"en","from":"which_cmd","orig":"where is the gcc executable","teacher":"which_cmd","conf":0.63}
+{"text":"what directories are in my PATH git binary","intent":"show_path","lang":"en","shell":"bash","os":"linux","from":"which_cmd","orig":"where is the git binary","teacher":"which_cmd","conf":0.83}
+{"text":"show hidden files and their sizes in ./dist","intent":"hidden_files","lang":"en","from":"list_files","orig":"show files and their sizes in ./dist","teacher":"hidden_files","conf":0.41}
+{"text":"aktywne wszystkie kontenery, także zatrzymane","intent":"docker_ps_all","lang":"pl","shell":"fish","os":"linux","from":"docker_ps","orig":"aktywne kontenery","teacher":"none","conf":0.51}
+{"text":"just stop docker","intent":"service_stop","lang":"en","from":"service_restart","orig":"just restart docker","teacher":"docker_stop_all","conf":0.44}
+{"text":"stop gunicorn","intent":"service_stop","lang":"en","from":"service_restart","orig":"restart gunicorn","teacher":"kill_by_name","conf":0.54}
+{"text":"zatrzymaj gunicorna","intent":"service_stop","lang":"pl","from":"service_restart","orig":"zrestartuj gunicorna","teacher":"kill_by_name","conf":0.65}

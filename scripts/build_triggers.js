@@ -49,10 +49,10 @@ writeFileSync(`${ROOT}model/tldr_triggers.json`, JSON.stringify(out));
 // intent means ("hidden" for hidden_files, "kernel" for dmesg) and must not make the composer replace it.
 const { triggeredFlags } = await import('../src/compose.js');
 const { FAMILY_OF } = await import('../src/tools.js');
-const { readdirSync } = await import('node:fs');
-const train = [...readdirSync(`${ROOT}data/intents`).filter((f) => f.endsWith('.jsonl')).flatMap((f) => readFileSync(`${ROOT}data/intents/${f}`, 'utf8').split('\n')),
-  ...(existsSync(`${ROOT}data/shell/train.jsonl`) ? readFileSync(`${ROOT}data/shell/train.jsonl`, 'utf8').split('\n') : [])]
-  .filter(Boolean).map((l) => JSON.parse(l));
+// read the FILTERED corpus written by gen_data.js (held-out collisions, eval-only values and teacher drops removed)
+const trainFile = `${ROOT}build/train_rows.jsonl`;
+if (!existsSync(trainFile)) { console.error('no build/train_rows.jsonl (run scripts/gen_data.js first)'); process.exit(1); }
+const train = readFileSync(trainFile, 'utf8').split('\n').filter(Boolean).map((l) => JSON.parse(l));
 const counts = {};
 const totals = {};
 for (const r of train) {
