@@ -1,48 +1,43 @@
-# Round 7 fixes (user decision: one line of history; review/r6-claude.md, review/r6-codex.md)
+History references now use only the previous command, and every open finding in `review/r6-claude.md` and `review/r6-codex.md` is fixed. Everything is committed as `142fa6f` on `master`. All 295 tests pass, eval and bench were re-run, and nothing was pushed or published.
 
-Regression tests: `test/regressions8.test.js` (12 tests). Full suite 295/295. Version stays 0.3.0 (package.json).
+**One line of history**
+- `buildContext` (`src/history.js`) reads only the most recent command. It first drops the current `tellsh` call, which zsh, fish and PowerShell write to the history file before it runs. The CLI now reads 2 lines instead of 10.
+- All the logic that compared or combined older lines is gone. Rules within one compound line (`cat a.txt; ls`, `cd X && make`) still work.
+- If the previous command has nothing of the needed type ("delete it" after `ls`), or can't be read, the reference is refused: you get a placeholder and a note, never an older value. "same for X" or "same but …" after a command that can't be repeated is refused the same way.
+- Destructive requests still need confirmation. "delete that branch" is refused when the previous command checked that branch out. "delete that backups folder" is refused when the previous command named a different folder.
 
-## One line of history (user decision) — `src/history.js` `buildContext`, `src/cli.js`
-Only the single most recent command is a reference target. `buildContext` drops the running `tellsh` line once (zsh/
-fish/PSReadLine write it first), then analyses exactly one line. Removed: cross-line recency (`age`, `all`), stale-
-relative propagation across lines, `cd` line + later `ls` line linking, hint-selected older values (`chooseValue`),
-"newest value of its type" guard. Kept per segment within the line: later segments win, listings after a value,
-search roots / listed dirs, `cd` followed by other commands, `intentStale`. The CLI reads 2 lines (`loadHistory` n=2).
-A pronoun with no matching entity in that line ("delete it" after `ls`) and "same for"/"same but" after a command
-that cannot be repeated are now explicit refusals (placeholder + note). "files that are …", "this week" are not
-references (`NOT_REF`). Still refused for a changing command: the checked-out branch (`git_delete_branch` only), a
-request naming another target ("delete that backups folder" after `mkdir /srv/current`, `HINTED_NOUN`).
-Tests changed on purpose (multi-line histories → one compound line, or now expect a placeholder): pipeline,
-regressions2, 3-history, 4, 5, 6, 7.
+**Review findings fixed**
+- **Blocker, both reviews:** a quoted path with a space is no longer cut. `tellsh delete folder "/tmp/a b"` gives `rm -r '/tmp/a b'`, both from the command line and from an earlier `tellsh` line in history. A request passed as one quoted argument is used as is.
+- **Blocker, codex:** a history value that fails validation (e.g. a 265-character path) becomes a placeholder, never `find .`.
+- **Major:** "delete all log files in this folder" with a refused reference now gives `find <PATH> … -delete`, never `rm -r .`.
+- **Major:** "in the previous folder", "in the last directory", "the directory I listed" and "w poprzednim katalogu" are now treated like "there". A file named next to "there" ("delete notes.txt there") becomes a placeholder, with or without history.
+- **Major, codex:** `git -C /tmp status` and `docker --context prod ps` count as listings again.
+- **Minor:**
+  - "its contents", "what is in it" and "usuń jego zawartość" no longer target the directory itself.
+  - "move it there" is refused.
+  - A request naming more paths than the command takes, or a path inside `` `…` `` or `$(…)`, gets a placeholder and a warning.
+  - The danger checker now catches here-strings and heredocs, `sh -c 'rm -rf "$1"' _ /`, and truncating or overwriting system files (now critical).
+  - A NUL byte in the request no longer crashes `suggest()`.
 
-## Findings
-- **Blocker (both): quoted path with a space cut** — `src/shellwords.js` `joinWords`: among several argv words, a word
-  with whitespace is re-quoted (`delete folder "/tmp/a b"`); a single argv word is the whole request. Used by the CLI
-  and by `tellshQuery` (also skips `--shell X`-style option values; unreadable line → refused).
-- **Blocker (codex 2): invalid history values → `.`** — `src/pipeline.js` `invalidHistorySlots`: same-for, same-but and
-  pronoun fills blank a value that fails validation (265-char path) instead of dropping it.
-- **Major (claude 2 / codex 3): refused reference → `rm -r .`** — refused/guarded references clear the `.` read for
-  "this folder" (`refWordsOnly`); a CONTENTS refusal keeps the classifier's intent and classifies without history
-  features (`ref.contents`): `find <PATH> … -delete`.
-- **Major (claude 3 / codex 4): other wordings of the previous directory** — `LOCATIVE`: "previous/last/prior folder",
-  "the directory I listed/used/…", "w poprzednim/ostatnim katalogu". A locative with any non-safe, non-find command
-  that takes a path withholds every path slot with or without history ("delete notes.txt there" → `rm <FILE>`);
-  "still there" is not a place.
-- **Major (codex 5): global options hide a listing** — `afterGlobals` for git/docker/podman in `listedBySegment` and
-  `segmentEnts` (`git -C /tmp status`, `docker --context prod ps`). Cross-line case is moot (one line).
-- **Minor: "its contents", "what is in it", "usuń jego zawartość"** — `CONTENTS` extended.
-- **Minor: "move it there"** — an object pronoun plus a place reference on a two-path command withholds both ends.
-- **Minor: several paths / `pwd`** — non-safe intents: more explicit paths than path slots → placeholders + warning;
-  a path inside backticks / `$(…)` (or an empty path slot when the request has one) → placeholder.
-- **Minor: danger** — here-strings/heredocs into shells (checked as commands) and interpreters (high, literals and
-  delete calls checked); `sh -c STR arg0 args` also checked with `$1`/`"$@"` filled in; `truncate`/`shred` of a system
-  file and `>` onto a system file are critical (`>>` stays high); text piped into a bare interpreter is high.
-- **Minor: NUL byte** — `suggest` refuses a request with NUL; `validateComposed` never passes NUL to `spawnSync`.
+**Data, eval and docs**
+- I changed 3 gold rows where the expected answer referenced an older line:
+  - dev: "start it again" → `sudo systemctl start <SERVICE>`
+  - blind: "push it" → `git push`
+  - blind: "delete that branch" → `git branch -d <BRANCH>`
+- I added 5 dev rows checking that an older line is never used. Their queries were already in the held-out set, so training data is unaffected.
 
-## Eval / data
-- `node scripts/eval.js`: only section 5 changed. Dev 91.7% (48) → 92.5% (53: 1 gold edit, 5 rows added);
-  blind 79.7% → 82.3% (2 gold edits for the one-line rule; both gained rows are rule fixes). Everything else unchanged.
-- `gen_data.js`: output identical between HEAD and this change (all added dev queries were already held out). Note:
-  it does not match the existing `build/` (43564 vs 43574 rows; the private real-usage split differs on this machine);
-  that predates this round, `build/` was restored, the model was not retrained.
+| History eval | Before | After |
+|---|---|---|
+| Dev set | 91.7% (48 rows) | **92.5%** (53 rows) |
+| Blind set | 79.7% | **82.3%** |
+
+Both rows gained on the blind set come from rule changes, not the gold edits. All other eval numbers are unchanged. In the bench, the history case went from 1.6 to 0.74 ms. EVAL.md, the README history section, the CLI help and `review/fix7-log.md` are updated.
+
+Things to check:
+- **Blind set edits:** I edited 2 gold rows in a set described as "never used for tuning". EVAL.md lists each change, but you may prefer to keep those rows untouched.
+- **"push it" after `git commit`:** it gives `git push`, which pushes the current branch, rather than a `<BRANCH>` placeholder. I judged that the right answer; say if you'd rather have the placeholder.
+- **Training data vs `build/`:** regenerating the training data gives 43,564 classifier rows against 43,574 in the shipped model. HEAD without my changes gives the same 43,564, so this predates the round. It is probably the private real-usage data differing on this machine. I restored `build/` and did not retrain.
+- **Commit identity:** git had no identity configured, so I committed as `lksrz <lukasz@wearfits.com>`, matching earlier commits, without changing git config.
+- **Uncommitted files:** `review/STATUS` and `review/.hdone` look like review-tool markers, so I left them out.
+edates this round, `build/` was restored, the model was not retrained.
 - Bench re-run (EVAL.md): cold p50 177 ms, warm 0.40 ms, history case 0.74 ms (was 1.6 ms).
