@@ -28,6 +28,7 @@ import { silverSpans, relex, mulberry32 } from './lib/silver.js';
 import { sameCmd } from './lib/cmdnorm.js';
 import { updateSection } from './report.js';
 import { pwshParses } from './lib/pwsh_parse.js';
+import { heldOutIndex, nearKey } from './lib/heldout.js';
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
 const VERBOSE = process.argv.includes('--verbose');
@@ -433,11 +434,27 @@ md();
 // 8. blind sets for v0.3 (written by a separate author before any v0.3 result was seen)
 const blindInt = readJsonl(join(ROOT, 'data', 'blind', 'intents.jsonl'));
 const blindE2e = readJsonl(join(ROOT, 'data', 'blind', 'e2e.jsonl'));
+// Contamination: a blind row whose text (exactly, or after filler words are removed) also occurs in another
+// eval set or in any training source file (before gen_data.js filtering, so this includes rows the v0.2
+// model was trained on). Those rows are excluded from training now, but they were not written blind.
+const otherEval = heldOutIndex([
+  ...readDir(join(ROOT, 'data', 'eval')).map((r) => r.text), ...readJsonl(join(ROOT, 'data', 'shell', 'eval.jsonl')).map((r) => r.text),
+  ...readJsonl(join(ROOT, 'data', 'compose', 'eval.jsonl')).map((r) => r.text), ...readJsonl(join(ROOT, 'data', 'slots', 'gold.jsonl')).map((r) => r.text),
+  ...readJsonl(join(ROOT, 'data', 'ood_eval.jsonl')).map((r) => r.text), ...SLOT_CASES.map((c) => c[1]),
+].filter(Boolean));
+const trainSrc = new Set([...readDir(join(ROOT, 'data', 'intents')), ...readJsonl(join(ROOT, 'data', 'shell', 'train.jsonl')),
+  ...readJsonl(join(ROOT, 'data', 'ood.jsonl')), ...readJsonl(join(ROOT, 'data', 'ood_teacher.jsonl'))].map((r) => nearKey(r.text)));
+const contaminated = (r) => otherEval.has(r.text) || trainSrc.has(nearKey(r.text));
 if (blindInt.length || blindE2e.length) {
+  const all = [...blindInt, ...blindE2e];
+  const nEval = all.filter((r) => otherEval.has(r.text)).length;
+  const nTrain = all.filter((r) => trainSrc.has(nearKey(r.text))).length;
+  SUM.blind_contaminated = { rows: all.length, otherEval: nEval, trainingSource: nTrain };
   md('## 8. Blind sets (v0.3)');
   md();
-  md('Written by a separate author for v0.3 from the catalog descriptions/templates only, without access to the training data, the existing eval sets, ' +
-    'the model or any result; excluded from training (`gen_data.js`) and never used for tuning.');
+  md('Written for v0.3 from the catalog descriptions/templates and excluded from training (`gen_data.js`, including near-duplicates) and from tuning. ' +
+    `They are **not fully clean**: ${nEval} of ${all.length} intent/e2e rows repeat a request from another eval set and ${nTrain} repeat (exactly or up to filler words) ` +
+    'a row of a training source file, most of them rows the v0.2 model was trained on. Every table therefore also reports the **clean** subset without those rows.');
   md();
 }
 const DISK = /(na (całym |calym )?dysku|całego dysku|calego dysku|w całym systemie|w calym systemie|on (the )?(whole |entire )?(disk|drive)|(whole|entire) (disk|drive|system))/i;
@@ -453,6 +470,10 @@ if (blindInt.length) {
   md('| split | n | tool top-1 | tool top-3 | intent top-1 | intent top-3 | answered (p ≥ thr) | precision when answered |');
   md('|---|---|---|---|---|---|---|---|');
   for (const k of ['all', 'en', 'pl']) if (CBI.S[k]) md(row(k.toUpperCase(), CBI.S[k]));
+  const cleanInt = blindInt.filter((r) => !contaminated(r));
+  const CCI = clsStats(cleanInt, BASH);
+  md(row("CLEAN", CCI.S.all));
+  SUM.blind_intent_clean = rate(CCI.S.all.top1, CCI.S.all.n);
   md();
   const byShell = {};
   for (const r of blindInt) (byShell[r.shell || 'bash'] ??= []).push(r);
@@ -467,14 +488,14 @@ if (blindInt.length) {
 }
 const blindE2eFails = [];
 if (blindE2e.length) {
-  const E = { all: { n: 0, ok: 0, okGi: 0 }, en: { n: 0, ok: 0, okGi: 0 }, pl: { n: 0, ok: 0, okGi: 0 } };
+  const E = { all: { n: 0, ok: 0, okGi: 0 }, en: { n: 0, ok: 0, okGi: 0 }, pl: { n: 0, ok: 0, okGi: 0 }, clean: { n: 0, ok: 0, okGi: 0 } };
   let diskN = 0; let diskOk = 0;
   for (const r of blindE2e) {
     const s = suggest(r.text, { env: BASH, model, compose: 'off' });
     const ok = complete(s) && sameCmd(s.command, r.expect_command);
     const bi = buildCommand(r.intent, r.text, { env: BASH, resolved: resolveWithTagger(r.intent, r.text, { model }).slots });
     const okGi = !bi.missing?.length && sameCmd(bi.command, r.expect_command);
-    for (const k of ['all', r.lang]) { E[k].n++; if (ok) E[k].ok++; if (okGi) E[k].okGi++; }
+    for (const k of ['all', r.lang, ...(contaminated(r) ? [] : ['clean'])]) { E[k].n++; if (ok) E[k].ok++; if (okGi) E[k].okGi++; }
     if (DISK.test(r.text)) { diskN++; if (ok) diskOk++; }
     if (!ok) blindE2eFails.push({ text: r.text, gold: r.expect_command, got: s.command, intent: r.intent, pred: s.intent });
   }
@@ -484,7 +505,8 @@ if (blindE2e.length) {
   md();
   md('| split | n | exact command (full pipeline) | exact command given gold intent |');
   md('|---|---|---|---|');
-  for (const k of ['all', 'en', 'pl']) md(`| ${k.toUpperCase()} | ${E[k].n} | ${pct(E[k].ok, E[k].n)} | ${pct(E[k].okGi, E[k].n)} |`);
+  for (const k of ['all', 'en', 'pl', 'clean']) md(`| ${k.toUpperCase()} | ${E[k].n} | ${pct(E[k].ok, E[k].n)} | ${pct(E[k].okGi, E[k].n)} |`);
+  SUM.blind_e2e_clean = rate(E.clean.ok, E.clean.n);
   md();
   if (diskN) { SUM.blind_e2e_disk = rate(diskOk, diskN); md(`Whole-disk location rows: ${diskOk}/${diskN} exact.`); md(); }
 }

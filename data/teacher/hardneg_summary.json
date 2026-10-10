@@ -1,25 +1,29 @@
 {
  "rewrites": 601,
- "accepted": 495,
+ "accepted": 463,
  "rejected": 106,
  "lowMarginRows": 65,
- "boosted": 13,
+ "boosted": 3,
  "byPair": {
-  "broken_symlinks": 74,
-  "find_symlinks": 54,
-  "git_pull": 11,
-  "git_push": 11,
+  "broken_symlinks": 72,
+  "find_symlinks": 51,
+  "git_pull": 9,
+  "git_push": 10,
   "service_status": 20,
-  "find_process": 19,
-  "empty_dirs": 69,
+  "find_process": 18,
+  "empty_dirs": 68,
   "empty_files": 51,
   "block_devices": 10,
-  "disk_free": 23,
-  "last_logins": 10,
-  "show_path": 2,
-  "hidden_files": 26,
-  "docker_ps_all": 49,
-  "service_stop": 32,
-  "service_restart": 34
+  "disk_free": 18,
+  "last_logins": 8,
+  "show_path": 1,
+  "hidden_files": 25,
+  "docker_ps_all": 41,
+  "service_stop": 29,
+  "service_restart": 32
+ },
+ "heldOutLeaksRemoved": {
+  "rewrites": 32,
+  "boosted": 10
  }
 }

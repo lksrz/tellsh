@@ -45,7 +45,9 @@ test('trailing dots are not stripped from a path (only one sentence dot after an
   const up = run('delete directory /tmp/cache/..');
   assert.equal(up.command, 'rm -r /tmp/cache/..');
   assert.ok(up.warnings.some((w) => /\.\./.test(w)));
-  assert.equal(run('delete file /tmp/a.txt.').command, 'rm /tmp/a.txt');
+  // destructive: `/tmp/a.txt.` may be the name or a sentence dot -> placeholder (test/regressions3.test.js)
+  assert.equal(run('delete file /tmp/a.txt.').command, 'rm <FILE>');
+  assert.equal(run('show file /tmp/a.txt.').command, 'cat /tmp/a.txt');
   assert.equal(trimPathPunct('/tmp/x),'), '/tmp/x');
   assert.equal(trimPathPunct('backup(2)'), 'backup(2)');
   assert.deepEqual(extractSlots('copy /a/b, /c/d').paths, ['/a/b', '/c/d']);

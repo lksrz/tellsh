@@ -118,24 +118,22 @@ The composer runs `bash -n` (a subprocess, ~2 ms) only when it actually returns 
 <!-- bench:end -->
 
 <!-- teacher:start -->
-## Teacher verification (TypeSafe Jev, build time only)
+## Teacher (TypeSafe Jev, build time only)
 
-Sampled **300** training rows (stratified over intents, EN+PL, incl. shell-phrased rows) and made **300 API calls**
-(0 failed) to `jev-latest`: 164275 input tokens ≈ **$0.0069**
-(at $0.042/Mtok input, output free). Each call asked: intent (choice among the gold label and our two closest
-alternatives), "the rendered command does what is asked" (noul), risk (choice) and up to 3 silver slot spans (noul).
+All calls to `jev-latest` ($0.042/Mtok input, output free), counted by `scripts/lib/jev.js` in `data/teacher/ledger.json` (network calls only; cache hits are free and not counted). Several rows are packed per call; every row gets its own question(s), and the intent question shows only the request and shell — never our label or a command rendered from it.
 
-| check | agreement |
-|---|---|
-| intent label = teacher choice | 100.0% |
-| command judged correct (noul ≥ 0.5) | 93.3% |
-| risk level identical | 86.7% (teacher rated higher with conf ≥ 0.5: 28) |
-| silver slot spans accepted (noul ≥ 0.5) | 93.4% of 181 |
+| task | calls | failed | input tokens | spend |
+|---|---|---|---|---|
+| verify | 3292 | 0 | 3641360 | $0.1529 |
+| label | 611 | 0 | 519493 | $0.0218 |
+| mine | 279 | 0 | 259891 | $0.0109 |
+| **total** | **4182** | 0 | 4420744 | **$0.1857** |
 
-40 rows flagged → `data/teacher/review.jsonl`. After manual inspection (`data/teacher/decisions.jsonl`):
-* intent labels: no disagreement, **0 training rows dropped or relabelled**;
-* risk: **10 intents relabelled safe → medium** (extract_zip, extract_targz, compress_targz, compress_zip, git_stash, git_stash_pop, git_pull, git_new_branch, git_switch_branch, git_clone) — they overwrite files or change the git working tree;
-  4 kept safe where the teacher was stricter than our definition (touch_file, mkdir, git_init, git_add_all);
-* "command wrong" flags were slot-extraction bugs, not label errors (Windows `C:\` paths, `plik X.b64` for base64, Polish inflection
-  `javy` → `java`, filler words taken as values); fixed in `src/slots.js` / `src/tagger.js` (6 rows kept).
+**(a) Verification of every training row** (9875 rows; 9875 answered): teacher intent = our label for **97.6%** (not an independent accuracy: the options always contain our label plus the cascade's own top guesses, so this is agreement among 4-6 plausible choices); 112 rows flagged (teacher prefers another option with confidence ≥ 0.6 and gives our label p < 0.3) → `data/teacher/review.jsonl`. This run predates the held-out filter: 715 of the rows sent were held-out texts or near-duplicates of one (they were never trained on; `teacher.js` no longer sends them). Risk (asked about the request alone): identical to the catalog risk for 94.4% of rows; 4 intents where the teacher rates most rows differently (mkdir safe→medium, touch_file safe→medium, git_add_all safe→medium, git_init safe→medium).
+
+After manual inspection (`data/teacher/decisions.jsonl`, 132 decisions): **20 rows dropped**, **2 rows relabelled**, 96 flagged rows kept (teacher wrong or request genuinely ambiguous); risk: 10 intents relabelled (extract_zip safe→medium, extract_targz safe→medium, compress_targz safe→medium, compress_zip safe→medium, git_stash safe→medium, git_stash_pop safe→medium, git_pull safe→medium, git_new_branch safe→medium, git_switch_branch safe→medium, git_clone safe→medium), 4 kept.
+
+**(b) New paraphrases**: 1995 candidates (PL+EN, bash/zsh/sh/PowerShell/fish/cmd, written for v0.3; deduplicated against training and every held-out set) labelled by the teacher; **1911 accepted** (teacher picks the proposed intent with p ≥ 0.6; EN 999, PL 912; shells bash 787, zsh 299, powershell 505, sh 114, fish 112, cmd 94), 39 rejected → `data/teacher/label_rejected.jsonl`. 74 of the accepted rows were misclassified by the v0.2 model. Out-of-domain candidates: 445, **380 kept** (teacher p(shell request) < 0.3) → `data/ood_teacher.jsonl`. 45 accepted paraphrases and 1 out-of-domain rows were later removed as near-duplicates of held-out texts.
+
+**(c) Hard negatives**: 601 contrastive rewrites of training rows across confusable intents (e.g. "symlinks" → "broken symlinks", "push" → "pull", "process" → "service"); **463 confirmed** by the teacher and added (broken_symlinks 72, find_symlinks 51, git_pull 9, git_push 10, service_status 20, find_process 18, empty_dirs 68, empty_files 51, block_devices 10, disk_free 18, last_logins 8, show_path 1, hidden_files 25, docker_ps_all 41, service_stop 29, service_restart 32); 3 low-margin training rows of confusable intents (confirmed in (a)) are given double weight. 32 confirmed rewrites and 10 boosted rows were later removed because they were held-out texts, near-duplicates of one, or one-word rewrites of one (`scripts/lib/heldout.js`).
 <!-- teacher:end -->

@@ -60,22 +60,65 @@ export function simpleCommands(cmd, { winPaths = false } = {}) {
   return out;
 }
 
-// strip wrappers that run their argument as the command
+// strip wrappers that run their argument as the command (sudo, timeout N, chroot DIR, env A=b, ...)
+// options of each wrapper that take a separate value
+const WRAPPER_OPTARG = {
+  sudo: /^-[ugpCDhrtTUR]$|^--(?:user|group|prompt|close-from|chdir|host|role|type|other-user|command-timeout)$/,
+  doas: /^-[uC]$/,
+  nice: /^-n$|^--adjustment$/,
+  ionice: /^-[cnpPu]$|^--(?:class|classdata|pid|pgid|uid)$/,
+  xargs: /^-[IdEnLPsa]$|^--(?:arg-file|delimiter|max-args|max-procs|max-chars|replace|eof)$/,
+  timeout: /^-[sk]$|^--(?:signal|kill-after)$/,
+  chroot: /^--(?:userspec|groups)$/,
+  stdbuf: /^-[ioe]$|^--(?:input|output|error)$/,
+  env: /^-[uCS]$|^--(?:unset|chdir|split-string)$/,
+  time: /^-[fo]$|^--(?:format|output)$/,
+  exec: /^-a$/,
+};
+const WRAPPERS = new Set(['sudo', 'doas', 'command', 'builtin', 'exec', 'nohup', 'time', 'nice', 'ionice', 'then', 'do', 'else', '&', 'busybox', 'toybox', 'xargs', 'timeout', 'chroot', 'stdbuf', 'env', 'setsid', 'unbuffer', 'caffeinate']);
 function commandWords(words) {
   let w = words;
   for (;;) {
     while (w.length && /^\w+=/.test(w[0])) w = w.slice(1);
     const h = (w[0] || '').replace(/^.*[\\/]/, '').toLowerCase();
-    if (['sudo', 'doas', 'command', 'builtin', 'exec', 'nohup', 'time', 'nice', 'ionice', 'then', 'do', 'else', '&', 'busybox', 'toybox'].includes(h)) {
+    if (!WRAPPERS.has(h)) return w;
+    w = w.slice(1);
+    const optArg = WRAPPER_OPTARG[h];
+    while (w.length && /^-/.test(w[0])) {
+      const o = w[0];
       w = w.slice(1);
-      while (w.length && /^-/.test(w[0])) w = w.slice(1 + (/^-[ugnc]$/.test(w[0]) ? 1 : 0));
-      continue;
+      if (o === '--') break;
+      if (optArg && optArg.test(o)) w = w.slice(1);
     }
-    if (h === 'xargs') { w = w.slice(1); while (w.length && /^-/.test(w[0])) w = w.slice(1 + (/^-[IdEnLPs]$/.test(w[0]) ? 1 : 0)); continue; }
-    if (h === 'env') { w = w.slice(1); while (w.length && (/^-/.test(w[0]) || /^\w+=/.test(w[0]))) w = w.slice(1); continue; }
-    return w;
+    if (h === 'env') while (w.length && /^\w+=/.test(w[0])) w = w.slice(1);
+    if (h === 'timeout' && w.length) w = w.slice(1); // DURATION
+    if (h === 'chroot' && w.length) w = w.slice(1); // NEWROOT
   }
 }
+
+// Lexically normalise a path for the danger checks: `//`, `/./`, a trailing `/.` and `/..` collapse
+// (`rm -rf /.`, `rm -rf //`, `rm -r /etc/../`), so they are compared as the directory they name.
+// Only absolute, ~ and $HOME paths; a `..` above the home prefix is kept as is.
+export function normTarget(t) {
+  const s = String(t).trim();
+  const m = s.match(/^(\/|~(?=\/|$)|\$\{?HOME\}?(?=\/|$))(.*)$/s);
+  if (!m) return s;
+  const root = m[1] === '/';
+  const parts = [];
+  for (const p of m[2].split('/')) {
+    if (p === '' || p === '.') continue;
+    if (p === '..' && parts.length && parts[parts.length - 1] !== '..') { parts.pop(); continue; }
+    if (p === '..' && root) continue;
+    parts.push(p);
+  }
+  const prefix = root ? '' : m[1];
+  return parts.length ? prefix + '/' + parts.join('/') : (root ? '/' : prefix);
+}
+
+// system directories (and their direct children), user homes and key dot-directories: a recursive
+// delete or a move of any of these is critical
+const SYS_CRIT = /^(?:\/\*?|(?:~|\$\{?HOME\}?)(?:\/\*|\/\.(?:ssh|gnupg|config|local)(?:\/\*)?)?|\/(?:bin|boot|dev|etc|home|lib\w*|opt|proc|root|sbin|srv|sys|usr|var|System|Users|Library|Applications|private)(?:\/\*)?|\/(?:bin|boot|etc|home|lib\w*|sbin|usr|System|Users|Library|private)\/[^/*]+(?:\/\*)?|\/var\/(?:lib|db|spool|log|mail|backups)(?:\/\*)?|\/usr\/local\/[^/*]+(?:\/\*)?)$/;
+const sysCrit = (t) => SYS_CRIT.test(normTarget(t));
 
 const POSIX_CRIT_TARGET = /^(?:\/+|\/+\*|~\/*|~\/+\*|\$\{?HOME\}?\/*|\$\{?HOME\}?\/+\*|\*|\.\/*|\.\/+\*|\.\.\/*|\.\.\/+\*|\.\*|\/+(?:bin|boot|dev|etc|home|lib|lib32|lib64|opt|proc|root|sbin|srv|sys|usr|var|System|Users|Library|Applications|private)\/*\*?)$/;
 
@@ -103,7 +146,7 @@ function rmCheck(words, hit) {
   hit('high', 'rm deletes files permanently (no trash)');
   if (noPreserve) hit('high', 'rm --no-preserve-root', true);
   if (recursive && force) hit('high', 'rm -rf deletes without asking');
-  if (recursive && targets.some((t) => POSIX_CRIT_TARGET.test(t.trim()) || PS_CRIT_TARGET.test(t.trim()))) hit('high', 'recursive rm on /, ~, * or . — would wipe everything', true);
+  if (recursive && targets.some((t) => POSIX_CRIT_TARGET.test(t.trim()) || PS_CRIT_TARGET.test(t.trim()) || sysCrit(t))) hit('high', 'recursive rm on /, ~, * or . — would wipe everything', true);
   if (targets.some((t) => /(?:^|[\\/])\.\.(?:[\\/]|$)/.test(t))) hit('high', 'path contains .. (refers to a parent directory)');
 }
 
@@ -149,14 +192,17 @@ function cmdDelCheck(words, hit) {
 }
 
 // /, ~, $HOME, system directories, drive roots (not the relative ., .., * that rm -r also treats as critical)
-const critTarget = (t) => { const s = String(t).trim(); return (POSIX_CRIT_TARGET.test(s) || PS_CRIT_TARGET.test(s)) && !/^(?:\.{1,2}\/*\*?|\*|\.\*|\.\/+\*)$/.test(s); };
+const critTarget = (t) => { const s = String(t).trim(); return ((POSIX_CRIT_TARGET.test(s) || PS_CRIT_TARGET.test(s)) && !/^(?:\.{1,2}\/*\*?|\*|\.\*|\.\/+\*)$/.test(s)) || sysCrit(s); };
 const SYS_PATH = /^\/+(?:etc|boot|bin|sbin|usr|lib\w*|dev|proc|sys)(?:\/|$)/;
 const NULL_SRC = /^\/dev\/(?:null|zero|u?random)$/;
 const positional = (args) => { const out = []; let opts = true; for (const a of args) { if (opts && a === '--') { opts = false; continue; } if (opts && /^-./.test(a)) continue; out.push(a); } return out; };
 
+// find's own leading options (-H -L -P -O3 -D debugopts) come before the starting points
+const findArgs = (w) => { let a = w.slice(1); for (;;) { if (/^-[HLP]$|^-O\d*$/.test(a[0] || '')) a = a.slice(1); else if (a[0] === '-D') a = a.slice(2); else return a; } };
+
 // find ROOT... -delete / -exec rm: bulk deletion; critical on /, ~, C:\ ...
 function findCheck(w, hit) {
-  const a = w.slice(1);
+  const a = findArgs(w);
   const roots = [];
   for (const x of a) { if (/^[-(!]/.test(x)) break; roots.push(x); }
   const del = a.includes('-delete') || a.some((x, i) => /^-(?:exec|execdir|ok|okdir)$/.test(x) && /^(?:\S*\/)?(?:rm|shred|unlink)$/.test(a[i + 1] || ''));
@@ -178,7 +224,12 @@ function copyCheck(w, hit) {
   if (pos.length < 2) return;
   const dst = pos[pos.length - 1];
   const srcs = pos.slice(0, -1);
-  if (SYS_PATH.test(dst) || /^\/+$/.test(dst)) hit('high', 'overwrites a system file or directory');
+  if (SYS_PATH.test(normTarget(dst)) || normTarget(dst) === '/') hit('high', 'overwrites a system file or directory');
+  // moving /etc, /usr, ~ ... away is as destructive as deleting them
+  if (w[0].replace(/^.*[\\/]/, '') === 'mv') {
+    if (srcs.some(critTarget)) hit('high', 'moves a system or home directory away', true);
+    else if (srcs.some((x) => SYS_PATH.test(normTarget(x)))) hit('high', 'moves a system file');
+  }
   if (srcs.some((s) => NULL_SRC.test(s)) && !/^\/dev\//.test(dst)) hit('high', `overwrites ${dst} with ${srcs.find((s) => NULL_SRC.test(s))}`, SYS_PATH.test(dst));
 }
 
@@ -192,7 +243,7 @@ function pipelineDeleteCheck(text, hit) {
       if (!w.length) continue;
       const head = w[0].replace(/^.*[\\/]/, '').toLowerCase();
       let rootList = false;
-      if (head === 'find') { const roots = []; for (const x of w.slice(1)) { if (/^[-(!]/.test(x)) break; roots.push(x); } rootList = roots.some(critTarget); }
+      if (head === 'find') { const roots = []; for (const x of findArgs(w)) { if (/^[-(!]/.test(x)) break; roots.push(x); } rootList = roots.some(critTarget); }
       else if (LISTERS.test(head)) {
         const a = w.slice(1);
         const rec = a.some((x) => /^-r(?:e(?:c(?:u(?:r(?:s(?:e)?)?)?)?)?)?$/i.test(x)) || head === 'ls' && a.some((x) => /^-[a-zA-Z]*R/.test(x));
@@ -242,10 +293,13 @@ function dockerCheck(w, hit) {
   const vols = [];
   a.forEach((x, i) => {
     if (x === '-v' || x === '--volume' || x === '--mount') vols.push(a[i + 1] || '');
-    else if (/^(?:-v|--volume=|--mount=)/.test(x)) vols.push(x.replace(/^(?:-v|--volume=|--mount=)/, ''));
+    else if (/^(?:-v=?|--volume=|--mount=)/.test(x)) vols.push(x.replace(/^(?:-v=?|--volume=|--mount=)/, ''));
+    else if (/^-[a-zA-Z]*v$/.test(x)) vols.push(a[i + 1] || ''); // -itv /:/h
   });
   for (const v of vols) {
-    const root = /^\/+:/.test(v) || /(?:^|,)(?:source|src)=\/+(?:,|$)/.test(v);
+    const host = v.split(':')[0];
+    const src = (v.match(/(?:^|,)(?:source|src)=([^,]*)/) || [])[1];
+    const root = (v.includes(':') && normTarget(host) === '/') || (src != null && normTarget(src) === '/');
     if (root) hit('high', 'mounts the host root filesystem into a container', !/:ro(?:,|$)|(?:^|,)(?:readonly|ro)(?:=true|=1)?(?:,|$)/.test(v));
   }
 }

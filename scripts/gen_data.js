@@ -13,6 +13,7 @@ import { vectorize, normalize, tagTokens, tagFeatures } from '../src/features.js
 import { ctxFeatures } from '../src/history.js';
 import { silverSpans, relex, bioLabels, mulberry32, EVAL_VALUES } from './lib/silver.js';
 import { SLOT_CASES } from '../test/slot-cases.js';
+import { heldOutTexts, heldOutIndex } from './lib/heldout.js';
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
 export const DIM = 1 << 18;
@@ -99,21 +100,13 @@ function main() {
   mkdirSync(outDir, { recursive: true });
   const ids = new Set(INTENTS.map((i) => i.id));
 
-  // held-out texts (never trained on)
-  const heldOut = new Set([
-    ...readDir(join(ROOT, 'data', 'eval')).map((r) => r.text),
-    ...readJsonl(join(ROOT, 'data', 'shell', 'eval.jsonl')).map((r) => r.text),
-    ...readJsonl(join(ROOT, 'data', 'history', 'eval.jsonl')).map((r) => r.query),
-    ...readJsonl(join(ROOT, 'data', 'compose', 'eval.jsonl')).map((r) => r.text),
-    ...readJsonl(join(ROOT, 'data', 'slots', 'gold.jsonl')).map((r) => r.text),
-    ...readJsonl(join(ROOT, 'data', 'ood_eval.jsonl')).map((r) => r.text),
-    ...readDir(join(ROOT, 'data', 'blind')).map((r) => r.text ?? r.query),
-    ...SLOT_CASES.map((c) => c[1]),
-  ].filter(Boolean).map(normalize));
+  // held-out texts (never trained on), with filler-word near-duplicates and contrastive rewrites
+  // (scripts/lib/heldout.js)
+  const heldOut = heldOutIndex(heldOutTexts(ROOT, SLOT_CASES.map((c) => c[1])));
   // eval-only slot values (scripts/lib/silver.js EVAL_POOLS) must never occur in training text
   const esc = (v) => v.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   const evalValRe = new RegExp(`(?<![\\p{L}\\d_])(?:${[...EVAL_VALUES].sort((a, b) => b.length - a.length).map(esc).join('|')})(?![\\p{L}\\d_])`, 'iu');
-  const leaks = (text) => heldOut.has(normalize(text)) || evalValRe.test(text);
+  const leaks = (text) => heldOut.has(text) || evalValRe.test(text);
 
   const intentRows = [...readDir(join(ROOT, 'data', 'intents')), ...readJsonl(join(ROOT, 'data', 'train.jsonl'))]
     .map((r) => ({ ...r, src: 'intents' }));
@@ -131,7 +124,7 @@ function main() {
   const base = [];
   for (const r0 of [...intentRows, ...shellRows]) {
     const n = normalize(r0.text);
-    if (heldOut.has(n)) { dropped++; continue; }
+    if (heldOut.has(r0.text)) { dropped++; continue; }
     if (evalValRe.test(r0.text)) { droppedEvalValue++; continue; }
     const d = decide.get(n);
     if (d?.action === 'drop') { teacherDropped++; continue; }

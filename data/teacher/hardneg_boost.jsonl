@@ -1,13 +1,3 @@
-{"text":"lsblk","intent":"block_devices","lang":"en","src":"hardneg-boost"}
-{"text":"list storage devices","intent":"block_devices","lang":"en","src":"hardneg-boost"}
-{"text":"is nginx running?","intent":"find_process","lang":"en","src":"hardneg-boost"}
-{"text":"jaki pid ma firefox","intent":"find_process","lang":"pl","src":"hardneg-boost"}
 {"text":"czy postgres jest uruchomiony","intent":"service_status","lang":"pl","src":"hardneg-boost"}
 {"text":"wlacz nginx","intent":"service_start","lang":"pl","src":"hardneg-boost"}
-{"text":"which gateway am i using","intent":"routes","lang":"en","src":"hardneg-boost"}
-{"text":"upload my changes to the remote","intent":"git_push","lang":"en","src":"hardneg-boost"}
-{"text":"wyslij zmiany na remote","intent":"git_push","lang":"pl","src":"hardneg-boost"}
-{"text":"docker ps","intent":"docker_ps","lang":"en","src":"hardneg-boost"}
 {"text":"wszystkie kontenery dockera","intent":"docker_ps_all","lang":"pl","src":"hardneg-boost"}
-{"text":"jako kto jestem zalogowany","intent":"whoami","lang":"pl","shell":"powershell","os":"win32","src":"hardneg-boost"}
-{"text":"docker ps","intent":"docker_ps","lang":"en","shell":"powershell","os":"win32","src":"hardneg-boost"}

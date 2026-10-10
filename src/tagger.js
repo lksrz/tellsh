@@ -182,7 +182,7 @@ export function exFromSpans(text, spans) {
           const ch = pathChunk(text, sp);
           // "na (całym) dysku", "on (the) disk", "whole drive": the filesystem root
           const upto = foldKeepLength(text.slice(0, ch.end)).toLowerCase().replace(/[.,;:!?]+$/, '');
-          p = ROOT_PHRASE_END.test(upto) ? '/' : normPath(ch.text);
+          if (ROOT_PHRASE_END.test(upto)) { p = '/'; ex.rootPhrase = true; } else p = normPath(ch.text);
           // a path-looking word we cannot represent exactly: nothing (placeholder), never a part of it
           if (!p && /[\\/~.]/.test(ch.text) && !GENERIC.test(foldKeepLength(ch.text).toLowerCase())) ex.rejectedPaths.push(ch);
         }

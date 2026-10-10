@@ -29,7 +29,6 @@
 {"text":"what are the broken symbolic links in ~/dotfiles and where do they point","intent":"broken_symlinks","lang":"en","src":"hardneg"}
 {"text":"enumerate broken symlinks under the current directory","intent":"broken_symlinks","lang":"en","src":"hardneg"}
 {"text":"show broken symbolic links in ../shared","intent":"broken_symlinks","lang":"en","src":"hardneg"}
-{"text":"list broken symlinks in /usr/local/bin","intent":"broken_symlinks","lang":"en","shell":"bash","os":"linux","src":"hardneg"}
 {"text":"find broken symbolic links in ./build","intent":"broken_symlinks","lang":"en","src":"hardneg"}
 {"text":"find broken symbolic links in C:\\Users\\me","intent":"broken_symlinks","lang":"en","shell":"powershell","os":"win32","src":"hardneg"}
 {"text":"list broken symlinks in C:\\links","intent":"broken_symlinks","lang":"en","shell":"cmd","os":"win32","src":"hardneg"}
@@ -55,7 +54,6 @@
 {"text":"wypisz zepsute linki symboliczne w katalogu ../shared","intent":"broken_symlinks","lang":"pl","src":"hardneg"}
 {"text":"znajdź wszystkie zepsute dowiązania symboliczne w projekcie","intent":"broken_symlinks","lang":"pl","src":"hardneg"}
 {"text":"gdzie są zepsute linki symboliczne w /opt","intent":"broken_symlinks","lang":"pl","src":"hardneg"}
-{"text":"znajdź zepsute symlinki w /usr/local/bin","intent":"broken_symlinks","lang":"pl","src":"hardneg"}
 {"text":"ktore pliki w /opt/tools to zepsute dowiazania","intent":"broken_symlinks","lang":"pl","shell":"bash","os":"linux","src":"hardneg"}
 {"text":"znajdz zepsute dowiazania symboliczne w ./vendor","intent":"broken_symlinks","lang":"pl","src":"hardneg"}
 {"text":"wylistuj zepsute linki symboliczne w /usr/local","intent":"broken_symlinks","lang":"pl","shell":"zsh","os":"darwin","src":"hardneg"}
@@ -76,7 +74,6 @@
 {"text":"links in current folder","intent":"find_symlinks","lang":"en","src":"hardneg"}
 {"text":"find symlinks in C:\\Users\\me","intent":"find_symlinks","lang":"en","shell":"powershell","os":"win32","src":"hardneg"}
 {"text":"search for links in /etc/nginx/sites-enabled","intent":"find_symlinks","lang":"en","src":"hardneg"}
-{"text":"symlinks in /usr/lib","intent":"find_symlinks","lang":"en","src":"hardneg"}
 {"text":"locate symbolic links recursively","intent":"find_symlinks","lang":"en","src":"hardneg"}
 {"text":"show me symlinks that are in /home/marek","intent":"find_symlinks","lang":"en","src":"hardneg"}
 {"text":"links in ~/dotfiles","intent":"find_symlinks","lang":"en","shell":"zsh","os":"darwin","src":"hardneg"}
@@ -90,7 +87,6 @@
 {"text":"show symlinks in /etc/alternatives","intent":"find_symlinks","lang":"en","src":"hardneg"}
 {"text":"detect symlinks in /opt","intent":"find_symlinks","lang":"en","src":"hardneg"}
 {"text":"detect soft links in ../shared","intent":"find_symlinks","lang":"en","src":"hardneg"}
-{"text":"can you find all symlinks here?","intent":"find_symlinks","lang":"en","src":"hardneg"}
 {"text":"symlinks in C:\\work","intent":"find_symlinks","lang":"en","shell":"cmd","os":"win32","src":"hardneg"}
 {"text":"what symlinks are in /usr/share","intent":"find_symlinks","lang":"en","src":"hardneg"}
 {"text":"any links in this directory?","intent":"find_symlinks","lang":"en","src":"hardneg"}
@@ -104,7 +100,6 @@
 {"text":"znajdź rekurencyjnie linki symboliczne","intent":"find_symlinks","lang":"pl","src":"hardneg"}
 {"text":"dowiązania symboliczne na całym dysku","intent":"find_symlinks","lang":"pl","shell":"bash","os":"linux","src":"hardneg"}
 {"text":"linki symboliczne w /usr/local","intent":"find_symlinks","lang":"pl","shell":"zsh","os":"darwin","src":"hardneg"}
-{"text":"symlinki w D:\\dev","intent":"find_symlinks","lang":"pl","shell":"powershell","os":"win32","src":"hardneg"}
 {"text":"znajdz symlinki w /opt","intent":"find_symlinks","lang":"pl","shell":"bash","os":"linux","src":"hardneg"}
 {"text":"znajdz linki w /etc","intent":"find_symlinks","lang":"pl","src":"hardneg"}
 {"text":"znajdź dowiązania symboliczne w /etc","intent":"find_symlinks","lang":"pl","shell":"bash","os":"linux","src":"hardneg"}
@@ -128,7 +123,6 @@
 {"text":"symlinki w /usr/lib","intent":"find_symlinks","lang":"pl","src":"hardneg"}
 {"text":"pull changes","intent":"git_pull","lang":"en","src":"hardneg"}
 {"text":"git pull origin main","intent":"git_pull","lang":"en","shell":"powershell","os":"win32","src":"hardneg"}
-{"text":"pull my commits","intent":"git_pull","lang":"en","src":"hardneg"}
 {"text":"git pull origin feature/login","intent":"git_pull","lang":"en","shell":"bash","os":"linux","src":"hardneg"}
 {"text":"pull current branch","intent":"git_pull","lang":"en","src":"hardneg"}
 {"text":"can you pull my branch fix-123?","intent":"git_pull","lang":"en","src":"hardneg"}
@@ -136,12 +130,10 @@
 {"text":"pull branch hotfix/42","intent":"git_pull","lang":"en","shell":"bash","os":"linux","src":"hardneg"}
 {"text":"please pull the latest commits","intent":"git_pull","lang":"en","src":"hardneg"}
 {"text":"sync with remote (push)","intent":"git_push","lang":"en","shell":"powershell","os":"win32","src":"hardneg"}
-{"text":"push latest changes","intent":"git_push","lang":"en","shell":"cmd","os":"win32","src":"hardneg"}
 {"text":"please push the latest version","intent":"git_push","lang":"en","src":"hardneg"}
 {"text":"i'm behind origin, push the changes","intent":"git_push","lang":"en","src":"hardneg"}
 {"text":"push updates","intent":"git_push","lang":"en","src":"hardneg"}
 {"text":"ściągnij brancha release/2.0","intent":"git_pull","lang":"pl","src":"hardneg"}
-{"text":"ściągnij commity","intent":"git_pull","lang":"pl","src":"hardneg"}
 {"text":"wypchnij to co koledzy wypchneli","intent":"git_push","lang":"pl","shell":"bash","os":"linux","src":"hardneg"}
 {"text":"wypchnij aktualizacje","intent":"git_push","lang":"pl","src":"hardneg"}
 {"text":"wypchnij zmiany kolegów","intent":"git_push","lang":"pl","src":"hardneg"}
@@ -160,7 +152,6 @@
 {"text":"what's the status of the W32Time process","intent":"find_process","lang":"en","shell":"powershell","os":"win32","src":"hardneg"}
 {"text":"is the cups process running?","intent":"find_process","lang":"en","src":"hardneg"}
 {"text":"is the mysql process active","intent":"find_process","lang":"en","src":"hardneg"}
-{"text":"is the cron process up?","intent":"find_process","lang":"en","shell":"bash","os":"linux","src":"hardneg"}
 {"text":"show me if the docker process is up","intent":"find_process","lang":"en","src":"hardneg"}
 {"text":"status of the ssh process","intent":"find_process","lang":"en","shell":"sh","os":"linux","src":"hardneg"}
 {"text":"check ssh process status","intent":"find_process","lang":"en","src":"hardneg"}
@@ -270,7 +261,6 @@
 {"text":"katalogi zerobajtowe, wypisz je","intent":"empty_dirs","lang":"pl","src":"hardneg"}
 {"text":"puste katalogi w ./build prosze","intent":"empty_dirs","lang":"pl","src":"hardneg"}
 {"text":"znajdz katalogi o rozmiarze zero w /srv","intent":"empty_dirs","lang":"pl","src":"hardneg"}
-{"text":"znajdz puste katalogi tutaj","intent":"empty_dirs","lang":"pl","src":"hardneg"}
 {"text":"które katalogi są puste w /var/log","intent":"empty_dirs","lang":"pl","src":"hardneg"}
 {"text":"znajdz puste katalogi w /var/spool","intent":"empty_dirs","lang":"pl","src":"hardneg"}
 {"text":"gdzie są puste katalogi w tym repo","intent":"empty_dirs","lang":"pl","src":"hardneg"}
@@ -318,7 +308,6 @@
 {"text":"how much disks and partitions do my drives have","intent":"block_devices","lang":"en","shell":"powershell","os":"win32","src":"hardneg"}
 {"text":"disks and partitions on mounted filesystems","intent":"block_devices","lang":"en","src":"hardneg"}
 {"text":"list free space on the disks","intent":"disk_free","lang":"en","src":"hardneg"}
-{"text":"list free space on the disks and partitions","intent":"disk_free","lang":"en","src":"hardneg"}
 {"text":"lsit free space on the disks","intent":"disk_free","lang":"en","src":"hardneg"}
 {"text":"display free space on the disks with sizes","intent":"disk_free","lang":"en","src":"hardneg"}
 {"text":"how many free space on the disks are installed","intent":"disk_free","lang":"en","src":"hardneg"}
@@ -328,22 +317,16 @@
 {"text":"show me the free space on the disks attached to this server","intent":"disk_free","lang":"en","src":"hardneg"}
 {"text":"which free space on the disks do I have","intent":"disk_free","lang":"en","src":"hardneg"}
 {"text":"view all free space on the disks and partitions with their sizes","intent":"disk_free","lang":"en","src":"hardneg"}
-{"text":"list free space on the disks and partitions pls","intent":"disk_free","lang":"en","src":"hardneg"}
 {"text":"what free space on the disks are on the external drive","intent":"disk_free","lang":"en","src":"hardneg"}
 {"text":"list all free space on the disks including unmounted ones","intent":"disk_free","lang":"en","src":"hardneg"}
-{"text":"list all free space on the disks and partitions","intent":"disk_free","lang":"en","shell":"powershell","os":"win32","src":"hardneg"}
 {"text":"what free space on the disks are connected","intent":"disk_free","lang":"en","src":"hardneg"}
 {"text":"list free space on the disks and drives","intent":"disk_free","lang":"en","shell":"bash","os":"linux","src":"hardneg"}
-{"text":"show all free space on the disks","intent":"disk_free","lang":"en","src":"hardneg"}
-{"text":"show free space on the disks","intent":"disk_free","lang":"en","src":"hardneg"}
 {"text":"enumerate free space on the disks","intent":"disk_free","lang":"en","src":"hardneg"}
 {"text":"show nvme free space on the disks and partitions","intent":"disk_free","lang":"en","src":"hardneg"}
 {"text":"show free space on the disks and partitions","intent":"disk_free","lang":"en","shell":"bash","os":"linux","src":"hardneg"}
 {"text":"show my hard free space on the disks and their partitions","intent":"disk_free","lang":"en","src":"hardneg"}
 {"text":"see which users logged in recently at present","intent":"last_logins","lang":"en","src":"hardneg"}
-{"text":"who logged in recently now","intent":"last_logins","lang":"en","shell":"bash","os":"linux","src":"hardneg"}
 {"text":"which users logged in recently","intent":"last_logins","lang":"en","shell":"bash","os":"linux","src":"hardneg"}
-{"text":"who else logged in recently right now","intent":"last_logins","lang":"en","shell":"bash","os":"linux","src":"hardneg"}
 {"text":"check who logged in recently at the moment","intent":"last_logins","lang":"en","src":"hardneg"}
 {"text":"kto się ostatnio logował na tym serwerze windows","intent":"last_logins","lang":"pl","shell":"powershell","os":"win32","src":"hardneg"}
 {"text":"sprawdź kto się ostatnio logował","intent":"last_logins","lang":"pl","src":"hardneg"}
@@ -351,13 +334,11 @@
 {"text":"pokaz kto się ostatnio logował","intent":"last_logins","lang":"pl","src":"hardneg"}
 {"text":"kto się ostatnio logował na tym serwerze","intent":"last_logins","lang":"pl","shell":"cmd","os":"win32","src":"hardneg"}
 {"text":"what directories are in my PATH binary","intent":"show_path","lang":"en","src":"hardneg"}
-{"text":"what directories are in my PATH located","intent":"show_path","lang":"en","shell":"powershell","os":"win32","src":"hardneg"}
 {"text":"show hidden files in /var/log with details","intent":"hidden_files","lang":"en","src":"hardneg"}
 {"text":"show me the hidden files in my home directory","intent":"hidden_files","lang":"en","src":"hardneg"}
 {"text":"list all hidden files with permissions in current directory","intent":"hidden_files","lang":"en","src":"hardneg"}
 {"text":"list hidden files in /var/www with details","intent":"hidden_files","lang":"en","shell":"bash","os":"linux","src":"hardneg"}
 {"text":"list hidden files in /var/tmp with sizes","intent":"hidden_files","lang":"en","shell":"powershell","os":"linux","src":"hardneg"}
-{"text":"list hidden files here","intent":"hidden_files","lang":"en","src":"hardneg"}
 {"text":"lsit hidden files in /mnt/usb","intent":"hidden_files","lang":"en","src":"hardneg"}
 {"text":"what hidden files are in ~/Documents?","intent":"hidden_files","lang":"en","src":"hardneg"}
 {"text":"list the hidden files in ~/music please","intent":"hidden_files","lang":"en","src":"hardneg"}
@@ -385,11 +366,8 @@
 {"text":"show live all containers, including stopped ones","intent":"docker_ps_all","lang":"en","src":"hardneg"}
 {"text":"display all containers, including stopped ones only","intent":"docker_ps_all","lang":"en","src":"hardneg"}
 {"text":"show all containers, including stopped ones in up state","intent":"docker_ps_all","lang":"en","src":"hardneg"}
-{"text":"which all containers, including stopped ones are up right now","intent":"docker_ps_all","lang":"en","shell":"bash","os":"linux","src":"hardneg"}
-{"text":"show active docker all containers, including stopped ones","intent":"docker_ps_all","lang":"en","src":"hardneg"}
 {"text":"list running docker all containers, including stopped ones","intent":"docker_ps_all","lang":"en","shell":"bash","os":"linux","src":"hardneg"}
 {"text":"please list the all containers, including stopped ones that are running","intent":"docker_ps_all","lang":"en","src":"hardneg"}
-{"text":"which all containers, including stopped ones are up?","intent":"docker_ps_all","lang":"en","src":"hardneg"}
 {"text":"check what all containers, including stopped ones are running","intent":"docker_ps_all","lang":"en","src":"hardneg"}
 {"text":"which docker all containers, including stopped ones are alive","intent":"docker_ps_all","lang":"en","src":"hardneg"}
 {"text":"show runnign all containers, including stopped ones","intent":"docker_ps_all","lang":"en","src":"hardneg"}
@@ -399,17 +377,12 @@
 {"text":"is my postgres container running? list all containers, including stopped ones","intent":"docker_ps_all","lang":"en","shell":"bash","os":"linux","src":"hardneg"}
 {"text":"what all containers, including stopped ones are running right now?","intent":"docker_ps_all","lang":"en","src":"hardneg"}
 {"text":"how to list active all containers, including stopped ones in docker","intent":"docker_ps_all","lang":"en","src":"hardneg"}
-{"text":"currently all containers, including stopped ones?","intent":"docker_ps_all","lang":"en","src":"hardneg"}
-{"text":"show me the running docker all containers, including stopped ones","intent":"docker_ps_all","lang":"en","src":"hardneg"}
-{"text":"can you show all containers, including stopped ones?","intent":"docker_ps_all","lang":"en","src":"hardneg"}
 {"text":"jak zobaczyć wszystkie kontenery, także zatrzymane?","intent":"docker_ps_all","lang":"pl","src":"hardneg"}
 {"text":"czy możesz pokazać wszystkie kontenery, także zatrzymane?","intent":"docker_ps_all","lang":"pl","src":"hardneg"}
 {"text":"proszę wypisać wszystkie kontenery, także zatrzymane które działają","intent":"docker_ps_all","lang":"pl","src":"hardneg"}
 {"text":"wypisz uruchomione wszystkie kontenery, także zatrzymane","intent":"docker_ps_all","lang":"pl","src":"hardneg"}
 {"text":"pokaż wszystkie kontenery, także zatrzymane w stanie up","intent":"docker_ps_all","lang":"pl","src":"hardneg"}
 {"text":"wypisz aktualnie wszystkie kontenery, także zatrzymane","intent":"docker_ps_all","lang":"pl","src":"hardneg"}
-{"text":"pokaż aktywne wszystkie kontenery, także zatrzymane","intent":"docker_ps_all","lang":"pl","src":"hardneg"}
-{"text":"uruchomione wszystkie kontenery, także zatrzymane","intent":"docker_ps_all","lang":"pl","src":"hardneg"}
 {"text":"jakie wszystkie kontenery, także zatrzymane działają","intent":"docker_ps_all","lang":"pl","shell":"powershell","os":"win32","src":"hardneg"}
 {"text":"jak wylistowac aktywne wszystkie kontenery, także zatrzymane","intent":"docker_ps_all","lang":"pl","src":"hardneg"}
 {"text":"sprawdz jakie wszystkie kontenery, także zatrzymane sa uruchomione","intent":"docker_ps_all","lang":"pl","src":"hardneg"}
@@ -428,8 +401,6 @@
 {"text":"wszystkie kontenery, także zatrzymane dockera","intent":"docker_ps_all","lang":"pl","src":"hardneg"}
 {"text":"aktywne wszystkie kontenery, także zatrzymane dockera","intent":"docker_ps_all","lang":"pl","src":"hardneg"}
 {"text":"stop the grafana-server service now","intent":"service_stop","lang":"en","src":"hardneg"}
-{"text":"stop postgresql","intent":"service_stop","lang":"en","shell":"zsh","os":"darwin","src":"hardneg"}
-{"text":"stop apache2","intent":"service_stop","lang":"en","shell":"bash","os":"linux","src":"hardneg"}
 {"text":"please stop the my-app service","intent":"service_stop","lang":"en","src":"hardneg"}
 {"text":"systemctl stop apache2","intent":"service_stop","lang":"en","src":"hardneg"}
 {"text":"give apache a stop","intent":"service_stop","lang":"en","src":"hardneg"}
@@ -439,7 +410,6 @@
 {"text":"stop the network manager service","intent":"service_stop","lang":"en","src":"hardneg"}
 {"text":"apply new config: stop nginx","intent":"service_stop","lang":"en","src":"hardneg"}
 {"text":"nginx needs a stop","intent":"service_stop","lang":"en","src":"hardneg"}
-{"text":"stop php8.2-fpm","intent":"service_stop","lang":"en","src":"hardneg"}
 {"text":"please stop the php-fpm service","intent":"service_stop","lang":"en","shell":"zsh","os":"darwin","src":"hardneg"}
 {"text":"stop the print spooler service","intent":"service_stop","lang":"en","shell":"cmd","os":"win32","src":"hardneg"}
 {"text":"can you stop mysql","intent":"service_stop","lang":"en","src":"hardneg"}
@@ -455,7 +425,6 @@
 {"text":"restart the apache2 service","intent":"service_restart","lang":"en","shell":"bash","os":"linux","src":"hardneg"}
 {"text":"please restart mysql","intent":"service_restart","lang":"en","src":"hardneg"}
 {"text":"restart the ssh service","intent":"service_restart","lang":"en","shell":"sh","os":"linux","src":"hardneg"}
-{"text":"restart bluetooth service","intent":"service_restart","lang":"en","src":"hardneg"}
 {"text":"disable nginx for now, just restart it","intent":"service_restart","lang":"en","src":"hardneg"}
 {"text":"please restart the nginx daemon","intent":"service_restart","lang":"en","shell":"zsh","os":"darwin","src":"hardneg"}
 {"text":"i want to restart the ssh service","intent":"service_restart","lang":"en","src":"hardneg"}
@@ -489,7 +458,6 @@
 {"text":"zrestartuj postgresa","intent":"service_restart","lang":"pl","src":"hardneg"}
 {"text":"zrestartuj usługę wyszukiwania WSearch","intent":"service_restart","lang":"pl","shell":"cmd","os":"win32","src":"hardneg"}
 {"text":"na razie zrestartuj nginxa","intent":"service_restart","lang":"pl","src":"hardneg"}
-{"text":"zrestartuj usluge bluetooth","intent":"service_restart","lang":"pl","src":"hardneg"}
 {"text":"zrestartuj usluge MSSQLSERVER","intent":"service_restart","lang":"pl","shell":"cmd","os":"win32","src":"hardneg"}
 {"text":"zrestartuj usługę BITS","intent":"service_restart","lang":"pl","shell":"powershell","os":"win32","src":"hardneg"}
 {"text":"zrestartuj containerd","intent":"service_restart","lang":"pl","src":"hardneg"}

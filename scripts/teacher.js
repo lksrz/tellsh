@@ -10,7 +10,11 @@
 // Independence: the intent question shows ONLY the request (and the user's shell); never our label, the
 // rendered command or anything derived from the label. The options are the label plus the cascade's
 // closest alternatives plus known confusable intents plus "none of these", shuffled, so the label is
-// one of 4-6 plausible options. The risk question is asked about the request alone.
+// one of 4-6 plausible options. The risk question is asked about the request alone. Because the label is
+// always among the options, "agreement" is a consistency check, not an independent accuracy estimate.
+// Options come from --options-model (default model/model.bin; sha256 recorded in each summary), so pin
+// that file to rerun with identical prompts and cache keys. Failed calls are counted, never treated as a
+// rejection. Held-out texts and their near-duplicates (scripts/lib/heldout.js) are never sent.
 // Several rows are packed into one call (one question per row and aspect; Jev evaluates every
 // question in isolation against the shared state), responses are cached in build/jev_cache.jsonl, and
 // every network call is counted in data/teacher/ledger.json.
@@ -25,6 +29,9 @@ import { mulberry32 } from './lib/silver.js';
 import { ask, pool, stats, recordLedger, LEDGER, PRICE_PER_MTOK, MODEL } from './lib/jev.js';
 import { updateSection } from './report.js';
 import { CONFUSABLE, CONTRAST_RULES } from './lib/confusable.js';
+import { heldOutTexts, heldOutIndex } from './lib/heldout.js';
+import { parseModel, DEFAULT_MODEL } from '../src/model.js';
+import { createHash } from 'node:crypto';
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
 const TDIR = join(ROOT, 'data', 'teacher');
@@ -44,9 +51,23 @@ const RISK = {
 };
 const RANK = { safe: 0, medium: 1, high: 2 };
 
+// The cascade that proposes the alternative options. Prompts (and so cache keys) depend on it: pin it
+// with --options-model=FILE to rerun with the same questions; its sha256 is recorded in every summary.
+const OPTIONS_MODEL_PATH = arg('options-model', DEFAULT_MODEL);
+let optionsModel = null;
+let optionsModelSha = null;
+function getOptionsModel() {
+  if (!optionsModel) {
+    const buf = readFileSync(OPTIONS_MODEL_PATH);
+    optionsModelSha = createHash('sha256').update(buf).digest('hex');
+    optionsModel = parseModel(buf);
+  }
+  return optionsModel;
+}
+
 /** Options for the intent question: label + closest cascade alternatives + confusable intents, shuffled. */
 function intentOptions(text, label, shell, os, rng, k = 3) {
-  const c = cascade(text, { extras: envFeatures({ shell: shell || 'bash', os: os || 'linux' }), top: 8 });
+  const c = cascade(text, { model: getOptionsModel(), extras: envFeatures({ shell: shell || 'bash', os: os || 'linux' }), top: 8 });
   const alts = c.top.map((t) => t.intent).filter((i) => i && i !== label);
   const conf = (CONFUSABLE[label] || []).filter((i) => i !== label);
   const opts = [...new Set([label, ...conf.slice(0, 2), ...alts])].slice(0, k + 1 + Math.min(1, conf.length));
@@ -87,9 +108,18 @@ async function askPacked(items, per, label) {
   return out;
 }
 
-function trainingRows() {
+/** Held-out texts incl. near-duplicates and contrastive rewrites (scripts/lib/heldout.js). */
+const heldOutSet = () => heldOutIndex(heldOutTexts(ROOT));
+
+/**
+ * Training rows filtered as gen_data.js filters them: held-out texts (and their near-duplicates) are never
+ * sent to the teacher, and rows dropped in data/teacher/decisions.jsonl are not mined from.
+ */
+function trainingRows(held = heldOutSet()) {
+  const dropped = new Set(readJsonl(join(TDIR, 'decisions.jsonl')).filter((d) => d.text && d.action === 'drop').map((d) => normalize(d.text)));
   return [...readDir(join(ROOT, 'data', 'intents')).map((r) => ({ ...r, src: `intents/${r.file}` })),
-    ...readJsonl(join(ROOT, 'data', 'shell', 'train.jsonl')).map((r) => ({ ...r, src: 'shell/train.jsonl' }))];
+    ...readJsonl(join(ROOT, 'data', 'shell', 'train.jsonl')).map((r) => ({ ...r, src: 'shell/train.jsonl' }))]
+    .filter((r) => !held.has(r.text) && !dropped.has(normalize(r.text)));
 }
 
 // ---------------------------------------------------------------------------------------------
@@ -136,7 +166,7 @@ function summarizeVerify(res) {
   const riskFlags = Object.entries(perIntent).filter(([, p]) => p.riskHigher / p.n >= 0.5 || p.riskLower / p.n >= 0.5)
     .map(([id, p]) => ({ intent: id, ours: p.risk, teacher: Object.entries(p.teacherRisk).sort((a, b) => b[1] - a[1])[0][0], share: +(Math.max(p.riskHigher, p.riskLower) / p.n).toFixed(2), n: p.n }));
   const summary = {
-    rows: res.length, answered: ok.length, failed: res.length - ok.length,
+    rows: res.length, answered: ok.length, failed: res.length - ok.length, optionsModelSha256: optionsModelSha,
     intentAgree: agree.length, flagged: flagged.length,
     riskAgree: ok.filter((r) => r.t_risk === r.risk).length,
     riskFlags,
@@ -151,16 +181,6 @@ function summarizeVerify(res) {
 
 // ---------------------------------------------------------------------------------------------
 // (b) label / filter new paraphrase candidates (data/candidates/*.jsonl) -> data/intents/g06_teacher.jsonl
-function heldOutSet() {
-  const r = (p) => readJsonl(join(ROOT, 'data', ...p));
-  return new Set([
-    ...readDir(join(ROOT, 'data', 'eval')).map((x) => x.text), ...r(['shell', 'eval.jsonl']).map((x) => x.text),
-    ...r(['history', 'eval.jsonl']).map((x) => x.query), ...r(['compose', 'eval.jsonl']).map((x) => x.text),
-    ...r(['slots', 'gold.jsonl']).map((x) => x.text), ...r(['ood_eval.jsonl']).map((x) => x.text),
-    ...readDir(join(ROOT, 'data', 'blind')).map((x) => x.text ?? x.query),
-  ].filter(Boolean).map(normalize));
-}
-
 async function label() {
   const rng = mulberry32(+arg('seed', 7));
   const held = heldOutSet();
@@ -169,7 +189,7 @@ async function label() {
   const cands = readDir(join(ROOT, 'data', 'candidates')).filter((r) => {
     if (!r.intent) return false;
     const n = normalize(r.text);
-    if (!BY_ID[r.intent] || held.has(n) || have.has(n) || seen.has(n)) return false;
+    if (!BY_ID[r.intent] || held.has(r.text) || have.has(n) || seen.has(n)) return false;
     seen.add(n);
     return true;
   });
@@ -178,8 +198,10 @@ async function label() {
   const ans = await askPacked(items, +arg('per', 4), 'label');
   const accepted = [];
   const rejected = [];
+  let failed = 0;
   items.forEach((it, j) => {
     const a = ans[j]?.i;
+    if (!a) { failed++; return; } // a failed call is no answer, not a rejection
     const p = a?.probabilities?.[it.r.intent] ?? 0;
     const row = { text: it.r.text, intent: it.r.intent, lang: it.r.lang, ...(it.r.shell ? { shell: it.r.shell, os: it.r.os } : {}) };
     // accept when the teacher picks the proposed intent with p >= 0.6
@@ -191,16 +213,16 @@ async function label() {
   // out-of-domain candidates (data/candidates/ood_*.jsonl): keep only what the teacher agrees is not a shell request
   const oodC = readDir(join(ROOT, 'data', 'candidates')).filter((r) => !r.intent && r.text && /^ood/.test(r.file));
   const oodHave = new Set(readJsonl(join(ROOT, 'data', 'ood.jsonl')).map((r) => normalize(r.text)));
-  const oodItems = oodC.filter((r) => { const n = normalize(r.text); if (held.has(n) || oodHave.has(n) || seen.has(n)) return false; seen.add(n); return true; })
+  const oodItems = oodC.filter((r) => { const n = normalize(r.text); if (held.has(r.text) || oodHave.has(n) || seen.has(n)) return false; seen.add(n); return true; })
     .map((r) => ({ r, qs: { o: { type: 'noul', instructions: { question: 'Is this a request to do something on the computer that a shell command (bash, PowerShell, ...) could carry out — find, list, show, change, delete, kill, install, check something?', request: r.text } } } }));
   const oodAns = await askPacked(oodItems, +arg('per', 4), 'label-ood');
   const oodAcc = [];
   const oodRej = [];
-  oodItems.forEach((it, j) => { const p = oodAns[j]?.o?.noul; (p != null && p < 0.3 ? oodAcc : oodRej).push({ text: it.r.text, lang: it.r.lang, p }); });
+  oodItems.forEach((it, j) => { const p = oodAns[j]?.o?.noul; if (p == null) { failed++; return; } (p < 0.3 ? oodAcc : oodRej).push({ text: it.r.text, lang: it.r.lang, p }); });
   writeJsonl(join(ROOT, 'data', 'ood_teacher.jsonl'), oodAcc.map(({ text, lang }) => ({ text, lang })));
   writeJsonl(join(TDIR, 'ood_rejected.jsonl'), oodRej);
   const hard = accepted.filter((r) => r.hard).length;
-  const s = { candidates: cands.length, accepted: accepted.length, rejected: rejected.length, modelDisagreedOnAccepted: hard,
+  const s = { candidates: cands.length, accepted: accepted.length, rejected: rejected.length, failed, optionsModelSha256: optionsModelSha, modelDisagreedOnAccepted: hard,
     ood: { candidates: oodItems.length, accepted: oodAcc.length, rejected: oodRej.length },
     byLang: Object.fromEntries(['en', 'pl'].map((l) => [l, accepted.filter((r) => r.lang === l).length])),
     byShell: accepted.reduce((m, r) => ((m[r.shell || 'bash'] = (m[r.shell || 'bash'] || 0) + 1), m), {}) };
@@ -226,7 +248,7 @@ async function mine() {
       if (!rule.re.test(r.text)) continue;
       const text = r.text.replace(rule.re, rule.to);
       const n = normalize(text);
-      if (text === r.text || rule.bad?.test(text) || held.has(n) || have.has(n) || seen.has(n)) continue;
+      if (text === r.text || rule.bad?.test(text) || held.has(text) || have.has(n) || seen.has(n)) continue;
       seen.add(n);
       cands.push({ text, intent: rule.target, lang: r.lang, shell: r.shell, os: r.os, from: r.intent, orig: r.text });
       made++;
@@ -236,7 +258,7 @@ async function mine() {
   const hardRows = [];
   for (const r of rows) {
     if (!CONFUSABLE[r.intent]) continue;
-    const c = cascade(r.text, { extras: envFeatures({ shell: r.shell || 'bash', os: r.os || 'linux' }), top: 2 });
+    const c = cascade(r.text, { model: getOptionsModel(), extras: envFeatures({ shell: r.shell || 'bash', os: r.os || 'linux' }), top: 2 });
     const margin = c.top[0]?.intent === r.intent ? (c.top[0].p - (c.top[1]?.p ?? 0)) : -1;
     if (margin < 0.2) hardRows.push({ ...r, margin });
   }
@@ -245,8 +267,10 @@ async function mine() {
   const ans = await askPacked(items, +arg('per', 4), 'mine');
   const accepted = [];
   const rejected = [];
+  let failed = 0;
   items.forEach((it, j) => {
     const a = ans[j]?.i;
+    if (!a) { failed++; return; } // a failed call is no answer, not a rejection
     const p = a?.probabilities?.[it.r.intent] ?? 0;
     const row = { text: it.r.text, intent: it.r.intent, lang: it.r.lang, ...(it.r.shell ? { shell: it.r.shell, os: it.r.os } : {}) };
     if (a && a.choice === it.r.intent && p >= 0.6) accepted.push({ ...row, src: 'hardneg' });
@@ -259,7 +283,7 @@ async function mine() {
   writeJsonl(join(ROOT, 'data', 'intents', 'g07_hardneg.jsonl'), accepted);
   writeJsonl(join(TDIR, 'hardneg_rejected.jsonl'), rejected);
   writeJsonl(join(TDIR, 'hardneg_boost.jsonl'), boost);
-  const s = { rewrites: cands.length, accepted: accepted.length, rejected: rejected.length, lowMarginRows: hardRows.length, boosted: boost.length,
+  const s = { rewrites: cands.length, accepted: accepted.length, rejected: rejected.length, failed, optionsModelSha256: optionsModelSha, lowMarginRows: hardRows.length, boosted: boost.length,
     byPair: accepted.reduce((m, r) => ((m[r.intent] = (m[r.intent] || 0) + 1), m), {}) };
   writeFileSync(join(TDIR, 'hardneg_summary.json'), JSON.stringify(s, null, 1) + '\n');
   console.log(`mine: accepted ${accepted.length}/${cands.length} rewrites; ${boost.length} teacher-confirmed low-margin rows boosted`);
@@ -281,7 +305,7 @@ function report() {
   const lines = [];
   lines.push('## Teacher (TypeSafe Jev, build time only)');
   lines.push('');
-  lines.push(`All calls to \`${MODEL}\` (${L.pricePerMtok}/Mtok input, output free), counted by \`scripts/lib/jev.js\` in \`data/teacher/ledger.json\` ` +
+  lines.push(`All calls to \`${MODEL}\` ($${L.pricePerMtok}/Mtok input, output free), counted by \`scripts/lib/jev.js\` in \`data/teacher/ledger.json\` ` +
     '(network calls only; cache hits are free and not counted). Several rows are packed per call; every row gets its own question(s), and the intent ' +
     'question shows only the request and shell — never our label or a command rendered from it.');
   lines.push('');
@@ -291,8 +315,10 @@ function report() {
   lines.push(`| **total** | **${L.total.calls}** | ${L.total.failed} | ${L.total.inTok} | **$${L.total.usd.toFixed(4)}** |`);
   lines.push('');
   if (V) {
-    lines.push(`**(a) Verification of every training row** (${V.rows} rows; ${V.answered} answered): teacher intent = our label for **${pct(V.intentAgree, V.answered)}**; ` +
+    lines.push(`**(a) Verification of every training row** (${V.rows} rows; ${V.answered} answered): teacher intent = our label for **${pct(V.intentAgree, V.answered)}** ` +
+      '(not an independent accuracy: the options always contain our label plus the cascade\'s own top guesses, so this is agreement among 4-6 plausible choices); ' +
       `${V.flagged} rows flagged (teacher prefers another option with confidence ≥ 0.6 and gives our label p < 0.3) → \`data/teacher/review.jsonl\`. ` +
+      (V.heldOutSent ? `This run predates the held-out filter: ${V.heldOutSent} of the rows sent were held-out texts or near-duplicates of one (none of them is in the training data of the shipped model; \`teacher.js\` no longer sends them). ` : '') +
       `Risk (asked about the request alone): identical to the catalog risk for ${pct(V.riskAgree, V.answered)} of rows; ${V.riskFlags.length} intents where the teacher rates most rows differently ` +
       `(${V.riskFlags.map((f) => `${f.intent} ${f.ours}→${f.teacher}`).join(', ') || 'none'}).`);
     lines.push('');
@@ -308,13 +334,16 @@ function report() {
       `labelled by the teacher; **${LB.accepted} accepted** (teacher picks the proposed intent with p ≥ 0.6; EN ${LB.byLang.en}, PL ${LB.byLang.pl}; ` +
       `shells ${Object.entries(LB.byShell).map(([k, v]) => `${k} ${v}`).join(', ')}), ${LB.rejected} rejected → \`data/teacher/label_rejected.jsonl\`. ` +
       `${LB.modelDisagreedOnAccepted} of the accepted rows were misclassified by the v0.2 model. ` +
-      (LB.ood ? `Out-of-domain candidates: ${LB.ood.candidates}, **${LB.ood.accepted} kept** (teacher p(shell request) < 0.3) → \`data/ood_teacher.jsonl\`.` : ''));
+      (LB.ood ? `Out-of-domain candidates: ${LB.ood.candidates}, **${LB.ood.accepted} kept** (teacher p(shell request) < 0.3) → \`data/ood_teacher.jsonl\`.` : '') +
+      (LB.heldOutLeaksRemoved ? ` ${LB.heldOutLeaksRemoved.accepted} accepted paraphrases and ${LB.heldOutLeaksRemoved.ood} out-of-domain rows were later removed as near-duplicates of held-out texts.` : ''));
     lines.push('');
   }
   if (HN) {
     lines.push(`**(c) Hard negatives**: ${HN.rewrites} contrastive rewrites of training rows across confusable intents (e.g. "symlinks" → "broken symlinks", "push" → "pull", ` +
       `"process" → "service"); **${HN.accepted} confirmed** by the teacher and added (${Object.entries(HN.byPair).map(([k, v]) => `${k} ${v}`).join(', ')}); ` +
-      `${HN.boosted} low-margin training rows of confusable intents (confirmed in (a)) are given double weight.`);
+      `${HN.boosted} low-margin training rows of confusable intents (confirmed in (a)) are given double weight.` +
+      (HN.heldOutLeaksRemoved ? ` ${HN.heldOutLeaksRemoved.rewrites} confirmed rewrites and ${HN.heldOutLeaksRemoved.boosted} boosted rows were later removed because they were ` +
+        'held-out texts, near-duplicates of one, or one-word rewrites of one (`scripts/lib/heldout.js`).' : ''));
   }
   updateSection('teacher', lines.join('\n'));
   console.log(`teacher report: ${L.total.calls} calls, ${L.total.inTok} input tokens, $${L.total.usd}`);

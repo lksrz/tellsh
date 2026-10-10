@@ -1,23 +1,27 @@
 {
  "candidates": 1995,
- "accepted": 1956,
+ "accepted": 1911,
  "rejected": 39,
  "modelDisagreedOnAccepted": 74,
  "ood": {
   "candidates": 445,
-  "accepted": 381,
+  "accepted": 380,
   "rejected": 64
  },
  "byLang": {
-  "en": 1025,
-  "pl": 931
+  "en": 999,
+  "pl": 912
  },
  "byShell": {
-  "bash": 810,
-  "zsh": 306,
-  "powershell": 511,
-  "sh": 118,
-  "fish": 115,
-  "cmd": 96
+  "bash": 787,
+  "zsh": 299,
+  "powershell": 505,
+  "sh": 114,
+  "fish": 112,
+  "cmd": 94
+ },
+ "heldOutLeaksRemoved": {
+  "accepted": 45,
+  "ood": 1
  }
 }

@@ -355,7 +355,10 @@ export function tellshQuery(line, kind = 'posix') {
  * Segments of a compound line (`a; b`, `a && b`, `a | b`) are read in order and later ones win: the
  * entities of `cat old.txt; cat new.txt` are those of `cat new.txt`. Redirection targets (`> out.txt`)
  * are files the line wrote. A `cd` makes every earlier working-directory-relative path ambiguous.
- * -> { line, intent, slots, ents, ambiguous, cd?, fromTellsh?, opaque? }
+ * `at` gives each entity type the index of the segment it came from (later segment = newer), and
+ * `searchDir` marks a `dir` entity that is only the root of a search (`find /var/log -name '*.gz'`,
+ * `grep -rl TODO src`): the results live inside it, so it must never be a destructive target.
+ * -> { line, intent, slots, ents, at, searchDir?, ambiguous, cd?, fromTellsh?, opaque? }
  */
 export function analyzeCommand(line, classify, kind = 'posix') {
   let ents = {};
@@ -368,7 +371,7 @@ export function analyzeCommand(line, classify, kind = 'posix') {
     const q = tellshQuery(t, k);
     const r = q && classify ? classify(q) : null;
     if (r?.intent) { intent = r.intent; slots = { ...(r.slots || {}) }; entsFromSlots(intent, slots, ents); }
-    return { line: t, intent, slots, ents, fromTellsh: true, ambiguous };
+    return { line: t, intent, slots, ents, at: {}, ...(isSearchRoot(intent, slots, ents) ? { searchDir: true } : {}), fromTellsh: true, ambiguous };
   }
   const split = splitCommand(t, k, { keepRedirects: true });
   if (!split.ok) {
@@ -376,13 +379,15 @@ export function analyzeCommand(line, classify, kind = 'posix') {
     // so older file/dir values must not be picked up by "it"
     ents.file = AMB + t;
     ents.dir = AMB + t;
-    return { line: t, intent, slots, ents, opaque: true, ambiguous: true };
+    return { line: t, intent, slots, ents, at: {}, opaque: true, ambiguous: true };
   }
   const inv = invert(t, k);
   let segIntent = null;
   let segSlots = {};
   let segIntentAt = -1;
   let cdAt = -1;
+  let searchDir = false;
+  const at = {};
   const firstWord = (s) => { let w = s.words.filter((x) => !REDIR_TARGET_OP.test(x) && !REDIR_DUP_OP.test(x)); while (w.length && (w[0] === 'sudo' || /^\w+=/.test(w[0]))) w = w.slice(1); return w[0]; };
   split.segments.forEach(({ words }, segIdx) => {
     const e = {};
@@ -414,6 +419,9 @@ export function analyzeCommand(line, classify, kind = 'posix') {
       else e.dir = AMB + (target ?? '-');
       delete e.file;
     }
+    if (e.dir !== undefined) searchDir = !!e.searchDir;
+    delete e.searchDir;
+    for (const key of Object.keys(e)) at[key] = segIdx;
     Object.assign(ents, e); // later segments supersede earlier ones
   });
   if (inv && cdAt < 0) {
@@ -421,14 +429,19 @@ export function analyzeCommand(line, classify, kind = 'posix') {
     intent = inv.intent; slots = inv.slots; ambiguous = inv.ambiguous;
     const ie = {};
     entsFromSlots(intent, slots, ie);
+    for (const key of Object.keys(ie)) at[key] = split.segments.length;
+    if (ie.dir !== undefined) searchDir = isSearchRoot(intent, slots, ie);
     ents = { ...ents, ...ie };
   } else if (segIntent) {
     intent = segIntent; slots = { ...segSlots };
     if (segIntentAt < cdAt) staleRelative({}, slots);
   }
   if (Object.values(slots).some(isAmbiguous)) ambiguous = true;
-  return { line: t, intent, slots, ents, ambiguous, ...(cdAt >= 0 ? { cd: true } : {}) };
+  return { line: t, intent, slots, ents, at, ambiguous, ...(searchDir && ents.dir != null ? { searchDir: true } : {}), ...(cdAt >= 0 ? { cd: true } : {}) };
 }
+
+// find/grep catalog intents: their path slot is where the search ran, not what it found
+const isSearchRoot = (intent, slots, ents) => ents.dir != null && ['find', 'grep'].includes(FAMILY_OF[intent]) && String(ents.dir) === String(slots.path);
 
 /** Entities of one simple command `w` (sudo/VAR= removed) into `e`. */
 function segmentEnts(w, e, setIntent, split, k, segIdx, firstWord) {
@@ -490,7 +503,11 @@ function segmentEnts(w, e, setIntent, split, k, segIdx, firstWord) {
     const pat = opts['-e'] ?? opts['--regexp'] ?? pos[0];
     const path = opts['-e'] != null || opts['--regexp'] != null ? pos[0] : pos[1];
     if (pat != null) setIntent(flags.some((a) => /^-\w*l/.test(a)) ? 'grep_files_containing' : 'grep_text', { pattern: rawOf(pat), ...(path != null ? { path } : {}) });
-    if (path != null) e[typeByExt(path)] = path;
+    if (path != null) {
+      const t = typeByExt(path);
+      e[t] = path;
+      if (t === 'dir') e.searchDir = true; // searched directory: the matches are inside it
+    }
   } else if (head === 'lsof' || head === 'ss' || head === 'netstat' || head === 'fuser') {
     const pm = args.map(rawOf).join(' ').match(/(?::|tcp:|udp:|sport = :)(\d{2,5})\b/);
     if (pm) { e.port = pm[1]; setIntent('process_on_port', { port: pm[1] }); }
@@ -543,8 +560,9 @@ function segmentEnts(w, e, setIntent, split, k, segIdx, firstWord) {
     const p = nonFlags.filter((a) => !/^[0-7]{3,4}$|^[ugoa]*[+=-][rwxXst]+$/.test(a)).pop();
     if (p) e[/\/$/.test(p) ? 'dir' : 'file'] = p;
   } else if (DIR_HEADS.has(head)) {
-    const p = head === 'find' ? nonFlags[0] : nonFlags.find((a) => !isGlob(a));
-    if (p) e.dir = p;
+    // find ROOT -name ...: the search root; other heads: the last directory argument (`ls /a /b` -> /b)
+    const p = head === 'find' ? nonFlags[0] : nonFlags.filter((a) => !isGlob(a)).pop();
+    if (p) { e.dir = p; if (head === 'find') e.searchDir = true; }
   } else if (!INERT_HEADS.has(head.toLowerCase())) {
     // unknown command (or unknown cmdlet) naming a path: we cannot tell what it did with it, so an
     // older file/dir must not be picked up by "it"
@@ -558,14 +576,19 @@ const ENT_TYPES = ['container', 'service', 'pid', 'proc', 'port', 'file', 'dir',
 /**
  * Build the context object from history commands (oldest first).
  * kind: 'posix' | 'pwsh' (default: `cmds.kind` as set by loadHistory, else posix)
- * -> { n, ents: {type: value}, entOrder: [types by recency], last: {intent, slots, ambiguous}, features: [...] }
+ * -> { n, ents: {type: value}, entOrder: [types by recency], refOrder, searchRoots, last: {intent, slots, ambiguous}, features: [...] }
  *    values that could not be read unambiguously are kept as AMB-prefixed strings (see isAmbiguous)
+ *    entOrder ranks types by line only (it feeds ctxFeatures, which the model was trained on);
+ *    refOrder also ranks the segments of one line (`cat old.txt; ls newdir`: dir before file) and is
+ *    what pronoun resolution uses. searchRoots: dir values whose newest use was as a find/grep root.
  */
 export function buildContext(cmds, { classify, cwd, kind, query } = {}) {
   const k = kind || cmds.kind || 'posix';
   const ents = {};
   const all = {};
   const recency = {};
+  const pos = {};
+  const searchRoots = new Set();
   let last = null;
   let current = null;
   const list = [...cmds];
@@ -593,12 +616,18 @@ export function buildContext(cmds, { classify, cwd, kind, query } = {}) {
     if (current == null && a.ents.current && !isAmbiguous(a.ents.current)) current = a.ents.current;
     for (const t of ENT_TYPES) {
       if (a.ents[t] == null) continue;
-      if (ents[t] == null) { ents[t] = a.ents[t]; recency[t] = i; }
-      (all[t] ??= []).includes(String(a.ents[t])) || all[t].push(String(a.ents[t]));
+      if (ents[t] == null) { ents[t] = a.ents[t]; recency[t] = i; pos[t] = a.at?.[t] ?? 0; }
+      const v = String(a.ents[t]);
+      if (!(all[t] ??= []).includes(v)) {
+        all[t].push(v);
+        if (t === 'dir' && a.searchDir) searchRoots.add(v); // its newest use was as a search root
+      }
     }
   });
-  const entOrder = Object.keys(ents).sort((a, b) => recency[a] - recency[b] || ENT_TYPES.indexOf(a) - ENT_TYPES.indexOf(b));
-  const ctx = { n: recent.length, ents, all, currentBranch: current, entOrder, last, cwdFlags: cwdFlags(cwd) };
+  const byType = (a, b) => ENT_TYPES.indexOf(a) - ENT_TYPES.indexOf(b);
+  const entOrder = Object.keys(ents).sort((a, b) => recency[a] - recency[b] || byType(a, b));
+  const refOrder = Object.keys(ents).sort((a, b) => recency[a] - recency[b] || pos[b] - pos[a] || byType(a, b));
+  const ctx = { n: recent.length, ents, all, currentBranch: current, entOrder, refOrder, searchRoots, last, cwdFlags: cwdFlags(cwd) };
   ctx.features = ctxFeatures(ctx);
   return ctx;
 }
@@ -746,13 +775,14 @@ export function resolveReference(query, ctx) {
   if (named.length && !types?.length) {
     return { rule: 'refused', intent: null, ent: named[0], note: `no ${named[0]} in the recent history; not guessing` };
   }
-  const ent = (types && types.length ? types : ctx.entOrder)[0];
+  const order = ctx.refOrder || ctx.entOrder;
+  const ent = (types && types.length ? types : order)[0];
   if (!ent) return null;
   let intent = null;
   let verb = null;
   for (const [name, re, table] of VERBS) {
     if (re.test(fq)) {
-      const pick = table[ent] || (!types && ctx.entOrder.map((e) => table[e]).find(Boolean));
+      const pick = table[ent] || (!types && order.map((e) => table[e]).find(Boolean));
       if (pick) { intent = pick; verb = name; break; }
     }
   }
@@ -761,11 +791,17 @@ export function resolveReference(query, ctx) {
   if (value == null || isAmbiguous(value)) {
     return { rule: 'refused', intent, ent: finalEnt, note: `the latest ${finalEnt} in history (${rawOf(value ?? '?')}) cannot be read unambiguously; not guessing` };
   }
+  // `find /var/log -name '*.gz'` + "delete them": the search root is not what the search found
+  const searchRoot = finalEnt === 'dir' && !!ctx.searchRoots?.has(String(value));
+  if (searchRoot && intent && BY_ID[intent].risk !== 'safe') {
+    return { rule: 'refused', intent, ent: finalEnt, note: `the latest dir in history (${value}) is where a search ran, not what it found; not guessing` };
+  }
   if (intent === 'kill_by_name' && FORCE.test(fq)) intent = 'kill_force';
   if (intent === 'extract_targz' && /\.zip$/i.test(value)) intent = 'extract_zip';
   const fill = {};
   for (const s of SLOT_FROM_ENT[finalEnt] || []) fill[s] = value;
-  return { rule: 'pronoun', intent, fill, ent: finalEnt, note: `"${finalEnt}" from history = ${value}` };
+  // searchRoot: the caller must not use the value for a non-safe intent it picks itself
+  return { rule: 'pronoun', intent, fill, ent: finalEnt, ...(searchRoot ? { searchRoot: true } : {}), note: `"${finalEnt}" from history = ${value}` };
 }
 
 /**
@@ -776,7 +812,9 @@ function chooseValue(type, fq, ctx, verb) {
   // the newest value cannot be read ($BACKUP, a glob, an unknown command): never fall back to an older one
   if (isAmbiguous(ctx.ents[type])) return ctx.ents[type];
   let vals = ctx.all?.[type] || (ctx.ents[type] != null ? [String(ctx.ents[type])] : []);
-  const words = fq.split(/[^a-z0-9]+/).filter((w) => w.length >= 4 && !/^(that|this|branch|file|plik|galez|container|kontener|service|usluga|back)$/.test(w));
+  // only words that identify a target count, not the action, pronoun or filler words of the request
+  // ("remove it" must not pick /srv/remove-backups over the newer /srv/current)
+  const words = fq.split(/[^a-z0-9]+/).filter(isHintWord);
   const named = vals.find((v) => !isAmbiguous(v) && words.some((w) => foldKeepLength(v).toLowerCase().includes(w)));
   if (named) return named;
   if (type === 'branch' && (verb === 'delete' || verb === 'switch') && ctx.currentBranch) {
@@ -785,6 +823,10 @@ function chooseValue(type, fq, ctx, verb) {
   }
   return vals[0];
 }
+
+const NOT_HINT = /^(that|this|branch|file|plik|galez|container|kontener|service|usluga|back|list\w*|wylistuj\w*|check|sprawdz\w*|wipe|nuke|purge|destroy|clear|clean\w*|wyczysc\w*|drop|what|which|where|about|with|from|into|then|also|again|teraz|jeszcze)$/;
+const isHintWord = (w) => w.length >= 4 && !NOT_HINT.test(w) && !isStopWord(w) && !PRONOUN_WORD.test(w) && !FORCE.test(w)
+  && !VERBS.some(([, re]) => re.test(w)) && !NOUN_TYPE.some(([re]) => re.test(w));
 
 /** Implicit references ("ile ma słów", "md5 of the same file"): fill a missing slot from history. */
 export function entityForSlot(slot, ctx) {
@@ -816,5 +858,5 @@ function intentUses(intent, ent) {
 }
 function pickEnt(intent, ent, ctx) {
   if (intentUses(intent, ent)) return ent;
-  return ctx.entOrder.find((e) => intentUses(intent, e)) || ent;
+  return (ctx.refOrder || ctx.entOrder).find((e) => intentUses(intent, e)) || ent;
 }

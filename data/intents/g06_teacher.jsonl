@@ -27,7 +27,6 @@
 {"text":"biggest folders in C:\\temp","intent":"largest_dirs","lang":"en","shell":"cmd","os":"win32","src":"teacher"}
 {"text":"du na podkatalogach /var/log, posortowane, najwieksze na gorze","intent":"largest_dirs","lang":"pl","shell":"bash","os":"linux","src":"teacher"}
 {"text":"how much free space is left on my disks","intent":"disk_free","lang":"en","shell":"bash","os":"linux","src":"teacher"}
-{"text":"df -h please","intent":"disk_free","lang":"en","shell":"bash","os":"linux","src":"teacher"}
 {"text":"ile wolnego miejsca na partycjach","intent":"disk_free","lang":"pl","shell":"bash","os":"linux","src":"teacher"}
 {"text":"is my SSD almost full? show free space","intent":"disk_free","lang":"en","shell":"zsh","os":"darwin","src":"teacher"}
 {"text":"sprawdz wolne miejsce na dyskach","intent":"disk_free","lang":"pl","shell":"zsh","os":"darwin","src":"teacher"}
@@ -240,7 +239,6 @@
 {"text":"list zero-byte files in /var/log","intent":"empty_files","lang":"en","shell":"bash","os":"linux","src":"teacher"}
 {"text":"znajdź puste pliki w /srv/data","intent":"empty_files","lang":"pl","shell":"bash","os":"linux","src":"teacher"}
 {"text":"pliki o rozmiarze 0 bajtow w /tmp","intent":"empty_files","lang":"pl","shell":"bash","os":"linux","src":"teacher"}
-{"text":"any empty files in ~/Documents?","intent":"empty_files","lang":"en","shell":"zsh","os":"darwin","src":"teacher"}
 {"text":"pokaz puste pliki w ~/repo","intent":"empty_files","lang":"pl","shell":"zsh","os":"darwin","src":"teacher"}
 {"text":"find empty files in C:\\Data","intent":"empty_files","lang":"en","shell":"powershell","os":"win32","src":"teacher"}
 {"text":"puste pliki w D:\\Eksport","intent":"empty_files","lang":"pl","shell":"powershell","os":"win32","src":"teacher"}
@@ -278,7 +276,6 @@
 {"text":"zduplikowane pliki w /data","intent":"duplicate_files","lang":"pl","shell":"sh","os":"linux","src":"teacher"}
 {"text":"find duplicate files in C:\\docs","intent":"duplicate_files","lang":"en","shell":"cmd","os":"win32","src":"teacher"}
 {"text":"which files in ./assets are dupes?","intent":"duplicate_files","lang":"en","shell":"bash","os":"linux","src":"teacher"}
-{"text":"list symlinks in /usr/local/bin","intent":"find_symlinks","lang":"en","shell":"bash","os":"linux","src":"teacher"}
 {"text":"find all symbolic links under /etc","intent":"find_symlinks","lang":"en","shell":"bash","os":"linux","src":"teacher"}
 {"text":"pokaż dowiązania symboliczne w /opt","intent":"find_symlinks","lang":"pl","shell":"bash","os":"linux","src":"teacher"}
 {"text":"znajdz symlinki w /home/dev","intent":"find_symlinks","lang":"pl","shell":"bash","os":"linux","src":"teacher"}
@@ -411,7 +408,6 @@
 {"text":"śledź plik D:\\logi\\app.log na żywo","intent":"tail_follow","lang":"pl","shell":"powershell","os":"win32","src":"teacher"}
 {"text":"Get-Content C:\\temp\\job.log -Wait","intent":"tail_follow","lang":"en","shell":"powershell","os":"win32","src":"teacher"}
 {"text":"podgladaj na biezaco C:\\serwis\\log.txt","intent":"tail_follow","lang":"pl","shell":"powershell","os":"win32","src":"teacher"}
-{"text":"live tail of worker.log","intent":"tail_follow","lang":"en","shell":"fish","os":"linux","src":"teacher"}
 {"text":"tail -f /var/log/cron","intent":"tail_follow","lang":"pl","shell":"sh","os":"linux","src":"teacher"}
 {"text":"follow C:\\logs\\build.log live","intent":"tail_follow","lang":"en","shell":"cmd","os":"win32","src":"teacher"}
 {"text":"stream new lines from /var/log/kern.log","intent":"tail_follow","lang":"en","shell":"bash","os":"linux","src":"teacher"}
@@ -568,7 +564,6 @@
 {"text":"usuń plik D:\\pobrane\\smieci.zip","intent":"delete_file","lang":"pl","shell":"powershell","os":"win32","src":"teacher"}
 {"text":"Remove-Item C:\\Users\\me\\test.txt","intent":"delete_file","lang":"en","shell":"powershell","os":"win32","src":"teacher"}
 {"text":"skasuj plik C:\\dane\\stary.csv","intent":"delete_file","lang":"pl","shell":"powershell","os":"win32","src":"teacher"}
-{"text":"remove core.dump","intent":"delete_file","lang":"en","shell":"fish","os":"linux","src":"teacher"}
 {"text":"usun /tmp/x.pid","intent":"delete_file","lang":"pl","shell":"sh","os":"linux","src":"teacher"}
 {"text":"del C:\\work\\tmp.txt","intent":"delete_file","lang":"en","shell":"cmd","os":"win32","src":"teacher"}
 {"text":"get rid of the file nohup.out","intent":"delete_file","lang":"en","shell":"bash","os":"linux","src":"teacher"}
@@ -633,7 +628,6 @@
 {"text":"Get-Location","intent":"current_dir","lang":"en","shell":"powershell","os":"win32","src":"teacher"}
 {"text":"pokaz biezaca sciezke","intent":"current_dir","lang":"pl","shell":"powershell","os":"win32","src":"teacher"}
 {"text":"current dir?","intent":"current_dir","lang":"en","shell":"fish","os":"linux","src":"teacher"}
-{"text":"what folder am I in","intent":"current_dir","lang":"en","shell":"cmd","os":"win32","src":"teacher"}
 {"text":"which directory is this shell in","intent":"current_dir","lang":"en","shell":"bash","os":"linux","src":"teacher"}
 {"text":"create a symlink from /opt/app/current to /usr/local/app","intent":"create_symlink","lang":"en","shell":"bash","os":"linux","src":"teacher"}
 {"text":"ln -s ~/dotfiles/vimrc ~/.vimrc","intent":"create_symlink","lang":"en","shell":"bash","os":"linux","src":"teacher"}
@@ -803,7 +797,6 @@
 {"text":"kill -9 na procesie java","intent":"kill_force","lang":"pl","shell":"sh","os":"linux","src":"teacher"}
 {"text":"SIGKILL the hung python processes","intent":"kill_force","lang":"en","shell":"bash","os":"linux","src":"teacher"}
 {"text":"kill process with id 6620","intent":"kill_by_pid","lang":"en","shell":"powershell","os":"win32","src":"teacher"}
-{"text":"zabij pid 8800","intent":"kill_by_pid","lang":"pl","shell":"powershell","os":"win32","src":"teacher"}
 {"text":"kill the process listening on 5173","intent":"kill_by_port","lang":"en","shell":"zsh","os":"darwin","src":"teacher"}
 {"text":"zabij to co siedzi na porcie 4200","intent":"kill_by_port","lang":"pl","shell":"zsh","os":"darwin","src":"teacher"}
 {"text":"kill the process using port 443","intent":"kill_by_port","lang":"en","shell":"powershell","os":"win32","src":"teacher"}
@@ -825,9 +818,7 @@
 {"text":"which program is using port 445","intent":"process_on_port","lang":"en","shell":"cmd","os":"win32","src":"teacher"}
 {"text":"active tcp connections","intent":"established_connections","lang":"en","shell":"bash","os":"linux","src":"teacher"}
 {"text":"list established connections","intent":"established_connections","lang":"en","shell":"zsh","os":"darwin","src":"teacher"}
-{"text":"jakie mam aktywne polaczenia","intent":"established_connections","lang":"pl","shell":"zsh","os":"darwin","src":"teacher"}
 {"text":"Get-NetTCPConnection -State Established","intent":"established_connections","lang":"en","shell":"powershell","os":"win32","src":"teacher"}
-{"text":"z kim jest teraz polaczony komputer","intent":"established_connections","lang":"pl","shell":"powershell","os":"win32","src":"teacher"}
 {"text":"established connections","intent":"established_connections","lang":"en","shell":"fish","os":"linux","src":"teacher"}
 {"text":"polaczenia ESTABLISHED","intent":"established_connections","lang":"pl","shell":"sh","os":"linux","src":"teacher"}
 {"text":"active network connections","intent":"established_connections","lang":"en","shell":"cmd","os":"win32","src":"teacher"}
@@ -857,7 +848,6 @@
 {"text":"wersja kernela windows","intent":"kernel_version","lang":"pl","shell":"powershell","os":"win32","src":"teacher"}
 {"text":"which linux kernel am I on","intent":"kernel_version","lang":"en","shell":"bash","os":"linux","src":"teacher"}
 {"text":"how much memory is used","intent":"memory_usage","lang":"en","shell":"zsh","os":"darwin","src":"teacher"}
-{"text":"ile ramu zostalo","intent":"memory_usage","lang":"pl","shell":"zsh","os":"darwin","src":"teacher"}
 {"text":"ile mam wolnego RAM","intent":"memory_usage","lang":"pl","shell":"powershell","os":"win32","src":"teacher"}
 {"text":"ile pamieci wolnej","intent":"memory_usage","lang":"pl","shell":"sh","os":"linux","src":"teacher"}
 {"text":"how much RAM is available","intent":"memory_usage","lang":"en","shell":"cmd","os":"win32","src":"teacher"}
@@ -913,7 +903,6 @@
 {"text":"list zero-byte files in ~/projects","intent":"empty_files","lang":"en","shell":"bash","os":"linux","src":"teacher"}
 {"text":"empty files in ./data","intent":"empty_files","lang":"en","shell":"bash","os":"linux","src":"teacher"}
 {"text":"znajdź puste pliki w /srv/uploads","intent":"empty_files","lang":"pl","shell":"bash","os":"linux","src":"teacher"}
-{"text":"puste pliki w ~/projekty","intent":"empty_files","lang":"pl","shell":"bash","os":"linux","src":"teacher"}
 {"text":"pliki o zerowym rozmiarze w ./data","intent":"empty_files","lang":"pl","shell":"bash","os":"linux","src":"teacher"}
 {"text":"find empty files in D:\\Import","intent":"empty_files","lang":"en","shell":"powershell","os":"win32","src":"teacher"}
 {"text":"puste pliki w D:\\Import","intent":"empty_files","lang":"pl","shell":"powershell","os":"win32","src":"teacher"}
@@ -927,7 +916,6 @@
 {"text":"find empty folders in D:\\Import","intent":"empty_dirs","lang":"en","shell":"powershell","os":"win32","src":"teacher"}
 {"text":"puste foldery w D:\\Import","intent":"empty_dirs","lang":"pl","shell":"powershell","os":"win32","src":"teacher"}
 {"text":"which folders are empty in ~/notes","intent":"empty_dirs","lang":"en","shell":"zsh","os":"darwin","src":"teacher"}
-{"text":"ktore katalogi sa puste w ~/notatki","intent":"empty_dirs","lang":"pl","shell":"zsh","os":"darwin","src":"teacher"}
 {"text":"find .txt files in /srv/uploads","intent":"find_by_ext","lang":"en","shell":"bash","os":"linux","src":"teacher"}
 {"text":"list .json files in ~/projects","intent":"find_by_ext","lang":"en","shell":"bash","os":"linux","src":"teacher"}
 {"text":".csv files in ./data","intent":"find_by_ext","lang":"en","shell":"bash","os":"linux","src":"teacher"}
@@ -965,12 +953,10 @@
 {"text":"pliki z kropką na początku w ~/projekty","intent":"hidden_files","lang":"pl","shell":"bash","os":"linux","src":"teacher"}
 {"text":"ukryte pliki w D:\\Import","intent":"hidden_files","lang":"pl","shell":"powershell","os":"win32","src":"teacher"}
 {"text":"hidden files in D:\\Import","intent":"hidden_files","lang":"en","shell":"powershell","os":"win32","src":"teacher"}
-{"text":"how much space is left on the disk","intent":"disk_free","lang":"en","shell":"bash","os":"linux","src":"teacher"}
 {"text":"free space on my partitions","intent":"disk_free","lang":"en","shell":"bash","os":"linux","src":"teacher"}
 {"text":"is the disk full?","intent":"disk_free","lang":"en","shell":"bash","os":"linux","src":"teacher"}
 {"text":"how much storage do I have left","intent":"disk_free","lang":"en","shell":"zsh","os":"darwin","src":"teacher"}
 {"text":"free space on drive D:","intent":"disk_free","lang":"en","shell":"powershell","os":"win32","src":"teacher"}
-{"text":"df -h","intent":"disk_free","lang":"pl","shell":"bash","os":"linux","src":"teacher"}
 {"text":"czy dysk jest pełny?","intent":"disk_free","lang":"pl","shell":"bash","os":"linux","src":"teacher"}
 {"text":"ile mam jeszcze miejsca","intent":"disk_free","lang":"pl","shell":"zsh","os":"darwin","src":"teacher"}
 {"text":"ile wolnego miejsca na dysku D:","intent":"disk_free","lang":"pl","shell":"powershell","os":"win32","src":"teacher"}
@@ -1014,11 +1000,9 @@
 {"text":"wartosc SHELL","intent":"env_var_get","lang":"pl","shell":"zsh","os":"darwin","src":"teacher"}
 {"text":"pokaż $env:USERPROFILE","intent":"env_var_get","lang":"pl","shell":"powershell","os":"win32","src":"teacher"}
 {"text":"echo %TEMP%","intent":"env_var_get","lang":"en","shell":"cmd","os":"win32","src":"teacher"}
-{"text":"who is logged in now","intent":"users_logged_in","lang":"en","shell":"bash","os":"linux","src":"teacher"}
 {"text":"which users are logged in","intent":"users_logged_in","lang":"en","shell":"bash","os":"linux","src":"teacher"}
 {"text":"who is currently on this server","intent":"users_logged_in","lang":"en","shell":"bash","os":"linux","src":"teacher"}
 {"text":"list users currently signed in","intent":"users_logged_in","lang":"en","shell":"powershell","os":"win32","src":"teacher"}
-{"text":"którzy użytkownicy są teraz zalogowani","intent":"users_logged_in","lang":"pl","shell":"bash","os":"linux","src":"teacher"}
 {"text":"kto teraz siedzi na serwerze","intent":"users_logged_in","lang":"pl","shell":"bash","os":"linux","src":"teacher"}
 {"text":"lista aktualnie zalogowanych uzytkownikow","intent":"users_logged_in","lang":"pl","shell":"powershell","os":"win32","src":"teacher"}
 {"text":"query user","intent":"users_logged_in","lang":"en","shell":"cmd","os":"win32","src":"teacher"}
@@ -1100,11 +1084,9 @@
 {"text":"what changed today across the whole drive","intent":"find_recent","lang":"en","shell":"powershell","os":"win32","src":"teacher"}
 {"text":"co sie zmienilo dzis w calym systemie","intent":"find_recent","lang":"pl","shell":"zsh","os":"darwin","src":"teacher"}
 {"text":"empty files on the whole disk","intent":"empty_files","lang":"en","shell":"bash","os":"linux","src":"teacher"}
-{"text":"puste pliki na dysku D:","intent":"empty_files","lang":"pl","shell":"powershell","os":"win32","src":"teacher"}
 {"text":"zero-byte files across the entire drive","intent":"empty_files","lang":"en","shell":"zsh","os":"darwin","src":"teacher"}
 {"text":"list all symlinks on the whole disk","intent":"find_symlinks","lang":"en","shell":"bash","os":"linux","src":"teacher"}
 {"text":"wszystkie dowiązania symboliczne w całym systemie","intent":"find_symlinks","lang":"pl","shell":"bash","os":"linux","src":"teacher"}
-{"text":"symlinki na calym dysku","intent":"find_symlinks","lang":"pl","shell":"zsh","os":"darwin","src":"teacher"}
 {"text":"zepsute dowiązania symboliczne na całym dysku","intent":"broken_symlinks","lang":"pl","shell":"bash","os":"linux","src":"teacher"}
 {"text":"dangling links across the entire system","intent":"broken_symlinks","lang":"en","shell":"zsh","os":"darwin","src":"teacher"}
 {"text":"martwe symlinki na dysku C:","intent":"broken_symlinks","lang":"pl","shell":"powershell","os":"win32","src":"teacher"}
@@ -1117,23 +1099,19 @@
 {"text":"whats the name of this mac on the network","intent":"hostname","lang":"en","shell":"zsh","os":"darwin","src":"teacher"}
 {"text":"$env:COMPUTERNAME? just tell me the computer name","intent":"hostname","lang":"en","shell":"powershell","os":"win32","src":"teacher"}
 {"text":"what is the hostname of this windows box","intent":"hostname","lang":"en","shell":"powershell","os":"win32","src":"teacher"}
-{"text":"hostname pls","intent":"hostname","lang":"en","shell":"fish","os":"linux","src":"teacher"}
 {"text":"show computer name","intent":"hostname","lang":"en","shell":"cmd","os":"win32","src":"teacher"}
 {"text":"jak się nazywa ten serwer","intent":"hostname","lang":"pl","shell":"bash","os":"linux","src":"teacher"}
 {"text":"jaka jest nazwa tego maca w sieci?","intent":"hostname","lang":"pl","shell":"zsh","os":"darwin","src":"teacher"}
 {"text":"hostname tej maszyny","intent":"hostname","lang":"pl","shell":"sh","os":"linux","src":"teacher"}
-{"text":"na jakim hoście jestem teraz?","intent":"hostname","lang":"pl","shell":"bash","os":"linux","src":"teacher"}
 {"text":"jak sie nazywa ten komputer z windowsem","intent":"hostname","lang":"pl","shell":"powershell","os":"win32","src":"teacher"}
 {"text":"which user account is this shell running under","intent":"whoami","lang":"en","shell":"zsh","os":"darwin","src":"teacher"}
 {"text":"what's my current windows username","intent":"whoami","lang":"en","shell":"powershell","os":"win32","src":"teacher"}
 {"text":"show my user name","intent":"whoami","lang":"en","shell":"cmd","os":"win32","src":"teacher"}
-{"text":"am i root right now?","intent":"whoami","lang":"en","shell":"bash","os":"linux","src":"teacher"}
 {"text":"ktory to user","intent":"whoami","lang":"pl","shell":"bash","os":"linux","src":"teacher"}
 {"text":"jaki mam login w tym terminalu","intent":"whoami","lang":"pl","shell":"zsh","os":"darwin","src":"teacher"}
 {"text":"na jakim koncie siedze","intent":"whoami","lang":"pl","shell":"fish","os":"linux","src":"teacher"}
 {"text":"czy jestem rootem czy zwyklym userem?","intent":"whoami","lang":"pl","shell":"bash","os":"linux","src":"teacher"}
 {"text":"kim jestem w tym cmd","intent":"whoami","lang":"pl","shell":"cmd","os":"win32","src":"teacher"}
-{"text":"who else is logged in right now","intent":"users_logged_in","lang":"en","shell":"bash","os":"linux","src":"teacher"}
 {"text":"list users currently on this box","intent":"users_logged_in","lang":"en","shell":"bash","os":"linux","src":"teacher"}
 {"text":"show active sessions on this mac","intent":"users_logged_in","lang":"en","shell":"zsh","os":"darwin","src":"teacher"}
 {"text":"which users are logged on to this server","intent":"users_logged_in","lang":"en","shell":"powershell","os":"win32","src":"teacher"}
@@ -1170,7 +1148,6 @@
 {"text":"ile wynosi zmienna PAGER","intent":"env_var_get","lang":"pl","shell":"fish","os":"linux","src":"teacher"}
 {"text":"sprawdź zmienną NODE_ENV","intent":"env_var_get","lang":"pl","shell":"bash","os":"linux","src":"teacher"}
 {"text":"pokaz zmienna PATHEXT","intent":"env_var_get","lang":"pl","shell":"cmd","os":"win32","src":"teacher"}
-{"text":"where is python3 installed","intent":"which_cmd","lang":"en","shell":"bash","os":"linux","src":"teacher"}
 {"text":"which node binary am i using","intent":"which_cmd","lang":"en","shell":"bash","os":"linux","src":"teacher"}
 {"text":"path to the brew executable","intent":"which_cmd","lang":"en","shell":"zsh","os":"darwin","src":"teacher"}
 {"text":"where is git.exe located","intent":"which_cmd","lang":"en","shell":"powershell","os":"win32","src":"teacher"}
@@ -1219,7 +1196,6 @@
 {"text":"jaka strefa czasowa na tym komputerze","intent":"timezone","lang":"pl","shell":"powershell","os":"win32","src":"teacher"}
 {"text":"calendar for this month","intent":"calendar","lang":"en","shell":"bash","os":"linux","src":"teacher"}
 {"text":"print the cal for march 2027","intent":"calendar","lang":"en","shell":"zsh","os":"darwin","src":"teacher"}
-{"text":"show me a calendar","intent":"calendar","lang":"en","shell":"powershell","os":"win32","src":"teacher"}
 {"text":"what day of week is the 1st of next month, show calendar","intent":"calendar","lang":"en","shell":"bash","os":"linux","src":"teacher"}
 {"text":"monthly calendar","intent":"calendar","lang":"en","shell":"sh","os":"linux","src":"teacher"}
 {"text":"kalendarz na ten miesiąc","intent":"calendar","lang":"pl","shell":"bash","os":"linux","src":"teacher"}
@@ -1230,7 +1206,6 @@
 {"text":"do i have any cronjobs set up?","intent":"cron_list","lang":"en","shell":"bash","os":"linux","src":"teacher"}
 {"text":"wylistuj crontab","intent":"cron_list","lang":"pl","shell":"bash","os":"linux","src":"teacher"}
 {"text":"sprawdz czy jest jakis cron od backupu","intent":"cron_list","lang":"pl","shell":"bash","os":"linux","src":"teacher"}
-{"text":"i want to add a cron job","intent":"cron_edit","lang":"en","shell":"bash","os":"linux","src":"teacher"}
 {"text":"modify cron entries","intent":"cron_edit","lang":"en","shell":"bash","os":"linux","src":"teacher"}
 {"text":"schedule a new job in cron that runs nightly","intent":"cron_edit","lang":"en","shell":"bash","os":"linux","src":"teacher"}
 {"text":"chcę dodać zadanie do crona","intent":"cron_edit","lang":"pl","shell":"bash","os":"linux","src":"teacher"}
@@ -1293,7 +1268,6 @@
 {"text":"please stop the nginx daemon","intent":"service_stop","lang":"en","shell":"zsh","os":"darwin","src":"teacher"}
 {"text":"stop the windows update service","intent":"service_stop","lang":"en","shell":"powershell","os":"win32","src":"teacher"}
 {"text":"halt the cups service","intent":"service_stop","lang":"en","shell":"bash","os":"linux","src":"teacher"}
-{"text":"zatrzymaj usługę nginx","intent":"service_stop","lang":"pl","shell":"bash","os":"linux","src":"teacher"}
 {"text":"wyłącz serwis postgresql (stop)","intent":"service_stop","lang":"pl","shell":"bash","os":"linux","src":"teacher"}
 {"text":"stopnij usluge redis","intent":"service_stop","lang":"pl","shell":"zsh","os":"darwin","src":"teacher"}
 {"text":"zatrzymaj usługę BITS","intent":"service_stop","lang":"pl","shell":"powershell","os":"win32","src":"teacher"}
@@ -1352,7 +1326,6 @@
 {"text":"ostatnie wpisy z bufora jadra","intent":"dmesg","lang":"pl","shell":"bash","os":"linux","src":"teacher"}
 {"text":"Get-CimInstance Win32_Battery charge","intent":"battery","lang":"en","shell":"powershell","os":"win32","src":"teacher"}
 {"text":"poziom naładowania baterii","intent":"battery","lang":"pl","shell":"bash","os":"linux","src":"teacher"}
-{"text":"how hot is the processor","intent":"temperature","lang":"en","shell":"bash","os":"linux","src":"teacher"}
 {"text":"what's the cpu temp","intent":"temperature","lang":"en","shell":"powershell","os":"win32","src":"teacher"}
 {"text":"check the cpu temps, fans are loud","intent":"temperature","lang":"en","shell":"bash","os":"linux","src":"teacher"}
 {"text":"jak gorący jest cpu","intent":"temperature","lang":"pl","shell":"bash","os":"linux","src":"teacher"}
@@ -1397,7 +1370,6 @@
 {"text":"update all packages with winget","intent":"system_update","lang":"en","shell":"powershell","os":"win32","src":"teacher"}
 {"text":"update system packages","intent":"system_update","lang":"en","shell":"sh","os":"linux","src":"teacher"}
 {"text":"zrob apt update i upgrade","intent":"system_update","lang":"pl","shell":"bash","os":"linux","src":"teacher"}
-{"text":"aktualizacja wszystkich pakietów","intent":"system_update","lang":"pl","shell":"zsh","os":"darwin","src":"teacher"}
 {"text":"zainstaluj aktualizacje systemu","intent":"system_update","lang":"pl","shell":"powershell","os":"win32","src":"teacher"}
 {"text":"upgrade wszystkich paczek","intent":"system_update","lang":"pl","shell":"bash","os":"linux","src":"teacher"}
 {"text":"aktualizuj system","intent":"system_update","lang":"pl","shell":"cmd","os":"win32","src":"teacher"}
@@ -1447,7 +1419,6 @@
 {"text":"show network hops to github.com","intent":"traceroute","lang":"en","shell":"zsh","os":"darwin","src":"teacher"}
 {"text":"Test-NetConnection 1.1.1.1 -TraceRoute","intent":"traceroute","lang":"en","shell":"powershell","os":"win32","src":"teacher"}
 {"text":"where does traffic to api.example.com get lost, trace it","intent":"traceroute","lang":"en","shell":"bash","os":"linux","src":"teacher"}
-{"text":"traceroute 10.20.0.1","intent":"traceroute","lang":"en","shell":"sh","os":"linux","src":"teacher"}
 {"text":"traceroute do onet.pl","intent":"traceroute","lang":"pl","shell":"bash","os":"linux","src":"teacher"}
 {"text":"tracert do serwera vpn.firma.pl","intent":"traceroute","lang":"pl","shell":"powershell","os":"win32","src":"teacher"}
 {"text":"tracert wp.pl","intent":"traceroute","lang":"pl","shell":"cmd","os":"win32","src":"teacher"}
@@ -1526,7 +1497,6 @@
 {"text":"repo status","intent":"git_status","lang":"en","shell":"fish","os":"linux","src":"teacher"}
 {"text":"co jest niezacommitowane","intent":"git_status","lang":"pl","shell":"powershell","os":"win32","src":"teacher"}
 {"text":"czy mam jakies zmiany w repo","intent":"git_status","lang":"pl","shell":"bash","os":"linux","src":"teacher"}
-{"text":"git status pls","intent":"git_status","lang":"pl","shell":"sh","os":"linux","src":"teacher"}
 {"text":"pokaz zmodyfikowane i nieśledzone pliki","intent":"git_status","lang":"pl","shell":"bash","os":"linux","src":"teacher"}
 {"text":"git log last 20","intent":"git_log","lang":"en","shell":"bash","os":"linux","src":"teacher"}
 {"text":"last 5 commits as a graph","intent":"git_log","lang":"en","shell":"zsh","os":"darwin","src":"teacher"}
@@ -1537,7 +1507,6 @@
 {"text":"pokaż log gita","intent":"git_log","lang":"pl","shell":"powershell","os":"win32","src":"teacher"}
 {"text":"co ostatnio commitowano","intent":"git_log","lang":"pl","shell":"bash","os":"linux","src":"teacher"}
 {"text":"graf ostatnich 30 commitów","intent":"git_log","lang":"pl","shell":"bash","os":"linux","src":"teacher"}
-{"text":"show my unstaged changes","intent":"git_diff","lang":"en","shell":"bash","os":"linux","src":"teacher"}
 {"text":"what changed in src/app.ts","intent":"git_diff","lang":"en","shell":"zsh","os":"darwin","src":"teacher"}
 {"text":"diff of README.md","intent":"git_diff","lang":"en","shell":"powershell","os":"win32","src":"teacher"}
 {"text":"show uncommitted diff","intent":"git_diff","lang":"en","shell":"powershell","os":"win32","src":"teacher"}
@@ -1549,7 +1518,6 @@
 {"text":"jakie zmiany nie są jeszcze w stage","intent":"git_diff","lang":"pl","shell":"bash","os":"linux","src":"teacher"}
 {"text":"pokaz diff","intent":"git_diff","lang":"pl","shell":"sh","os":"linux","src":"teacher"}
 {"text":"różnice w src/main.go","intent":"git_diff","lang":"pl","shell":"bash","os":"linux","src":"teacher"}
-{"text":"show the staged diff","intent":"git_diff_staged","lang":"en","shell":"powershell","os":"win32","src":"teacher"}
 {"text":"co jest dodane do commita","intent":"git_diff_staged","lang":"pl","shell":"bash","os":"linux","src":"teacher"}
 {"text":"pokaż zastage'owane różnice","intent":"git_diff_staged","lang":"pl","shell":"powershell","os":"win32","src":"teacher"}
 {"text":"pokaz diff tego co juz dodalem git addem","intent":"git_diff_staged","lang":"pl","shell":"bash","os":"linux","src":"teacher"}
@@ -1559,7 +1527,6 @@
 {"text":"pokaż wszystkie branche","intent":"git_branches","lang":"pl","shell":"bash","os":"linux","src":"teacher"}
 {"text":"jakie mam branche lokalnie i na remote","intent":"git_branches","lang":"pl","shell":"zsh","os":"darwin","src":"teacher"}
 {"text":"wylistuj gałęzie","intent":"git_branches","lang":"pl","shell":"powershell","os":"win32","src":"teacher"}
-{"text":"pokaz galezie","intent":"git_branches","lang":"pl","shell":"bash","os":"linux","src":"teacher"}
 {"text":"wszystkie branche","intent":"git_branches","lang":"pl","shell":"fish","os":"linux","src":"teacher"}
 {"text":"what's the name of this branch","intent":"git_current_branch","lang":"en","shell":"zsh","os":"darwin","src":"teacher"}
 {"text":"jaka jest aktualna gałąź","intent":"git_current_branch","lang":"pl","shell":"bash","os":"linux","src":"teacher"}
@@ -1579,7 +1546,6 @@
 {"text":"załóż branch refactor-api","intent":"git_new_branch","lang":"pl","shell":"bash","os":"linux","src":"teacher"}
 {"text":"nowy branch test/e2e","intent":"git_new_branch","lang":"pl","shell":"fish","os":"linux","src":"teacher"}
 {"text":"zrob galaz feature/eksport-csv","intent":"git_new_branch","lang":"pl","shell":"bash","os":"linux","src":"teacher"}
-{"text":"switch to develop","intent":"git_switch_branch","lang":"en","shell":"bash","os":"linux","src":"teacher"}
 {"text":"go to the branch feature/search","intent":"git_switch_branch","lang":"en","shell":"zsh","os":"darwin","src":"teacher"}
 {"text":"git checkout staging","intent":"git_switch_branch","lang":"en","shell":"powershell","os":"win32","src":"teacher"}
 {"text":"change branch to fix/typo","intent":"git_switch_branch","lang":"en","shell":"bash","os":"linux","src":"teacher"}
@@ -1591,7 +1557,6 @@
 {"text":"checkoutnij release/3.1","intent":"git_switch_branch","lang":"pl","shell":"bash","os":"linux","src":"teacher"}
 {"text":"przelacz na master","intent":"git_switch_branch","lang":"pl","shell":"sh","os":"linux","src":"teacher"}
 {"text":"wróć na brancha dev","intent":"git_switch_branch","lang":"pl","shell":"bash","os":"linux","src":"teacher"}
-{"text":"delete branch feature/old-ui","intent":"git_delete_branch","lang":"en","shell":"bash","os":"linux","src":"teacher"}
 {"text":"remove the local branch fix/temp","intent":"git_delete_branch","lang":"en","shell":"bash","os":"linux","src":"teacher"}
 {"text":"delete branch experiment","intent":"git_delete_branch","lang":"en","shell":"zsh","os":"darwin","src":"teacher"}
 {"text":"git branch -d hotfix/123","intent":"git_delete_branch","lang":"en","shell":"powershell","os":"win32","src":"teacher"}
@@ -1605,12 +1570,10 @@
 {"text":"wywal brancha experiment-redis","intent":"git_delete_branch","lang":"pl","shell":"bash","os":"linux","src":"teacher"}
 {"text":"usun branch old","intent":"git_delete_branch","lang":"pl","shell":"sh","os":"linux","src":"teacher"}
 {"text":"skasuj zmergowany branch release/2.2","intent":"git_delete_branch","lang":"pl","shell":"bash","os":"linux","src":"teacher"}
-{"text":"undo the last commit but keep my changes","intent":"git_undo_commit","lang":"en","shell":"bash","os":"linux","src":"teacher"}
 {"text":"revert last commit softly","intent":"git_undo_commit","lang":"en","shell":"bash","os":"linux","src":"teacher"}
 {"text":"uncommit the latest commit","intent":"git_undo_commit","lang":"en","shell":"zsh","os":"darwin","src":"teacher"}
 {"text":"git reset --soft HEAD~1","intent":"git_undo_commit","lang":"en","shell":"powershell","os":"win32","src":"teacher"}
 {"text":"i committed too early, undo it but keep files","intent":"git_undo_commit","lang":"en","shell":"bash","os":"linux","src":"teacher"}
-{"text":"undo last commit","intent":"git_undo_commit","lang":"en","shell":"sh","os":"linux","src":"teacher"}
 {"text":"cofnij ostatni commit ale zostaw zmiany","intent":"git_undo_commit","lang":"pl","shell":"bash","os":"linux","src":"teacher"}
 {"text":"odkomituj ostatni commit","intent":"git_undo_commit","lang":"pl","shell":"bash","os":"linux","src":"teacher"}
 {"text":"cofnij commita, zmiany zostaw","intent":"git_undo_commit","lang":"pl","shell":"zsh","os":"darwin","src":"teacher"}
@@ -1623,10 +1586,8 @@
 {"text":"discard changes in app.py","intent":"git_discard_changes","lang":"en","shell":"powershell","os":"win32","src":"teacher"}
 {"text":"undo all local edits","intent":"git_discard_changes","lang":"en","shell":"powershell","os":"win32","src":"teacher"}
 {"text":"reset the file Makefile to the last commit","intent":"git_discard_changes","lang":"en","shell":"bash","os":"linux","src":"teacher"}
-{"text":"discard changes","intent":"git_discard_changes","lang":"en","shell":"cmd","os":"win32","src":"teacher"}
 {"text":"wycofaj zmiany w pliku index.html","intent":"git_discard_changes","lang":"pl","shell":"bash","os":"linux","src":"teacher"}
 {"text":"wywal moje zmiany w repo","intent":"git_discard_changes","lang":"pl","shell":"bash","os":"linux","src":"teacher"}
-{"text":"odrzuc zmiany","intent":"git_discard_changes","lang":"pl","shell":"sh","os":"linux","src":"teacher"}
 {"text":"cofnij edycje w pliku README.md","intent":"git_discard_changes","lang":"pl","shell":"bash","os":"linux","src":"teacher"}
 {"text":"stash current changes","intent":"git_stash","lang":"en","shell":"powershell","os":"win32","src":"teacher"}
 {"text":"save uncommitted work to stash","intent":"git_stash","lang":"en","shell":"powershell","os":"win32","src":"teacher"}
@@ -1731,7 +1692,6 @@
 {"text":"tail the redis container logs","intent":"docker_logs","lang":"en","shell":"powershell","os":"win32","src":"teacher"}
 {"text":"what is container worker printing","intent":"docker_logs","lang":"en","shell":"bash","os":"linux","src":"teacher"}
 {"text":"docker logs app","intent":"docker_logs","lang":"en","shell":"sh","os":"linux","src":"teacher"}
-{"text":"logi kontenera web","intent":"docker_logs","lang":"pl","shell":"bash","os":"linux","src":"teacher"}
 {"text":"pokaz logi kontenera api ostatnie 100 linii","intent":"docker_logs","lang":"pl","shell":"bash","os":"linux","src":"teacher"}
 {"text":"sledz logi kontenera mongo","intent":"docker_logs","lang":"pl","shell":"zsh","os":"darwin","src":"teacher"}
 {"text":"logi z kontenera backend","intent":"docker_logs","lang":"pl","shell":"powershell","os":"win32","src":"teacher"}
@@ -1870,7 +1830,6 @@
 {"text":"stop the process listening on port 5000","intent":"kill_by_port","lang":"en","shell":"powershell","os":"win32","src":"teacher"}
 {"text":"pkill -f gunicorn","intent":"kill_by_name","lang":"en","shell":"bash","os":"linux","src":"teacher"}
 {"text":"find process postgres","intent":"find_process","lang":"en","shell":"sh","os":"linux","src":"teacher"}
-{"text":"zabij wszystkie procesy chrome","intent":"kill_by_name","lang":"pl","shell":"bash","os":"linux","src":"teacher"}
 {"text":"skiluj node","intent":"kill_by_name","lang":"pl","shell":"bash","os":"linux","src":"teacher"}
 {"text":"zatrzymaj proces notepad","intent":"kill_by_name","lang":"pl","shell":"powershell","os":"win32","src":"teacher"}
 {"text":"killnij procesy python o nazwie worker.py","intent":"kill_by_name","lang":"pl","shell":"bash","os":"linux","src":"teacher"}
@@ -1900,7 +1859,6 @@
 {"text":"czy dojde do api.internal na 8443","intent":"port_check","lang":"pl","shell":"zsh","os":"darwin","src":"teacher"}
 {"text":"sprawdź port 80 na web01","intent":"port_check","lang":"pl","shell":"powershell","os":"win32","src":"teacher"}
 {"text":"ktory proces uzywa portu 9000","intent":"process_on_port","lang":"pl","shell":"bash","os":"linux","src":"teacher"}
-{"text":"which containers are up right now","intent":"docker_ps","lang":"en","shell":"bash","os":"linux","src":"teacher"}
 {"text":"list all containers, including stopped","intent":"docker_ps_all","lang":"en","shell":"zsh","os":"darwin","src":"teacher"}
 {"text":"show exited containers too","intent":"docker_ps_all","lang":"en","shell":"powershell","os":"win32","src":"teacher"}
 {"text":"which images are on this host","intent":"docker_images","lang":"en","shell":"bash","os":"linux","src":"teacher"}
@@ -1920,7 +1878,6 @@
 {"text":"start the redis service","intent":"service_start","lang":"en","shell":"bash","os":"linux","src":"teacher"}
 {"text":"stop the redis service","intent":"service_stop","lang":"en","shell":"bash","os":"linux","src":"teacher"}
 {"text":"enable redis to start at boot","intent":"service_enable","lang":"en","shell":"bash","os":"linux","src":"teacher"}
-{"text":"restart postgresql","intent":"service_restart","lang":"en","shell":"zsh","os":"darwin","src":"teacher"}
 {"text":"start postgresql","intent":"service_start","lang":"en","shell":"zsh","os":"darwin","src":"teacher"}
 {"text":"Stop-Service Spooler","intent":"service_stop","lang":"en","shell":"powershell","os":"win32","src":"teacher"}
 {"text":"Start-Service Spooler","intent":"service_start","lang":"en","shell":"powershell","os":"win32","src":"teacher"}
@@ -1932,7 +1889,6 @@
 {"text":"uruchom usługę redis","intent":"service_start","lang":"pl","shell":"bash","os":"linux","src":"teacher"}
 {"text":"włącz redis przy starcie systemu","intent":"service_enable","lang":"pl","shell":"bash","os":"linux","src":"teacher"}
 {"text":"wystartuj postgresql","intent":"service_start","lang":"pl","shell":"zsh","os":"darwin","src":"teacher"}
-{"text":"zatrzymaj usługę Spooler","intent":"service_stop","lang":"pl","shell":"powershell","os":"win32","src":"teacher"}
 {"text":"ustaw Spooler na start automatyczny","intent":"service_enable","lang":"pl","shell":"powershell","os":"win32","src":"teacher"}
 {"text":"zrob restart apache2","intent":"service_restart","lang":"pl","shell":"bash","os":"linux","src":"teacher"}
 {"text":"wylacz usluge cups","intent":"service_stop","lang":"pl","shell":"bash","os":"linux","src":"teacher"}
@@ -1945,7 +1901,6 @@
 {"text":"ipconfig, local addresses","intent":"ip_addresses","lang":"en","shell":"powershell","os":"win32","src":"teacher"}
 {"text":"which ip does the internet see","intent":"public_ip","lang":"en","shell":"bash","os":"linux","src":"teacher"}
 {"text":"my WAN ip please","intent":"public_ip","lang":"en","shell":"powershell","os":"win32","src":"teacher"}
-{"text":"what's the default gateway","intent":"routes","lang":"en","shell":"bash","os":"linux","src":"teacher"}
 {"text":"netstat -rn routes","intent":"routes","lang":"en","shell":"zsh","os":"darwin","src":"teacher"}
 {"text":"curl ifconfig.me","intent":"public_ip","lang":"en","shell":"bash","os":"linux","src":"teacher"}
 {"text":"adres ip interfejsu eth0","intent":"ip_addresses","lang":"pl","shell":"bash","os":"linux","src":"teacher"}
