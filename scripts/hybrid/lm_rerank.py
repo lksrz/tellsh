@@ -167,14 +167,23 @@ def cmd_train(a):
         lists = [candidate_list(r, brng, train=True) for r in batch]
         prompts = [P(r['text'], r['shell'], r['os'], c) for r, c in zip(batch, lists)]
         y = torch.tensor([c.index(r['intent']) for r, c in zip(batch, lists)])
-        enc = tok(prompts, return_tensors='pt', padding=True, add_special_tokens=False)
-        lg = m(**enc, logits_to_keep=1).logits[:, -1, :][:, lid]  # cross-entropy over the 5 letters only
-        loss = torch.nn.functional.cross_entropy(lg, y)
         for g in opt.param_groups:
             g['lr'] = a.lr * sched(step)
-        opt.zero_grad(); loss.backward(); torch.nn.utils.clip_grad_norm_(params, 1.0); opt.step(); step += 1
+        opt.zero_grad()
+        # micro-batches (--accum) bound activation memory: fp32 batch-8 backward needs ~8 GB on this model
+        mb = math.ceil(a.bs / a.accum)
+        tot = 0.0
+        for i in range(0, a.bs, mb):
+            enc = tok(prompts[i:i + mb], return_tensors='pt', padding=True, pad_to_multiple_of=32, add_special_tokens=False)
+            lg = m(**enc, logits_to_keep=1).logits[:, -1, :][:, lid]  # cross-entropy over the 5 letters only
+            part = torch.nn.functional.cross_entropy(lg, y[i:i + mb], reduction='sum') / a.bs
+            part.backward()
+            tot += part.item()
+        loss = torch.tensor(tot)
+        torch.nn.utils.clip_grad_norm_(params, 1.0); opt.step(); step += 1
         if step % 10 == 0:
-            print(f'step {step}/{a.steps} loss {loss.item():.4f} {time.time() - t0:.0f}s', flush=True)
+            rss = int(open('/proc/self/statm').read().split()[1]) * 4096 / 2**30 if os.path.exists('/proc/self/statm') else 0
+            print(f'step {step}/{a.steps} loss {loss.item():.4f} {time.time() - t0:.0f}s rss {rss:.1f}G', flush=True)
         if step % 50 == 0 or step == a.steps:
             sd = {k: v for k, v in m.state_dict().items() if (not a.lora) or 'lora' in k}
             torch.save({'model': sd, 'opt': opt.state_dict(), 'step': step}, ck + '.tmp'); os.replace(ck + '.tmp', ck)
@@ -246,6 +255,7 @@ if __name__ == '__main__':
     ap.add_argument('--lora', action='store_true')
     ap.add_argument('--steps', type=int, default=600)
     ap.add_argument('--bs', type=int, default=8)
+    ap.add_argument('--accum', type=int, default=1, help='split each batch into this many micro-batches')
     ap.add_argument('--lr', type=float, default=1e-4)
     ap.add_argument('--threads', type=int, default=2)
     ap.add_argument('--max-conf', type=float, default=2.0)
