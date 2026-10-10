@@ -70,11 +70,11 @@ test('several operands: "them" / "it" leave a placeholder instead of the last on
       assert.ok(!/b\.txt|\/tmp\/b/.test(r.command ?? ''), `${q} after ${h}: ${r.command}`);
     }
   }
-  // one operand (counts, chmod modes, owners and script arguments are not operands)
+  // one operand (counts, chmod modes and owners are not operands; a script and its arguments are several: regressions10)
   assert.equal(run('delete it', ['head -n 5 a.txt']).command, 'rm a.txt');
   assert.equal(run('delete it', ['chmod 644 a.txt']).command, 'rm a.txt');
   assert.equal(run('delete it', ['chown me:me a.txt']).command, 'rm a.txt');
-  assert.equal(analyzeCommand('python3 run.py --fast out.txt').ents.file, 'run.py');
+  assert.equal(analyzeCommand('python3 run.py --fast').ents.file, 'run.py');
 });
 
 test('deleting, editing in place or overwriting a system file is critical', () => {

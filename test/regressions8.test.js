@@ -140,8 +140,9 @@ test('major: global options of git/docker do not hide a listing in the line', ()
   refused(run('delete it', ['cat old.txt; git -C /tmp status']), '<FILE>', 'git -C');
   refused(run('stop it', ['docker logs old; docker --context prod ps']), '<CONTAINER>', 'docker --context');
   refused(run('stop it', ['docker logs old; docker -H tcp://h:2375 ps']), '<CONTAINER>', 'docker -H');
-  assert.equal(run('stop it', ['docker --context prod logs web']).command, 'docker stop web');
-  assert.equal(run('delete that branch', ['git -C /srv/app merge feature/x']).command, 'git branch -d feature/x');
+  // the values themselves belong to that context (round 9): see regressions10 'scope-changing global options'
+  refused(run('stop it', ['docker --context prod logs web']), '<CONTAINER>', 'docker --context logs');
+  refused(run('delete that branch', ['git -C /srv/app merge feature/x']), '<BRANCH>', 'git -C merge');
 });
 
 test('minor: "its contents", "what is in it", "usuń jego zawartość" are not the directory', () => {

@@ -273,10 +273,27 @@ function rmCheck(words, hit) {
 // `> /etc/passwd` or `truncate -s0 /etc/passwd`
 const SYS_FILE = /^\/+(?:etc|boot|usr|bin|sbin|lib\w*)\/+[^/]/;
 const sysFile = (t) => SYS_FILE.test(normTarget(t));
-// rm/unlink/shred of a system file; sed -i on one; tee (not -a) onto one
+// rm/unlink/shred of a system file; sed -i / perl -i on one; tee (not -a), dd of=, cp/install/mv/ln -f onto one; chmod 000 on one
 function sysFileWriteCheck(w, head, hit) {
   const a = w.slice(1);
-  if (head === 'rm' || head === 'unlink') {
+  if (head === 'dd') {
+    if (a.some((x) => /^of=/.test(x) && sysFile(x.slice(3)))) hit('high', 'overwrites a system file', true);
+  } else if (head === 'cp' || head === 'mv' || head === 'install' || (head === 'ln' && a.some((x) => /^-[a-zA-Z]*f/.test(x) || x === '--force'))) {
+    // the destination: -t DIR / --target-directory=DIR (a file inside it), else the last operand unless it names a
+    // directory by its form (`cp x.service /etc/systemd/system/`: adds a file)
+    const ti = a.findIndex((x) => x === '-t' || x === '--target-directory');
+    const td = ti >= 0 ? a[ti + 1] : a.find((x) => /^--target-directory=/.test(x))?.slice(19);
+    if (td != null) return;
+    const pos = positional(a);
+    const dst = pos.length >= 2 ? pos[pos.length - 1] : null;
+    if (dst != null && !/[\\/]$/.test(dst) && sysFile(dst)) hit('high', 'overwrites a system file or directory', true);
+  } else if (/^(?:perl|ruby)[\d.]*$/.test(head)) {
+    if (a.some((x) => /^-[a-zA-Z]*i/.test(x)) && positional(a).some(sysFile)) hit('high', 'edits a system file in place', true);
+  } else if (head === 'chmod') {
+    // no permissions at all (`chmod 000 /etc/passwd`, `chmod a= …`): nobody can read it, logins stop working
+    const pos = positional(a);
+    if (/^0*$|^[ugoa]*=$|^a?-rwx$/.test(pos[0] ?? 'x') && pos.slice(1).some(sysFile)) hit('high', 'removes every permission from a system file', true);
+  } else if (head === 'rm' || head === 'unlink') {
     if (positional(a).some(sysFile)) hit('high', 'deletes a system file', true);
   } else if (head === 'sed') {
     if (!a.some((x) => /^-[a-zA-Z]*i/.test(x) || /^--in-place/.test(x))) return;

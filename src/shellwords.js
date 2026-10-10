@@ -183,18 +183,29 @@ export function decodeWord(text, kind = 'posix') {
 
 // a word that is a path by its form: /x, ~/x, ./x, ../x, C:\x, \\server
 const PATH_START = /^(?:~(?:[\\/]|$)|\.{1,2}[\\/]|[\\/]|[A-Za-z]:[\\/])/;
-// a word that contains a path separator or ends in a file extension ("my data/a.txt", "My Notes.txt")
+// a word that contains a path separator or ends in a file extension ("My Notes.txt", "/tmp/a b")
 const PATH_FORM = /[\\/]|\.[A-Za-z0-9]{1,8}$/;
+// first words that make a multi-word argument read as part of the request, not a name ("the file notes.txt",
+// "folder /tmp/x", "plik raport.pdf", "all files in /tmp/x"); compared without diacritics ("usuń" -> "usun")
+const REQUEST_WORDS = new Set(('the all every each any some this that these those of in on at from to into with for ' +
+  'file files folder folders directory directories dir dirs document documents ' +
+  'delete remove erase rm show list display print open edit view read move copy rename find search make create ' +
+  'ten ta to te tego tej wszystkie wszystko kazdy kazda w we z ze na do od dla ' +
+  'plik pliki pliku plikow plikiem folderu folderze folderow katalog katalogi katalogu katalogow katalogiem dokument dokumenty ' +
+  'usun skasuj wykasuj kasuj pokaz wyswietl otworz edytuj przenies skopiuj kopiuj zmien znajdz szukaj utworz stworz').split(' '));
+const fold = (w) => w.normalize('NFD').replace(/\p{M}/gu, '').replace(/[łŁ]/g, 'l').toLowerCase();
 
 /**
  * Join already-split words (argv, or the words of a `tellsh …` history line) back into request text without
  * losing their boundaries. A single word is the whole request (`tellsh "delete folder /tmp/x"`) and is used as it is.
  * Among several words, one with whitespace is
- *   - a value, quoted again so the slot extractor reads it as one value (never `/tmp/a`), when it has the form of a
- *     path: `delete folder "/tmp/a b"`, `delete "my data/a.txt"`;
+ *   - a value, quoted again so the slot extractor reads it as one value (never `/tmp/a`), when it starts like a path
+ *     (`delete folder "/tmp/a b"`), or, after the first word, has the form of a file name whose first word is not a
+ *     request word and whose spaces are all after the last separator (`delete "My Notes.txt"`);
  *   - request text, joined unquoted, when it is the first word and not a path (`tellsh "delete folder" /tmp/x`);
- *   - unclear otherwise (`tellsh delete folder "my data"`: a name, or words of the request?): quoted, and listed in
- *     `unclear` so a changing command leaves that path as a placeholder.
+ *   - unclear otherwise (`tellsh delete folder "my data"`, `delete "folder /tmp/x"`, `delete "the file notes.txt"`:
+ *     a name, or words of the request?): quoted, and listed in `unclear` so a changing command leaves that path as
+ *     a placeholder.
  * -> { text, unclear: string[] }, or null when a word with whitespace contains both quote characters (cannot be
  *    re-quoted for the extractor).
  */
@@ -205,7 +216,9 @@ export function joinArgs(words) {
   for (let i = 0; i < words.length; i++) {
     const s = String(words[i]);
     if (!/\s/.test(s)) { out.push(s); continue; }
-    const value = PATH_START.test(s) || (i > 0 && PATH_FORM.test(s));
+    const sep = s.search(/[\\/]/);
+    const nameLike = i > 0 && PATH_FORM.test(s) && !REQUEST_WORDS.has(fold(s.trim().split(/\s+/)[0])) && (sep < 0 || s.search(/\s/) > sep);
+    const value = PATH_START.test(s) || nameLike;
     if (!value && i === 0) { out.push(s); continue; }
     if (!value) unclear.push(s);
     if (!s.includes('"')) out.push(`"${s}"`);

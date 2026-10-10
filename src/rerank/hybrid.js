@@ -13,12 +13,14 @@ import { FAMILY_OF, NONE } from '../tools.js';
 
 // calibrated on the training dev split (scripts/hybrid/eval_hybrid.js --calibrate); see HYBRID.md
 export const POLICY = {
-  // v0.4 (enc-v2 retrained without held-out augmented rows, recalibrated with the v0.4 A_dev); the first v0.4 encoder
-  // had tau 0.9, alpha 0.5, none 0.3 (both); v0.3 had none: 0.5 and k: 5 for the safe variant
-  'A+B': { tau: 0.8, k: 5, alpha: 0.75, accept: 0, none: 0.5, keepNone: true, tagger: 'A' },
+  // v0.4 (enc-v2 retrained without held-out augmented rows, recalibrated with an A_dev that excludes the dev split
+  // from every training source, OOD included); with the OOD-leaking A_dev A+B had tau 0.8, alpha 0.75; the first v0.4
+  // encoder had tau 0.9, alpha 0.5, none 0.3 (both); v0.3 had none: 0.5 and k: 5 for the safe variant
+  'A+B': { tau: 0.9, k: 5, alpha: 0.5, accept: 0, none: 0.5, keepNone: true, tagger: 'A' },
   'A+B-safe': { tau: 0.9, k: 3, alpha: 0.5, accept: 0, none: 0.5, rescue: false, tagger: 'A' },
-  'A+C': { tau: 0.9, k: 5, alpha: 0.75, accept: 0, keepNone: true },
-  'A+C-safe': { tau: 0.9, k: 5, alpha: 0.75, accept: 0, rescue: false },
+  // A+C: C-ft rescored for the leak-free A_dev's candidates (before: tau 0.9)
+  'A+C': { tau: 0.8, k: 5, alpha: 0.75, accept: 0, keepNone: true },
+  'A+C-safe': { tau: 0.8, k: 5, alpha: 0.75, accept: 0, rescue: false },
   B: { tau: Infinity, k: 0, alpha: 0, accept: 0, none: 0.3, keepNone: true, tagger: 'B' },
   C: { tau: Infinity, k: 3, alpha: 0, accept: 0, keepNone: true },
 };

@@ -65,9 +65,11 @@ only prints. Exit codes: command's own · `0` printed · `2` usage · `3` not un
 `5` no rendering for this shell · `130` aborted.
 
 Quoting: the whole request may be one argument (`tellsh "delete folder /tmp/x"`). Among several arguments, one with a
-space is a value when it looks like a path (`tellsh delete folder "/tmp/a b"`, `"My Notes.txt"`), and request text
-when it comes first (`tellsh "delete folder" /tmp/x`). Anything else (`tellsh delete folder "my data"`) is unclear:
-a changing command leaves that path as a placeholder.
+space is a value when it starts like a path (`tellsh delete folder "/tmp/a b"`) or, after the first argument, looks
+like a file name (`"My Notes.txt"`, `"data/my notes.txt"`), and request text when it comes first
+(`tellsh "delete folder" /tmp/x`). Anything else is unclear: `tellsh delete folder "my data"`, and arguments that mix
+request words with a path (`delete "folder /tmp/x"`, `delete "the file notes.txt"`, `usuń "plik raport.pdf"`, a space
+before the first `/`). A changing command leaves that path (or name) as a placeholder, with a warning.
 
 ## How it works
 
@@ -140,7 +142,7 @@ never runs them.
 
 ### Optional neural fallback (`--hybrid`)
 
-`tellsh --hybrid …` (or `TELLSH_HYBRID=1`) keeps the cascade's answer when it is confident (≥ 0.8, most requests) and
+`tellsh --hybrid …` (or `TELLSH_HYBRID=1`) keeps the cascade's answer when it is confident (≥ 0.9, most requests) and
 otherwise re-ranks its top-5 with a small int8 encoder (pruned multilingual-e5-small, 6 layers, 27 MB, ~4 ms on one
 core). It needs `onnxruntime-node` and the `tellsh-model-enc` 0.4 bundle (`enc-v2`, not in this repo); without them
 tellsh silently uses the cascade. `TELLSH_HYBRID=safe` never turns a rejection into an answer. Re-ranked answers are
@@ -154,7 +156,8 @@ never auto-run with `--yes`. Details, numbers and the trade-off (fewer rejection
 `ConsoleHost_history.txt`, keeps the last 2 lines **in memory for this one request** and never prints, logs or
 stores them. **Only the single most recent command is a reference target**: "delete it", "same for /var", "there"
 always mean the previous command, never an older line (the second line is read only because zsh, fish and PSReadLine
-write the running `tellsh …` call to the file before it runs; that line is dropped). When the previous command does
+write the running `tellsh …` call to the file before it runs; that line is dropped when it is exactly this request,
+and never for bash, which writes it afterwards). When the previous command does
 not name a value of the needed type ("delete it" after `ls`, "logs of that container" after `git status`, "same for
 /var" after `clear`), or it cannot be read (an unparseable line, `cat $F`, `rm *.log`, an unknown command naming a
 path), the reference is **refused**: the slot stays a placeholder, never an older value or a catalog default.
@@ -177,7 +180,11 @@ value only when it is unambiguous; otherwise the slot stays a placeholder:
   * the request names something else ("delete that backups folder" after `mkdir /srv/current`), or is about the
     entries of the directory ("everything in it", "its contents", "what is in it", "usuń jego zawartość"); a request
     about entries keeps its own intent (`find <PATH> … -delete`, never `rm -r .` for "delete all log files in this folder");
-  * the checked-out branch is never the one deleted.
+  * the checked-out branch is never the one deleted;
+  * the command ran against another repository, directory or daemon (`git -C /repo blame notes.txt`, `git --work-tree=…`,
+    `docker --context prod logs web`, `docker -H …`, `DOCKER_HOST=… docker …`): "delete it", "stop it" and "same for
+    api" are refused, here they would hit something else;
+  * the command has several operands (`touch a.txt b.txt`, `python3 script.py data.csv`): "it" may be any of them.
 Place references ("there", "over there", "in there", a final "inside", "in the same folder", "in the previous/last
 folder", "the directory I listed", "tam", "stamtąd", "w tym samym / poprzednim katalogu") are the directory of the
 previous command under the same rules, only as the place a command runs in (`find DIR … -delete`, `ls DIR`, a
@@ -232,7 +239,9 @@ compression from the archive name, `bash -n` and an allowed-flag check validate 
   programs calling `system()`; their string literals are checked as commands and `shutil.rmtree('/')`-style calls on
   `/`, `~` or system directories are critical), and an unknown program followed by a destructive command
   (`mywrap rm -rf /`). `chmod`/`chown` of `/` or a top-level system directory (even without `-R`) and `tee`/`cp` onto a
-  whole disk device (`… | sudo tee /dev/sda`) are critical. Switching user (`su`, `runuser`, `pkexec`) is at least medium, like `sudo`. It
+  whole disk device (`… | sudo tee /dev/sda`) are critical, and so is deleting, overwriting or editing in place a
+  system file under `/etc`, `/boot`, `/usr`, `/bin`, `/sbin`, `/lib*` (`rm`, `unlink`, `sed -i`, `perl -i`, `tee`
+  without `-a`, `dd of=`, `cp`/`install`/`mv`/`ln -f` onto it, `chmod 000`). Switching user (`su`, `runuser`, `pkexec`) is at least medium, like `sudo`. It
   strips `git`/`docker` global options (`git -C dir -c k=v reset --hard` = `git reset --hard`). POSIX: `rm -rf` /
   `rm --recursive --force` on `/`, `~`, `~/*`, `"/"`, `/usr`, …, `mkfs`, `dd of=/dev/…`, fork bombs, `curl | sh`,
   `bash <(curl …)`, `sh -c "$(curl …)"`, force-push (incl. `+branch`), redirects into `/etc` (`>>`, `1>`, `&>`),
@@ -269,11 +278,11 @@ the public sets for a large gain on real usage (before/after tables for A, A+B a
 | history references, exact command (53 EN+PL; only the previous command is a target) | **92.5%** (dev set, blind first run 60.4%) · v0.3 blind set (79): 82.3% (2 gold rows changed for the one-line rule, see EVAL.md) |
 | composer on out-of-catalogue requests: acceptable / exact | 43.1% / 41.2% (dev set) · any answer acceptable 49.0% · v0.3 blind set (58): acceptable 17.2% · false fires on catalog requests 0.7% |
 | out-of-domain rejected | 92.4% (blind set 98.4%) |
-| **real usage** (private, held-out command groups, 2957 EN+PL): intent, A · A+B (`--hybrid`) | **82.0% · 88.3%** (v0.3: 31.6% · 38.5%) |
+| **real usage** (private, held-out command groups, 2957 EN+PL): intent, A · A+B (`--hybrid`) | **82.0% · 88.8%** (v0.3: 31.6% · 38.5%) |
 | v0.4 intents, independent eval set (424 rows): intent · exact command | **95.8%** · 91.0% |
 | model size | **2.95 MB** (v0.3: 2.71 MB) |
-| latency, `taskset -c 0`: cold process p50 / p95 | **188 / 264 ms** (shared, loaded box) |
-| latency, warm full cascade + tagger + render p50 / p95 | **0.41 / 4.4 ms** |
+| latency, `taskset -c 0`: cold process p50 / p95 | **205 / 272 ms** (shared, loaded box; bare `node` 112 ms) |
+| latency, warm full cascade + tagger + render p50 / p95 | **0.45 / 4.7 ms** |
 
 ## Data & licenses
 

@@ -94,7 +94,7 @@ export function loadHistory({ shell = 'bash', file, n = 2, env = process.env, os
       const { buf, partial } = readTail(path);
       const text = (kind === 'zsh' ? unmetafy(buf) : buf).toString('utf8');
       const cmds = parseHistory(text, kind, { partial });
-      if (cmds.length) return Object.assign(cmds.slice(-n), { kind: kind === 'pwsh' ? 'pwsh' : 'posix' });
+      if (cmds.length) return Object.assign(cmds.slice(-n), { kind: kind === 'pwsh' ? 'pwsh' : 'posix', shell: kind });
     } catch { /* unreadable: no context */ }
   }
   return [];
@@ -400,7 +400,7 @@ export function tellshArgs(line, kind = 'posix') {
  * `at` gives each entity type the index of the segment it came from (later segment = newer), and
  * `searchDir` marks a `dir` entity that is only the root of a search (`find /var/log -name '*.gz'`,
  * `grep -rl TODO src`): the results live inside it, so it must never be a destructive target.
- * -> { line, intent, slots, ents, at, searchDir?, ambiguous, cd?, fromTellsh?, opaque? }
+ * -> { line, intent, slots, ents, at, searchDir?, ambiguous, cd?, scoped?, fromTellsh?, opaque? }  (scoped: see scopedElsewhere)
  */
 export function analyzeCommand(line, classify, kind = 'posix') {
   let ents = {};
@@ -436,6 +436,7 @@ export function analyzeCommand(line, classify, kind = 'posix') {
   let segIntentAt = -1;
   let intentStale = false;
   let cdAt = -1;
+  let scoped = false;
   let searchDir = false;
   let listDir = false;
   const at = {};
@@ -470,6 +471,13 @@ export function analyzeCommand(line, classify, kind = 'posix') {
       w = [];
     }
     if (w.length) segmentEnts(w, e, setIntent, split, k, segIdx, firstWord);
+    // `git -C /repo blame notes.txt`, `docker --context prod logs web`: "delete it" / "stop it" here would hit a
+    // different file / container than the one the command used (never resolved, never repeated)
+    if (w.length && scopedElsewhere(w, raw)) {
+      scoped = true;
+      for (const x of [...ENT_TYPES, 'current', 'created']) if (e[x] != null && !isAmbiguous(e[x])) e[x] = AMB + rawOf(e[x]);
+      if (segIntentAt === segIdx) { segSlots = { ...segSlots }; markScoped(segSlots); }
+    }
     if (redirTarget != null) e.file = redirTarget;
     const pipedIn = segIdx > 0 && split.segments[segIdx - 1].sep === '|';
     if (w.length && !isAmbiguous(w[0])) for (const x of listedBySegment(w, pipedIn, k)) listed[x] = segIdx;
@@ -508,6 +516,7 @@ export function analyzeCommand(line, classify, kind = 'posix') {
   if (inv && cdAt < 0) {
     // the whole line is a catalog/variant command: its slots are the most precise reading
     intent = inv.intent; slots = inv.slots; ambiguous = inv.ambiguous;
+    if (scoped) { slots = { ...slots }; markScoped(slots); }
     const ie = {};
     entsFromSlots(intent, slots, ie);
     for (const key of Object.keys(ie)) at[key] = split.segments.length;
@@ -527,7 +536,7 @@ export function analyzeCommand(line, classify, kind = 'posix') {
   if (Object.values(slots).some(isAmbiguous)) ambiguous = true;
   return { line: t, intent, slots, ents, at, ambiguous, ...(searchDir && ents.dir != null ? { searchDir: true } : {}),
     ...(listDir && !searchDir && ents.dir != null ? { listDir: true } : {}), ...(cdAt >= 0 ? { cd: true } : {}),
-    ...(intentStale ? { intentStale: true } : {}), listed,
+    ...(intentStale ? { intentStale: true } : {}), ...(scoped ? { scoped: true } : {}), listed,
     // the dir is the `cd` target (`cdFollowed`: another segment ran after the cd)
     ...(cdAt >= 0 && at.dir === cdAt ? { cdDir: true, cdFollowed: cdAt < split.segments.length - 1 } : {}) };
 }
@@ -546,6 +555,27 @@ const GLOBAL_VALUE_OPTS = {
   podman: new Set(['-c', '--connection', '--url', '--identity', '--root', '--runroot', '--cgroup-manager', '--log-level', '--storage-driver',
     '--module', '--events-backend', '--network-cmd-path', '--tmpdir', '--volumepath', '--imagestore', '--hooks-dir', '--conmon', '--runtime', '--ssh']),
 };
+// global options / environment that point git, docker or podman at another repository, directory or daemon
+const SCOPE_OPTS = {
+  git: /^(?:-C|--git-dir|--work-tree|--namespace)(?:=|$)/,
+  docker: /^(?:-H|--host|-c|--context|--config)(?:=|$)/,
+  podman: /^(?:-c|--connection|--url|--root|--runroot|--identity|--ssh)(?:=|$)/,
+};
+const SCOPE_ENV = /^(?:GIT_DIR|GIT_WORK_TREE|GIT_NAMESPACE|DOCKER_HOST|DOCKER_CONTEXT|DOCKER_CONFIG|CONTAINER_HOST|CONTAINER_CONNECTION)=/;
+/** `git -C /repo …`, `docker --context prod …`, `DOCKER_HOST=… docker …` (w: the unwrapped words, raw: before unwrap). */
+function scopedElsewhere(w, raw) {
+  if (isAmbiguous(w[0])) return false;
+  const head = String(w[0]).replace(/^.*[\\/]/, '').replace(/\.exe$/i, '').toLowerCase();
+  const re = SCOPE_OPTS[head];
+  if (!re) return false;
+  if (raw.slice(0, raw.length - w.length).some((x) => SCOPE_ENV.test(String(x)))) return true;
+  const args = w.slice(1);
+  return args.slice(0, args.length - afterGlobals(head, args).length).some((a) => re.test(String(a)));
+}
+/** The values of a scoped command (scopedElsewhere) as ambiguous: they name things in another repository / daemon. */
+function markScoped(o) {
+  for (const x of Object.keys(o)) if (o[x] != null && typeof o[x] !== 'boolean' && !isAmbiguous(o[x])) o[x] = AMB + rawOf(o[x]);
+}
 /** The arguments after the global options of git/docker/podman (`git -C /tmp status` -> ['status']); other heads: unchanged. */
 function afterGlobals(head, args) {
   const vo = GLOBAL_VALUE_OPTS[head];
@@ -717,10 +747,10 @@ function segmentEnts(w, e, setIntent, split, k, segIdx, firstWord) {
     const a = nonFlags.find((x) => /\.(tar(\.\w+)?|tgz|zip)$/.test(x));
     if (a) e.file = a;
   } else if (FILE_HEADS.has(head)) {
-    // operands: not a chmod mode, a chown owner, a count (`head -n 5 a.txt`), or the arguments of a script
+    // operands: not a chmod mode, a chown owner, or a count (`head -n 5 a.txt`); a script and its arguments
+    // (`python3 script.py data.csv`) are several operands: "delete it" may mean either
     let ops = nonFlags.filter((a) => !/^[0-7]{3,4}$|^[ugoa]*[+=-][rwxXst]+$|^\d+$/.test(a));
     if (['chown'].includes(head)) ops = ops.slice(1);
-    if (['python', 'python3', 'node', 'bash', 'sh', 'source'].includes(head)) ops = ops.slice(0, 1);
     const p = oneOf(ops);
     if (p) e[/\/$/.test(rawOf(p)) ? 'dir' : 'file'] = p;
   } else if (DIR_HEADS.has(head)) {
@@ -750,7 +780,7 @@ const ENT_TYPES = ['container', 'service', 'pid', 'proc', 'port', 'file', 'dir',
  * reference target ("delete it", "same for /var", "there" always mean the previous command, never an older one);
  * the running `tellsh <query>` line itself, which some shells write before it runs, is dropped first.
  * kind: 'posix' | 'pwsh' (default: `cmds.kind` as set by loadHistory, else posix)
- * -> { n, line, ents: {type: value}, entOrder, refOrder, searchRoots, listedDirs, last: {intent, slots, ambiguous, skipped},
+ * -> { n, line, ents: {type: value}, entOrder, refOrder, searchRoots, listedDirs, last: {intent, slots, ambiguous, skipped, scoped},
  *      pos, listing, cdDir, features }
  *    values that could not be read unambiguously are kept as AMB-prefixed strings (see isAmbiguous).
  *    Within the line (`cat old.txt; ls newdir`) later segments win: pos gives the segment of each value, and refOrder
@@ -763,8 +793,9 @@ export function buildContext(cmds, { classify, cwd, kind, query } = {}) {
   const k = kind || cmds.kind || 'posix';
   const list = [...cmds];
   // zsh (share_history / inc_append_history), fish and PSReadLine write the running line to the
-  // history file before it executes: the current `tellsh <query>` call is not the previous command
-  if (query != null && list.length) {
+  // history file before it executes: the current `tellsh <query>` call is not the previous command. bash writes it
+  // only afterwards, so there an identical last line is an earlier call (`cmds.shell` as set by loadHistory)
+  if (query != null && list.length && cmds.shell !== 'bash') {
     const norm = (x) => String(x).trim().replace(/\s+/g, ' ');
     const q = tellshQuery(list[list.length - 1], k);
     // exact match only: an earlier `tellsh` line whose text merely contains the query is the previous command
@@ -779,7 +810,7 @@ export function buildContext(cmds, { classify, cwd, kind, query } = {}) {
   const searchRoots = new Set(dir != null && a.searchDir ? [dir] : []);
   const listedDirs = new Set(dir != null && a.listDir ? [dir] : []);
   const listing = Object.fromEntries(Object.entries(a.listed || {}).map(([t, seg]) => [t, { seg }]));
-  const last = a.intent ? { intent: a.intent, slots: a.slots, ambiguous: !!a.ambiguous, skipped: !!a.intentStale } : null;
+  const last = a.intent ? { intent: a.intent, slots: a.slots, ambiguous: !!a.ambiguous, skipped: !!a.intentStale, scoped: !!a.scoped } : null;
   const current = a.ents.current && !isAmbiguous(a.ents.current) ? a.ents.current : null;
   const cdDir = a.cdDir && dir != null ? { value: dir, followed: !!a.cdFollowed } : null;
   const byType = (x, y) => ENT_TYPES.indexOf(x) - ENT_TYPES.indexOf(y);
@@ -956,6 +987,10 @@ export function resolveReference(query, ctx) {
     if (rt && ctx.last.skipped && BY_ID[ctx.last.intent].risk !== 'safe') {
       return { rule: 'refused', intent: null, stop: true, note: `the newest command that tellsh can repeat (${ctx.last.intent}) is not the previous command; not guessing` };
     }
+    // "same for api" after `docker --context prod logs web`: here it would run against another daemon / repository
+    if (rt && ctx.last.scoped) {
+      return { rule: 'refused', intent: null, stop: true, note: `the previous command (${ctx.last.intent}) ran against another repository, directory or daemon (-C, --context, -H, ...); not guessing` };
+    }
     // "same for /srv/x" after `git status`: the previous command has no slot for it; not a new request either
     if (!rt && EXPLICIT_SAME.some((re) => re.test(fold(query)))) {
       return { rule: 'refused', intent: null, stop: true, note: `the previous command (${ctx.last.intent}) has nothing that "${arg}" could replace; not guessing` };
@@ -1107,7 +1142,7 @@ export function sameBut(query, ctx) {
   const lastSlots = Object.fromEntries(Object.entries(ctx.last.slots || {}).filter(([, v]) => !isAmbiguous(v)));
   // slots of the previous command that depend on the shell state ("$DIR"): withheld, never the catalog default
   const blank = Object.keys(ctx.last.slots || {}).filter((k) => isAmbiguous(ctx.last.slots[k]));
-  for (const re of SAME_BUT) if (re.test(fq)) return { lastIntent: ctx.last.intent, lastSlots, blank, skipped: !!ctx.last.skipped };
+  for (const re of SAME_BUT) if (re.test(fq)) return { lastIntent: ctx.last.intent, lastSlots, blank, skipped: !!ctx.last.skipped, scoped: !!ctx.last.scoped };
   return null;
 }
 
