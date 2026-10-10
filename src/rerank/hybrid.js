@@ -13,11 +13,12 @@ import { FAMILY_OF, NONE } from '../tools.js';
 
 // calibrated on the training dev split (scripts/hybrid/eval_hybrid.js --calibrate); see HYBRID.md
 export const POLICY = {
-  'A+B': { tau: 0.9, k: 5, alpha: 0.5, accept: 0, none: 0.5, keepNone: true, tagger: 'A' },
-  'A+B-safe': { tau: 0.9, k: 5, alpha: 0.5, accept: 0, none: 0.5, rescue: false, tagger: 'A' },
+  // v0.4 (enc-v2, recalibrated with the v0.4 A_dev); v0.3 had none: 0.5 and k: 5 for the safe variant
+  'A+B': { tau: 0.9, k: 5, alpha: 0.5, accept: 0, none: 0.3, keepNone: true, tagger: 'A' },
+  'A+B-safe': { tau: 0.9, k: 3, alpha: 0.5, accept: 0, none: 0.3, rescue: false, tagger: 'A' },
   'A+C': { tau: 0.9, k: 5, alpha: 0.75, accept: 0, keepNone: true },
   'A+C-safe': { tau: 0.9, k: 5, alpha: 0.75, accept: 0, rescue: false },
-  B: { tau: Infinity, k: 0, alpha: 0, accept: 0, none: 0.5, keepNone: true, tagger: 'B' },
+  B: { tau: Infinity, k: 0, alpha: 0, accept: 0, none: 0.3, keepNone: true, tagger: 'B' },
   C: { tau: Infinity, k: 3, alpha: 0, accept: 0, keepNone: true },
 };
 

@@ -1,0 +1,70 @@
+{
+ "thrAdev": 0.41,
+ "n": 5189,
+ "A": {
+  "acc": 0.8755058778184621,
+  "n": 5189,
+  "deferred": 0,
+  "indAcc": 0.8743923779895003,
+  "oodRej": 1,
+  "nOod": 46
+ },
+ "B": {
+  "P": {
+   "tau": "Infinity",
+   "alpha": 0,
+   "k": 0,
+   "accept": 0,
+   "none": 0.3,
+   "keepNone": true,
+   "tagger": "B"
+  },
+  "s": {
+   "acc": 0.8932356908845634,
+   "n": 5189,
+   "deferred": 1,
+   "indAcc": 0.8922807699786117,
+   "oodRej": 1,
+   "nOod": 46
+  }
+ },
+ "A+B": {
+  "P": {
+   "tau": 0.9,
+   "alpha": 0.5,
+   "k": 5,
+   "accept": 0,
+   "none": 0.3,
+   "keepNone": true,
+   "tagger": "A"
+  },
+  "s": {
+   "acc": 0.9352476392368472,
+   "n": 5189,
+   "deferred": 0.4070148390826749,
+   "indAcc": 0.9346684814310714,
+   "oodRej": 1,
+   "nOod": 46
+  }
+ },
+ "A+B-safe": {
+  "P": {
+   "tau": 0.9,
+   "alpha": 0.5,
+   "k": 3,
+   "accept": 0,
+   "none": 0.3,
+   "keepNone": false,
+   "tagger": "A",
+   "rescue": false
+  },
+  "s": {
+   "acc": 0.8968972827134323,
+   "n": 5189,
+   "deferred": 0.4070148390826749,
+   "indAcc": 0.8959751118024499,
+   "oodRej": 1,
+   "nOod": 46
+  }
+ }
+}
