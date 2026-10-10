@@ -32,6 +32,20 @@ const RULES = [
   [/(?:^|[^0-9>&|-])>(?!>|&|\s*\/dev\/null)\s*\S/, 'medium', 'redirect overwrites a file'],
   [/\bsed\s+(?:-\S+\s+)*-i\b/, 'medium', 'edits files in place'],
   [/\bcrontab\s+-r\b/, 'high', 'removes all cron jobs', true],
+  // PowerShell
+  [/\bRemove-Item\b(?=.*-Recurse)(?=.*(?:\s(?:-(?:Literal)?Path\s+)?(?:'?[A-Za-z]:\\?'?|'?\/'?|\$HOME|'?~'?|\$env:USERPROFILE|\*)(?:\s|$)))/i, 'high', 'recursive Remove-Item on a drive root, home or *', true],
+  [/\bRemove-Item\b|\bClear-Content\b/i, 'high', 'deletes files permanently'],
+  [/\bStop-Process\b|\btaskkill\b/i, 'high', 'terminates processes'],
+  [/\bFormat-Volume\b|\bClear-Disk\b|\bInitialize-Disk\b|(?:^|[;&|]\s*)format\s+[a-z]:/i, 'high', 'formats a disk', true],
+  [/\b(?:Stop|Restart)-Computer\b|\bshutdown(?:\.exe)?\s+\/[srp]\b/i, 'high', 'shuts down / reboots the machine'],
+  [/\b(?:iwr|irm|Invoke-WebRequest|Invoke-RestMethod|curl|wget)\b[^|;]*\|\s*(?:iex|Invoke-Expression)\b/i, 'high', 'pipes a download straight into PowerShell'],
+  [/\bSet-ExecutionPolicy\b|\bStart-Process\b.*-Verb\s+RunAs/i, 'medium', 'changes security policy / elevates'],
+  [/\b(?:Stop|Restart|Start|Set)-Service\b/i, 'medium', 'changes a service'],
+  [/\b(?:Set-Content|Out-File|Add-Content|Rename-Item|Move-Item|Copy-Item|New-Item|Set-Acl|Compress-Archive|Expand-Archive)\b/i, 'medium', 'modifies files'],
+  [/\bdocker\s+stop\b/, 'medium', 'stops containers'],
+  // cmd.exe
+  [/(?:^|[&|]\s*)(?:rd|rmdir)\s+\/s\b(?=.*\s(?:[A-Za-z]:\\?|%USERPROFILE%|\\)\s*$)/i, 'high', 'recursive delete of a drive root or home', true],
+  [/(?:^|[&|]\s*)(?:del|erase|rd|rmdir)\b/i, 'high', 'deletes files permanently'],
 ];
 
 /** @returns {{risk:'safe'|'medium'|'high', warnings:string[], critical:boolean}} */

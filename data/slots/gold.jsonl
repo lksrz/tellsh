@@ -1,0 +1,208 @@
+{"text": "show the 15 biggest files in /mnt/storage/raw", "intent": "largest_files", "lang": "en", "spans": [["NUM", "15"], ["PATH", "/mnt/storage/raw"]]}
+{"text": "top five largest files in my home directory", "intent": "largest_files", "lang": "en", "spans": [["NUM", "five"], ["PATH", "home directory"]]}
+{"text": "which folders under /var/lib/qzx eat the most space, top 3", "intent": "largest_dirs", "lang": "en", "spans": [["PATH", "/var/lib/qzx"], ["NUM", "3"]]}
+{"text": "how big is ~/Library/Containers", "intent": "dir_size", "lang": "en", "spans": [["PATH", "~/Library/Containers"]]}
+{"text": "total size of the Downloads folder", "intent": "dir_size", "lang": "en", "spans": [["PATH", "Downloads"]]}
+{"text": "find a file called invoice_0423 somewhere in ~/Documents", "intent": "find_by_name", "lang": "en", "spans": [["NAME", "invoice_0423"], ["PATH", "~/Documents"]]}
+{"text": "locate anything named zz_legacy_cfg under /opt", "intent": "find_by_name", "lang": "en", "spans": [["NAME", "zz_legacy_cfg"], ["PATH", "/opt"]]}
+{"text": "find all .parquet files in /data/lake", "intent": "find_by_ext", "lang": "en", "spans": [["EXT", ".parquet"], ["PATH", "/data/lake"]]}
+{"text": "list python files in the src folder", "intent": "find_by_ext", "lang": "en", "spans": [["EXT", "python"], ["PATH", "src"]]}
+{"text": "every pdf in Downloads modified in the last 2 weeks", "intent": "find_by_ext", "lang": "en", "spans": [["EXT", "pdf"], ["PATH", "Downloads"], ["TIME", "last 2 weeks"]]}
+{"text": "files changed in /etc in the last 45 minutes", "intent": "find_recent", "lang": "en", "spans": [["PATH", "/etc"], ["TIME", "last 45 minutes"]]}
+{"text": "what did I modify yesterday in ~/notes", "intent": "find_recent", "lang": "en", "spans": [["TIME", "yesterday"], ["PATH", "~/notes"]]}
+{"text": "log files touched in the past 3 hours under /srv/qzx/out", "intent": "find_recent", "lang": "en", "spans": [["EXT", "log"], ["TIME", "past 3 hours"], ["PATH", "/srv/qzx/out"]]}
+{"text": "files older than 90 days in /srv/backups", "intent": "find_older_than", "lang": "en", "spans": [["TIME", "90 days"], ["PATH", "/srv/backups"]]}
+{"text": ".tmp files in /scratch not modified for 2 weeks", "intent": "find_older_than", "lang": "en", "spans": [["EXT", ".tmp"], ["PATH", "/scratch"], ["TIME", "2 weeks"]]}
+{"text": "files bigger than 250 MB in /home/olek", "intent": "find_larger_than", "lang": "en", "spans": [["SIZE", "250 MB"], ["PATH", "/home/olek"]]}
+{"text": "any mkv over 4GB on /media/ext", "intent": "find_larger_than", "lang": "en", "spans": [["EXT", "mkv"], ["SIZE", "4GB"], ["PATH", "/media/ext"]]}
+{"text": "files under 2k in ./fixtures", "intent": "find_smaller_than", "lang": "en", "spans": [["SIZE", "2k"], ["PATH", "./fixtures"]]}
+{"text": "search for \"connection reset\" in /var/log/haproxy", "intent": "grep_text", "lang": "en", "spans": [["PATTERN", "connection reset"], ["PATH", "/var/log/haproxy"]]}
+{"text": "grep ERR_QZX_42 in all .log files under /opt/app", "intent": "grep_text", "lang": "en", "spans": [["PATTERN", "ERR_QZX_42"], ["EXT", ".log"], ["PATH", "/opt/app"]]}
+{"text": "where is getUserById used in the frontend dir", "intent": "grep_text", "lang": "en", "spans": [["PATTERN", "getUserById"], ["PATH", "frontend"]]}
+{"text": "which files in ~/dotfiles mention \"AWS_SECRET\"", "intent": "grep_files_containing", "lang": "en", "spans": [["PATH", "~/dotfiles"], ["PATTERN", "AWS_SECRET"]]}
+{"text": "list yaml files containing imagePullPolicy in ./k8s", "intent": "grep_files_containing", "lang": "en", "spans": [["EXT", "yaml"], ["PATTERN", "imagePullPolicy"], ["PATH", "./k8s"]]}
+{"text": "how many lines are in /etc/services", "intent": "count_lines", "lang": "en", "spans": [["PATH", "/etc/services"]]}
+{"text": "line count of trades_2024-03.csv", "intent": "count_lines", "lang": "en", "spans": [["PATH", "trades_2024-03.csv"]]}
+{"text": "total lines of rust code in crates/", "intent": "count_lines_code", "lang": "en", "spans": [["EXT", "rust"], ["PATH", "crates/"]]}
+{"text": "how many jpg files are in ~/Pictures/2019", "intent": "count_files", "lang": "en", "spans": [["EXT", "jpg"], ["PATH", "~/Pictures/2019"]]}
+{"text": "word count for chapter-07.md", "intent": "count_words", "lang": "en", "spans": [["PATH", "chapter-07.md"]]}
+{"text": "20 most common lines in /tmp/useragents.txt", "intent": "sort_uniq", "lang": "en", "spans": [["NUM", "20"], ["PATH", "/tmp/useragents.txt"]]}
+{"text": "the 7 most recently changed files in /var/www/html", "intent": "recent_files", "lang": "en", "spans": [["NUM", "7"], ["PATH", "/var/www/html"]]}
+{"text": "find empty files in /srv/ftp/incoming", "intent": "empty_files", "lang": "en", "spans": [["PATH", "/srv/ftp/incoming"]]}
+{"text": "empty directories under ~/Music/rips", "intent": "empty_dirs", "lang": "en", "spans": [["PATH", "~/Music/rips"]]}
+{"text": "duplicate files in /mnt/photos_old", "intent": "duplicate_files", "lang": "en", "spans": [["PATH", "/mnt/photos_old"]]}
+{"text": "broken symlinks in /usr/local/lib", "intent": "broken_symlinks", "lang": "en", "spans": [["PATH", "/usr/local/lib"]]}
+{"text": "list everything in /etc/qzx.d with details", "intent": "list_files", "lang": "en", "spans": [["PATH", "/etc/qzx.d"]]}
+{"text": "show the tree of ./services 3 levels deep", "intent": "list_tree", "lang": "en", "spans": [["PATH", "./services"], ["NUM", "3"]]}
+{"text": "dotfiles in /root", "intent": "hidden_files", "lang": "en", "spans": [["PATH", "/root"]]}
+{"text": "what type of file is blob_8812.dat", "intent": "file_type", "lang": "en", "spans": [["PATH", "blob_8812.dat"]]}
+{"text": "show metadata for /usr/bin/sudo", "intent": "file_stat", "lang": "en", "spans": [["PATH", "/usr/bin/sudo"]]}
+{"text": "first 12 lines of schema.sql", "intent": "head_file", "lang": "en", "spans": [["NUM", "12"], ["PATH", "schema.sql"]]}
+{"text": "last 200 lines of /var/log/qzx-worker.log", "intent": "tail_file", "lang": "en", "spans": [["NUM", "200"], ["PATH", "/var/log/qzx-worker.log"]]}
+{"text": "follow /var/log/nginx/error.log live", "intent": "tail_follow", "lang": "en", "spans": [["PATH", "/var/log/nginx/error.log"]]}
+{"text": "print the contents of ~/.config/starship.toml", "intent": "cat_file", "lang": "en", "spans": [["PATH", "~/.config/starship.toml"]]}
+{"text": "tar up /var/www/shop into shop-backup.tar.gz", "intent": "compress_targz", "lang": "en", "spans": [["PATH", "/var/www/shop"], ["PATH", "shop-backup.tar.gz"]]}
+{"text": "extract node-v22.1.0-linux-x64.tar.gz into /opt/node", "intent": "extract_targz", "lang": "en", "spans": [["PATH", "node-v22.1.0-linux-x64.tar.gz"], ["PATH", "/opt/node"]]}
+{"text": "zip the folder reports_Q3", "intent": "compress_zip", "lang": "en", "spans": [["PATH", "reports_Q3"]]}
+{"text": "unzip ~/Downloads/Inter-4.0.zip to ~/fonts", "intent": "extract_zip", "lang": "en", "spans": [["PATH", "~/Downloads/Inter-4.0.zip"], ["PATH", "~/fonts"]]}
+{"text": "what's inside dump_2023-11-02.tar", "intent": "list_archive", "lang": "en", "spans": [["PATH", "dump_2023-11-02.tar"]]}
+{"text": "set mode 640 on /etc/qzx/secrets.yml", "intent": "chmod", "lang": "en", "spans": [["MODE", "640"], ["PATH", "/etc/qzx/secrets.yml"]]}
+{"text": "add u+x to tools/gen.sh", "intent": "chmod", "lang": "en", "spans": [["MODE", "u+x"], ["PATH", "tools/gen.sh"]]}
+{"text": "make ./bin/qzx-run executable", "intent": "make_executable", "lang": "en", "spans": [["PATH", "./bin/qzx-run"]]}
+{"text": "change owner of /srv/minio to user minio-svc", "intent": "chown", "lang": "en", "spans": [["PATH", "/srv/minio"], ["USER", "minio-svc"]]}
+{"text": "copy nginx.conf to /root/backup/nginx.old", "intent": "copy", "lang": "en", "spans": [["PATH", "nginx.conf"], ["PATH", "/root/backup/nginx.old"]]}
+{"text": "rename draft_v3_FINAL.docx to thesis.docx", "intent": "move_rename", "lang": "en", "spans": [["PATH", "draft_v3_FINAL.docx"], ["PATH", "thesis.docx"]]}
+{"text": "delete /tmp/core.18832", "intent": "delete_file", "lang": "en", "spans": [["PATH", "/tmp/core.18832"]]}
+{"text": "remove the directory ~/old_projects/angular-1", "intent": "delete_dir", "lang": "en", "spans": [["PATH", "~/old_projects/angular-1"]]}
+{"text": "delete all .orig files in the repo root", "intent": "delete_by_ext", "lang": "en", "spans": [["EXT", ".orig"], ["PATH", "repo root"]]}
+{"text": "create /opt/qzx/plugins/enabled", "intent": "mkdir", "lang": "en", "spans": [["PATH", "/opt/qzx/plugins/enabled"]]}
+{"text": "replace \"staging-db\" with \"prod-db\" in config/database.yml", "intent": "replace_text", "lang": "en", "spans": [["PATTERN", "staging-db"], ["REPL", "prod-db"], ["PATH", "config/database.yml"]]}
+{"text": "in index.html change http://cdn.old.io to https://cdn.new.io", "intent": "replace_text", "lang": "en", "spans": [["PATH", "index.html"], ["PATTERN", "http://cdn.old.io"], ["REPL", "https://cdn.new.io"]]}
+{"text": "sha256 of debian-12.5.0-amd64-netinst.iso", "intent": "hash_sha256", "lang": "en", "spans": [["PATH", "debian-12.5.0-amd64-netinst.iso"]]}
+{"text": "md5sum of ~/Downloads/fw_v2.bin", "intent": "hash_md5", "lang": "en", "spans": [["PATH", "~/Downloads/fw_v2.bin"]]}
+{"text": "base64 encode \"ci-bot:Xy7#pass\"", "intent": "base64_encode", "lang": "en", "spans": [["TEXT", "ci-bot:Xy7#pass"]]}
+{"text": "decode the base64 string cXp4LXNlY3JldA==", "intent": "base64_decode", "lang": "en", "spans": [["TEXT", "cXp4LXNlY3JldA=="]]}
+{"text": "top 8 processes by cpu", "intent": "top_cpu", "lang": "en", "spans": [["NUM", "8"]]}
+{"text": "show the 4 hungriest processes by memory", "intent": "top_mem", "lang": "en", "spans": [["NUM", "4"]]}
+{"text": "is qzx-worker running?", "intent": "find_process", "lang": "en", "spans": [["NAME", "qzx-worker"]]}
+{"text": "find the gunicorn process", "intent": "find_process", "lang": "en", "spans": [["NAME", "gunicorn"]]}
+{"text": "kill all instances of zlurp-daemon", "intent": "kill_by_name", "lang": "en", "spans": [["NAME", "zlurp-daemon"]]}
+{"text": "force kill the hung ffmpeg", "intent": "kill_force", "lang": "en", "spans": [["NAME", "ffmpeg"]]}
+{"text": "kill process 48211", "intent": "kill_by_pid", "lang": "en", "spans": [["PID", "48211"]]}
+{"text": "kill whatever's listening on port 5173", "intent": "kill_by_port", "lang": "en", "spans": [["PORT", "5173"]]}
+{"text": "who is using port 27017", "intent": "process_on_port", "lang": "en", "spans": [["PORT", "27017"]]}
+{"text": "logs for the qzx-agent service from the last 2 hours", "intent": "journal_service", "lang": "en", "spans": [["NAME", "qzx-agent"], ["TIME", "last 2 hours"]]}
+{"text": "show 100 lines of journal for cron", "intent": "journal_service", "lang": "en", "spans": [["NUM", "100"], ["NAME", "cron"]]}
+{"text": "status of the mosquitto service", "intent": "service_status", "lang": "en", "spans": [["NAME", "mosquitto"]]}
+{"text": "restart the php8.3-fpm service", "intent": "service_restart", "lang": "en", "spans": [["NAME", "php8.3-fpm"]]}
+{"text": "stop service snapd", "intent": "service_stop", "lang": "en", "spans": [["NAME", "snapd"]]}
+{"text": "enable fail2ban on boot", "intent": "service_enable", "lang": "en", "spans": [["NAME", "fail2ban"]]}
+{"text": "install ripgrep", "intent": "install_package", "lang": "en", "spans": [["NAME", "ripgrep"]]}
+{"text": "is libssl-dev installed?", "intent": "package_installed", "lang": "en", "spans": [["NAME", "libssl-dev"]]}
+{"text": "what's the value of KUBECONFIG", "intent": "env_var_get", "lang": "en", "spans": [["VAR", "KUBECONFIG"]]}
+{"text": "where does the terraform binary live", "intent": "which_cmd", "lang": "en", "spans": [["NAME", "terraform"]]}
+{"text": "search my history for \"rsync -avz\"", "intent": "history_search", "lang": "en", "spans": [["PATTERN", "rsync -avz"]]}
+{"text": "show the last 25 logins", "intent": "last_logins", "lang": "en", "spans": [["NUM", "25"]]}
+{"text": "ping 10.20.0.1 6 times", "intent": "ping_host", "lang": "en", "spans": [["HOST", "10.20.0.1"], ["NUM", "6"]]}
+{"text": "resolve api.qzx-internal.net", "intent": "dns_lookup", "lang": "en", "spans": [["HOST", "api.qzx-internal.net"]]}
+{"text": "trace route to 203.0.113.9", "intent": "traceroute", "lang": "en", "spans": [["HOST", "203.0.113.9"]]}
+{"text": "is port 6443 open on k8s-master-01", "intent": "port_check", "lang": "en", "spans": [["PORT", "6443"], ["HOST", "k8s-master-01"]]}
+{"text": "show headers for https://status.example.dev/api", "intent": "curl_headers", "lang": "en", "spans": [["URL", "https://status.example.dev/api"]]}
+{"text": "status code of http://localhost:8081/healthz", "intent": "http_status", "lang": "en", "spans": [["URL", "http://localhost:8081/healthz"]]}
+{"text": "download https://dl.qzx.io/releases/qzx_1.4.2_amd64.deb", "intent": "download_file", "lang": "en", "spans": [["URL", "https://dl.qzx.io/releases/qzx_1.4.2_amd64.deb"]]}
+{"text": "ssh into deploy@build-07.lan", "intent": "ssh_connect", "lang": "en", "spans": [["HOST", "deploy@build-07.lan"]]}
+{"text": "last 30 commits", "intent": "git_log", "lang": "en", "spans": [["NUM", "30"]]}
+{"text": "create branch feat/JIRA-12-login", "intent": "git_new_branch", "lang": "en", "spans": [["BRANCH", "feat/JIRA-12-login"]]}
+{"text": "switch to release/2025.03", "intent": "git_switch_branch", "lang": "en", "spans": [["BRANCH", "release/2025.03"]]}
+{"text": "delete the branch spike_qzx_cache", "intent": "git_delete_branch", "lang": "en", "spans": [["BRANCH", "spike_qzx_cache"]]}
+{"text": "push hotfix/PAY-301 to origin", "intent": "git_push", "lang": "en", "spans": [["BRANCH", "hotfix/PAY-301"]]}
+{"text": "commit everything with message \"fix race in qzx scheduler\"", "intent": "git_commit", "lang": "en", "spans": [["MSG", "fix race in qzx scheduler"]]}
+{"text": "clone git@gitlab.com:acme/infra-live.git", "intent": "git_clone", "lang": "en", "spans": [["URL", "git@gitlab.com:acme/infra-live.git"]]}
+{"text": "blame lib/parser/tokenize.ts", "intent": "git_blame", "lang": "en", "spans": [["PATH", "lib/parser/tokenize.ts"]]}
+{"text": "last 500 log lines of container qzx-ingest-2", "intent": "docker_logs", "lang": "en", "spans": [["NUM", "500"], ["NAME", "qzx-ingest-2"]]}
+{"text": "stop the container named grafana_old", "intent": "docker_stop", "lang": "en", "spans": [["NAME", "grafana_old"]]}
+{"text": "open a shell in my-postgres", "intent": "docker_exec", "lang": "en", "spans": [["NAME", "my-postgres"]]}
+{"text": "pokaż 10 największych plików w katalogu domowym", "intent": "largest_files", "lang": "pl", "spans": [["NUM", "10"], ["PATH", "katalogu domowym"]]}
+{"text": "najwieksze pliki w /var/lib/postgresql, daj piec", "intent": "largest_files", "lang": "pl", "spans": [["PATH", "/var/lib/postgresql"], ["NUM", "piec"]]}
+{"text": "które foldery w Pobranych zajmują najwięcej", "intent": "largest_dirs", "lang": "pl", "spans": [["PATH", "Pobranych"]]}
+{"text": "ile waży katalog /srv/qzx-data", "intent": "dir_size", "lang": "pl", "spans": [["PATH", "/srv/qzx-data"]]}
+{"text": "rozmiar folderu ~/Wideo/2023", "intent": "dir_size", "lang": "pl", "spans": [["PATH", "~/Wideo/2023"]]}
+{"text": "znajdź plik o nazwie umowa_najmu w Dokumentach", "intent": "find_by_name", "lang": "pl", "spans": [["NAME", "umowa_najmu"], ["PATH", "Dokumentach"]]}
+{"text": "gdzie jest plik krzak.cfg w /etc", "intent": "find_by_name", "lang": "pl", "spans": [["NAME", "krzak.cfg"], ["PATH", "/etc"]]}
+{"text": "znajdź wszystkie pliki .docx na pulpicie", "intent": "find_by_ext", "lang": "pl", "spans": [["EXT", ".docx"], ["PATH", "pulpicie"]]}
+{"text": "pliki pdf w Pobranych", "intent": "find_by_ext", "lang": "pl", "spans": [["EXT", "pdf"], ["PATH", "Pobranych"]]}
+{"text": "wszystkie pliki javascript w katalogu web", "intent": "find_by_ext", "lang": "pl", "spans": [["EXT", "javascript"], ["PATH", "web"]]}
+{"text": "pliki zmienione w ciągu ostatnich 2 godzin w /var/www", "intent": "find_recent", "lang": "pl", "spans": [["TIME", "ostatnich 2 godzin"], ["PATH", "/var/www"]]}
+{"text": "co się zmieniło wczoraj w ~/projekty/sklep", "intent": "find_recent", "lang": "pl", "spans": [["TIME", "wczoraj"], ["PATH", "~/projekty/sklep"]]}
+{"text": "pliki .csv zmodyfikowane w ostatnim tygodniu w /data/import", "intent": "find_recent", "lang": "pl", "spans": [["EXT", ".csv"], ["TIME", "ostatnim tygodniu"], ["PATH", "/data/import"]]}
+{"text": "pliki starsze niż 60 dni w /var/log/qzx", "intent": "find_older_than", "lang": "pl", "spans": [["TIME", "60 dni"], ["PATH", "/var/log/qzx"]]}
+{"text": "logi starsze niz tydzien w katalogu logs", "intent": "find_older_than", "lang": "pl", "spans": [["TIME", "tydzien"], ["PATH", "logs"]]}
+{"text": "pliki większe niż 1,5 GB w katalogu domowym", "intent": "find_larger_than", "lang": "pl", "spans": [["SIZE", "1,5 GB"], ["PATH", "katalogu domowym"]]}
+{"text": "filmy mp4 powyżej 700 MB w /media/dysk2", "intent": "find_larger_than", "lang": "pl", "spans": [["EXT", "mp4"], ["SIZE", "700 MB"], ["PATH", "/media/dysk2"]]}
+{"text": "pliki mniejsze niż 10 KB w /tmp/cache", "intent": "find_smaller_than", "lang": "pl", "spans": [["SIZE", "10 KB"], ["PATH", "/tmp/cache"]]}
+{"text": "szukaj \"brak połączenia\" w /var/log/aplikacja", "intent": "grep_text", "lang": "pl", "spans": [["PATTERN", "brak połączenia"], ["PATH", "/var/log/aplikacja"]]}
+{"text": "wyszukaj tekst OutOfMemoryError w plikach .log w /opt/tomcat", "intent": "grep_text", "lang": "pl", "spans": [["PATTERN", "OutOfMemoryError"], ["EXT", ".log"], ["PATH", "/opt/tomcat"]]}
+{"text": "gdzie w kodzie jest funkcja oblicz_vat", "intent": "grep_text", "lang": "pl", "spans": [["PATTERN", "oblicz_vat"]]}
+{"text": "które pliki w /etc zawierają 10.0.0.15", "intent": "grep_files_containing", "lang": "pl", "spans": [["PATH", "/etc"], ["PATTERN", "10.0.0.15"]]}
+{"text": "nazwy plików php z tekstem \"mysql_connect\" w /var/www/stary", "intent": "grep_files_containing", "lang": "pl", "spans": [["EXT", "php"], ["PATTERN", "mysql_connect"], ["PATH", "/var/www/stary"]]}
+{"text": "ile linii ma plik klienci_2024.csv", "intent": "count_lines", "lang": "pl", "spans": [["PATH", "klienci_2024.csv"]]}
+{"text": "policz wiersze w /var/log/dpkg.log", "intent": "count_lines", "lang": "pl", "spans": [["PATH", "/var/log/dpkg.log"]]}
+{"text": "ile linii kodu w plikach .go w katalogu cmd", "intent": "count_lines_code", "lang": "pl", "spans": [["EXT", ".go"], ["PATH", "cmd"]]}
+{"text": "ile jest plików w /srv/nfs/skany", "intent": "count_files", "lang": "pl", "spans": [["PATH", "/srv/nfs/skany"]]}
+{"text": "ile słów ma praca_magisterska.txt", "intent": "count_words", "lang": "pl", "spans": [["PATH", "praca_magisterska.txt"]]}
+{"text": "15 najczęstszych linii w pliku adresy.txt", "intent": "sort_uniq", "lang": "pl", "spans": [["NUM", "15"], ["PATH", "adresy.txt"]]}
+{"text": "pięć ostatnio zmienionych plików w ~/Dokumenty", "intent": "recent_files", "lang": "pl", "spans": [["NUM", "pięć"], ["PATH", "~/Dokumenty"]]}
+{"text": "puste pliki w /var/spool/qzx", "intent": "empty_files", "lang": "pl", "spans": [["PATH", "/var/spool/qzx"]]}
+{"text": "znajdź puste katalogi w Obrazach", "intent": "empty_dirs", "lang": "pl", "spans": [["PATH", "Obrazach"]]}
+{"text": "zduplikowane pliki w /mnt/zdjecia_mamy", "intent": "duplicate_files", "lang": "pl", "spans": [["PATH", "/mnt/zdjecia_mamy"]]}
+{"text": "dowiązania symboliczne w /usr/local/bin", "intent": "find_symlinks", "lang": "pl", "spans": [["PATH", "/usr/local/bin"]]}
+{"text": "pokaż zawartość katalogu /opt/krzak-app", "intent": "list_files", "lang": "pl", "spans": [["PATH", "/opt/krzak-app"]]}
+{"text": "drzewo katalogu src na 4 poziomy", "intent": "list_tree", "lang": "pl", "spans": [["PATH", "src"], ["NUM", "4"]]}
+{"text": "ukryte pliki w katalogu domowym", "intent": "hidden_files", "lang": "pl", "spans": [["PATH", "katalogu domowym"]]}
+{"text": "jaki typ ma plik zrzut_ekranu.bin", "intent": "file_type", "lang": "pl", "spans": [["PATH", "zrzut_ekranu.bin"]]}
+{"text": "pokaż metadane pliku /etc/shadow-", "intent": "file_stat", "lang": "pl", "spans": [["PATH", "/etc/shadow-"]]}
+{"text": "pierwsze 3 linie pliku nagłówki.tsv", "intent": "head_file", "lang": "pl", "spans": [["NUM", "3"], ["PATH", "nagłówki.tsv"]]}
+{"text": "ostatnie pięćdziesiąt linii /var/log/syslog.1", "intent": "tail_file", "lang": "pl", "spans": [["NUM", "pięćdziesiąt"], ["PATH", "/var/log/syslog.1"]]}
+{"text": "śledź na żywo plik /var/log/qzx/zdarzenia.log", "intent": "tail_follow", "lang": "pl", "spans": [["PATH", "/var/log/qzx/zdarzenia.log"]]}
+{"text": "wyświetl plik ~/.ssh/known_hosts", "intent": "cat_file", "lang": "pl", "spans": [["PATH", "~/.ssh/known_hosts"]]}
+{"text": "spakuj katalog /home/marta/projekty do projekty.tar.gz", "intent": "compress_targz", "lang": "pl", "spans": [["PATH", "/home/marta/projekty"], ["PATH", "projekty.tar.gz"]]}
+{"text": "rozpakuj kopia_2024-05-01.tgz do /srv/restore", "intent": "extract_targz", "lang": "pl", "spans": [["PATH", "kopia_2024-05-01.tgz"], ["PATH", "/srv/restore"]]}
+{"text": "zrób zipa z folderu faktury_marzec", "intent": "compress_zip", "lang": "pl", "spans": [["PATH", "faktury_marzec"]]}
+{"text": "wypakuj sterowniki_v3.zip do Pobranych", "intent": "extract_zip", "lang": "pl", "spans": [["PATH", "sterowniki_v3.zip"], ["PATH", "Pobranych"]]}
+{"text": "co jest w archiwum backup_bazy.tar.gz", "intent": "list_archive", "lang": "pl", "spans": [["PATH", "backup_bazy.tar.gz"]]}
+{"text": "ustaw prawa 600 na pliku ~/.netrc", "intent": "chmod", "lang": "pl", "spans": [["MODE", "600"], ["PATH", "~/.netrc"]]}
+{"text": "nadaj g+w katalogowi /srv/wspolne", "intent": "chmod", "lang": "pl", "spans": [["MODE", "g+w"], ["PATH", "/srv/wspolne"]]}
+{"text": "zrób plik skrypty/wdrozenie.sh wykonywalnym", "intent": "make_executable", "lang": "pl", "spans": [["PATH", "skrypty/wdrozenie.sh"]]}
+{"text": "zmień właściciela /var/lib/qzx na użytkownika qzxsvc", "intent": "chown", "lang": "pl", "spans": [["PATH", "/var/lib/qzx"], ["USER", "qzxsvc"]]}
+{"text": "skopiuj plik env.example do .env.local", "intent": "copy", "lang": "pl", "spans": [["PATH", "env.example"], ["PATH", ".env.local"]]}
+{"text": "przenieś zdjęcie IMG_2231.HEIC do ~/Obrazy/wakacje", "intent": "move_rename", "lang": "pl", "spans": [["PATH", "IMG_2231.HEIC"], ["PATH", "~/Obrazy/wakacje"]]}
+{"text": "zmień nazwę stary_raport.xlsx na raport_q1.xlsx", "intent": "move_rename", "lang": "pl", "spans": [["PATH", "stary_raport.xlsx"], ["PATH", "raport_q1.xlsx"]]}
+{"text": "usuń plik /tmp/blokada.lock", "intent": "delete_file", "lang": "pl", "spans": [["PATH", "/tmp/blokada.lock"]]}
+{"text": "skasuj katalog build-artefakty razem z zawartością", "intent": "delete_dir", "lang": "pl", "spans": [["PATH", "build-artefakty"]]}
+{"text": "usuń wszystkie pliki .bak z /etc/qzx", "intent": "delete_by_ext", "lang": "pl", "spans": [["EXT", ".bak"], ["PATH", "/etc/qzx"]]}
+{"text": "utwórz katalog /srv/kopie/2025/styczeń", "intent": "mkdir", "lang": "pl", "spans": [["PATH", "/srv/kopie/2025/styczeń"]]}
+{"text": "stwórz pusty plik notatki_spotkanie.md", "intent": "touch_file", "lang": "pl", "spans": [["PATH", "notatki_spotkanie.md"]]}
+{"text": "zamień \"Kowalski\" na \"Nowak\" w pliku umowa.txt", "intent": "replace_text", "lang": "pl", "spans": [["PATTERN", "Kowalski"], ["REPL", "Nowak"], ["PATH", "umowa.txt"]]}
+{"text": "w config.ini podmień port=8080 na port=9443", "intent": "replace_text", "lang": "pl", "spans": [["PATH", "config.ini"], ["PATTERN", "port=8080"], ["REPL", "port=9443"]]}
+{"text": "policz sha256 pliku obraz_systemu.img", "intent": "hash_sha256", "lang": "pl", "spans": [["PATH", "obraz_systemu.img"]]}
+{"text": "suma md5 dla /var/backups/baza.sql.gz", "intent": "hash_md5", "lang": "pl", "spans": [["PATH", "/var/backups/baza.sql.gz"]]}
+{"text": "zakoduj w base64 tekst \"zażółć gęślą jaźń\"", "intent": "base64_encode", "lang": "pl", "spans": [["TEXT", "zażółć gęślą jaźń"]]}
+{"text": "odkoduj z base64 a3J6YWs=", "intent": "base64_decode", "lang": "pl", "spans": [["TEXT", "a3J6YWs="]]}
+{"text": "6 procesów najbardziej obciążających procesor", "intent": "top_cpu", "lang": "pl", "spans": [["NUM", "6"]]}
+{"text": "pokaż trzy procesy zjadające najwięcej ramu", "intent": "top_mem", "lang": "pl", "spans": [["NUM", "trzy"]]}
+{"text": "czy działa proces krzak-sync", "intent": "find_process", "lang": "pl", "spans": [["NAME", "krzak-sync"]]}
+{"text": "znajdź proces celery", "intent": "find_process", "lang": "pl", "spans": [["NAME", "celery"]]}
+{"text": "zabij wszystkie procesy qzx-scraper", "intent": "kill_by_name", "lang": "pl", "spans": [["NAME", "qzx-scraper"]]}
+{"text": "ubij siłowo proces Xorg", "intent": "kill_force", "lang": "pl", "spans": [["NAME", "Xorg"]]}
+{"text": "zakończ proces o PID 7731", "intent": "kill_by_pid", "lang": "pl", "spans": [["PID", "7731"]]}
+{"text": "zabij proces na porcie 8888", "intent": "kill_by_port", "lang": "pl", "spans": [["PORT", "8888"]]}
+{"text": "co słucha na porcie 9200", "intent": "process_on_port", "lang": "pl", "spans": [["PORT", "9200"]]}
+{"text": "logi usługi qzx-agent z ostatnich 30 minut", "intent": "journal_service", "lang": "pl", "spans": [["NAME", "qzx-agent"], ["TIME", "ostatnich 30 minut"]]}
+{"text": "pokaż logi sshd od wczoraj", "intent": "journal_service", "lang": "pl", "spans": [["NAME", "sshd"], ["TIME", "wczoraj"]]}
+{"text": "status usługi krzak-api", "intent": "service_status", "lang": "pl", "spans": [["NAME", "krzak-api"]]}
+{"text": "zrestartuj usługę nginx", "intent": "service_restart", "lang": "pl", "spans": [["NAME", "nginx"]]}
+{"text": "uruchom usługę mariadb", "intent": "service_start", "lang": "pl", "spans": [["NAME", "mariadb"]]}
+{"text": "zatrzymaj usługę cups-browsed", "intent": "service_stop", "lang": "pl", "spans": [["NAME", "cups-browsed"]]}
+{"text": "zainstaluj pakiet python3-venv", "intent": "install_package", "lang": "pl", "spans": [["NAME", "python3-venv"]]}
+{"text": "czy jest zainstalowany pakiet wireguard-tools", "intent": "package_installed", "lang": "pl", "spans": [["NAME", "wireguard-tools"]]}
+{"text": "jaka jest wartość zmiennej JAVA_HOME", "intent": "env_var_get", "lang": "pl", "spans": [["VAR", "JAVA_HOME"]]}
+{"text": "gdzie jest polecenie kubectl", "intent": "which_cmd", "lang": "pl", "spans": [["NAME", "kubectl"]]}
+{"text": "znajdź w historii komendę z \"docker run\"", "intent": "history_search", "lang": "pl", "spans": [["PATTERN", "docker run"]]}
+{"text": "pingnij 192.168.88.1 trzy razy", "intent": "ping_host", "lang": "pl", "spans": [["HOST", "192.168.88.1"], ["NUM", "trzy"]]}
+{"text": "sprawdź dns dla sklep-krzak.pl", "intent": "dns_lookup", "lang": "pl", "spans": [["HOST", "sklep-krzak.pl"]]}
+{"text": "czy port 5432 na db-replika-2 jest otwarty", "intent": "port_check", "lang": "pl", "spans": [["PORT", "5432"], ["HOST", "db-replika-2"]]}
+{"text": "nagłówki http dla https://www.gov.pl", "intent": "curl_headers", "lang": "pl", "spans": [["URL", "https://www.gov.pl"]]}
+{"text": "jaki kod zwraca https://api.krzak.io/v1/health", "intent": "http_status", "lang": "pl", "spans": [["URL", "https://api.krzak.io/v1/health"]]}
+{"text": "pobierz https://mirror.example.pl/obrazy/alpine-3.20.iso", "intent": "download_file", "lang": "pl", "spans": [["URL", "https://mirror.example.pl/obrazy/alpine-3.20.iso"]]}
+{"text": "połącz się przez ssh z admin@10.8.0.14", "intent": "ssh_connect", "lang": "pl", "spans": [["HOST", "admin@10.8.0.14"]]}
+{"text": "ostatnie 12 commitów", "intent": "git_log", "lang": "pl", "spans": [["NUM", "12"]]}
+{"text": "utwórz gałąź poprawka/KRZ-404-koszyk", "intent": "git_new_branch", "lang": "pl", "spans": [["BRANCH", "poprawka/KRZ-404-koszyk"]]}
+{"text": "przełącz się na gałąź develop", "intent": "git_switch_branch", "lang": "pl", "spans": [["BRANCH", "develop"]]}
+{"text": "usuń brancha eksperyment_qzx", "intent": "git_delete_branch", "lang": "pl", "spans": [["BRANCH", "eksperyment_qzx"]]}
+{"text": "wypchnij gałąź feature/platnosci-blik na origin", "intent": "git_push", "lang": "pl", "spans": [["BRANCH", "feature/platnosci-blik"]]}
+{"text": "zrób commit z wiadomością \"poprawka walidacji NIP\"", "intent": "git_commit", "lang": "pl", "spans": [["MSG", "poprawka walidacji NIP"]]}
+{"text": "sklonuj https://github.com/krzak/narzedzia.git", "intent": "git_clone", "lang": "pl", "spans": [["URL", "https://github.com/krzak/narzedzia.git"]]}
+{"text": "pokaż zmiany w pliku src/koszyk.ts", "intent": "git_diff", "lang": "pl", "spans": [["PATH", "src/koszyk.ts"]]}
+{"text": "logi kontenera qzx-ingest-7", "intent": "docker_logs", "lang": "pl", "spans": [["NAME", "qzx-ingest-7"]]}
+{"text": "zatrzymaj kontener stary_redis", "intent": "docker_stop", "lang": "pl", "spans": [["NAME", "stary_redis"]]}
+{"text": "wejdź do kontenera krzak-web-1", "intent": "docker_exec", "lang": "pl", "spans": [["NAME", "krzak-web-1"]]}

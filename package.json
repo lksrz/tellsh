@@ -1,7 +1,7 @@
 {
   "name": "tellsh",
-  "version": "0.1.0",
-  "description": "Offline natural-language (Polish & English) to bash command CLI. Tiny classifier + templates, no LLM at runtime, zero dependencies.",
+  "version": "0.2.0",
+  "description": "Offline natural-language (Polish & English) to shell command CLI: tool->intent->slot cascade of tiny linear models + templates for bash/zsh/sh/PowerShell (fish/cmd best effort). No LLM at runtime, zero dependencies.",
   "type": "module",
   "bin": {
     "tellsh": "bin/tellsh.js"
@@ -9,18 +9,27 @@
   "main": "src/cli.js",
   "exports": {
     ".": "./src/cli.js",
+    "./pipeline": "./src/pipeline.js",
     "./classifier": "./src/classifier.js",
+    "./cascade": "./src/cascade.js",
+    "./tagger": "./src/tagger.js",
     "./fill": "./src/fill.js",
     "./slots": "./src/slots.js",
     "./danger": "./src/danger.js",
     "./catalog": "./src/catalog.js",
+    "./history": "./src/history.js",
+    "./env": "./src/env.js",
+    "./compose": "./src/compose.js",
     "./package.json": "./package.json"
   },
   "files": [
     "bin/tellsh.js",
     "src/*.js",
     "model/model.bin",
+    "model/tldr_triggers.json",
+    "model/compose_explained.json",
     "README.md",
+    "DATA_LICENSES.md",
     "LICENSE"
   ],
   "engines": {
@@ -28,10 +37,13 @@
   },
   "scripts": {
     "test": "node --test test/",
-    "train": "python3 scripts/train.py",
+    "gen-data": "node scripts/gen_data.js",
+    "train": "node scripts/gen_data.js && python3 scripts/train.py && node scripts/build_triggers.js",
+    "tldr": "python3 -I scripts/tldr_ingest.py",
+    "teacher": "node scripts/teacher.js",
     "eval": "node scripts/eval.js",
     "bench": "taskset -c 0 node scripts/bench.js",
-    "prepack": "node -e \"require('fs').statSync('model/model.bin')\""
+    "prepack": "node -e \"for (const f of ['model/model.bin','model/tldr_triggers.json','model/compose_explained.json']) require('fs').statSync(f)\""
   },
   "keywords": [
     "cli",
@@ -42,7 +54,10 @@
     "offline",
     "polish",
     "intent-classification",
-    "terminal"
+    "terminal",
+    "powershell",
+    "zsh",
+    "slot-filling"
   ],
   "author": "lksrz <lukasz@wearfits.com>",
   "license": "MIT",

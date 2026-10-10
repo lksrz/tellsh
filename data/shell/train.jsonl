@@ -1,0 +1,958 @@
+{"text": "Get-ChildItem -Recurse C:\\Users\\me | sort Length -desc | select -first 10", "intent": "largest_files", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "which files are eating my C: drive? show the biggest ones", "intent": "largest_files", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "pokaż 15 największych plików w C:\\Users\\ola\\Downloads, może być przez Get-ChildItem", "intent": "largest_files", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "najwieksze pliki w /srv/data", "intent": "largest_files", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "biggest files in ~/Movies pls", "intent": "largest_files", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "jakie pliki zajmuja najwiecej miejsca na D:\\backup", "intent": "largest_files", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "top 20 largest files under /var/lib", "intent": "largest_files", "lang": "en", "shell": "fish", "os": "linux"}
+{"text": "które pliki w ~/Library zajmują najwięcej, daj top 5", "intent": "largest_files", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "which folders in C:\\ProgramData are the biggest", "intent": "largest_dirs", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "największe podfoldery w C:\\Users\\me\\AppData\\Local", "intent": "largest_dirs", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "what dirs under /var take most space", "intent": "largest_dirs", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "pokaż które katalogi w ~ są najcięższe", "intent": "largest_dirs", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "biggest subfolders of D:\\projects, top 5", "intent": "largest_dirs", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "ktore foldery w /opt zjadaja dysk", "intent": "largest_dirs", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "largest directories in /home sorted", "intent": "largest_dirs", "lang": "en", "shell": "fish", "os": "linux"}
+{"text": "Get-PSDrive, how much free space is left", "intent": "disk_free", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "ile wolnego miejsca zostało na dyskach C i D", "intent": "disk_free", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "wmic logicaldisk get freespace - show free disk space", "intent": "disk_free", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "sprawdź wolne miejsce na dysku w powershellu", "intent": "disk_free", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "how full is my mac's SSD", "intent": "disk_free", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "ile mam miejsca na dysku", "intent": "disk_free", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "df please, free space on all filesystems", "intent": "disk_free", "lang": "en", "shell": "sh", "os": "linux"}
+{"text": "pokaz zajetosc partycji", "intent": "disk_free", "lang": "pl", "shell": "fish", "os": "linux"}
+{"text": "free disk space on this box (pwsh on ubuntu)", "intent": "disk_free", "lang": "en", "shell": "powershell", "os": "linux"}
+{"text": "how big is C:\\Users\\me\\Documents in total", "intent": "dir_size", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "ile waży folder D:\\Gry\\Steam", "intent": "dir_size", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "total size of node_modules, use Measure-Object if you have to", "intent": "dir_size", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "ile zajmuje ~/Library/Caches", "intent": "dir_size", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "size of /var/log total", "intent": "dir_size", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "rozmiar katalogu /home/kuba", "intent": "dir_size", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "how much space does ~/.cache take", "intent": "dir_size", "lang": "en", "shell": "fish", "os": "linux"}
+{"text": "policz rozmiar folderu C:\\temp", "intent": "dir_size", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "dir /s /b *invoice* on C:\\Users\\me", "intent": "find_by_name", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "znajdź plik który się nazywa raport_2023 gdzieś na D:\\", "intent": "find_by_name", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "Get-ChildItem -Recurse -Filter *config* in C:\\inetpub", "intent": "find_by_name", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "wyszukaj plik hosts w C:\\Windows\\System32", "intent": "find_by_name", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "where is the file named .zshrc.backup", "intent": "find_by_name", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "znajdz plik docker-compose.yml w /srv", "intent": "find_by_name", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "find anything named \"README\" under ~/src", "intent": "find_by_name", "lang": "en", "shell": "fish", "os": "linux"}
+{"text": "gdzie mam plik o nazwie faktura_marzec", "intent": "find_by_name", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "locate files called id_rsa in my home", "intent": "find_by_name", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "dir /s *.pdf in C:\\Users\\me\\Downloads", "intent": "find_by_ext", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "pokaż wszystkie pliki .docx na pulpicie (C:\\Users\\anna\\Desktop)", "intent": "find_by_ext", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "Get-ChildItem all *.log recursively", "intent": "find_by_ext", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "użyj gci -Recurse -Include *.ps1 w C:\\scripts", "intent": "find_by_ext", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "list every .mp4 under D:\\Videos", "intent": "find_by_ext", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "wszystkie pliki .heic w ~/Pictures", "intent": "find_by_ext", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "find all yaml files in /etc/kubernetes", "intent": "find_by_ext", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "znajdz pliki .rs w ~/code", "intent": "find_by_ext", "lang": "pl", "shell": "fish", "os": "linux"}
+{"text": "find .dmg files in Downloads", "intent": "find_by_ext", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "pliki pdf w katalogu domowym", "intent": "find_by_ext", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "gci -r *.json in ~/projects (pwsh on my mac)", "intent": "find_by_ext", "lang": "en", "shell": "powershell", "os": "darwin"}
+{"text": "wylistuj wszystkie pliki exe w C:\\tools rekurencyjnie", "intent": "find_by_ext", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "files changed in the last 24 hours under C:\\work", "intent": "find_recent", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "pliki zmodyfikowane dzisiaj w C:\\Users\\me\\Documents", "intent": "find_recent", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "which files did I touch in the last hour in this folder", "intent": "find_recent", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "co się zmieniło w /etc w ciągu ostatnich 2 dni", "intent": "find_recent", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "files modified in the past 30 minutes in ~/Desktop", "intent": "find_recent", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "pliki zmienione wczoraj w ~/notes", "intent": "find_recent", "lang": "pl", "shell": "fish", "os": "linux"}
+{"text": "recently modified .conf files in /etc, last 3 days", "intent": "find_recent", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "files older than 90 days in C:\\Windows\\Temp", "intent": "find_older_than", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "pliki starsze niż 30 dni w D:\\logs", "intent": "find_older_than", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "stuff in /tmp not modified for a week", "intent": "find_older_than", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "stare pliki w ~/Downloads, nieruszane od pół roku", "intent": "find_older_than", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "Get-ChildItem where LastWriteTime is older than 60 days in C:\\backup", "intent": "find_older_than", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "znajdz logi starsze niz 14 dni w /var/log/nginx", "intent": "find_older_than", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "files bigger than 1GB on D:\\", "intent": "find_larger_than", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "pliki większe niż 500 MB w C:\\Users\\me", "intent": "find_larger_than", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "show me files over 2 GB anywhere in C:\\", "intent": "find_larger_than", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "co w ~/Movies ma ponad 4 giga", "intent": "find_larger_than", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "files larger than 100M in /var", "intent": "find_larger_than", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "pliki powyzej 50 mega w ~/Downloads", "intent": "find_larger_than", "lang": "pl", "shell": "fish", "os": "linux"}
+{"text": "find files above 300MB in /data", "intent": "find_larger_than", "lang": "en", "shell": "powershell", "os": "linux"}
+{"text": "files smaller than 1 KB in C:\\temp", "intent": "find_smaller_than", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "pliki mniejsze niż 10k w /var/spool", "intent": "find_smaller_than", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "tiny files under 100 bytes in this repo", "intent": "find_smaller_than", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "male pliki ponizej 5 KB w D:\\export", "intent": "find_smaller_than", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "Select-String \"TODO\" in all .cs files under C:\\src", "intent": "grep_text", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "szukaj słowa Exception w logach w C:\\logs przez Select-String", "intent": "grep_text", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "findstr /s /i \"connection refused\" *.log", "intent": "grep_text", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "findstr szukaj \"password\" we wszystkich plikach w C:\\config", "intent": "grep_text", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "grep for \"OOM\" in /var/log", "intent": "grep_text", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "znajdź wystąpienia \"deprecated\" w kodzie w ~/app/src", "intent": "grep_text", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "search for the string api_key in this project", "intent": "grep_text", "lang": "en", "shell": "fish", "os": "linux"}
+{"text": "gdzie w /etc jest wpisane 192.168.1.10", "intent": "grep_text", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "sls -Pattern 'FIXME' -Path *.py recursively", "intent": "grep_text", "lang": "en", "shell": "powershell", "os": "darwin"}
+{"text": "przeszukaj pliki *.xml w C:\\inetpub pod kątem connectionString", "intent": "grep_text", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "which files contain \"Copyright 2019\" in C:\\repo, just names", "intent": "grep_files_containing", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "wypisz tylko nazwy plików w których jest \"localhost:8080\"", "intent": "grep_files_containing", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "list files that mention log4j in /opt", "intent": "grep_files_containing", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "które pliki zawierają słowo \"secret\" w ~/dotfiles", "intent": "grep_files_containing", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "just filenames containing \"import torch\"", "intent": "grep_files_containing", "lang": "en", "shell": "fish", "os": "linux"}
+{"text": "pliki z tekstem \"DROP TABLE\" w /srv/sql", "intent": "grep_files_containing", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "how many lines in C:\\data\\users.csv (Get-Content | Measure-Object -Line)", "intent": "count_lines", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "ile linii ma plik D:\\export\\orders.txt", "intent": "count_lines", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "find /c /v \"\" big.log - count the lines", "intent": "count_lines", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "policz linie w /etc/passwd", "intent": "count_lines", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "wc -l on access.log", "intent": "count_lines", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "ile wierszy ma dane.csv", "intent": "count_lines", "lang": "pl", "shell": "fish", "os": "linux"}
+{"text": "line count of server.log please", "intent": "count_lines", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "total lines of code across all *.cs files in C:\\src\\app", "intent": "count_lines_code", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "ile linii kodu mają wszystkie pliki .ts w projekcie", "intent": "count_lines_code", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "how many lines of python do we have in ./src", "intent": "count_lines_code", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "policz łączną liczbę linii we wszystkich plikach .swift", "intent": "count_lines_code", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "sum of lines in all go files", "intent": "count_lines_code", "lang": "en", "shell": "fish", "os": "linux"}
+{"text": "how many files are in C:\\Users\\me\\Pictures (recursive)", "intent": "count_files", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "ile jest plików w D:\\zdjecia razem z podfolderami", "intent": "count_files", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "count files in /var/www", "intent": "count_files", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "ile plików jest w ~/Downloads", "intent": "count_files", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "count the .jpg files in C:\\photos", "intent": "count_files", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "liczba plików w /usr/share/doc", "intent": "count_files", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "word count of C:\\docs\\essay.txt", "intent": "count_words", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "ile słów ma plik notatki.txt", "intent": "count_words", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "how many words in thesis.md", "intent": "count_words", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "policz słowa w README.md", "intent": "count_words", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "liczba słów w rozdzial1.txt", "intent": "count_words", "lang": "pl", "shell": "fish", "os": "linux"}
+{"text": "most common lines in errors.log, Group-Object then sort by count", "intent": "sort_uniq", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "najczęściej powtarzające się linie w C:\\logs\\ip.txt", "intent": "sort_uniq", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "which lines repeat the most in access_ips.txt", "intent": "sort_uniq", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "policz duplikaty linii w lista.txt i pokaż top 10", "intent": "sort_uniq", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "top repeated entries in words.txt", "intent": "sort_uniq", "lang": "en", "shell": "fish", "os": "linux"}
+{"text": "10 most recently modified files in C:\\Users\\me\\Documents", "intent": "recent_files", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "ostatnio zmienione pliki w C:\\projekty, posortuj po LastWriteTime", "intent": "recent_files", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "dir /o-d - newest files first", "intent": "recent_files", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "najnowsze pliki w ~/Desktop", "intent": "recent_files", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "latest changed files under /var/www", "intent": "recent_files", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "które pliki były ostatnio edytowane w tym katalogu", "intent": "recent_files", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "find zero byte files in C:\\data", "intent": "empty_files", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "puste pliki na D:\\import", "intent": "empty_files", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "empty files in /tmp", "intent": "empty_files", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "znajdź puste pliki w projekcie", "intent": "empty_files", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "list empty folders under C:\\Users\\me\\Music", "intent": "empty_dirs", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "puste foldery w D:\\stare", "intent": "empty_dirs", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "which directories are empty in /srv/media", "intent": "empty_dirs", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "pokaz puste katalogi w ~/projekty", "intent": "empty_dirs", "lang": "pl", "shell": "fish", "os": "linux"}
+{"text": "find duplicate files in C:\\Photos using Get-FileHash", "intent": "duplicate_files", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "znajdź zduplikowane pliki w D:\\Muzyka", "intent": "duplicate_files", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "duplicate photos in ~/Pictures/import", "intent": "duplicate_files", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "powtórzone pliki (te same treści) w /data/backup", "intent": "duplicate_files", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "any duplicate files in ~/Downloads?", "intent": "duplicate_files", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "list symlinks / junctions in C:\\dev", "intent": "find_symlinks", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "pokaż dowiązania w C:\\Users\\me", "intent": "find_symlinks", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "show all symlinks in /usr/local/bin", "intent": "find_symlinks", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "jakie linki symboliczne są w ~/.config", "intent": "find_symlinks", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "find dangling symlinks in /etc/nginx/sites-enabled", "intent": "broken_symlinks", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "zepsute linki symboliczne w /usr/local", "intent": "broken_symlinks", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "broken links under ~/bin", "intent": "broken_symlinks", "lang": "en", "shell": "fish", "os": "linux"}
+{"text": "znajdz niedzialajace symlinki w /opt", "intent": "broken_symlinks", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "dir C:\\Users\\me\\Downloads", "intent": "list_files", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "pokaż zawartość folderu C:\\Program Files", "intent": "list_files", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "Get-ChildItem C:\\temp with details", "intent": "list_files", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "ls w powershellu dla D:\\muzyka", "intent": "list_files", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "ls -la of ~/Library/LaunchAgents", "intent": "list_files", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "wylistuj pliki w /etc/nginx", "intent": "list_files", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "what's in this folder", "intent": "list_files", "lang": "en", "shell": "fish", "os": "linux"}
+{"text": "co jest w ~/Downloads", "intent": "list_files", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "list files in /var/tmp with sizes", "intent": "list_files", "lang": "en", "shell": "powershell", "os": "linux"}
+{"text": "tree /f C:\\src\\myapp", "intent": "list_tree", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "pokaż drzewo katalogów D:\\projekt", "intent": "list_tree", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "show the folder tree of C:\\repo two levels deep", "intent": "list_tree", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "struktura katalogów /etc/systemd", "intent": "list_tree", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "tree view of this repo", "intent": "list_tree", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "drzewko folderow w ~/code/blog", "intent": "list_tree", "lang": "pl", "shell": "fish", "os": "linux"}
+{"text": "dir /a:h to show hidden files in C:\\Users\\me", "intent": "hidden_files", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "pokaż ukryte pliki (gci -Force) w C:\\Users\\me", "intent": "hidden_files", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "show hidden files in Finder - well, just list dotfiles in ~", "intent": "hidden_files", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "w Finderze ukryte pliki, pokaż mi je w terminalu", "intent": "hidden_files", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "list dotfiles in my home", "intent": "hidden_files", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "ukryte pliki w /root", "intent": "hidden_files", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "which hidden files are here", "intent": "hidden_files", "lang": "en", "shell": "fish", "os": "linux"}
+{"text": "what kind of file is C:\\Downloads\\unknown.bin", "intent": "file_type", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "jaki to typ pliku: dane.dat", "intent": "file_type", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "what type of file is mystery_file", "intent": "file_type", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "sprawdz typ pliku /usr/bin/node", "intent": "file_type", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "Get-Item C:\\data\\report.xlsx | Format-List * - all metadata", "intent": "file_stat", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "pokaż właściwości pliku C:\\Windows\\notepad.exe (data utworzenia, rozmiar)", "intent": "file_stat", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "stat of /etc/shadow", "intent": "file_stat", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "kiedy był ostatnio zmieniony plik ~/.zshrc", "intent": "file_stat", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "file details for setup.exe (size, dates)", "intent": "file_stat", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "Get-Content C:\\logs\\app.log -TotalCount 20", "intent": "head_file", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "pierwsze 5 linii pliku C:\\data\\clients.csv", "intent": "head_file", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "show the top of config.ini, first 15 lines", "intent": "head_file", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "pokaż początek pliku /etc/fstab", "intent": "head_file", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "first 30 lines of package.json", "intent": "head_file", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "pierwsze linijki z dane.tsv", "intent": "head_file", "lang": "pl", "shell": "fish", "os": "linux"}
+{"text": "Get-Content C:\\logs\\app.log -Tail 50", "intent": "tail_file", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "ostatnie 20 linii pliku C:\\inetpub\\logs\\u_ex231011.log", "intent": "tail_file", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "last lines of install.log", "intent": "tail_file", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "końcówka pliku /var/log/auth.log, 40 linii", "intent": "tail_file", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "last 10 lines of build.log", "intent": "tail_file", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "ostatnie wpisy w error.log", "intent": "tail_file", "lang": "pl", "shell": "fish", "os": "linux"}
+{"text": "Get-Content C:\\logs\\service.log -Wait - follow it live", "intent": "tail_follow", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "śledź na żywo plik C:\\app\\logs\\debug.log", "intent": "tail_follow", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "tail -f the nginx error log /var/log/nginx/error.log", "intent": "tail_follow", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "podgląd na żywo /var/log/system.log", "intent": "tail_follow", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "watch the system log live", "intent": "tail_follow", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "obserwuj logi w czasie rzeczywistym", "intent": "tail_follow", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "follow app.log as it grows", "intent": "tail_follow", "lang": "en", "shell": "fish", "os": "linux"}
+{"text": "type C:\\Windows\\System32\\drivers\\etc\\hosts", "intent": "cat_file", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "wyświetl zawartość pliku notes.txt (type)", "intent": "cat_file", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "gc .\\settings.json", "intent": "cat_file", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "pokaż co jest w pliku C:\\Users\\me\\.gitconfig", "intent": "cat_file", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "print /etc/hostname", "intent": "cat_file", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "wyświetl plik ~/.ssh/config", "intent": "cat_file", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "cat ~/.config/fish/config.fish", "intent": "cat_file", "lang": "en", "shell": "fish", "os": "linux"}
+{"text": "pokaz plik /etc/resolv.conf", "intent": "cat_file", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "tar -czf on windows: pack C:\\site into site.tar.gz", "intent": "compress_targz", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "spakuj katalog /var/www do www.tar.gz", "intent": "compress_targz", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "make a tarball of ~/projects/blog", "intent": "compress_targz", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "zrób tar.gz z folderu zdjecia", "intent": "compress_targz", "lang": "pl", "shell": "fish", "os": "linux"}
+{"text": "archive /etc as etc-backup.tar.gz", "intent": "compress_targz", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "skompresuj ~/Documents/umowy do tgz", "intent": "compress_targz", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "extract node-v20.tar.gz into C:\\tools (tar is built into windows 10)", "intent": "extract_targz", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "rozpakuj archiwum backup.tar.gz", "intent": "extract_targz", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "untar logs.tar.gz into /tmp/logs", "intent": "extract_targz", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "wypakuj ~/Downloads/ffmpeg.tar.gz", "intent": "extract_targz", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "unpack release.tgz here", "intent": "extract_targz", "lang": "en", "shell": "fish", "os": "linux"}
+{"text": "rozpakuj plik dane.tar.gz do /srv/dane", "intent": "extract_targz", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "Compress-Archive C:\\reports to reports.zip", "intent": "compress_zip", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "spakuj folder C:\\Users\\me\\Desktop\\projekt do zipa", "intent": "compress_zip", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "zip up D:\\photos\\2023", "intent": "compress_zip", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "zrób zipa z ~/Documents/cv", "intent": "compress_zip", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "zip the dist folder", "intent": "compress_zip", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "skompresuj /home/ola/faktury do faktury.zip", "intent": "compress_zip", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "Expand-Archive C:\\Downloads\\tools.zip -DestinationPath C:\\tools", "intent": "extract_zip", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "rozpakuj plik C:\\Users\\me\\Downloads\\sterowniki.zip", "intent": "extract_zip", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "unzip setup.zip in this folder", "intent": "extract_zip", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "wypakuj ~/Downloads/fonts.zip", "intent": "extract_zip", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "extract archive.zip into /opt/app", "intent": "extract_zip", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "rozpakuj zipa materialy.zip", "intent": "extract_zip", "lang": "pl", "shell": "fish", "os": "linux"}
+{"text": "what's inside C:\\Downloads\\backup.zip without extracting", "intent": "list_archive", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "pokaż zawartość archiwum logi.zip", "intent": "list_archive", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "list files in backup.tar.gz", "intent": "list_archive", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "co jest w środku ~/Downloads/src.tar.gz", "intent": "list_archive", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "peek into release.zip", "intent": "list_archive", "lang": "en", "shell": "fish", "os": "linux"}
+{"text": "wylistuj pliki w archiwum dump.tar", "intent": "list_archive", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "set permissions 644 on index.html", "intent": "chmod", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "ustaw prawa 755 na deploy.sh", "intent": "chmod", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "chmod 600 ~/.ssh/id_ed25519", "intent": "chmod", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "zmień uprawnienia pliku secrets.env na 600", "intent": "chmod", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "give config.yml mode 640", "intent": "chmod", "lang": "en", "shell": "fish", "os": "linux"}
+{"text": "nadaj prawa 700 katalogowi /srv/private", "intent": "chmod", "lang": "pl", "shell": "sh", "os": "linux"}
+{"text": "make run.sh executable", "intent": "make_executable", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "daj prawa wykonywania dla install.sh", "intent": "make_executable", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "chmod +x build.sh", "intent": "make_executable", "lang": "en", "shell": "fish", "os": "linux"}
+{"text": "zrób skrypt ~/bin/backup wykonywalnym", "intent": "make_executable", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "let me execute ./start", "intent": "make_executable", "lang": "en", "shell": "sh", "os": "linux"}
+{"text": "uczyn plik skrypt.py wykonywalnym", "intent": "make_executable", "lang": "pl", "shell": "fish", "os": "linux"}
+{"text": "change owner of /var/www to www-data", "intent": "chown", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "zmień właściciela /srv/app na użytkownika deploy", "intent": "chown", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "chown /opt/minecraft to user mc", "intent": "chown", "lang": "en", "shell": "sh", "os": "linux"}
+{"text": "ustaw właściciela ~/shared na kasia", "intent": "chown", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "make user postgres own /data/pg", "intent": "chown", "lang": "en", "shell": "powershell", "os": "linux"}
+{"text": "copy C:\\Users\\me\\Desktop\\report.docx to D:\\backup", "intent": "copy", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "skopiuj plik faktura.pdf do C:\\Users\\me\\Documents", "intent": "copy", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "xcopy the whole C:\\site folder to E:\\site_backup", "intent": "copy", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "Copy-Item C:\\config\\app.json do C:\\config\\app.json.bak", "intent": "copy", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "robocopy D:\\photos to E:\\photos", "intent": "copy", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "skopiuj ~/Documents/cv.pdf na pulpit", "intent": "copy", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "copy /etc/nginx to /root/nginx-bak", "intent": "copy", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "zrób kopię pliku config.yaml jako config.yaml.orig", "intent": "copy", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "duplicate notes.md into ~/archive", "intent": "copy", "lang": "en", "shell": "fish", "os": "linux"}
+{"text": "ren old_report.txt report_2023.txt", "intent": "move_rename", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "zmień nazwę pliku zdjecie.JPG na wakacje.jpg", "intent": "move_rename", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "Move-Item C:\\temp\\setup.log to C:\\logs", "intent": "move_rename", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "przenieś D:\\pobrane\\film.mkv do D:\\Filmy", "intent": "move_rename", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "move C:\\Users\\me\\Downloads\\*.zip to D:\\archives", "intent": "move_rename", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "przenieś ~/Desktop/screenshot.png do ~/Pictures", "intent": "move_rename", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "rename app.conf to app.conf.old", "intent": "move_rename", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "przenieś plik /tmp/dump.sql do /srv/backup", "intent": "move_rename", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "mv draft.md to posts/final.md", "intent": "move_rename", "lang": "en", "shell": "fish", "os": "linux"}
+{"text": "del C:\\temp\\old.log", "intent": "delete_file", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "usuń plik D:\\pobrane\\instalator.exe", "intent": "delete_file", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "Remove-Item C:\\Users\\me\\Desktop\\junk.txt", "intent": "delete_file", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "skasuj plik C:\\logs\\debug.txt przez Remove-Item", "intent": "delete_file", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "delete /tmp/test.txt", "intent": "delete_file", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "wywal plik ~/Desktop/notatka.txt", "intent": "delete_file", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "remove the file core.dump", "intent": "delete_file", "lang": "en", "shell": "fish", "os": "linux"}
+{"text": "usuń plik zrzut.sql", "intent": "delete_file", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "rd /s /q C:\\temp\\build", "intent": "delete_dir", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "usuń cały folder D:\\stare_projekty razem z zawartością", "intent": "delete_dir", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "Remove-Item -Recurse -Force .\\node_modules", "intent": "delete_dir", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "skasuj katalog C:\\Users\\me\\AppData\\Local\\Temp\\cache rekursywnie", "intent": "delete_dir", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "delete the directory /var/cache/myapp", "intent": "delete_dir", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "usuń folder ~/Library/Caches/com.spotify.client", "intent": "delete_dir", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "nuke the build dir", "intent": "delete_dir", "lang": "en", "shell": "fish", "os": "linux"}
+{"text": "del /s *.tmp in C:\\work", "intent": "delete_by_ext", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "usuń wszystkie pliki .bak z D:\\projekty", "intent": "delete_by_ext", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "Get-ChildItem -Recurse *.pyc | Remove-Item", "intent": "delete_by_ext", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "skasuj wszystkie pliki log w C:\\inetpub\\logs", "intent": "delete_by_ext", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "delete all .orig files in this repo", "intent": "delete_by_ext", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "wyrzuć wszystkie pliki .DS_Store z ~/Projects", "intent": "delete_by_ext", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "remove every .class file under target", "intent": "delete_by_ext", "lang": "en", "shell": "fish", "os": "linux"}
+{"text": "md C:\\projects\\new_app", "intent": "mkdir", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "utwórz folder D:\\backup\\2024\\styczen", "intent": "mkdir", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "New-Item -ItemType Directory C:\\temp\\logs", "intent": "mkdir", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "zrób nowy katalog C:\\dev\\playground", "intent": "mkdir", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "create the directory /opt/app/config", "intent": "mkdir", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "stwórz folder ~/Code/sandbox", "intent": "mkdir", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "make a dir called scratch", "intent": "mkdir", "lang": "en", "shell": "fish", "os": "linux"}
+{"text": "New-Item -ItemType File C:\\temp\\empty.txt", "intent": "touch_file", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "utwórz pusty plik .env w bieżącym folderze", "intent": "touch_file", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "create an empty file called placeholder.txt", "intent": "touch_file", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "stwórz pusty plik /tmp/lock", "intent": "touch_file", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "touch README.md", "intent": "touch_file", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "zrob nowy pusty plik todo.txt", "intent": "touch_file", "lang": "pl", "shell": "fish", "os": "linux"}
+{"text": "which folder am I in right now (cd)", "intent": "current_dir", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "Get-Location - gdzie jestem", "intent": "current_dir", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "print the current path", "intent": "current_dir", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "w jakim katalogu jestem", "intent": "current_dir", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "pwd", "intent": "current_dir", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "pokaż bieżący katalog", "intent": "current_dir", "lang": "pl", "shell": "fish", "os": "linux"}
+{"text": "mklink /D C:\\dev\\shared D:\\shared", "intent": "create_symlink", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "utwórz link symboliczny C:\\Users\\me\\config wskazujący na D:\\config", "intent": "create_symlink", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "New-Item -ItemType SymbolicLink from C:\\links\\python to C:\\Python312", "intent": "create_symlink", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "zrób symlink /usr/local/bin/node do /opt/node/bin/node", "intent": "create_symlink", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "symlink ~/Dropbox/dotfiles/.vimrc to ~/.vimrc", "intent": "create_symlink", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "utwórz dowiązanie symboliczne do pliku config.json", "intent": "create_symlink", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "fc config_old.ini config_new.ini", "intent": "diff_files", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "porównaj pliki C:\\a\\settings.xml i C:\\b\\settings.xml", "intent": "diff_files", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "Compare-Object (gc old.txt) (gc new.txt)", "intent": "diff_files", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "jakie są różnice między plikami v1.json i v2.json", "intent": "diff_files", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "diff nginx.conf and nginx.conf.bak", "intent": "diff_files", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "porownaj /etc/hosts z hosts.orig", "intent": "diff_files", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "what changed between list1.txt and list2.txt", "intent": "diff_files", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "replace \"localhost\" with \"db.prod\" in C:\\app\\config.json", "intent": "replace_text", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "zamień w pliku settings.ini słowo DEBUG na INFO", "intent": "replace_text", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "sed replace foo with bar in main.c", "intent": "replace_text", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "podmień wszystkie \"http://\" na \"https://\" w index.html", "intent": "replace_text", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "in README.md swap \"v1.2\" for \"v1.3\"", "intent": "replace_text", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "zamień tekst stara_nazwa na nowa_nazwa w pliku app.yml", "intent": "replace_text", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "replace 8080 with 9090 in docker-compose.yml", "intent": "replace_text", "lang": "en", "shell": "fish", "os": "linux"}
+{"text": "mountvol - what volumes are mounted", "intent": "disk_mounts", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "pokaż zamontowane woluminy (Get-Volume)", "intent": "disk_mounts", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "show mounted filesystems", "intent": "disk_mounts", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "co jest zamontowane", "intent": "disk_mounts", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "list mount points", "intent": "disk_mounts", "lang": "en", "shell": "fish", "os": "linux"}
+{"text": "diskpart list disk - show my physical disks", "intent": "block_devices", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "Get-Disk, pokaż dyski i partycje", "intent": "block_devices", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "diskutil list", "intent": "block_devices", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "jakie mam dyski i partycje na macu", "intent": "block_devices", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "show disks and partitions", "intent": "block_devices", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "lista dysków (lsblk)", "intent": "block_devices", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "Get-FileHash C:\\Downloads\\ubuntu-24.04.iso", "intent": "hash_sha256", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "policz sha256 pliku C:\\Users\\me\\Downloads\\setup.exe", "intent": "hash_sha256", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "certutil -hashfile installer.msi SHA256", "intent": "hash_sha256", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "suma kontrolna sha256 dla pliku obraz.iso", "intent": "hash_sha256", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "shasum -a 256 the file ~/Downloads/app.dmg", "intent": "hash_sha256", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "sha256 pliku /tmp/release.tar.gz", "intent": "hash_sha256", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "sha-256 checksum of firmware.bin", "intent": "hash_sha256", "lang": "en", "shell": "fish", "os": "linux"}
+{"text": "Get-FileHash -Algorithm MD5 C:\\data\\dump.bak", "intent": "hash_md5", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "certutil -hashfile film.mp4 MD5", "intent": "hash_md5", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "md5 of archive.zip", "intent": "hash_md5", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "policz md5 pliku ~/Desktop/plik.pdf", "intent": "hash_md5", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "md5sum of /var/backups/db.sql", "intent": "hash_md5", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "jaka jest suma md5 pliku obraz.img", "intent": "hash_md5", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "base64 encode the string hello world in powershell", "intent": "base64_encode", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "zakoduj tekst \"admin:haslo123\" w base64", "intent": "base64_encode", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "certutil -encode logo.png to base64", "intent": "base64_encode", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "zakoduj plik klucz.pem w base64", "intent": "base64_encode", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "base64 the text \"user:pass\"", "intent": "base64_encode", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "przerob napis tajne na base64", "intent": "base64_encode", "lang": "pl", "shell": "fish", "os": "linux"}
+{"text": "decode this base64: aGVsbG8gd29ybGQ=", "intent": "base64_decode", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "odkoduj base64 \"c2VjcmV0\"", "intent": "base64_decode", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "certutil -decode encoded.txt", "intent": "base64_decode", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "zdekoduj plik token.b64 z base64", "intent": "base64_decode", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "what does dGVzdA== decode to", "intent": "base64_decode", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "odszyfruj base64 cGFzc3dvcmQ=", "intent": "base64_decode", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "Get-Process | sort CPU -desc | select -first 10", "intent": "top_cpu", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "użyj Get-Process i pokaż top 5 wg procesora", "intent": "top_cpu", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "which programs are hogging the cpu", "intent": "top_cpu", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "co tak obciąża procesor", "intent": "top_cpu", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "what's using all my CPU, like activity monitor", "intent": "top_cpu", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "procesy które najbardziej zżerają procka", "intent": "top_cpu", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "top 15 cpu hungry processes", "intent": "top_cpu", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "najbardziej obciazajace procesy", "intent": "top_cpu", "lang": "pl", "shell": "fish", "os": "linux"}
+{"text": "Get-Process sorted by cpu on linux pwsh", "intent": "top_cpu", "lang": "en", "shell": "powershell", "os": "linux"}
+{"text": "Get-Process | Sort-Object WS -Descending | Select -First 10", "intent": "top_mem", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "użyj Get-Process i pokaż top 5 wg pamięci", "intent": "top_mem", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "tasklist sorted by memory usage", "intent": "top_mem", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "co zjada cały RAM", "intent": "top_mem", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "which apps use the most memory on my mac", "intent": "top_mem", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "procesy zżerające najwięcej pamięci", "intent": "top_mem", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "top memory consumers", "intent": "top_mem", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "10 procesów z największym użyciem ramu", "intent": "top_mem", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "what's eating my ram", "intent": "top_mem", "lang": "en", "shell": "fish", "os": "linux"}
+{"text": "tasklist | find chrome", "intent": "find_process", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "tasklist | findstr java - czy działa?", "intent": "find_process", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "Get-Process -Name *node*", "intent": "find_process", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "czy jest uruchomiony proces teams", "intent": "find_process", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "is Spotify running?", "intent": "find_process", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "znajdź proces python", "intent": "find_process", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "pgrep for gunicorn", "intent": "find_process", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "czy chodzi proces nginx", "intent": "find_process", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "is there a postgres process running", "intent": "find_process", "lang": "en", "shell": "fish", "os": "linux"}
+{"text": "pokaż proces o nazwie OUTLOOK", "intent": "find_process", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "taskkill /im notepad.exe", "intent": "kill_by_name", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "taskkill excel.exe", "intent": "kill_by_name", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "Stop-Process notepad", "intent": "kill_by_name", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "Stop-Process -Name chrome, zamknij go", "intent": "kill_by_name", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "kill Slack", "intent": "kill_by_name", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "zabij proces Dropbox", "intent": "kill_by_name", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "kill all node processes", "intent": "kill_by_name", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "ubij procesy python3", "intent": "kill_by_name", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "stop the firefox process", "intent": "kill_by_name", "lang": "en", "shell": "fish", "os": "linux"}
+{"text": "taskkill /f /im explorer.exe", "intent": "kill_force", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "wymuś zamknięcie programu zawieszony.exe (taskkill /F)", "intent": "kill_force", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "Stop-Process -Name java -Force", "intent": "kill_force", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "siłowo ubij proces vlc", "intent": "kill_force", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "force quit Xcode, it's frozen", "intent": "kill_force", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "kill -9 wszystkie procesy ffmpeg", "intent": "kill_force", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "SIGKILL every chromium process", "intent": "kill_force", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "zabij na twardo proces steam", "intent": "kill_force", "lang": "pl", "shell": "fish", "os": "linux"}
+{"text": "taskkill /pid 4312", "intent": "kill_by_pid", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "zabij proces o PID 9921", "intent": "kill_by_pid", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "Stop-Process -Id 15024", "intent": "kill_by_pid", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "zakończ proces 7788", "intent": "kill_by_pid", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "kill pid 31337", "intent": "kill_by_pid", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "zabij proces 552", "intent": "kill_by_pid", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "terminate process 12001", "intent": "kill_by_pid", "lang": "en", "shell": "fish", "os": "linux"}
+{"text": "kill whatever is listening on port 3000", "intent": "kill_by_port", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "zabij proces który blokuje port 8080", "intent": "kill_by_port", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "free up port 5000, something is stuck on it", "intent": "kill_by_port", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "zwolnij port 4200", "intent": "kill_by_port", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "kill the thing on port 9229", "intent": "kill_by_port", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "ubij to co siedzi na porcie 5432", "intent": "kill_by_port", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "netstat -an | find \"LISTENING\"", "intent": "listening_ports", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "jakie porty nasłuchują na tym komputerze", "intent": "listening_ports", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "Get-NetTCPConnection -State Listen", "intent": "listening_ports", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "pokaż otwarte porty (nasłuchujące)", "intent": "listening_ports", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "what ports are open locally on my mac", "intent": "listening_ports", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "lista nasłuchujących portów", "intent": "listening_ports", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "which services listen on which ports", "intent": "listening_ports", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "otwarte porty na serwerze", "intent": "listening_ports", "lang": "pl", "shell": "fish", "os": "linux"}
+{"text": "netstat -ano | findstr :8080", "intent": "process_on_port", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "który program używa portu 443", "intent": "process_on_port", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "Get-NetTCPConnection -LocalPort 3389 - who owns it", "intent": "process_on_port", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "co zajmuje port 1433", "intent": "process_on_port", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "lsof -i :3000", "intent": "process_on_port", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "jaki proces słucha na porcie 5000", "intent": "process_on_port", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "who's on port 25", "intent": "process_on_port", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "sprawdź co jest na porcie 6379", "intent": "process_on_port", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "netstat -n | find \"ESTABLISHED\"", "intent": "established_connections", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "pokaż aktywne połączenia sieciowe (Get-NetTCPConnection -State Established)", "intent": "established_connections", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "current open network connections", "intent": "established_connections", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "aktywne połączenia tcp", "intent": "established_connections", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "established connections right now", "intent": "established_connections", "lang": "en", "shell": "fish", "os": "linux"}
+{"text": "show processes as a parent/child tree", "intent": "process_tree", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "drzewo procesów w windowsie", "intent": "process_tree", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "pstree style process list", "intent": "process_tree", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "pokaż drzewo procesów", "intent": "process_tree", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "process hierarchy", "intent": "process_tree", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "systeminfo", "intent": "system_info", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "pokaż informacje o systemie", "intent": "system_info", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "Get-ComputerInfo", "intent": "system_info", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "informacje o systemie (uname)", "intent": "system_info", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "system info please", "intent": "system_info", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "daj info o maszynie", "intent": "system_info", "lang": "pl", "shell": "fish", "os": "linux"}
+{"text": "ver - which windows version is this", "intent": "os_release", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "jaka mam wersję windowsa", "intent": "os_release", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "what Windows build am I on", "intent": "os_release", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "jaka wersja macOS (sw_vers)", "intent": "os_release", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "which macOS version am I running", "intent": "os_release", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "jaka dystrybucja linuxa", "intent": "os_release", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "what distro is this", "intent": "os_release", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "kernel version", "intent": "kernel_version", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "jaka wersja jądra", "intent": "kernel_version", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "darwin kernel version", "intent": "kernel_version", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "wersja kernela", "intent": "kernel_version", "lang": "pl", "shell": "fish", "os": "linux"}
+{"text": "uname -r from pwsh", "intent": "kernel_version", "lang": "en", "shell": "powershell", "os": "linux"}
+{"text": "how much RAM is free (Get-CimInstance Win32_OperatingSystem)", "intent": "memory_usage", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "ile wolnej pamięci RAM", "intent": "memory_usage", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "memory usage on my mac", "intent": "memory_usage", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "ile ramu jest zajęte", "intent": "memory_usage", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "free -h", "intent": "memory_usage", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "zużycie pamięci", "intent": "memory_usage", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "how much memory do I have left", "intent": "memory_usage", "lang": "en", "shell": "fish", "os": "linux"}
+{"text": "wmic cpu get name - what processor do I have", "intent": "cpu_info", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "jaki mam procesor", "intent": "cpu_info", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "which chip is in this mac, M1 or intel?", "intent": "cpu_info", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "model procesora", "intent": "cpu_info", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "cpu details", "intent": "cpu_info", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "echo %NUMBER_OF_PROCESSORS%", "intent": "cpu_cores", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "ile rdzeni ma ten komputer", "intent": "cpu_cores", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "sysctl hw.ncpu - how many cores", "intent": "cpu_cores", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "ile mam rdzeni", "intent": "cpu_cores", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "number of cpu threads", "intent": "cpu_cores", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "liczba rdzeni procesora", "intent": "cpu_cores", "lang": "pl", "shell": "fish", "os": "linux"}
+{"text": "Get-Uptime - how long since last boot", "intent": "uptime", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "od kiedy komputer jest włączony", "intent": "uptime", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "when did this pc last restart", "intent": "uptime", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "jak długo działa mac bez restartu", "intent": "uptime", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "uptime and load", "intent": "uptime", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "od ilu dni chodzi serwer", "intent": "uptime", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "hostname", "intent": "hostname", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "jak się nazywa ten komputer", "intent": "hostname", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "$env:COMPUTERNAME", "intent": "hostname", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "nazwa hosta", "intent": "hostname", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "what's this machine called", "intent": "hostname", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "pokaz hostname", "intent": "hostname", "lang": "pl", "shell": "fish", "os": "linux"}
+{"text": "whoami", "intent": "whoami", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "jako kto jestem zalogowany", "intent": "whoami", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "which user am I", "intent": "whoami", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "jaki jest mój login", "intent": "whoami", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "kim jestem w systemie", "intent": "whoami", "lang": "pl", "shell": "fish", "os": "linux"}
+{"text": "query user - who is logged in", "intent": "users_logged_in", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "kto jest zalogowany na tym serwerze", "intent": "users_logged_in", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "who else is on this box", "intent": "users_logged_in", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "zalogowani użytkownicy", "intent": "users_logged_in", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "who is logged in", "intent": "users_logged_in", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "recent logons from the event log", "intent": "last_logins", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "ostatnie logowania", "intent": "last_logins", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "last 20 logins", "intent": "last_logins", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "historia logowań", "intent": "last_logins", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "who logged in recently", "intent": "last_logins", "lang": "en", "shell": "fish", "os": "linux"}
+{"text": "set - show all environment variables", "intent": "env_vars", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "wypisz zmienne środowiskowe", "intent": "env_vars", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "Get-ChildItem env:", "intent": "env_vars", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "gci env: posortowane", "intent": "env_vars", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "print all env vars", "intent": "env_vars", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "pokaż wszystkie zmienne środowiskowe", "intent": "env_vars", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "list environment", "intent": "env_vars", "lang": "en", "shell": "fish", "os": "linux"}
+{"text": "echo %JAVA_HOME%", "intent": "env_var_get", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "jaka jest wartość zmiennej USERPROFILE", "intent": "env_var_get", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "$env:TEMP", "intent": "env_var_get", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "pokaż zmienną środowiskową PSModulePath", "intent": "env_var_get", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "what is $SHELL set to", "intent": "env_var_get", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "wartość zmiennej HOME", "intent": "env_var_get", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "echo $EDITOR", "intent": "env_var_get", "lang": "en", "shell": "fish", "os": "linux"}
+{"text": "co jest w zmiennej LANG", "intent": "env_var_get", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "where python", "intent": "which_cmd", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "gdzie jest zainstalowany git.exe", "intent": "which_cmd", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "Get-Command node - which one runs", "intent": "which_cmd", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "gdzie leży kubectl (Get-Command)", "intent": "which_cmd", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "which brew", "intent": "which_cmd", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "skąd się uruchamia python3", "intent": "which_cmd", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "path to the java binary", "intent": "which_cmd", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "gdzie jest fish", "intent": "which_cmd", "lang": "pl", "shell": "fish", "os": "linux"}
+{"text": "echo %PATH%", "intent": "show_path", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "pokaż PATH", "intent": "show_path", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "$env:Path -split ';'", "intent": "show_path", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "wypisz katalogi z PATH po jednym w linii", "intent": "show_path", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "show my PATH one per line", "intent": "show_path", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "pokaż ścieżkę PATH", "intent": "show_path", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "print $PATH entries", "intent": "show_path", "lang": "en", "shell": "fish", "os": "linux"}
+{"text": "Get-History | Select-String ssh", "intent": "history_search", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "szukaj w historii poleceń \"docker run\"", "intent": "history_search", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "doskey /history | find \"git push\"", "intent": "history_search", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "znajdź w historii zsh komendę rsync", "intent": "history_search", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "search zsh history for kubectl", "intent": "history_search", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "w historii basha szukaj scp", "intent": "history_search", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "history search for ffmpeg", "intent": "history_search", "lang": "en", "shell": "fish", "os": "linux"}
+{"text": "date /t and time /t", "intent": "date_time", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "która godzina", "intent": "date_time", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "Get-Date", "intent": "date_time", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "pokaż datę i godzinę", "intent": "date_time", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "what's the date today", "intent": "date_time", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "jaka jest data", "intent": "date_time", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "tzutil /g", "intent": "timezone", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "Get-TimeZone, jaka strefa czasowa", "intent": "timezone", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "which timezone is my mac set to", "intent": "timezone", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "jaka jest strefa czasowa systemu", "intent": "timezone", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "show time zone", "intent": "timezone", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "show a calendar", "intent": "calendar", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "pokaż kalendarz na ten miesiąc", "intent": "calendar", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "cal", "intent": "calendar", "lang": "en", "shell": "fish", "os": "linux"}
+{"text": "kalendarz", "intent": "calendar", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "schtasks /query - list scheduled tasks", "intent": "cron_list", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "pokaż zaplanowane zadania (Get-ScheduledTask)", "intent": "cron_list", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "list my cron jobs", "intent": "cron_list", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "jakie mam wpisy w cronie", "intent": "cron_list", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "crontab -l", "intent": "cron_list", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "pokaż crontaba", "intent": "cron_list", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "edit crontab", "intent": "cron_edit", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "edytuj zadania crona", "intent": "cron_edit", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "open my crontab in the editor", "intent": "cron_edit", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "dodaj zadanie do crona (edytuj crontab)", "intent": "cron_edit", "lang": "pl", "shell": "fish", "os": "linux"}
+{"text": "logs of the nginx service", "intent": "journal_service", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "logi usługi docker z journalctl", "intent": "journal_service", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "journalctl for sshd since yesterday", "intent": "journal_service", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "pokaż logi postgresql z ostatniej godziny", "intent": "journal_service", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "event log entries for the W3SVC service", "intent": "journal_service", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "Get-EventLog dla usługi MSSQLSERVER", "intent": "journal_service", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "logs for the bluetoothd daemon", "intent": "journal_service", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "Get-EventLog System -EntryType Error -Newest 50", "intent": "journal_errors", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "pokaż błędy z dziennika zdarzeń systemu", "intent": "journal_errors", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "show system errors from event viewer", "intent": "journal_errors", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "błędy systemowe z journala", "intent": "journal_errors", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "show error level logs since boot", "intent": "journal_errors", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "systemowe błędy z ostatniej godziny", "intent": "journal_errors", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "sc query spooler", "intent": "service_status", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "status usługi wuauserv", "intent": "service_status", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "Get-Service sshd", "intent": "service_status", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "czy usługa MSSQLSERVER działa (Get-Service)", "intent": "service_status", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "is nginx running? systemctl status", "intent": "service_status", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "status usługi cron", "intent": "service_status", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "status of the postgresql service", "intent": "service_status", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "sprawdz status uslugi redis", "intent": "service_status", "lang": "pl", "shell": "fish", "os": "linux"}
+{"text": "Restart-Service spooler", "intent": "service_restart", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "zrestartuj usługę W3SVC", "intent": "service_restart", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "restart the print spooler service", "intent": "service_restart", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "net stop i net start dla usługi Apache2.4 (restart)", "intent": "service_restart", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "brew services restart postgresql@15", "intent": "service_restart", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "zrestartuj nginx przez brew services", "intent": "service_restart", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "restart apache2", "intent": "service_restart", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "zrestartuj usługę docker", "intent": "service_restart", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "bounce the redis service", "intent": "service_restart", "lang": "en", "shell": "fish", "os": "linux"}
+{"text": "net stop wuauserv", "intent": "service_stop", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "zatrzymaj usługę wyszukiwania WSearch", "intent": "service_stop", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "Stop-Service -Name Spooler", "intent": "service_stop", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "zatrzymaj usługę bufora wydruku (Stop-Service)", "intent": "service_stop", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "brew services stop mysql", "intent": "service_stop", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "zatrzymaj usługę mongodb-community", "intent": "service_stop", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "stop the nginx service", "intent": "service_stop", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "wyłącz usługę bluetooth", "intent": "service_stop", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "net start MSSQLSERVER", "intent": "service_start", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "uruchom usługę Spooler", "intent": "service_start", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "Start-Service sshd", "intent": "service_start", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "wystartuj usługę W3SVC", "intent": "service_start", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "brew services start redis", "intent": "service_start", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "odpal usługę postgresql", "intent": "service_start", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "start the docker service", "intent": "service_start", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "uruchom usługę cups", "intent": "service_start", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "Set-Service sshd -StartupType Automatic", "intent": "service_enable", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "ustaw usługę ssh-agent żeby startowała automatycznie", "intent": "service_enable", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "enable nginx at boot", "intent": "service_enable", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "włącz usługę docker przy starcie systemu", "intent": "service_enable", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "make fail2ban start on boot", "intent": "service_enable", "lang": "en", "shell": "sh", "os": "linux"}
+{"text": "niech postgresql startuje z systemem", "intent": "service_enable", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "Get-Service | where Status -eq Running", "intent": "list_services", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "pokaż uruchomione usługi", "intent": "list_services", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "net start - which services are running", "intent": "list_services", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "lista działających usług", "intent": "list_services", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "launchctl list", "intent": "list_services", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "jakie usługi są uruchomione", "intent": "list_services", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "list running services", "intent": "list_services", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "which services failed", "intent": "failed_services", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "usługi które się wysypały", "intent": "failed_services", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "systemctl --failed", "intent": "failed_services", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "pokaz uslugi ktore padly", "intent": "failed_services", "lang": "pl", "shell": "fish", "os": "linux"}
+{"text": "kernel messages", "intent": "dmesg", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "dmesg ostatnie wpisy", "intent": "dmesg", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "show the kernel ring buffer", "intent": "dmesg", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "komunikaty jądra", "intent": "dmesg", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "powercfg /batteryreport - battery status", "intent": "battery", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "ile procent baterii zostało", "intent": "battery", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "pmset -g batt", "intent": "battery", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "stan baterii macbooka", "intent": "battery", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "battery percentage", "intent": "battery", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "poziom baterii laptopa", "intent": "battery", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "cpu temperature on windows", "intent": "temperature", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "temperatura procesora na macu", "intent": "temperature", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "show cpu temps", "intent": "temperature", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "jaka jest temperatura procesora", "intent": "temperature", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "Get-CimInstance Win32_VideoController - what graphics card", "intent": "gpu_info", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "jaką mam kartę graficzną", "intent": "gpu_info", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "which GPU does my mac have", "intent": "gpu_info", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "informacje o karcie graficznej", "intent": "gpu_info", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "show the gpu", "intent": "gpu_info", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "Get-PnpDevice -Class USB", "intent": "usb_devices", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "pokaż podłączone urządzenia usb", "intent": "usb_devices", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "list usb devices", "intent": "usb_devices", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "urządzenia usb", "intent": "usb_devices", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "lsusb", "intent": "usb_devices", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "winget install Git.Git", "intent": "install_package", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "zainstaluj 7zip przez winget", "intent": "install_package", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "choco install nodejs", "intent": "install_package", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "zainstaluj vlc", "intent": "install_package", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "brew install wget", "intent": "install_package", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "zainstaluj htop przez brew", "intent": "install_package", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "install ripgrep", "intent": "install_package", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "zainstaluj pakiet nginx", "intent": "install_package", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "apt install jq", "intent": "install_package", "lang": "en", "shell": "fish", "os": "linux"}
+{"text": "doinstaluj tmux", "intent": "install_package", "lang": "pl", "shell": "fish", "os": "linux"}
+{"text": "is 7zip installed (winget list)", "intent": "package_installed", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "czy mam zainstalowany python", "intent": "package_installed", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "brew list | grep ffmpeg - is it there?", "intent": "package_installed", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "czy ffmpeg jest zainstalowany przez brew", "intent": "package_installed", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "is curl installed", "intent": "package_installed", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "czy pakiet openssl jest zainstalowany", "intent": "package_installed", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "winget upgrade --all", "intent": "system_update", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "zaktualizuj wszystkie programy przez winget", "intent": "system_update", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "brew update && brew upgrade", "intent": "system_update", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "zaktualizuj wszystko w brew", "intent": "system_update", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "update all packages", "intent": "system_update", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "zaktualizuj system", "intent": "system_update", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "upgrade the system", "intent": "system_update", "lang": "en", "shell": "fish", "os": "linux"}
+{"text": "ipconfig", "intent": "ip_addresses", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "jaki mam adres IP", "intent": "ip_addresses", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "Get-NetIPAddress -AddressFamily IPv4", "intent": "ip_addresses", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "pokaż adresy ip interfejsów", "intent": "ip_addresses", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "what's my local ip on wifi", "intent": "ip_addresses", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "lokalny adres ip", "intent": "ip_addresses", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "ip addresses of this machine", "intent": "ip_addresses", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "adresy ip", "intent": "ip_addresses", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "what's my public ip", "intent": "public_ip", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "jaki jest mój zewnętrzny adres IP", "intent": "public_ip", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "external ip address", "intent": "public_ip", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "mój publiczny adres ip", "intent": "public_ip", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "whats my ip on the internet", "intent": "public_ip", "lang": "en", "shell": "fish", "os": "linux"}
+{"text": "ping google.com", "intent": "ping_host", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "pinguj 8.8.8.8", "intent": "ping_host", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "Test-Connection 1.1.1.1 -Count 4", "intent": "ping_host", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "sprawdź czy odpowiada serwer intranet.firma.local", "intent": "ping_host", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "ping github.com 10 times", "intent": "ping_host", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "pingnij 192.168.0.1", "intent": "ping_host", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "is example.org reachable", "intent": "ping_host", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "nslookup wikipedia.org", "intent": "dns_lookup", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "jaki adres IP ma onet.pl", "intent": "dns_lookup", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "Resolve-DnsName contoso.com", "intent": "dns_lookup", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "sprawdź dns dla domeny allegro.pl", "intent": "dns_lookup", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "dig github.com", "intent": "dns_lookup", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "rozwiąż nazwę wp.pl", "intent": "dns_lookup", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "resolve api.stripe.com", "intent": "dns_lookup", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "tracert 8.8.8.8", "intent": "traceroute", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "trasa pakietów do google.com", "intent": "traceroute", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "Test-NetConnection bing.com -TraceRoute", "intent": "traceroute", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "traceroute do cloudflare.com", "intent": "traceroute", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "trace the route to 1.1.1.1", "intent": "traceroute", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "route print", "intent": "routes", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "tablica routingu", "intent": "routes", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "Get-NetRoute - default gateway", "intent": "routes", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "jaka jest brama domyślna", "intent": "routes", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "netstat -rn", "intent": "routes", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "pokaż trasy routingu", "intent": "routes", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "what's my default gateway", "intent": "routes", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "Test-NetConnection db01 -Port 1433", "intent": "port_check", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "sprawdź czy port 443 na serwerze sklep.pl jest otwarty", "intent": "port_check", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "is port 3389 open on 10.0.0.5", "intent": "port_check", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "czy na 192.168.1.20 działa port 22", "intent": "port_check", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "nc -zv to redis.local 6379", "intent": "port_check", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "czy port 5432 jest otwarty na db.local", "intent": "port_check", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "check if example.com port 80 is open", "intent": "port_check", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "Invoke-WebRequest -Method Head https://example.com - show headers", "intent": "curl_headers", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "pokaż nagłówki odpowiedzi z https://api.github.com", "intent": "curl_headers", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "curl -I https://apple.com", "intent": "curl_headers", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "nagłówki http dla https://wp.pl", "intent": "curl_headers", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "response headers of https://httpbin.org/get", "intent": "curl_headers", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "what status code does https://mysite.com/health return", "intent": "http_status", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "jaki kod http zwraca https://sklep.pl/api/ping", "intent": "http_status", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "curl status code for http://localhost:8080", "intent": "http_status", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "kod odpowiedzi dla https://google.com", "intent": "http_status", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "http status of https://example.com/login", "intent": "http_status", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "Invoke-WebRequest https://example.com/setup.exe -OutFile setup.exe", "intent": "download_file", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "pobierz plik https://github.com/x/y/releases/download/v1/tool.zip", "intent": "download_file", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "curl -O https://the.earth.li/~sgtatham/putty/latest/w64/putty.exe", "intent": "download_file", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "ściągnij https://example.com/plik.pdf", "intent": "download_file", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "download https://nodejs.org/dist/latest/node.pkg", "intent": "download_file", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "pobierz https://ftp.gnu.org/gnu/tar/tar-1.35.tar.gz", "intent": "download_file", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "wget https://releases.ubuntu.com/24.04/ubuntu.iso", "intent": "download_file", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "ssh into admin@10.0.0.12", "intent": "ssh_connect", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "połącz się po ssh z serwerem deploy@prod01", "intent": "ssh_connect", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "ssh root@192.168.1.50 from cmd", "intent": "ssh_connect", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "zaloguj się na serwer pi@raspberrypi.local", "intent": "ssh_connect", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "ssh to my vps ubuntu@vps.example.com", "intent": "ssh_connect", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "połącz z serwerem backup.firma.pl przez ssh", "intent": "ssh_connect", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "ssh git@build-box", "intent": "ssh_connect", "lang": "en", "shell": "fish", "os": "linux"}
+{"text": "git status in C:\\repo\\api", "intent": "git_status", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "co się zmieniło w repo (git status)", "intent": "git_status", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "what's the state of my working tree", "intent": "git_status", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "status gita", "intent": "git_status", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "any uncommitted changes?", "intent": "git_status", "lang": "en", "shell": "fish", "os": "linux"}
+{"text": "pokaż zmienione pliki w gicie", "intent": "git_status", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "last 10 commits", "intent": "git_log", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "historia commitów w skrócie", "intent": "git_log", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "git log one line", "intent": "git_log", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "pokaż ostatnie 5 commitów", "intent": "git_log", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "recent commit history", "intent": "git_log", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "log gita z grafem", "intent": "git_log", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "show the last 20 commits", "intent": "git_log", "lang": "en", "shell": "fish", "os": "linux"}
+{"text": "what did I change but not stage", "intent": "git_diff", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "pokaż niezacommitowane zmiany (git diff)", "intent": "git_diff", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "git diff of src/app.ts", "intent": "git_diff", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "różnice w pliku README.md", "intent": "git_diff", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "show unstaged diff", "intent": "git_diff", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "co zmieniłem w kodzie", "intent": "git_diff", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "diff of staged files", "intent": "git_diff_staged", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "pokaż zmiany dodane do stage", "intent": "git_diff_staged", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "what's in the index, ready to commit", "intent": "git_diff_staged", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "git diff --cached", "intent": "git_diff_staged", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "show staged changes", "intent": "git_diff_staged", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "list all git branches incl remote", "intent": "git_branches", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "jakie są gałęzie w repo", "intent": "git_branches", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "show branches", "intent": "git_branches", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "lista branchy", "intent": "git_branches", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "git branches local and remote", "intent": "git_branches", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "pokaż wszystkie gałęzie", "intent": "git_branches", "lang": "pl", "shell": "fish", "os": "linux"}
+{"text": "which branch am I on", "intent": "git_current_branch", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "na jakiej gałęzi jestem", "intent": "git_current_branch", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "current branch name", "intent": "git_current_branch", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "nazwa aktualnego brancha", "intent": "git_current_branch", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "what branch is checked out", "intent": "git_current_branch", "lang": "en", "shell": "fish", "os": "linux"}
+{"text": "create branch feature/login and switch to it", "intent": "git_new_branch", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "utwórz nową gałąź hotfix/2.1.4", "intent": "git_new_branch", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "git checkout -b bugfix-123", "intent": "git_new_branch", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "nowy branch feat/JIRA-77-export", "intent": "git_new_branch", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "start a new branch called release-v3", "intent": "git_new_branch", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "stwórz gałąź poprawki_ui i przełącz się na nią", "intent": "git_new_branch", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "switch to main", "intent": "git_switch_branch", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "przełącz się na gałąź develop", "intent": "git_switch_branch", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "git checkout release/2024.06", "intent": "git_switch_branch", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "przejdź na brancha staging", "intent": "git_switch_branch", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "checkout the master branch", "intent": "git_switch_branch", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "przelacz na feature/payments", "intent": "git_switch_branch", "lang": "pl", "shell": "fish", "os": "linux"}
+{"text": "delete local branch old-experiment", "intent": "git_delete_branch", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "usuń gałąź feature/stary-widok", "intent": "git_delete_branch", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "remove the branch wip-refactor", "intent": "git_delete_branch", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "skasuj brancha test123", "intent": "git_delete_branch", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "git branch -d hotfix/typo", "intent": "git_delete_branch", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "undo my last commit but keep the changes", "intent": "git_undo_commit", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "cofnij ostatni commit", "intent": "git_undo_commit", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "oops, uncommit the last one", "intent": "git_undo_commit", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "wycofaj ostatni commit, zostaw zmiany", "intent": "git_undo_commit", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "reset soft head~1", "intent": "git_undo_commit", "lang": "en", "shell": "fish", "os": "linux"}
+{"text": "throw away all my local changes", "intent": "git_discard_changes", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "odrzuć wszystkie niezapisane zmiany w repo", "intent": "git_discard_changes", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "discard changes to src/index.js", "intent": "git_discard_changes", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "przywróć plik config.py do stanu z repo", "intent": "git_discard_changes", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "revert all uncommitted edits", "intent": "git_discard_changes", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "stash my changes", "intent": "git_stash", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "schowaj zmiany na bok (git stash)", "intent": "git_stash", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "put my work in progress aside", "intent": "git_stash", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "zrób stash", "intent": "git_stash", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "git stash pop", "intent": "git_stash_pop", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "przywróć schowane zmiany", "intent": "git_stash_pop", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "bring back the stash", "intent": "git_stash_pop", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "wyciągnij zmiany ze stasha", "intent": "git_stash_pop", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "pull latest changes", "intent": "git_pull", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "ściągnij najnowsze zmiany z remota", "intent": "git_pull", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "git pull", "intent": "git_pull", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "zaktualizuj repo z serwera", "intent": "git_pull", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "sync with origin", "intent": "git_pull", "lang": "en", "shell": "fish", "os": "linux"}
+{"text": "push to origin main", "intent": "git_push", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "wypchnij zmiany", "intent": "git_push", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "git push", "intent": "git_push", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "wypchnij gałąź feature/api na origin", "intent": "git_push", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "push my commits", "intent": "git_push", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "push na serwer", "intent": "git_push", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "clone https://github.com/PowerShell/PowerShell.git", "intent": "git_clone", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "sklonuj repo https://github.com/torvalds/linux", "intent": "git_clone", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "git clone git@github.com:me/dotfiles.git", "intent": "git_clone", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "pobierz repozytorium https://gitlab.com/firma/backend.git", "intent": "git_clone", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "clone the repo https://github.com/neovim/neovim", "intent": "git_clone", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "stage everything", "intent": "git_add_all", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "dodaj wszystkie zmiany do commita", "intent": "git_add_all", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "git add all", "intent": "git_add_all", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "dodaj wszystko do indeksu", "intent": "git_add_all", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "commit everything with message \"fix login bug\"", "intent": "git_commit", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "zacommituj z opisem \"poprawka walidacji\"", "intent": "git_commit", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "git commit -am \"update readme\"", "intent": "git_commit", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "commit z wiadomością \"dodano testy\"", "intent": "git_commit", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "commit all with message wip", "intent": "git_commit", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "zrób commita \"refaktor modułu płatności\"", "intent": "git_commit", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "show the remote urls", "intent": "git_remote", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "jaki jest adres origin", "intent": "git_remote", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "git remote -v", "intent": "git_remote", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "pokaż zdalne repozytoria", "intent": "git_remote", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "who wrote each line of Program.cs", "intent": "git_blame", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "git blame dla pliku Startup.cs", "intent": "git_blame", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "blame src/main.rs", "intent": "git_blame", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "kto zmienił linie w pliku utils.py", "intent": "git_blame", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "make this folder a git repo", "intent": "git_init", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "zainicjuj repozytorium git", "intent": "git_init", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "git init here", "intent": "git_init", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "stwórz nowe repo w tym katalogu", "intent": "git_init", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "docker ps", "intent": "docker_ps", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "jakie kontenery działają", "intent": "docker_ps", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "show running containers", "intent": "docker_ps", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "uruchomione kontenery dockera", "intent": "docker_ps", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "list running docker containers", "intent": "docker_ps", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "pokaż działające kontenery", "intent": "docker_ps", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "all containers including stopped ones", "intent": "docker_ps_all", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "wszystkie kontenery łącznie z zatrzymanymi", "intent": "docker_ps_all", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "docker ps -a", "intent": "docker_ps_all", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "pokaż też zatrzymane kontenery", "intent": "docker_ps_all", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "list every container", "intent": "docker_ps_all", "lang": "en", "shell": "fish", "os": "linux"}
+{"text": "docker logs for container web", "intent": "docker_logs", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "pokaż logi kontenera api", "intent": "docker_logs", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "logs of the redis container", "intent": "docker_logs", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "logi kontenera qzx-worker", "intent": "docker_logs", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "follow logs of nginx-proxy", "intent": "docker_logs", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "śledź logi kontenera postgres-db", "intent": "docker_logs", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "tail the logs of my-app", "intent": "docker_logs", "lang": "en", "shell": "fish", "os": "linux"}
+{"text": "list docker images", "intent": "docker_images", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "jakie mam obrazy dockera", "intent": "docker_images", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "docker images", "intent": "docker_images", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "pokaż obrazy", "intent": "docker_images", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "stop container web", "intent": "docker_stop", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "zatrzymaj kontener mongo", "intent": "docker_stop", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "docker stop redis-cache", "intent": "docker_stop", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "zatrzymaj kontener mailhog", "intent": "docker_stop", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "stop the grafana container", "intent": "docker_stop", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "zatrzymaj kontener backend_1", "intent": "docker_stop", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "stop all running containers", "intent": "docker_stop_all", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "zatrzymaj wszystkie kontenery", "intent": "docker_stop_all", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "kill all my docker containers gracefully", "intent": "docker_stop_all", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "zatrzymaj wszystko w dockerze", "intent": "docker_stop_all", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "clean up docker, remove unused stuff", "intent": "docker_prune", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "wyczyść nieużywane obrazy i kontenery dockera", "intent": "docker_prune", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "docker system prune", "intent": "docker_prune", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "posprzątaj dockera, zwolnij miejsce", "intent": "docker_prune", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "prune docker", "intent": "docker_prune", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "open a shell in container web", "intent": "docker_exec", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "wejdź do kontenera api", "intent": "docker_exec", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "docker exec into redis", "intent": "docker_exec", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "odpal sh w kontenerze php-fpm", "intent": "docker_exec", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "get a shell inside the nginx container", "intent": "docker_exec", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "wejdz do srodka kontenera db", "intent": "docker_exec", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "docker resource usage per container", "intent": "docker_stats", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "ile cpu i ramu zużywają kontenery", "intent": "docker_stats", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "docker stats", "intent": "docker_stats", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "statystyki kontenerów", "intent": "docker_stats", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "docker compose up in the background", "intent": "docker_compose_up", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "odpal docker compose", "intent": "docker_compose_up", "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "start the compose stack", "intent": "docker_compose_up", "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "uruchom usługi z docker-compose.yml", "intent": "docker_compose_up", "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "bring up the compose services detached", "intent": "docker_compose_up", "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "postaw środowisko z compose", "intent": "docker_compose_up", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "docker compose down", "intent": "docker_compose_down", "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "zatrzymaj stack compose", "intent": "docker_compose_down", "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "tear down the compose environment", "intent": "docker_compose_down", "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "wyłącz usługi docker compose", "intent": "docker_compose_down", "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "znajdz wszystkie pliki .sh w /usr/local/sbin", "intent": "find_by_ext", "lang": "pl", "shell": "sh", "os": "linux"}
+{"text": "Get-ChildItem -Recurse -Filter *.md w ~/notatki (pwsh na macu)", "intent": "find_by_ext", "lang": "pl", "shell": "powershell", "os": "darwin"}
+{"text": "daj mi 10 najwiekszych plikow w /var/lib/docker", "intent": "largest_files", "lang": "pl", "shell": "zsh", "os": "linux"}
+{"text": "Get-Process posortowane po pamięci, pwsh na ubuntu", "intent": "top_mem", "lang": "pl", "shell": "powershell", "os": "linux"}
+{"text": "co zżera ram na macu", "intent": "top_mem", "lang": "pl", "shell": "fish", "os": "darwin"}
+{"text": "pkill dla procesu cronjob-sync", "intent": "kill_by_name", "lang": "pl", "shell": "sh", "os": "linux"}
+{"text": "Stop-Process -Name dotnet na linuksie", "intent": "kill_by_name", "lang": "pl", "shell": "powershell", "os": "linux"}
+{"text": "restart usługi haproxy", "intent": "service_restart", "lang": "pl", "shell": "sh", "os": "linux"}
+{"text": "przeładuj usługę php8.2-fpm restartem", "intent": "service_restart", "lang": "pl", "shell": "zsh", "os": "linux"}
+{"text": "Select-String \"ERROR\" w /var/log/app/*.log", "intent": "grep_text", "lang": "pl", "shell": "powershell", "os": "linux"}
+{"text": "wyszukaj fraze \"segfault\" w /var/log", "intent": "grep_text", "lang": "pl", "shell": "zsh", "os": "linux"}
+{"text": "szukaj \"TODO\" w ~/dev/aplikacja", "intent": "grep_text", "lang": "pl", "shell": "fish", "os": "darwin"}
+{"text": "wolne miejsce na wszystkich partycjach", "intent": "disk_free", "lang": "pl", "shell": "zsh", "os": "linux"}
+{"text": "ile mam wolnego na dysku macintosh hd", "intent": "disk_free", "lang": "pl", "shell": "fish", "os": "darwin"}
+{"text": "ile zajmuje /var/lib/mysql", "intent": "dir_size", "lang": "pl", "shell": "sh", "os": "linux"}
+{"text": "rozmiar folderu ~/Movies w pwsh", "intent": "dir_size", "lang": "pl", "shell": "powershell", "os": "darwin"}
+{"text": "ostatnie 100 linii /var/log/messages", "intent": "tail_file", "lang": "pl", "shell": "sh", "os": "linux"}
+{"text": "kto siedzi na porcie 8000", "intent": "process_on_port", "lang": "pl", "shell": "fish", "os": "darwin"}
+{"text": "Get-NetTCPConnection nie ma na linuxie, ale sprawdź kto słucha na 8443", "intent": "process_on_port", "lang": "pl", "shell": "powershell", "os": "linux"}
+{"text": "logi kontenera traefik", "intent": "docker_logs", "lang": "pl", "shell": "zsh", "os": "linux"}
+{"text": "pokaz logi z kontenera keycloak", "intent": "docker_logs", "lang": "pl", "shell": "sh", "os": "linux"}
+{"text": "ostatnie 3 commity", "intent": "git_log", "lang": "pl", "shell": "fish", "os": "darwin"}
+{"text": "historia gita, ostatnie 15", "intent": "git_log", "lang": "pl", "shell": "zsh", "os": "linux"}
+{"text": "brew install neovim prosze", "intent": "install_package", "lang": "pl", "shell": "fish", "os": "darwin"}
+{"text": "zainstaluj pakiet build-essential", "intent": "install_package", "lang": "pl", "shell": "zsh", "os": "linux"}
+{"text": "ifconfig, jaki mam adres", "intent": "ip_addresses", "lang": "pl", "shell": "fish", "os": "darwin"}
+{"text": "$env:HOME w pwsh na linuksie", "intent": "env_var_get", "lang": "pl", "shell": "powershell", "os": "linux"}
+{"text": "wartosc zmiennej PATH_PREFIX", "intent": "env_var_get", "lang": "pl", "shell": "sh", "os": "linux"}
+{"text": "suma sha256 dla ~/Downloads/obraz.dmg", "intent": "hash_sha256", "lang": "pl", "shell": "fish", "os": "darwin"}
+{"text": "Get-Command python3 na macu, gdzie jest", "intent": "which_cmd", "lang": "pl", "shell": "powershell", "os": "darwin"}
+{"text": "spakuj /etc/letsencrypt do certy.tar.gz", "intent": "compress_targz", "lang": "pl", "shell": "sh", "os": "linux"}
+{"text": "gci ~/Desktop", "intent": "list_files", "lang": "pl", "shell": "powershell", "os": "darwin"}
+{"text": "lista plikow w /mnt/usb", "intent": "list_files", "lang": "pl", "shell": "sh", "os": "linux"}
+{"text": "ssh na admin@172.16.0.4", "intent": "ssh_connect", "lang": "pl", "shell": "zsh", "os": "linux"}
+{"text": "polacz sie przez ssh z pi@192.168.1.77", "intent": "ssh_connect", "lang": "pl", "shell": "fish", "os": "darwin"}
+{"text": "skopiuj /etc/fstab do /root/fstab.bak", "intent": "copy", "lang": "pl", "shell": "sh", "os": "linux"}

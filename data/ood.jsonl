@@ -58,3 +58,152 @@
 {"text": "lubię placki", "lang": "pl"}
 {"text": "cześć", "lang": "pl"}
 {"text": "co słychać", "lang": "pl"}
+{"text": "what's the best laptop for programming", "lang": "en"}
+{"text": "explain what a kernel is", "lang": "en"}
+{"text": "how does the internet work", "lang": "en"}
+{"text": "what's the difference between RAM and storage", "lang": "en"}
+{"text": "should I learn python or javascript first", "lang": "en"}
+{"text": "is linux better than windows", "lang": "en"}
+{"text": "why is my wifi so slow at night", "lang": "en"}
+{"text": "what does an operating system actually do", "lang": "en"}
+{"text": "recommend a mechanical keyboard", "lang": "en"}
+{"text": "how much ram do I need for gaming", "lang": "en"}
+{"text": "what is a docker container, conceptually", "lang": "en"}
+{"text": "explain git to a five year old", "lang": "en"}
+{"text": "what's the history of unix", "lang": "en"}
+{"text": "who invented the world wide web", "lang": "en"}
+{"text": "what is the cloud", "lang": "en"}
+{"text": "write me a cover letter for a devops job", "lang": "en"}
+{"text": "help me write an email to my landlord about the heating", "lang": "en"}
+{"text": "summarize the plot of the matrix", "lang": "en"}
+{"text": "what's a good name for my cat", "lang": "en"}
+{"text": "is it safe to eat raw eggs", "lang": "en"}
+{"text": "how many hours of sleep do adults need", "lang": "en"}
+{"text": "what are some fun things to do in krakow", "lang": "en"}
+{"text": "give me a workout plan for beginners", "lang": "en"}
+{"text": "what's the population of tokyo", "lang": "en"}
+{"text": "how far is the moon", "lang": "en"}
+{"text": "why is the sky blue", "lang": "en"}
+{"text": "what year did world war 2 end", "lang": "en"}
+{"text": "recommend a podcast about history", "lang": "en"}
+{"text": "how do vaccines work", "lang": "en"}
+{"text": "what's trending on twitter", "lang": "en"}
+{"text": "can you help me with my math homework", "lang": "en"}
+{"text": "solve x squared minus 4 equals 0", "lang": "en"}
+{"text": "what's the square root of 144", "lang": "en"}
+{"text": "is bitcoin a good investment", "lang": "en"}
+{"text": "what does SSD stand for", "lang": "en"}
+{"text": "what's the difference between http and https", "lang": "en"}
+{"text": "how do I become a software engineer", "lang": "en"}
+{"text": "what's a good gift for my dad", "lang": "en"}
+{"text": "tell me about the roman empire", "lang": "en"}
+{"text": "lol that's funny", "lang": "en"}
+{"text": "ok cool", "lang": "en"}
+{"text": "never mind", "lang": "en"}
+{"text": "you're awesome", "lang": "en"}
+{"text": "are you a robot", "lang": "en"}
+{"text": "do you dream", "lang": "en"}
+{"text": "what can you do", "lang": "en"}
+{"text": "what's your favourite color", "lang": "en"}
+{"text": "how do I fix a leaking tap", "lang": "en"}
+{"text": "best way to learn guitar", "lang": "en"}
+{"text": "what's the weather in berlin this weekend", "lang": "en"}
+{"text": "when is the next full moon", "lang": "en"}
+{"text": "how do I cook rice without a rice cooker", "lang": "en"}
+{"text": "should I buy a mac or a pc", "lang": "en"}
+{"text": "which programming language is the fastest", "lang": "en"}
+{"text": "is chatgpt better than google", "lang": "en"}
+{"text": "what is machine learning", "lang": "en"}
+{"text": "explain recursion", "lang": "en"}
+{"text": "what's a good linux distro for beginners", "lang": "en"}
+{"text": "how do I get better at chess", "lang": "en"}
+{"text": "translate \"where is the train station\" to spanish", "lang": "en"}
+{"text": "draw me a picture of a dog", "lang": "en"}
+{"text": "what's the meaning of the word ephemeral", "lang": "en"}
+{"text": "write a haiku about autumn", "lang": "en"}
+{"text": "how long does it take to fly to new york", "lang": "en"}
+{"text": "what time is it in sydney", "lang": "en"}
+{"text": "my printer is jammed what do I do physically", "lang": "en"}
+{"text": "how do I clean my laptop keyboard", "lang": "en"}
+{"text": "what is an API", "lang": "en"}
+{"text": "explain the difference between tcp and udp in theory", "lang": "en"}
+{"text": "which is better, vim or emacs", "lang": "en"}
+{"text": "book a table for two at 8pm", "lang": "en"}
+{"text": "jaki laptop do programowania polecasz", "lang": "pl"}
+{"text": "wytłumacz czym jest jądro systemu", "lang": "pl"}
+{"text": "jak działa internet", "lang": "pl"}
+{"text": "napisz mi maila do szefa że jutro mnie nie będzie", "lang": "pl"}
+{"text": "czym się różni ram od dysku", "lang": "pl"}
+{"text": "czy warto uczyć się pythona", "lang": "pl"}
+{"text": "dlaczego linux jest lepszy od windowsa", "lang": "pl"}
+{"text": "co to jest chmura obliczeniowa", "lang": "pl"}
+{"text": "kto wymyślił komputer", "lang": "pl"}
+{"text": "polecisz jakąś klawiaturę mechaniczną", "lang": "pl"}
+{"text": "ile ramu potrzebuję do gier", "lang": "pl"}
+{"text": "wytłumacz mi czym jest git na prostym przykładzie", "lang": "pl"}
+{"text": "historia systemu unix w skrócie", "lang": "pl"}
+{"text": "napisz list motywacyjny na stanowisko programisty", "lang": "pl"}
+{"text": "streść mi pana tadeusza", "lang": "pl"}
+{"text": "jak nazwać psa", "lang": "pl"}
+{"text": "ile godzin snu potrzebuje dorosły", "lang": "pl"}
+{"text": "co warto zobaczyć w gdańsku", "lang": "pl"}
+{"text": "plan treningowy dla początkujących", "lang": "pl"}
+{"text": "ile ludzi mieszka w warszawie", "lang": "pl"}
+{"text": "jak daleko jest księżyc", "lang": "pl"}
+{"text": "dlaczego niebo jest niebieskie", "lang": "pl"}
+{"text": "kiedy skończyła się druga wojna światowa", "lang": "pl"}
+{"text": "polec jakiś podcast", "lang": "pl"}
+{"text": "jak działają szczepionki", "lang": "pl"}
+{"text": "pomóż mi z zadaniem z matmy", "lang": "pl"}
+{"text": "rozwiąż równanie 2x + 3 = 7", "lang": "pl"}
+{"text": "ile to pierwiastek z 81", "lang": "pl"}
+{"text": "czy warto kupić bitcoina", "lang": "pl"}
+{"text": "co znaczy skrót ssd", "lang": "pl"}
+{"text": "czym się różni http od https", "lang": "pl"}
+{"text": "jak zostać programistą", "lang": "pl"}
+{"text": "co kupić tacie na urodziny", "lang": "pl"}
+{"text": "opowiedz o starożytnym rzymie", "lang": "pl"}
+{"text": "haha dobre", "lang": "pl"}
+{"text": "ok spoko", "lang": "pl"}
+{"text": "nieważne", "lang": "pl"}
+{"text": "jesteś super", "lang": "pl"}
+{"text": "czy jesteś robotem", "lang": "pl"}
+{"text": "co potrafisz", "lang": "pl"}
+{"text": "jaki jest twój ulubiony kolor", "lang": "pl"}
+{"text": "jak naprawić cieknący kran", "lang": "pl"}
+{"text": "jak nauczyć się grać na gitarze", "lang": "pl"}
+{"text": "jaka bedzie pogoda w zakopanem w weekend", "lang": "pl"}
+{"text": "kiedy jest pełnia", "lang": "pl"}
+{"text": "jak ugotować ryż", "lang": "pl"}
+{"text": "mac czy pc, co lepsze", "lang": "pl"}
+{"text": "jaki język programowania jest najszybszy", "lang": "pl"}
+{"text": "co to jest uczenie maszynowe", "lang": "pl"}
+{"text": "wyjasnij rekurencje", "lang": "pl"}
+{"text": "jaka dystrybucja linuxa jest najlepsza na start", "lang": "pl"}
+{"text": "jak grać lepiej w szachy", "lang": "pl"}
+{"text": "przetłumacz \"gdzie jest dworzec\" na hiszpański", "lang": "pl"}
+{"text": "narysuj mi kota", "lang": "pl"}
+{"text": "co oznacza słowo efemeryczny", "lang": "pl"}
+{"text": "napisz haiku o jesieni", "lang": "pl"}
+{"text": "ile leci się do nowego jorku", "lang": "pl"}
+{"text": "która godzina jest teraz w tokio", "lang": "pl"}
+{"text": "drukarka się zacięła, co mam zrobić", "lang": "pl"}
+{"text": "jak wyczyścić klawiaturę w laptopie", "lang": "pl"}
+{"text": "co to jest api", "lang": "pl"}
+{"text": "różnica między tcp a udp, tak teoretycznie", "lang": "pl"}
+{"text": "vim czy emacs", "lang": "pl"}
+{"text": "zarezerwuj stolik na dwie osoby", "lang": "pl"}
+{"text": "czy jutro jest dzien wolny", "lang": "pl"}
+{"text": "ile kosztuje nowy iphone", "lang": "pl"}
+{"text": "jak zalozyc konto w banku", "lang": "pl"}
+{"text": "co to jest system operacyjny", "lang": "pl"}
+{"text": "kto stworzył linuxa", "lang": "pl"}
+{"text": "ile zarabia programista w polsce", "lang": "pl"}
+{"text": "jak napisać cv", "lang": "pl"}
+{"text": "powiedz mi coś miłego", "lang": "pl"}
+{"text": "nudzi mi się", "lang": "pl"}
+{"text": "czy windows 11 jest dobry", "lang": "pl"}
+{"text": "how much does a new iphone cost", "lang": "en"}
+{"text": "who created linux", "lang": "en"}
+{"text": "i'm bored", "lang": "en"}
+{"text": "is windows 11 any good", "lang": "en"}

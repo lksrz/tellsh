@@ -1,0 +1,40 @@
+{"text":"proszę rozpakuj docs.zip","intent":"extract_zip","command":"unzip docs.zip","reasons":["teacher risk medium > ours safe"]}
+{"text":"zrób .zip z katalogu docs","intent":"compress_zip","command":"zip -r docs.zip docs","reasons":["teacher risk medium > ours safe"]}
+{"text":"załóż nowy branch refactor-api","intent":"git_new_branch","command":"git checkout -b refactor-api","reasons":["teacher risk medium > ours safe"]}
+{"text":"sklonuj https://github.com/user/repo.git","intent":"git_clone","command":"git clone https://github.com/user/repo.git","reasons":["teacher risk medium > ours safe"]}
+{"text":"open the tarball node-v20.tar.gz","intent":"extract_targz","command":"tar -xzvf node-v20.tar.gz","reasons":["teacher risk medium > ours safe"]}
+{"text":"przywroc schowane zmiany","intent":"git_stash_pop","command":"git stash pop","reasons":["teacher risk medium > ours safe"]}
+{"text":"stashnij to","intent":"git_stash","command":"git stash","reasons":["teacher risk medium > ours safe"]}
+{"text":"zdekoduj plik token.b64 z base64","intent":"base64_decode","command":"printf '%s' 'plik token.b64' | base64 -d","reasons":["command judged wrong (0.07)"]}
+{"text":"tar up the logs folder","intent":"compress_targz","command":"tar -czvf archive.tar.gz .","reasons":["command judged wrong (0.09)","teacher risk medium > ours safe"]}
+{"text":"ściągnij zmiany","intent":"git_pull","command":"git pull","reasons":["teacher risk medium > ours safe"]}
+{"text":"dodaj wszystko do indeksu bez commitowania","intent":"git_add_all","command":"git add -A","reasons":["teacher risk medium > ours safe"]}
+{"text":"zakodowac w base64 haslo qwerty","intent":"base64_encode","command":"printf '%s' 'w base64 haslo qwerty' | base64","reasons":["command judged wrong (0.05)"]}
+{"text":"pokaż właściwości pliku C:\\Windows\\notepad.exe (data utworzenia, rozmiar)","intent":"file_stat","command":"stat <FILE>","reasons":["command judged wrong (0.16)"]}
+{"text":"create empty git repo","intent":"git_init","command":"git init","reasons":["teacher risk medium > ours safe"]}
+{"text":"is there a file named .env somewhere here?","intent":"find_by_name","command":"find . -iname '*somewhere*'","reasons":["command judged wrong (0.03)","span NAME \"somewhere\" rejected (0.02)"]}
+{"text":"new empty file: src/utils.js","intent":"touch_file","command":"touch src/utils.js","reasons":["teacher risk medium > ours safe"]}
+{"text":"połącz się z moim raspberry pi przez ssh","intent":"ssh_connect","command":"ssh moim","reasons":["command judged wrong (0.1)"]}
+{"text":"jak utworzyć folder z podfolderami a/b/c naraz","intent":"mkdir","command":"mkdir -p a/b/c","reasons":["teacher risk medium > ours safe"]}
+{"text":"przejdź na istniejącą gałąź release/2.0","intent":"git_switch_branch","command":"git checkout 'istniejącą'","reasons":["command judged wrong (0.02)","teacher risk medium > ours safe","span BRANCH \"istniejącą\" rejected (0.16)"]}
+{"text":"pushuj na origin hotfix/payment","intent":"git_push","command":"git push origin origin","reasons":["command judged wrong (0.15)","span BRANCH \"origin\" rejected (0.21)"]}
+{"text":"napraw właściciela ~/Pobrane, ma być piotr","intent":"chown","command":"sudo chown -R ma ~/Pobrane","reasons":["command judged wrong (0.02)","span USER \"ma\" rejected (0.17)"]}
+{"text":"sprawdź czy katalog cargo jest w PATH","intent":"show_path","command":"echo \"$PATH\" | tr ':' '\\n'","reasons":["command judged wrong (0.29)"]}
+{"text":"make a fresh folder for my notes","intent":"mkdir","command":"mkdir -p notes","reasons":["teacher risk medium > ours safe"]}
+{"text":"find files named exactly Dockerfile under /srv","intent":"find_by_name","command":"find /srv -iname '*exactly*'","reasons":["command judged wrong (0.01)","span NAME \"exactly\" rejected (0.03)"]}
+{"text":"i want a new branch called feature/search","intent":"git_new_branch","command":"git checkout -b feature/search","reasons":["teacher risk medium > ours safe"]}
+{"text":"folder tree of /opt/app with depth one","intent":"list_tree","command":"find /opt/app -maxdepth 1 -not -path '*/.git/*' | sort","reasons":["span NUM \"one\" rejected (0.11)"]}
+{"text":"zabij procesy javy","intent":"kill_by_name","command":"pkill -f javy","reasons":["command judged wrong (0.21)"]}
+{"text":"zmien branch na fix-123","intent":"git_switch_branch","command":"git checkout fix-123","reasons":["teacher risk medium > ours safe"]}
+{"text":"copy C:\\Users\\me\\Desktop\\report.docx to D:\\backup","intent":"copy","command":"cp -ri ~/Desktop d","reasons":["command judged wrong (0.03)"]}
+{"text":"get the files out of backup.zip","intent":"extract_zip","command":"unzip backup.zip","reasons":["teacher risk medium > ours safe"]}
+{"text":"spulluj zmiany","intent":"git_pull","command":"git pull","reasons":["teacher risk medium > ours safe"]}
+{"text":"proszę zainicjować repozytorium w tym katalogu","intent":"git_init","command":"git init","reasons":["teacher risk medium > ours safe"]}
+{"text":"touch README.md","intent":"touch_file","command":"touch README.md","reasons":["teacher risk medium > ours safe"]}
+{"text":"stgae all changes","intent":"git_add_all","command":"git add -A","reasons":["teacher risk medium > ours safe"]}
+{"text":"sklonuj git@github.com:acme/api.git do katalogu","intent":"git_clone","command":"git clone git@github.com:acme/api.git","reasons":["teacher risk medium > ours safe"]}
+{"text":"turn the folder exports into a tar.gz","intent":"compress_targz","command":"tar -czvf exports.tar.gz exports","reasons":["teacher risk medium > ours safe"]}
+{"text":"zip up report.pdf","intent":"compress_zip","command":"zip -r report.pdf.zip report.pdf","reasons":["teacher risk medium > ours safe"]}
+{"text":"rozpakuj ~/backupy/home.tar.gz do ~/restore","intent":"extract_targz","command":"tar -xzvf ~/backupy/home.tar.gz -C ~/restore","reasons":["teacher risk medium > ours safe"]}
+{"text":"how to unstash changes","intent":"git_stash_pop","command":"git stash pop","reasons":["teacher risk medium > ours safe"]}
+{"text":"push changes onto the stash stack","intent":"git_stash","command":"git stash","reasons":["teacher risk medium > ours safe"]}

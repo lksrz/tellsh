@@ -6,6 +6,8 @@
 //   «...»        optional segment, dropped if any slot inside it is missing
 // `slots` maps slot name -> default value; `null` means required (a <PLACEHOLDER> is shown).
 // `darwin` overrides the template on macOS. `risk` is safe | medium | high (src/danger.js may escalate).
+// v0.2: archive create/extract, git stash/pull/checkout/clone raised safe -> medium after the teacher review
+// (they overwrite files or change the working tree; data/teacher/decisions.jsonl).
 
 const T = (id, description, template, slots, risk = 'safe', extra = {}) =>
   ({ id, description, template, slots, risk, ...extra });
@@ -70,10 +72,10 @@ export const INTENTS = [
     { file: '/var/log/syslog' }, 'safe', { darwinDefaults: { file: '/var/log/system.log' } }),
   T('cat_file', 'Print a file contents', 'cat {file}', { file: null }),
   T('compress_targz', 'Compress a directory/file into tar.gz',
-    'tar -czvf {archive} {path}', { path: '.', archive: null }),
-  T('extract_targz', 'Extract a tar.gz archive', 'tar -xzvf {file}«-C {dest}»', { file: null }),
-  T('compress_zip', 'Compress into a zip archive', 'zip -r {archive} {path}', { path: '.', archive: null }),
-  T('extract_zip', 'Extract a zip archive', 'unzip {file}«-d {dest}»', { file: null }),
+    'tar -czvf {archive} {path}', { path: '.', archive: null }, 'medium'),
+  T('extract_targz', 'Extract a tar.gz archive', 'tar -xzvf {file}«-C {dest}»', { file: null }, 'medium'),
+  T('compress_zip', 'Compress into a zip archive', 'zip -r {archive} {path}', { path: '.', archive: null }, 'medium'),
+  T('extract_zip', 'Extract a zip archive', 'unzip {file}«-d {dest}»', { file: null }, 'medium'),
   T('list_archive', 'List contents of an archive (tar/zip)',
     (s, q) => /\.zip$/i.test(s.file || '') ? `unzip -l ${q(s.file)}` : `tar -tvf ${q(s.file)}`,
     { file: null }),
@@ -213,16 +215,16 @@ export const INTENTS = [
   T('git_diff_staged', 'Show staged changes', 'git diff --staged', {}),
   T('git_branches', 'List git branches', 'git branch -a', {}),
   T('git_current_branch', 'Show current git branch', 'git branch --show-current', {}),
-  T('git_new_branch', 'Create and switch to a new branch', 'git checkout -b {branch}', { branch: null }),
-  T('git_switch_branch', 'Switch to an existing branch', 'git checkout {branch}', { branch: null }),
+  T('git_new_branch', 'Create and switch to a new branch', 'git checkout -b {branch}', { branch: null }, 'medium'),
+  T('git_switch_branch', 'Switch to an existing branch', 'git checkout {branch}', { branch: null }, 'medium'),
   T('git_delete_branch', 'Delete a local branch', 'git branch -d {branch}', { branch: null }, 'medium'),
   T('git_undo_commit', 'Undo the last commit (keep changes)', 'git reset --soft HEAD~1', {}, 'medium'),
   T('git_discard_changes', 'Discard all uncommitted changes', 'git restore«{file}»', { file: '.' }, 'high'),
-  T('git_stash', 'Stash current changes', 'git stash', {}),
-  T('git_stash_pop', 'Restore stashed changes', 'git stash pop', {}),
-  T('git_pull', 'Pull from remote', 'git pull', {}),
+  T('git_stash', 'Stash current changes', 'git stash', {}, 'medium'),
+  T('git_stash_pop', 'Restore stashed changes', 'git stash pop', {}, 'medium'),
+  T('git_pull', 'Pull from remote', 'git pull', {}, 'medium'),
   T('git_push', 'Push to remote', 'git push«origin {branch}»', {}, 'medium'),
-  T('git_clone', 'Clone a repository', 'git clone {url}', { url: null }),
+  T('git_clone', 'Clone a repository', 'git clone {url}', { url: null }, 'medium'),
   T('git_add_all', 'Stage all changes', 'git add -A', {}),
   T('git_commit', 'Commit all changes with a message', 'git add -A && git commit -m {message}',
     { message: null }, 'medium'),

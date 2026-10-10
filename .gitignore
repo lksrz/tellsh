@@ -3,3 +3,5 @@ __pycache__/
 *.pyc
 *.tgz
 .DS_Store
+data/external/
+build/

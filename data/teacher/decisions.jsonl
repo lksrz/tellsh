@@ -1,0 +1,20 @@
+{"action":"relabel","field":"risk","intent":"extract_zip","from":"safe","to":"medium","reason":"teacher: medium; unzip/tar -x can overwrite existing files"}
+{"action":"relabel","field":"risk","intent":"extract_targz","from":"safe","to":"medium","reason":"teacher: medium; tar -x overwrites files silently"}
+{"action":"relabel","field":"risk","intent":"compress_targz","from":"safe","to":"medium","reason":"teacher: medium; tar -c overwrites an existing archive"}
+{"action":"relabel","field":"risk","intent":"compress_zip","from":"safe","to":"medium","reason":"teacher: medium; writes/updates an archive file"}
+{"action":"relabel","field":"risk","intent":"git_stash","from":"safe","to":"medium","reason":"teacher: medium; changes the working tree"}
+{"action":"relabel","field":"risk","intent":"git_stash_pop","from":"safe","to":"medium","reason":"teacher: medium; can conflict with local changes"}
+{"action":"relabel","field":"risk","intent":"git_pull","from":"safe","to":"medium","reason":"teacher: medium; merges remote changes into the working tree"}
+{"action":"relabel","field":"risk","intent":"git_new_branch","from":"safe","to":"medium","reason":"teacher: medium; checkout changes HEAD"}
+{"action":"relabel","field":"risk","intent":"git_switch_branch","from":"safe","to":"medium","reason":"teacher: medium; checkout changes the working tree"}
+{"action":"relabel","field":"risk","intent":"git_clone","from":"safe","to":"medium","reason":"teacher: medium; network + creates a directory"}
+{"action":"keep","field":"risk","intent":"touch_file","reason":"teacher: medium; kept safe: creates an empty file, never overwrites content"}
+{"action":"keep","field":"risk","intent":"mkdir","reason":"teacher: medium; kept safe: mkdir -p only creates"}
+{"action":"keep","field":"risk","intent":"git_init","reason":"teacher: medium; kept safe: creates .git only, idempotent"}
+{"action":"keep","field":"risk","intent":"git_add_all","reason":"teacher: medium; kept safe: index change, undone by git reset"}
+{"action":"keep","field":"label","text":"pokaż właściwości pliku C:\\Windows\\notepad.exe (data utworzenia, rozmiar)","reason":"label correct; Windows paths now extracted (slots.js PATH_TOKEN)"}
+{"action":"keep","field":"label","text":"copy C:\\Users\\me\\Desktop\\report.docx to D:\\backup","reason":"label correct; Windows paths now extracted"}
+{"action":"keep","field":"label","text":"zdekoduj plik token.b64 z base64","reason":"label correct; 'plik X.ext' now selects file mode for base64"}
+{"action":"keep","field":"label","text":"zabij procesy javy","reason":"label correct; Polish inflection javy -> java now mapped (slots.js deinflect)"}
+{"action":"keep","field":"label","text":"połącz się z moim raspberry pi przez ssh","reason":"label correct; request has no host -> placeholder instead of 'moim'"}
+{"action":"keep","field":"label","text":"folder tree of /opt/app with depth one","reason":"teacher rejected NUM 'one' but it is the depth; silver span correct"}

@@ -1,0 +1,51 @@
+{"text": "list files sorted by modification time, oldest first, with details", "lang": "en", "tool": "ls", "gold": "ls -l -t -r", "acceptable": ["ls -l -t -r -h", "ls -l -r -t", "ls -ltr"]}
+{"text": "show all files including hidden ones, one per line", "lang": "en", "tool": "ls", "gold": "ls -1 -a", "acceptable": ["ls -a -1", "ls -1 -A", "ls -A -1"]}
+{"text": "list /etc in long format sorted by size, human readable", "lang": "en", "tool": "ls", "gold": "ls -l -S -h /etc", "acceptable": ["ls -l -h -S /etc", "ls -lhS /etc"]}
+{"text": "list only the directories here, not their contents", "lang": "en", "tool": "ls", "gold": "ls -d */", "acceptable": ["ls -d -- */", "ls -l -d */"]}
+{"text": "long listing of ~/Downloads with inode numbers", "lang": "en", "tool": "ls", "gold": "ls -l -i ~/Downloads", "acceptable": ["ls -i -l ~/Downloads", "ls -l -i -h ~/Downloads"]}
+{"text": "find directories named node_modules under ~/code, don't go deeper than 3 levels", "lang": "en", "tool": "find", "gold": "find ~/code -maxdepth 3 -type d -name node_modules", "acceptable": ["find ~/code -maxdepth 3 -name node_modules -type d", "find ~/code -maxdepth 3 -type d -iname node_modules"]}
+{"text": "find files in /tmp owned by user bob", "lang": "en", "tool": "find", "gold": "find /tmp -type f -user bob", "acceptable": ["find /tmp -user bob -type f"]}
+{"text": "find executable files in ./bin", "lang": "en", "tool": "find", "gold": "find ./bin -type f -executable", "acceptable": ["find bin -type f -executable", "find ./bin -type f -perm -u+x"]}
+{"text": "grep case-insensitive for error in app.log and show line numbers", "lang": "en", "tool": "grep", "gold": "grep -i -n error app.log", "acceptable": ["grep -n -i error app.log", "grep -i -n -- error app.log", "grep -in error app.log"]}
+{"text": "count how many lines in access.log do NOT contain 200", "lang": "en", "tool": "grep", "gold": "grep -v -c 200 access.log", "acceptable": ["grep -c -v 200 access.log", "grep -v -c -- 200 access.log"]}
+{"text": "show 3 lines of context around every match of timeout in server.log", "lang": "en", "tool": "grep", "gold": "grep -C 3 timeout server.log", "acceptable": ["grep -C 3 -- timeout server.log", "grep -n -C 3 timeout server.log"]}
+{"text": "search for the whole word main in all .c files under src, recursively", "lang": "en", "tool": "grep", "gold": "grep -r -w --include='*.c' main src", "acceptable": ["grep -r -w --include=*.c main src", "grep -r -n -w --include='*.c' main src"]}
+{"text": "du for each item in /var/log, human readable, depth 1", "lang": "en", "tool": "du", "gold": "du -h -d 1 /var/log", "acceptable": ["du -h --max-depth=1 /var/log", "du -d 1 -h /var/log"]}
+{"text": "total size of every file and folder in the current dir, summarized, in megabytes", "lang": "en", "tool": "du", "gold": "du -s -m *", "acceptable": ["du -s -m -- *", "du -m -s *"]}
+{"text": "disk space only for ext4 filesystems, human readable", "lang": "en", "tool": "df", "gold": "df -h -t ext4", "acceptable": ["df -t ext4 -h", "df -h --type=ext4"]}
+{"text": "show inode usage on all filesystems", "lang": "en", "tool": "df", "gold": "df -i", "acceptable": ["df -i -h", "df -h -i"]}
+{"text": "ps tree of all processes", "lang": "en", "tool": "ps", "gold": "ps -e -f -H", "acceptable": ["ps -e -H -f", "ps -ef --forest", "ps -e -f --forest", "ps -e -H", "ps axjf"]}
+{"text": "show pid, user and command of all processes of user postgres", "lang": "en", "tool": "ps", "gold": "ps -u postgres -o pid,user,cmd", "acceptable": ["ps -u postgres -o pid,user,command", "ps -o pid,user,cmd -u postgres"]}
+{"text": "tar list contents verbosely of backup.tar.gz", "lang": "en", "tool": "tar", "gold": "tar -t -v -z -f backup.tar.gz", "acceptable": ["tar -t -v -f backup.tar.gz", "tar -tvzf backup.tar.gz", "tar -tvf backup.tar.gz"]}
+{"text": "create an uncompressed tar of the docs folder called docs.tar, verbose", "lang": "en", "tool": "tar", "gold": "tar -c -v -f docs.tar docs", "acceptable": ["tar -cvf docs.tar docs"]}
+{"text": "sort numbers.txt numerically in reverse and remove duplicates", "lang": "en", "tool": "sort", "gold": "sort -n -r -u numbers.txt", "acceptable": ["sort -r -n -u numbers.txt", "sort -nru numbers.txt"]}
+{"text": "count lines of words.txt without filename", "lang": "en", "tool": "wc", "gold": "wc -l < words.txt", "acceptable": ["cat words.txt | wc -l"]}
+{"text": "how many characters are in title.txt", "lang": "en", "tool": "wc", "gold": "wc -m title.txt", "acceptable": ["wc -c title.txt"]}
+{"text": "git log one line per commit, last 5, with graph", "lang": "en", "tool": "git", "gold": "git log --oneline --graph -n 5", "acceptable": ["git log --oneline --graph -5", "git log --graph --oneline -n 5", "git log --oneline --graph --decorate -n 5"]}
+{"text": "docker ps showing only IDs", "lang": "en", "tool": "docker", "gold": "docker ps -q", "acceptable": ["docker ps --quiet"]}
+{"text": "list merged branches", "lang": "en", "tool": "git", "gold": "git branch --merged", "acceptable": ["git branch --merged HEAD"]}
+{"text": "pokaż ukryte pliki w długim formacie posortowane wg rozmiaru", "lang": "pl", "tool": "ls", "gold": "ls -l -a -S", "acceptable": ["ls -l -a -S -h", "ls -laS", "ls -l -A -S"]}
+{"text": "wylistuj /var/log od najnowszych, z rozmiarami czytelnymi dla człowieka", "lang": "pl", "tool": "ls", "gold": "ls -l -t -h /var/log", "acceptable": ["ls -l -h -t /var/log", "ls -lth /var/log"]}
+{"text": "pokaż rekurencyjnie zawartość katalogu src", "lang": "pl", "tool": "ls", "gold": "ls -R src", "acceptable": ["ls -R -- src", "ls -l -R src"]}
+{"text": "lista plików w katalogu bez sortowania", "lang": "pl", "tool": "ls", "gold": "ls -U", "acceptable": ["ls -f"]}
+{"text": "znajdź pliki .log w /var/log zmodyfikowane w ciągu ostatnich 60 minut", "lang": "pl", "tool": "find", "gold": "find /var/log -type f -name '*.log' -mmin -60", "acceptable": ["find /var/log -type f -iname '*.log' -mmin -60", "find /var/log -name '*.log' -type f -mmin -60"]}
+{"text": "znajdź katalogi w /srv nazwane cache, maksymalnie 2 poziomy w głąb", "lang": "pl", "tool": "find", "gold": "find /srv -maxdepth 2 -type d -name cache", "acceptable": ["find /srv -maxdepth 2 -type d -iname cache"]}
+{"text": "znajdź puste pliki .txt w bieżącym katalogu, bez wchodzenia do podkatalogów", "lang": "pl", "tool": "find", "gold": "find . -maxdepth 1 -type f -name '*.txt' -empty", "acceptable": ["find . -maxdepth 1 -type f -iname '*.txt' -empty", "find . -maxdepth 1 -name '*.txt' -type f -empty"]}
+{"text": "wyszukaj 'failed' bez rozróżniania wielkości liter w auth.log i policz trafienia", "lang": "pl", "tool": "grep", "gold": "grep -i -c failed auth.log", "acceptable": ["grep -c -i failed auth.log", "grep -ic failed auth.log"]}
+{"text": "pokaż linie z pliku config.ini które nie są komentarzami (nie zaczynają się od #)", "lang": "pl", "tool": "grep", "gold": "grep -v '^#' config.ini", "acceptable": ["grep -v -- '^#' config.ini", "grep -v -E '^#' config.ini"]}
+{"text": "szukaj słowa password w katalogu /etc, rekurencyjnie, tylko nazwy plików, bez wielkości liter", "lang": "pl", "tool": "grep", "gold": "grep -r -l -i password /etc", "acceptable": ["grep -r -i -l password /etc", "grep -rli password /etc"]}
+{"text": "pokaż 2 linie po każdym wystąpieniu Traceback w worker.log", "lang": "pl", "tool": "grep", "gold": "grep -A 2 Traceback worker.log", "acceptable": ["grep -A 2 -- Traceback worker.log", "grep -n -A 2 Traceback worker.log"]}
+{"text": "rozmiar każdego podkatalogu w /home w czytelnej formie, tylko jeden poziom", "lang": "pl", "tool": "du", "gold": "du -h -d 1 /home", "acceptable": ["du -h --max-depth=1 /home", "du -d 1 -h /home"]}
+{"text": "łączny rozmiar katalogu /opt w kilobajtach", "lang": "pl", "tool": "du", "gold": "du -s -k /opt", "acceptable": ["du -k -s /opt", "du -sk /opt"]}
+{"text": "wolne miejsce na partycji z /home w czytelnej formie", "lang": "pl", "tool": "df", "gold": "df -h /home", "acceptable": ["df -h -- /home"]}
+{"text": "pokaż miejsce na dyskach z typem systemu plików", "lang": "pl", "tool": "df", "gold": "df -h -T", "acceptable": ["df -T -h", "df -T"]}
+{"text": "wszystkie procesy w formacie pełnym, z użytkownikiem i pełną komendą", "lang": "pl", "tool": "ps", "gold": "ps -e -f", "acceptable": ["ps -ef", "ps aux", "ps -e -f -w"]}
+{"text": "pokaż procesy użytkownika www-data", "lang": "pl", "tool": "ps", "gold": "ps -u www-data", "acceptable": ["ps -u www-data -f", "ps -f -u www-data"]}
+{"text": "wypakuj archiwum src.tar.bz2 (bzip2) do katalogu /tmp/src", "lang": "pl", "tool": "tar", "gold": "tar -x -j -f src.tar.bz2 -C /tmp/src", "acceptable": ["tar -x -j -v -f src.tar.bz2 -C /tmp/src", "tar -xjf src.tar.bz2 -C /tmp/src", "tar -x -f src.tar.bz2 -C /tmp/src"]}
+{"text": "posortuj plik dane.csv po drugiej kolumnie, separator przecinek", "lang": "pl", "tool": "sort", "gold": "sort -t , -k 2 dane.csv", "acceptable": ["sort -t, -k2 dane.csv", "sort -t ',' -k 2 dane.csv", "sort -k 2 -t , dane.csv"]}
+{"text": "pokaż pierwsze 100 bajtów pliku dump.bin", "lang": "pl", "tool": "head", "gold": "head -c 100 dump.bin", "acceptable": ["head --bytes=100 dump.bin"]}
+{"text": "wszystko z pliku log.txt od linii 50 do końca", "lang": "pl", "tool": "tail", "gold": "tail -n +50 log.txt", "acceptable": ["tail -n+50 log.txt", "tail --lines=+50 log.txt"]}
+{"text": "git log z datami i autorem, po jednym commicie w linii, 10 ostatnich", "lang": "pl", "tool": "git", "gold": "git log --pretty=format:'%h %ad %an %s' --date=short -n 10", "acceptable": ["git log --format='%h %ad %an %s' --date=short -n 10", "git log --pretty='format:%h %ad %an %s' --date=short -10"]}
+{"text": "pokaż tylko nazwy plików zmienionych w stosunku do main", "lang": "pl", "tool": "git", "gold": "git diff --name-only main", "acceptable": ["git diff --name-only main --", "git diff main --name-only"]}
+{"text": "pokaż obrazy dockera bez kolumn, tylko ich ID", "lang": "pl", "tool": "docker", "gold": "docker images -q", "acceptable": ["docker images --quiet", "docker image ls -q"]}
+{"text": "wszystkie kontenery, także zatrzymane, tylko ich nazwy", "lang": "pl", "tool": "docker", "gold": "docker ps -a --format '{{.Names}}'", "acceptable": ["docker ps -a --format='{{.Names}}'", "docker ps --all --format '{{.Names}}'"]}

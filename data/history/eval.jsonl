@@ -1,0 +1,48 @@
+{"lang":"en","history":["cd ~/projects","ls","cat notes.txt"],"query":"delete it","expect_intent":"delete_file","expect_command":"rm notes.txt"}
+{"lang":"pl","history":["git status","vim todo.md","cat todo.md"],"query":"usuń to","expect_intent":"delete_file","expect_command":"rm todo.md"}
+{"lang":"en","history":["df -h","du -sh /home"],"query":"same for /var","expect_intent":"dir_size","expect_command":"du -sh /var"}
+{"lang":"pl","history":["tellsh ile zajmuje /home"],"query":"to samo dla /var/log","expect_intent":"dir_size","expect_command":"du -sh /var/log"}
+{"lang":"en","history":["tellsh how big is /home"],"query":"now for /etc","expect_intent":"dir_size","expect_command":"du -sh /etc"}
+{"lang":"en","history":["docker pull nginx","docker run -d --name web nginx"],"query":"logs of that container","expect_intent":"docker_logs","expect_command":"docker logs --tail 100 -f web"}
+{"lang":"pl","history":["docker build -t myorg/api .","docker run -d --name api -p 8080:80 myorg/api:latest"],"query":"logi tego kontenera","expect_intent":"docker_logs","expect_command":"docker logs --tail 100 -f api"}
+{"lang":"pl","history":["tellsh pokaż logi kontenera api"],"query":"a teraz dla kontenera worker","expect_intent":"docker_logs","expect_command":"docker logs --tail 100 -f worker"}
+{"lang":"en","history":["docker ps","docker logs web"],"query":"stop it","expect_intent":"docker_stop","expect_command":"docker stop web"}
+{"lang":"pl","history":["docker run -d --name qzx-worker busybox sleep 1000"],"query":"zatrzymaj go","expect_intent":"docker_stop","expect_command":"docker stop qzx-worker"}
+{"lang":"en","history":["docker run -d --name pg -e POSTGRES_PASSWORD=x postgres:16"],"query":"open a shell in it","expect_intent":"docker_exec","expect_command":"docker exec -it pg sh"}
+{"lang":"pl","history":["docker ps -a","docker start redis-cache"],"query":"wejdź do niego","expect_intent":"docker_exec","expect_command":"docker exec -it redis-cache sh"}
+{"lang":"en","history":["htop","pgrep -af node"],"query":"kill it","expect_intent":"kill_by_name","expect_command":"pkill -f node"}
+{"lang":"pl","history":["ps aux | grep java","pgrep -af java"],"query":"zabij go","expect_intent":"kill_by_name","expect_command":"pkill -f java"}
+{"lang":"en","history":["pgrep -af ffmpeg","pkill -f ffmpeg","pgrep -af ffmpeg"],"query":"it's still there, force kill it","expect_intent":"kill_force","expect_command":"pkill -9 -f ffmpeg"}
+{"lang":"en","history":["ps -p 4242 -o comm"],"query":"kill it","expect_intent":"kill_by_pid","expect_command":"kill 4242"}
+{"lang":"pl","history":["top","ps -fp 31337"],"query":"ubij ten proces","expect_intent":"kill_by_pid","expect_command":"kill 31337"}
+{"lang":"pl","history":["ss -ltnup 'sport = :8080'"],"query":"zabij to co tam siedzi","expect_intent":"kill_by_port","expect_command":"lsof -ti tcp:8080 | xargs -r kill"}
+{"lang":"en","history":["npm run dev","lsof -i :3000"],"query":"kill whatever is on that port","expect_intent":"kill_by_port","expect_command":"lsof -ti tcp:3000 | xargs -r kill"}
+{"lang":"en","history":["systemctl status nginx"],"query":"restart that service","expect_intent":"service_restart","expect_command":"sudo systemctl restart nginx"}
+{"lang":"pl","history":["sudo -i","systemctl status postgresql"],"query":"zrestartuj tę usługę","expect_intent":"service_restart","expect_command":"sudo systemctl restart postgresql"}
+{"lang":"en","history":["sudo systemctl start redis-server"],"query":"stop it","expect_intent":"service_stop","expect_command":"sudo systemctl stop redis-server"}
+{"lang":"pl","history":["journalctl -u php8.2-fpm -n 50"],"query":"zatrzymaj tę usługę","expect_intent":"service_stop","expect_command":"sudo systemctl stop php8.2-fpm"}
+{"lang":"en","history":["sudo systemctl stop nginx","sudo nginx -t"],"query":"start it again","expect_intent":"service_start","expect_command":"sudo systemctl start nginx"}
+{"lang":"pl","history":["sudo systemctl restart docker"],"query":"pokaż logi tej usługi","expect_intent":"journal_service","expect_command":"journalctl -u docker -n 50 --no-pager"}
+{"lang":"en","history":["git checkout -b feature/x","git push -u origin feature/x","git checkout main"],"query":"delete that branch","expect_intent":"git_delete_branch","expect_command":"git branch -d feature/x"}
+{"lang":"pl","history":["git checkout -b fix/JIRA-88-null","git checkout main"],"query":"usuń tę gałąź","expect_intent":"git_delete_branch","expect_command":"git branch -d fix/JIRA-88-null"}
+{"lang":"en","history":["git checkout -b release/2.3","git checkout main","git pull"],"query":"switch back to that release branch","expect_intent":"git_switch_branch","expect_command":"git checkout release/2.3"}
+{"lang":"pl","history":["git diff src/app.js"],"query":"pokaż kto zmieniał ten plik","expect_intent":"git_blame","expect_command":"git blame src/app.js"}
+{"lang":"pl","history":["ls -lah /var/log"],"query":"a teraz dla /etc","expect_intent":"list_files","expect_command":"ls -lah /etc"}
+{"lang":"en","history":["vim deploy.sh"],"query":"make it executable","expect_intent":"make_executable","expect_command":"chmod +x deploy.sh"}
+{"lang":"pl","history":["nano backup.sh"],"query":"nadaj mu prawa wykonywania","expect_intent":"make_executable","expect_command":"chmod +x backup.sh"}
+{"lang":"en","history":["wget https://example.com/data.tar.gz"],"query":"extract it","expect_intent":"extract_targz","expect_command":"tar -xzvf data.tar.gz"}
+{"lang":"pl","history":["curl -fLO https://releases.example.org/tool-1.2.zip"],"query":"rozpakuj to","expect_intent":"extract_zip","expect_command":"unzip tool-1.2.zip"}
+{"lang":"en","history":["sha256sum ubuntu.iso"],"query":"now the md5 of the same file","expect_intent":"hash_md5","expect_command":"md5sum ubuntu.iso"}
+{"lang":"pl","history":["tail -n 20 /var/log/nginx/access.log"],"query":"śledź go na żywo","expect_intent":"tail_follow","expect_command":"tail -f /var/log/nginx/access.log"}
+{"lang":"en","history":["head -n 5 users.csv"],"query":"how many lines does it have","expect_intent":"count_lines","expect_command":"wc -l users.csv"}
+{"lang":"pl","history":["cat raport.txt"],"query":"ile ma słów","expect_intent":"count_words","expect_command":"wc -w raport.txt"}
+{"lang":"en","history":["sudo vim /etc/hosts"],"query":"show it","expect_intent":"cat_file","expect_command":"cat /etc/hosts"}
+{"lang":"pl","history":["ls","mv report.txt 'raport końcowy.txt'"],"query":"pokaż go","expect_intent":"cat_file","expect_command":"cat 'raport końcowy.txt'"}
+{"lang":"en","history":["ping -c 4 db.internal"],"query":"trace the route to it","expect_intent":"traceroute","expect_command":"traceroute db.internal"}
+{"lang":"pl","history":["ping -c 4 example.org"],"query":"sprawdź dns dla tego hosta","expect_intent":"dns_lookup","expect_command":"dig +short example.org"}
+{"lang":"pl","history":["mkdir -p /srv/app/releases"],"query":"zmień właściciela tego katalogu na deploy","expect_intent":"chown","expect_command":"sudo chown -R deploy /srv/app/releases"}
+{"lang":"pl","history":["tellsh znajdź pliki pdf w Pobrane"],"query":"a teraz w /tmp","expect_intent":"find_by_ext","expect_command":"find /tmp -type f -iname '*.pdf'"}
+{"lang":"en","history":["tellsh largest files in /var"],"query":"same for /opt","expect_intent":"largest_files","expect_command":"find /opt -xdev -type f -exec du -h {} + 2>/dev/null | sort -rh | head -n 10"}
+{"lang":"pl","history":["grep -rn TODO src"],"query":"to samo ale tylko nazwy plików","expect_intent":"grep_files_containing","expect_command":"grep -rl -- TODO src"}
+{"lang":"en","history":["cp config.yml config.yml.bak","vim config.yml"],"query":"compare it with the backup","expect_intent":"diff_files","expect_command":"diff -u config.yml config.yml.bak"}
+{"lang":"en","history":["tellsh show the last 20 lines of /var/log/syslog"],"query":"same for /var/log/auth.log","expect_intent":"tail_file","expect_command":"tail -n 20 /var/log/auth.log"}

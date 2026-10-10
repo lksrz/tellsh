@@ -41,7 +41,7 @@ export const KNOWN_EXT = new Set(('log txt pdf py js mjs cjs ts tsx jsx json md 
   'deb rpm dmg exe bak tmp swp out lock class jar war o so a').split(' '));
 // extensions that are also common words: only accepted with an explicit dot
 const AMBIG_EXT = new Set(['go', 'a', 'o', 'so', 'out', 'lock', 'env', 'db', 'class', 'war', 'tmp', 'doc', 'c', 'h', 'rs', 'sh']);
-const EXT_ALIASES = {
+export const EXT_ALIASES = {
   python: 'py', pythona: 'py', pythonowe: 'py', javascript: 'js', javascriptowe: 'js', typescript: 'ts',
   typescriptowe: 'ts', markdown: 'md', markdownowe: 'md', tekstowe: 'txt', tekstowych: 'txt', tekstowy: 'txt',
   text: 'txt', logi: 'log', logow: 'log', logs: 'log', logami: 'log', logach: 'log',
@@ -85,7 +85,9 @@ const STOP = new Set(('the a an all any every some my me mi this that these thos
   'kill zabij ubij show pokaz pokaż sprawdz sprawdź check list lista via using uzywajac it its it\'s up out into ' +
   'się sie mnie mi tego ten ta to tej tym user uzytkownik uzytkownika owner wlasciciel host server serwer serwera ' +
   'domain domena domeny word slowo slowa text tekst tekstu phrase fraze fraza string ciag pattern wzorzec ' +
-  'history historii historia historie historyczne shell bash zsh commands komend poprzednich previous earlier wczesniej').split(' '));
+  'history historii historia historie historyczne shell bash zsh commands komend poprzednich previous earlier wczesniej ' +
+  'moim mojego moj moja moje mojej mojego twoim your exactly dokladnie somewhere gdzies anywhere ma byc być').split(' '));
+export const isStopWord = (w) => STOP.has(foldKeepLength(String(w)).toLowerCase());
 
 const LOCATIONS = [
   [/\b(home dir(ectory)?|home folder|my home|katalog\w* domow\w*|folder\w* domow\w*|domow\w* (katalog|folder)\w*|w domu|\$home)\b/, '~'],
@@ -98,6 +100,8 @@ const LOCATIONS = [
 ];
 
 const blank = (s, start, end) => s.slice(0, start) + ' '.repeat(end - start) + s.slice(end);
+// end of the word starting at `i` in the original text (number words were padded to digits in `work`)
+const wordEnd = (text, i) => { const m = /^[\p{L}\d]+/u.exec(text.slice(i)); return i + (m ? m[0].length : 1); };
 
 function numVal(s) {
   if (s == null) return null;
@@ -140,7 +144,7 @@ export function durationDerived(amount, unit) {
   return { minutes, days, age, since };
 }
 
-const PATH_TOKEN = /(?:^|[\s(=,])((?:~|\.{1,2})?\/[^\s,;:"'()]*|~(?=[\s,;]|$)|(?:[\w@+-][\w.@+-]*\/)+[\w.@+-]*|[\w@+-][\w@+-]*(?:\.[\w-]+)*\.[A-Za-z][A-Za-z0-9]{0,4}(?:\.[a-z0-9]{1,3})?)(?=$|[\s,;:!?)])/g;
+const PATH_TOKEN = /(?:^|[\s(=,])([A-Za-z]:\\[^\s,;"'()]*|\\\\[^\s,;"'()]+|(?:~|\.{1,2})?\/[^\s,;:"'()]*|~(?=[\s,;]|$)|(?:[\w@+-][\w.@+-]*\/)+[\w.@+-]*|[\w@+-][\w@+-]*(?:\.[\w-]+)*\.[A-Za-z][A-Za-z0-9]{0,4}(?:\.[a-z0-9]{1,3})?)(?=$|[\s,;:!?)])/g;
 
 /**
  * @returns object with: quoted[], urls[], hosts[], target, paths[], count, size, duration, port, pid, mode,
@@ -149,8 +153,11 @@ const PATH_TOKEN = /(?:^|[\s(=,])((?:~|\.{1,2})?\/[^\s,;:"'()]*|~(?=[\s,;]|$)|(?
 export function extractSlots(input) {
   const text = String(input);
   let work = foldKeepLength(text); // same length as text
-  const out = { text, quoted: [], urls: [], hosts: [], paths: [], numbers: [] };
+  const out = { text, quoted: [], urls: [], hosts: [], paths: [], numbers: [], spans: [] };
   const spans = []; // [start, value] for ordering paths
+  // surface spans (character offsets into `text`) by type; `work` stays the same length as `text`
+  // throughout so every regex index maps straight back to the original string
+  const mark = (type, start, end, value) => out.spans.push({ type, start, end, value });
   const take = (re, fn) => {
     re.lastIndex = 0;
     let m;
@@ -161,6 +168,7 @@ export function extractSlots(input) {
     }
     for (const mm of found.reverse()) work = blank(work, mm.index, mm.index + mm[0].length);
   };
+  const cut = (m) => { work = blank(work, m.index, m.index + m[0].length); };
 
   // 1. quoted strings (values from the original text, case preserved)
   const quotedSpans = [];
@@ -168,11 +176,13 @@ export function extractSlots(input) {
     const v = text.slice(m.index + 1, m.index + m[0].length - 1);
     out.quoted.push(v);
     quotedSpans.push([m.index, v]);
+    mark('QUOTED', m.index + 1, m.index + m[0].length - 1, v);
   });
   // 2. URLs and git remotes
   take(/\b(?:https?|ftp|ssh|git):\/\/[^\s"'<>]+|\bwww\.[^\s"'<>]+|\bgit@[\w.-]+:[\w./-]+/g, (m) => {
     const u = text.slice(m.index, m.index + m[0].length).replace(/[.,;:!?)]+$/, '');
     out.urls.push(u);
+    mark('URL', m.index, m.index + u.length, u);
     const h = u.replace(/^\w+:\/\//, '').replace(/^git@/, '').split(/[/:?#]/)[0];
     if (h) out.hosts.push(h);
   });
@@ -181,11 +191,16 @@ export function extractSlots(input) {
     const v = text.slice(m.index, m.index + m[0].length);
     out.target = out.target || v;
     out.hosts.push(v.split('@')[1]);
+    mark('HOST', m.index, m.index + v.length, v);
   });
   // 4. IPv4 (optionally with :port)
   take(/\b(\d{1,3}(?:\.\d{1,3}){3})(?::(\d{1,5}))?\b/g, (m) => {
     out.hosts.push(m[1]);
-    if (m[2]) out.port = out.port || +m[2];
+    mark('HOST', m.index, m.index + m[1].length, m[1]);
+    if (m[2]) {
+      out.port = out.port || +m[2];
+      mark('PORT', m.index + m[0].length - m[2].length, m.index + m[0].length, +m[2]);
+    }
   });
   // 5. paths / filenames (positions kept for src/dst ordering)
   PATH_TOKEN.lastIndex = 0;
@@ -203,6 +218,7 @@ export function extractSlots(input) {
         // bare "name.ext": a domain (host intents) or a filename — keep it as both candidates
         if (/^[a-z0-9-]+(\.[a-z0-9-]+)*\.(com|org|net|io|pl|dev|de|uk|eu|gov|edu|info|co|app|ai|me|cloud|local|lan|internal|xyz|tech|ru|fr|it|es|nl|cz|us|ca)$/i.test(raw)) {
           out.hosts.push(raw);
+          mark('HOST', start, start + raw.length, raw);
           continue;
         }
       }
@@ -211,16 +227,21 @@ export function extractSlots(input) {
     }
     for (const [start, raw, len] of found.reverse()) {
       spans.push([start, raw]);
+      mark('PATH', start, start + raw.length, raw);
       work = blank(work, start, start + len);
     }
   }
   // 5b. domains / hostnames not caught above (e.g. "google.com" without path)
-  take(/\b((?:[a-z0-9-]+\.)+[a-z]{2,})\b/g, (m) => out.hosts.push(text.slice(m.index, m.index + m[0].length)));
+  take(/\b((?:[a-z0-9-]+\.)+[a-z]{2,})\b/g, (m) => {
+    out.hosts.push(text.slice(m.index, m.index + m[0].length));
+    mark('HOST', m.index, m.index + m[0].length, out.hosts[out.hosts.length - 1]);
+  });
   // 6. named locations
   for (const [re, val] of LOCATIONS) {
     const m = work.match(re);
     if (m) {
       spans.push([m.index, val]);
+      mark('PATH', m.index, m.index + m[0].length, val);
       work = blank(work, m.index, m.index + m[0].length);
     }
   }
@@ -235,21 +256,29 @@ export function extractSlots(input) {
   // 7. variable names (UPPER_CASE in the original)
   {
     const m = text.match(/(?:^|[\s$])\$?\{?([A-Z_][A-Z0-9_]{1,})\}?(?=$|[\s,.?!])/);
-    if (m && !/^(PID|CPU|RAM|GPU|USB|DNS|IP|URL|HTTP|HTTPS|SSH|TCP|UDP|OS|PDF|JSON|CSV|MD5|SHA|SHA256|GB|MB|KB|TB|II|PL|EN|README|TODO|FIXME|ERROR|WARN|INFO|DEBUG|HEAD|API|SQL|AWS|GCP)$/.test(m[1])) out.var = m[1];
+    if (m && !/^(PID|CPU|RAM|GPU|USB|DNS|IP|URL|HTTP|HTTPS|SSH|TCP|UDP|OS|PDF|JSON|CSV|MD5|SHA|SHA256|GB|MB|KB|TB|II|PL|EN|README|TODO|FIXME|ERROR|WARN|INFO|DEBUG|HEAD|API|SQL|AWS|GCP)$/.test(m[1])) {
+      out.var = m[1];
+      const at = m.index + m[0].indexOf(m[1]);
+      mark('VAR', at, at + m[1].length, m[1]);
+    }
   }
 
-  // 8. number words -> digits (length may change from here on; positions no longer needed)
-  work = work.replace(NUM_WORD_RE, (w) => String(NUM_WORDS[w]));
+  // 8. number words -> digits, padded with spaces so positions keep mapping to `text`
+  work = work.replace(NUM_WORD_RE, (w) => String(NUM_WORDS[w]).padEnd(w.length));
   // half an hour
-  work = work.replace(/\b(half an hour|pol godziny|polgodziny|30 ?min)\b/, ' 30 minut ');
+  work = work.replace(/\b(half an hour|pol godziny|polgodziny)\b/, (w) => '30 min'.padEnd(w.length));
 
   // 9. sizes
-  work = work.replace(new RegExp(String.raw`(?:^|\s|[+><])${NUM}\s*(tb|tib|terabajt\w*|terabytes?|gb|gib|gigabajt\w*|gigabytes?|giga|gigs?|g|mb|mib|megabajt\w*|megabytes?|mega|megs?|meg|m|kb|kib|kilobajt\w*|kilobytes?|kilo|k|bajt\w*|bytes?|b)\b(?!\s*(?:dni|days?|godz|hour|minut))`, 'i'), (m0, n, u) => {
+  {
+    const m = work.match(new RegExp(String.raw`(?:^|\s|[+><])${NUM}\s*(tb|tib|terabajt\w*|terabytes?|gb|gib|gigabajt\w*|gigabytes?|giga|gigs?|g|mb|mib|megabajt\w*|megabytes?|mega|megs?|meg|m|kb|kib|kilobajt\w*|kilobytes?|kilo|k|bajt\w*|bytes?|b)\b(?!\s*(?:dni|days?|godz|hour|minut))`, 'i'));
     // "5 m" could be minutes; treat bare m/k/g as size only when glued ("100M") or explicit unit
-    if (/^[mkgb]$/i.test(u) && /\s/.test(m0.trim().slice(n.length, n.length + 1))) return m0;
-    out.size = sizeToFind(n, u);
-    return ' ';
-  });
+    if (m && !(/^[mkgb]$/i.test(m[2]) && /\s/.test(m[0].trim().slice(m[1].length, m[1].length + 1)))) {
+      out.size = sizeToFind(m[1], m[2]);
+      const at = m.index + m[0].indexOf(m[1]);
+      mark('SIZE', at, m.index + m[0].length, out.size);
+      cut(m);
+    }
+  }
 
   // 10. durations
   const durRe = new RegExp(String.raw`(?:\b(?:last|past|previous|within|in the last|ostatni\w*|poprzedni\w*|minion\w*|older than|starsze? niz|starszych niz|sprzed|ponad|over|more than|od|since|for|przez|z)\s+)?\b${NUM}\s*${UNIT_RE}\b(?:\s+ago|\s+temu)?`);
@@ -257,7 +286,8 @@ export function extractSlots(input) {
   if (dm) {
     const amount = numVal(dm[1]);
     out.duration = { amount, unit: unitOf(dm[2]), ...durationDerived(amount, unitOf(dm[2])) };
-    work = work.replace(dm[0], ' ');
+    mark('TIME', dm.index, dm.index + dm[0].length, out.duration.minutes);
+    cut(dm);
   } else {
     const rel = [
       [/\b(yesterday|wczoraj\w*|od wczoraj)\b/, 2, 'd', 'yesterday'],
@@ -274,7 +304,8 @@ export function extractSlots(input) {
       if (m) {
         out.duration = { amount, unit, ...durationDerived(amount, unit) };
         if (since) out.duration.since = since;
-        work = work.replace(m[0], ' ');
+        mark('TIME', m.index, m.index + m[0].length, out.duration.minutes);
+        cut(m);
         break;
       }
     }
@@ -286,43 +317,67 @@ export function extractSlots(input) {
       work.match(/(?:^|[\s\w]):(\d{2,5})\b/) || work.match(/\b(\d{2,5})\s*(?:port\w*|porcie)\b/);
     if (m && +m[1] > 0 && +m[1] < 65536) {
       out.port = out.port || +m[1];
-      work = work.replace(m[0], ' ');
+      const at = m.index + m[0].lastIndexOf(m[1]);
+      mark('PORT', at, at + m[1].length, +m[1]);
+      cut(m);
     }
   }
   // 12. pid
   {
     const m = work.match(/\b(?:pid\w*|process id|id procesu|procesu? (?:o )?(?:id|numerze|nr)|numer procesu)\s*(?:=|:|nr|numer)?\s*(\d+)\b/);
-    if (m) { out.pid = +m[1]; work = work.replace(m[0], ' '); }
+    if (m) {
+      out.pid = +m[1];
+      const at = m.index + m[0].lastIndexOf(m[1]);
+      mark('PID', at, at + m[1].length, +m[1]);
+      cut(m);
+    }
   }
   // 13. chmod mode
   {
     const m = work.match(/(?:^|\s)([0-7]{3,4})(?=\s|$)/) || work.match(/(?:^|\s)([ugoa]*[+=-][rwxXst]+)(?=\s|$)/);
-    if (m && (/[+=-]/.test(m[1]) || /^[0-7]{3,4}$/.test(m[1]))) { out.mode = m[1]; out.modeRaw = m[0]; }
+    if (m && (/[+=-]/.test(m[1]) || /^[0-7]{3,4}$/.test(m[1]))) {
+      out.mode = m[1];
+      out.modeRaw = m[0];
+      const at = m.index + m[0].indexOf(m[1]);
+      out.modeSpan = { type: 'MODE', start: at, end: at + m[1].length, value: m[1] };
+    }
   }
   // 14. extension
   {
     let m = work.match(/(?:^|\s)\*?\.([a-z0-9]{1,6})\b/);
     if (m && (KNOWN_EXT.has(m[1]) || /^[a-z]{1,5}$/.test(m[1]))) {
       out.ext = m[1];
-      work = work.replace(m[0], ' ');
+      const at = m.index + m[0].search(/\S/);
+      mark('EXT', at, m.index + m[0].length, m[1]);
+      cut(m);
     } else {
-      const toks = work.split(/[^a-z0-9]+/).filter(Boolean);
       const hasFileWord = FILE_WORDS.test(work);
-      for (const t of toks) {
-        if (KNOWN_EXT.has(t) && !AMBIG_EXT.has(t) && t !== 'tar' && t !== 'zip' && t !== 'gz') { out.ext = t; break; }
-        if (EXT_ALIASES[t] && (!WEAK_ALIAS.has(t) || hasFileWord)) { out.ext = EXT_ALIASES[t]; break; }
-        if ((t === 'zip' || t === 'gz' || t === 'tar') && hasFileWord) { out.ext = t; break; }
+      for (const tm of work.matchAll(/[a-z0-9]+/g)) {
+        const t = tm[0];
+        let e = null;
+        if (KNOWN_EXT.has(t) && !AMBIG_EXT.has(t) && t !== 'tar' && t !== 'zip' && t !== 'gz') e = t;
+        else if (EXT_ALIASES[t] && (!WEAK_ALIAS.has(t) || hasFileWord)) e = EXT_ALIASES[t];
+        else if ((t === 'zip' || t === 'gz' || t === 'tar') && hasFileWord) e = t;
+        if (e) { out.ext = e; mark('EXT', tm.index, tm.index + t.length, e); break; }
       }
     }
   }
   // 15. remaining numbers -> count
   {
-    const nums = [...work.matchAll(/(?<![\w.])(\d+)(?![\w.])/g)].map((m) => +m[1]);
+    const numMs = [...work.matchAll(/(?<![\w.])(\d+)(?![\w.])/g)];
+    const nums = numMs.map((m) => +m[1]);
     out.numbers = nums;
+    out.numberSpans = numMs.map((m) => ({ type: 'NUM', start: m.index, end: wordEnd(text, m.index), value: +m[1] }));
     const top = work.match(/\b(?:top|first|last|pierwsz\w*|ostatni\w*|najwieksz\w*)\s+(\d+)\b/) ||
       work.match(/\b(\d+)\s+(?:largest|biggest|najwieksz\w*|top|najciezsz\w*|lines?|lini\w*|files?|plik\w*|process\w*|proces\w*|commit\w*|entries|wpis\w*|items?|results?|wynik\w*|ostatnich|pierwszych)\b/);
-    if (top) out.count = +top[1];
-    else if (nums.length) out.count = nums[0];
+    if (top) {
+      out.count = +top[1];
+      const at = top.index + top[0].indexOf(top[1]);
+      out.countSpan = { type: 'NUM', start: at, end: wordEnd(text, at), value: out.count };
+    } else if (nums.length) {
+      out.count = nums[0];
+      out.countSpan = out.numberSpans[0];
+    }
   }
   out.rest = work;
   out.words = work.split(/[^a-z0-9@._/+-]+/).filter(Boolean);
@@ -330,6 +385,17 @@ export function extractSlots(input) {
 }
 
 // ---------- argument extraction for name-like slots ----------
+
+/** Map a Polish-inflected form onto a vocabulary entry (javy -> java, nginxa -> nginx). */
+export function deinflect(w, vocab) {
+  if (w.length < 4) return null;
+  for (const suf of ['ami', 'ach', 'owi', 'em', 'om', 'ie', 'y', 'a', 'u', 'e', 'i']) {
+    if (!w.endsWith(suf)) continue;
+    const stem = w.slice(0, -suf.length);
+    for (const add of ['', 'a', 'e', 'o']) if (stem.length + add.length >= 3 && vocab.has(stem + add)) return stem + add;
+  }
+  return null;
+}
 
 function nextAfter(words, triggers, { skip = STOP, accept = /^[\w@.:/+-]+$/ } = {}) {
   for (let i = 0; i < words.length; i++) {
@@ -360,15 +426,35 @@ const TRIG = {
   cmd: set('which where gdzie location lokalizacja path sciezka sciezke command komenda komendy polecenie polecenia binary binarka executable program programu jest is'),
   var: set('variable zmienna zmiennej zmiennych env value wartosc printenv echo'),
   branch: set('branch branchu brancha branchem branche galaz galezi galezia checkout switch przelacz przelaczyc przejdz -b called named nazwie na to do delete usun skasuj'),
-  user: set('user uzytkownik uzytkownika uzytkownikowi owner wlasciciel wlasciciela to dla na chown'),
+  user: set('user uzytkownik uzytkownika uzytkownikowi owner wlasciciel wlasciciela to dla na chown byc'),
   pattern: set('for containing contains contain word text phrase string pattern grep szukaj wyszukaj poszukaj slowo slowa tekst tekstu fraze fraza frazy zawierajace zawierajacy zawierajacych zawieraja zawiera zawierajace ciag wystapienia occurrences mentions mention wzmianki find znajdz search'),
   host: set('ping pinguj pingnij host hosta hosts server serwer serwera serwerem to do domain domena domeny domenie for dla lookup resolve traceroute trace route trasa trase reach dns nslookup dig'),
   target: set('ssh connect polacz polaczyc zaloguj login log to do na into server serwer serwera'),
 };
 
-const BRANCH_STOP = new Set([...STOP, 'on', 'off', 'and', 'then', 'git', 'switch', 'checkout', 'create', 'utworz', 'stworz', 'zrob', 'make', 'go', 'idz']);
+const BRANCH_STOP = new Set([...STOP, 'on', 'off', 'and', 'then', 'git', 'switch', 'checkout', 'create', 'utworz', 'stworz', 'zrob', 'make', 'go', 'idz',
+  'origin', 'upstream', 'remote', 'istniejaca', 'istniejacy', 'existing', 'nowa', 'nowy', 'the']);
+const BRANCH_STRONG = set('branch branchu brancha branchem galaz galezi galezia -b checkout switch named called nazwie');
+
+const TAG_OF = { name: 'NAME', service: 'NAME', container: 'NAME', pkg: 'NAME', cmd: 'NAME', branch: 'BRANCH',
+  user: 'USER', pattern: 'PATTERN', message: 'MSG', var: 'VAR', text: 'TEXT' };
+
+// tagger-only mode (ex built by src/tagger.js exFromSpans): values come from tagged spans, no regex fallback
+function taggedArg(slot, ex) {
+  if (slot === 'host') return ex.hosts[0] ?? null;
+  if (slot === 'target') {
+    if (ex.target) return ex.target;
+    const host = ex.hosts[0];
+    const user = ex.tagged.USER?.[0];
+    return host ? (user ? `${user}@${host}` : host) : null;
+  }
+  const t = TAG_OF[slot];
+  const v = (t && ex.tagged[t]?.[0]) ?? null;
+  return slot === 'service' && v ? v.replace(/\.service$/, '') : v;
+}
 
 export function pickArg(slot, ex) {
+  if (ex.taggerOnly) return taggedArg(slot, ex);
   const { quoted, words, text } = ex;
   const vocab = slot === 'service' ? KNOWN_SERVICES : slot === 'pkg' ? KNOWN_PKGS : (slot === 'name' || slot === 'container') ? KNOWN_PROCS : null;
   if (['pattern', 'message', 'text', 'name', 'service', 'container', 'pkg', 'cmd', 'branch', 'user'].includes(slot) && quoted.length) {
@@ -408,9 +494,12 @@ export function pickArg(slot, ex) {
   }
   if (vocab) {
     for (const w of words) if (vocab.has(w)) return original(text, w);
+    // Polish inflection of a known name: "procesy javy" -> java, "logi nginxa" -> nginx, "chroma" -> chrome
+    for (const w of words) { const d = deinflect(w, vocab); if (d) return d; }
   }
   if (slot === 'branch') {
-    const r = nextAfter(words, TRIG.branch, { skip: BRANCH_STOP, accept: /^[\w./-]+$/ });
+    const r = nextAfter(words, BRANCH_STRONG, { skip: BRANCH_STOP, accept: /^[\w./-]+$/ }) ||
+      nextAfter(words, TRIG.branch, { skip: BRANCH_STOP, accept: /^[\w./-]+$/ });
     if (r) return original(text, r.word);
     const p = ex.paths.find((x) => /^[\w-]+\/[\w./-]+$/.test(x));
     return p || null;

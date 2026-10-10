@@ -1,22 +1,13 @@
-// Turn (intent, extracted slots) into a concrete, safely-quoted shell command.
+// Turn (intent, slots) into a concrete, safely-quoted command for the target shell.
 import { BY_ID } from './catalog.js';
 import { extractSlots, pickArg, pickDest, pickDir } from './slots.js';
 import { checkDanger, maxRisk } from './danger.js';
+import { shQuote, psQuote, chooseTemplate, quoteForKind } from './render.js';
 
-const SAFE_WORD = /^[A-Za-z0-9_\/.,:@%+=-]+$/;
-
-/** POSIX shell quoting. Keeps a leading ~/ unquoted so tilde expansion still works. */
-export function shQuote(value) {
-  const s = String(value);
-  if (s === '') return "''";
-  const tilde = s.match(/^~(\/|$)(.*)$/s);
-  if (tilde) return '~' + tilde[1] + (tilde[2] ? shQuote(tilde[2]) : '');
-  if (SAFE_WORD.test(s)) return s;
-  return "'" + s.replace(/'/g, `'\\''`) + "'";
-}
+export { shQuote };
 
 // Validators for slots that are inserted raw ({slot!raw}).
-const RAW_OK = {
+export const RAW_OK = {
   count: (v) => /^\d{1,6}$/.test(String(v)),
   depth: (v) => /^\d{1,2}$/.test(String(v)),
   days: (v) => /^\d{1,5}$/.test(String(v)),
@@ -26,6 +17,8 @@ const RAW_OK = {
   age: (v) => /^-m(?:min|time) -\d+$/.test(String(v)),
   mode: (v) => /^[0-7]{3,4}$|^[ugoa]*[+=-][rwxXst]+$/.test(String(v)),
   var: (v) => /^[A-Za-z_][A-Za-z0-9_]*$/.test(String(v)),
+  minutes: (v) => /^\d{1,7}$/.test(String(v)),
+  sizeBytes: (v) => /^\d{1,16}$/.test(String(v)),
 };
 
 const PATH_SLOTS = new Set(['path', 'file', 'src', 'dst', 'dest', 'archive']);
@@ -34,6 +27,14 @@ const PLACEHOLDER = (name) => `<${name.toUpperCase()}>`;
 // sed needs regex-escaped search text and &,\,/ escaped replacement
 const sedEscapeOld = (s) => s.replace(/[\\/.*^$[\]]/g, '\\$&');
 const sedEscapeNew = (s) => s.replace(/[\\/&]/g, '\\$&').replace(/\n/g, '\\n');
+
+/** Recompute derived slots after values were merged/overridden (tagger, history rules). */
+export function finalizeSlots(intent, v) {
+  if (v.ext != null && v.glob == null) v.glob = `*.${v.ext}`;
+  if (intent.id === 'find_by_name' && v.name) v.namepat = /[*?]/.test(v.name) || /\.\w+$/.test(v.name) ? v.name : `*${v.name}*`;
+  if (intent.id === 'replace_text' && v.old != null && v.new != null) v.sedexpr = `s/${sedEscapeOld(v.old)}/${sedEscapeNew(v.new)}/g`;
+  return v;
+}
 
 /** Resolve the values an intent can use from the generic extraction. */
 export function resolveSlots(intent, ex) {
@@ -102,7 +103,9 @@ export function resolveSlots(intent, ex) {
   }
   if (intent.id === 'base64_encode' || intent.id === 'base64_decode') {
     const t = pickArg('text', ex);
+    const fileWord = /\b(plik\w*|files?)\s+\S+\.\w+/i.test(ex.text);
     if (ex.quoted.length) v.text = ex.quoted[0];
+    else if (paths.length && fileWord) v.file = paths[0];
     else if (paths.length && !(t && t.includes(' '))) v.file = paths[0];
     else if (t) v.text = t;
   }
@@ -119,8 +122,8 @@ export function resolveSlots(intent, ex) {
     }
   }
   if (intent.id === 'replace_text') {
-    let [o, n] = ex.quoted;
-    if (o == null || n == null) {
+    let [o, n] = ex.taggerOnly ? [ex.tagged.PATTERN?.[0], ex.tagged.REPL?.[0]] : ex.quoted;
+    if (!ex.taggerOnly && (o == null || n == null)) {
       const m = ex.text.match(/(?:replace|substitute|change|swap|zamie[nń]|zmie[nń]|podmie[nń]|zast[aą]p)\s+(?:all\s+|every\s+|wszystkie\s+|ka[zż]de\s+)?(?:occurrences of\s+|wyst[aą]pienia\s+)?(?:word\s+|s[lł]owo\s+|text\s+|tekst\s+|string\s+)?["'„]?([^\s"'”]+)["'”]?\s+(?:with|to|for|into|by|na|->|=>)\s+["'„]?([^\s"'”]+)["'”]?/i);
       if (m) { o = o ?? m[1]; n = n ?? m[2]; }
     }
@@ -135,35 +138,37 @@ export function resolveSlots(intent, ex) {
   return v;
 }
 
-function renderValue(name, raw, values) {
+function renderValue(name, raw, values, quote) {
   if (!(name in values)) return null;
   let val = values[name];
   if (raw) return RAW_OK[name] && !RAW_OK[name](val) ? null : String(val);
   if (PATH_SLOTS.has(name) && /^-/.test(String(val))) val = './' + val; // never let a path look like an option
-  return shQuote(val);
+  return quote(val);
 }
+
+const SLOT_NAMES = /^(path|file|count|src|dst|archive|glob|namepat|sedexpr|age|days|size|depth|port|pid|mode|var|name|service|container|pkg|cmd|branch|user|pattern|host|target|message|url|since|dest|text|ext|minutes|sizeBytes|old|new)$/;
 
 /**
  * Fill a template. Returns { command, missing[] }.
  * `values` = resolved slots merged over intent defaults.
  */
-export function render(template, values, required = []) {
+export function render(template, values, required = [], quote = shQuote) {
   const missing = [];
   // optional segments «...»
   let out = template.replace(/«([^»]*)»/g, (_, seg) => {
     let ok = true;
     const r = seg.replace(/\{(\w+)(!raw)?\}/g, (m, name, raw) => {
-      const val = renderValue(name, !!raw, values);
+      const val = renderValue(name, !!raw, values, quote);
       if (val == null) { ok = false; return m; }
       return val;
     });
-    return ok ? ' ' + r : '';
+    return ok ? (/^\s/.test(r) ? r : ' ' + r) : '';
   });
   out = out.replace(/\{(\w+)(!raw)?\}/g, (m, name, raw) => {
-    if (!(name in values) && !required.includes(name) && !/^(path|file|count|src|dst|archive|glob|namepat|sedexpr|age|days|size|depth|port|pid|mode|var|name|service|container|pkg|cmd|branch|user|pattern|host|target|message|url|since|dest|text)$/.test(name)) {
-      return m; // not a slot (e.g. awk braces, %{http_code})
+    if (!(name in values) && !required.includes(name) && !SLOT_NAMES.test(name)) {
+      return m; // not a slot (e.g. awk braces, %{http_code}, PowerShell script blocks)
     }
-    const val = renderValue(name, !!raw, values);
+    const val = renderValue(name, !!raw, values, quote);
     if (val == null) {
       missing.push(name);
       return PLACEHOLDER(name);
@@ -175,46 +180,78 @@ export function render(template, values, required = []) {
 
 const DERIVED_REQUIRED = { namepat: 'name', glob: 'ext', sedexpr: 'old' };
 
+const SIZE_MULT = { c: 1, k: 1024, M: 1024 ** 2, G: 1024 ** 3 };
+/** Slots derived from others so every shell can use the unit it needs (find: -mmin/-size, PowerShell: minutes/bytes). */
+export function deriveSlots(v) {
+  if (v.glob && v.ext == null) { const m = String(v.glob).match(/^\*\.([\w]+)$/); if (m) v.ext = m[1]; }
+  if (v.minutes == null && v.age) {
+    const m = String(v.age).match(/^-m(min|time) -(\d+)$/);
+    if (m) v.minutes = m[1] === 'min' ? +m[2] : +m[2] * 1440;
+  }
+  if (v.sizeBytes == null && v.size != null) {
+    const m = String(v.size).match(/^(\d+)([ckMG]?)$/);
+    if (m) v.sizeBytes = +m[1] * (SIZE_MULT[m[2]] ?? 512);
+  }
+  return v;
+}
+
+/** env from the legacy `platform` option */
+export const envFromPlatform = (platform = process.platform) => ({
+  shell: 'bash',
+  os: platform === 'darwin' ? 'darwin' : platform === 'win32' ? 'win32' : 'linux',
+  coreutils: platform === 'darwin' ? 'bsd' : 'gnu',
+});
+
 /**
  * Build a full suggestion for an intent and query.
- * @returns {{intent, command, risk, baseRisk, warnings, critical, missing, slots, notes}}
+ *   env: { shell, os, coreutils } (default: bash on `platform`)
+ *   resolved: pre-resolved slot values (skips extraction; used by the cascade/tagger and history rules)
+ * @returns {{intent, command, risk, baseRisk, warnings, critical, missing, slots, notes, shell, variant, gap}}
  */
-export function buildCommand(intentId, text, { platform = process.platform, extracted } = {}) {
+export function buildCommand(intentId, text, { platform = process.platform, env, extracted, resolved: given } = {}) {
   const intent = BY_ID[intentId];
   if (!intent) throw new Error(`unknown intent ${intentId}`);
-  const ex = extracted || extractSlots(text);
-  const resolved = resolveSlots(intent, ex);
-  const defaults = { ...intent.slots, ...(platform === 'darwin' ? intent.darwinDefaults : {}) };
+  const e = env || envFromPlatform(platform);
+  const resolved = given || resolveSlots(intent, extracted || extractSlots(text));
+  const defaults = { ...intent.slots, ...(e.os === 'darwin' ? intent.darwinDefaults : {}) };
   const values = {};
   for (const [k, d] of Object.entries(defaults)) if (d != null) values[k] = d;
   Object.assign(values, resolved);
+  deriveSlots(values);
   const required = Object.entries(intent.slots).filter(([, d]) => d == null).map(([k]) => k);
 
-  const tpl = platform === 'darwin' && intent.darwin ? intent.darwin : intent.template;
+  const choice = chooseTemplate(intent, e);
+  const base = {
+    intent: intent.id, description: intent.description, baseRisk: intent.risk, slots: resolved,
+    notes: intent.notes || null, shell: e.shell, os: e.os, variant: choice.variant || null,
+  };
+  if (choice.gap) {
+    return { ...base, command: null, gap: choice.gap, risk: intent.risk, warnings: [], critical: false, missing: [] };
+  }
+  const quote = quoteForKind(choice.kind, choice.wrapPosix);
+  const tpl = choice.tpl;
   let command;
   let missing = [];
   if (typeof tpl === 'function') {
-    const q = (s) => (/^-/.test(String(s)) ? shQuote('./' + s) : shQuote(s));
+    const q = (s) => (/^-/.test(String(s)) ? quote('./' + s) : quote(s));
     const vals = { ...values };
     for (const r of required) if (!(r in vals)) { missing.push(r); vals[r] = PLACEHOLDER(r); }
-    command = tpl(vals, q, platform);
+    // catalog functions take the OS string, variant functions a ctx object
+    command = tpl(vals, q, tpl === intent.template || tpl === intent.darwin ? e.os : e);
     if (/<TEXT>/.test(command)) missing.push('text');
   } else {
-    ({ command, missing } = render(tpl, values, required));
+    ({ command, missing } = render(tpl, values, required, quote));
     missing = missing.map((m) => DERIVED_REQUIRED[m] || m);
   }
+  if (choice.wrapPosix) { command = 'bash -c ' + psQuote(command); base.variant = 'bash -c (no native PowerShell variant)'; }
   missing = [...new Set(missing)];
   const danger = checkDanger(command, intent.risk);
   return {
-    intent: intent.id,
-    description: intent.description,
+    ...base,
     command,
-    baseRisk: intent.risk,
     risk: maxRisk(intent.risk, danger.risk),
     warnings: danger.warnings,
     critical: danger.critical,
     missing,
-    slots: resolved,
-    notes: intent.notes || null,
   };
 }
