@@ -13,12 +13,12 @@ import { FAMILY_OF, NONE } from '../tools.js';
 
 // calibrated on the training dev split (scripts/hybrid/eval_hybrid.js --calibrate); see HYBRID.md
 export const POLICY = {
-  'A+B': { tau: 0.9, k: 5, alpha: 0.25, accept: 0.3, none: 0.5, tagger: 'A' },
-  'A+C': { tau: 0.9, k: 5, alpha: 0.5, accept: 0.3 },
-  'A+B-safe': { tau: 0.9, k: 5, alpha: 0.5, accept: 0, rescue: false, tagger: 'A' },
+  'A+B': { tau: 0.9, k: 5, alpha: 0.5, accept: 0, none: 0.5, keepNone: true, tagger: 'A' },
+  'A+B-safe': { tau: 0.9, k: 5, alpha: 0.5, accept: 0, none: 0.5, rescue: false, tagger: 'A' },
+  'A+C': { tau: 0.9, k: 5, alpha: 0.75, accept: 0, keepNone: true },
   'A+C-safe': { tau: 0.9, k: 5, alpha: 0.75, accept: 0, rescue: false },
-  B: { tau: Infinity, k: 0, alpha: 0, accept: 0.3, none: 0.5, tagger: 'B' },
-  C: { tau: Infinity, k: 5, alpha: 0, accept: 0 },
+  B: { tau: Infinity, k: 0, alpha: 0, accept: 0, none: 0.5, keepNone: true, tagger: 'B' },
+  C: { tau: Infinity, k: 3, alpha: 0, accept: 0, keepNone: true },
 };
 
 const LOG = (p) => Math.log(Math.max(p, 1e-6));
@@ -81,6 +81,23 @@ export async function suggestHybrid(query, opts = {}) {
   const ms = performance.now() - t0;
   const res = suggest(query, { ...base, tagger, rerank: (c, { thr }) => rerank(c, pX, P, { thr, pNone }) });
   return { ...res, hybrid: { system, deferred: true, ms, pNone } };
+}
+
+/** CLI entry: A+B with the encoder loaded lazily (only when the cascade defers); falls back to A when the optional
+ *  runtime or model bundle is missing (result.hybrid.unavailable says why). */
+let ENC = null;
+export async function suggestLazy(query, opts = {}) {
+  const encoder = { infer: async (t, env) => {
+    if (ENC === null) { const { Encoder } = await import('./encoder.js'); ENC = (await Encoder.load({ threads: 1 })) || false; }
+    if (!ENC) throw Object.assign(new Error('unavailable'), { unavailable: true });
+    return ENC.infer(t, env);
+  } };
+  try {
+    return await suggestHybrid(query, { ...opts, system: opts.system || 'A+B', encoder });
+  } catch (e) {
+    if (!e.unavailable) throw e;
+    return { ...suggest(query, opts), hybrid: { system: 'A', deferred: false, unavailable: 'encoder (install onnxruntime-node + tellsh-model-enc)' } };
+  }
 }
 
 export { NONE };
