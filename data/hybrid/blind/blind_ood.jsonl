@@ -1,0 +1,40 @@
+{"text": "book me a flight to Lisbon next friday", "intent": null, "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "translate this sentence to German: the meeting is postponed", "intent": null, "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "write me a poem about cats", "intent": null, "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "what's the weather like in Berlin tomorrow", "intent": null, "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "what is a symlink and why would I use one?", "intent": null, "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "how do I become a sysadmin", "intent": null, "lang": "en", "shell": "fish", "os": "linux"}
+{"text": "tell me a joke", "intent": null, "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "who won the world cup in 2018", "intent": null, "lang": "en", "shell": "cmd", "os": "win32"}
+{"text": "remind me to call mom at 6pm", "intent": null, "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "explain the difference between TCP and UDP", "intent": null, "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "recommend a good sci-fi book", "intent": null, "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "thanks, that's all for now", "intent": null, "lang": "en", "shell": "sh", "os": "linux"}
+{"text": "order a large pepperoni pizza", "intent": null, "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "what's the capital of Australia", "intent": null, "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "convert 50 euros to dollars", "intent": null, "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "is linux better than windows for gaming?", "intent": null, "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "send an email to my boss saying I'll be late", "intent": null, "lang": "en", "shell": "zsh", "os": "darwin"}
+{"text": "hello, how are you today?", "intent": null, "lang": "en", "shell": "fish", "os": "linux"}
+{"text": "summarize the plot of hamlet in three sentences", "intent": null, "lang": "en", "shell": "bash", "os": "linux"}
+{"text": "what does chmod actually stand for, historically?", "intent": null, "lang": "en", "shell": "powershell", "os": "win32"}
+{"text": "zarezerwuj mi lot do Gdańska na weekend", "intent": null, "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "przetłumacz to na angielski: dziękuję za spotkanie", "intent": null, "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "napisz wierszyk o kotach", "intent": null, "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "jaka bedzie jutro pogoda w Krakowie", "intent": null, "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "co to jest dowiązanie symboliczne i do czego służy?", "intent": null, "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "jak zostać administratorem systemów", "intent": null, "lang": "pl", "shell": "fish", "os": "linux"}
+{"text": "opowiedz mi kawał", "intent": null, "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "kto wygrał mistrzostwa świata w 2022", "intent": null, "lang": "pl", "shell": "cmd", "os": "win32"}
+{"text": "przypomnij mi o dentyście jutro o 10", "intent": null, "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "wyjaśnij czym się różni proces od wątku", "intent": null, "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "polec mi dobry film na wieczór", "intent": null, "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "dzieki, to wszystko", "intent": null, "lang": "pl", "shell": "sh", "os": "linux"}
+{"text": "zamów pizzę z pieczarkami", "intent": null, "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "ile mieszkańców ma Warszawa", "intent": null, "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "przelicz 100 zlotych na euro", "intent": null, "lang": "pl", "shell": "powershell", "os": "win32"}
+{"text": "czy warto uczyć się Rusta w 2026?", "intent": null, "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "wyślij maila do Kasi że spóźnię się na spotkanie", "intent": null, "lang": "pl", "shell": "zsh", "os": "darwin"}
+{"text": "czesc, co tam u ciebie?", "intent": null, "lang": "pl", "shell": "fish", "os": "linux"}
+{"text": "streść mi Pana Tadeusza w trzech zdaniach", "intent": null, "lang": "pl", "shell": "bash", "os": "linux"}
+{"text": "jaka jest różnica między linuksem a uniksem, tak historycznie?", "intent": null, "lang": "pl", "shell": "cmd", "os": "win32"}
