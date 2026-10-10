@@ -9,7 +9,7 @@
 //   build/hybrid/meta.json    {tools, intents, intentTool, tagLabels}
 import { readFileSync, readdirSync, existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import { fileURLToPath } from 'node:url';
+import { fileURLToPath, pathToFileURL } from 'node:url';
 import { INTENTS } from '../../src/catalog.js';
 import { FAMILIES, FAMILY_OF, NONE, TAG_TYPES } from '../../src/tools.js';
 import { normalize, fnv1a } from '../../src/features.js';
@@ -49,6 +49,16 @@ function typo(text) {
 // typo() shifts offsets, so only the clean / relexicalised copies carry spans
 export const isDev = (text) => fnv1a('dev:' + normalize(text)) % 10 === 0;
 
+/**
+ * The row sink: every emitted row is checked against the held-out index, not only the originals. A typo or
+ * relexicalised copy can be exactly a held-out text ("kill all node processes", "koniec pliku /var/log/syslog").
+ */
+export function heldOutFilter(heldOut) {
+  const out = { rows: [], dropped: 0 };
+  out.push = (o) => { if (heldOut.has(o.text)) out.dropped++; else out.rows.push(o); };
+  return out;
+}
+
 function main() {
   mkdirSync(OUT, { recursive: true });
   const ids = new Set(INTENTS.map((i) => i.id));
@@ -75,9 +85,9 @@ function main() {
     seen.add(key);
     base.push(r);
   }
-  const rows = [];
+  const out = heldOutFilter(heldOut);
+  const { rows, push } = out;
   let gid = 0;
-  const push = (o) => rows.push(o);
   for (const r of base) {
     const g = gid++;
     const tool = FAMILY_OF[r.intent];
@@ -119,6 +129,7 @@ function main() {
   };
   writeFileSync(join(OUT, 'meta.json'), JSON.stringify(meta, null, 1));
   const c = (f) => rows.filter(f).length;
+  console.log(`export_data: ${out.dropped} augmented rows dropped (held-out texts)`);
   console.log(`export_data: ${base.length} base (${base.filter((r) => r.src === 'real').length} real), ${rows.length} rows (train ${c((r) => r.split === 'train')}, dev ${c((r) => r.split === 'dev')}), tldr ${c((r) => r.src === 'tldr')}, ood ${c((r) => r.src === 'ood')}`);
 }
-main();
+if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) main();

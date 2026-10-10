@@ -8,7 +8,7 @@ import { INTENTS, BY_ID } from './catalog.js';
 import { FAMILY_OF } from './tools.js';
 import { extractSlots, foldKeepLength, isStopWord } from './slots.js';
 import { VARIANTS } from './variants.js';
-import { splitCommand, wordsOf, decodeWord, AMB, isAmbiguous, isExpansion, isGlob, rawOf, joinWords } from './shellwords.js';
+import { splitCommand, wordsOf, decodeWord, AMB, isAmbiguous, isExpansion, isGlob, rawOf, joinArgs } from './shellwords.js';
 import { commandWords, commandChains } from './danger.js';
 
 export { isAmbiguous };
@@ -371,18 +371,24 @@ const TELLSH_VALUE_OPTS = new Set(['--shell', '--os', '--platform', '--top', '--
  * line cannot be read back as one request (a word with spaces and both quote characters, unparseable quoting).
  */
 export function tellshQuery(line, kind = 'posix') {
+  const a = tellshArgs(line, kind);
+  return a == null || a === false ? a : a.text;
+}
+
+/** tellshQuery with the quoted arguments joinArgs could not classify: -> { text, unclear } | null | false */
+export function tellshArgs(line, kind = 'posix') {
   const t = String(line).trim();
   const tm = t.match(TELLSH_LINE);
   if (!tm) return null;
   const w = wordsOf(tm[1] || '', lineKind(t, kind), { literalTilde: false });
-  if (!w) return tm[1] ? false : '';
+  if (!w) return tm[1] ? false : { text: '', unclear: [] };
   const words = [];
   for (let i = 0; i < w.length; i++) {
     if (TELLSH_VALUE_OPTS.has(w[i])) { i++; continue; }
     if (!/^-/.test(w[i])) words.push(rawOf(w[i]));
   }
-  const q = joinWords(words);
-  return q == null ? false : q;
+  if (!words.length) return { text: '', unclear: [] };
+  return joinArgs(words) ?? false;
 }
 
 /**
@@ -404,10 +410,11 @@ export function analyzeCommand(line, classify, kind = 'posix') {
   const t = line.trim();
   const k = lineKind(t, kind);
   if (TELLSH_LINE.test(t)) {
-    const q = tellshQuery(t, k);
+    const qa = tellshArgs(t, k);
     // a request that cannot be read back: it may have named any file or directory
-    if (q === false) return { line: t, intent, slots, ents: { file: AMB + t, dir: AMB + t }, at: {}, listed: { file: 0, dir: 0 }, opaque: true, fromTellsh: true, ambiguous: true };
-    const r = q && classify ? classify(q) : null;
+    if (qa === false) return { line: t, intent, slots, ents: { file: AMB + t, dir: AMB + t }, at: {}, listed: { file: 0, dir: 0 }, opaque: true, fromTellsh: true, ambiguous: true };
+    const q = qa?.text;
+    const r = q && classify ? classify(q, qa.unclear) : null;
     if (r?.intent) { intent = r.intent; slots = { ...(r.slots || {}) }; entsFromSlots(intent, slots, ents); }
     // `tellsh list directory /tmp/build`: like `ls /tmp/build`, the user saw the entries of the directory
     const sr = isSearchRoot(intent, slots, ents);
@@ -585,6 +592,10 @@ const GREP_HEADS = new Set(['grep', 'egrep', 'fgrep', 'rg', 'ack', 'ag']);
 // find/grep catalog intents: their path slot is where the search ran, not what it found
 const isSearchRoot = (intent, slots, ents) => ents.dir != null && ['find', 'grep'].includes(FAMILY_OF[intent]) && String(ents.dir) === String(slots.path);
 
+// the one operand of a command, or (several files: `touch a.txt b.txt`, `rm a b`) an ambiguous value: "delete them"
+// or "delete it" may mean any or all of them, never just the last one
+const oneOf = (ops) => (ops.length > 1 ? AMB + ops.map(rawOf).join(' ') : ops[0]);
+
 /** Entities of one simple command `w` (sudo/VAR= removed) into `e`. */
 function segmentEnts(w, e, setIntent, split, k, segIdx, firstWord) {
   if (isAmbiguous(w[0])) {
@@ -695,7 +706,7 @@ function segmentEnts(w, e, setIntent, split, k, segIdx, firstWord) {
       if (saves && /\.\w{1,5}$/.test(base)) e.file = base;
     }
   } else if (head === 'rm' || head === 'trash' || head === 'rmdir') {
-    const p = nonFlags[nonFlags.length - 1];
+    const p = oneOf(nonFlags);
     if (p) e[args.some((a) => /^-\w*r/i.test(a)) || head === 'rmdir' ? 'dir' : 'file'] = p;
   } else if (head === 'cp' || head === 'mv' || head === 'ln') {
     const { pos, opts } = parseArgs(args, VALUE_OPTS[head]);
@@ -706,12 +717,16 @@ function segmentEnts(w, e, setIntent, split, k, segIdx, firstWord) {
     const a = nonFlags.find((x) => /\.(tar(\.\w+)?|tgz|zip)$/.test(x));
     if (a) e.file = a;
   } else if (FILE_HEADS.has(head)) {
-    const p = nonFlags.filter((a) => !/^[0-7]{3,4}$|^[ugoa]*[+=-][rwxXst]+$/.test(a)).pop();
-    if (p) e[/\/$/.test(p) ? 'dir' : 'file'] = p;
+    // operands: not a chmod mode, a chown owner, a count (`head -n 5 a.txt`), or the arguments of a script
+    let ops = nonFlags.filter((a) => !/^[0-7]{3,4}$|^[ugoa]*[+=-][rwxXst]+$|^\d+$/.test(a));
+    if (['chown'].includes(head)) ops = ops.slice(1);
+    if (['python', 'python3', 'node', 'bash', 'sh', 'source'].includes(head)) ops = ops.slice(0, 1);
+    const p = oneOf(ops);
+    if (p) e[/\/$/.test(rawOf(p)) ? 'dir' : 'file'] = p;
   } else if (DIR_HEADS.has(head)) {
-    // find ROOT -name ...: the search root; other heads: the last directory argument (`ls /a /b` -> /b)
+    // find ROOT -name ...: the search root; other heads: the one directory argument (`ls /a /b`: ambiguous)
     // (find's root is the operands before its first expression word: `find -name "*.o"` has none)
-    const p = head === 'find' ? args.slice(0, (args.findIndex((a) => /^[-(!]/.test(a)) + 1 || args.length + 1) - 1)[0] : nonFlags.filter((a) => !isGlob(a)).pop();
+    const p = head === 'find' ? args.slice(0, (args.findIndex((a) => /^[-(!]/.test(a)) + 1 || args.length + 1) - 1)[0] : oneOf(nonFlags.filter((a) => !isGlob(a) && !/^\d+$/.test(a)));
     if (p) {
       e.dir = p;
       if (head === 'find') e.searchDir = true;
@@ -752,7 +767,8 @@ export function buildContext(cmds, { classify, cwd, kind, query } = {}) {
   if (query != null && list.length) {
     const norm = (x) => String(x).trim().replace(/\s+/g, ' ');
     const q = tellshQuery(list[list.length - 1], k);
-    if (q != null && (norm(q) === norm(query) || norm(list[list.length - 1]).includes(norm(query)))) list.pop();
+    // exact match only: an earlier `tellsh` line whose text merely contains the query is the previous command
+    if (q != null && q !== false && norm(q) === norm(query)) list.pop();
   }
   const line = list.length ? list[list.length - 1] : null;
   const a = line != null ? analyzeCommand(line, classify, k) : { ents: {}, at: {}, listed: {}, slots: {} };
@@ -1051,6 +1067,8 @@ export function changeGuard(type, value, fq, ctx) {
     return `the previous command listed ${type === 'dir' || type === 'file' ? 'files' : `${type} values`}, so the reference may mean one of them, not ${v}; not guessing`;
   }
   if (type === 'dir' && ctx.cdDir?.value === v && ctx.cdDir.followed) return `${v} is the working directory of a cd after which other commands ran; not guessing`;
+  // `cat a.txt; cd /srv`: the line also named a file before the cd, so "it" may mean the file as well as the directory
+  if (type === 'dir' && ctx.cdDir?.value === v && ctx.ents.file != null) return `the previous command named a file (${rawOf(ctx.ents.file)}) and then changed to ${v}; the reference is unclear; not guessing`;
   // "delete that backups folder" after `mkdir /srv/current`: the request names something else
   const hints = [...fq.matchAll(HINTED_NOUN)].map((m) => m[1]).filter(isHintWord);
   if (hints.length && !hints.some((w) => foldKeepLength(v).toLowerCase().includes(w))) return `the request names "${hints.join(' ')}", which is not part of ${v}; not guessing`;

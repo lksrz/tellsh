@@ -78,9 +78,10 @@ test('history: a note never claims a history value the command does not use', ()
   assert.ok(!Object.values(r.slotSources ?? {}).includes('history'));
 });
 
-test('history: `ls /a /b` + "it" is the last argument', () => {
-  assert.equal(run('delete it', ['du -sh /a /b']).command, 'rm -r /b');
-  assert.equal(run('delete it', ['ls /a /b']).command, 'rm -r <PATH>'); // listed (round 4b)
-  assert.equal(run('show it', ['ls /a /b']).command, 'ls -lah /b');
-  assert.equal(run('how big is it', ['du -sh /a /b']).command, 'du -sh /b');
+test('history: `ls /a /b` + "it": several operands, none of them is "it" (round 8: no longer the last one)', () => {
+  assert.equal(run('delete it', ['du -sh /a /b']).command, 'rm -r <PATH>');
+  assert.equal(run('delete it', ['ls /a /b']).command, 'rm -r <PATH>');
+  assert.match(run('show it', ['ls /a /b']).command, /<PATH>/);
+  assert.match(run('how big is it', ['du -sh /a /b']).command, /<PATH>/);
+  assert.equal(run('how big is it', ['du -sh /b']).command, 'du -sh /b');
 });

@@ -64,6 +64,11 @@ runs in the target shell (`$SHELL -c`, `fish -c`, `pwsh -NoProfile -Command`, `c
 only prints. Exit codes: command's own · `0` printed · `2` usage · `3` not understood · `4` `--yes` refused ·
 `5` no rendering for this shell · `130` aborted.
 
+Quoting: the whole request may be one argument (`tellsh "delete folder /tmp/x"`). Among several arguments, one with a
+space is a value when it looks like a path (`tellsh delete folder "/tmp/a b"`, `"My Notes.txt"`), and request text
+when it comes first (`tellsh "delete folder" /tmp/x`). Anything else (`tellsh delete folder "my data"`) is unclear:
+a changing command leaves that path as a placeholder.
+
 ## How it works
 
 ```
@@ -135,7 +140,7 @@ never runs them.
 
 ### Optional neural fallback (`--hybrid`)
 
-`tellsh --hybrid …` (or `TELLSH_HYBRID=1`) keeps the cascade's answer when it is confident (≥ 0.9, most requests) and
+`tellsh --hybrid …` (or `TELLSH_HYBRID=1`) keeps the cascade's answer when it is confident (≥ 0.8, most requests) and
 otherwise re-ranks its top-5 with a small int8 encoder (pruned multilingual-e5-small, 6 layers, 27 MB, ~4 ms on one
 core). It needs `onnxruntime-node` and the `tellsh-model-enc` 0.4 bundle (`enc-v2`, not in this repo); without them
 tellsh silently uses the cascade. `TELLSH_HYBRID=safe` never turns a rejection into an answer. Re-ranked answers are
@@ -264,8 +269,8 @@ the public sets for a large gain on real usage (before/after tables for A, A+B a
 | history references, exact command (53 EN+PL; only the previous command is a target) | **92.5%** (dev set, blind first run 60.4%) · v0.3 blind set (79): 82.3% (2 gold rows changed for the one-line rule, see EVAL.md) |
 | composer on out-of-catalogue requests: acceptable / exact | 43.1% / 41.2% (dev set) · any answer acceptable 49.0% · v0.3 blind set (58): acceptable 17.2% · false fires on catalog requests 0.7% |
 | out-of-domain rejected | 92.4% (blind set 98.4%) |
-| **real usage** (private, held-out command groups, 2957 EN+PL): intent, A · A+B (`--hybrid`) | **82.0% · 88.8%** (v0.3: 31.6% · 38.5%) |
-| v0.4 intents, independent eval set (424 rows): intent · exact command | **95.8%** · 90.7% |
+| **real usage** (private, held-out command groups, 2957 EN+PL): intent, A · A+B (`--hybrid`) | **82.0% · 88.3%** (v0.3: 31.6% · 38.5%) |
+| v0.4 intents, independent eval set (424 rows): intent · exact command | **95.8%** · 91.0% |
 | model size | **2.95 MB** (v0.3: 2.71 MB) |
 | latency, `taskset -c 0`: cold process p50 / p95 | **188 / 264 ms** (shared, loaded box) |
 | latency, warm full cascade + tagger + render p50 / p95 | **0.41 / 4.4 ms** |

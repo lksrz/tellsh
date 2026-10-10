@@ -268,6 +268,37 @@ function rmCheck(words, hit) {
   if (targets.some((t) => /(?:^|[\\/])\.\.(?:[\\/]|$)/.test(t))) hit('high', 'path contains .. (refers to a parent directory)');
 }
 
+// a file under /etc, /boot, /usr, /bin, /sbin, /lib*: deleting, overwriting or editing it in place can make the system
+// unbootable or lock everyone out (`rm /etc/passwd`, `sed -i d /etc/passwd`, `tee /etc/passwd < /dev/null`), the same as
+// `> /etc/passwd` or `truncate -s0 /etc/passwd`
+const SYS_FILE = /^\/+(?:etc|boot|usr|bin|sbin|lib\w*)\/+[^/]/;
+const sysFile = (t) => SYS_FILE.test(normTarget(t));
+// rm/unlink/shred of a system file; sed -i on one; tee (not -a) onto one
+function sysFileWriteCheck(w, head, hit) {
+  const a = w.slice(1);
+  if (head === 'rm' || head === 'unlink') {
+    if (positional(a).some(sysFile)) hit('high', 'deletes a system file', true);
+  } else if (head === 'sed') {
+    if (!a.some((x) => /^-[a-zA-Z]*i/.test(x) || /^--in-place/.test(x))) return;
+    // the script is the first positional unless given with -e/-f; every later positional is a file
+    const pos = [];
+    let script = !a.some((x) => /^-[a-zA-Z]*[ef]$|^--(?:expression|file)(?:=|$)/.test(x));
+    let opts = true;
+    for (let i = 0; i < a.length; i++) {
+      const x = a[i];
+      if (opts && x === '--') { opts = false; continue; }
+      if (opts && /^-[a-zA-Z]*[ef]$|^--(?:expression|file)$/.test(x)) { i++; continue; }
+      if (opts && /^-./.test(x)) continue;
+      if (script) { script = false; continue; }
+      pos.push(x);
+    }
+    if (pos.some(sysFile)) hit('high', 'edits a system file in place', true);
+  } else if (head === 'tee') {
+    const t = positional(a).filter(sysFile);
+    if (t.length) hit('high', a.some((x) => /^-[a-zA-Z]*a/.test(x) || x === '--append') ? 'appends to a system file' : 'overwrites a system file', !a.some((x) => /^-[a-zA-Z]*a/.test(x) || x === '--append'));
+  }
+}
+
 // kill [-SIG | -s SIG | -n NUM | --signal SIG] [--] pid...   (pid 1 / -1 = init / every process)
 function killCheck(words, hit) {
   hit('high', 'terminates processes');
@@ -601,6 +632,7 @@ export function checkDanger(command, baseRisk = 'safe', { lenient = false } = {}
     interpCheck(w, hit);
     stdinCodeCheck(w, hit, inner);
     if (head === 'git' && w[1] === 'rm') hit('high', 'rm deletes files permanently (no trash)');
+    sysFileWriteCheck(w, head, hit);
    }
   }
   if (flags.unsure) hit('high', flags.unsure);

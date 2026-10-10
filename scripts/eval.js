@@ -337,7 +337,9 @@ md(`**Development set** \`data/history/eval.jsonl\` (${hist.length} rows). Writt
 md();
 histTable(H);
 if (HB) {
-  md(`**Blind set** \`data/blind/history.jsonl\` (${histBlind.length} rows, written for v0.3 by a separate author before any result was seen, never used for tuning):`);
+  md(`**Blind set** \`data/blind/history.jsonl\` (${histBlind.length} rows, written for v0.3 by a separate author before any result was seen, never used for tuning). ` +
+    'From round 7 on, 2 of its gold rows were rewritten for the one-line history rule (see the round-7 notes above), so its scores ' +
+    'are **not directly comparable** with earlier rounds:');
   md();
   histTable(HB.H);
 }

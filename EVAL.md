@@ -9,8 +9,8 @@ see [HYBRID.md](HYBRID.md#v04-real-usage)); thresholds are calibrated on curated
 The sections below are the regenerated public metrics. Against v0.3 on public sets the retrained A is slightly
 worse: intent top-1 on `data/eval` 95.6% → 95.4%, end-to-end relex 85.3% → 83.4%, hand-written slot cases 99 → 98/99,
 composer any-acceptable 52.9% → 49.0% (dev) and 22.4% → 17.2% (blind), OOD rejection 94.6% → 92.4%, blind OOD
-100% → 98.4%, model 2.71 → 2.95 MB. In exchange, real-usage intent accuracy goes from 31.6% to 82.0% (A) and 88.8%
-(A+B), and the new intents reach 95.8% on an independently written eval set — see the v0.4 section at the end.
+100% → 98.4%, model 2.71 → 2.95 MB. In exchange, real-usage intent accuracy goes from 31.6% to 82.0% (A) and 88.3%
+(A+B, retrained encoder of round 8; 88.8% before), and the new intents reach 95.8% on an independently written eval set — see the v0.4 section at the end.
 Two composer fixes: no composed command for a value with a line break or for a place reference ("list files there").
 
 **v0.3.0 (2026-10-10), after three review rounds.** The model is **retrained** on the v0.3 data (31534 classifier
@@ -56,6 +56,18 @@ references never become `.`, more place wordings ("the previous folder", "the di
 katalogu"), "its contents"/"usuń jego zawartość", `git -C`/`docker --context` before a listing, "move it there", several
 paths for one slot, `$(…)` locations, here-strings and `sh -c … _ /` in the danger checker, critical writes to system
 files, NUL bytes. Every other eval number is unchanged. Bench: the history case is 1.6 → 0.7 ms p50 (one line parsed).
+
+**Round 8 (review r7; A unchanged, B retrained).** Quoted request text passed as several arguments is no longer read as
+a path (`tellsh "delete folder" /tmp/x` → `rm -r /tmp/x`; a quoted argument that is neither a path nor the first word,
+`tellsh delete folder "my data"`, leaves a changing command's path as a placeholder). The running `tellsh` call is
+dropped from history only on an exact match. Several operands (`touch a.txt b.txt`) are never "it"/"them"; `cat a.txt;
+cd /srv` + "delete it" is refused; "move it there" is refused with a note. Deleting, editing in place or overwriting a
+system file (`rm /etc/passwd`, `sed -i d /etc/passwd`, `… | tee /etc/passwd`) is critical. The composer never fills a
+slot the catalog withheld (`` `pwd` ``, a line break). npm scoped packages (`@types/node`) are kept, an invalid package
+operand is a placeholder. `fetch_model.js` installs only the bundle's own file names. `export_data.js` now filters
+augmented rows against the held-out index (143 leaked copies): B was retrained and recalibrated (see HYBRID.md); the
+hybrid re-ranks the policy's 5 candidates whatever `--top` shows. Every eval number of A is unchanged; the v0.4 devtools
+exact command (A) is 90.7 → 91.0% (scoped packages). `ls /a /b` + "show it" now gives a placeholder (test updated).
 
 <!-- eval:start -->
 ## Model
@@ -126,7 +138,7 @@ Per type F1 (tagger only / regex only / merged): PATH 97/97/98, SIZE 100/100/100
 | EN | 27 | 100.0% | 88.9% | 11.1% |
 | PL | 26 | 100.0% | 96.2% | 7.7% |
 
-**Blind set** `data/blind/history.jsonl` (79 rows, written for v0.3 by a separate author before any result was seen, never used for tuning):
+**Blind set** `data/blind/history.jsonl` (79 rows, written for v0.3 by a separate author before any result was seen, never used for tuning). From round 7 on, 2 of its gold rows were rewritten for the one-line history rule (see the round-7 notes above), so its scores are **not directly comparable** with earlier rounds:
 
 | split | n | intent | exact command | exact command without history |
 |---|---|---|---|---|
@@ -244,61 +256,61 @@ Private real-usage split held out by command group, the independent v0.4 devtool
 | `data/eval` (bash) | A v0.3 | 2384 | 97.3% | **94.9%** | 94.5% | 95.3% | 98.3% | 96.5% | – |
 | `data/eval` (bash) | A v0.4 | 2384 | 97.1% | **94.4%** | 94.5% | 94.3% | 98.0% | 96.4% | – |
 | `data/eval` (bash) | A+B v0.3 | 2384 | 98.2% | **96.7%** | 96.4% | 97.0% | 99.7% | 96.9% | 24.2% |
-| `data/eval` (bash) | A+B v0.4 | 2384 | 98.3% | **96.7%** | 97.3% | 96.1% | 99.6% | 97.1% | 24.4% |
+| `data/eval` (bash) | A+B v0.4 | 2384 | 98.4% | **96.8%** | 97.1% | 96.5% | 99.8% | 97.0% | 15.8% |
 | `data/eval` (bash) | A+B-safe v0.3 | 2384 | 98.0% | **95.8%** | 95.4% | 96.2% | 98.3% | 97.4% | 24.2% |
-| `data/eval` (bash) | A+B-safe v0.4 | 2384 | 97.8% | **95.4%** | 96.0% | 94.9% | 97.8% | 97.6% | 24.4% |
+| `data/eval` (bash) | A+B-safe v0.4 | 2384 | 97.9% | **95.3%** | 95.6% | 95.1% | 97.9% | 97.3% | 24.4% |
 | `data/eval` (bash) | B alone v0.3 | 2384 | 94.4% | **85.9%** | 86.6% | 85.3% | 99.7% | 86.2% | 100.0% |
-| `data/eval` (bash) | B alone v0.4 | 2384 | 96.4% | **91.0%** | 92.1% | 89.8% | 99.5% | 91.4% | 100.0% |
+| `data/eval` (bash) | B alone v0.4 | 2384 | 96.6% | **90.9%** | 91.6% | 90.1% | 99.5% | 91.3% | 100.0% |
 | `data/eval` (bash) | A+C-ft v0.3 | 2384 | 98.5% | **97.5%** | 97.9% | 97.1% | 99.7% | 97.7% | 24.2% |
 | `data/eval` (bash) | A+C-ft v0.4 | 2384 | 98.4% | **97.2%** | 97.7% | 96.7% | 99.8% | 97.4% | 24.4% |
 | `data/shell/eval` | A v0.3 | 336 | 97.9% | **96.4%** | 95.1% | 97.7% | 97.9% | 98.5% | – |
 | `data/shell/eval` | A v0.4 | 336 | 97.3% | **95.2%** | 93.3% | 97.1% | 97.3% | 97.9% | – |
 | `data/shell/eval` | A+B v0.3 | 336 | 99.1% | **98.8%** | 98.8% | 98.8% | 100.0% | 98.8% | 19.6% |
-| `data/shell/eval` | A+B v0.4 | 336 | 99.1% | **98.8%** | 98.8% | 98.8% | 100.0% | 98.8% | 19.6% |
+| `data/shell/eval` | A+B v0.4 | 336 | 98.8% | **98.5%** | 98.8% | 98.3% | 100.0% | 98.5% | 12.2% |
 | `data/shell/eval` | A+B-safe v0.3 | 336 | 98.2% | **97.0%** | 95.7% | 98.3% | 97.9% | 99.1% | 19.6% |
-| `data/shell/eval` | A+B-safe v0.4 | 336 | 98.5% | **96.7%** | 95.1% | 98.3% | 97.3% | 99.4% | 19.6% |
+| `data/shell/eval` | A+B-safe v0.4 | 336 | 97.6% | **95.8%** | 95.1% | 96.5% | 97.3% | 98.5% | 19.6% |
 | `data/shell/eval` | B alone v0.3 | 336 | 96.4% | **92.0%** | 91.5% | 92.4% | 100.0% | 92.0% | 100.0% |
-| `data/shell/eval` | B alone v0.4 | 336 | 97.9% | **93.8%** | 93.3% | 94.2% | 100.0% | 93.8% | 100.0% |
+| `data/shell/eval` | B alone v0.4 | 336 | 98.2% | **94.6%** | 93.9% | 95.3% | 100.0% | 94.6% | 100.0% |
 | `data/shell/eval` | A+C-ft v0.3 | 336 | 98.8% | **98.5%** | 98.8% | 98.3% | 100.0% | 98.5% | 19.6% |
 | `data/shell/eval` | A+C-ft v0.4 | 336 | 98.5% | **98.2%** | 98.8% | 97.7% | 100.0% | 98.2% | 19.6% |
 | hybrid blind | A v0.3 | 641 | 99.2% | **98.9%** | 98.2% | 99.7% | 100.0% | 98.9% | – |
 | hybrid blind | A v0.4 | 641 | 98.8% | **98.4%** | 97.9% | 99.0% | 99.8% | 98.6% | – |
 | hybrid blind | A+B v0.3 | 641 | 99.4% | **98.8%** | 98.5% | 99.0% | 100.0% | 98.8% | 10.8% |
-| hybrid blind | A+B v0.4 | 641 | 99.2% | **98.9%** | 98.5% | 99.4% | 99.8% | 99.1% | 12.0% |
+| hybrid blind | A+B v0.4 | 641 | 99.5% | **99.4%** | 98.8% | 100.0% | 100.0% | 99.4% | 6.6% |
 | hybrid blind | A+B-safe v0.3 | 641 | 99.4% | **98.8%** | 98.5% | 99.0% | 100.0% | 98.8% | 10.8% |
-| hybrid blind | A+B-safe v0.4 | 641 | 99.1% | **98.8%** | 98.2% | 99.4% | 99.7% | 99.1% | 12.0% |
+| hybrid blind | A+B-safe v0.4 | 641 | 99.2% | **99.1%** | 98.2% | 100.0% | 99.8% | 99.2% | 12.0% |
 | hybrid blind | B alone v0.3 | 641 | 95.8% | **89.4%** | 89.7% | 89.0% | 100.0% | 89.4% | 100.0% |
-| hybrid blind | B alone v0.4 | 641 | 98.1% | **95.9%** | 96.1% | 95.8% | 99.8% | 96.1% | 100.0% |
+| hybrid blind | B alone v0.4 | 641 | 97.7% | **95.9%** | 96.1% | 95.8% | 100.0% | 95.9% | 100.0% |
 | hybrid blind | A+C-ft v0.3 | 641 | 99.7% | **99.4%** | 99.4% | 99.4% | 100.0% | 99.4% | 10.8% |
 | hybrid blind | A+C-ft v0.4 | 641 | 99.7% | **99.2%** | 99.1% | 99.4% | 100.0% | 99.2% | 12.0% |
 | v0.3 blind | A v0.3 | 844 | 99.2% | **98.5%** | 97.9% | 99.0% | 99.4% | 99.0% | – |
 | v0.3 blind | A v0.4 | 844 | 99.4% | **98.3%** | 97.7% | 99.0% | 99.2% | 99.2% | – |
 | v0.3 blind | A+B v0.3 | 844 | 99.4% | **99.1%** | 99.1% | 99.0% | 100.0% | 99.1% | 12.2% |
-| v0.3 blind | A+B v0.4 | 844 | 99.6% | **99.2%** | 98.8% | 99.5% | 100.0% | 99.2% | 12.2% |
+| v0.3 blind | A+B v0.4 | 844 | 99.6% | **99.3%** | 98.8% | 99.8% | 100.0% | 99.3% | 7.7% |
 | v0.3 blind | A+B-safe v0.3 | 844 | 99.3% | **98.7%** | 98.4% | 99.0% | 99.4% | 99.3% | 12.2% |
-| v0.3 blind | A+B-safe v0.4 | 844 | 99.4% | **98.3%** | 97.9% | 98.8% | 99.2% | 99.2% | 12.2% |
+| v0.3 blind | A+B-safe v0.4 | 844 | 99.4% | **98.5%** | 98.2% | 98.8% | 99.2% | 99.3% | 12.2% |
 | v0.3 blind | B alone v0.3 | 844 | 97.2% | **91.4%** | 91.2% | 91.5% | 100.0% | 91.4% | 100.0% |
-| v0.3 blind | B alone v0.4 | 844 | 98.1% | **94.7%** | 94.5% | 94.9% | 99.9% | 94.8% | 100.0% |
+| v0.3 blind | B alone v0.4 | 844 | 98.5% | **95.4%** | 94.7% | 96.1% | 99.9% | 95.5% | 100.0% |
 | v0.3 blind | A+C-ft v0.3 | 844 | 99.5% | **99.3%** | 99.5% | 99.0% | 100.0% | 99.3% | 12.2% |
 | v0.3 blind | A+C-ft v0.4 | 844 | 99.8% | **99.5%** | 99.5% | 99.5% | 100.0% | 99.5% | 12.2% |
 | v0.4 devtools (new + neighbours) | A v0.3 | 424 | 13.9% | **9.0%** | 9.8% | 8.1% | 59.0% | 15.2% | – |
 | v0.4 devtools (new + neighbours) | A v0.4 | 424 | 98.8% | **95.8%** | 98.1% | 93.3% | 97.9% | 97.8% | – |
 | v0.4 devtools (new + neighbours) | A+B v0.3 | 424 | 13.2% | **9.0%** | 9.8% | 8.1% | 88.4% | 10.1% | 82.1% |
-| v0.4 devtools (new + neighbours) | A+B v0.4 | 424 | 99.3% | **97.9%** | 99.1% | 96.7% | 99.8% | 98.1% | 15.8% |
+| v0.4 devtools (new + neighbours) | A+B v0.4 | 424 | 99.3% | **97.9%** | 99.1% | 96.7% | 100.0% | 97.9% | 9.0% |
 | v0.4 devtools (new + neighbours) | A+B-safe v0.3 | 424 | 13.2% | **9.0%** | 9.8% | 8.1% | 59.0% | 15.2% | 82.1% |
-| v0.4 devtools (new + neighbours) | A+B-safe v0.4 | 424 | 99.1% | **96.2%** | 98.1% | 94.3% | 97.6% | 98.6% | 15.8% |
+| v0.4 devtools (new + neighbours) | A+B-safe v0.4 | 424 | 99.1% | **96.2%** | 98.1% | 94.3% | 97.9% | 98.3% | 15.8% |
 | v0.4 devtools (new + neighbours) | B alone v0.3 | 424 | 11.8% | **7.8%** | 8.9% | 6.7% | 88.4% | 8.8% | 100.0% |
-| v0.4 devtools (new + neighbours) | B alone v0.4 | 424 | 97.4% | **92.5%** | 95.3% | 89.5% | 99.8% | 92.7% | 100.0% |
+| v0.4 devtools (new + neighbours) | B alone v0.4 | 424 | 98.3% | **92.5%** | 94.4% | 90.5% | 100.0% | 92.5% | 100.0% |
 | v0.4 devtools (new + neighbours) | A+C-ft v0.3 | 424 | 15.1% | **9.0%** | 9.8% | 8.1% | 88.4% | 10.1% | 82.1% |
 | v0.4 devtools (new + neighbours) | A+C-ft v0.4 | 424 | 99.3% | **98.6%** | 99.5% | 97.6% | 100.0% | 98.6% | 15.8% |
 | REAL usage (held-out groups) | A v0.3 | 2957 | 49.2% | **31.6%** | 32.4% | 30.8% | 66.0% | 47.9% | – |
 | REAL usage (held-out groups) | A v0.4 | 2957 | 86.6% | **82.0%** | 82.2% | 81.8% | 94.3% | 87.0% | – |
 | REAL usage (held-out groups) | A+B v0.3 | 2957 | 57.3% | **38.5%** | 39.4% | 37.5% | 97.8% | 39.3% | 84.5% |
-| REAL usage (held-out groups) | A+B v0.4 | 2957 | 91.9% | **88.8%** | 88.8% | 88.8% | 99.9% | 88.9% | 42.4% |
+| REAL usage (held-out groups) | A+B v0.4 | 2957 | 91.3% | **88.3%** | 88.5% | 88.0% | 99.9% | 88.4% | 31.0% |
 | REAL usage (held-out groups) | A+B-safe v0.3 | 2957 | 53.8% | **32.9%** | 33.9% | 32.0% | 66.0% | 49.9% | 84.5% |
-| REAL usage (held-out groups) | A+B-safe v0.4 | 2957 | 90.1% | **85.3%** | 85.5% | 85.1% | 94.3% | 90.5% | 42.4% |
+| REAL usage (held-out groups) | A+B-safe v0.4 | 2957 | 89.8% | **85.2%** | 85.3% | 85.2% | 94.3% | 90.4% | 42.4% |
 | REAL usage (held-out groups) | B alone v0.3 | 2957 | 56.4% | **34.0%** | 34.2% | 33.8% | 97.8% | 34.8% | 100.0% |
-| REAL usage (held-out groups) | B alone v0.4 | 2957 | 93.3% | **89.1%** | 89.2% | 89.1% | 99.9% | 89.3% | 100.0% |
+| REAL usage (held-out groups) | B alone v0.4 | 2957 | 92.7% | **88.4%** | 88.2% | 88.7% | 99.9% | 88.6% | 100.0% |
 | REAL usage (held-out groups) | A+C-ft v0.3 | 2957 | 56.2% | **39.6%** | 40.6% | 38.6% | 97.8% | 40.5% | 84.5% |
 | REAL usage (held-out groups) | A+C-ft v0.4 | 2957 | 89.8% | **87.4%** | 87.6% | 87.2% | 99.9% | 87.5% | 42.4% |
 
@@ -308,29 +320,29 @@ Real-usage data: 3242 unique generic, verified commands (private; 838 labelled b
 
 | subset | n | A v0.3 | A v0.4 | A+B v0.3 | A+B v0.4 | A+B-safe v0.3 | A+B-safe v0.4 | A+C-ft v0.3 | A+C-ft v0.4 |
 |---|---|---|---|---|---|---|---|---|---|
-| all | 2957 | 31.6% | 82.0% | 38.5% | 88.8% | 32.9% | 85.3% | 39.6% | 87.4% |
-| intents that existed in v0.3 | 1715 | 54.5% | 73.9% | 66.3% | 82.9% | 56.8% | 77.8% | 68.3% | 81.0% |
-| v0.4 intents | 1242 | 0.0% | 93.2% | 0.0% | 97.0% | 0.0% | 95.7% | 0.0% | 96.1% |
-| natural requests | 2706 | 30.2% | 82.9% | 36.5% | 89.0% | 31.2% | 85.9% | 38.0% | 87.5% |
-| literal commands | 251 | 46.6% | 72.1% | 59.0% | 87.3% | 51.8% | 78.9% | 57.0% | 86.1% |
-| EN | 1478 | 32.4% | 82.2% | 39.4% | 88.8% | 33.9% | 85.5% | 40.6% | 87.6% |
-| PL | 1479 | 30.8% | 81.8% | 37.5% | 88.8% | 32.0% | 85.1% | 38.6% | 87.2% |
-| bash | 1464 | 42.1% | 80.1% | 49.0% | 85.9% | 43.4% | 82.8% | 50.4% | 85.2% |
-| zsh | 1433 | 20.9% | 83.7% | 28.1% | 91.4% | 22.4% | 87.4% | 29.0% | 89.5% |
-| PowerShell | 60 | 30.0% | 90.0% | 30.0% | 96.7% | 30.0% | 96.7% | 30.0% | 91.7% |
+| all | 2957 | 31.6% | 82.0% | 38.5% | 88.3% | 32.9% | 85.2% | 39.6% | 87.4% |
+| intents that existed in v0.3 | 1715 | 54.5% | 73.9% | 66.3% | 82.3% | 56.8% | 77.4% | 68.3% | 81.0% |
+| v0.4 intents | 1242 | 0.0% | 93.2% | 0.0% | 96.5% | 0.0% | 96.0% | 0.0% | 96.1% |
+| natural requests | 2706 | 30.2% | 82.9% | 36.5% | 88.4% | 31.2% | 85.8% | 38.0% | 87.5% |
+| literal commands | 251 | 46.6% | 72.1% | 59.0% | 87.3% | 51.8% | 79.3% | 57.0% | 86.1% |
+| EN | 1478 | 32.4% | 82.2% | 39.4% | 88.5% | 33.9% | 85.3% | 40.6% | 87.6% |
+| PL | 1479 | 30.8% | 81.8% | 37.5% | 88.0% | 32.0% | 85.2% | 38.6% | 87.2% |
+| bash | 1464 | 42.1% | 80.1% | 49.0% | 86.3% | 43.4% | 82.9% | 50.4% | 85.2% |
+| zsh | 1433 | 20.9% | 83.7% | 28.1% | 90.2% | 22.4% | 87.1% | 29.0% | 89.5% |
+| PowerShell | 60 | 30.0% | 90.0% | 30.0% | 91.7% | 30.0% | 96.7% | 30.0% | 91.7% |
 
 ### Real usage, stage 3 (slots) for correctly classified requests
 
 | system | correct-intent rows | slot values filled | found in the real command | real command reproduced exactly |
 |---|---|---|---|---|
 | A v0.3 | 935 | 1078 | 91.0% | 20.2% |
-| A v0.4 | 2425 | 3811 | 94.1% | 11.1% |
+| A v0.4 | 2425 | 3797 | 94.1% | 11.0% |
 | A+B v0.3 | 1137 | 1337 | 91.6% | 20.8% |
-| A+B v0.4 | 2626 | 4067 | 94.2% | 12.8% |
+| A+B v0.4 | 2610 | 4051 | 94.2% | 12.1% |
 | A+B-safe v0.3 | 974 | 1127 | 91.6% | 21.7% |
-| A+B-safe v0.4 | 2523 | 3933 | 94.1% | 11.9% |
+| A+B-safe v0.4 | 2520 | 3918 | 94.1% | 11.5% |
 | B alone v0.3 | 1006 | 1237 | 94.1% | 28.4% |
-| B alone v0.4 | 2636 | 4051 | 94.5% | 13.8% |
+| B alone v0.4 | 2615 | 4001 | 94.6% | 13.2% |
 | A+C-ft v0.3 | 1171 | 1390 | 91.2% | 19.4% |
 | A+C-ft v0.4 | 2584 | 4017 | 94.4% | 12.7% |
 
@@ -344,11 +356,11 @@ normalisation (real commands often carry extra flags, so this is a lower bound).
 | A v0.3 | 94.6% (n=92) | 100.0% (n=40) | 100.0% (n=64) | 50.8% (n=2213) |
 | A v0.4 | 92.4% (n=92) | 100.0% (n=40) | 98.4% (n=64) | 29.1% (n=2213) |
 | A+B v0.3 | 93.5% (n=92) | 100.0% (n=40) | 100.0% (n=64) | 4.1% (n=2213) |
-| A+B v0.4 | 92.4% (n=92) | 100.0% (n=40) | 98.4% (n=64) | 2.4% (n=2213) |
+| A+B v0.4 | 91.3% (n=92) | 100.0% (n=40) | 96.9% (n=64) | 2.1% (n=2213) |
 | A+B-safe v0.3 | 94.6% (n=92) | 100.0% (n=40) | 100.0% (n=64) | 50.8% (n=2213) |
-| A+B-safe v0.4 | 93.5% (n=92) | 100.0% (n=40) | 98.4% (n=64) | 29.6% (n=2213) |
+| A+B-safe v0.4 | 93.5% (n=92) | 100.0% (n=40) | 98.4% (n=64) | 29.3% (n=2213) |
 | B alone v0.3 | 93.5% (n=92) | 100.0% (n=40) | 100.0% (n=64) | 4.1% (n=2213) |
-| B alone v0.4 | 92.4% (n=92) | 100.0% (n=40) | 98.4% (n=64) | 2.4% (n=2213) |
+| B alone v0.4 | 91.3% (n=92) | 100.0% (n=40) | 98.4% (n=64) | 2.4% (n=2213) |
 | A+C-ft v0.3 | 93.5% (n=92) | 100.0% (n=40) | 100.0% (n=64) | 4.0% (n=2213) |
 | A+C-ft v0.4 | 90.2% (n=92) | 100.0% (n=40) | 96.9% (n=64) | 1.8% (n=2213) |
 
@@ -357,13 +369,13 @@ normalisation (real commands often carry extra flags, so this is a lower bound).
 | system | relex `data/eval` | hybrid blind | v0.3 blind e2e | v0.4 devtools |
 |---|---|---|---|---|
 | A v0.3 | 84.1% (n=1326) | 94.2% (n=641) | 96.1% (n=207) | 10.5% (n=324) |
-| A v0.4 | 82.2% (n=1329) | 93.9% (n=641) | 95.7% (n=207) | 90.7% (n=324) |
+| A v0.4 | 82.2% (n=1329) | 93.9% (n=641) | 95.7% (n=207) | 91.0% (n=324) |
 | A+B v0.3 | 86.9% (n=1326) | 94.1% (n=641) | 96.6% (n=207) | 10.5% (n=324) |
-| A+B v0.4 | 86.8% (n=1329) | 94.4% (n=641) | 96.6% (n=207) | 92.0% (n=324) |
+| A+B v0.4 | 85.4% (n=1329) | 94.9% (n=641) | 96.6% (n=207) | 92.3% (n=324) |
 | A+B-safe v0.3 | 85.1% (n=1326) | 94.1% (n=641) | 96.6% (n=207) | 10.5% (n=324) |
-| A+B-safe v0.4 | 84.7% (n=1329) | 94.2% (n=641) | 96.1% (n=207) | 91.0% (n=324) |
+| A+B-safe v0.4 | 84.1% (n=1329) | 94.5% (n=641) | 96.1% (n=207) | 91.4% (n=324) |
 | B alone v0.3 | 82.1% (n=1326) | 85.2% (n=641) | 93.2% (n=207) | 9.3% (n=324) |
-| B alone v0.4 | 86.5% (n=1329) | 92.0% (n=641) | 96.6% (n=207) | 87.0% (n=324) |
+| B alone v0.4 | 86.3% (n=1329) | 91.9% (n=641) | 96.6% (n=207) | 88.6% (n=324) |
 | A+C-ft v0.3 | 87.5% (n=1326) | 94.5% (n=641) | 97.4% (n=194) | 10.5% (n=324) |
 | A+C-ft v0.4 | 86.2% (n=1329) | 94.7% (n=641) | 96.9% (n=193) | 92.9% (n=324) |
 
@@ -374,11 +386,11 @@ normalisation (real commands often carry extra flags, so this is a lower bound).
 | A v0.3 | 94.9% | 94.8% | 94.8% | 94.7% | 94.9% | 94.9% | 99.1% / 98.6% / 99.2% | 10.8% / 8.8% / 4.0% |
 | A v0.4 | 94.4% | 94.5% | 94.3% | 94.3% | 93.9% | 93.9% | 98.2% / 97.2% / 99.2% | 95.5% / 100.0% / 96.0% |
 | A+B v0.3 | 96.7% | 96.5% | 96.7% | 96.8% | 96.7% | 96.4% | 99.1% / 97.9% / 99.2% | 10.8% / 8.8% / 4.0% |
-| A+B v0.4 | 96.7% | 96.7% | 96.8% | 96.9% | 96.5% | 96.5% | 98.7% / 98.6% / 99.2% | 97.8% / 98.8% / 100.0% |
+| A+B v0.4 | 96.8% | 97.0% | 96.9% | 97.0% | 96.8% | 96.7% | 98.7% / 100.0% / 99.2% | 97.4% / 100.0% / 100.0% |
 | A+B-safe v0.3 | 95.8% | 95.6% | 95.6% | 96.0% | 95.8% | 95.5% | 99.1% / 97.9% / 99.2% | 10.8% / 8.8% / 4.0% |
-| A+B-safe v0.4 | 95.4% | 95.1% | 95.1% | 95.3% | 95.2% | 95.0% | 98.7% / 97.9% / 99.2% | 96.3% / 98.8% / 96.0% |
+| A+B-safe v0.4 | 95.3% | 95.2% | 95.2% | 95.3% | 95.3% | 95.2% | 98.7% / 98.6% / 99.2% | 95.9% / 100.0% / 96.0% |
 | B alone v0.3 | 85.9% | 86.2% | 86.1% | 85.9% | 85.9% | 86.0% | 91.6% / 86.6% / 90.4% | 9.7% / 7.5% / 4.0% |
-| B alone v0.4 | 91.0% | 90.8% | 91.0% | 90.8% | 90.8% | 90.7% | 95.1% / 97.9% / 96.0% | 91.8% / 95.0% / 96.0% |
+| B alone v0.4 | 90.9% | 90.7% | 90.9% | 91.1% | 91.1% | 91.0% | 96.5% / 95.1% / 96.0% | 92.6% / 92.5% / 92.0% |
 | A+C-ft v0.3 | n/a | n/a | n/a | n/a | n/a | n/a | 99.1% / 99.3% / 99.2% | 10.8% / 8.8% / 4.0% |
 | A+C-ft v0.4 | n/a | n/a | n/a | n/a | n/a | n/a | 99.1% / 99.3% / 99.2% | 98.5% / 100.0% / 100.0% |
 
@@ -387,9 +399,9 @@ normalisation (real commands often carry extra flags, so this is a lower bound).
 | run | warm A | warm A+B (deferred) | warm B infer | cold A | cold A+B (deferred) | cold A+B, deferred only | B load ms |
 |---|---|---|---|---|---|---|---|
 | v0.3, `data/eval` queries | 0.681 / 7.464 | 0.497 / 10.612 (24%) | 3.983 / 6.575 | 178.446 / 190.919 | 182.652 / 410.248 (7/20) | 375.971 / 410.248 | 223.8 |
-| v0.4, `data/eval` queries | 0.498 / 5.925 | 0.474 / 8.947 (23%) | 4.067 / 7.511 | 189.5 / 218.319 | 191.794 / 514.236 (6/20) | 406.149 / 514.236 | 213.8 |
+| v0.4, `data/eval` queries | 0.523 / 5.848 | 0.43 / 8.672 (14%) | 3.802 / 6.094 | 182.533 / 194.465 | 199.427 / 448.519 (4/20) | 439.296 / 448.519 | 217.9 |
 | v0.3, real-usage queries | 0.594 / 6.654 | 9.219 / 17.29 (90%) | 8.547 / 15.477 | 225.424 / 264.14 | 554.068 / 643.029 (18/20) | 556.26 / 643.029 | 192.8 |
-| v0.4, real-usage queries | 1.15 / 8.823 | 12.171 / 28.365 (61%) | 14.212 / 27.607 | 260.13 / 319.267 | 403.395 / 506.413 (13/20) | 413.283 / 506.413 | 255.5 |
+| v0.4, real-usage queries | 0.783 / 5.578 | 1.347 / 17.159 (48%) | 7.878 / 14.727 | 187.352 / 231.094 | 239.85 / 477.794 (9/20) | 448.494 / 477.794 | 236.3 |
 
 p50 / p95 ms, `taskset -c 0` (one core), Intel(R) Xeon(R) Processor, Node v20.19.2. Warm: 600 queries in one process; cold: a new process per query (node start + model load + query), 20 queries.
 <!-- v04:end -->

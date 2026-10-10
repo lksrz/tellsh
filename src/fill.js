@@ -184,7 +184,7 @@ const SLOT_NAMES = /^(path|file|count|src|dst|archive|glob|namepat|sedexpr|age|d
  * Fill a template. Returns { command, missing[] }.
  * `values` = resolved slots merged over intent defaults.
  */
-export function render(template, values, required = [], quote = shQuote) {
+export function render(template, values, required = [], quote = shQuote, keepOptional = []) {
   const missing = [];
   const isSlot = (name) => name in values || required.includes(name) || SLOT_NAMES.test(name);
   // Single pass over the template: every {slot} and «optional segment» is substituted exactly once and
@@ -195,6 +195,9 @@ export function render(template, values, required = [], quote = shQuote) {
       const r = seg.replace(/\{(\w+)(!raw)?\}/g, (m2, n2, raw2) => {
         if (!ok) return m2;
         const val = renderValue(n2, !!raw2, values, quote);
+        // an operand the request named but that is not valid (keepOptional) keeps its placeholder: the optional part
+        // is not silently dropped (`npm install <PKG>`, never `npm install`)
+        if (val == null && keepOptional.includes(n2)) { missing.push(n2); return PLACEHOLDER(n2); }
         if (val == null) { ok = false; return m2; }
         return val;
       });
@@ -241,7 +244,7 @@ export const envFromPlatform = (platform = process.platform) => ({
  *   resolved: pre-resolved slot values (skips extraction; used by the cascade/tagger and history rules)
  * @returns {{intent, command, risk, baseRisk, warnings, critical, missing, slots, notes, shell, variant, gap}}
  */
-export function buildCommand(intentId, text, { platform = process.platform, env, extracted, resolved: given, blank = [] } = {}) {
+export function buildCommand(intentId, text, { platform = process.platform, env, extracted, resolved: given, blank = [], keepOptional = [] } = {}) {
   const intent = BY_ID[intentId];
   if (!intent) throw new Error(`unknown intent ${intentId}`);
   const e = env || envFromPlatform(platform);
@@ -298,7 +301,7 @@ export function buildCommand(intentId, text, { platform = process.platform, env,
       command = tpl(vals, q, tpl === intent.template || tpl === intent.darwin ? e.os : e);
       if (/<TEXT>/.test(command)) missing.push('text');
     } else {
-      ({ command, missing } = render(tpl, values, required, quote));
+      ({ command, missing } = render(tpl, values, required, quote, keepOptional.filter((k) => blank.includes(k) && !(k in values))));
       missing = missing.map((m) => DERIVED_REQUIRED[m] || m);
     }
   } catch (err) {

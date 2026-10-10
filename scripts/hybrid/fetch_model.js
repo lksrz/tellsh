@@ -33,12 +33,24 @@ const get = async (name) => {
   return readFileSync(join(from, name));
 };
 const manifest = JSON.parse((await get('manifest.json')).toString('utf8'));
+// the manifest comes from the same place as the files, so its names are not trusted: exactly the bundle's own file
+// names (never `../../.bashrc` or an absolute path), each with a sha256
+const names = Object.keys(manifest?.files || {});
+if (names.length !== FILES.length || !FILES.every((f) => names.includes(f)) ||
+    !FILES.every((f) => /^[0-9a-f]{64}$/.test(String(manifest.files[f])))) {
+  console.error(`fetch_model: manifest.json must list exactly ${FILES.join(', ')} with sha256 checksums (got: ${names.join(', ') || 'none'})`);
+  process.exit(1);
+}
+// everything is downloaded and verified before anything is written
+const bufs = {};
+for (const f of FILES) {
+  bufs[f] = await get(f);
+  if (sha(bufs[f]) !== manifest.files[f]) throw new Error(`${f}: sha256 mismatch`);
+}
 mkdirSync(dest, { recursive: true });
-for (const [f, want] of Object.entries(manifest.files)) {
-  const buf = await get(f);
-  if (sha(buf) !== want) throw new Error(`${f}: sha256 mismatch`);
-  writeFileSync(join(dest, f + '.part'), buf);
+for (const f of FILES) {
+  writeFileSync(join(dest, f + '.part'), bufs[f]);
   renameSync(join(dest, f + '.part'), join(dest, f));
 }
-writeFileSync(join(dest, 'manifest.json'), JSON.stringify(manifest, null, 1));
+writeFileSync(join(dest, 'manifest.json'), JSON.stringify({ bundle: manifest.bundle, files: Object.fromEntries(FILES.map((f) => [f, manifest.files[f]])) }, null, 1));
 console.log(`installed ${BUNDLE} -> ${dest} (${readdirSync(dest).join(', ')})`);

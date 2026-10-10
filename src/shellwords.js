@@ -181,22 +181,41 @@ export function decodeWord(text, kind = 'posix') {
   return w && w.length === 1 ? w[0] : null;
 }
 
+// a word that is a path by its form: /x, ~/x, ./x, ../x, C:\x, \\server
+const PATH_START = /^(?:~(?:[\\/]|$)|\.{1,2}[\\/]|[\\/]|[A-Za-z]:[\\/])/;
+// a word that contains a path separator or ends in a file extension ("my data/a.txt", "My Notes.txt")
+const PATH_FORM = /[\\/]|\.[A-Za-z0-9]{1,8}$/;
+
 /**
  * Join already-split words (argv, or the words of a `tellsh …` history line) back into request text without
- * losing their boundaries: among several words, one with whitespace is a quoted value and is quoted again
- * (`delete folder "/tmp/a b"`), so the slot extractor reads it as one value, never `/tmp/a`. A single word is the
- * whole request (`tellsh "delete folder /tmp/x"`) and is used as it is. null when a word with whitespace contains
- * both quote characters (cannot be re-quoted for the extractor).
+ * losing their boundaries. A single word is the whole request (`tellsh "delete folder /tmp/x"`) and is used as it is.
+ * Among several words, one with whitespace is
+ *   - a value, quoted again so the slot extractor reads it as one value (never `/tmp/a`), when it has the form of a
+ *     path: `delete folder "/tmp/a b"`, `delete "my data/a.txt"`;
+ *   - request text, joined unquoted, when it is the first word and not a path (`tellsh "delete folder" /tmp/x`);
+ *   - unclear otherwise (`tellsh delete folder "my data"`: a name, or words of the request?): quoted, and listed in
+ *     `unclear` so a changing command leaves that path as a placeholder.
+ * -> { text, unclear: string[] }, or null when a word with whitespace contains both quote characters (cannot be
+ *    re-quoted for the extractor).
  */
-export function joinWords(words) {
-  if (words.length === 1) return String(words[0]);
+export function joinArgs(words) {
+  if (words.length === 1) return { text: String(words[0]), unclear: [] };
   const out = [];
-  for (const w of words) {
-    const s = String(w);
+  const unclear = [];
+  for (let i = 0; i < words.length; i++) {
+    const s = String(words[i]);
     if (!/\s/.test(s)) { out.push(s); continue; }
+    const value = PATH_START.test(s) || (i > 0 && PATH_FORM.test(s));
+    if (!value && i === 0) { out.push(s); continue; }
+    if (!value) unclear.push(s);
     if (!s.includes('"')) out.push(`"${s}"`);
     else if (!s.includes("'")) out.push(`'${s}'`);
     else return null;
   }
-  return out.join(' ');
+  return { text: out.join(' '), unclear };
+}
+
+/** joinArgs(words).text, or null. */
+export function joinWords(words) {
+  return joinArgs(words)?.text ?? null;
 }
