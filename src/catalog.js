@@ -268,7 +268,8 @@ export const INTENTS = [
 
   // ---------- Cloudflare wrangler ----------
   T('wrangler_deploy', 'Deploy a Cloudflare Worker with wrangler', 'npx wrangler deploy', {}, 'medium'),
-  T('wrangler_dev', 'Run a Cloudflare Worker locally (wrangler dev)', 'npx wrangler dev', {}),
+  // wrangler dev runs the project's configured build command (and project code): medium, like npm_run_script
+  T('wrangler_dev', 'Run a Cloudflare Worker locally (wrangler dev)', 'npx wrangler dev', {}, 'medium'),
   T('wrangler_tail', 'Stream live logs of a deployed Cloudflare Worker', 'npx wrangler tail', {}),
   T('wrangler_secret_put', 'Set a secret (environment variable) on a Cloudflare Worker', 'npx wrangler secret put {var!raw}',
     { var: null }, 'medium', { notes: 'wrangler prompts for the value, so it never lands in shell history' }),

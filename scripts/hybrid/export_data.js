@@ -7,6 +7,7 @@
 //     split = 'dev' for ~10% of the base sentence groups (all copies of a sentence stay on one side); dev rows are
 //     never used to fit B/C and serve to calibrate the hybrid thresholds.
 //   build/hybrid/meta.json    {tools, intents, intentTool, tagLabels}
+//   build/hybrid/dev_texts.json  every normalized dev text (train rows with one of these texts are dropped)
 import { readFileSync, readdirSync, existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath, pathToFileURL } from 'node:url';
@@ -119,7 +120,15 @@ function main() {
     push({ text: r.text, tool: NONE, intent: '', lang: r.lang, ...sampleEnv(), spans: [], gid: g, src: 'ood', split, kind: 'orig' });
     push({ text: typo(r.text), tool: NONE, intent: '', lang: r.lang, ...sampleEnv(), spans: [], gid: g, src: 'ood', split, kind: 'typo' });
   }
+  // a typo / relexicalised copy (or another source's sentence) on the train side can be exactly a dev text
+  // ("policz pliki w /var/log"): the dev split must stay unseen, so such train rows are dropped
+  const devTexts = new Set(rows.filter((r) => r.split === 'dev').map((r) => normalize(r.text)));
+  const before = rows.length;
+  rows.splice(0, rows.length, ...rows.filter((r) => r.split === 'dev' || !devTexts.has(normalize(r.text))));
   writeFileSync(join(OUT, 'train.jsonl'), rows.map((r) => JSON.stringify(r)).join('\n') + '\n');
+  // the complete dev-text index (every emitted dev row, not only texts whose own hash is dev): train_a_dev.sh
+  // excludes it from A_dev's training data
+  writeFileSync(join(OUT, 'dev_texts.json'), JSON.stringify([...devTexts].sort()));
   const meta = {
     tools: [...Object.keys(FAMILIES), NONE],
     intents: INTENTS.map((i) => i.id),
@@ -129,7 +138,7 @@ function main() {
   };
   writeFileSync(join(OUT, 'meta.json'), JSON.stringify(meta, null, 1));
   const c = (f) => rows.filter(f).length;
-  console.log(`export_data: ${out.dropped} augmented rows dropped (held-out texts)`);
+  console.log(`export_data: ${out.dropped} augmented rows dropped (held-out texts), ${before - rows.length} train rows dropped (dev texts)`);
   console.log(`export_data: ${base.length} base (${base.filter((r) => r.src === 'real').length} real), ${rows.length} rows (train ${c((r) => r.split === 'train')}, dev ${c((r) => r.split === 'dev')}), tldr ${c((r) => r.src === 'tldr')}, ood ${c((r) => r.src === 'ood')}`);
 }
 if (process.argv[1] && import.meta.url === pathToFileURL(process.argv[1]).href) main();

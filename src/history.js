@@ -437,6 +437,7 @@ export function analyzeCommand(line, classify, kind = 'posix') {
   let intentStale = false;
   let cdAt = -1;
   let scoped = false;
+  let wrapCwd = false;
   let searchDir = false;
   let listDir = false;
   const at = {};
@@ -478,6 +479,18 @@ export function analyzeCommand(line, classify, kind = 'posix') {
       for (const x of [...ENT_TYPES, 'current', 'created']) if (e[x] != null && !isAmbiguous(e[x])) e[x] = AMB + rawOf(e[x]);
       if (segIntentAt === segIdx) { segSlots = { ...segSlots }; markScoped(segSlots); }
     }
+    // `env -C /repo cat notes.txt`, `sudo -D /repo …`: relative values name files in that directory, not here;
+    // `chroot /srv cat /etc/x`: every value names something under the other root
+    const ws = w.length && w !== raw ? wrapperScope(w, raw) : null;
+    if (ws === 'root') {
+      scoped = true;
+      for (const x of [...ENT_TYPES, 'current', 'created']) if (e[x] != null && !isAmbiguous(e[x])) e[x] = AMB + rawOf(e[x]);
+      if (segIntentAt === segIdx) { segSlots = { ...segSlots }; markScoped(segSlots); }
+    } else if (ws === 'cwd') {
+      wrapCwd = true;
+      for (const x of [...ENT_TYPES, 'current', 'created']) if (e[x] != null && !isAmbiguous(e[x]) && isRelativePath(e[x])) e[x] = AMB + rawOf(e[x]);
+      if (segIntentAt === segIdx) { segSlots = { ...segSlots }; staleRelative({}, segSlots); }
+    }
     if (redirTarget != null) e.file = redirTarget;
     const pipedIn = segIdx > 0 && split.segments[segIdx - 1].sep === '|';
     if (w.length && !isAmbiguous(w[0])) for (const x of listedBySegment(w, pipedIn, k)) listed[x] = segIdx;
@@ -517,6 +530,7 @@ export function analyzeCommand(line, classify, kind = 'posix') {
     // the whole line is a catalog/variant command: its slots are the most precise reading
     intent = inv.intent; slots = inv.slots; ambiguous = inv.ambiguous;
     if (scoped) { slots = { ...slots }; markScoped(slots); }
+    if (wrapCwd) { slots = { ...slots }; staleRelative({}, slots); }
     const ie = {};
     entsFromSlots(intent, slots, ie);
     for (const key of Object.keys(ie)) at[key] = split.segments.length;
@@ -556,10 +570,11 @@ const GLOBAL_VALUE_OPTS = {
     '--module', '--events-backend', '--network-cmd-path', '--tmpdir', '--volumepath', '--imagestore', '--hooks-dir', '--conmon', '--runtime', '--ssh']),
 };
 // global options / environment that point git, docker or podman at another repository, directory or daemon
+// (a short option may carry its value attached: `git -C/repo`, `docker -Htcp://prod:2375`, `podman -cprod`)
 const SCOPE_OPTS = {
-  git: /^(?:-C|--git-dir|--work-tree|--namespace)(?:=|$)/,
-  docker: /^(?:-H|--host|-c|--context|--config)(?:=|$)/,
-  podman: /^(?:-c|--connection|--url|--root|--runroot|--identity|--ssh)(?:=|$)/,
+  git: /^-C|^--(?:git-dir|work-tree|namespace)(?:=|$)/,
+  docker: /^-[Hc]|^--(?:host|context|config)(?:=|$)/,
+  podman: /^-c|^--(?:connection|url|root|runroot|identity|ssh)(?:=|$)/,
 };
 const SCOPE_ENV = /^(?:GIT_DIR|GIT_WORK_TREE|GIT_NAMESPACE|DOCKER_HOST|DOCKER_CONTEXT|DOCKER_CONFIG|CONTAINER_HOST|CONTAINER_CONNECTION)=/;
 /** `git -C /repo …`, `docker --context prod …`, `DOCKER_HOST=… docker …` (w: the unwrapped words, raw: before unwrap). */
@@ -571,6 +586,38 @@ function scopedElsewhere(w, raw) {
   if (raw.slice(0, raw.length - w.length).some((x) => SCOPE_ENV.test(String(x)))) return true;
   const args = w.slice(1);
   return args.slice(0, args.length - afterGlobals(head, args).length).some((a) => re.test(String(a)));
+}
+// wrapper options that run the command in another working directory (`env -C /repo`, `sudo -D /repo`, also with the
+// value attached or in a cluster) or under another root (`chroot /srv`, `unshare --root=/srv`, `nsenter -r`)
+const WRAPPER_CWD = {
+  env: /^-[a-zA-Z0-9]*C|^--chdir(?:=|$)/,
+  sudo: /^-[a-zA-Z]*D|^--chdir(?:=|$)/,
+  unshare: /^-w|^--wd(?:=|$)/,
+  nsenter: /^-w|^--wd(?:=|$)/,
+  'systemd-run': /^--working-directory(?:=|$)/,
+  'start-stop-daemon': /^-d|^--chdir(?:=|$)/,
+};
+const WRAPPER_ROOT = {
+  unshare: /^-R|^--root(?:=|$)/,
+  nsenter: /^-r|^--root(?:=|$)/,
+  'start-stop-daemon': /^-r|^--chroot(?:=|$)/,
+};
+const ROOT_WRAPPERS = new Set(['chroot', 'proot', 'firejail', 'bwrap', 'systemd-nspawn']);
+/**
+ * 'root' when a wrapper in the removed prefix of `raw` (before the unwrapped words `w`) runs the command under another
+ * root (every path names something else), 'cwd' when it runs it in another working directory (relative paths do).
+ */
+function wrapperScope(w, raw) {
+  let cur = null;
+  let scope = null;
+  for (const x of raw.slice(0, raw.length - w.length).map((v) => String(rawOf(v)))) {
+    const h = x.replace(/^.*[\\/]/, '').toLowerCase();
+    if (ROOT_WRAPPERS.has(h)) return 'root';
+    if (!x.startsWith('-')) { if (WRAPPER_CWD[h] || WRAPPER_ROOT[h]) cur = h; continue; }
+    if (WRAPPER_ROOT[cur]?.test(x)) return 'root';
+    if (WRAPPER_CWD[cur]?.test(x)) scope = 'cwd';
+  }
+  return scope;
 }
 /** The values of a scoped command (scopedElsewhere) as ambiguous: they name things in another repository / daemon. */
 function markScoped(o) {
