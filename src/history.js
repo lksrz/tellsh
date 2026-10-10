@@ -9,6 +9,7 @@ import { FAMILY_OF } from './tools.js';
 import { extractSlots, foldKeepLength, isStopWord } from './slots.js';
 import { VARIANTS } from './variants.js';
 import { splitCommand, wordsOf, decodeWord, AMB, isAmbiguous, isExpansion, isGlob, rawOf } from './shellwords.js';
+import { commandWords, commandChains } from './danger.js';
 
 export { isAmbiguous };
 
@@ -273,6 +274,16 @@ function parseArgs(args, valueOpts = new Set()) {
   return { pos, opts, flags, after };
 }
 
+// VAR=x prefixes and wrapper commands (sudo -u root, env, command, nice -n 5, timeout 5, ...) removed: the command that runs.
+// Returns `w` itself when there is nothing to remove.
+function unwrap(w) {
+  let i = 0;
+  while (i < w.length && /^\w+=/.test(w[i])) i++;
+  if (i < w.length && isAmbiguous(w[i])) return i ? w.slice(i) : w;
+  const r = commandWords(w.map(String));
+  return r.length === w.length ? w : w.slice(w.length - r.length);
+}
+
 const CD_HEADS = new Set(['cd', 'pushd', 'popd', 'chdir', 'set-location', 'sl', 'push-location', 'pop-location']);
 // a path that depends on the working directory (stale once the directory changes)
 export const isRelativePath = (v) => {
@@ -410,7 +421,7 @@ export function analyzeCommand(line, classify, kind = 'posix') {
   const listed = {}; // entity type -> index of the newest segment that listed values of that type
   // segments from..to-1 are connected by pipes only
   const samePipe = (from, to) => from >= 0 && split.segments.slice(from, to).every((s) => s.sep === '|');
-  const firstWord = (s) => { let w = s.words.filter((x) => !REDIR_TARGET_OP.test(x) && !REDIR_DUP_OP.test(x)); while (w.length && (w[0] === 'sudo' || /^\w+=/.test(w[0]))) w = w.slice(1); return w[0]; };
+  const firstWord = (s) => unwrap(s.words.filter((x) => !REDIR_TARGET_OP.test(x) && !REDIR_DUP_OP.test(x)))[0];
   split.segments.forEach(({ words }, segIdx) => {
     const e = {};
     const setIntent = (id, s) => { segIntent = id; segSlots = s; segIntentAt = segIdx; };
@@ -428,11 +439,21 @@ export function analyzeCommand(line, classify, kind = 'posix') {
       }
       w.push(x);
     }
-    while (w.length && (w[0] === 'sudo' || /^\w+=/.test(w[0]))) w = w.slice(1);
+    // wrappers (`sudo -u root ls`, `env ls`, `command ls`, `nice -n 5 ls`, `timeout 5 ps aux`): the command they run
+    const raw = w;
+    w = unwrap(w);
+    // a wrapper whose options could not be read: what ran is unknown, so it may have printed or named anything
+    if (!w.length || (w !== raw && /^-/.test(w[0]))) {
+      e.file = AMB + raw.join(' '); e.dir = AMB + raw.join(' ');
+      for (const x of ENT_TYPES) listed[x] = segIdx;
+      w = [];
+    }
     if (w.length) segmentEnts(w, e, setIntent, split, k, segIdx, firstWord);
     if (redirTarget != null) e.file = redirTarget;
     const pipedIn = segIdx > 0 && split.segments[segIdx - 1].sep === '|';
     if (w.length && !isAmbiguous(w[0])) for (const x of listedBySegment(w, pipedIn, k)) listed[x] = segIdx;
+    // every command the wrapper chain may run (also when its options are misread): a listing anywhere in it counts
+    if (w !== raw) for (const c of commandChains(raw, [], {})) if (c.length && !isAmbiguous(c[0])) for (const x of listedBySegment(c, pipedIn, k)) listed[x] = segIdx;
     // a listing piped into anything (`ls DIR | sort | grep pdf`, `ls -S DIR | head -1`, `gci DIR | Select-Object
     // -First 1`): what the user saw is a selection of the entries inside DIR, never DIR itself
     const piped = split.segments[segIdx].sep.startsWith('|') && !split.segments[segIdx].sep.startsWith('||');
@@ -804,6 +825,19 @@ const PRONOUN_WORD = /^(it|its|that|this|them|those|these|one|again|there|here|t
 const PLURAL = /(?:^|[^a-z])(them|those|these|je|te|tamte|ich|nimi)(?=$|[^a-z])/;
 const PRONOUN_PL = /(?:^|\s)(tego|ten|te|ta|tej|tym|go|je|ja|jego|jej|niego|nia|nim|niej|mu|im|tamten|tamtego|tamta|tamtej|tamto|tamtym)(?=\s|$|[?!.,])|(?:^|\s)to(?=\s*[?!.]*$|\s+(?:co|ktor\w*|tam))/;
 
+// locative references: the directory of an earlier command as the place to act in ("delete all log files there",
+// "usuń pliki log tam", "in the same folder"). Not "is there" / "there are" (existential), not "here" (the cwd).
+const LOCATIVE = new RegExp([
+  String.raw`(?<!\b(?:is|are|was|were|if|whether|be)\s+)\bthere\b(?!\s+(?:is|are|was|were|be|exists?|isn|aren|wasn|weren)\b|'s\b)`,
+  String.raw`\binside(?=\s*(?:(?:too|also|as well|please|now|recursively)\s*)*[?!.,]*$)`,
+  String.raw`\b(?:the\s+)?same\s+(?:folder|directory|dir|place|location|path|spot|catalog)\b`,
+  String.raw`(?:^|\s)(?:tam|stamtad|tamze|tamtedy)(?=\s|$|[?!.,])`,
+  String.raw`(?:^|\s)(?:tym\s+samym|tamtym|tego\s+samego|tamtego)\s+(?:folder\w*|katalog\w*|miejsc\w*)`,
+].join('|'));
+export const hasLocative = (q) => LOCATIVE.test(fold(q));
+// a request about the entries of a referenced directory, not the directory ("delete everything in it", "all files in it")
+const CONTENTS = /\b(?:everything|all|anything|contents?|files?|wszystk\w*|wszystko|zawarto\w*|plik\w*)\b.*(?:^|\s)(?:in|inside|within|from|of|w|we|z|ze|wewnatrz)\s+(?:it|that|this|them|there|nim|niej|niego|tym|tamtym|tego|nich)(?=\s|$|[?!.,])/;
+
 const NOUN_TYPE = [
   [/\b(containers?|kontener\w*)\b/i, ['container']],
   [/\b(services?|unit|uslug\w*|serwis\w*|daemon|demon\w*)\b/i, ['service']],
@@ -909,6 +943,7 @@ export function resolveReference(query, ctx) {
       return { rule: 'same-for', intent: ctx.last.intent, slots, changed: rt.slot, note: `same as previous ${ctx.last.intent} with ${rt.slot}=${rt.value}` };
     }
   }
+  if (!hasPronoun(query) && hasLocative(query)) return locativeRef(fold(query), ctx);
   if (!hasPronoun(query) || !ctx.entOrder.length) return null;
   // which entity does the pronoun point at? noun hint first ("that container"), else most recent
   const fq = fold(query);
@@ -950,6 +985,22 @@ export function resolveReference(query, ctx) {
 }
 
 /**
+ * "there", "tam", "in the same folder": the newest directory of the history, as the place a command runs in
+ * (`find {path} …`, `ls {path}`). It never names the object of a command (`rm -r`, `mv`): `locative` tells the caller.
+ * Refused when there is no directory, it cannot be read, or a newer file is the newest location-like value.
+ */
+function locativeRef(fq, ctx) {
+  const v = ctx.ents.dir;
+  const base = { intent: null, ent: 'dir', blank: ['path', 'dest'], locative: true };
+  if (v == null) return { rule: 'refused', ...base, note: 'the request refers to a place ("there"), but there is no directory in the recent history; not guessing' };
+  if (isAmbiguous(v)) return { rule: 'refused', ...base, note: `the latest dir in history (${rawOf(v)}) cannot be read unambiguously; not guessing` };
+  const fileNewer = ctx.ents.file != null && ((ctx.age.file ?? 1e9) < ctx.age.dir || (ctx.age.file === ctx.age.dir && (ctx.pos.file ?? 0) > (ctx.pos.dir ?? 0)));
+  if (fileNewer) return { rule: 'refused', ...base, note: `the newest path in history is a file (${rawOf(ctx.ents.file)}), so "there" is unclear; not guessing` };
+  const guardNote = changeGuard('dir', v, fq, ctx);
+  return { rule: 'pronoun', ...base, fill: { path: String(v) }, ...(guardNote ? { guarded: true, guardNote } : {}), note: `"dir" from history = ${v}` };
+}
+
+/**
  * Why `value` (of entity type `type`) must not be the target of a changing command (rm, mv, cp, kill, chmod,
  * git branch -d, ...), or null. A history value is only used for one when it is unambiguous and is the value
  * of the most recent history segment that produced that type:
@@ -960,6 +1011,8 @@ export function resolveReference(query, ctx) {
  */
 export function changeGuard(type, value, fq, ctx) {
   const v = String(value);
+  // "delete everything in it" after `cd /tmp/build`: the entries inside the directory, not the directory itself
+  if (type === 'dir' && CONTENTS.test(fq)) return `the request is about the entries inside ${v}, not ${v} itself; not guessing`;
   if (type === 'dir' && ctx.searchRoots?.has(v)) return `the latest dir in history (${v}) is where a search ran, not what it found; not guessing`;
   if (type === 'dir' && ctx.listedDirs?.has(v)) {
     const pl = PLURAL.exec(fq);

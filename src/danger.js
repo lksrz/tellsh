@@ -107,6 +107,15 @@ const WRAPPERS = new Set(['sudo', 'doas', 'run0', 'command', 'builtin', 'exec', 
 // programs that run the command at the end of their arguments without being a plain wrapper
 const SUFFIX_RUNNERS = new Set(['ssh', 'mosh', 'kubectl', 'docker', 'podman', 'lxc', 'incus', 'machinectl', 'distrobox', 'toolbox', 'flatpak', 'nix-shell', 'firejail', 'bwrap']);
 
+// programs whose arguments are data, never a command they run (`grep -r rm src`, `man rm`, `echo rm -rf /`)
+const DATA_ARGS = new Set(['grep', 'egrep', 'fgrep', 'rg', 'ag', 'ack', 'sed', 'awk', 'gawk', 'mawk', 'echo', 'printf', 'man', 'which', 'whereis',
+  'type', 'whatis', 'apropos', 'help', 'info', 'tldr', 'git', 'cat', 'less', 'more', 'head', 'tail', 'ls', 'find', 'locate', 'tellsh', 'alias',
+  'history', 'fc', 'complete', 'compgen', 'hash', 'test', '[', '[[', 'true', 'false', 'printenv', 'set', 'unset', 'export', 'declare', 'local',
+  'readonly', 'trap', 'write-host', 'write-output', 'get-help', 'get-command', 'select-string', 'sls', 'findstr', 'wc', 'sort', 'uniq', 'cut',
+  'tr', 'diff', 'cmp', 'file', 'stat', 'du', 'df', 'tree', 'jq', 'yq', 'xxd', 'od', 'hexdump', 'strings', 'mkdir', 'touch', 'cd', 'pushd']);
+// programs that destroy or change things: after an unknown program they may be the command it runs (`mywrap rm -rf /`)
+const DANGER_HEADS = /^(?:rm|rmdir|unlink|shred|wipe|wipefs|mkfs(?:\.\w+)?|mke2fs|dd|truncate|kill|pkill|killall|chmod|chown|chgrp|mv|cp|rsync|find|tar|tee|sh|bash|zsh|dash|ksh|fish|eval|shutdown|reboot|halt|poweroff|crontab|iptables|remove-item|ri|del|erase|rd|format|diskpart|stop-process|format-volume|clear-disk)$/i;
+
 /** Collect `-c STR` style payloads of one simple command into `inner` (`unsure` when a runner's payload cannot be read). */
 function payloads(w, inner, flags) {
   const h = (w[0] || '').replace(/^.*[\\/]/, '').replace(/\.exe$/i, '').toLowerCase();
@@ -143,7 +152,7 @@ function payloads(w, inner, flags) {
 }
 
 /** The command a wrapper chain runs. `inner` collects command strings given as option values (`su -c "…"`). */
-function commandWords(words, inner = [], flags = {}) {
+export function commandWords(words, inner = [], flags = {}) {
   let w = words;
   for (;;) {
     while (w.length && /^\w+=/.test(w[0])) w = w.slice(1);
@@ -173,13 +182,17 @@ function commandWords(words, inner = [], flags = {}) {
  * at every later non-option word of a wrapper / remote runner (`ssh host rm -rf /`, `docker exec ct rm …`).
  * The checks only ever escalate, so reading too many candidates is safe; missing one is not.
  */
-function commandChains(words, inner, flags) {
+export function commandChains(words, inner, flags) {
   const out = [];
   const push = (w) => { if (w.length && !out.some((o) => o.length === w.length && o.every((x, i) => x === w[i]))) out.push(w); };
   push(commandWords(words, inner, flags));
   const lead = words.findIndex((x) => !/^\w+=/.test(x));
   const h = lead >= 0 ? String(words[lead]).replace(/^.*[\\/]/, '').replace(/\.exe$/i, '').toLowerCase() : '';
   const remote = SUFFIX_RUNNERS.has(h) && (!['docker', 'podman', 'kubectl', 'lxc', 'incus'].includes(h) || words.some((x) => ['exec', 'run', 'debug', 'create'].includes(x)));
+  // an unknown program followed by a destructive command (`mywrap rm -rf /`, `catchsegv2 dd …`): it may run it
+  if (h && !WRAPPERS.has(h) && !remote && !DATA_ARGS.has(h)) {
+    for (let j = lead + 1; j < words.length - 1; j++) if (DANGER_HEADS.test(String(words[j]).replace(/^.*[\\/]/, '').replace(/\.exe$/i, ''))) push(commandWords(words.slice(j), inner, flags));
+  }
   if (WRAPPERS.has(h) || remote) {
     for (let j = lead + 1; j < words.length; j++) {
       if (/^-|^\w+=/.test(words[j])) continue;
@@ -361,11 +374,70 @@ function pipelineDeleteCheck(text, hit) {
   }
 }
 
-// chmod/chown/chgrp -R on /, ~, * ... (options may come in any order: chmod -R -v 777 ~)
+// chmod/chown/chgrp -R on /, ~, * ... (options may come in any order: chmod -R -v 777 ~); without -R on /, ~ or a
+// system directory (`chmod 000 /`, `chmod 000 /etc`, `chown nobody /`): the system stops working
 function permCheck(w, hit) {
   const a = w.slice(1);
-  if (!a.some((x) => /^-[a-zA-Z]*R[a-zA-Z]*$/.test(x) || x === '--recursive')) return;
-  if (positional(a).slice(1).some(critTarget)) hit('high', 'recursive permission/owner change on /, ~ or *', true);
+  const targets = positional(a).slice(1);
+  if (!a.some((x) => /^-[a-zA-Z]*R[a-zA-Z]*$/.test(x) || x === '--recursive')) {
+    if (targets.some((t) => TOP_DIR.test(normTarget(t)) || /^[A-Za-z]:[\\/]*$/.test(String(t).trim()))) hit('high', 'permission/owner change on / or a system directory', true);
+    else if (targets.some((t) => SYS_PATH.test(normTarget(t)) || /^(?:~|\$\{?HOME\}?)$/.test(normTarget(t)))) hit('high', 'changes permissions/owner of a system file or the home directory');
+    return;
+  }
+  if (targets.some(critTarget)) hit('high', 'recursive permission/owner change on /, ~ or *', true);
+}
+
+// / and the top-level system directories themselves
+const TOP_DIR = /^(?:\/|\/(?:bin|boot|dev|etc|home|lib\w*|opt|proc|root|sbin|srv|sys|usr|var|System|Users|Library|Applications|private))$/;
+// whole disk devices (writing to them destroys the filesystem on them)
+const RAW_DISK = /^\/dev\/(?:sd|hd|vd|xvd|nvme|mmcblk|disk|rdisk|md|dm-|mapper\/|loop)\w*/;
+// tee/cp/install/sponge/pv … onto a whole disk device (`cat x | sudo tee /dev/sda`)
+function rawDiskWriteCheck(w, hit) {
+  if (positional(w.slice(1)).some((x) => RAW_DISK.test(normTarget(x)))) hit('high', 'writes onto a raw disk device', true);
+}
+
+// Interpreters running inline code (`python3 -c`, `perl -e`, `ruby -e`, `node -e`, `php -r`, awk programs that call
+// system()): the code is not shell and cannot be checked, so it is high. Its string literals are checked as commands
+// (`system("rm -rf /")`) and file-deleting calls on /, ~ or a system directory (`shutil.rmtree('/')`) are critical.
+const INTERP_CODE = [
+  [/^(?:python[\d.]*|pypy[\d.]*)$/, /^-[a-zA-Z]*c$/],
+  [/^perl[\d.]*$/, /^-[a-zA-Z]*[eE]$/],
+  [/^(?:ruby|jruby)[\d.]*$/, /^-[a-zA-Z]*e$/],
+  [/^(?:node|nodejs|bun)$/, /^(?:-e|-p|-pe|--eval|--print)$/],
+  [/^php[\d.]*$/, /^-r$/],
+  [/^(?:lua[\d.]*|luajit|julia|rscript|osascript|tclsh)$/, /^-e$/],
+];
+const AWK = /^(?:awk|gawk|mawk|nawk|busybox-awk)$/;
+const DELETE_CALL = /\b(?:rmtree|rm_rf|rm_r|rmdir|removedirs|rmSync|rmdirSync|unlink(?:Sync)?|remove|rm|delete|chmod|chown|chmodSync|chownSync)\s*\(?\s*(?:path\s*=\s*)?[rb]?['"]([^'"]*)['"]/g;
+function inlineCode(w) {
+  const h = (w[0] || '').replace(/^.*[\\/]/, '').replace(/\.exe$/i, '').toLowerCase();
+  if (AWK.test(h)) {
+    const a = w.slice(1);
+    for (let i = 0; i < a.length; i++) {
+      if (/^-[Fvf]$/.test(a[i])) { if (a[i] === '-f') return null; i++; continue; }
+      if (/^-/.test(a[i])) continue;
+      return /\bsystem\s*\(|\|\s*getline|\b(?:print|printf)\b[^;}]*(?:>|\|)/.test(a[i]) ? { h, code: a[i] } : null;
+    }
+    return null;
+  }
+  if (h === 'deno' && w[1] === 'eval') return { h, code: w.slice(2).join(' ') };
+  const it = INTERP_CODE.find(([re]) => re.test(h));
+  if (!it) return null;
+  const i = w.findIndex((x, j) => j > 0 && it[1].test(x));
+  return i > 0 && w[i + 1] != null ? { h, code: String(w[i + 1]) } : null;
+}
+function interpCheck(w, hit) {
+  const ic = inlineCode(w);
+  if (!ic) return;
+  hit('high', `${ic.h} runs inline code; it cannot be checked`);
+  const lits = [];
+  for (const m of ic.code.matchAll(/'([^']*)'|"([^"]*)"|`([^`]*)`|\bqq?\s*([{(\[])([^})\]]*)[})\]]/g)) lits.push(m[1] ?? m[2] ?? m[3] ?? m[5]);
+  for (const c of lits) {
+    if (!c || !c.trim()) continue;
+    const d = checkDanger(c, 'safe', { lenient: true });
+    for (const m of d.warnings) hit(d.risk, m, d.critical);
+  }
+  for (const m of ic.code.matchAll(DELETE_CALL)) if (critTarget(m[1]) || SYS_PATH.test(normTarget(m[1]))) hit('high', `${ic.h} code deletes or changes /, ~ or a system directory`, true);
 }
 
 // tar -x … -C / (or --directory=/): extracting over the root or home directory
@@ -489,6 +561,8 @@ export function checkDanger(command, baseRisk = 'safe', { lenient = false } = {}
     else if (['chmod', 'chown', 'chgrp'].includes(head)) permCheck(w, hit);
     else if (head === 'tar' || head === 'bsdtar' || head === 'gtar') tarCheck(w, hit);
     else if (head === 'docker' || head === 'podman') dockerCheck(w, hit);
+    if (['tee', 'cp', 'install', 'sponge', 'pv', 'mv', 'ln'].includes(lower)) rawDiskWriteCheck(w, hit);
+    interpCheck(w, hit);
     if (head === 'git' && w[1] === 'rm') hit('high', 'rm deletes files permanently (no trash)');
    }
   }

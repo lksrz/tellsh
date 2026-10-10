@@ -171,13 +171,13 @@ Machine: Intel(R) Xeon(R) Processor, Node v20.19.2, linux; CPU affinity: `0` (ru
 
 | measurement | p50 | p95 | runs |
 |---|---|---|---|
-| bare `node -e 0` startup (baseline) | 86.0 ms | 88.7 ms | 10 |
-| **cold**: `node bin/tellsh.js --dry-run --json --shell bash <query>` (new process, model load, full pipeline) | **170.9 ms** | **189.7 ms** | 40 |
-| model load (in-process, one-off) | 5.4 ms | – | 1 |
-| **warm**: full cascade + tagger + render (bash, composer off) | **0.353 ms** | **3.9 ms** | 2000 |
-| warm, incl. composer modifier check (shipped default) | 0.573 ms | 7.4 ms | 2000 |
-| warm, PowerShell rendering | 0.334 ms | 0.877 ms | 2000 |
-| warm, with 5 history lines (context build + reference rules) | 1.2 ms | 7.7 ms | 2000 |
+| bare `node -e 0` startup (baseline) | 86.8 ms | 98.5 ms | 10 |
+| **cold**: `node bin/tellsh.js --dry-run --json --shell bash <query>` (new process, model load, full pipeline) | **168.7 ms** | **196.0 ms** | 40 |
+| model load (in-process, one-off) | 4.7 ms | – | 1 |
+| **warm**: full cascade + tagger + render (bash, composer off) | **0.350 ms** | **2.2 ms** | 2000 |
+| warm, incl. composer modifier check (shipped default) | 0.619 ms | 7.5 ms | 2000 |
+| warm, PowerShell rendering | 0.321 ms | 0.760 ms | 2000 |
+| warm, with 5 history lines (context build + reference rules) | 1.4 ms | 8.3 ms | 2000 |
 
 The composer runs `bash -n` (a subprocess, ~2 ms) only when it actually returns a composed command.
 <!-- bench:end -->

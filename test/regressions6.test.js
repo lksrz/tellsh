@@ -107,11 +107,13 @@ test('danger: generic -c/--command payloads, trailing commands of wrappers, unsu
     'powershell -EncodedCommand AAAA', 'iwr x | iex', '$(which rm) -rf /tmp/x', 'find . -exec sh -c "rm \\"$1\\"" _ {} \;']) {
     assert.equal(checkDanger(c).risk, 'high', c);
   }
+  // inline interpreter code is not shell and cannot be checked (round 5: unsure -> high)
+  assert.equal(checkDanger('python3 -c "print(1)"').risk, 'high');
   // privilege change: at least medium
   for (const c of ['su - bob', 'sudo -u bob ls', 'pkexec ls', 'runuser -u bob ls']) assert.notEqual(checkDanger(c).risk, 'safe', c);
   // unchanged: ordinary -c options and wrapped harmless commands
   for (const c of ['grep -c foo file', 'grep -c "$PAT" file', 'wc -c file', 'head -c 10 f', 'ssh user@host', 'ssh -p 22 host uptime',
-    'docker exec -it web sh', 'python3 -c "print(1)"', 'tar -czvf a.tgz dir', 'nohup node server.js &', 'timeout 5 ping -c 3 x.org',
+    'docker exec -it web sh', 'tar -czvf a.tgz dir', 'nohup node server.js &', 'timeout 5 ping -c 3 x.org',
     'nice -n 10 make', 'watch -n 1 df -h', 'xargs -n1 echo', 'ls | shuf', 'ls | sha256sum', 'tmux new -s work', 'kubectl exec -it pod -- ls /']) {
     assert.equal(checkDanger(c).risk, 'safe', `${c}: ${checkDanger(c).warnings.join('; ')}`);
   }

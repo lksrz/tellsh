@@ -104,6 +104,8 @@ only prints. Exit codes: command's own · `0` printed · `2` usage · `3` not un
 * **Slots**: the tagger is primary; every value is validated (paths not generic nouns, ports 1–65535, branch/user
   syntax, …). If the tagger misses a slot or its value fails validation, the v0.1 regex extractor fills/wins. Values are
   normalised by the same parsers (`~/Pobrane`, "katalog domowy" → `~`, "1,5 GB" → `1536M`, "ostatnie 2 godziny" → 120 min).
+  A path the request names but that fails validation (a function word: "in the", "in there"; a name with a newline;
+  a place reference such as "there") stays `<PATH>`; it is never silently replaced by the default `.`.
 
 ### Shells and operating systems
 
@@ -144,12 +146,21 @@ unambiguous **and** is the newest value of its type; otherwise the slot stays a 
   * a newer listing of the same type (`cat a.txt` then `ls`, `pgrep foo` then `ps aux`, `docker ps`, `git branch`,
     `git status`, `systemctl list-units`) means "it" may be one of the listed values;
   * the directory of a `cd` is a target only when nothing ran after the `cd` (`cd DIR` then `make`, `rg TODO`,
-    `grep -rl TODO`, `ls`: refused).
+    `grep -rl TODO`, `ls`: refused);
+  * "everything in it" / "all files in it" / "wszystko w nim" are the entries of the directory, never the directory itself.
+Place references ("there", "over there", "in there", a final "inside", "in the same folder", "tam", "stamtąd", "w tym
+samym katalogu") are the newest history directory under the same rules, only as the place a command runs in
+(`find DIR … -delete`, `ls DIR`, a `cp`/`mv` destination), never as the object of `rm -r`/`mv`; without a usable
+directory they stay `<PATH>`, never `.`. ("is there …" / "there are …" are not references.)
+Wrapped commands (`sudo -u root ls`, `env ls`, `command ls`, `nice -n 5 ps aux`) are read as the command they run; a
+wrapper whose arguments cannot be read makes every older value unusable for a changing command. An earlier
+`tellsh <query>` line counts with what that request produced: a slot it left as a placeholder is not a usable value.
 An argument-less `ls`/`Get-ChildItem`/search lists the directory of the latest `cd`, and a `tellsh list directory X`
 line counts as a listing too. "Same for X" / "same but …" are refused for a changing command when any newer line (or a later
 segment of the same line) ran after it, or when X names nothing the previous command takes. A slot of the previous
-command that depends on the shell state (`find "$DIR" …`) stays a placeholder. With a refused or pronoun source ("move
-them to /tmp/old"), the named path is the destination; with a reference in destination position ("copy notes.txt to
+command that depends on the shell state (`find "$DIR" …`) stays a placeholder, and a slot the new request withheld
+(`same but … in /tmp/new!`) is never refilled from the previous command. A single named path after "to"/"into"/"do"
+("move them to /tmp/old", with or without history) is the destination and the source stays `<SRC>`; with a reference in destination position ("copy notes.txt to
 it / into that folder / do niego"), the named path is the source. A quoted `'~/x'` from history stays the literal
 directory `./~/x`.
 
@@ -188,7 +199,11 @@ compression from the archive name, `bash -n` and an allowed-flag check validate 
   `-c`/`--command`/`--command=` string (`bash -lc '…'`, `su -c '…'`, `script -c '…'`, `find … -exec sh -c '…'`,
   `env -S '…'`, `eval`, `cmd /c`, `pwsh -Command`). Unsure is high: a command name or a runner's command string that
   depends on the shell state (`$CMD -rf /`, `sh -c "$X"`, `eval "$X"`), `pwsh -EncodedCommand`, and text piped into a
-  shell (`… | sh`, `… | iex`). Switching user (`su`, `runuser`, `pkexec`) is at least medium, like `sudo`. It
+  shell (`… | sh`, `… | iex`), inline interpreter code (`python3 -c`, `perl -e`, `ruby -e`, `node -e`, `php -r`, awk
+  programs calling `system()`; their string literals are checked as commands and `shutil.rmtree('/')`-style calls on
+  `/`, `~` or system directories are critical), and an unknown program followed by a destructive command
+  (`mywrap rm -rf /`). `chmod`/`chown` of `/` or a top-level system directory (even without `-R`) and `tee`/`cp` onto a
+  whole disk device (`… | sudo tee /dev/sda`) are critical. Switching user (`su`, `runuser`, `pkexec`) is at least medium, like `sudo`. It
   strips `git`/`docker` global options (`git -C dir -c k=v reset --hard` = `git reset --hard`). POSIX: `rm -rf` /
   `rm --recursive --force` on `/`, `~`, `~/*`, `"/"`, `/usr`, …, `mkfs`, `dd of=/dev/…`, fork bombs, `curl | sh`,
   `bash <(curl …)`, `sh -c "$(curl …)"`, force-push (incl. `+branch`), redirects into `/etc` (`>>`, `1>`, `&>`),
