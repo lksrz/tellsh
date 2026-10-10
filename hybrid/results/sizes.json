@@ -1,0 +1,21 @@
+{
+ "tellsh_pack_mb": 1.1,
+ "model_bin_mb": 2.71,
+ "enc_onnx_mb": 26.72,
+ "enc_vocab_mb": 0.73,
+ "enc_bundle_tgz_mb": 21.7,
+ "ort_node_tgz_mb": 113.5,
+ "ort_node_linux_x64_so_mb": 45.8,
+ "ort_node_cuda_postinstall_mb": 272.1,
+ "ort_node_unpacked_mb": 301,
+ "ort_web_tgz_mb": 33.1,
+ "ort_web_wasm_mb": 14.2,
+ "qwen05_q8_gguf_mb": 531,
+ "qwen05_q4km_gguf_mb": 398,
+ "llama_cpp_cpu_release_tgz_mb": 17.8,
+ "e5_small_full_params_m": 117.6,
+ "e5_pruned_params_m": 35.6,
+ "e5_pruned_6l_params_m": 25.0,
+ "vocab_before": 250002,
+ "vocab_after": 36357
+}

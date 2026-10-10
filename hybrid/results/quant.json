@@ -1,0 +1,8 @@
+[
+ {"variant": "PyTorch fp32 (reference)", "mb": 99.7, "dev_acc": 0.8367, "agree": 1.0, "p50_ms": null},
+ {"variant": "dynamic int8 (QOperator), per-tensor, int8 embeddings, fp32 heads", "mb": 25.4, "dev_acc": 0.7467, "agree": 0.857, "p50_ms": null},
+ {"variant": "dynamic int8, per-channel, int8 embeddings", "mb": 25.3, "dev_acc": null, "agree": 0.957, "p50_ms": 1.86},
+ {"variant": "weight-only 4-bit (MatMulNBits + 4-bit embeddings), fp32 compute", "mb": 16.1, "dev_acc": 0.8167, "agree": 0.945, "p50_ms": null},
+ {"variant": "weight-only 8-bit MatMulNBits, int8 embeddings, fp32 compute", "mb": 26.7, "dev_acc": 0.8417, "agree": 0.99, "p50_ms": 17.3},
+ {"variant": "weight-only 8-bit MatMulNBits accuracy_level=4 (int8 compute), int8 embeddings  [shipped]", "mb": 26.7, "dev_acc": 0.8433, "agree": 0.987, "p50_ms": 4.25}
+]

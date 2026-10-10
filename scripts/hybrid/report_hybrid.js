@@ -1,26 +1,26 @@
 #!/usr/bin/env node
-// Render build/hybrid/{results,bench,policy}.json + zeroshot.jsonl into HYBRID.md (<!-- hybrid:start/end -->).
+// Render hybrid/results/*.json (copied from build/hybrid/ after a run) into HYBRID.md (<!-- hybrid:start/end -->).
 import { readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 const ROOT = fileURLToPath(new URL('../..', import.meta.url));
 const J = (f) => (existsSync(join(ROOT, f)) ? JSON.parse(readFileSync(join(ROOT, f), 'utf8')) : null);
-const res = J('build/hybrid/results.json');
+const res = J('hybrid/results/results.json');
 // fine-tuned C variant (eval_hybrid.js --tag=_ft): merged in as C-ft / A+C-ft / A+C-ft-safe
-const ft = J('build/hybrid/results_ft.json');
+const ft = J('hybrid/results/results_ft.json');
 const merge = (dst, src) => {
   for (const [k, v] of Object.entries(src)) {
-    if (/C/.test(k) && !/^(en|pl|all)$/.test(k) && typeof v === 'object' && !Array.isArray(v) && ['C', 'A+C', 'A+C-safe'].includes(k)) dst[k.replace('C', 'C-ft')] = v;
+    if (['C', 'A+C', 'A+C-safe'].includes(k)) dst[k.replace('C', 'C-ft')] = v;
     else if (typeof v === 'object' && v && !Array.isArray(v) && dst[k] && typeof dst[k] === 'object') merge(dst[k], v);
   }
 };
 if (ft) merge(res.R, ft.R);
-const bench = J('build/hybrid/bench.json');
-const pol = J('build/hybrid/policy.json');
-const polFt = J('build/hybrid/policy_ft.json');
+const bench = J('hybrid/results/bench.json');
+const pol = J('hybrid/results/policy.json');
+const polFt = J('hybrid/results/policy_ft.json');
 if (pol && polFt) for (const k of ['C', 'A+C', 'A+C-safe']) if (polFt[k]) pol[k.replace('C', 'C-ft')] = polFt[k];
-const zs = existsSync(join(ROOT, 'build/hybrid/zeroshot.jsonl')) ? readFileSync(join(ROOT, 'build/hybrid/zeroshot.jsonl'), 'utf8').trim().split('\n').map((l) => JSON.parse(l)) : [];
+const zs = existsSync(join(ROOT, 'hybrid/results/zeroshot.jsonl')) ? readFileSync(join(ROOT, 'hybrid/results/zeroshot.jsonl'), 'utf8').trim().split('\n').map((l) => JSON.parse(l)) : [];
 const pct = (a, b) => (b ? `${((100 * a) / b).toFixed(1)}%` : 'n/a');
 const R = res.R;
 const ORDER = ['A', 'B', 'A+B', 'A+B-safe', 'C', 'A+C', 'A+C-safe', 'C-ft', 'A+C-ft', 'A+C-ft-safe'];
@@ -122,13 +122,13 @@ if (bench) {
   L(`| cold B (always loads the encoder) | ${r(bench.cold_B)} |`);
   for (const [k, v] of Object.entries(bench)) {
     if (k.startsWith('C_llama_') && Array.isArray(v)) for (const x of v) if (x.n_prompt) L(`| C ${k.slice(8)}: ${x.n_prompt}-token prompt (llama.cpp, 1 thread, ${x.tps.toFixed(0)} tok/s) | ${(1000 * x.n_prompt / x.tps).toFixed(0)} |`);
-    if (k.startsWith('C_cold_')) L(`| C cold ${k.slice(7)}: new llama-cli process, load + 300-token prompt | ${r(v)} |`);
+    if (k.startsWith('C_cold_')) L(`| C cold ${k.slice(7)}: new llama-completion process, load + 300-token prompt | ${r(v)} |`);
   }
   L();
   if (bench.bundle) L(`B bundle files: ${Object.entries(bench.bundle).map(([f, s]) => `${f} ${(s / 1e6).toFixed(1)} MB`).join(', ')}.`);
   L();
 }
-const quant = J('build/hybrid/quant.json');
+const quant = J('hybrid/results/quant.json');
 if (quant) {
   L('### B quantisation (dev split, 600 rows; 1-core onnxruntime-node p50)');
   L();
@@ -137,7 +137,7 @@ if (quant) {
   for (const q of quant) L(`| ${q.variant} | ${q.mb} | ${q.dev_acc != null ? (q.dev_acc * 100).toFixed(1) + '%' : 'n/a'} | ${(q.agree * 100).toFixed(1)}% | ${q.p50_ms ?? 'n/a'} |`);
   L();
 }
-const sz = J('build/hybrid/sizes.json');
+const sz = J('hybrid/results/sizes.json');
 if (sz) {
   L('### Sizes');
   L();

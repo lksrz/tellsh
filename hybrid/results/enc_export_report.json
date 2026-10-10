@@ -1,0 +1,20 @@
+{
+ "fp32_mb": 99.72,
+ "int8_mb": 26.72,
+ "vocab_json_mb": 0.73,
+ "intent_argmax_agree_fp32": 1.0,
+ "intent_argmax_agree_int8": 0.9866666666666667,
+ "tool_argmax_agree_int8": 0.9983333333333333,
+ "n": 600,
+ "gather_quantized": true,
+ "per_channel": false,
+ "fp32_heads": false,
+ "wq": 8,
+ "block": 32,
+ "acc_level": 4,
+ "dev_intent_acc": {
+  "pt": 0.8367,
+  "fp32": 0.8367,
+  "int8": 0.8433
+ }
+}
