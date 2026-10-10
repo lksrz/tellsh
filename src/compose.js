@@ -360,6 +360,8 @@ export function validateComposed(cmd, toolName, sub) {
     const base = w.replace(/=.*$/, '');
     if (!vocab.has(w) && !vocab.has(base) && !/^-\d+$/.test(w)) return { ok: false, error: `${w} is not an option in the ${toolName} vocabulary` };
   }
+  // a NUL byte cannot be passed to bash (spawnSync throws) and is never part of a command argument
+  if (/\0/.test(cmd)) return { ok: false, error: 'contains a NUL byte' };
   const sx = spawnSync('bash', ['-n', '-c', cmd], { encoding: 'utf8', timeout: 2000 });
   if (sx.error) return { ok: true, syntax: 'skipped (bash not found)' };
   if (sx.status !== 0) return { ok: false, error: `bash -n: ${sx.stderr.trim()}` };

@@ -53,7 +53,7 @@ tellsh [options] <request...>
       --json           machine-readable output (implies --dry-run)
       --shell <s>      bash | zsh | sh | powershell | fish | cmd   (default: detected)
       --os <o>         linux | darwin | win32                      (default: this machine; --platform = alias)
-      --history[=FILE] resolve "it", "that container", "same for /var" from the last ~10 history lines
+      --history[=FILE] resolve "it", "that container", "same for /var" from the previous command
       --compose / --no-compose   force / disable the experimental composer
       --top <k>, --threshold <p>, -v/--version, -h/--help
 ```
@@ -146,47 +146,53 @@ never auto-run with `--yes`. Details, numbers and the trade-off (fewer rejection
 
 `--history` (or `TELLSH_HISTORY=1`) reads the **tail** (last 32 KB) of `$HISTFILE` / `~/.bash_history` /
 `~/.zsh_history` (extended format and zsh metafication handled) / fish history / PSReadLine
-`ConsoleHost_history.txt`, keeps the last 10 commands **in memory for this one request** and never prints, logs or
-stores them. Earlier `tellsh <query>` lines are re-interpreted, raw commands are parsed (template inversion + per-tool
-rules: `docker run --name`, `systemctl … X`, `kill N`, `ps -p N`, `lsof -i :P`, `git checkout`, file arguments, …).
-Lines are split with a shell-aware tokenizer (`a\ b.txt`, quoted `;`/`|`, redirections; PowerShell `''`/backtick
-escapes and native cmdlets such as `Get-Content -LiteralPath`, `Remove-Item`, `Stop-Process -Id`, `Restart-Service`).
-If the latest value of the referenced type depends on the shell state (`cat $F`, `rm *.log`), comes from a line that
-cannot be parsed, or from an unknown command naming a path, the reference is **refused** (the slot stays a
-placeholder) rather than resolved to an older value. A changing command (rm, mv, cp source or destination, kill,
-chmod, git branch -d/checkout/restore, docker stop/exec, service restart, …) only ever takes a history value that is
-unambiguous **and** is the newest value of its type; otherwise the slot stays a placeholder:
+`ConsoleHost_history.txt`, keeps the last 2 lines **in memory for this one request** and never prints, logs or
+stores them. **Only the single most recent command is a reference target**: "delete it", "same for /var", "there"
+always mean the previous command, never an older line (the second line is read only because zsh, fish and PSReadLine
+write the running `tellsh …` call to the file before it runs; that line is dropped). When the previous command does
+not name a value of the needed type ("delete it" after `ls`, "logs of that container" after `git status`, "same for
+/var" after `clear`), or it cannot be read (an unparseable line, `cat $F`, `rm *.log`, an unknown command naming a
+path), the reference is **refused**: the slot stays a placeholder, never an older value or a catalog default.
+An earlier `tellsh <query>` line is re-interpreted (words keep their quoting, so `tellsh delete folder "/tmp/a b"`
+names `/tmp/a b`); a slot it left as a placeholder is not a usable value. Raw commands are parsed (template inversion +
+per-tool rules: `docker run --name`, `systemctl … X`, `kill N`, `ps -p N`, `lsof -i :P`, `git checkout`, file
+arguments, global options such as `git -C DIR`/`docker --context X`, …) with a shell-aware tokenizer (`a\ b.txt`,
+quoted `;`/`|`, redirections; PowerShell `''`/backtick escapes and native cmdlets such as `Get-Content -LiteralPath`,
+`Remove-Item`, `Stop-Process -Id`, `Restart-Service`).
+
+Within that one line, later segments win (`cat old.txt; cat new.txt` → `new.txt`). A changing command (rm, mv, cp
+source or destination, kill, chmod, git branch -d/checkout/restore, docker stop/exec, service restart, …) takes the
+value only when it is unambiguous; otherwise the slot stays a placeholder:
   * a directory that was searched, filtered or listed (`find /var/log -name '*.gz'`, `grep -rl TODO src`, `ls /tmp/build`,
     `du -d 1 DIR`, `Get-ChildItem DIR`, `ls DIR | sort | grep pdf`, `ls -S DIR | head -1`) is never the target, for
     "it" as well as "them": the user saw entries inside it;
-  * an older value is never picked (no older branch because the newest is the checked-out one, no older path because
-    a word of the request matches it); reads may still use them;
-  * a newer listing of the same type (`cat a.txt` then `ls`, `pgrep foo` then `ps aux`, `docker ps`, `git branch`,
-    `git status`, `systemctl list-units`) means "it" may be one of the listed values;
-  * the directory of a `cd` is a target only when nothing ran after the `cd` (`cd DIR` then `make`, `rg TODO`,
-    `grep -rl TODO`, `ls`: refused);
-  * "everything in it" / "all files in it" / "wszystko w nim" are the entries of the directory, never the directory itself.
-Place references ("there", "over there", "in there", a final "inside", "in the same folder", "tam", "stamtąd", "w tym
-samym katalogu") are the newest history directory under the same rules, only as the place a command runs in
-(`find DIR … -delete`, `ls DIR`, a `cp`/`mv` destination), never as the object of `rm -r`/`mv`; without a usable
-directory they stay `<PATH>`, never `.`. ("is there …" / "there are …" are not references.)
-Wrapped commands (`sudo -u root ls`, `env ls`, `command ls`, `nice -n 5 ps aux`) are read as the command they run; a
-wrapper whose arguments cannot be read makes every older value unusable for a changing command. An earlier
-`tellsh <query>` line counts with what that request produced: a slot it left as a placeholder is not a usable value.
-An argument-less `ls`/`Get-ChildItem`/search lists the directory of the latest `cd`, and a `tellsh list directory X`
-line counts as a listing too. "Same for X" / "same but …" are refused for a changing command when any newer line (or a later
-segment of the same line) ran after it, or when X names nothing the previous command takes. A slot of the previous
-command that depends on the shell state (`find "$DIR" …`) stays a placeholder, and a slot the new request withheld
-(`same but … in /tmp/new!`) is never refilled from the previous command. A single named path after "to"/"into"/"do"
-("move them to /tmp/old", with or without history) is the destination and the source stays `<SRC>`; with a reference in destination position ("copy notes.txt to
-it / into that folder / do niego"), the named path is the source. A quoted `'~/x'` from history stays the literal
-directory `./~/x`.
+  * a later listing of the same type in the line (`cat a.txt; ls`, `pgrep foo; ps aux`, `docker logs web; docker ps`,
+    `cat a.txt; git -C /tmp status`) means "it" may be one of the listed values;
+  * the directory of a `cd` is a target only when nothing ran after the `cd` in that line (`cd DIR && make`: refused);
+  * the request names something else ("delete that backups folder" after `mkdir /srv/current`), or is about the
+    entries of the directory ("everything in it", "its contents", "what is in it", "usuń jego zawartość"); a request
+    about entries keeps its own intent (`find <PATH> … -delete`, never `rm -r .` for "delete all log files in this folder");
+  * the checked-out branch is never the one deleted.
+Place references ("there", "over there", "in there", a final "inside", "in the same folder", "in the previous/last
+folder", "the directory I listed", "tam", "stamtąd", "w tym samym / poprzednim katalogu") are the directory of the
+previous command under the same rules, only as the place a command runs in (`find DIR … -delete`, `ls DIR`, a
+`cp`/`mv` destination), never as the object of `rm -r`/`mv`; a path named next to one ("delete notes.txt there") is
+withheld too, with or without history, and without a usable directory the place stays `<PATH>`, never `.`. ("is there
+…" / "there are …" / "still there" are not references.) "Move it there" names both ends by reference and is refused.
+Wrapped commands (`sudo -u root ls`, `env ls`, `command ls`, `nice -n 5 ps aux`) are read as the command they run.
+"Same for X" / "same but …" repeat the previous command only; they are refused when it cannot be repeated, when a
+later segment of its line ran after the repeatable command, or when X names nothing it takes. A slot of the previous
+command that depends on the shell state (`find "$DIR" …`) or fails validation (a 300-character path) stays a
+placeholder, and a slot the new request withheld (`same but … in /tmp/new!`) is never refilled. A single named path
+after "to"/"into"/"do" ("move them to /tmp/old", with or without history) is the destination and the source stays
+`<SRC>`; with a reference in destination position ("copy notes.txt to it / into that folder / do niego"), the named
+path is the source. A quoted `'~/x'` from history stays the literal directory `./~/x`.
 
 * deterministic rules: "same for /var" / "to samo dla /var" (previous intent, one slot replaced), "delete it" /
   "usuń to", "logs of that container" / "logi tego kontenera", "kill it" / "zabij go" (verb × entity type table; a
-  noun in the request picks the entity type; a named part like "that release branch" picks an older value only for
-  a read; the checked-out branch is never the one deleted), "same but only file names" / "to samo ale tylko nazwy plików" (previous tool,
-  new intent, slots carried over), and missing required slots filled from history ("ile ma słów" after `cat raport.txt`);
+  noun in the request picks the entity type), "same but only file names" / "to samo ale tylko nazwy plików" (previous
+  tool, new intent, slots carried over), and missing required slots of safe commands filled from the previous
+  command ("ile ma słów" after `cat raport.txt`);
 * `ctx_last=…`, `ctx_has=…`, `ctx_tool=…`, `ctx_cwd=git|compose` tokens are classifier features (trained on synthetic
   anaphora), so un-ruled paraphrases still benefit.
 
@@ -255,7 +261,7 @@ the public sets for a large gain on real usage (before/after tables for A, A+B a
 | end-to-end exact command, relexicalised held-out values (full pipeline / gold intent) | **83.4%** / 92.6% (v0.3: 85.3%) |
 | blind sets (v0.3, separate author): intent top-1 · end-to-end exact command | 98.8% (clean subset 98.5%) · 95.7% |
 | hand-written slot cases, exact command | 98/99 |
-| history references, exact command (48 EN+PL; without history 0%) | **91.7%** (dev set, blind first run 60.4%) · v0.3 blind set (79): 79.7% (stricter rules for changing commands, see EVAL.md) |
+| history references, exact command (53 EN+PL; only the previous command is a target) | **92.5%** (dev set, blind first run 60.4%) · v0.3 blind set (79): 82.3% (2 gold rows changed for the one-line rule, see EVAL.md) |
 | composer on out-of-catalogue requests: acceptable / exact | 43.1% / 41.2% (dev set) · any answer acceptable 49.0% · v0.3 blind set (58): acceptable 17.2% · false fires on catalog requests 0.7% |
 | out-of-domain rejected | 92.4% (blind set 98.4%) |
 | **real usage** (private, held-out command groups, 2957 EN+PL): intent, A · A+B (`--hybrid`) | **82.0% · 88.8%** (v0.3: 31.6% · 38.5%) |

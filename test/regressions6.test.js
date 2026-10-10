@@ -28,11 +28,11 @@ test('a changing command is never aimed at the parent directory of a listing or 
     ['delete it', ['du /tmp/build']], ['delete it', ['du -h -d 1 /tmp/build | sort -rh']],
     ['usuń to', ['ls /tmp/build']], ['remove it', ['Get-ChildItem C:\\x'], PWSH],
     // a search without a path after `cd` searches the cd directory
-    ['delete it', ['cd /tmp/build', 'grep -rl TODO']], ['delete them', ['cd /tmp/build', 'rg TODO']],
-    ['delete them', ['cd /tmp/build', 'fd pdf']], ['delete them', ['cd /tmp/build', 'find -name "*.o"']],
-    ['delete it', ['pushd /tmp/build', 'ls']], ['delete it', ['cd /tmp/build; ls -la']],
+    ['delete it', ['cd /tmp/build && grep -rl TODO']], ['delete them', ['cd /tmp/build; rg TODO']],
+    ['delete them', ['cd /tmp/build; fd pdf']], ['delete them', ['cd /tmp/build; find -name "*.o"']],
+    ['delete it', ['pushd /tmp/build; ls']], ['delete it', ['cd /tmp/build; ls -la']],
     // the cd directory after other commands ran in it
-    ['delete it', ['cd /tmp/build', 'make']], ['delete it', ['cd /tmp/build && make']],
+    ['delete it', ['cd /tmp/build; make']], ['delete it', ['cd /tmp/build && make']],
   ]) refused(run(q, h, env), '<PATH>', `${q} after ${JSON.stringify(h)}`);
   for (const [q, h] of [['move it to /tmp/old', ['ls /tmp/build']], ['copy it to /backup', ['cat a.txt', 'ls']]]) {
     const r = run(q, h);
@@ -50,22 +50,25 @@ test('a changing command is never aimed at the parent directory of a listing or 
 
 test('a newer listing of the same entity type blocks an older value for a changing command', () => {
   for (const [q, h, ph] of [
+    ['delete it', ['cat foo.txt; ls'], '<FILE>'],
+    ['delete it', ['cat foo.txt; ls /tmp'], '<PATH>'],
+    ['remove it', ['Get-Content a.txt; Get-ChildItem'], '<FILE>'],
+    ['kill it', ['pgrep foo; ps aux'], '<NAME>'],
+    ['kill that pid', ['kill 1111; pgrep worker'], '<PID>'],
+    ['stop it', ['docker logs web; docker ps'], '<CONTAINER>'],
+    ['restart that service', ['systemctl status nginx; systemctl list-units'], '<SERVICE>'],
+    ['delete that branch', ['git checkout -b feat; git branch'], '<BRANCH>'],
+    // an older line is never read (round 7: one line of history)
     ['delete it', ['cat foo.txt', 'ls'], '<FILE>'],
-    ['delete it', ['cat foo.txt', 'ls /tmp'], '<PATH>'],
-    ['remove it', ['Get-Content a.txt', 'Get-ChildItem'], '<FILE>'],
-    ['kill it', ['pgrep foo', 'ps aux'], '<NAME>'],
-    ['kill that pid', ['kill 1111', 'pgrep worker'], '<PID>'],
-    ['stop it', ['docker logs web', 'docker ps'], '<CONTAINER>'],
-    ['restart that service', ['systemctl status nginx', 'systemctl list-units'], '<SERVICE>'],
-    ['delete it', ['git checkout -b feat', 'git branch'], '<BRANCH>'],
+    ['stop it', ['docker logs web', 'docker ps'], '<'],
   ]) refused(run(q, h), ph, `${q} after ${JSON.stringify(h)}`);
   // a value printed after the listing (or by it) is fine
-  assert.equal(run('delete it', ['ls', 'cat foo.txt']).command, 'rm foo.txt');
+  assert.equal(run('delete it', ['ls; cat foo.txt']).command, 'rm foo.txt');
   assert.equal(run('kill it', ['ps aux | grep node']).command, 'pkill -f node');
   assert.equal(run('ubij ten proces', ['top', 'ps -fp 31337']).command, 'kill 31337');
-  assert.equal(run('stop it', ['docker ps', 'docker logs web']).command, 'docker stop web');
-  // reads may still use the older value
-  assert.equal(run('show it', ['cat foo.txt', 'ls']).command, 'cat foo.txt');
+  assert.equal(run('stop it', ['docker ps; docker logs web']).command, 'docker stop web');
+  // reads may still use the value listed over
+  assert.equal(run('show it', ['cat foo.txt; ls']).command, 'cat foo.txt');
 });
 
 test('only the newest value of a type is a target: no older branch, no hint-selected older path', () => {
@@ -74,9 +77,11 @@ test('only the newest value of a type is a target: no older branch, no hint-sele
   assert.match(b.context.note, /checked-out/);
   refused(run('delete that backups folder', ['mkdir /srv/remove-backups', 'mkdir /srv/current']), '<PATH>', 'hint');
   assert.equal(run('delete that branch', ['git push origin feature/x']).command, 'git branch -d feature/x');
+  // only the previous line is read
   const ctx = buildContext(['mkdir /a', 'mkdir /b']);
-  assert.match(changeGuard('dir', '/a', 'delete it', ctx), /newest dir/);
+  assert.deepEqual(ctx.ents, { dir: '/b' });
   assert.equal(changeGuard('dir', '/b', 'delete it', ctx), null);
+  assert.match(changeGuard('dir', '/b', 'delete that backups folder', ctx), /backups/);
 });
 
 test('stale changing commands are never replayed', () => {

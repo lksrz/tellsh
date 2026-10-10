@@ -62,9 +62,9 @@ test('history: request verbs are not target hints (newest target wins)', () => {
   assert.equal(run('kill it', ['pgrep kill-worker', 'pgrep current-worker']).command, 'pkill -f current-worker');
   assert.equal(run('stop that process', ['pgrep stop-worker', 'pgrep current-worker']).command, 'pkill -f current-worker');
   assert.equal(run('usuń to', ['mkdir /srv/usun-stare', 'mkdir /srv/current']).command, 'rm -r /srv/current');
-  // an explicit target word still selects an older value for a read; a changing command only ever uses
-  // the newest value of its type (round 4b)
-  assert.equal(run('show that backups folder', ['ls /srv/remove-backups', 'ls /srv/current']).command, 'ls -lah /srv/remove-backups');
+  // only the previous command is a reference target: a target word never selects an older line, and a changing
+  // command whose words do not match the previous value is refused
+  assert.ok(!/remove-backups/.test(run('show that backups folder', ['ls /srv/remove-backups', 'ls /srv/current']).command ?? ''));
   const old = run('delete that backups folder', ['mkdir /srv/remove-backups', 'mkdir /srv/current']);
   assert.equal(old.context.rule, 'refused');
   assert.equal(old.command, 'rm -r <PATH>');

@@ -183,8 +183,9 @@ test('history: relative paths from before a cd are not reused', () => {
   assert.ok(!/notes\.txt/.test(r.command), r.command);
   const rel = run('show it', ['cat notes.txt', 'cd sub']);
   assert.ok(!/notes\.txt|sub/.test(rel.command), rel.command);
-  // absolute paths survive a cd
-  assert.equal(run('show that file', ['cat /etc/hosts', 'cd sub', 'true']).command, 'cat /etc/hosts');
+  // absolute paths survive a cd (in the same line; an older line is never a reference target)
+  assert.equal(run('show that file', ['cat /etc/hosts; cd sub']).command, 'cat /etc/hosts');
+  assert.ok(!/hosts/.test(run('show that file', ['cat /etc/hosts', 'cd sub', 'true']).command ?? ''));
   // same line: `cat a.txt; cd y` makes a.txt stale
   const same = run('show it', ['cat a.txt; cd y']);
   assert.ok(!/a\.txt/.test(same.command), same.command);

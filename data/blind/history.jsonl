@@ -3,8 +3,8 @@
 {"lang": "en", "history": ["systemctl status grafana-agent --no-pager"], "query": "restart it", "expect_intent": "service_restart", "expect_command": "sudo systemctl restart grafana-agent"}
 {"lang": "en", "history": ["sudo systemctl restart mosquitto"], "query": "show me its logs", "expect_intent": "journal_service", "expect_command": "journalctl -u mosquitto -n 50 --no-pager"}
 {"lang": "en", "history": ["pgrep -af vite"], "query": "kill it", "expect_intent": "kill_by_name", "expect_command": "pkill -f vite"}
-{"lang": "en", "history": ["git checkout -b feature/sso-okta", "git add -A", "git commit -m 'wip'"], "query": "push it", "expect_intent": "git_push", "expect_command": "git push origin feature/sso-okta"}
-{"lang": "en", "history": ["git checkout hotfix/tz-offset", "git log -n 3"], "query": "delete that branch", "expect_intent": "git_delete_branch", "expect_command": "git branch -d hotfix/tz-offset"}
+{"lang": "en", "history": ["git checkout -b feature/sso-okta", "git add -A", "git commit -m 'wip'"], "query": "push it", "expect_intent": "git_push", "expect_command": "git push"}
+{"lang": "en", "history": ["git checkout hotfix/tz-offset", "git log -n 3"], "query": "delete that branch", "expect_intent": "git_delete_branch", "expect_command": "git branch -d <BRANCH>"}
 {"lang": "en", "history": ["git status"], "query": "delete that branch", "expect_intent": "git_delete_branch", "expect_command": "git branch -d <BRANCH>"}
 {"lang": "en", "history": ["cat deploy/values-prod.yaml"], "query": "how many lines does it have", "expect_intent": "count_lines", "expect_command": "wc -l deploy/values-prod.yaml"}
 {"lang": "en", "history": ["vim scripts/rotate_keys.sh"], "query": "make it executable", "expect_intent": "make_executable", "expect_command": "chmod +x scripts/rotate_keys.sh"}

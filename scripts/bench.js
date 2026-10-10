@@ -71,7 +71,7 @@ Machine: ${cpus()[0]?.model || 'unknown CPU'}, Node ${process.version}, ${proces
 | **warm**: full cascade + tagger + render (bash, composer off) | **${fmt(quantile(warm, 0.5))}** | **${fmt(quantile(warm, 0.95))}** | ${warm.length} |
 | warm, incl. composer modifier check (shipped default) | ${fmt(quantile(warmCompose, 0.5))} | ${fmt(quantile(warmCompose, 0.95))} | ${warmCompose.length} |
 | warm, PowerShell rendering | ${fmt(quantile(warmPs, 0.5))} | ${fmt(quantile(warmPs, 0.95))} | ${warmPs.length} |
-| warm, with 5 history lines (context build + reference rules) | ${fmt(quantile(warmHist, 0.5))} | ${fmt(quantile(warmHist, 0.95))} | ${warmHist.length} |
+| warm, 5 history lines given (only the previous one is read; context build + reference rules) | ${fmt(quantile(warmHist, 0.5))} | ${fmt(quantile(warmHist, 0.95))} | ${warmHist.length} |
 
 The composer runs \`bash -n\` (a subprocess, ~2 ms) only when it actually returns a composed command.
 `;

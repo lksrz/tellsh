@@ -328,8 +328,9 @@ SUM.history_dev = rate(H.all.cmd, H.all.n);
 if (HB) SUM.history_blind = rate(HB.H.all.cmd, HB.H.all.n);
 md('## 5. History references');
 md();
-md('"delete it" / "usuń to", "same for /var" / "to samo dla /var", "logs of that container" / "logi tego kontenera", "kill it", … with the last shell-history lines given (raw commands and earlier `tellsh` queries). ' +
-  'Some rows expect a placeholder: the right answer is to refuse a stale, ambiguous or missing reference.');
+md('"delete it" / "usuń to", "same for /var" / "to samo dla /var", "logs of that container" / "logi tego kontenera", "kill it", … with shell-history lines given (raw commands and earlier `tellsh` queries). ' +
+  'Only the single most recent line is a reference target (since round 7); some rows expect a placeholder: the right answer is to refuse ' +
+  'a reference to an older line, or an ambiguous or missing one.');
 md();
 md(`**Development set** \`data/history/eval.jsonl\` (${hist.length} rows). Written independently of the rules but then used while developing them ` +
   '(v0.2: first run 60.4% exact), so it is **not a blind score**:');

@@ -104,12 +104,14 @@ test('"same but" never refills a slot the request withheld (codex r5 major 2)', 
 
 test('a wrapped listing protects older values like a plain one (codex r5 major 3)', () => {
   for (const [q, h, ph] of [
-    ['delete it', ['cat old.txt', 'sudo -u root ls'], '<FILE>'], ['kill it', ['kill 1111', 'sudo -u root ps aux'], '<PID>'],
-    ['stop it', ['docker logs old', 'sudo -u root docker ps'], '<CONTAINER>'], ['delete it', ['cat old.txt', 'env ls'], '<FILE>'],
-    ['delete it', ['cat old.txt', 'command ls'], '<FILE>'], ['delete it', ['cat old.txt', 'nice -n 5 ls'], '<FILE>'],
-    ['delete it', ['cat old.txt', 'timeout 5 ls'], '<FILE>'], ['delete it', ['cat old.txt', 'sudo -iu root ls'], '<FILE>'],
+    ['delete it', ['cat old.txt; sudo -u root ls'], '<FILE>'], ['kill that pid', ['kill 1111; sudo -u root ps aux'], '<PID>'],
+    ['stop it', ['docker logs old; sudo -u root docker ps'], '<CONTAINER>'], ['delete it', ['cat old.txt; env ls'], '<FILE>'],
+    ['delete it', ['cat old.txt; command ls'], '<FILE>'], ['delete it', ['cat old.txt; nice -n 5 ls'], '<FILE>'],
+    ['delete it', ['cat old.txt; timeout 5 ls'], '<FILE>'], ['delete it', ['cat old.txt; sudo -iu root ls'], '<FILE>'],
     // a wrapper whose arguments cannot be read: unknown, refuse
-    ['delete it', ['cat old.txt', 'sudo -u'], '<FILE>'],
+    ['delete it', ['cat old.txt; sudo -u'], '<FILE>'],
+    // and in their own line (only the previous line is read)
+    ['delete it', ['cat old.txt', 'sudo -u root ls'], '<FILE>'], ['delete it', ['cat old.txt', 'sudo -u'], '<FILE>'],
   ]) {
     const r = run(q, h);
     assert.equal(r.context.rule, 'refused', `${q} after ${h}: ${r.command}`);

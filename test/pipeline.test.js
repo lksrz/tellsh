@@ -57,7 +57,9 @@ test('end-to-end bash + PowerShell + BSD', () => {
 
 test('history: pronouns, "same for", container/service/pid references (EN + PL)', () => {
   const cases = [
-    [['docker run -d --name web nginx', 'ls'], 'logs of that container', 'docker logs --tail 100 -f web'],
+    [['ls', 'docker run -d --name web nginx'], 'logs of that container', 'docker logs --tail 100 -f web'],
+    // only the previous command is a reference target: an older line is never used
+    [['docker run -d --name web nginx', 'ls'], 'logs of that container', 'docker logs --tail 100 -f <CONTAINER>'],
     [['docker run -d --name web nginx'], 'logi tego kontenera', 'docker logs --tail 100 -f web'],
     [['cat notes.txt'], 'delete it', 'rm notes.txt'],
     [['cat notes.txt'], 'usuń to', 'rm notes.txt'],

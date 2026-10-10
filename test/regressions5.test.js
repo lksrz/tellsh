@@ -46,28 +46,35 @@ test('stale commands are not replayed by "same for" or modified by "same but"', 
   // the previous command itself still works
   assert.equal(run('same for /srv/current', ['rm -r old']).command, 'rm -r /srv/current');
   assert.equal(run('same for 2222', ['kill 1111']).command, 'kill 2222');
-  assert.equal(run('same for /srv/x', ['du -sh old', 'ls newdir']).command, 'du -sh /srv/x');
+  assert.equal(run('same for /srv/x', ['du -sh old', 'ls newdir']).command, null);
+  assert.equal(run('same for /srv/x', ['ls newdir', 'du -sh old']).command, 'du -sh /srv/x');
 });
 
 test('a listing after `cd` is a listing of the cd directory', () => {
   for (const [q, h, env] of [
-    ['delete them', ['cd ~/Downloads', 'ls | grep pdf']],
-    ['delete it', ['cd ~/Downloads', 'ls | grep pdf']],
-    ['delete them', ['cd /tmp/build', 'ls']],
-    ['usuń je', ['cd /tmp/build', 'ls']],
-    ['delete it', ['cd /tmp/build', 'ls *.pdf']],
+    ['delete them', ['cd ~/Downloads && ls | grep pdf']],
+    ['delete it', ['cd ~/Downloads; ls | grep pdf']],
+    ['delete them', ['cd /tmp/build; ls']],
+    ['usuń je', ['cd /tmp/build; ls']],
+    ['delete it', ['cd /tmp/build; ls *.pdf']],
     ['delete them', ['cd /tmp/build && ls']],
     ['delete it', ['cd /tmp/build && ls | grep pdf']],
-    ['delete them', ['cd /tmp/build', 'Get-ChildItem'], PWSH],
-    ['delete it', ['Set-Location C:\\x', 'Get-ChildItem -Filter *.tmp'], PWSH],
+    ['delete them', ['cd /tmp/build; Get-ChildItem'], PWSH],
+    ['delete it', ['Set-Location C:\\x; Get-ChildItem -Filter *.tmp'], PWSH],
   ]) {
     const r = run(q, h, env);
     refusedPath(r);
     assert.ok(!/Downloads|build|C:\\x/.test(r.command), `${JSON.stringify(h)} ${q} -> ${r.command}`);
   }
   // singular "it" after a listing is refused too (round 4b); the newest cd with nothing after it is a target
-  assert.equal(run('delete it', ['cd /tmp/build', 'ls']).command, 'rm -r <PATH>');
-  assert.equal(run('delete them', ['cd /tmp/a', 'cd /tmp/b']).command, 'rm -r /tmp/b');
+  assert.equal(run('delete it', ['cd /tmp/build; ls']).command, 'rm -r <PATH>');
+  assert.equal(run('delete them', ['cd /tmp/a; cd /tmp/b']).command, 'rm -r /tmp/b');
+  // only the previous line is read: a listing in its own line names nothing, so the cd of an older line is not used
+  for (const h of [['cd ~/Downloads', 'ls | grep pdf'], ['cd /tmp/build', 'ls'], ['cd /tmp/a', 'cd /tmp/b', 'ls']]) {
+    const r = run('delete them', h);
+    assert.equal(r.context.rule, 'refused', JSON.stringify(h));
+    assert.ok(!/Downloads|build|\/tmp\/[ab]/.test(r.command), `${JSON.stringify(h)} -> ${r.command}`);
+  }
 });
 
 test('a listing piped into any later stage is a selection of its entries', () => {

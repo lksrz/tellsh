@@ -40,6 +40,23 @@ before a newer `docker ps`); every one of these now renders a placeholder instea
 (`sh -c "$X"`, `$CMD …`, `… | sh`) high. Function words never turn a path into `.` ("list files in the" → `<PATH>`).
 Benchmark re-run on a busier machine (bare `node` startup 75 → 86 ms).
 
+**Round 7 (one line of history, model unchanged).** History references now read **only the single most recent
+command** ("delete it", "same for /var", "there" never reach an older line; the running `tellsh` call that zsh/fish/
+PSReadLine write first is dropped). When that line does not name a value of the needed type, or cannot be read, the
+reference is refused and the slot stays a placeholder. Gold rows whose meaning changed: dev `["sudo systemctl stop
+nginx", "sudo nginx -t"]` + "start it again" → `sudo systemctl start <SERVICE>`; blind (rewritten for the new rule, not
+tuned on) `[… "git commit -m 'wip'"]` + "push it" → `git push` and `["git checkout hotfix/tz-offset", "git log -n 3"]`
++ "delete that branch" → `git branch -d <BRANCH>`. 5 dev rows added (a value two lines back is never used; their
+queries were already held out, so `gen_data.js` output is unchanged). Dev 91.7% (48) → **92.5%** (53); blind 79.7% →
+**82.3%** (both gained rows are rule fixes, not gold edits: "ssh to that host again" after `history | tail` and
+"wejdź do tamtego kontenera" after `docker ps -a` now give the expected placeholders; the 2 edited rows were correct
+under the old gold and are correct under the new one). Round-6 fixes:
+quoted paths with spaces keep their boundaries (CLI argv and earlier `tellsh` lines), invalid history values and refused
+references never become `.`, more place wordings ("the previous folder", "the directory I listed", "w poprzednim
+katalogu"), "its contents"/"usuń jego zawartość", `git -C`/`docker --context` before a listing, "move it there", several
+paths for one slot, `$(…)` locations, here-strings and `sh -c … _ /` in the danger checker, critical writes to system
+files, NUL bytes. Every other eval number is unchanged. Bench: the history case is 1.6 → 0.7 ms p50 (one line parsed).
+
 <!-- eval:start -->
 ## Model
 
@@ -99,23 +116,23 @@ Per type F1 (tagger only / regex only / merged): PATH 97/97/98, SIZE 100/100/100
 
 ## 5. History references
 
-"delete it" / "usuń to", "same for /var" / "to samo dla /var", "logs of that container" / "logi tego kontenera", "kill it", … with the last shell-history lines given (raw commands and earlier `tellsh` queries). Some rows expect a placeholder: the right answer is to refuse a stale, ambiguous or missing reference.
+"delete it" / "usuń to", "same for /var" / "to samo dla /var", "logs of that container" / "logi tego kontenera", "kill it", … with shell-history lines given (raw commands and earlier `tellsh` queries). Only the single most recent line is a reference target (since round 7); some rows expect a placeholder: the right answer is to refuse a reference to an older line, or an ambiguous or missing one.
 
-**Development set** `data/history/eval.jsonl` (48 rows). Written independently of the rules but then used while developing them (v0.2: first run 60.4% exact), so it is **not a blind score**:
+**Development set** `data/history/eval.jsonl` (53 rows). Written independently of the rules but then used while developing them (v0.2: first run 60.4% exact), so it is **not a blind score**:
 
 | split | n | intent | exact command | exact command without history |
 |---|---|---|---|---|
-| ALL | 48 | 100.0% | 91.7% | 0.0% |
-| EN | 24 | 100.0% | 87.5% | 0.0% |
-| PL | 24 | 100.0% | 95.8% | 0.0% |
+| ALL | 53 | 100.0% | 92.5% | 9.4% |
+| EN | 27 | 100.0% | 88.9% | 11.1% |
+| PL | 26 | 100.0% | 96.2% | 7.7% |
 
 **Blind set** `data/blind/history.jsonl` (79 rows, written for v0.3 by a separate author before any result was seen, never used for tuning):
 
 | split | n | intent | exact command | exact command without history |
 |---|---|---|---|---|
-| ALL | 79 | 94.9% | 79.7% | 13.9% |
-| EN | 40 | 95.0% | 82.5% | 12.5% |
-| PL | 39 | 94.9% | 76.9% | 15.4% |
+| ALL | 79 | 94.9% | 82.3% | 16.5% |
+| EN | 40 | 95.0% | 85.0% | 17.5% |
+| PL | 39 | 94.9% | 79.5% | 15.4% |
 
 ## 6. Second pass: experimental composer
 
@@ -182,13 +199,13 @@ Machine: Intel(R) Xeon(R) Processor, Node v20.19.2, linux; CPU affinity: `0` (ru
 
 | measurement | p50 | p95 | runs |
 |---|---|---|---|
-| bare `node -e 0` startup (baseline) | 89.8 ms | 135.6 ms | 10 |
-| **cold**: `node bin/tellsh.js --dry-run --json --shell bash <query>` (new process, model load, full pipeline) | **187.7 ms** | **264.2 ms** | 40 |
+| bare `node -e 0` startup (baseline) | 82.8 ms | 88.3 ms | 10 |
+| **cold**: `node bin/tellsh.js --dry-run --json --shell bash <query>` (new process, model load, full pipeline) | **177.2 ms** | **198.1 ms** | 40 |
 | model load (in-process, one-off) | 5.5 ms | – | 1 |
-| **warm**: full cascade + tagger + render (bash, composer off) | **0.413 ms** | **4.4 ms** | 2000 |
-| warm, incl. composer modifier check (shipped default) | 0.759 ms | 9.0 ms | 2000 |
-| warm, PowerShell rendering | 0.517 ms | 2.0 ms | 2000 |
-| warm, with 5 history lines (context build + reference rules) | 1.6 ms | 10.0 ms | 2000 |
+| **warm**: full cascade + tagger + render (bash, composer off) | **0.408 ms** | **4.6 ms** | 2000 |
+| warm, incl. composer modifier check (shipped default) | 0.646 ms | 7.2 ms | 2000 |
+| warm, PowerShell rendering | 0.397 ms | 0.925 ms | 2000 |
+| warm, 5 history lines given (only the previous one is read; context build + reference rules) | 0.744 ms | 7.4 ms | 2000 |
 
 The composer runs `bash -n` (a subprocess, ~2 ms) only when it actually returns a composed command.
 <!-- bench:end -->

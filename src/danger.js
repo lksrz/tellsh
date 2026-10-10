@@ -145,10 +145,19 @@ function payloads(w, inner, flags) {
     if (CMD_STRING_ANY.test(x) || ((SHELLS.test(h) || h === 'su' || h === 'runuser') && CMD_STRING_CLUSTER.test(x))) {
       // sh -c 'cmd' arg0 args: only the string is the command
       add(w[i + 1], i);
+      // its $0, $1, "$@" are the words after it (`sh -c 'rm -rf "$1"' _ /`): also checked with them filled in
+      if (SHELLS.test(h) && w[i + 1] != null && w.length > i + 2) inner.push(withPositional(String(w[i + 1]), w.slice(i + 2).map(String)));
       i++;
     }
   }
   if (h === 'eval' || h === 'iex' || h === 'invoke-expression') add(w.slice(1).join(' '), 0);
+}
+
+const sq = (x) => `'${x.replace(/'/g, "'\\''")}'`;
+/** `sh -c STR arg0 args…`: STR with $0…$9, ${N}, "$@", $@ and $* replaced by the (quoted) arguments. */
+function withPositional(str, args) {
+  const all = args.slice(1).map(sq).join(' ');
+  return str.replace(/"\$@"|"\$\*"|\$@|\$\*/g, all).replace(/"\$\{?(\d)\}?"|\$\{?(\d)\}?/g, (m, a, b) => sq(args[+(a ?? b)] ?? ''));
 }
 
 /** The command a wrapper chain runs. `inner` collects command strings given as option values (`su -c "…"`). */
@@ -430,6 +439,29 @@ function interpCheck(w, hit) {
   const ic = inlineCode(w);
   if (!ic) return;
   hit('high', `${ic.h} runs inline code; it cannot be checked`);
+  codeCheck(ic, hit);
+}
+const INTERP_HEAD = /^(?:python[\d.]*|pypy[\d.]*|perl[\d.]*|(?:j?ruby)[\d.]*|node|nodejs|bun|deno|php[\d.]*|lua[\d.]*|luajit|julia|rscript|osascript|tclsh|awk|gawk|mawk|nawk)$/;
+/**
+ * Code fed to a shell or an interpreter on stdin by a here-string or heredoc (`bash <<< 'rm -rf /'`,
+ * `python3 - <<< "import os; os.system('rm -rf /')"`, `python3 <<EOF`): a shell's here-string is checked as a
+ * command; interpreter code is high (cannot be checked) and its literals / delete calls are checked as for `-c`.
+ */
+function stdinCodeCheck(w, hit, inner) {
+  const h = (w[0] || '').replace(/^.*[\\/]/, '').replace(/\.exe$/i, '').toLowerCase();
+  const shell = SHELLS.test(h);
+  if (!shell && !INTERP_HEAD.test(h)) return;
+  const hs = w.indexOf('<<<');
+  if (hs >= 0) {
+    const code = String(w[hs + 1] ?? '');
+    if (shell) { inner.push(code); return; }
+    hit('high', `${h} runs code from a here-string; it cannot be checked`);
+    codeCheck({ h, code }, hit);
+    return;
+  }
+  if (w.some((x) => /^<<-?\S/.test(String(x)) || x === '<<' || x === '<<-')) hit('high', `${h} runs a heredoc script; it cannot be checked`);
+}
+function codeCheck(ic, hit) {
   const lits = [];
   for (const m of ic.code.matchAll(/'([^']*)'|"([^"]*)"|`([^`]*)`|\bqq?\s*([{(\[])([^})\]]*)[})\]]/g)) lits.push(m[1] ?? m[2] ?? m[3] ?? m[5]);
   for (const c of lits) {
@@ -496,11 +528,15 @@ const RULES = [
   [/\b(?:shutdown|reboot|halt|poweroff)\b|\binit\s+[06]\b/, 'high', 'shuts down / reboots the machine'],
   [/\b(?:pkill|killall)\b|\bdocker\s+kill\b/, 'high', 'terminates processes'],
   [/\b(?:shred|wipe|blkdiscard|truncate)\b[^|;&]*\s['"]?\/dev\/(?:sd|hd|vd|xvd|nvme|mmcblk|disk|md|dm-|mapper\/|loop)\w*/, 'high', 'destroys a whole disk device', true],
+  [/\b(?:shred|truncate)\b[^|;&]*\s['"]?\/(?:etc|boot|usr|bin|sbin|lib\w*)\//, 'high', 'destroys the contents of a system file', true],
   [/\b(?:shred|truncate)\b/, 'high', 'destroys file contents'],
   [/\biptables\s+-F\b|\bufw\s+disable\b/, 'high', 'drops firewall rules'],
   [/\bmv\s+\S+\s+\/dev\/null\b/, 'high', 'moves a file into /dev/null (deletes it)', true],
   // redirections: N>, N>>, &>, >|, >> onto system files; any other file write is medium
-  [/(?:\d*|&)>>?\|?\s*['"]?\/(?:etc|boot|usr|bin|sbin|lib\w*)\//, 'high', 'overwrites a system file'],
+  [/(?:^|[^>])(?:\d*|&)>(?!>)\|?\s*['"]?\/(?:etc|boot|usr|bin|sbin|lib\w*)\//, 'high', 'overwrites a system file', true],
+  [/(?:\d*|&)>>\|?\s*['"]?\/(?:etc|boot|usr|bin|sbin|lib\w*)\//, 'high', 'appends to a system file'],
+  // text piped into an interpreter with no script runs it as code (`curl … | python3`, `cat x | perl -`)
+  [/\|\s*(?:(?:sudo|doas)\s+(?:-\S+\s+)*)?(?:\S*\/)?(?:python[\d.]*|perl[\d.]*|ruby|node|php[\d.]*)(?:\s+-)?\s*(?:$|[;&|)])/, 'high', 'runs piped text as a script'],
   [/(?:^|[^<>=-])(?:\d+|&)?>>?\|?(?!&|>)\s*(?!['"]?\/dev\/(?:null|stdout|stderr)\b)['"]?[^\s&|;)]/, 'medium', 'redirect writes to a file'],
   [/\btee\b/, 'medium', 'tee writes to a file'],
   [/\bsed\s+(?:-\S+\s+)*(?:-i|--in-place)\b/, 'medium', 'edits files in place'],
@@ -563,6 +599,7 @@ export function checkDanger(command, baseRisk = 'safe', { lenient = false } = {}
     else if (head === 'docker' || head === 'podman') dockerCheck(w, hit);
     if (['tee', 'cp', 'install', 'sponge', 'pv', 'mv', 'ln'].includes(lower)) rawDiskWriteCheck(w, hit);
     interpCheck(w, hit);
+    stdinCodeCheck(w, hit, inner);
     if (head === 'git' && w[1] === 'rm') hit('high', 'rm deletes files permanently (no trash)');
    }
   }

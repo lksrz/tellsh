@@ -21,7 +21,7 @@
 {"lang":"pl","history":["sudo -i","systemctl status postgresql"],"query":"zrestartuj tę usługę","expect_intent":"service_restart","expect_command":"sudo systemctl restart postgresql"}
 {"lang":"en","history":["sudo systemctl start redis-server"],"query":"stop it","expect_intent":"service_stop","expect_command":"sudo systemctl stop redis-server"}
 {"lang":"pl","history":["journalctl -u php8.2-fpm -n 50"],"query":"zatrzymaj tę usługę","expect_intent":"service_stop","expect_command":"sudo systemctl stop php8.2-fpm"}
-{"lang":"en","history":["sudo systemctl stop nginx","sudo nginx -t"],"query":"start it again","expect_intent":"service_start","expect_command":"sudo systemctl start nginx"}
+{"lang":"en","history":["sudo systemctl stop nginx","sudo nginx -t"],"query":"start it again","expect_intent":"service_start","expect_command":"sudo systemctl start <SERVICE>"}
 {"lang":"pl","history":["sudo systemctl restart docker"],"query":"pokaż logi tej usługi","expect_intent":"journal_service","expect_command":"journalctl -u docker -n 50 --no-pager"}
 {"lang":"en","history":["git checkout -b feature/x","git push -u origin feature/x","git checkout main"],"query":"delete that branch","expect_intent":"git_delete_branch","expect_command":"git branch -d feature/x"}
 {"lang":"pl","history":["git checkout -b fix/JIRA-88-null","git checkout main"],"query":"usuń tę gałąź","expect_intent":"git_delete_branch","expect_command":"git branch -d fix/JIRA-88-null"}
@@ -46,3 +46,8 @@
 {"lang":"pl","history":["grep -rn TODO src"],"query":"to samo ale tylko nazwy plików","expect_intent":"grep_files_containing","expect_command":"grep -rl -- TODO src"}
 {"lang":"en","history":["cp config.yml config.yml.bak","vim config.yml"],"query":"compare it with the backup","expect_intent":"diff_files","expect_command":"diff -u config.yml config.yml.bak"}
 {"lang":"en","history":["tellsh show the last 20 lines of /var/log/syslog"],"query":"same for /var/log/auth.log","expect_intent":"tail_file","expect_command":"tail -n 20 /var/log/auth.log"}
+{"lang":"en","history":["cat notes.txt","ls"],"query":"delete it","expect_intent":"delete_file","expect_command":"rm <FILE>"}
+{"lang":"en","history":["docker run -d --name web nginx","git status"],"query":"logs of that container","expect_intent":"docker_logs","expect_command":"docker logs --tail 100 -f <CONTAINER>"}
+{"lang":"en","history":["git checkout -b feature/x","git checkout main"],"query":"delete that branch","expect_intent":"git_delete_branch","expect_command":"git branch -d <BRANCH>"}
+{"lang":"pl","history":["cat raport.txt","pwd"],"query":"usuń to","expect_intent":"delete_file","expect_command":"rm <FILE>"}
+{"lang":"pl","history":["systemctl status nginx","uptime"],"query":"zrestartuj tę usługę","expect_intent":"service_restart","expect_command":"sudo systemctl restart <SERVICE>"}

@@ -53,7 +53,9 @@ test('"same for" never replays an older changing command past a newer one', () =
   assert.equal(r.context.rule, 'refused');
   // the previous command itself, or a safe one, is still repeated
   assert.equal(run('same for /srv/current', ['rm -r old']).command, 'rm -r /srv/current');
-  assert.equal(run('same for /srv/x', ['du -sh old', 'ls newdir']).command, 'du -sh /srv/x');
+  // only the previous command is repeated: a safe one too (round 7, one line of history)
+  assert.equal(run('same for /srv/x', ['du -sh old', 'ls newdir']).command, null);
+  assert.equal(run('same for /srv/x', ['ls newdir', 'du -sh old']).command, 'du -sh /srv/x');
   // any newer line, even one that names nothing, is the previous command (round 4)
   assert.equal(run('same for /srv/x', ['rm -r old', 'clear']).command, null);
   // "what about this": no new target at all

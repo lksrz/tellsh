@@ -180,3 +180,23 @@ export function decodeWord(text, kind = 'posix') {
   const w = wordsOf(text, kind);
   return w && w.length === 1 ? w[0] : null;
 }
+
+/**
+ * Join already-split words (argv, or the words of a `tellsh …` history line) back into request text without
+ * losing their boundaries: among several words, one with whitespace is a quoted value and is quoted again
+ * (`delete folder "/tmp/a b"`), so the slot extractor reads it as one value, never `/tmp/a`. A single word is the
+ * whole request (`tellsh "delete folder /tmp/x"`) and is used as it is. null when a word with whitespace contains
+ * both quote characters (cannot be re-quoted for the extractor).
+ */
+export function joinWords(words) {
+  if (words.length === 1) return String(words[0]);
+  const out = [];
+  for (const w of words) {
+    const s = String(w);
+    if (!/\s/.test(s)) { out.push(s); continue; }
+    if (!s.includes('"')) out.push(`"${s}"`);
+    else if (!s.includes("'")) out.push(`'${s}'`);
+    else return null;
+  }
+  return out.join(' ');
+}
