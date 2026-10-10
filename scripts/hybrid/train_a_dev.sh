@@ -9,7 +9,8 @@ T=$ROOT/build/adev
 mkdir -p $T/scripts/lib $T/model $T/build
 ln -sfn $ROOT/src $T/src
 ln -sfn $ROOT/data $T/data
-ln -sfn $ROOT/test $T/test
+# test/ is copied, not symlinked: train.py writes test/fixtures/parity.json
+mkdir -p $T/test/fixtures && cp $ROOT/test/*.js $T/test/
 cp $ROOT/scripts/lib/*.js $T/scripts/lib/
 cp $ROOT/scripts/train.py $T/scripts/train.py
 cp $ROOT/model/*.json $T/model/
