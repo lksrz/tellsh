@@ -27,6 +27,7 @@ import { SLOT_CASES } from '../test/slot-cases.js';
 import { silverSpans, relex, mulberry32 } from './lib/silver.js';
 import { sameCmd } from './lib/cmdnorm.js';
 import { updateSection } from './report.js';
+import { pwshParses } from './lib/pwsh_parse.js';
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
 const VERBOSE = process.argv.includes('--verbose');
@@ -109,7 +110,7 @@ const syntaxCheck = (cmd, shell) => {
   if (shell === 'bash' || shell === 'zsh') return spawnSync('bash', ['-n', '-c', cmd]).status === 0;
   if (shell === 'sh') return spawnSync('sh', ['-n', '-c', cmd]).status === 0;
   if (shell === 'fish' && hasBin('fish')) return spawnSync('fish', ['-n', '-c', cmd]).status === 0;
-  if (shell === 'powershell' && hasBin('pwsh')) return spawnSync('pwsh', ['-NoProfile', '-Command', `$e=$null;[void][System.Management.Automation.Language.Parser]::ParseInput($args[0],[ref]$null,[ref]$e);if($e.Count){exit 1}`, cmd]).status === 0;
+  if (shell === 'powershell' && hasBin('pwsh')) return pwshParses(cmd); // parse only, never runs cmd
   return null;
 };
 md('## 2. Per shell');
@@ -299,6 +300,11 @@ md('*Development note:* this set was written independently of the rules, but it 
   '(blind) run scored **60.4%** exact; the failures led to general fixes (more Polish pronoun forms, `ps -p`/`wget` entities, ' +
   'blame/extract verbs, "same but …", implicit required-slot fill). The number above is therefore not a blind score.');
 md();
+md('*Review fixes:* history lines are now split with a shell-aware tokenizer (`a\\ b.txt`, quoted `;`/`|`, PowerShell `\'\'`/backtick escapes, ' +
+  'native cmdlets such as `Get-Content -LiteralPath`), and a reference whose latest value depends on the shell state (`$F`, `*.txt`, ' +
+  'unparseable or unknown-command lines) is refused (placeholder) instead of falling back to an older value. Two gold commands ' +
+  '(`kill_by_port`) were updated for the `-sTCP:LISTEN` fix; no other row changed.');
+md();
 
 // ------------------------------------------------------------------------------------------
 // 6. composer
@@ -326,7 +332,11 @@ for (const r of evalRows) if (suggest(r.text, { env: BASH, model }).method === '
 md('## 6. Second pass: experimental composer (`data/compose/eval.jsonl`)');
 md();
 md(`${comp.length} out-of-catalogue requests (a tool with a flag combination that no catalog template has), written independently of the composer vocabulary. ` +
-  'Commands are compared order-insensitively (`ls -ltr` = `ls -l -t -r`). *exact* = the gold command, *acceptable* = gold or a listed alternative.');
+  'Commands are compared after shell unquoting with only behaviour-preserving normalisation: option bundling/order for ordinary ' +
+  'commands (`ls -ltr` = `ls -l -t -r`, `head -n5` = `head -5`); argument boundaries, case (`-name` ≠ `-iname`), find\'s expression order, ' +
+  'redirections and pipeline separators must match. *exact* = the gold command, *acceptable* = gold or a listed alternative. ' +
+  '(Before the review the comparison lowercased find predicates and mapped `-iname` to `-name`; that credited one catalog answer: ' +
+  '"any answer acceptable" was 33.3%, now 31.4%.)');
 md();
 md('| split | n | composer fired | composed exact | composed acceptable | any answer acceptable (catalog or composed) |');
 md('|---|---|---|---|---|---|');

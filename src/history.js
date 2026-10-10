@@ -7,6 +7,10 @@ import { join } from 'node:path';
 import { INTENTS, BY_ID } from './catalog.js';
 import { FAMILY_OF } from './tools.js';
 import { extractSlots, foldKeepLength } from './slots.js';
+import { VARIANTS } from './variants.js';
+import { splitCommand, wordsOf, decodeWord, AMB, isAmbiguous, isExpansion, isGlob, rawOf } from './shellwords.js';
+
+export { isAmbiguous };
 
 // ---------------------------------------------------------------------------------------------
 // reading
@@ -89,7 +93,7 @@ export function loadHistory({ shell = 'bash', file, n = 10, env = process.env, o
       const { buf, partial } = readTail(path);
       const text = (kind === 'zsh' ? unmetafy(buf) : buf).toString('utf8');
       const cmds = parseHistory(text, kind, { partial });
-      if (cmds.length) return cmds.slice(-n);
+      if (cmds.length) return Object.assign(cmds.slice(-n), { kind: kind === 'pwsh' ? 'pwsh' : 'posix' });
     } catch { /* unreadable: no context */ }
   }
   return [];
@@ -97,52 +101,75 @@ export function loadHistory({ shell = 'bash', file, n = 10, env = process.env, o
 
 // ---------------------------------------------------------------------------------------------
 // entities from commands
+//
+// Values are decoded with a shell-aware tokenizer (src/shellwords.js): quotes, escapes (a\ b.txt),
+// separators inside quotes, PowerShell '' / ` escapes. A value that depends on shell state ($VAR,
+// $(..), unquoted globs) or a line that cannot be interpreted becomes an *ambiguous* entity: it
+// still shadows older values of the same type, and a reference to it is refused instead of being
+// resolved to a stale or guessed target.
 
-function shellWords(s) {
-  const out = [];
-  const re = /'([^']*)'|"((?:\\.|[^"\\])*)"|(\S+)/g;
-  let m;
-  while ((m = re.exec(s))) out.push(m[1] ?? (m[2] != null ? m[2].replace(/\\(.)/g, '$1') : m[3]));
-  return out;
-}
+const PS_CMDLET = /^[A-Za-z]+-[A-Za-z]+$/;
+const lineKind = (line, kind) => (kind === 'pwsh' || PS_CMDLET.test(String(line).trim().split(/\s/)[0]) ? 'pwsh' : 'posix');
+const PATHLIKE = /(?:^|\s)['"]?[~.\w-]*[\\/][\w.-]|\.\w{1,5}(?:['"]?\s|['"]?$)/;
+const GLOB_SLOTS = new Set(['namepat', 'glob', 'pattern', 'sedexpr', 'old', 'new', 'text', 'message']);
 
-// template inversion: catalog template -> regex that recovers intent + slot values from a command
+// template inversion: catalog/variant template -> regex that recovers intent + slot values from a command
+const BT = '`';
+const WORD_RE = {
+  posix: String.raw`((?:'[^']*'|"(?:\\.|[^"\\])*"|\\.|[^\s'"\;&|<>()])+)`,
+  pwsh: `((?:['‘-‛](?:[^'‘-‛]|['‘-‛]{2})*['‘-‛]|["“-„](?:${BT}.|["“-„]{2}|[^"“-„${BT}])*["“-„]|${BT}.|[^\\s'"‘-„${BT};|(){}<>])+)`,
+};
 let INV = null;
 function inverters() {
   if (INV) return INV;
   INV = [];
-  const VAL = String.raw`('(?:[^']|'\\'')*'|~?\S+)`;
-  for (const it of INTENTS) {
-    for (const tpl of [it.template, it.darwin]) {
-      if (typeof tpl !== 'string') continue;
-      const names = [];
-      let src = '';
-      const parts = tpl.split(/(«[^»]*»)/);
-      for (const part of parts) {
-        const opt = part.startsWith('«');
-        const body = opt ? part.slice(1, -1) : part;
-        let rx = '';
-        for (const piece of body.split(/(\{\w+(?:!raw)?\})/)) {
-          const m = piece.match(/^\{(\w+)(!raw)?\}$/);
-          if (m) { names.push(m[1]); rx += !m[2] ? VAL : m[1] === 'age' ? '(-m(?:min|time) -\\d+)' : '([\\w.+=-]+)'; } else rx += piece.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const add = (id, tpl) => {
+    if (typeof tpl !== 'string') return;
+    const names = [];
+    const raws = [];
+    const src = { posix: '', pwsh: '' };
+    for (const part of tpl.split(/(«[^»]*»)/)) {
+      const opt = part.startsWith('«');
+      const body = opt ? part.slice(1, -1) : part;
+      const rx = { posix: '', pwsh: '' };
+      for (const piece of body.split(/(\{\w+(?:!raw)?\})/)) {
+        const m = piece.match(/^\{(\w+)(!raw)?\}$/);
+        for (const k of ['posix', 'pwsh']) {
+          if (m) rx[k] += !m[2] ? WORD_RE[k] : m[1] === 'age' ? '(-m(?:min|time) -\\d+)' : '([\\w.+=-]+)';
+          else rx[k] += piece.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
         }
-        src += opt ? `(?: ${rx})?` : rx;
+        if (m) { names.push(m[1]); raws.push(!!m[2]); }
       }
-      try { INV.push({ id: it.id, re: new RegExp(`^${src}$`), names }); } catch { /* skip */ }
+      for (const k of ['posix', 'pwsh']) src[k] += opt ? `(?: ${rx[k]})?` : rx[k];
     }
+    try { INV.push({ id, re: { posix: new RegExp(`^${src.posix}$`), pwsh: new RegExp(`^${src.pwsh}$`) }, names, raws }); } catch { /* skip */ }
+  };
+  for (const it of INTENTS) {
+    add(it.id, it.template);
+    add(it.id, it.darwin);
+    const v = VARIANTS[it.id] || {};
+    for (const k of ['bsd', 'gnuMac', 'busybox', 'zsh', 'fish']) add(it.id, v[k]);
+    if (v.pwsh) for (const t of typeof v.pwsh === 'object' ? [v.pwsh.win, v.pwsh.unix] : [v.pwsh]) add(it.id, t);
   }
   return INV;
 }
-const unq = (v) => (v == null ? v : /^'.*'$/s.test(v) ? v.slice(1, -1).replace(/'\\''/g, "'") : v);
 
-function invert(cmd) {
-  for (const { id, re, names } of inverters()) {
-    const m = cmd.match(re);
+function invert(cmd, kind = 'posix') {
+  for (const { id, re, names, raws } of inverters()) {
+    const m = cmd.match(re[kind]);
     if (!m) continue;
     const slots = {};
-    names.forEach((n, i) => { if (m[i + 1] != null) slots[n] = unq(m[i + 1]); });
-    if (slots.namepat && !slots.name) slots.name = slots.namepat.replace(/^\*|\*$/g, '');
-    return { intent: id, slots };
+    let ambiguous = false;
+    names.forEach((n, i) => {
+      const rv = m[i + 1];
+      if (rv == null) return;
+      if (raws[i]) { slots[n] = rv; return; }
+      const v = decodeWord(rv, kind);
+      if (v == null || isExpansion(v) || (isGlob(v) && !GLOB_SLOTS.has(n))) { ambiguous = true; slots[n] = AMB + rv; return; }
+      slots[n] = rawOf(v);
+    });
+    if (slots.namepat && !slots.name && !isAmbiguous(slots.namepat)) slots.name = slots.namepat.replace(/^\*|\*$/g, '');
+    return { intent: id, slots, ambiguous };
   }
   return null;
 }
@@ -150,10 +177,77 @@ function invert(cmd) {
 const FILE_HEADS = new Set(['cat', 'less', 'more', 'head', 'tail', 'vim', 'vi', 'nvim', 'nano', 'code', 'stat', 'file', 'wc',
   'sha256sum', 'md5sum', 'shasum', 'md5', 'touch', 'open', 'bat', 'chmod', 'chown', 'source', 'python', 'python3', 'node', 'bash', 'sh', 'unzip', 'gzip', 'gunzip', 'xdg-open']);
 const DIR_HEADS = new Set(['cd', 'ls', 'du', 'find', 'tree', 'mkdir', 'rmdir', 'pushd', 'ncdu']);
+// heads whose arguments are never file references (no stale-reference invalidation for them)
+const INERT_HEADS = new Set(['echo', 'printf', 'man', 'which', 'whereis', 'type', 'history', 'clear', 'exit', 'export', 'alias', 'unalias',
+  'npm', 'npx', 'yarn', 'pnpm', 'make', 'cargo', 'go', 'pip', 'pip3', 'apt', 'apt-get', 'brew', 'tellsh', 'true', 'false', 'date', 'sleep',
+  'write-host', 'write-output', 'get-help', 'get-command', 'set-psreadlineoption', 'clear-host', 'cls']);
 const DOCKER_CT = new Set(['logs', 'exec', 'stop', 'start', 'restart', 'rm', 'inspect', 'attach', 'kill', 'top', 'port', 'pause', 'unpause']);
 const DOCKER_VAL_FLAGS = new Set(['--tail', '-n', '--since', '--until', '-e', '--env', '-u', '--user', '-w', '--workdir', '-t', '--time', '-s', '--signal']);
 const DOCKER_INTENT = { logs: 'docker_logs', stop: 'docker_stop', exec: 'docker_exec' };
 const SYSTEMCTL_INTENT = { status: 'service_status', restart: 'service_restart', stop: 'service_stop', start: 'service_start', enable: 'service_enable' };
+
+// PowerShell cmdlets and their aliases -> what their target argument is
+const PS_NATIVE = {
+  'get-content': 'file', gc: 'file', type: 'file', 'get-filehash': 'file', 'select-string': 'file', 'expand-archive': 'file', 'set-content': 'file', 'add-content': 'file', 'out-file': 'file',
+  'get-item': 'path', gi: 'path', 'get-itemproperty': 'path', 'invoke-item': 'path', ii: 'path', 'rename-item': 'path', rni: 'path', 'test-path': 'path',
+  'remove-item': 'remove', ri: 'remove', del: 'remove', erase: 'remove', rd: 'remove',
+  'set-location': 'dir', sl: 'dir', chdir: 'dir', 'push-location': 'dir', 'get-childitem': 'dir', gci: 'dir', dir: 'dir',
+  'copy-item': 'copy', cpi: 'copy', copy: 'copy', 'move-item': 'copy', mi: 'copy', move: 'copy', 'new-item': 'new', ni: 'new',
+  'stop-process': 'proc', spps: 'proc', 'get-process': 'proc', gps: 'proc',
+  'stop-service': 'service', 'start-service': 'service', 'restart-service': 'service', 'get-service': 'service', gsv: 'service', 'set-service': 'service',
+  'test-connection': 'host', 'test-netconnection': 'host', 'resolve-dnsname': 'host',
+  'invoke-webrequest': 'url', iwr: 'url', 'invoke-restmethod': 'url', irm: 'url',
+};
+const PS_SERVICE_INTENT = { 'stop-service': 'service_stop', 'start-service': 'service_start', 'restart-service': 'service_restart', 'get-service': 'service_status' };
+const PS_VALUE_PARAMS = new Set(['path', 'literalpath', 'lp', 'pspath', 'name', 'id', 'processname', 'computername', 'targetname', 'uri', 'destination',
+  'destinationpath', 'totalcount', 'tail', 'head', 'first', 'last', 'encoding', 'filter', 'include', 'exclude', 'itemtype', 'type', 'algorithm', 'value',
+  'newname', 'pattern', 'count', 'depth', 'outfile', 'method', 'erroraction', 'ea', 'port', 'delimiter', 'readcount', 'stream', 'credential', 'displayname']);
+
+function psArgs(args) {
+  const named = {};
+  const pos = [];
+  const sw = new Set();
+  for (let i = 0; i < args.length; i++) {
+    const m = String(args[i]).match(/^-([A-Za-z]\w*)(?::(.+))?$/);
+    if (!m) { pos.push(args[i]); continue; }
+    const p = m[1].toLowerCase();
+    if (m[2] != null) named[p] = m[2];
+    else if (PS_VALUE_PARAMS.has(p) && args[i + 1] != null) named[p] = args[++i];
+    else sw.add(p);
+  }
+  return { named, pos, sw };
+}
+
+const typeByExt = (p) => (/\.\w{1,5}$/.test(rawOf(p)) ? 'file' : 'dir');
+
+/** PowerShell native commands. Returns true when the head was recognised. */
+function psNative(head, args, ents, setIntent) {
+  const kind = PS_NATIVE[head];
+  if (!kind) return false;
+  const { named, pos, sw } = psArgs(args);
+  const path = named.literalpath ?? named.lp ?? named.path ?? named.pspath ?? pos[0];
+  if (kind === 'file' && path != null) ents.file ??= path;
+  else if (kind === 'path' && path != null) ents[typeByExt(path)] ??= path;
+  else if (kind === 'dir' && path != null) ents.dir ??= path;
+  else if (kind === 'remove' && path != null) ents[[...sw].some((s) => 'recurse'.startsWith(s)) ? 'dir' : typeByExt(path)] ??= path;
+  else if (kind === 'copy') { const d = named.destination ?? pos[1]; if (d != null) ents[typeByExt(d)] ??= d; }
+  else if (kind === 'new' && path != null) ents[/^dir/i.test(named.itemtype ?? named.type ?? '') ? 'dir' : 'file'] ??= path;
+  else if (kind === 'proc') {
+    const id = named.id ?? (pos[0] != null && /^\d+$/.test(pos[0]) ? pos[0] : null);
+    const nm = named.name ?? named.processname ?? (id == null ? pos[0] : null);
+    if (id != null) ents.pid ??= String(id).split(',')[0];
+    if (nm != null) ents.proc ??= nm;
+  } else if (kind === 'service') {
+    const s = named.name ?? named.displayname ?? pos[0];
+    if (s != null) { ents.service ??= s; if (PS_SERVICE_INTENT[head]) setIntent(PS_SERVICE_INTENT[head], { service: s }); }
+  } else if (kind === 'host') { const h = named.computername ?? named.targetname ?? pos[0]; if (h != null) ents.host ??= h; }
+  else if (kind === 'url') {
+    const u = named.uri ?? pos[0];
+    if (u != null) ents.url ??= u;
+    if (named.outfile != null) ents.file ??= named.outfile;
+  }
+  return true;
+}
 
 function entsFromSlots(intent, slots, ents) {
   const fam = FAMILY_OF[intent];
@@ -173,29 +267,48 @@ function entsFromSlots(intent, slots, ents) {
   if (slots.path && slots.path !== '.') put(['delete_dir', 'mkdir', 'dir_size', 'largest_dirs', 'list_files'].includes(intent) || fam === 'find' ? 'dir' : /\.\w{1,5}$/.test(slots.path) ? 'file' : 'dir', slots.path);
 }
 
-/** Analyse one history line. `classify(query)` handles previous `tellsh <query>` lines. */
-export function analyzeCommand(line, classify) {
+/**
+ * Analyse one history line. `classify(query)` handles previous `tellsh <query>` lines.
+ * kind: 'posix' | 'pwsh' (PowerShell history; Verb-Noun lines are always read as PowerShell).
+ */
+export function analyzeCommand(line, classify, kind = 'posix') {
   const ents = {};
   let intent = null;
   let slots = {};
+  let ambiguous = false;
   const t = line.trim();
-  const tm = t.match(/^(?:npx\s+(?:-y\s+)?)?tellsh\s+(.*)$/);
+  const k = lineKind(t, kind);
+  const tm = t.match(/^(?:npx\s+(?:-y\s+)?)?tellsh\s+(.*)$/s);
   if (tm) {
-    const q = shellWords(tm[1]).filter((w) => !/^-/.test(w)).join(' ');
+    const w = wordsOf(tm[1], k);
+    const q = w ? w.filter((x) => !/^-/.test(x)).map(rawOf).join(' ') : '';
     const r = q && classify ? classify(q) : null;
     if (r?.intent) { intent = r.intent; slots = r.slots || {}; entsFromSlots(intent, slots, ents); }
-    return { line: t, intent, slots, ents, fromTellsh: true };
+    return { line: t, intent, slots, ents, fromTellsh: true, ambiguous };
   }
-  const inv = invert(t);
-  if (inv) { intent = inv.intent; slots = inv.slots; entsFromSlots(intent, slots, ents); }
-  // per-segment heuristics (pipelines, &&, ;)
-  for (const seg of t.split(/\s*(?:\|\|?|&&|;)\s*/)) {
-    let w = shellWords(seg);
+  const split = splitCommand(t, k);
+  if (!split.ok) {
+    // cannot interpret the line (unterminated quote, heredoc, ...): it may name any file or directory,
+    // so older file/dir values must not be picked up by "it"
+    ents.file = AMB + t;
+    ents.dir = AMB + t;
+    return { line: t, intent, slots, ents, opaque: true, ambiguous: true };
+  }
+  const inv = invert(t, k);
+  if (inv) { intent = inv.intent; slots = inv.slots; ambiguous = inv.ambiguous; entsFromSlots(intent, slots, ents); }
+  const setIntent = (id, s) => { if (!intent) { intent = id; slots = s; } };
+  for (const { words } of split.segments) {
+    let w = words;
     while (w.length && (w[0] === 'sudo' || /^\w+=/.test(w[0]))) w = w.slice(1);
     if (!w.length) continue;
-    const head = w[0].replace(/^.*\//, '');
+    if (isAmbiguous(w[0])) {
+      if (w.slice(1).some((a) => PATHLIKE.test(rawOf(a)))) { ents.file ??= AMB + t; ents.dir ??= AMB + t; }
+      continue;
+    }
+    const head = w[0].replace(/^.*[\\/]/, '').replace(/\.exe$/i, '');
     const args = w.slice(1);
     const nonFlags = args.filter((a) => !/^-/.test(a));
+    if ((k === 'pwsh' || PS_CMDLET.test(head)) && psNative(head.toLowerCase(), args, ents, setIntent)) continue;
     if (head === 'docker') {
       const sub = nonFlags[0];
       if (sub === 'run') {
@@ -232,24 +345,24 @@ export function analyzeCommand(line, classify) {
       const i = args.findIndex((a) => /^-\w*p$/.test(a));
       const pid = (args[i + 1] || '').split(',')[0];
       if (/^\d+$/.test(pid)) ents.pid ??= pid;
-    } else if (head === 'grep' && /\bps\b/.test(t)) {
+    } else if (head === 'grep' && split.segments.some((s) => s.words[0] === 'ps')) {
       if (nonFlags[0]) ents.proc ??= nonFlags[0];
     } else if ((head === 'grep' || head === 'rg') && nonFlags[0]) {
       const path = nonFlags[1];
       if (!intent) {
         intent = args.some((a) => /^-\w*l/.test(a)) ? 'grep_files_containing' : 'grep_text';
-        slots = { pattern: nonFlags[0], ...(path ? { path } : {}) };
+        slots = { pattern: rawOf(nonFlags[0]), ...(path ? { path } : {}) };
       }
-      if (path) ents[/\.\w{1,5}$/.test(path) ? 'file' : 'dir'] ??= path;
+      if (path) ents[typeByExt(path)] ??= path;
     } else if (head === 'lsof' || head === 'ss' || head === 'netstat' || head === 'fuser') {
-      const pm = seg.match(/(?::|tcp:|udp:|sport = :)(\d{2,5})\b/);
+      const pm = args.map(rawOf).join(' ').match(/(?::|tcp:|udp:|sport = :)(\d{2,5})\b/);
       if (pm) { ents.port ??= pm[1]; if (!intent) { intent = 'process_on_port'; slots = { port: pm[1] }; } }
     } else if (head === 'git') {
       const sub = nonFlags[0];
       if (['checkout', 'switch', 'merge', 'rebase'].includes(sub) || (sub === 'branch' && nonFlags[1])) {
         const b = nonFlags[nonFlags.length - 1];
         const creates = args.some((a) => ['-b', '-B', '-c', '-C'].includes(a));
-        if (b && b !== sub && b !== '.' && !b.includes('*') && !b.startsWith('-')) {
+        if (b && b !== sub && b !== '.' && !isGlob(b) && !b.startsWith('-')) {
           ents.branch ??= b;
           if ((sub === 'checkout' || sub === 'switch')) ents.current ??= b;
           if (creates) ents.created ??= b;
@@ -273,7 +386,7 @@ export function analyzeCommand(line, classify) {
       if (p) ents[args.some((a) => /^-\w*r/i.test(a)) || head === 'rmdir' ? 'dir' : 'file'] ??= p;
     } else if (head === 'cp' || head === 'mv' || head === 'ln') {
       const p = nonFlags[nonFlags.length - 1];
-      if (p) ents[/\.\w{1,5}$/.test(p) ? 'file' : 'dir'] ??= p;
+      if (p) ents[typeByExt(p)] ??= p;
     } else if (head === 'tar' || head === 'zip') {
       const a = nonFlags.find((x) => /\.(tar(\.\w+)?|tgz|zip)$/.test(x));
       if (a) ents.file ??= a;
@@ -281,20 +394,29 @@ export function analyzeCommand(line, classify) {
       const p = nonFlags.filter((a) => !/^[0-7]{3,4}$|^[ugoa]*[+=-][rwxXst]+$/.test(a)).pop();
       if (p) ents[/\/$/.test(p) ? 'dir' : 'file'] ??= p;
     } else if (DIR_HEADS.has(head)) {
-      const p = nonFlags.find((a) => !/^['"]?\*/.test(a));
+      const p = head === 'find' ? nonFlags[0] : nonFlags.find((a) => !isGlob(a));
       if (p) ents.dir ??= p;
+    } else if (!INERT_HEADS.has(head.toLowerCase())) {
+      // unknown command (or unknown cmdlet) naming a path: we cannot tell what it did with it, so an
+      // older file/dir must not be picked up by "it"
+      const p = nonFlags.find((a) => PATHLIKE.test(rawOf(a)) && !/^\w+:\/\//.test(rawOf(a)));
+      if (p) ents[typeByExt(p)] ??= AMB + rawOf(p);
     }
   }
-  return { line: t, intent, slots, ents };
+  if (Object.values(slots).some(isAmbiguous)) ambiguous = true;
+  return { line: t, intent, slots, ents, ambiguous };
 }
 
 const ENT_TYPES = ['container', 'service', 'pid', 'proc', 'port', 'file', 'dir', 'branch', 'host', 'url'];
 
 /**
  * Build the context object from history commands (oldest first).
- * -> { n, ents: {type: value}, entOrder: [types by recency], last: {intent, slots}, features: [...] }
+ * kind: 'posix' | 'pwsh' (default: `cmds.kind` as set by loadHistory, else posix)
+ * -> { n, ents: {type: value}, entOrder: [types by recency], last: {intent, slots, ambiguous}, features: [...] }
+ *    values that could not be read unambiguously are kept as AMB-prefixed strings (see isAmbiguous)
  */
-export function buildContext(cmds, { classify, cwd } = {}) {
+export function buildContext(cmds, { classify, cwd, kind } = {}) {
+  const k = kind || cmds.kind || 'posix';
   const ents = {};
   const all = {};
   const recency = {};
@@ -302,13 +424,13 @@ export function buildContext(cmds, { classify, cwd } = {}) {
   let current = null;
   const recent = [...cmds].reverse();
   recent.forEach((line, i) => {
-    const a = analyzeCommand(line, classify);
-    if (!last && a.intent) last = { intent: a.intent, slots: a.slots, age: i };
-    if (current == null && a.ents.current) current = a.ents.current;
-    for (const k of ENT_TYPES) {
-      if (a.ents[k] == null) continue;
-      if (ents[k] == null) { ents[k] = a.ents[k]; recency[k] = i; }
-      (all[k] ??= []).includes(String(a.ents[k])) || all[k].push(String(a.ents[k]));
+    const a = analyzeCommand(line, classify, k);
+    if (!last && a.intent) last = { intent: a.intent, slots: a.slots, age: i, ambiguous: !!a.ambiguous };
+    if (current == null && a.ents.current && !isAmbiguous(a.ents.current)) current = a.ents.current;
+    for (const t of ENT_TYPES) {
+      if (a.ents[t] == null) continue;
+      if (ents[t] == null) { ents[t] = a.ents[t]; recency[t] = i; }
+      (all[t] ??= []).includes(String(a.ents[t])) || all[t].push(String(a.ents[t]));
     }
   });
   const entOrder = Object.keys(ents).sort((a, b) => recency[a] - recency[b] || ENT_TYPES.indexOf(a) - ENT_TYPES.indexOf(b));
@@ -431,6 +553,7 @@ function retarget(intent, arg) {
  * Deterministic resolution. Returns null, or
  *   { rule: 'same-for', intent, slots, note }   (full override, slots to merge over the previous ones)
  *   { rule: 'pronoun', intent|null, fill: {slot: value}, ent, note }
+ *   { rule: 'refused', intent|null, ent?, note }  (the referenced value is ambiguous: nothing is filled)
  */
 export function resolveReference(query, ctx) {
   if (!ctx || !ctx.n) return null;
@@ -439,6 +562,8 @@ export function resolveReference(query, ctx) {
     const rt = retarget(ctx.last.intent, arg);
     if (rt) {
       const slots = { ...ctx.last.slots, [rt.slot]: rt.value };
+      const amb = Object.entries(slots).find(([, v]) => isAmbiguous(v));
+      if (amb) return { rule: 'refused', intent: ctx.last.intent, note: `previous ${ctx.last.intent} has ${amb[0]}=${rawOf(amb[1])}, which depends on the shell state; not guessing` };
       if (rt.slot === 'ext') delete slots.glob;
       if (rt.slot === 'name') delete slots.namepat;
       return { rule: 'same-for', intent: ctx.last.intent, slots, note: `same as previous ${ctx.last.intent} with ${rt.slot}=${rt.value}` };
@@ -461,6 +586,9 @@ export function resolveReference(query, ctx) {
   }
   const finalEnt = intent ? (Object.entries(SLOT_FROM_ENT).find(([e]) => ctx.ents[e] != null && intentUses(intent, e)) ? pickEnt(intent, ent, ctx) : ent) : ent;
   const value = chooseValue(finalEnt, fq, ctx, verb);
+  if (value == null || isAmbiguous(value)) {
+    return { rule: 'refused', intent, ent: finalEnt, note: `the latest ${finalEnt} in history (${rawOf(value ?? '?')}) cannot be read unambiguously; not guessing` };
+  }
   if (intent === 'kill_by_name' && FORCE.test(fq)) intent = 'kill_force';
   if (intent === 'extract_targz' && /\.zip$/i.test(value)) intent = 'extract_zip';
   const fill = {};
@@ -475,7 +603,7 @@ export function resolveReference(query, ctx) {
 function chooseValue(type, fq, ctx, verb) {
   let vals = ctx.all?.[type] || (ctx.ents[type] != null ? [String(ctx.ents[type])] : []);
   const words = fq.split(/[^a-z0-9]+/).filter((w) => w.length >= 4 && !/^(that|this|branch|file|plik|galez|container|kontener|service|usluga|back)$/.test(w));
-  const named = vals.find((v) => words.some((w) => foldKeepLength(v).toLowerCase().includes(w)));
+  const named = vals.find((v) => !isAmbiguous(v) && words.some((w) => foldKeepLength(v).toLowerCase().includes(w)));
   if (named) return named;
   if (type === 'branch' && (verb === 'delete' || verb === 'switch') && ctx.currentBranch) {
     const other = vals.filter((v) => v !== ctx.currentBranch);
@@ -486,10 +614,11 @@ function chooseValue(type, fq, ctx, verb) {
 
 /** Implicit references ("ile ma słów", "md5 of the same file"): fill a missing slot from history. */
 export function entityForSlot(slot, ctx) {
+  // the most recent value of the type is used, or nothing: an ambiguous latest value never falls back to an older one
   for (const [ent, slots] of Object.entries(SLOT_FROM_ENT)) {
-    if (slots[0] === slot && ctx.ents[ent] != null) return { ent, value: String(ctx.ents[ent]) };
+    if (slots[0] === slot && ctx.ents[ent] != null) return isAmbiguous(ctx.ents[ent]) ? null : { ent, value: String(ctx.ents[ent]) };
   }
-  if (slot === 'file' && ctx.ents.dir == null && ctx.ents.file != null) return { ent: 'file', value: String(ctx.ents.file) };
+  if (slot === 'file' && ctx.ents.dir == null && ctx.ents.file != null && !isAmbiguous(ctx.ents.file)) return { ent: 'file', value: String(ctx.ents.file) };
   return null;
 }
 
@@ -499,7 +628,8 @@ const SAME_BUT = [/^\s*(?:and\s+)?(?:the\s+)?same(?:\s+thing|\s+command)?,?\s+bu
 export function sameBut(query, ctx) {
   if (!ctx?.last) return null;
   const fq = fold(query);
-  for (const re of SAME_BUT) if (re.test(fq)) return { lastIntent: ctx.last.intent, lastSlots: ctx.last.slots };
+  const lastSlots = Object.fromEntries(Object.entries(ctx.last.slots || {}).filter(([, v]) => !isAmbiguous(v)));
+  for (const re of SAME_BUT) if (re.test(fq)) return { lastIntent: ctx.last.intent, lastSlots };
   return null;
 }
 

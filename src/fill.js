@@ -2,7 +2,7 @@
 import { BY_ID } from './catalog.js';
 import { extractSlots, pickArg, pickDest, pickDir } from './slots.js';
 import { checkDanger, maxRisk } from './danger.js';
-import { shQuote, psQuote, chooseTemplate, quoteForKind } from './render.js';
+import { shQuote, psQuote, chooseTemplate, quoteForKind, UnquotableError } from './render.js';
 
 export { shQuote };
 
@@ -154,20 +154,21 @@ const SLOT_NAMES = /^(path|file|count|src|dst|archive|glob|namepat|sedexpr|age|d
  */
 export function render(template, values, required = [], quote = shQuote) {
   const missing = [];
-  // optional segments «...»
-  let out = template.replace(/«([^»]*)»/g, (_, seg) => {
-    let ok = true;
-    const r = seg.replace(/\{(\w+)(!raw)?\}/g, (m, name, raw) => {
-      const val = renderValue(name, !!raw, values, quote);
-      if (val == null) { ok = false; return m; }
-      return val;
-    });
-    return ok ? (/^\s/.test(r) ? r : ' ' + r) : '';
-  });
-  out = out.replace(/\{(\w+)(!raw)?\}/g, (m, name, raw) => {
-    if (!(name in values) && !required.includes(name) && !SLOT_NAMES.test(name)) {
-      return m; // not a slot (e.g. awk braces, %{http_code}, PowerShell script blocks)
+  const isSlot = (name) => name in values || required.includes(name) || SLOT_NAMES.test(name);
+  // Single pass over the template: every {slot} and «optional segment» is substituted exactly once and
+  // inserted values are never scanned again (a value containing "{file}" must stay inert text).
+  const out = template.replace(/«([^»]*)»|\{(\w+)(!raw)?\}/g, (m, seg, name, raw) => {
+    if (seg != null) {
+      let ok = true;
+      const r = seg.replace(/\{(\w+)(!raw)?\}/g, (m2, n2, raw2) => {
+        if (!ok) return m2;
+        const val = renderValue(n2, !!raw2, values, quote);
+        if (val == null) { ok = false; return m2; }
+        return val;
+      });
+      return ok ? (/^\s/.test(r) ? r : ' ' + r) : '';
     }
+    if (!isSlot(name)) return m; // not a slot (e.g. awk braces, %{http_code}, PowerShell script blocks)
     const val = renderValue(name, !!raw, values, quote);
     if (val == null) {
       missing.push(name);
@@ -232,18 +233,28 @@ export function buildCommand(intentId, text, { platform = process.platform, env,
   const tpl = choice.tpl;
   let command;
   let missing = [];
-  if (typeof tpl === 'function') {
-    const q = (s) => (/^-/.test(String(s)) ? quote('./' + s) : quote(s));
-    const vals = { ...values };
-    for (const r of required) if (!(r in vals)) { missing.push(r); vals[r] = PLACEHOLDER(r); }
-    // catalog functions take the OS string, variant functions a ctx object
-    command = tpl(vals, q, tpl === intent.template || tpl === intent.darwin ? e.os : e);
-    if (/<TEXT>/.test(command)) missing.push('text');
-  } else {
-    ({ command, missing } = render(tpl, values, required, quote));
-    missing = missing.map((m) => DERIVED_REQUIRED[m] || m);
+  try {
+    if (typeof tpl === 'function') {
+      const q = (s) => (/^-/.test(String(s)) ? quote('./' + s) : quote(s));
+      const vals = { ...values };
+      for (const r of required) if (!(r in vals)) { missing.push(r); vals[r] = PLACEHOLDER(r); }
+      // catalog functions take the OS string, variant functions a ctx object
+      command = tpl(vals, q, tpl === intent.template || tpl === intent.darwin ? e.os : e);
+      if (/<TEXT>/.test(command)) missing.push('text');
+    } else {
+      ({ command, missing } = render(tpl, values, required, quote));
+      missing = missing.map((m) => DERIVED_REQUIRED[m] || m);
+    }
+  } catch (err) {
+    if (!(err instanceof UnquotableError)) throw err;
+    return { ...base, command: null, gap: err.message, risk: intent.risk, warnings: [], critical: false, missing: [] };
   }
-  if (choice.wrapPosix) { command = 'bash -c ' + psQuote(command); base.variant = 'bash -c (no native PowerShell variant)'; }
+  if (choice.wrapPosix) {
+    // PowerShell < 7.3 drops embedded double quotes when passing arguments to native programs, so a
+    // POSIX command containing `"` is fed to bash on stdin instead of as a -c argument.
+    if (command.includes('"')) { command = psQuote(command) + ' | bash'; base.variant = 'piped to bash (no native PowerShell variant)'; }
+    else { command = 'bash -c ' + psQuote(command); base.variant = 'bash -c (no native PowerShell variant)'; }
+  }
   missing = [...new Set(missing)];
   const danger = checkDanger(command, intent.risk);
   return {

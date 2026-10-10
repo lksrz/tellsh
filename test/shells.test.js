@@ -7,6 +7,7 @@ import { INTENTS } from '../src/catalog.js';
 import { buildCommand } from '../src/fill.js';
 import { shQuote, fishQuote, psQuote, cmdQuote } from '../src/render.js';
 import { VARIANTS } from '../src/variants.js';
+import { pwshParses } from '../scripts/lib/pwsh_parse.js';
 
 const has = (b) => spawnSync('sh', ['-c', `command -v ${b}`]).status === 0;
 // nasty-but-valid values for every slot (quotes, spaces, $, &, globs)
@@ -83,8 +84,7 @@ for (const os of ['win32', 'linux']) {
         assert.ok(!/\$\{\w+:-/.test(s), `${it.id}: POSIX expansion in PowerShell: ${r.command}`);
       }
       if (has('pwsh')) {
-        const res = spawnSync('pwsh', ['-NoProfile', '-Command', '$e=$null;[void][System.Management.Automation.Language.Parser]::ParseInput($args[0],[ref]$null,[ref]$e);if($e.Count){exit 1}', r.command]);
-        if (res.status !== 0) bad.push(it.id);
+        if (pwshParses(r.command) !== true) bad.push(it.id);
       }
     }
     if (!has('pwsh')) t.diagnostic(`pwsh not installed: parser check skipped (${gaps} gaps)`);
@@ -117,7 +117,9 @@ test('fish / PowerShell / cmd quoting rules', () => {
   assert.equal(psQuote('$(evil)'), "'$(evil)'");
   assert.equal(psQuote('~/Pobrane'), '"$HOME/Pobrane"');
   assert.equal(psQuote('~/$x'), '"$HOME/`$x"');
-  assert.equal(cmdQuote('a "b"'), '"a ""b"""');
+  assert.throws(() => cmdQuote('a "b"'), /cmd.exe/);
+  assert.throws(() => cmdQuote('%PATH%'), /cmd.exe/);
+  assert.equal(cmdQuote('a b'), '"a b"');
   assert.equal(cmdQuote('~/Downloads'), '%USERPROFILE%\\Downloads');
 });
 

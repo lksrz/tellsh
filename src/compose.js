@@ -43,7 +43,7 @@ export const TOOLS = {
       F('-empty', ['empty', 'pust']),
       F('-maxdepth', ['depth', 'levels deep', 'level', 'not recursive', 'top level only', 'glebok', 'poziom', 'bez podkatalog'], { value: 'depth' }),
       F('-iname', ['case insensitive', 'ignore case', 'ignoring case', 'bez wzgledu na wielkosc', 'wielkosc liter']),
-      F('-newer', ['newer than']),
+      F('-newer', ['newer than', 'nowsze niz', 'nowszych niz', 'nowszy niz'], { value: 'newer' }),
       F('-print0', ['null separated', 'print0']),
       F('-executable', ['executable', 'wykonywaln']),
       F('-user', ['owned by', 'belonging to', 'of user', 'nalezace do', 'uzytkownika', 'wlasciciel'], { value: 'user' }),
@@ -311,6 +311,15 @@ export function validateComposed(cmd, toolName, sub) {
   const vocab = new Set((sub ? spec.sub[sub].flags : spec.flags).flatMap((f) => f.flag.split(' ')[0]));
   if (spec.filters) for (const x of ['-name', '-iname', '-mtime', '-mmin', '-size', '-type', '-maxdepth', '-empty', '-newer', '-print0', 'f', 'd', 'l']) vocab.add(x);
   const words = cmd.match(/'(?:[^']|'\\'')*'|\S+/g) || [];
+  // flags that take an operand must have one (find -newer FILE, grep -A N, ...)
+  const needsArg = new Set((sub ? spec.sub[sub].flags : spec.flags).filter((f) => f.value && !f.flag.startsWith('--')).map((f) => f.flag));
+  if (spec.filters) for (const x of ['-name', '-iname', '-mtime', '-mmin', '-size', '-type', '-maxdepth', '-newer', '-user']) needsArg.add(x);
+  for (let i = sub ? 2 : 1; i < words.length; i++) {
+    if (!needsArg.has(words[i])) continue;
+    const next = words[i + 1];
+    if (next == null || (/^-[a-z]/i.test(next) && !/^-\d/.test(next))) return { ok: false, error: `${words[i]} needs an operand` };
+    i++;
+  }
   for (const w of words.slice(sub ? 2 : 1)) {
     if (!/^-/.test(w)) continue;
     const base = w.replace(/=.*$/, '');
@@ -381,6 +390,7 @@ export function compose(query, tools, ex, { patternOf, nameOf } = {}) {
         if (ex.count == null) return null;
         return /\b(from line|starting at line|od linii|od wiersza|poczawszy od)\b/.test(fq) ? `+${ex.count}` : String(ex.count);
       }
+      case 'newer': return newerRef ? q(newerRef) : null;
       case 'fstype': { const m = fq.match(/\b(ext[234]|xfs|btrfs|tmpfs|nfs4?|vfat|ntfs|zfs|apfs|overlay|squashfs)\b/); return m ? m[1] : null; }
       case 'fname': {
         const m = query.match(/(?:named|called|nazwan\w*|o nazwie|nazywaj\w* si[eę])\s+["']?([\w.*?-]+)/i);
@@ -393,6 +403,11 @@ export function compose(query, tools, ex, { patternOf, nameOf } = {}) {
       default: return null;
     }
   };
+  // find -newer FILE: the reference file is the operand of -newer, never the search root
+  const newerRef = tn === 'find' ? (() => {
+    const m = query.match(/(?:newer than|nowsze? niż|nowsze? niz|nowszych niż|nowszych niz|nowszy niż|nowszy niz)\s+["'„]?([^\s"'”]+)/i);
+    return m ? (ex.paths.find((p) => p === m[1] || m[1].startsWith(p)) || m[1]) : null;
+  })() : null;
   const used = [];
   const archive = ex.paths.find((x) => /\.(tar(\.\w+)?|tgz|tbz2?|txz)$/.test(x));
   for (const f of flags) {
@@ -408,7 +423,7 @@ export function compose(query, tools, ex, { patternOf, nameOf } = {}) {
     used.push(f.flag);
   }
   // tool-specific arguments
-  const paths = [...ex.paths];
+  const paths = ex.paths.filter((p) => p !== newerRef);
   if (tn === 'find') {
     parts.splice(1, 0, q(paths[0] || '.'));
     if (ex.ext && !used.includes('-name')) parts.push(used.includes('-iname') ? '-iname' : '-name', q(`*.${ex.ext}`));

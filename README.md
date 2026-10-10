@@ -47,7 +47,8 @@ Offline install: `npm pack` → copy `tellsh-0.2.0.tgz` (~1.1 MB) → `npm i -g 
 tellsh [options] <request...>
 
   -n, --dry-run        print the command only, never run it
-  -y, --yes            run without prompting (only risk=safe catalog commands; never composed ones)
+  -y, --yes            run without prompting (only risk=safe commands straight from the catalog; never
+                       history-resolved, composed, incomplete or medium/high-risk ones)
   -e, --explain        tool/intent scores, slots and where each slot came from (tagger/regex/history)
       --json           machine-readable output (implies --dry-run)
       --shell <s>      bash | zsh | sh | powershell | fish | cmd   (default: detected)
@@ -128,6 +129,11 @@ The intent and slots are shared; only the rendering differs (`src/render.js`, va
 `ConsoleHost_history.txt`, keeps the last 10 commands **in memory for this one request** and never prints, logs or
 stores them. Earlier `tellsh <query>` lines are re-interpreted, raw commands are parsed (template inversion + per-tool
 rules: `docker run --name`, `systemctl … X`, `kill N`, `ps -p N`, `lsof -i :P`, `git checkout`, file arguments, …).
+Lines are split with a shell-aware tokenizer (`a\ b.txt`, quoted `;`/`|`, redirections; PowerShell `''`/backtick
+escapes and native cmdlets such as `Get-Content -LiteralPath`, `Remove-Item`, `Stop-Process -Id`, `Restart-Service`).
+If the latest value of the referenced type depends on the shell state (`cat $F`, `rm *.log`), comes from a line that
+cannot be parsed, or from an unknown command naming a path, the reference is **refused** (the slot stays a
+placeholder) rather than resolved to an older value.
 
 * deterministic rules: "same for /var" / "to samo dla /var" (previous intent, one slot replaced), "delete it" /
   "usuń to", "logs of that container" / "logi tego kontenera", "kill it" / "zabij go" (verb × entity type table; a
@@ -156,12 +162,25 @@ compression from the archive name, `bash -n` and an allowed-flag check validate 
 * Every intent has a base risk: **safe** (read-only), **medium** (modifies state: archives, git checkout/pull/stash,
   chmod, mv, sudo, …), **high** (destructive: rm, kill, prune, discard). v0.2 raised 10 intents from safe to medium after
   the teacher review (see `EVAL.md`).
-* `src/danger.js` scans the **final** command — also edited ones — and can only escalate: POSIX (`rm -rf /`, `mkfs`,
-  `dd of=/dev/…`, fork bombs, `curl | sh`, force-push, …), PowerShell (`Remove-Item -Recurse` on a root/home,
-  `Stop-Process`, `Format-Volume`, `iwr | iex`, `Set-ExecutionPolicy`, …) and cmd (`rd /s`, `del`, `taskkill`, `format`).
-* Quoting per shell: POSIX `'…'\''…'`, fish `\'`/`\\`, PowerShell `''` (and `"$HOME/…"` for `~`), cmd `""`. Raw slots
-  (numbers, find flags) are validated before insertion; paths starting with `-` get `./`.
-* `--yes` never runs anything that is not `safe`, incomplete, or composed. Non-TTY use prints only.
+* `src/danger.js` scans the **final** command — also edited ones — and can only escalate. It tokenizes each simple
+  command (quotes, `--`, long options, `sudo`/`xargs`/`env` wrappers, `bash -c '…'`/`eval`/`'…' | bash` payloads) and
+  strips `git`/`docker` global options (`git -C dir -c k=v reset --hard` = `git reset --hard`). POSIX: `rm -rf` /
+  `rm --recursive --force` on `/`, `~`, `~/*`, `"/"`, `/usr`, …, `mkfs`, `dd of=/dev/…`, fork bombs, `curl | sh`,
+  `bash <(curl …)`, `sh -c "$(curl …)"`, force-push (incl. `+branch`), redirects into `/etc` (`>>`, `1>`, `&>`),
+  `kill -1`/PID 1 (but not `kill -1 PID` = SIGHUP, and not `docker run --rm`); PowerShell: `Remove-Item`/`ri`/`rm`/`del`
+  `-Recurse` on a drive root (`C:\`, `C:/`), home or `*`, `Stop-Process`, `Format-Volume`, `iwr | iex`, `iex (iwr …)`,
+  `Set-ExecutionPolicy`, …; cmd: `rd /s`/`del /s` on a root or `%USERPROFILE%`, `del`, `taskkill`, `format`.
+* Quoting per shell, every value inserted exactly once (a value containing `{file}` stays text): POSIX `'…'\''…'`
+  (a leading `=` is always quoted for zsh), fish `\'`/`\\`, PowerShell always a single-quoted string with **every**
+  single-quote character doubled — PowerShell also treats `‘ ’ ‚ ‛` as quotes — and `"$HOME/…"` for `~` with
+  `` ` $ " “ ” „ `` escaped; cmd `"…"`, and values containing `%`, `!` or `"` (which cmd expands or cannot escape)
+  are refused for cmd (reported as a gap). On Linux/macOS PowerShell without a native variant the POSIX command runs
+  as `bash -c '…'`, or is piped to `bash` when it contains `"` (PowerShell < 7.3 drops embedded `"` in native args).
+* Raw slots (numbers, find flags) are validated before insertion; paths starting with `-` get `./`; other values
+  (names, hosts, URLs, containers, …) may not start with `-`, and URLs must be `scheme://…` or `user@host:path`.
+  Values taken from history pass the same validation.
+* `--yes` only runs `safe` commands that come straight from the catalog: never history-resolved, composed, incomplete
+  or medium/high-risk ones. Non-TTY use prints only.
 
 ## Accuracy & speed (details: [EVAL.md](EVAL.md))
 
@@ -177,11 +196,11 @@ All numbers are on held-out data never used for training (`npm run eval`, `npm r
 | end-to-end exact command, relexicalised held-out values (full pipeline / gold intent) | **82.8%** / 92.2% |
 | hand-written slot cases, exact command | 99/99 |
 | history references, exact command (48 EN+PL; without history 0%) | **97.9%** (dev set, blind first run 60.4%) |
-| composer on out-of-catalogue requests: acceptable / exact | 29.4% / 27.5% (blind first run 3.9%) · false fires on catalog requests 0.7% |
+| composer on out-of-catalogue requests: acceptable / exact | 29.4% / 27.5% (blind first run 3.9%) · any answer acceptable 31.4% · false fires on catalog requests 0.7% |
 | out-of-domain rejected | 92.4% |
 | model size | **2.71 MB** (v0.1: 3.68 MB) |
-| latency, `taskset -c 0`: cold process p50 / p95 | **157 / 192 ms** (bare `node -e 0`: 87 ms) |
-| latency, warm full cascade + tagger + render p50 / p95 | **0.32 / 1.4 ms** |
+| latency, `taskset -c 0`: cold process p50 / p95 | **159 / 190 ms** (bare `node -e 0`: 104 ms) |
+| latency, warm full cascade + tagger + render p50 / p95 | **0.31 / 2.2 ms** |
 
 ## Data & licenses
 

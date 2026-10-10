@@ -14,7 +14,7 @@ import { resolveSlots, buildCommand, finalizeSlots, RAW_OK } from './fill.js';
 import { BY_ID } from './catalog.js';
 import { FAMILY_OF, NONE } from './tools.js';
 import { detectEnv, envFeatures } from './env.js';
-import { buildContext, resolveReference, hasPronoun, cwdFlags, sameBut, entityForSlot } from './history.js';
+import { buildContext, resolveReference, hasPronoun, cwdFlags, sameBut, entityForSlot, isAmbiguous } from './history.js';
 import { compose } from './compose.js';
 import { readFileSync } from 'node:fs';
 
@@ -30,21 +30,28 @@ const headOf = (cmd) => { const w = String(cmd).replace(/^sudo\s+/, '').split(/\
 // extracted "values" that are really the pronoun/filler words of a reference ("restart it", "zatrzymaj tę usługę")
 const PRONOUN_VALUE = /^(it|its|that|this|them|those|one|again|back|there|here|to|tego|ten|tę|te|ta|tą|tej|tym|go|je|ją|ja|jego|jej|niego|nią|nia|nim|niej|mu|tamten|tamtego|tamto|ponownie|znowu)$/i;
 
+// Non-path values must never start with `-` (they would become options: `ssh -oProxyCommand=…`,
+// `curl -o/path`); paths get a ./ prefix at render time instead.
+const WORDISH = (v) => /^(?!-)[\w@.:+-]{1,64}$/.test(v);
 const VALID_SLOT = {
-  path: (v) => typeof v === 'string' && v.length < 256 && !/[\n\0]/.test(v) && /[\w~./]/.test(v),
-  name: (v) => /^[\w@.:+-]{1,64}$/.test(v), service: (v) => /^[\w@.:+-]{1,64}$/.test(v),
-  container: (v) => /^[\w@.:+-]{1,64}$/.test(v), pkg: (v) => /^[\w@.:+-]{1,64}$/.test(v), cmd: (v) => /^[\w@.:+-]{1,64}$/.test(v),
+  path: (v) => typeof v === 'string' && v.length < 256 && !/[\n\0\u0001]/.test(v) && /[\w~./]/.test(v),
+  name: WORDISH, service: WORDISH, container: WORDISH, pkg: WORDISH, cmd: WORDISH,
   branch: (v) => /^(?!-)[\w./-]{1,100}$/.test(v), user: (v) => /^[a-z_][\w.-]{0,31}$/i.test(v),
-  glob: (v) => /^\*\.[\w]{1,8}$/.test(v), url: (v) => /^\S+$/.test(v), host: (v) => /^[\w.@:-]+$/.test(v),
-  target: (v) => /^[\w.@:-]+$/.test(v),
+  glob: (v) => /^\*\.[\w]{1,8}$/.test(v),
+  url: (v) => v.length < 2048 && (/^(?:https?|ftp|ftps|ssh|git|file):\/\/[^\s/?#]*[^\s]*$/i.test(v) || /^(?!-)[\w.-]+@[\w.-]+:[^\s]+$/.test(v)),
+  host: (v) => /^(?!-)[\w.@:-]+$/.test(v), target: (v) => /^(?!-)[\w.@:-]+$/.test(v),
+  pattern: (v) => v.length < 300 && !/[\n\0]/.test(v), message: (v) => v.length < 300 && !/\0/.test(v),
 };
 for (const k of ['file', 'src', 'dst', 'dest', 'archive']) VALID_SLOT[k] = VALID_SLOT.path;
-function validSlot(k, v) {
+export function validSlot(k, v) {
   if (v == null || v === '') return false;
+  if (isAmbiguous(v)) return false;
   if (RAW_OK[k]) return RAW_OK[k](v);
   if (VALID_SLOT[k]) return VALID_SLOT[k](String(v));
-  return String(v).length < 300;
+  return String(v).length < 300 && !/\0/.test(String(v));
 }
+/** Values recovered from history go through the same validation as classifier/regex values. */
+const validHistorySlots = (slots) => Object.fromEntries(Object.entries(slots || {}).filter(([k, v]) => ['namepat', 'sedexpr'].includes(k) || validSlot(k, v)));
 
 /**
  * Slot resolution: tagger is primary, regex is fallback + validator.
@@ -115,7 +122,8 @@ export function suggest(query, opts = {}) {
       if (c.confidence < thr) return null;
       return { intent: c.intent, slots: resolveWithTagger(c.intent, q, { model, tool: c.tool }).slots };
     };
-    ctx = buildContext(opts.history, { classify: quick, cwd: opts.cwd });
+    const kind = opts.historyKind || opts.history.kind || (env.shell === 'powershell' ? 'pwsh' : 'posix');
+    ctx = buildContext(opts.history, { classify: quick, cwd: opts.cwd, kind });
   }
   const ctxFeats = ctx ? ctx.features : (opts.cwd ? cwdFlags(opts.cwd).map((c) => 'ctx_cwd=' + c) : []);
   const extras = [...envFeatures(env), ...ctxFeats];
@@ -126,7 +134,7 @@ export function suggest(query, opts = {}) {
 
   // ---- rule: "same for X" reuses the previous intent with one slot replaced ----
   if (ref?.rule === 'same-for') {
-    const b = buildCommand(ref.intent, query, { env, resolved: finalizeSlots(BY_ID[ref.intent], { ...ref.slots }) });
+    const b = buildCommand(ref.intent, query, { env, resolved: finalizeSlots(BY_ID[ref.intent], validHistorySlots(ref.slots)) });
     return { ...base, understood: true, method: 'history-rule', confidence: 1, tool: FAMILY_OF[ref.intent], candidates: [], tools: [], ...b };
   }
 
@@ -137,7 +145,7 @@ export function suggest(query, opts = {}) {
   let intent = c.intent;
   let confidence = c.confidence;
   let method = 'catalog';
-  if (ref?.rule === 'pronoun' && ref.intent) { intent = ref.intent; method = 'history-rule'; confidence = Math.max(confidence, thr); }
+  if ((ref?.rule === 'pronoun' || ref?.rule === 'refused') && ref.intent) { intent = ref.intent; method = 'history-rule'; confidence = Math.max(confidence, thr); }
   if (sb) { method = 'history-rule'; confidence = Math.max(confidence, thr); context.rule = 'same-but'; context.note = `modifies previous ${sb.lastIntent}`; }
   const out = { ...base, confidence: +confidence.toFixed(4), tool: FAMILY_OF[intent] || c.tool, tools, candidates };
 
@@ -166,9 +174,16 @@ export function suggest(query, opts = {}) {
 
   const r = resolveWithTagger(intent, query, { model, tool: FAMILY_OF[intent], mode: opts.slotMode });
   const slots = r.slots;
+  if (ref?.rule === 'refused') {
+    // the reference points at something we cannot read safely: leave the slot empty (placeholder)
+    for (const k of Object.keys(slots)) if (PRONOUN_VALUE.test(String(slots[k]))) { delete slots[k]; delete r.sources[k]; }
+    finalizeSlots(BY_ID[intent], slots);
+    method = 'history-rule';
+  }
   if (ref?.rule === 'pronoun') {
     const it = BY_ID[intent];
     for (const [k, v] of Object.entries(ref.fill)) {
+      if (!validSlot(k, v)) { if (slots[k] != null && PRONOUN_VALUE.test(String(slots[k]))) delete slots[k]; continue; }
       // the referenced value wins unless the request spells out its own value literally ("kill 4242")
       const literal = slots[k] != null && !PRONOUN_VALUE.test(String(slots[k])) && new RegExp(`(^|[^\\w])${String(slots[k]).replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}($|[^\\w])`, 'i').test(query);
       if (usesSlot(it, k) && (!literal || (k === 'path' && slots[k] === '.'))) { slots[k] = v; r.sources[k] = 'history'; }
@@ -178,18 +193,18 @@ export function suggest(query, opts = {}) {
   }
   if (sb) {
     const it = BY_ID[intent];
-    for (const [k, v] of Object.entries(sb.lastSlots || {})) {
+    for (const [k, v] of Object.entries(validHistorySlots(sb.lastSlots))) {
       if (usesSlot(it, k) && slots[k] == null && !['namepat', 'sedexpr'].includes(k)) { slots[k] = v; r.sources[k] = 'history'; }
     }
     finalizeSlots(it, slots);
   }
   let b = buildCommand(intent, query, { env, resolved: slots });
   // implicit reference: a required slot is still missing and the history has a value of that type
-  if (ctx && b.missing.length) {
+  if (ctx && b.missing.length && ref?.rule !== 'refused') {
     const filled = [];
     for (const m of b.missing) {
       const e = entityForSlot(m, ctx) || (ctx.last?.slots?.[m] != null ? { ent: m, value: ctx.last.slots[m] } : null);
-      if (e) { slots[m] = e.value; r.sources[m] = 'history'; filled.push(`${m}=${e.value}`); }
+      if (e && validSlot(m, e.value)) { slots[m] = e.value; r.sources[m] = 'history'; filled.push(`${m}=${e.value}`); }
     }
     if (filled.length) {
       finalizeSlots(BY_ID[intent], slots);

@@ -15,8 +15,8 @@
 {"lang":"en","history":["pgrep -af ffmpeg","pkill -f ffmpeg","pgrep -af ffmpeg"],"query":"it's still there, force kill it","expect_intent":"kill_force","expect_command":"pkill -9 -f ffmpeg"}
 {"lang":"en","history":["ps -p 4242 -o comm"],"query":"kill it","expect_intent":"kill_by_pid","expect_command":"kill 4242"}
 {"lang":"pl","history":["top","ps -fp 31337"],"query":"ubij ten proces","expect_intent":"kill_by_pid","expect_command":"kill 31337"}
-{"lang":"pl","history":["ss -ltnup 'sport = :8080'"],"query":"zabij to co tam siedzi","expect_intent":"kill_by_port","expect_command":"lsof -ti tcp:8080 | xargs -r kill"}
-{"lang":"en","history":["npm run dev","lsof -i :3000"],"query":"kill whatever is on that port","expect_intent":"kill_by_port","expect_command":"lsof -ti tcp:3000 | xargs -r kill"}
+{"lang":"pl","history":["ss -ltnup 'sport = :8080'"],"query":"zabij to co tam siedzi","expect_intent":"kill_by_port","expect_command":"lsof -ti tcp:8080 -sTCP:LISTEN | xargs -r kill"}
+{"lang":"en","history":["npm run dev","lsof -i :3000"],"query":"kill whatever is on that port","expect_intent":"kill_by_port","expect_command":"lsof -ti tcp:3000 -sTCP:LISTEN | xargs -r kill"}
 {"lang":"en","history":["systemctl status nginx"],"query":"restart that service","expect_intent":"service_restart","expect_command":"sudo systemctl restart nginx"}
 {"lang":"pl","history":["sudo -i","systemctl status postgresql"],"query":"zrestartuj tę usługę","expect_intent":"service_restart","expect_command":"sudo systemctl restart postgresql"}
 {"lang":"en","history":["sudo systemctl start redis-server"],"query":"stop it","expect_intent":"service_stop","expect_command":"sudo systemctl stop redis-server"}

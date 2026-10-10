@@ -2,6 +2,7 @@
 import { spawn, spawnSync } from 'node:child_process';
 import { createInterface } from 'node:readline';
 import { readFileSync } from 'node:fs';
+import { constants as osConstants } from 'node:os';
 import { getModel } from './model.js';
 import { suggest as pipelineSuggest } from './pipeline.js';
 import { checkDanger, maxRisk } from './danger.js';
@@ -21,7 +22,8 @@ Usage: tellsh [options] <request...>
 
 Options:
   -n, --dry-run     print the command only, never run it
-  -y, --yes         run without prompting (only for risk=safe catalog commands)
+  -y, --yes         run without prompting (only risk=safe commands straight from the catalog;
+                    never history-resolved, composed, incomplete or medium/high-risk ones)
   -e, --explain     show tool/intent scores, slots and their source
       --json        machine-readable output (implies --dry-run)
       --shell <s>   target shell: bash|zsh|sh|powershell|fish|cmd (default: detected)
@@ -112,7 +114,7 @@ export function runShell(command, shellName = normShell(process.env.SHELL) || 'b
   return new Promise((res) => {
     const child = spawn(shell, args, { stdio: 'inherit', windowsVerbatimArguments: shell === 'cmd.exe' });
     child.on('error', (e) => { console.error(`tellsh: cannot start ${shell}: ${e.message}`); res(127); });
-    child.on('exit', (code, sig) => res(code ?? (sig ? 128 + 1 : 1)));
+    child.on('exit', (code, sig) => res(code ?? (sig ? 128 + (osConstants.signals[sig] ?? 1) : 1)));
   });
 }
 
@@ -182,8 +184,8 @@ export async function main(argv = process.argv.slice(2)) {
   const interactive = process.stdin.isTTY && process.stdout.isTTY;
   const shellName = s.shell;
   if (opts.yes) {
-    if (s.risk !== 'safe' || s.missing.length || s.method === 'composed') {
-      const why = s.method === 'composed' ? 'composed (experimental)' : s.missing.length ? 'incomplete' : s.risk;
+    if (s.risk !== 'safe' || s.missing.length || s.method !== 'catalog') {
+      const why = s.method === 'composed' ? 'composed (experimental)' : s.method !== 'catalog' ? 'resolved from history' : s.missing.length ? 'incomplete' : s.risk;
       console.log(C.yellow(`  --yes only auto-runs safe catalog commands; this one is ${why}. Not running.`));
       return 4;
     }

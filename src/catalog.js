@@ -55,7 +55,8 @@ export const INTENTS = [
   T('duplicate_files', 'Find duplicate files by content hash',
     'find {path} -type f -exec md5sum {} + | sort | uniq -w32 -dD',
     { path: '.' }, 'safe',
-    { darwin: "find {path} -type f -exec md5 -r {} + | sort | awk '{ if (seen[$1]++) print }'" }),
+    // sorted `hash path` lines: print every member of a group, including the first one
+    { darwin: "find {path} -type f -exec md5 -r {} + | sort | awk '$1 == p { if (!shown) print last; print; shown = 1; next } { p = $1; last = $0; shown = 0 }'" }),
   T('find_symlinks', 'List symbolic links', 'find {path} -type l -ls', { path: '.' }),
   T('broken_symlinks', 'Find broken symbolic links', 'find {path} -xtype l',
     { path: '.' }, 'safe', { darwin: 'find -L {path} -type l' }),
@@ -102,12 +103,13 @@ export const INTENTS = [
     { darwin: 'shasum -a 256 {file}' }),
   T('hash_md5', 'Compute MD5 checksum', 'md5sum {file}', { file: null }, 'safe', { darwin: 'md5 {file}' }),
   T('base64_encode', 'Base64-encode text or a file',
-    (s, q) => s.file ? `base64 ${q(s.file)}` : `printf '%s' ${q(s.text ?? '<TEXT>')} | base64`,
+    // macOS base64 takes no positional file operand: it needs -i FILE
+    (s, q, os) => s.file ? (os === 'darwin' ? `base64 -i ${q(s.file)}` : `base64 ${q(s.file)}`) : `printf '%s' ${q(s.text ?? '<TEXT>')} | base64`,
     {}),
   T('base64_decode', 'Decode base64 text or a file',
     (s, q, os) => {
       const d = os === 'darwin' ? 'base64 -D' : 'base64 -d';
-      return s.file ? `${d} ${q(s.file)}` : `printf '%s' ${q(s.text ?? '<TEXT>')} | ${d}`;
+      return s.file ? `${d} ${os === 'darwin' ? '-i ' : ''}${q(s.file)}` : `printf '%s' ${q(s.text ?? '<TEXT>')} | ${d}`;
     }, {}),
 
   // ---------- processes ----------
@@ -121,8 +123,9 @@ export const INTENTS = [
   T('kill_force', 'Force-kill (SIGKILL) processes by name', 'pkill -9 -f {name}', { name: null }, 'high'),
   T('kill_by_pid', 'Kill a process by PID', 'kill {pid!raw}', { pid: null }, 'high'),
   T('kill_by_port', 'Kill the process listening on a port',
-    'lsof -ti tcp:{port!raw} | xargs -r kill', { port: null }, 'high',
-    { darwin: 'lsof -ti tcp:{port!raw} | xargs kill', notes: 'needs lsof' }),
+    // -sTCP:LISTEN: only the server; plain `-i tcp:PORT` also matches clients connected to that port
+    'lsof -ti tcp:{port!raw} -sTCP:LISTEN | xargs -r kill', { port: null }, 'high',
+    { darwin: 'lsof -ti tcp:{port!raw} -sTCP:LISTEN | xargs kill', notes: 'needs lsof' }),
   T('listening_ports', 'Show listening ports', 'ss -tulpn', {}, 'safe',
     { darwin: 'lsof -iTCP -sTCP:LISTEN -n -P' }),
   T('process_on_port', 'Which process is using a port', "ss -ltnup 'sport = :{port!raw}'",
@@ -150,7 +153,7 @@ export const INTENTS = [
   T('show_path', 'Show PATH entries one per line', "echo \"$PATH\" | tr ':' '\\n'", {}),
   T('history_search', 'Search shell history',
     'grep -ai -- {pattern} "${HISTFILE:-$HOME/.bash_history}"', { pattern: null }, 'safe',
-    { notes: 'reads $HISTFILE (history builtin is empty in a subshell); zsh: ~/.zsh_history' }),
+    { notes: 'reads the history file (the history builtin is empty in a subshell, and HISTFILE is not exported to it)' }),
   T('date_time', 'Show current date and time', 'date', {}),
   T('timezone', 'Show the system time zone',
     'timedatectl show -p Timezone --value 2>/dev/null || cat /etc/timezone', {}, 'safe',

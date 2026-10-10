@@ -3,6 +3,7 @@
 // Keys per intent (all optional):
 //   bsd      macOS/BSD userland (bash/zsh/sh on macOS without GNU coreutils), used before catalog `darwin`
 //   gnuMac   macOS + Homebrew GNU coreutils (g-prefixed: gdu, gsort, gmd5sum, guniq, ...)
+//   zsh      zsh only (bash/sh keep the POSIX choice)
 //   busybox  BusyBox userland (Alpine etc.) - only where the GNU template uses flags/tools busybox lacks
 //   fish     fish 3.x - only where the POSIX template is not valid fish
 //   pwsh     PowerShell: a string (all OSes) or { win, unix }. A missing `unix` means the renderer falls back
@@ -404,6 +405,7 @@ export const VARIANTS = {
     cmd: 'echo %PATH:;=&echo.%',
   },
   history_search: {
+    zsh: 'grep -ai -- {pattern} "${HISTFILE:-$HOME/.zsh_history}"',
     busybox: 'grep -i -- {pattern} "${HISTFILE:-$HOME/.ash_history}"',
     fish: 'history search --contains -- {pattern}',
     pwsh: 'Select-String -LiteralPath (Get-PSReadLineOption).HistorySavePath -Pattern {pattern}',
