@@ -21,8 +21,11 @@ const N = +(process.env.WARM_N || 600);
 const sample = Array.from({ length: N }, (_, i) => queries[(i * 7919) % queries.length]);
 const env = { shell: 'bash', os: 'linux', coreutils: 'gnu' };
 const out = { machine: cpus()[0].model, node: process.version, affinity: spawnSync('sh', ['-c', `taskset -pc ${process.pid}`], { encoding: 'utf8' }).stdout.trim().split(': ')[1] };
+const ONLY_C = !!process.env.ONLY_C;
+if (ONLY_C) Object.assign(out, JSON.parse(readFileSync(join(ROOT, 'build/hybrid/bench.json'), 'utf8')));
 const model = getModel();
 const time = async (fn) => { const ts = []; for (const s of sample) { const t = performance.now(); await fn(s); ts.push(performance.now() - t); } return ts; };
+if (!ONLY_C) {
 for (const s of sample.slice(0, 50)) suggest(s, { env, model, compose: 'off' });
 out.warm_A = stat(await time((s) => suggest(s, { env, model, compose: 'off' })));
 for (const rt of ['node', 'web']) {
@@ -50,6 +53,7 @@ if (abD.length) out.cold_AB_deferred_only = stat(abD);
 out.cold_B = stat(cold('B', coldQs.slice(0, 10)).map((x) => x[0]));
 const d = findModelDir();
 if (d) out.bundle = Object.fromEntries(readdirSync(d).map((f) => [f, statSync(join(d, f)).size]));
+}
 // C: llama.cpp (GGUF) prompt processing on one thread, if available
 const LB = process.env.LLAMA_BIN;
 if (LB && existsSync(join(LB, 'llama-bench'))) {
@@ -59,7 +63,7 @@ if (LB && existsSync(join(LB, 'llama-bench'))) {
     // cold: load + one few-shot-sized prompt, new process
     const prompt = 'x '.repeat(300);
     const ts = [];
-    for (let i = 0; i < 3; i++) { const t = performance.now(); spawnSync(join(LB, 'llama-cli'), ['-m', f, '-t', '1', '-p', prompt, '-n', '1', '-no-cnv', '--no-warmup'], { encoding: 'utf8', env: { ...process.env, LD_LIBRARY_PATH: LB } }); ts.push(performance.now() - t); }
+    for (let i = 0; i < 3; i++) { const t = performance.now(); const r2 = spawnSync(join(LB, 'llama-completion'), ['-m', f, '-t', '1', '-p', prompt, '-n', '1', '-no-cnv', '--no-warmup'], { encoding: 'utf8', input: '', env: { ...process.env, LD_LIBRARY_PATH: LB } }); if (r2.status !== 0) throw new Error('llama-completion failed: ' + r2.stderr.slice(-300)); ts.push(performance.now() - t); }
     out[`C_cold_${f.split('/').pop()}`] = stat(ts);
   }
 }

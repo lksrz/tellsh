@@ -34,6 +34,7 @@ const pct = (a, b) => (b ? `${((100 * a) / b).toFixed(1)}%` : 'n/a');
 const key = (text, env) => `${env.shell}|${env.os}|${text}`;
 const envOf = (r) => ({ shell: r.shell || 'bash', os: r.os || 'linux', coreutils: (r.os || 'linux') === 'darwin' ? 'bsd' : 'gnu' });
 const BASH = { shell: 'bash', os: 'linux', coreutils: 'gnu' };
+const TAG = arg('tag', ''); // separate policy/results files per LM variant (e.g. --tag=_ft)
 
 // ---------------------------------------------------------------- model outputs (cached)
 const encoder = has('no-b') ? null : await Encoder.load({ dir: arg('enc'), threads: +arg('threads', 1) });
@@ -117,13 +118,13 @@ if (has('calibrate')) {
     if (/C/.test(sys) && !LM.size) continue;
     out[sys] = grid(sys);
   }
-  writeFileSync(join(ROOT, 'build/hybrid/policy.json'), JSON.stringify(out, (k, v) => (v === Infinity ? 'Infinity' : v), 1));
+  writeFileSync(join(ROOT, `build/hybrid/policy${TAG}.json`), JSON.stringify(out, (k, v) => (v === Infinity ? 'Infinity' : v), 1));
   console.log(JSON.stringify(out, (k, v) => (v === Infinity ? 'Infinity' : v)));
   process.exit(0);
 }
 
 // ---------------------------------------------------------------- evaluation
-const cal = existsSync(join(ROOT, 'build/hybrid/policy.json')) ? JSON.parse(readFileSync(join(ROOT, 'build/hybrid/policy.json'), 'utf8')) : {};
+const cal = existsSync(join(ROOT, `build/hybrid/policy${TAG}.json`)) ? JSON.parse(readFileSync(join(ROOT, `build/hybrid/policy${TAG}.json`), 'utf8')) : {};
 const policyOf = (sys) => {
   const p = cal[sys]?.P ? { ...cal[sys].P } : { ...POLICY[sys] };
   if (p.tau === 'Infinity') p.tau = Infinity;
@@ -132,7 +133,8 @@ const policyOf = (sys) => {
 };
 const model = getModel();
 const thr = model.thresholds.accept;
-const active = SYSTEMS.filter((s) => (/B/.test(s) ? !!encoder : /C/.test(s) ? LM.size > 0 : true));
+const ONLY = arg('systems') ? arg('systems').split(',') : null;
+const active = SYSTEMS.filter((s) => !ONLY || ONLY.includes(s)).filter((s) => (/B/.test(s) ? !!encoder : /C/.test(s) ? LM.size > 0 : true));
 
 async function run(sys, text, env, extra = {}) {
   if (sys === 'A') return suggest(text, { env, model, compose: 'off', ...extra });
@@ -324,5 +326,5 @@ for (const sys of active) {
   R.history[sys] = [hist.length, ok];
 }
 
-writeFileSync(join(ROOT, 'build/hybrid/results.json'), JSON.stringify({ R, policies: Object.fromEntries(active.map((s) => [s, policyOf(s)])), lmRows: LM.size, privateRows: privRows.length }, (k, v) => (v === Infinity ? 'Infinity' : v), 1));
+writeFileSync(join(ROOT, `build/hybrid/results${TAG}.json`), JSON.stringify({ R, policies: Object.fromEntries(active.map((s) => [s, policyOf(s)])), lmRows: LM.size, privateRows: privRows.length }, (k, v) => (v === Infinity ? 'Infinity' : v), 1));
 console.error(`wrote build/hybrid/results.json in ${((Date.now() - t0) / 1000).toFixed(0)}s`);

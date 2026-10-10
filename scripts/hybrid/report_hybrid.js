@@ -7,13 +7,25 @@ import { fileURLToPath } from 'node:url';
 const ROOT = fileURLToPath(new URL('../..', import.meta.url));
 const J = (f) => (existsSync(join(ROOT, f)) ? JSON.parse(readFileSync(join(ROOT, f), 'utf8')) : null);
 const res = J('build/hybrid/results.json');
+// fine-tuned C variant (eval_hybrid.js --tag=_ft): merged in as C-ft / A+C-ft / A+C-ft-safe
+const ft = J('build/hybrid/results_ft.json');
+const merge = (dst, src) => {
+  for (const [k, v] of Object.entries(src)) {
+    if (/C/.test(k) && !/^(en|pl|all)$/.test(k) && typeof v === 'object' && !Array.isArray(v) && ['C', 'A+C', 'A+C-safe'].includes(k)) dst[k.replace('C', 'C-ft')] = v;
+    else if (typeof v === 'object' && v && !Array.isArray(v) && dst[k] && typeof dst[k] === 'object') merge(dst[k], v);
+  }
+};
+if (ft) merge(res.R, ft.R);
 const bench = J('build/hybrid/bench.json');
 const pol = J('build/hybrid/policy.json');
+const polFt = J('build/hybrid/policy_ft.json');
+if (pol && polFt) for (const k of ['C', 'A+C', 'A+C-safe']) if (polFt[k]) pol[k.replace('C', 'C-ft')] = polFt[k];
 const zs = existsSync(join(ROOT, 'build/hybrid/zeroshot.jsonl')) ? readFileSync(join(ROOT, 'build/hybrid/zeroshot.jsonl'), 'utf8').trim().split('\n').map((l) => JSON.parse(l)) : [];
 const pct = (a, b) => (b ? `${((100 * a) / b).toFixed(1)}%` : 'n/a');
 const R = res.R;
-const SYS = Object.keys(R.eval);
-const NAME = { A: 'A cascade (v0.2)', B: 'B encoder alone', C: 'C LM rerank alone', 'A+B': 'A+B hybrid', 'A+C': 'A+C hybrid', 'A+B-safe': 'A+B safe (no rescue)', 'A+C-safe': 'A+C safe (no rescue)' };
+const ORDER = ['A', 'B', 'A+B', 'A+B-safe', 'C', 'A+C', 'A+C-safe', 'C-ft', 'A+C-ft', 'A+C-ft-safe'];
+const SYS = ORDER.filter((s) => R.eval[s]);
+const NAME = { 'C-ft': 'C-ft LM rerank alone (LoRA)', 'A+C-ft': 'A+C-ft hybrid', 'A+C-ft-safe': 'A+C-ft safe (no rescue)', A: 'A cascade (v0.2)', B: 'B encoder alone', C: 'C LM rerank alone', 'A+B': 'A+B hybrid', 'A+C': 'A+C hybrid', 'A+B-safe': 'A+B safe (no rescue)', 'A+C-safe': 'A+C safe (no rescue)' };
 const md = [];
 const L = (s = '') => md.push(s);
 
@@ -64,7 +76,7 @@ L('|---|---|---|---|---|');
 for (const s of SYS) {
   const f = (x) => (x ? `${pct(x.all[1], x.all[0])} (${pct(x.en[1], x.en[0])} / ${pct(x.pl[1], x.pl[0])})` : 'n/a');
   const h = R.history[s];
-  L(`| ${NAME[s]} | ${f(R.e2e.relex[s])} | ${f(R.e2e.blind[s])} | ${R.e2e.blind_novel[s] ? pct(R.e2e.blind_novel[s].all[1], R.e2e.blind_novel[s].all[0]) : 'n/a'} | ${h ? `${h[1]}/${h[0]}` : 'n/a'} |`);
+  L(`| ${NAME[s]} | ${/^C/.test(s) && R.e2e.relex[s]?.all[0] < 200 ? `n/a (n=${R.e2e.relex[s]?.all[0]})` : f(R.e2e.relex[s])} | ${f(R.e2e.blind[s])} | ${R.e2e.blind_novel[s] ? pct(R.e2e.blind_novel[s].all[1], R.e2e.blind_novel[s].all[0]) : 'n/a'} | ${h ? `${h[1]}/${h[0]}` : 'n/a'} |`);
 }
 L();
 if (pol) {
@@ -75,7 +87,7 @@ if (pol) {
   L('| system | tau (A conf to answer alone) | k | alpha (weight of log pA) | accept | none | dev decision acc | dev deferred |');
   L('|---|---|---|---|---|---|---|---|');
   L(`| A_dev alone | – | – | – | – | – | ${(pol.A.acc * 100).toFixed(1)}% | – |`);
-  for (const s of ['B', 'A+B', 'A+B-safe', 'C', 'A+C', 'A+C-safe']) {
+  for (const s of ['B', 'A+B', 'A+B-safe', 'C', 'A+C', 'A+C-safe', 'C-ft', 'A+C-ft', 'A+C-ft-safe']) {
     const p = pol[s]; if (!p) continue;
     L(`| ${s} | ${p.P.tau} | ${p.P.k} | ${p.P.alpha} | ${p.P.accept} | ${p.P.none}${p.P.keepNone ? ', keepNone' : ''} | ${(p.s.acc * 100).toFixed(1)}% (n=${p.s.n}) | ${(p.s.deferred * 100).toFixed(1)}% |`);
   }
@@ -114,6 +126,29 @@ if (bench) {
   }
   L();
   if (bench.bundle) L(`B bundle files: ${Object.entries(bench.bundle).map(([f, s]) => `${f} ${(s / 1e6).toFixed(1)} MB`).join(', ')}.`);
+  L();
+}
+const quant = J('build/hybrid/quant.json');
+if (quant) {
+  L('### B quantisation (dev split, 600 rows; 1-core onnxruntime-node p50)');
+  L();
+  L('| variant | size MB | dev intent acc | argmax agreement with fp32 | p50 ms |');
+  L('|---|---|---|---|---|');
+  for (const q of quant) L(`| ${q.variant} | ${q.mb} | ${q.dev_acc != null ? (q.dev_acc * 100).toFixed(1) + '%' : 'n/a'} | ${(q.agree * 100).toFixed(1)}% | ${q.p50_ms ?? 'n/a'} |`);
+  L();
+}
+const sz = J('build/hybrid/sizes.json');
+if (sz) {
+  L('### Sizes');
+  L();
+  L('| artefact | size |');
+  L('|---|---|');
+  L(`| tellsh npm package (A, zero dependencies) | ${sz.tellsh_pack_mb} MB packed (model.bin ${sz.model_bin_mb} MB) |`);
+  L(`| B bundle (tellsh-model-enc): encoder.int8.onnx + vocab.json | ${sz.enc_onnx_mb} + ${sz.enc_vocab_mb} MB (${sz.enc_bundle_tgz_mb} MB .tgz) |`);
+  L(`| B params: e5-small ${sz.e5_small_full_params_m}M -> PL+EN vocab ${sz.vocab_before} -> ${sz.vocab_after} pieces ${sz.e5_pruned_params_m}M -> 6 layers ${sz.e5_pruned_6l_params_m}M | |`);
+  L(`| onnxruntime-node (runtime for B) | ${sz.ort_node_tgz_mb} MB .tgz, ${sz.ort_node_unpacked_mb} MB unpacked (all platforms), + ${sz.ort_node_cuda_postinstall_mb} MB CUDA EP downloaded by its postinstall on linux-x64 (skip: \`--onnxruntime-node-install=skip\`); linux-x64 lib alone ${sz.ort_node_linux_x64_so_mb} MB |`);
+  L(`| onnxruntime-web (WASM alternative) | ${sz.ort_web_tgz_mb} MB .tgz (one .wasm ${sz.ort_web_wasm_mb} MB) |`);
+  L(`| C: Qwen2.5-0.5B GGUF | q8_0 ${sz.qwen05_q8_gguf_mb} MB, Q4_K_M ${sz.qwen05_q4km_gguf_mb} MB (+ llama.cpp CPU build ${sz.llama_cpp_cpu_release_tgz_mb} MB) |`);
   L();
 }
 const block = `<!-- hybrid:start -->\n${md.join('\n').trim()}\n<!-- hybrid:end -->`;
