@@ -134,10 +134,14 @@ escapes and native cmdlets such as `Get-Content -LiteralPath`, `Remove-Item`, `S
 If the latest value of the referenced type depends on the shell state (`cat $F`, `rm *.log`), comes from a line that
 cannot be parsed, or from an unknown command naming a path, the reference is **refused** (the slot stays a
 placeholder) rather than resolved to an older value. A directory that was only searched or filtered (`find /var/log
--name '*.gz'`, `grep -rl TODO src`, `Get-ChildItem DIR -Filter *.pdf`, `ls DIR | grep pdf`), or only listed when the
-request says "them"/"those"/"je" (`ls /tmp/build` + "delete them"), is never the target of a changing command: the
-results live inside it. "Same for X" is refused when a newer line used other targets than the command it would repeat
-(or when X names nothing), and a quoted `'~/x'` from history stays the literal directory `./~/x`.
+-name '*.gz'`, `grep -rl TODO src`, `Get-ChildItem DIR -Filter *.pdf`, a listing piped into any later stage such as
+`ls DIR | sort | grep pdf` or `ls -S DIR | head -1`), or only listed when the request says "them"/"those"/"je"
+(`ls /tmp/build` + "delete them"), is never the target of a changing command: the results live inside it. An
+argument-less `ls`/`Get-ChildItem` lists the directory of the latest `cd`, and a `tellsh list directory X` line counts
+as a listing too. "Same for X" / "same but …" are refused for a changing command when any newer line (or a later
+segment of the same line) ran after it, or when X names nothing the previous command takes. A slot of the previous
+command that depends on the shell state (`find "$DIR" …`) stays a placeholder. With a refused or pronoun source ("move
+them to /tmp/old"), the named path is the destination. A quoted `'~/x'` from history stays the literal directory `./~/x`.
 
 * deterministic rules: "same for /var" / "to samo dla /var" (previous intent, one slot replaced), "delete it" /
   "usuń to", "logs of that container" / "logi tego kontenera", "kill it" / "zabij go" (verb × entity type table; a
@@ -167,7 +171,7 @@ compression from the archive name, `bash -n` and an allowed-flag check validate 
   chmod, mv, sudo, …), **high** (destructive: rm, kill, prune, discard). v0.2 raised 10 intents from safe to medium after
   the teacher review (see `EVAL.md`).
 * `src/danger.js` scans the **final** command — also edited ones — and can only escalate. It tokenizes each simple
-  command (quotes, `--`, long options, `sudo`/`xargs`/`env` wrappers, `bash -c '…'`/`eval`/`'…' | bash` payloads) and
+  command (quotes, `--`, long options, `sudo`/`xargs`/`env` wrappers, `bash -c '…'`/`su -c '…'`/`flock -c '…'`/`eval`/`'…' | bash` payloads) and
   strips `git`/`docker` global options (`git -C dir -c k=v reset --hard` = `git reset --hard`). POSIX: `rm -rf` /
   `rm --recursive --force` on `/`, `~`, `~/*`, `"/"`, `/usr`, …, `mkfs`, `dd of=/dev/…`, fork bombs, `curl | sh`,
   `bash <(curl …)`, `sh -c "$(curl …)"`, force-push (incl. `+branch`), redirects into `/etc` (`>>`, `1>`, `&>`),
@@ -204,8 +208,8 @@ All numbers are on held-out data never used for training (`npm run eval`, `npm r
 | composer on out-of-catalogue requests: acceptable / exact | 49.0% / 47.1% (dev set) · any answer acceptable 52.9% · v0.3 blind set (58): acceptable 22.4% · false fires on catalog requests 0.5% |
 | out-of-domain rejected | 94.6% (blind set 100%) |
 | model size | **2.71 MB** (v0.1: 3.68 MB) |
-| latency, `taskset -c 0`: cold process p50 / p95 | **158 / 187 ms** (bare `node -e 0`: 72 ms) |
-| latency, warm full cascade + tagger + render p50 / p95 | **0.30 / 2.1 ms** |
+| latency, `taskset -c 0`: cold process p50 / p95 | **160 / 179 ms** (bare `node -e 0`: 75 ms) |
+| latency, warm full cascade + tagger + render p50 / p95 | **0.32 / 1.8 ms** |
 
 ## Data & licenses
 

@@ -307,6 +307,10 @@ function psNative(head, args, ents, setIntent) {
       else if (!['set-location', 'sl', 'chdir', 'push-location'].includes(head)) ents.listDir = true;
     }
   }
+  else if (kind === 'dir' && !['set-location', 'sl', 'chdir', 'push-location'].includes(head)) {
+    // Get-ChildItem without a path lists the working directory
+    ents.listCwd = named.filter != null || named.include != null || named.exclude != null || [...sw].some((x) => x.length >= 2 && 'recurse'.startsWith(x)) ? 'search' : 'list';
+  }
   else if (kind === 'remove' && path != null) ents[[...sw].some((s) => 'recurse'.startsWith(s)) ? 'dir' : typeByExt(path)] ??= path;
   else if (kind === 'copy') { const d = named.destination ?? pos[1]; if (d != null) destEnts(path != null ? String(path).split(',') : [], d, ents); }
   else if (kind === 'new' && path != null) ents[/^dir/i.test(named.itemtype ?? named.type ?? '') ? 'dir' : 'file'] ??= path;
@@ -379,7 +383,10 @@ export function analyzeCommand(line, classify, kind = 'posix') {
     const q = tellshQuery(t, k);
     const r = q && classify ? classify(q) : null;
     if (r?.intent) { intent = r.intent; slots = { ...(r.slots || {}) }; entsFromSlots(intent, slots, ents); }
-    return { line: t, intent, slots, ents, at: {}, ...(isSearchRoot(intent, slots, ents) ? { searchDir: true } : {}), fromTellsh: true, ambiguous };
+    // `tellsh list directory /tmp/build`: like `ls /tmp/build`, the user saw the entries of the directory
+    const sr = isSearchRoot(intent, slots, ents);
+    const ld = !sr && ents.dir != null && FAMILY_OF[intent] === 'ls';
+    return { line: t, intent, slots, ents, at: {}, ...(sr ? { searchDir: true } : {}), ...(ld ? { listDir: true } : {}), fromTellsh: true, ambiguous };
   }
   const split = splitCommand(t, k, { keepRedirects: true });
   if (!split.ok) {
@@ -393,10 +400,14 @@ export function analyzeCommand(line, classify, kind = 'posix') {
   let segIntent = null;
   let segSlots = {};
   let segIntentAt = -1;
+  let intentStale = false;
   let cdAt = -1;
   let searchDir = false;
   let listDir = false;
+  let listsCwd = null; // an argument-less listing of the working directory: 'list' | 'search' (filtered)
   const at = {};
+  // segments from..to-1 are connected by pipes only
+  const samePipe = (from, to) => from >= 0 && split.segments.slice(from, to).every((s) => s.sep === '|');
   const firstWord = (s) => { let w = s.words.filter((x) => !REDIR_TARGET_OP.test(x) && !REDIR_DUP_OP.test(x)); while (w.length && (w[0] === 'sudo' || /^\w+=/.test(w[0]))) w = w.slice(1); return w[0]; };
   split.segments.forEach(({ words }, segIdx) => {
     const e = {};
@@ -418,6 +429,17 @@ export function analyzeCommand(line, classify, kind = 'posix') {
     while (w.length && (w[0] === 'sudo' || /^\w+=/.test(w[0]))) w = w.slice(1);
     if (w.length) segmentEnts(w, e, setIntent, split, k, segIdx, firstWord);
     if (redirTarget != null) e.file = redirTarget;
+    // a listing piped into anything (`ls DIR | sort | grep pdf`, `ls -S DIR | head -1`, `gci DIR | Select-Object
+    // -First 1`): what the user saw is a selection of the entries inside DIR, never DIR itself
+    const piped = split.segments[segIdx].sep.startsWith('|') && !split.segments[segIdx].sep.startsWith('||');
+    if (e.listDir && piped) { e.searchDir = true; delete e.listDir; }
+    if (e.listCwd) {
+      const how = piped ? 'search' : e.listCwd;
+      // `cd DIR && ls | grep pdf`: the listing is of DIR
+      if (cdAt >= 0 && at.dir === cdAt) { if (how === 'search') { searchDir = true; listDir = false; } else if (!searchDir) listDir = true; }
+      else if (cdAt < 0 && listsCwd !== 'search') listsCwd = how;
+      delete e.listCwd;
+    }
     const head = w.length && !isAmbiguous(w[0]) ? w[0].replace(/^.*[\\/]/, '').toLowerCase() : '';
     if (CD_HEADS.has(head)) {
       // the working directory changes: earlier relative paths (and a relative cd target) are stale
@@ -431,7 +453,8 @@ export function analyzeCommand(line, classify, kind = 'posix') {
     if (e.dir !== undefined) { searchDir = !!e.searchDir; listDir = !!e.listDir; }
     // `ls ~/Downloads | grep pdf`, `gci DIR | Where-Object …`: the listed directory was filtered, so what
     // the user saw are entries inside it
-    else if (segIdx > 0 && split.segments[segIdx - 1].sep === '|' && at.dir === segIdx - 1 && FILTER_HEADS.has(head)) searchDir = true;
+    // (any later stage of the same pipeline, not only the next one)
+    else if (segIdx > 0 && at.dir != null && at.dir < segIdx && samePipe(at.dir, segIdx) && FILTER_HEADS.has(head)) searchDir = true;
     delete e.searchDir;
     delete e.listDir;
     for (const key of Object.keys(e)) at[key] = segIdx;
@@ -443,15 +466,23 @@ export function analyzeCommand(line, classify, kind = 'posix') {
     const ie = {};
     entsFromSlots(intent, slots, ie);
     for (const key of Object.keys(ie)) at[key] = split.segments.length;
-    if (ie.dir !== undefined) { searchDir = isSearchRoot(intent, slots, ie); listDir = !searchDir && ['ls', 'find'].includes(FAMILY_OF[intent]); }
+    if (ie.dir !== undefined) {
+      // a piped/filtered listing found above stays a search root even when the line is a catalog command
+      const piped = searchDir && String(ie.dir) === String(ents.dir);
+      searchDir = isSearchRoot(intent, slots, ie) || piped;
+      listDir = !searchDir && ['ls', 'find'].includes(FAMILY_OF[intent]);
+    }
     ents = { ...ents, ...ie };
   } else if (segIntent) {
     intent = segIntent; slots = { ...segSlots };
     if (segIntentAt < cdAt) staleRelative({}, slots);
+    // `kill 1111; ls newdir`: another command ran after the one tellsh could repeat
+    if (split.segments.slice(segIntentAt, -1).some((s) => s.sep !== '|')) intentStale = true;
   }
   if (Object.values(slots).some(isAmbiguous)) ambiguous = true;
   return { line: t, intent, slots, ents, at, ambiguous, ...(searchDir && ents.dir != null ? { searchDir: true } : {}),
-    ...(listDir && !searchDir && ents.dir != null ? { listDir: true } : {}), ...(cdAt >= 0 ? { cd: true } : {}) };
+    ...(listDir && !searchDir && ents.dir != null ? { listDir: true } : {}), ...(cdAt >= 0 ? { cd: true } : {}),
+    ...(listsCwd ? { listsCwd } : {}), ...(intentStale ? { intentStale: true } : {}) };
 }
 
 // pipeline stages that filter the entries of a listing piped into them
@@ -588,6 +619,8 @@ function segmentEnts(w, e, setIntent, split, k, segIdx, firstWord) {
     // find ROOT -name ...: the search root; other heads: the last directory argument (`ls /a /b` -> /b)
     const p = head === 'find' ? nonFlags[0] : nonFlags.filter((a) => !isGlob(a)).pop();
     if (p) { e.dir = p; if (head === 'find') e.searchDir = true; else if (['ls', 'tree'].includes(head)) e.listDir = true; }
+    // `ls`, `ls *.pdf`: the working directory (a glob selects some of its entries)
+    else if (['ls', 'tree'].includes(head)) e.listCwd = nonFlags.some(isGlob) ? 'search' : 'list';
   } else if (!INERT_HEADS.has(head.toLowerCase())) {
     // unknown command (or unknown cmdlet) naming a path: we cannot tell what it did with it, so an
     // older file/dir must not be picked up by "it"
@@ -601,11 +634,13 @@ const ENT_TYPES = ['container', 'service', 'pid', 'proc', 'port', 'file', 'dir',
 /**
  * Build the context object from history commands (oldest first).
  * kind: 'posix' | 'pwsh' (default: `cmds.kind` as set by loadHistory, else posix)
- * -> { n, ents: {type: value}, entOrder: [types by recency], refOrder, searchRoots, last: {intent, slots, ambiguous}, features: [...] }
+ * -> { n, ents: {type: value}, entOrder: [types by recency], refOrder, searchRoots, listedDirs, last: {intent, slots, age, ambiguous, skipped}, features: [...] }
  *    values that could not be read unambiguously are kept as AMB-prefixed strings (see isAmbiguous)
  *    entOrder ranks types by line only (it feeds ctxFeatures, which the model was trained on);
  *    refOrder also ranks the segments of one line (`cat old.txt; ls newdir`: dir before file) and is
- *    what pronoun resolution uses. searchRoots: dir values whose newest use was as a find/grep root.
+ *    what pronoun resolution uses. searchRoots: dir values whose newest use was as a find/grep root or a
+ *    filtered/piped listing (also the `cd` directory of a later argument-less `ls | grep …`); listedDirs: plain
+ *    listings. last.skipped: a newer line (or a later segment of its line) ran after the last repeatable command.
  */
 export function buildContext(cmds, { classify, cwd, kind, query } = {}) {
   const k = kind || cmds.kind || 'posix';
@@ -616,8 +651,8 @@ export function buildContext(cmds, { classify, cwd, kind, query } = {}) {
   const searchRoots = new Set();
   const listedDirs = new Set();
   let last = null;
-  let newerUses = false; // a line newer than `last` named something (last is then not "the previous command")
   let current = null;
+  let cwdListing = null; // a newer line listed the working directory without naming it ('list' | 'search')
   const list = [...cmds];
   // zsh (share_history / inc_append_history), fish and PSReadLine write the running line to the
   // history file before it executes: the current `tellsh <query>` call is not a previous command
@@ -638,9 +673,15 @@ export function buildContext(cmds, { classify, cwd, kind, query } = {}) {
       staleRelative(a.ents, a.slots);
       if (Object.values(a.slots).some(isAmbiguous)) a.ambiguous = true;
     }
+    if (a.cd) {
+      // `cd ~/Downloads` then `ls | grep pdf`: the listing (newer) was of this directory
+      const v = a.ents.dir;
+      if (cwdListing && v != null && !isAmbiguous(v)) (cwdListing === 'search' ? searchRoots : listedDirs).add(String(v));
+      cwdListing = null;
+    } else if (a.listsCwd && cwdListing !== 'search') cwdListing = a.listsCwd;
     if (a.cd) cdAfter = true;
-    if (!last && a.intent) last = { intent: a.intent, slots: a.slots, age: i, ambiguous: !!a.ambiguous, skipped: newerUses };
-    if (!last && (a.opaque || Object.keys(a.ents).length)) newerUses = true;
+    // skipped: `last` is not the previous command (any newer line ran after it, or a later segment of its own line)
+    if (!last && a.intent) last = { intent: a.intent, slots: a.slots, age: i, ambiguous: !!a.ambiguous, skipped: i > 0 || !!a.intentStale };
     if (current == null && a.ents.current && !isAmbiguous(a.ents.current)) current = a.ents.current;
     for (const t of ENT_TYPES) {
       if (a.ents[t] == null) continue;
@@ -694,6 +735,9 @@ const SAME_RES = [
   /^\s*(?:tak samo|analogicznie|powt[oó]rz)\s+(?:dla|w|we|na)\s+(.+?)\s*[?!.]*$/i,
   /^\s*(?:a\s+)?co\s+z\s+(.+?)\s*[?!.]*$/i,
 ];
+
+// the forms that can only mean "repeat the previous command" (not "what about X" / "a w X")
+const EXPLICIT_SAME = [SAME_RES[0], SAME_RES[3], SAME_RES[4], SAME_RES[6]];
 
 // all rule regexes run on the diacritic-folded, lowercased query (same length as the original)
 const fold = (q) => foldKeepLength(String(q)).toLowerCase();
@@ -791,9 +835,13 @@ export function resolveReference(query, ctx) {
     if (!rt && !arg.trim().split(/\s+/).some((w) => !PRONOUN_WORD.test(fold(w)) && !isStopWord(fold(w)))) {
       return { rule: 'refused', intent: null, stop: true, note: `"${arg}" does not name a new target for the previous ${ctx.last.intent}; not guessing` };
     }
-    // a newer line used other targets: replaying the older changing command for a new target is a guess
+    // any newer line ran after it: replaying the older changing command for a new target is a guess
     if (rt && ctx.last.skipped && BY_ID[ctx.last.intent].risk !== 'safe') {
       return { rule: 'refused', intent: null, stop: true, note: `the newest command that tellsh can repeat (${ctx.last.intent}) is not the previous command; not guessing` };
+    }
+    // "same for /srv/x" after `git status`: the previous command has no slot for it; not a new request either
+    if (!rt && EXPLICIT_SAME.some((re) => re.test(fold(query)))) {
+      return { rule: 'refused', intent: null, stop: true, note: `the previous command (${ctx.last.intent}) has nothing that "${arg}" could replace; not guessing` };
     }
     if (rt) {
       const slots = { ...ctx.last.slots, [rt.slot]: rt.value };
@@ -893,7 +941,9 @@ export function sameBut(query, ctx) {
   if (!ctx?.last) return null;
   const fq = fold(query);
   const lastSlots = Object.fromEntries(Object.entries(ctx.last.slots || {}).filter(([, v]) => !isAmbiguous(v)));
-  for (const re of SAME_BUT) if (re.test(fq)) return { lastIntent: ctx.last.intent, lastSlots };
+  // slots of the previous command that depend on the shell state ("$DIR"): withheld, never the catalog default
+  const blank = Object.keys(ctx.last.slots || {}).filter((k) => isAmbiguous(ctx.last.slots[k]));
+  for (const re of SAME_BUT) if (re.test(fq)) return { lastIntent: ctx.last.intent, lastSlots, blank, skipped: !!ctx.last.skipped };
   return null;
 }
 

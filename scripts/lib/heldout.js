@@ -7,6 +7,7 @@ import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { normalize } from '../../src/features.js';
 import { CONTRAST_RULES } from './confusable.js';
+import { SLOT_CASES } from '../../test/slot-cases.js';
 
 const readJsonl = (p) => (existsSync(p) ? readFileSync(p, 'utf8').split('\n').filter((l) => l.trim()).map((l) => JSON.parse(l)) : []);
 const readDir = (d) => (existsSync(d) ? readdirSync(d).filter((f) => f.endsWith('.jsonl')).sort().flatMap((f) => readJsonl(join(d, f))) : []);
@@ -24,7 +25,10 @@ export function nearKey(text) {
   return normalize(text).split(' ').filter((w) => w && !FILLER.has(w)).sort().join(' ');
 }
 
-/** Raw held-out request texts (eval sets, blind sets, slot gold, slot cases). */
+/**
+ * Raw held-out request texts (eval sets, blind sets, slot gold, the hand-written slot cases of
+ * test/slot-cases.js). Every caller (gen_data.js, teacher.js) gets the same index.
+ */
 export function heldOutTexts(root, extra = []) {
   const r = (...p) => readJsonl(join(root, 'data', ...p));
   return [
@@ -35,6 +39,7 @@ export function heldOutTexts(root, extra = []) {
     ...r('slots', 'gold.jsonl').map((x) => x.text),
     ...r('ood_eval.jsonl').map((x) => x.text),
     ...readDir(join(root, 'data', 'blind')).map((x) => x.text ?? x.query),
+    ...SLOT_CASES.map((c) => c[1]),
     ...extra,
   ].filter(Boolean);
 }

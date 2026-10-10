@@ -84,14 +84,32 @@ const WRAPPER_OPTARG = {
   taskset: /^-[c]$/,
   'systemd-run': /^-[upEH]$|^--(?:unit|property|setenv|host|machine|description|slice|uid|gid|working-directory|on-calendar|on-active)$/,
   runuser: /^-[ugl]$|^--(?:user|group|login)$/,
+  pkexec: /^--user$/,
+  chrt: /^-[TPD]$|^--(?:sched-runtime|sched-period|sched-deadline)$/,
+  cgexec: /^-g$/,
+  torsocks: /^-[uapP]$|^--(?:user|pass|address|port)$/,
 };
+// wrappers (and su) that run a command string given with -c / --command: `flock -c "rm -rf /" LOCK`,
+// `su -c "…"`, `runuser root -c "…"`
+const CMD_STRING_OPT = { flock: /^-c$|^--command$/, su: /^-\w*c$|^--(?:command|session-command)$/, runuser: /^-\w*c$|^--(?:command|session-command)$/ };
 const WRAPPERS = new Set(['sudo', 'doas', 'command', 'builtin', 'exec', 'nohup', 'time', 'nice', 'ionice', 'then', 'do', 'else', '&', 'busybox', 'toybox', 'xargs', 'timeout', 'chroot', 'stdbuf', 'env', 'setsid', 'unbuffer', 'caffeinate',
-  'unshare', 'watch', 'nsenter', 'setpriv', 'strace', 'ltrace', 'flock', 'taskset', 'systemd-run', 'runuser', 'firejail', 'proot', 'fakeroot']);
-function commandWords(words) {
+  'unshare', 'watch', 'nsenter', 'setpriv', 'strace', 'ltrace', 'flock', 'taskset', 'systemd-run', 'runuser', 'firejail', 'proot', 'fakeroot',
+  'pkexec', 'chrt', 'cgexec', 'eatmydata', 'torsocks', 'catchsegv']);
+/** The command a wrapper chain runs. `inner` collects command strings given as option values (`su -c "…"`). */
+function commandWords(words, inner = []) {
   let w = words;
   for (;;) {
     while (w.length && /^\w+=/.test(w[0])) w = w.slice(1);
     const h = (w[0] || '').replace(/^.*[\\/]/, '').toLowerCase();
+    const cmdOpt = CMD_STRING_OPT[h];
+    if (cmdOpt) {
+      for (let i = 1; i < w.length; i++) {
+        if (w[i] === '--') break;
+        const eq = String(w[i]).match(/^(--(?:command|session-command))=(.*)$/s);
+        if (eq && cmdOpt.test(eq[1])) inner.push(eq[2]);
+        else if (cmdOpt.test(w[i]) && w[i + 1] != null) inner.push(w[++i]);
+      }
+    }
     if (!WRAPPERS.has(h)) return w;
     w = w.slice(1);
     const optArg = WRAPPER_OPTARG[h];
@@ -106,6 +124,7 @@ function commandWords(words) {
     if (h === 'chroot' && w.length) w = w.slice(1); // NEWROOT
     if (h === 'flock' && w.length) w = w.slice(1); // LOCKFILE
     if (h === 'taskset' && w.length && /^(?:0x)?[\da-f,-]+$/i.test(w[0])) w = w.slice(1); // MASK (without -c: always one)
+    if (h === 'chrt' && w.length && /^\d+$/.test(w[0])) w = w.slice(1); // PRIORITY
   }
 }
 
@@ -382,7 +401,7 @@ export function checkDanger(command, baseRisk = 'safe') {
   const inner = [];
   // structural checks run on both readings of backslashes (POSIX escapes / Windows path separators)
   for (const words of [...simpleCommands(text), ...simpleCommands(text, { winPaths: true })]) {
-    const w = commandWords(words);
+    const w = commandWords(words, inner);
     if (!w.length) continue;
     const head = w[0].replace(/^.*[\\/]/, '');
     const lower = head.toLowerCase().replace(/\.exe$/, '');

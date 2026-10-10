@@ -12,7 +12,6 @@ import { FAMILIES, FAMILY_OF, NONE, TAG_TYPES } from '../src/tools.js';
 import { vectorize, normalize, tagTokens, tagFeatures } from '../src/features.js';
 import { ctxFeatures } from '../src/history.js';
 import { silverSpans, relex, bioLabels, mulberry32, EVAL_VALUES } from './lib/silver.js';
-import { SLOT_CASES } from '../test/slot-cases.js';
 import { heldOutTexts, heldOutIndex } from './lib/heldout.js';
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
@@ -102,7 +101,7 @@ function main() {
 
   // held-out texts (never trained on), with filler-word near-duplicates and contrastive rewrites
   // (scripts/lib/heldout.js)
-  const heldOut = heldOutIndex(heldOutTexts(ROOT, SLOT_CASES.map((c) => c[1])));
+  const heldOut = heldOutIndex(heldOutTexts(ROOT));
   // eval-only slot values (scripts/lib/silver.js EVAL_POOLS) must never occur in training text
   const esc = (v) => v.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
   const evalValRe = new RegExp(`(?<![\\p{L}\\d_])(?:${[...EVAL_VALUES].sort((a, b) => b.length - a.length).map(esc).join('|')})(?![\\p{L}\\d_])`, 'iu');
