@@ -9,4 +9,4 @@ Fixes for `review/r1-claude.md` and `review/r1-codex.md` (commits 2b5eea8..91d3b
 - bb2aac3 — per-shell quoting (PowerShell native arguments, cmd switches, fish), CLI/parser/model robustness.
 - 91d3b2c — v0.3.0; CLI exits cleanly on a closed pipe.
 
-The retrain these commits needed was not shipped in round 1; round 2 (`review/fix2-log.md`) retrains the model and regenerates EVAL.md.
+The retrain these commits needed was not shipped in round 1, and not in round 2 either (see `review/fix2-log.md`); it shipped in round 3 (`review/fix3-log.md`).

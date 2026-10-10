@@ -1,6 +1,7 @@
 // Held-out texts shared by gen_data.js, teacher.js and eval.js. A training text leaks when it equals a
-// held-out text after normalize(), when it equals one after filler words are removed ("list all symlinks
-// in X" vs "list symlinks in X"), or when it is a contrastive rewrite (scripts/lib/confusable.js) of a
+// held-out text after normalize(), when it equals one after filler words are removed and word order is
+// ignored ("list all symlinks in X" vs "list symlinks in X", "show disks and partitions" vs "partitions and
+// disks show"), or when it is a contrastive rewrite (scripts/lib/confusable.js) of a
 // held-out text ("push my commits" -> "pull my commits").
 import { readFileSync, readdirSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
@@ -15,9 +16,12 @@ const FILLER = new Set(('a an the all any some every each my me our your please 
   'wszystkie wszystkich wszystko mi mnie moje moich moj moja moim prosze teraz aktualnie obecnie sobie moze mozesz ' +
   'czy jakies jakie tu tutaj').split(' '));
 
-/** Order-preserving key without filler words (normalize() first: lowercase, no diacritics, digits -> 0). */
+/**
+ * Key without filler words and word order (normalize() first: lowercase, no diacritics, digits -> 0):
+ * "last 30 kernel messages" and "kernel messages last 30" are the same request for leakage purposes.
+ */
 export function nearKey(text) {
-  return normalize(text).split(' ').filter((w) => w && !FILLER.has(w)).join(' ');
+  return normalize(text).split(' ').filter((w) => w && !FILLER.has(w)).sort().join(' ');
 }
 
 /** Raw held-out request texts (eval sets, blind sets, slot gold, slot cases). */

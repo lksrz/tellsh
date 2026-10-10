@@ -74,8 +74,19 @@ const WRAPPER_OPTARG = {
   env: /^-[uCS]$|^--(?:unset|chdir|split-string)$/,
   time: /^-[fo]$|^--(?:format|output)$/,
   exec: /^-a$/,
+  unshare: /^-[SGRwl]$|^--(?:setuid|setgid|root|wd|map-user|map-group|propagation|setgroups)$/,
+  watch: /^-[nq]$|^--(?:interval|equexit)$/,
+  nsenter: /^-[tSGrw]$|^--(?:target|setuid|setgid|root|wd)$/,
+  setpriv: /^--(?:reuid|regid|groups|inh-caps|ambient-caps|bounding-set|securebits|pdeathsig|selinux-label|apparmor-profile)$/,
+  strace: /^-[eoopsuPIEXbS]$/,
+  ltrace: /^-[eoopsuPnS]$/,
+  flock: /^-[wEc]$|^--(?:timeout|wait|conflict-exit-code|command)$/,
+  taskset: /^-[c]$/,
+  'systemd-run': /^-[upEH]$|^--(?:unit|property|setenv|host|machine|description|slice|uid|gid|working-directory|on-calendar|on-active)$/,
+  runuser: /^-[ugl]$|^--(?:user|group|login)$/,
 };
-const WRAPPERS = new Set(['sudo', 'doas', 'command', 'builtin', 'exec', 'nohup', 'time', 'nice', 'ionice', 'then', 'do', 'else', '&', 'busybox', 'toybox', 'xargs', 'timeout', 'chroot', 'stdbuf', 'env', 'setsid', 'unbuffer', 'caffeinate']);
+const WRAPPERS = new Set(['sudo', 'doas', 'command', 'builtin', 'exec', 'nohup', 'time', 'nice', 'ionice', 'then', 'do', 'else', '&', 'busybox', 'toybox', 'xargs', 'timeout', 'chroot', 'stdbuf', 'env', 'setsid', 'unbuffer', 'caffeinate',
+  'unshare', 'watch', 'nsenter', 'setpriv', 'strace', 'ltrace', 'flock', 'taskset', 'systemd-run', 'runuser', 'firejail', 'proot', 'fakeroot']);
 function commandWords(words) {
   let w = words;
   for (;;) {
@@ -93,6 +104,8 @@ function commandWords(words) {
     if (h === 'env') while (w.length && /^\w+=/.test(w[0])) w = w.slice(1);
     if (h === 'timeout' && w.length) w = w.slice(1); // DURATION
     if (h === 'chroot' && w.length) w = w.slice(1); // NEWROOT
+    if (h === 'flock' && w.length) w = w.slice(1); // LOCKFILE
+    if (h === 'taskset' && w.length && /^(?:0x)?[\da-f,-]+$/i.test(w[0])) w = w.slice(1); // MASK (without -c: always one)
   }
 }
 
@@ -324,6 +337,7 @@ const RULES = [
   [/\bdocker\s+(?:system|volume|image|container|network|builder)\s+prune\b|\bdocker\s+(?:rmi?|container\s+rm|image\s+rm|volume\s+rm)\b/, 'high', 'deletes docker data'],
   [/\b(?:shutdown|reboot|halt|poweroff)\b|\binit\s+[06]\b/, 'high', 'shuts down / reboots the machine'],
   [/\b(?:pkill|killall)\b|\bdocker\s+kill\b/, 'high', 'terminates processes'],
+  [/\b(?:shred|wipe|blkdiscard|truncate)\b[^|;&]*\s['"]?\/dev\/(?:sd|hd|vd|xvd|nvme|mmcblk|disk|md|dm-|mapper\/|loop)\w*/, 'high', 'destroys a whole disk device', true],
   [/\b(?:shred|truncate)\b/, 'high', 'destroys file contents'],
   [/\biptables\s+-F\b|\bufw\s+disable\b/, 'high', 'drops firewall rules'],
   [/\bmv\s+\S+\s+\/dev\/null\b/, 'high', 'moves a file into /dev/null (deletes it)', true],

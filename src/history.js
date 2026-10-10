@@ -298,7 +298,15 @@ function psNative(head, args, ents, setIntent) {
   const path = named.literalpath ?? named.lp ?? named.path ?? named.pspath ?? pos[0];
   if (kind === 'file' && path != null) ents.file ??= path;
   else if (kind === 'path' && path != null) ents[typeByExt(path)] ??= path;
-  else if (kind === 'dir' && path != null) ents.dir ??= path;
+  else if (kind === 'dir' && path != null) {
+    if (ents.dir == null) {
+      ents.dir = path;
+      // Get-ChildItem DIR -Filter/-Include/-Exclude/-Recurse (or DIR *.tmp): the matches live inside DIR
+      if (!['set-location', 'sl', 'chdir', 'push-location'].includes(head) &&
+          (named.filter != null || named.include != null || named.exclude != null || pos[1] != null || [...sw].some((x) => x.length >= 2 && 'recurse'.startsWith(x)))) ents.searchDir = true;
+      else if (!['set-location', 'sl', 'chdir', 'push-location'].includes(head)) ents.listDir = true;
+    }
+  }
   else if (kind === 'remove' && path != null) ents[[...sw].some((s) => 'recurse'.startsWith(s)) ? 'dir' : typeByExt(path)] ??= path;
   else if (kind === 'copy') { const d = named.destination ?? pos[1]; if (d != null) destEnts(path != null ? String(path).split(',') : [], d, ents); }
   else if (kind === 'new' && path != null) ents[/^dir/i.test(named.itemtype ?? named.type ?? '') ? 'dir' : 'file'] ??= path;
@@ -345,7 +353,7 @@ export function tellshQuery(line, kind = 'posix') {
   const t = String(line).trim();
   const tm = t.match(TELLSH_LINE);
   if (!tm) return null;
-  const w = wordsOf(tm[1] || '', lineKind(t, kind));
+  const w = wordsOf(tm[1] || '', lineKind(t, kind), { literalTilde: false });
   return w ? w.filter((x) => !/^-/.test(x)).map(rawOf).join(' ') : '';
 }
 
@@ -387,6 +395,7 @@ export function analyzeCommand(line, classify, kind = 'posix') {
   let segIntentAt = -1;
   let cdAt = -1;
   let searchDir = false;
+  let listDir = false;
   const at = {};
   const firstWord = (s) => { let w = s.words.filter((x) => !REDIR_TARGET_OP.test(x) && !REDIR_DUP_OP.test(x)); while (w.length && (w[0] === 'sudo' || /^\w+=/.test(w[0]))) w = w.slice(1); return w[0]; };
   split.segments.forEach(({ words }, segIdx) => {
@@ -419,8 +428,12 @@ export function analyzeCommand(line, classify, kind = 'posix') {
       else e.dir = AMB + (target ?? '-');
       delete e.file;
     }
-    if (e.dir !== undefined) searchDir = !!e.searchDir;
+    if (e.dir !== undefined) { searchDir = !!e.searchDir; listDir = !!e.listDir; }
+    // `ls ~/Downloads | grep pdf`, `gci DIR | Where-Object …`: the listed directory was filtered, so what
+    // the user saw are entries inside it
+    else if (segIdx > 0 && split.segments[segIdx - 1].sep === '|' && at.dir === segIdx - 1 && FILTER_HEADS.has(head)) searchDir = true;
     delete e.searchDir;
+    delete e.listDir;
     for (const key of Object.keys(e)) at[key] = segIdx;
     Object.assign(ents, e); // later segments supersede earlier ones
   });
@@ -430,15 +443,20 @@ export function analyzeCommand(line, classify, kind = 'posix') {
     const ie = {};
     entsFromSlots(intent, slots, ie);
     for (const key of Object.keys(ie)) at[key] = split.segments.length;
-    if (ie.dir !== undefined) searchDir = isSearchRoot(intent, slots, ie);
+    if (ie.dir !== undefined) { searchDir = isSearchRoot(intent, slots, ie); listDir = !searchDir && ['ls', 'find'].includes(FAMILY_OF[intent]); }
     ents = { ...ents, ...ie };
   } else if (segIntent) {
     intent = segIntent; slots = { ...segSlots };
     if (segIntentAt < cdAt) staleRelative({}, slots);
   }
   if (Object.values(slots).some(isAmbiguous)) ambiguous = true;
-  return { line: t, intent, slots, ents, at, ambiguous, ...(searchDir && ents.dir != null ? { searchDir: true } : {}), ...(cdAt >= 0 ? { cd: true } : {}) };
+  return { line: t, intent, slots, ents, at, ambiguous, ...(searchDir && ents.dir != null ? { searchDir: true } : {}),
+    ...(listDir && !searchDir && ents.dir != null ? { listDir: true } : {}), ...(cdAt >= 0 ? { cd: true } : {}) };
 }
+
+// pipeline stages that filter the entries of a listing piped into them
+const FILTER_HEADS = new Set(['grep', 'egrep', 'fgrep', 'rg', 'ack', 'ag', 'findstr', 'select-string', 'sls', 'where-object', 'where', '?']);
+const GREP_HEADS = new Set(['grep', 'egrep', 'fgrep', 'rg', 'ack', 'ag']);
 
 // find/grep catalog intents: their path slot is where the search ran, not what it found
 const isSearchRoot = (intent, slots, ents) => ents.dir != null && ['find', 'grep'].includes(FAMILY_OF[intent]) && String(ents.dir) === String(slots.path);
@@ -498,8 +516,8 @@ function segmentEnts(w, e, setIntent, split, k, segIdx, firstWord) {
     const inverted = flags.some((f) => /^-[a-zA-Z]*v/.test(f) || f === '--invert-match');
     const pat = opts['-e'] ?? opts['--regexp'] ?? pos[0];
     if (!inverted && pat != null) e.proc = pat;
-  } else if ((head === 'grep' || head === 'rg') && nonFlags[0]) {
-    const { pos, opts, flags } = parseArgs(args, VALUE_OPTS[head]);
+  } else if (GREP_HEADS.has(head) && nonFlags[0]) {
+    const { pos, opts, flags } = parseArgs(args, VALUE_OPTS[head] || VALUE_OPTS.grep);
     const pat = opts['-e'] ?? opts['--regexp'] ?? pos[0];
     const path = opts['-e'] != null || opts['--regexp'] != null ? pos[0] : pos[1];
     if (pat != null) setIntent(flags.some((a) => /^-\w*l/.test(a)) ? 'grep_files_containing' : 'grep_text', { pattern: rawOf(pat), ...(path != null ? { path } : {}) });
@@ -514,6 +532,13 @@ function segmentEnts(w, e, setIntent, split, k, segIdx, firstWord) {
   } else if (head === 'git') {
     const sub = nonFlags[0];
     const rest = args.slice(args.indexOf(sub) + 1);
+    if (sub === 'grep') {
+      // git grep [-l] PATTERN [DIR]: a search, its directory argument is only where it looked
+      const { pos, opts } = parseArgs(rest, VALUE_OPTS.grep);
+      const path = opts['-e'] != null ? pos[0] : pos[1];
+      if (path != null) { const t = typeByExt(path); e[t] = path; if (t === 'dir') e.searchDir = true; }
+      return;
+    }
     if (sub === 'checkout' || sub === 'switch') {
       const { pos, opts, after } = parseArgs(rest, VALUE_OPTS[sub]);
       const created = opts['-b'] ?? opts['-B'] ?? opts['-c'] ?? opts['-C'] ?? opts['--create'] ?? opts['--force-create'] ?? opts['--orphan'];
@@ -562,7 +587,7 @@ function segmentEnts(w, e, setIntent, split, k, segIdx, firstWord) {
   } else if (DIR_HEADS.has(head)) {
     // find ROOT -name ...: the search root; other heads: the last directory argument (`ls /a /b` -> /b)
     const p = head === 'find' ? nonFlags[0] : nonFlags.filter((a) => !isGlob(a)).pop();
-    if (p) { e.dir = p; if (head === 'find') e.searchDir = true; }
+    if (p) { e.dir = p; if (head === 'find') e.searchDir = true; else if (['ls', 'tree'].includes(head)) e.listDir = true; }
   } else if (!INERT_HEADS.has(head.toLowerCase())) {
     // unknown command (or unknown cmdlet) naming a path: we cannot tell what it did with it, so an
     // older file/dir must not be picked up by "it"
@@ -589,7 +614,9 @@ export function buildContext(cmds, { classify, cwd, kind, query } = {}) {
   const recency = {};
   const pos = {};
   const searchRoots = new Set();
+  const listedDirs = new Set();
   let last = null;
+  let newerUses = false; // a line newer than `last` named something (last is then not "the previous command")
   let current = null;
   const list = [...cmds];
   // zsh (share_history / inc_append_history), fish and PSReadLine write the running line to the
@@ -612,7 +639,8 @@ export function buildContext(cmds, { classify, cwd, kind, query } = {}) {
       if (Object.values(a.slots).some(isAmbiguous)) a.ambiguous = true;
     }
     if (a.cd) cdAfter = true;
-    if (!last && a.intent) last = { intent: a.intent, slots: a.slots, age: i, ambiguous: !!a.ambiguous };
+    if (!last && a.intent) last = { intent: a.intent, slots: a.slots, age: i, ambiguous: !!a.ambiguous, skipped: newerUses };
+    if (!last && (a.opaque || Object.keys(a.ents).length)) newerUses = true;
     if (current == null && a.ents.current && !isAmbiguous(a.ents.current)) current = a.ents.current;
     for (const t of ENT_TYPES) {
       if (a.ents[t] == null) continue;
@@ -621,13 +649,14 @@ export function buildContext(cmds, { classify, cwd, kind, query } = {}) {
       if (!(all[t] ??= []).includes(v)) {
         all[t].push(v);
         if (t === 'dir' && a.searchDir) searchRoots.add(v); // its newest use was as a search root
+        if (t === 'dir' && a.listDir) listedDirs.add(v); // ... or as a listing
       }
     }
   });
   const byType = (a, b) => ENT_TYPES.indexOf(a) - ENT_TYPES.indexOf(b);
   const entOrder = Object.keys(ents).sort((a, b) => recency[a] - recency[b] || byType(a, b));
   const refOrder = Object.keys(ents).sort((a, b) => recency[a] - recency[b] || pos[b] - pos[a] || byType(a, b));
-  const ctx = { n: recent.length, ents, all, currentBranch: current, entOrder, refOrder, searchRoots, last, cwdFlags: cwdFlags(cwd) };
+  const ctx = { n: recent.length, ents, all, currentBranch: current, entOrder, refOrder, searchRoots, listedDirs, last, cwdFlags: cwdFlags(cwd) };
   ctx.features = ctxFeatures(ctx);
   return ctx;
 }
@@ -670,6 +699,8 @@ const SAME_RES = [
 const fold = (q) => foldKeepLength(String(q)).toLowerCase();
 const PRONOUN_EN = /\b(it|its|that|this|them|those|these|the same one)\b/;
 const PRONOUN_WORD = /^(it|its|that|this|them|those|these|one|again|there|here|tego|ten|te|ta|tej|tym|go|je|ja|jego|jej|niego|nia|nim|niej|mu|im|tamten|tamtego|tamta|tamtej|tamto|tamtym|to|force|forced|forcibly|sila|sile|silowo|recursive\w*|rekurencyjn\w*|please|prosze|too|also|tez|rowniez)$/;
+// plural references: the entries of a listing, never the listed directory itself
+const PLURAL = /(?:^|[^a-z])(them|those|these|je|te|tamte|ich|nimi)(?=$|[^a-z])/;
 const PRONOUN_PL = /(?:^|\s)(tego|ten|te|ta|tej|tym|go|je|ja|jego|jej|niego|nia|nim|niej|mu|im|tamten|tamtego|tamta|tamtej|tamto|tamtym)(?=\s|$|[?!.,])|(?:^|\s)to(?=\s*[?!.]*$|\s+(?:co|ktor\w*|tam))/;
 
 const NOUN_TYPE = [
@@ -756,26 +787,35 @@ export function resolveReference(query, ctx) {
   const arg = sameFor(query);
   if (arg && ctx.last) {
     const rt = retarget(ctx.last.intent, arg);
+    // "what about this": no new argument at all, nothing to retarget
+    if (!rt && !arg.trim().split(/\s+/).some((w) => !PRONOUN_WORD.test(fold(w)) && !isStopWord(fold(w)))) {
+      return { rule: 'refused', intent: null, stop: true, note: `"${arg}" does not name a new target for the previous ${ctx.last.intent}; not guessing` };
+    }
+    // a newer line used other targets: replaying the older changing command for a new target is a guess
+    if (rt && ctx.last.skipped && BY_ID[ctx.last.intent].risk !== 'safe') {
+      return { rule: 'refused', intent: null, stop: true, note: `the newest command that tellsh can repeat (${ctx.last.intent}) is not the previous command; not guessing` };
+    }
     if (rt) {
       const slots = { ...ctx.last.slots, [rt.slot]: rt.value };
       const amb = Object.entries(slots).find(([, v]) => isAmbiguous(v));
-      if (amb) return { rule: 'refused', intent: ctx.last.intent, note: `previous ${ctx.last.intent} has ${amb[0]}=${rawOf(amb[1])}, which depends on the shell state; not guessing` };
+      if (amb) return { rule: 'refused', intent: ctx.last.intent, blank: [amb[0]], note: `previous ${ctx.last.intent} has ${amb[0]}=${rawOf(amb[1])}, which depends on the shell state; not guessing` };
       if (rt.slot === 'ext') delete slots.glob;
       if (rt.slot === 'name') delete slots.namepat;
-      return { rule: 'same-for', intent: ctx.last.intent, slots, note: `same as previous ${ctx.last.intent} with ${rt.slot}=${rt.value}` };
+      return { rule: 'same-for', intent: ctx.last.intent, slots, changed: rt.slot, note: `same as previous ${ctx.last.intent} with ${rt.slot}=${rt.value}` };
     }
   }
   if (!hasPronoun(query) || !ctx.entOrder.length) return null;
   // which entity does the pronoun point at? noun hint first ("that container"), else most recent
   const fq = fold(query);
+  const order = ctx.refOrder || ctx.entOrder;
   let types = null;
   const named = [];
-  for (const [re, ts] of NOUN_TYPE) if (re.test(fq)) { named.push(...ts); types = ts.filter((t) => ctx.ents[t] != null); if (types.length) break; }
+  // several types for one noun ("that process": pid or name): the newest one wins
+  for (const [re, ts] of NOUN_TYPE) if (re.test(fq)) { named.push(...ts); types = ts.filter((t) => ctx.ents[t] != null).sort((a, b) => order.indexOf(a) - order.indexOf(b)); if (types.length) break; }
   // "delete that branch" with no branch in history: refuse instead of using another type's value
   if (named.length && !types?.length) {
-    return { rule: 'refused', intent: null, ent: named[0], note: `no ${named[0]} in the recent history; not guessing` };
+    return { rule: 'refused', intent: null, ent: named[0], blank: [...new Set(named.flatMap((t) => SLOT_FROM_ENT[t] || []))], note: `no ${named[0]} in the recent history; not guessing` };
   }
-  const order = ctx.refOrder || ctx.entOrder;
   const ent = (types && types.length ? types : order)[0];
   if (!ent) return null;
   let intent = null;
@@ -789,19 +829,24 @@ export function resolveReference(query, ctx) {
   const finalEnt = intent ? (Object.entries(SLOT_FROM_ENT).find(([e]) => ctx.ents[e] != null && intentUses(intent, e)) ? pickEnt(intent, ent, ctx) : ent) : ent;
   const value = chooseValue(finalEnt, fq, ctx, verb);
   if (value == null || isAmbiguous(value)) {
-    return { rule: 'refused', intent, ent: finalEnt, note: `the latest ${finalEnt} in history (${rawOf(value ?? '?')}) cannot be read unambiguously; not guessing` };
+    return { rule: 'refused', intent, ent: finalEnt, blank: SLOT_FROM_ENT[finalEnt], note: `the latest ${finalEnt} in history (${rawOf(value ?? '?')}) cannot be read unambiguously; not guessing` };
   }
-  // `find /var/log -name '*.gz'` + "delete them": the search root is not what the search found
-  const searchRoot = finalEnt === 'dir' && !!ctx.searchRoots?.has(String(value));
+  // `find /var/log -name '*.gz'` + "delete them": the search root is not what the search found;
+  // `ls /tmp/build` + "delete them": "them" are the listed entries, not the directory
+  const listedOnly = finalEnt === 'dir' && PLURAL.test(fq) && !!ctx.listedDirs?.has(String(value));
+  const searchRoot = finalEnt === 'dir' && (!!ctx.searchRoots?.has(String(value)) || listedOnly);
+  const rootNote = listedOnly && !ctx.searchRoots?.has(String(value))
+    ? `"${PLURAL.exec(fq)[1]}" are the entries listed in ${value}, not the directory; not guessing`
+    : `the latest dir in history (${value}) is where a search ran, not what it found; not guessing`;
   if (searchRoot && intent && BY_ID[intent].risk !== 'safe') {
-    return { rule: 'refused', intent, ent: finalEnt, note: `the latest dir in history (${value}) is where a search ran, not what it found; not guessing` };
+    return { rule: 'refused', intent, ent: finalEnt, blank: SLOT_FROM_ENT[finalEnt], note: rootNote };
   }
   if (intent === 'kill_by_name' && FORCE.test(fq)) intent = 'kill_force';
   if (intent === 'extract_targz' && /\.zip$/i.test(value)) intent = 'extract_zip';
   const fill = {};
   for (const s of SLOT_FROM_ENT[finalEnt] || []) fill[s] = value;
   // searchRoot: the caller must not use the value for a non-safe intent it picks itself
-  return { rule: 'pronoun', intent, fill, ent: finalEnt, ...(searchRoot ? { searchRoot: true } : {}), note: `"${finalEnt}" from history = ${value}` };
+  return { rule: 'pronoun', intent, fill, ent: finalEnt, ...(searchRoot ? { searchRoot: true, rootNote } : {}), note: `"${finalEnt}" from history = ${value}` };
 }
 
 /**

@@ -115,7 +115,7 @@ The intent and slots are shared; only the rendering differs (`src/render.js`, va
 | sh (dash / busybox) | **v1** | POSIX-only templates; tests run `sh -n` (dash) and `busybox sh -n`; busybox variants for 24 intents (no `ps --sort`, `find -printf`, …) |
 | PowerShell (7, mostly 5.1) | **v1** | real cmdlets (`Get-ChildItem`, `Get-Process`, `Stop-Process`, `Get-NetTCPConnection`, …) for 146/149 on Windows; on Linux/macOS native tools or `bash -c '…'`; gaps: chmod, chmod +x, cal on Windows |
 | fish | best effort | POSIX template with fish quoting + fish overrides (`string join \n $PATH`, history, …); not syntax-checked (fish not installed in CI) |
-| cmd.exe | best effort | 117/149 (`dir /s /b`, `tasklist`, `taskkill`, `netstat -ano | findstr`, `certutil -hashfile`, …); the rest reports a gap (exit 5) |
+| cmd.exe | best effort | 114/149 (`dir /s /b`, `tasklist`, `taskkill`, `netstat -ano | findstr`, `certutil -hashfile`, …); the rest reports a gap (exit 5) |
 
 * **macOS** = BSD userland unless Homebrew GNU coreutils (`gdu` + `gsort`) are on `PATH`: `du -k … | sort -rn` instead of
   `sort -h`, `sed -i ''`, `stat -f`, `md5 -r`, `lsof` instead of `ss`, `vm_stat`, `launchctl`/`brew services`, …
@@ -133,7 +133,11 @@ Lines are split with a shell-aware tokenizer (`a\ b.txt`, quoted `;`/`|`, redire
 escapes and native cmdlets such as `Get-Content -LiteralPath`, `Remove-Item`, `Stop-Process -Id`, `Restart-Service`).
 If the latest value of the referenced type depends on the shell state (`cat $F`, `rm *.log`), comes from a line that
 cannot be parsed, or from an unknown command naming a path, the reference is **refused** (the slot stays a
-placeholder) rather than resolved to an older value.
+placeholder) rather than resolved to an older value. A directory that was only searched or filtered (`find /var/log
+-name '*.gz'`, `grep -rl TODO src`, `Get-ChildItem DIR -Filter *.pdf`, `ls DIR | grep pdf`), or only listed when the
+request says "them"/"those"/"je" (`ls /tmp/build` + "delete them"), is never the target of a changing command: the
+results live inside it. "Same for X" is refused when a newer line used other targets than the command it would repeat
+(or when X names nothing), and a quoted `'~/x'` from history stays the literal directory `./~/x`.
 
 * deterministic rules: "same for /var" / "to samo dla /var" (previous intent, one slot replaced), "delete it" /
   "usuń to", "logs of that container" / "logi tego kontenera", "kill it" / "zabij go" (verb × entity type table; a
@@ -188,19 +192,20 @@ All numbers are on held-out data never used for training (`npm run eval`, `npm r
 
 | metric | result |
 |---|---|
-| stage 1 tool family top-1 / top-3 (`data/eval`, 2384 EN+PL) | **96.9% / 99.7%** |
-| stage 2 intent top-1 (EN / PL) | **95.2%** (95.3% / 95.1%); v0.1 flat classifier: 95.2% |
-| per shell, intent top-1 (bash · zsh · sh · PowerShell · fish · cmd) | 95.2 · 95.5 · 95.0 · 94.8 · 95.1 · 94.6% |
+| stage 1 tool family top-1 / top-3 (`data/eval`, 2384 EN+PL) | **97.2% / 99.7%** |
+| stage 2 intent top-1 (EN / PL) | **95.6%** (95.2% / 96.1%); v0.1 flat classifier: 95.2% |
+| per shell, intent top-1 (bash · zsh · sh · PowerShell · fish · cmd) | 95.6 · 95.6 · 95.7 · 95.2 · 95.8 · 95.7% |
 | renders passing `bash -n` / `sh -n` | 148/148 bash · zsh · sh (+ all 149 intents × 5 POSIX envs in `npm test`) |
-| slot F1, hand-annotated gold (tagger + regex fallback / tagger / regex) | **95.7%** / 94.2% / 94.5% |
-| end-to-end exact command, relexicalised held-out values (full pipeline / gold intent) | **82.8%** / 92.2% |
+| slot F1, hand-annotated gold (tagger + regex fallback / tagger / regex) | **96.3%** / 94.6% / 95.1% |
+| end-to-end exact command, relexicalised held-out values (full pipeline / gold intent) | **85.3%** / 93.9% |
+| blind sets (v0.3, separate author): intent top-1 · end-to-end exact command | 98.8% (clean subset 98.6%) · 96.1% (clean 96.0%) |
 | hand-written slot cases, exact command | 99/99 |
-| history references, exact command (48 EN+PL; without history 0%) | **97.9%** (dev set, blind first run 60.4%) |
-| composer on out-of-catalogue requests: acceptable / exact | 29.4% / 27.5% (blind first run 3.9%) · any answer acceptable 31.4% · false fires on catalog requests 0.7% |
-| out-of-domain rejected | 92.4% |
+| history references, exact command (48 EN+PL; without history 0%) | **97.9%** (dev set, blind first run 60.4%) · v0.3 blind set (79): 82.3% |
+| composer on out-of-catalogue requests: acceptable / exact | 49.0% / 47.1% (dev set) · any answer acceptable 52.9% · v0.3 blind set (58): acceptable 22.4% · false fires on catalog requests 0.5% |
+| out-of-domain rejected | 94.6% (blind set 100%) |
 | model size | **2.71 MB** (v0.1: 3.68 MB) |
-| latency, `taskset -c 0`: cold process p50 / p95 | **159 / 190 ms** (bare `node -e 0`: 104 ms) |
-| latency, warm full cascade + tagger + render p50 / p95 | **0.31 / 2.2 ms** |
+| latency, `taskset -c 0`: cold process p50 / p95 | **158 / 187 ms** (bare `node -e 0`: 72 ms) |
+| latency, warm full cascade + tagger + render p50 / p95 | **0.30 / 2.1 ms** |
 
 ## Data & licenses
 

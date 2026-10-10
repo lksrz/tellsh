@@ -306,7 +306,7 @@ function report() {
   lines.push('## Teacher (TypeSafe Jev, build time only)');
   lines.push('');
   lines.push(`All calls to \`${MODEL}\` ($${L.pricePerMtok}/Mtok input, output free), counted by \`scripts/lib/jev.js\` in \`data/teacher/ledger.json\` ` +
-    '(network calls only; cache hits are free and not counted). Several rows are packed per call; every row gets its own question(s), and the intent ' +
+    '(every request sent, including failed and retried ones; cache hits are free and not counted). Several rows are packed per call; every row gets its own question(s), and the intent ' +
     'question shows only the request and shell — never our label or a command rendered from it.');
   lines.push('');
   lines.push('| task | calls | failed | input tokens | spend |');

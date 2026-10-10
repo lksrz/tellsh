@@ -434,7 +434,7 @@ md();
 // 8. blind sets for v0.3 (written by a separate author before any v0.3 result was seen)
 const blindInt = readJsonl(join(ROOT, 'data', 'blind', 'intents.jsonl'));
 const blindE2e = readJsonl(join(ROOT, 'data', 'blind', 'e2e.jsonl'));
-// Contamination: a blind row whose text (exactly, or after filler words are removed) also occurs in another
+// Contamination: a blind row whose text (exactly, or after filler words are removed and words sorted) also occurs in another
 // eval set or in any training source file (before gen_data.js filtering, so this includes rows the v0.2
 // model was trained on). Those rows are excluded from training now, but they were not written blind.
 const otherEval = heldOutIndex([
@@ -453,7 +453,7 @@ if (blindInt.length || blindE2e.length) {
   md('## 8. Blind sets (v0.3)');
   md();
   md('Written for v0.3 from the catalog descriptions/templates and excluded from training (`gen_data.js`, including near-duplicates) and from tuning. ' +
-    `They are **not fully clean**: ${nEval} of ${all.length} intent/e2e rows repeat a request from another eval set and ${nTrain} repeat (exactly or up to filler words) ` +
+    `They are **not fully clean**: ${nEval} of ${all.length} intent/e2e rows repeat a request from another eval set and ${nTrain} repeat (exactly, or up to filler words and word order) ` +
     'a row of a training source file, most of them rows the v0.2 model was trained on. Every table therefore also reports the **clean** subset without those rows.');
   md();
 }

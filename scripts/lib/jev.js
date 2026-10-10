@@ -41,6 +41,8 @@ export async function ask(state, questions, { retries = 6 } = {}) {
   let delay = 500;
   for (let attempt = 0; ; attempt++) {
     let status = 0;
+    // every request sent counts as a network call (also the ones that fail and are retried)
+    stats.calls++;
     try {
       const r = await fetch(ENDPOINT, {
         method: 'POST',
@@ -51,7 +53,6 @@ export async function ask(state, questions, { retries = 6 } = {}) {
       status = r.status;
       const j = await r.json().catch(() => null);
       if (r.ok && j?.answers) {
-        stats.calls++;
         stats.inTok += j.usage?.input_tokens || 0;
         const v = { answers: j.answers, usage: j.usage };
         c.set(k, v);
@@ -60,7 +61,6 @@ export async function ask(state, questions, { retries = 6 } = {}) {
         return v;
       }
       if (r.ok || (status >= 400 && status < 500 && status !== 429 && status !== 408)) {
-        stats.calls++; // billed or rejected request still counts as a call
         stats.failed++;
         throw Object.assign(new Error(`HTTP ${status}`), { fatal: true });
       }

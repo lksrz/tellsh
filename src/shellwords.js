@@ -34,7 +34,7 @@ function matchParen(s, open) {
   return -1;
 }
 
-export function splitCommand(line, kind = 'posix', { keepRedirects = false } = {}) {
+export function splitCommand(line, kind = 'posix', { keepRedirects = false, literalTilde = true } = {}) {
   const ps = kind === 'pwsh' || kind === 'powershell';
   const s = String(line);
   const segments = [];
@@ -44,14 +44,18 @@ export function splitCommand(line, kind = 'posix', { keepRedirects = false } = {
   let raw = '';
   let amb = false;
   let glob = false;
+  let quoted0 = false; // the word starts with a quoted or escaped character
   let dropNext = false; // next word is a redirection target
   const flushWord = () => {
     if (w == null) return;
+    // POSIX: a quoted/escaped leading ~ ('~/x', \~/x) is a directory literally named ~, not the home
+    // directory; ./~/x keeps that meaning wherever the value is rendered again
+    if (!ps && literalTilde && quoted0 && w.startsWith('~')) w = './' + w;
     if (dropNext) { dropNext = false; } else {
       words.push(amb ? AMB + raw : glob ? GLOB + raw : w);
       raws.push(raw);
     }
-    w = null; raw = ''; amb = false; glob = false;
+    w = null; raw = ''; amb = false; glob = false; quoted0 = false;
   };
   const flushSeg = (sep = '') => { flushWord(); if (words.length) segments.push({ words, raw: raws, sep }); else if (sep && segments.length) segments[segments.length - 1].sep += sep; words = []; raws = []; };
   const fail = () => ({ ok: false, segments: [] });
@@ -59,6 +63,7 @@ export function splitCommand(line, kind = 'posix', { keepRedirects = false } = {
   for (let i = 0; i < s.length; i++) {
     const c = s[i];
     const start = i;
+    if (w == null && (ps ? PS_SQ.test(c) || PS_DQ.test(c) : c === "'" || c === '"' || c === '\\')) quoted0 = true;
     if (ps ? PS_SQ.test(c) : c === "'") {
       // single-quoted literal; PowerShell doubles any single-quote character to escape it
       let v = '';
@@ -96,6 +101,7 @@ export function splitCommand(line, kind = 'posix', { keepRedirects = false } = {
     } else if (!ps && c === '\\') {
       if (i + 1 >= s.length) return fail();
       if (s[i + 1] !== '\n') w = (w ?? '') + s[i + 1];
+      else if (w == null) quoted0 = false; // line continuation, not part of a word
       i++;
     } else if (ps && c === '`') {
       if (i + 1 >= s.length) return fail();
@@ -149,6 +155,8 @@ export function splitCommand(line, kind = 'posix', { keepRedirects = false } = {
         amb = true;
       }
       if (!ps && c === '`') amb = true;
+      // ~user, ~+, ~-: expanded by the shell to a directory we cannot know
+      if (!ps && c === '~' && w == null && i + 1 < s.length && !/[\/\s;|&)]/.test(s[i + 1])) amb = true;
       if (/[*?[]/.test(c)) glob = true;
       if (!ps && c === '{' && /^\{[^}\s]*,[^}\s]*\}/.test(s.slice(i))) amb = true; // brace expansion
       w = (w ?? '') + c;
@@ -161,8 +169,8 @@ export function splitCommand(line, kind = 'posix', { keepRedirects = false } = {
 }
 
 /** All words of a single simple command (no separators), or null if the text is not exactly one word list. */
-export function wordsOf(line, kind = 'posix') {
-  const r = splitCommand(line, kind);
+export function wordsOf(line, kind = 'posix', opts = {}) {
+  const r = splitCommand(line, kind, opts);
   if (!r.ok || r.segments.length !== 1) return null;
   return r.segments[0].words;
 }
