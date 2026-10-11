@@ -354,6 +354,7 @@ function entsFromSlots(intent, slots, ents) {
   if (slots.host) put('host', slots.host);
   if (slots.target) put('host', slots.target);
   if (slots.url) put('url', slots.url);
+  if (slots.pr && !String(slots.pr).startsWith('?')) put('pr', slots.pr);
   if (slots.file) put('file', slots.file);
   if (slots.archive) put('file', slots.archive);
   if (slots.dst && !isAmbiguous(slots.dst)) destEnts(slots.src != null ? [slots.src] : [], slots.dst, ents);
@@ -634,6 +635,7 @@ const HOST_WRAPPERS = new Set(['machinectl']);
 // flags that take no value `-tp X=…` / `-tpX=…`, also run0) that run the command in another directory ('cwd') or under
 // another root / mounts / namespaces ('root')
 const PROP_WRAPPERS = new Set(['systemd-run', 'run0']);
+// (the cluster class is the valueless short options of systemd-run(1): -t -P -q -G -d -S -r; keep it in sync with the man page)
 const PROP_OPT = /^(?:-[tPqGdSr]*p|--property)$/;
 const PROP_ATTACHED = /^(?:-[tPqGdSr]*p|--property=)(.+)$/;
 const PROP_CWD = /^WorkingDirectory=/i;
@@ -785,6 +787,13 @@ function segmentEnts(w, e, setIntent, split, k, segIdx, firstWord) {
   } else if (head === 'lsof' || head === 'ss' || head === 'netstat' || head === 'fuser') {
     const pm = args.map(rawOf).join(' ').match(/(?::|tcp:|udp:|sport = :)(\d{2,5})\b/);
     if (pm) { e.port = pm[1]; setIntent('process_on_port', { port: pm[1] }); }
+  } else if (head === 'gh' && nonFlags[0] === 'pr' && GH_PR_SELECTS.has(nonFlags[1])) {
+    // `gh pr view 45`, `gh pr checkout feature/x`, `gh pr merge <url>`: the pull request ("merge that pr"); none named is
+    // the current branch's (left out); another repository's (-R / --repo) or several operands cannot be read
+    const { pos, opts } = parseArgs(args.slice(args.indexOf(nonFlags[1]) + 1), GH_PR_VALUE_OPTS);
+    const repo = opts['-R'] ?? opts['--repo'];
+    if (pos.length === 1 && repo == null && !isAmbiguous(pos[0])) e.pr = rawOf(pos[0]);
+    else if (pos.length) e.pr = AMB + pos.map(rawOf).join(' ');
   } else if (head === 'git') {
     const sub = nonFlags[0];
     const rest = args.slice(args.indexOf(sub) + 1);
@@ -864,7 +873,13 @@ function segmentEnts(w, e, setIntent, split, k, segIdx, firstWord) {
   }
 }
 
-const ENT_TYPES = ['container', 'service', 'pid', 'proc', 'port', 'file', 'dir', 'branch', 'host', 'url'];
+const ENT_TYPES = ['container', 'service', 'pid', 'proc', 'port', 'file', 'dir', 'branch', 'host', 'url', 'pr'];
+// gh pr subcommands whose operand selects one pull request, and the options of those that take a value
+const GH_PR_SELECTS = new Set(['view', 'checkout', 'co', 'merge', 'close', 'reopen', 'diff', 'checks', 'review', 'ready', 'edit', 'comment']);
+const GH_PR_VALUE_OPTS = new Set(['-R', '--repo', '--json', '-q', '--jq', '-t', '--template', '--title', '-b', '--body', '-F',
+  '--body-file', '--subject', '-A', '--author-email', '--match-head-commit', '-B', '--base', '--branch', '-a', '--add-assignee',
+  '--remove-assignee', '-l', '--add-label', '--remove-label', '-m', '--milestone', '-p', '--add-project', '--remove-project',
+  '--add-reviewer', '--remove-reviewer', '-c', '--comment', '-e', '--color']);
 
 /**
  * Build the context object from history commands (oldest first). Only the single most recent command is a
@@ -926,8 +941,10 @@ export function cwdFlags(cwd) {
 /** ctx_ tokens fed to the classifiers (same function is used by scripts/gen_data.js). */
 export function ctxFeatures(ctx) {
   const f = [];
-  if (ctx.entOrder?.[0]) f.push('ctx_last=' + ctx.entOrder[0]);
-  for (const k of ctx.entOrder || []) f.push('ctx_has=' + k);
+  // (a pull request is not a feature the model was trained with)
+  const order = (ctx.entOrder || []).filter((k) => k !== 'pr');
+  if (order[0]) f.push('ctx_last=' + order[0]);
+  for (const k of order) f.push('ctx_has=' + k);
   if (ctx.last?.intent) f.push('ctx_tool=' + FAMILY_OF[ctx.last.intent]);
   for (const c of ctx.cwdFlags || []) f.push('ctx_cwd=' + c);
   return f;
@@ -994,6 +1011,7 @@ const NOUN_TYPE = [
   [/\b(files?|plik\w*)\b/i, ['file']],
   [/\b(hosts?|server\w*|serwer\w*|machine|maszyn\w*)\b/i, ['host']],
   [/\b(url|link\w*|adres\w*)\b/i, ['url']],
+  [/\b(prs?|pull[\s-]+requests?)\b/i, ['pr']],
 ];
 
 // verb class -> entity type -> intent
@@ -1022,7 +1040,7 @@ const VERBS = [
 
 const SLOT_FROM_ENT = {
   container: ['container'], service: ['service'], pid: ['pid'], proc: ['name'], port: ['port'], branch: ['branch'],
-  host: ['host', 'target'], url: ['url'], file: ['file', 'src', 'path'], dir: ['path', 'src'],
+  host: ['host', 'target'], url: ['url'], file: ['file', 'src', 'path'], dir: ['path', 'src'], pr: ['pr'],
 };
 
 // "files that are larger", "processes which use", "modified this week": not references to an earlier command

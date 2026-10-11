@@ -23,13 +23,13 @@ export const RAW_OK = {
   end: (v) => /^\d{1,9}$/.test(String(v)) && +v > 0,
   num: (v) => /^\d{1,12}$/.test(String(v)),
   // a pull request as gh selects it: number, URL or head branch
-  pr: (v) => /^\d{1,12}$|^https:\/\/github\.com\/[\w.-]+\/[\w.-]+\/pull\/\d{1,12}\/?$/.test(String(v)) || /^(?![-.])(?!.*\.\.)[\w./-]{1,100}$/.test(String(v)),
+  pr: (v) => (/^\d+$/.test(String(v)) ? /^[1-9]\d{0,11}$/.test(String(v)) : /^https:\/\/github\.com\/[\w.-]+\/[\w.-]+\/pull\/\d{1,12}\/?$/.test(String(v)) || /^(?![-.])(?!.*\.\.)[\w./-]{1,100}$/.test(String(v))),
 };
 
 // "merge pull request feature/login", "view the pr for branch fix-1", "pr #45", 'merge pull request "feature/login"'
 // (a quoted value ends at its matching quote, `“”„` being one family: "bob's-fix" is one value; a quote with no matching
 // close, `'it''s'`, is m[7] and withheld)
-const PR_SELECTOR = /\b(?:pull[\s-]+requests?|pr|prs)\s+((?:(?:for|of|on|from|branch|number|no\.?|nr\.?)\s+)*)(?:(?:"([^"]*)"|'([^']*)'|`([^`]*)`|[„“”]([^„“”"]*)[“”])(?=[\s.,!?;:]|$)|(#?[^\s"'`„“”]+?)[.,!?]?(?=\s|$)|(["'`„“”]))/i;
+const PR_SELECTOR = /\b(?:pull[\s-]+requests?|pr|prs)\s+((?:(?:for|of|on|from|branch|number|no\.?|nr\.?|(?:the|a|my|our)(?=\s+branch\b))\s+)*)(?:(?:"([^"]*)"|'([^']*)'|`([^`]*)`|[„“”]([^„“”"]*)[“”])(?=[\s.,!?;:]|$)|(#?[^\s"'`„“”]+?)[.,!?]?(?=\s|$)|(["'`„“”]))/i;
 // a function or describing word after "pull request" is not a selector ("merge the pull request and …", "merge pr now",
 // "check pr status", "view pull request on github", "merge pr by bob", "merge pull request quickly", "view pr from yesterday",
 // "close pr for issue 45"); only checked for an unmarked word (`feature/apply`, `fix-reply`, `#12-only` are selectors);
@@ -44,6 +44,15 @@ const PR_HOST = /^(?:[\w-]+\.)+(?:com|org|net|io|dev|app|co|me)$/i;
 // a number names the pull request only right after "pr" / "pull request" (`pr 45`, `pr #45`, `pr number 45`) or as `#45`
 const PR_NUMBER_LEAD = /^(?:(?:number|no\.?|nr\.?)\s+)*$/i;
 const PR_WORD = /\b(?:pull[\s-]+requests?|pr|prs)\b/i;
+// an issue, ticket or bug is not the pull request ("merge pr for issue #45", "merge the pull request for ticket 3")
+const PR_ISSUE = /^(?:issues?|tickets?|bugs?)$/i;
+// a number followed by a unit is an amount, not the pull request ("merge pr 2 days old", "merge pr 3 times")
+const PR_UNIT_AFTER = /^\s+(?:secs?|seconds?|mins?|minutes?|hours?|hrs?|days?|weeks?|months?|years?|times?|ago|old|more|approvals?|reviews?|reviewers?|commits?|files?|lines?|changes?|comments?|checks?)\b/i;
+// `#45` alone names the pull request only as the first word after the verb ("merge #45", "squash merge #45", "please
+// close #7"); one in another clause ("the pr that closes #12", "merge the pr, see #99") is withheld
+const PR_HASH_LEAD = /^\s*(?:(?:please|pls|now|then|just|squash|rebase|merge|close|reopen|view|show|open|display|check|checkout|diff|review|approve|ready|edit)\s+)+$/i;
+// "merge pr from the feature branch", "for my branch bob": a branch is named, but not one the parser read
+const PR_BRANCH_NAMED = /\b(?:for|of|on|from)\s+(?:\S+\s+){0,2}branch\b/i;
 /**
  * The pull request the user names (quoted: kept as written, validation withholds an odd one), else null (`gh pr merge`
  * acts on the current branch's pull request). A number elsewhere in the request ("merge pr with 2 approvals", "merge the
@@ -61,26 +70,32 @@ function prSelector(ex) {
     const w = m[6];
     const branch = /\bbranch\s+$/i.test(m[1]);
     // "merge my pr from 2 days ago", "view pr for 3 days": a number after a connective is not the pull request
+    if (PR_ISSUE.test(w)) return '?';
+    const rest = text.slice(m.index + m[0].length);
+    if (/^#?\d+$/.test(w) && PR_UNIT_AFTER.test(rest)) return '?';
     if (/^\d+$/.test(w)) return branch || PR_NUMBER_LEAD.test(m[1]) ? w : '?';
+    // "merge the pr for #12": the pull request for issue 12, or pull request 12
+    if (/^#\d+$/.test(w) && !PR_NUMBER_LEAD.test(m[1])) return '?';
     if (PR_ABBREV.test(w) || (PR_HOST.test(w) && !branch)) return '?';
     if (PR_MARKED.test(w)) return w;
     // "merge pr for branch status": after "branch" any word is the selector, a describing one is withheld
     if (branch) return PR_NOT_SELECTOR.test(w) ? `?${w}` : w;
     if (!PR_NOT_SELECTOR.test(w)) {
-      if (/\b(?:for|from)\s+$/i.test(m[1])) return w;
+      // "merge pr for fix #12": the word is followed by a number, so it may describe rather than name the branch
+      if (/\b(?:for|from)\s+$/i.test(m[1])) return /\d/.test(rest) ? `?${w}` : w;
       // "merge pr main": a bare word may be a branch or say something else: withheld (`gh pr merge <PR>`), never dropped
       return `?${w}`;
     }
   }
   const hash = text.match(/(?:^|\s)#(\d{1,12})(?=[\s.,!?;:]|$)/);
-  if (hash) return hash[1];
+  if (hash && PR_HASH_LEAD.test(text.slice(0, hash.index + hash[0].indexOf('#')))) return hash[1];
   // 'merge the "feature/login" pull request': an explicitly quoted value is the target
   if (ex.quoted.length) return ex.quoted[0];
   // named but not readable: a number anywhere ("merge the 2 open prs", "merge pr in 2 minutes"), or a marked word or a
   // quote after "pr" ("merge pr bob's", "merge pr feature/x's", "merge pr in repo v2"): withheld
   const p = text.match(PR_WORD);
   const after = p ? text.slice(p.index + p[0].length) : '';
-  if (ex.numbers?.length || /\d/.test(text) || /[/_#'"`„“”’]|\w[.-]\w/.test(after)) return '?';
+  if (ex.numbers?.length || /\d/.test(text) || /[/_#'"`„“”’]|\w[.-]\w/.test(after) || PR_BRANCH_NAMED.test(after)) return '?';
   return null;
 }
 const PATH_SLOTS = new Set(['path', 'file', 'src', 'dst', 'dest', 'archive']);

@@ -157,6 +157,16 @@ a bare `gh pr merge`. History replay keeps the placeholder of an optional operan
 were bare). Clustered `systemd-run -tp WorkingDirectory=…` and `PrivateIPC=`, `PrivateDevices=`, `ProtectHome=tmpfs` scope
 history values. Every eval number is unchanged. Bench re-run.
 
+**Round 17 (review r16; A unchanged, A+B policy unchanged).** An issue, ticket or bug number is never the pull request
+(`merge pr for issue #45`, `merge the pull request for ticket #3`), and `#45` alone counts only right after the verb
+(`merge #45`, `squash merge #45`); one in another clause (`merge the pr that closes #12`, `merge the pr, see #99`,
+`merge the pr for #12`) is withheld as `<PR>` (all gave `gh pr merge N`). "merge that pr" reads the pull request of a
+previous `gh pr view/checkout/… N|branch|url` (`gh pr merge 45`); after any other command, `gh pr view` with no or several
+operands, `--repo`, or with no history, it is `gh pr merge <PR>` (all gave a bare `gh pr merge`). The pull request is
+not a model feature, so the classifier input is unchanged. `from the branch main` / `for the branch develop` are read
+(`gh pr merge main`; were bare), an unreadable branch phrase (`from the feature branch`) is withheld. An amount after
+"pr" (`merge pr 2 days old`, `pr 3 times`), `pr 0` and `pr 007` are withheld. Every eval number is unchanged. Bench re-run.
+
 <!-- eval:start -->
 ## Model
 
@@ -299,13 +309,13 @@ Machine: Intel(R) Xeon(R) Processor, Node v20.19.2, linux; CPU affinity: `0` (ru
 
 | measurement | p50 | p95 | runs |
 |---|---|---|---|
-| bare `node -e 0` startup (baseline) | 84.1 ms | 91.1 ms | 10 |
-| **cold**: `node bin/tellsh.js --dry-run --json --shell bash <query>` (new process, model load, full pipeline) | **179.3 ms** | **233.9 ms** | 40 |
-| model load (in-process, one-off) | 5.3 ms | – | 1 |
-| **warm**: full cascade + tagger + render (bash, composer off) | **0.400 ms** | **4.5 ms** | 2000 |
-| warm, incl. composer modifier check (shipped default) | 0.606 ms | 7.4 ms | 2000 |
-| warm, PowerShell rendering | 0.376 ms | 0.775 ms | 2000 |
-| warm, 5 history lines given (only the previous one is read; context build + reference rules) | 0.708 ms | 7.3 ms | 2000 |
+| bare `node -e 0` startup (baseline) | 86.7 ms | 92.1 ms | 10 |
+| **cold**: `node bin/tellsh.js --dry-run --json --shell bash <query>` (new process, model load, full pipeline) | **181.5 ms** | **196.4 ms** | 40 |
+| model load (in-process, one-off) | 4.8 ms | – | 1 |
+| **warm**: full cascade + tagger + render (bash, composer off) | **0.403 ms** | **4.5 ms** | 2000 |
+| warm, incl. composer modifier check (shipped default) | 0.638 ms | 7.7 ms | 2000 |
+| warm, PowerShell rendering | 0.377 ms | 0.816 ms | 2000 |
+| warm, 5 history lines given (only the previous one is read; context build + reference rules) | 0.685 ms | 7.2 ms | 2000 |
 
 The composer runs `bash -n` (a subprocess, ~2 ms) only when it actually returns a composed command.
 <!-- bench:end -->

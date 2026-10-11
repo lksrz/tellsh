@@ -140,8 +140,9 @@ Added from real command usage: `npm run <script>`, `npm install [pkg]`, `npm ins
 `gh run list/view`; a pull request the request names, by number, URL or branch, is passed on: `gh pr merge
 feature/login`, also quoted, `merge pull request "feature/login"`, never a bare `gh pr merge` for the current branch's
 pull request; a word that may not be a branch, `merge pr main`, gives `gh pr merge <PR>`, while `feature/apply` or
-`hotfix/weekly` are kept; a number counts only next to "pr" (`pr 45`, `pr #45`, `#45`): `merge pr with 2 approvals`
-gives `gh pr merge <PR>`). A package version constraint is kept
+`hotfix/weekly` are kept; a number counts only next to "pr" (`pr 45`, `pr #45`) or as `#45` right after the verb: `merge pr with 2 approvals`,
+`merge pr for issue #45` and `merge the pr that closes #12` give `gh pr merge <PR>`; "merge that pr" after `gh pr view 45`
+gives `gh pr merge 45`, after any other command `gh pr merge <PR>`). A package version constraint is kept
 (`install requests==2.32.0 with pip` -> `python3 -m pip install requests==2.32.0`). Installs, project scripts (also every `npx wrangler` command: `npx` prefers a project-local binary,
 and `wrangler dev` runs the project's build command), deploys, merges, secrets and tunnels are `medium` risk, so `--yes`
 never runs them.
