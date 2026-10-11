@@ -179,7 +179,8 @@ test('cmd: ~ paths become a double-quoted %USERPROFILE% (a user name may contain
   assert.equal(cmdQuote('~/my docs'), '"%USERPROFILE%\\my docs"');
   assert.equal(psQuote('~/foo'), '"$HOME/foo"');
   for (const [id, slots] of [['delete_dir', { path: '~/foo' }], ['mkdir', { path: '~/foo' }], ['hidden_files', { path: '~' }], ['list_files', { path: '~/foo' }]]) {
-    const r = buildCommand(id, slots, { shell: 'cmd', os: 'win32' });
+    const r = b(id, { shell: 'cmd', os: 'win32' }, slots);
+    assert.match(r.gap ? '%USERPROFILE%' : r.command, /%USERPROFILE%/, id);
     if (r.gap) continue;
     assert.doesNotMatch(r.command, /(?<!")%USERPROFILE%/, `${id}: ${r.command}`);
   }

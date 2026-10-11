@@ -131,7 +131,7 @@ No failures.
 
 ## win32
 
-Host `lr-pc`, run 2026-10-11T16:39:44.716Z.
+Host `lr-pc`, run 2026-10-11T18:14:21.976Z.
 
 | cell | pass | fail | static | gap |
 |---|---|---|---|---|
