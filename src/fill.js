@@ -23,7 +23,7 @@ export const RAW_OK = {
   end: (v) => /^\d{1,9}$/.test(String(v)) && +v > 0,
   num: (v) => /^\d{1,12}$/.test(String(v)),
   // a repository as gh -R takes it: [HOST/]OWNER/REPO
-  repo: (v) => /^(?:[\w-]+(?:\.[\w-]+)+\/)?[\w-][\w.-]{0,99}\/[\w-][\w.-]{0,99}$/.test(String(v)) && !/\.\./.test(String(v)),
+  repo: (v) => /^(?:(?!-)[\w-]+(?:\.[\w-]+)+\/)?(?!-)[\w-][\w.-]{0,99}\/(?!-)[\w-][\w.-]{0,99}$/.test(String(v)) && !/\.\./.test(String(v)),
   // a pull request as gh selects it: number, URL or head branch
   pr: (v) => (/^\d+$/.test(String(v)) ? /^[1-9]\d{0,11}$/.test(String(v)) : /^https:\/\/github\.com\/[\w.-]+\/[\w.-]+\/pull\/\d{1,12}\/?$/.test(String(v)) || /^(?![-.])(?!.*\.\.)[\w./-]{1,100}$/.test(String(v))),
 };
@@ -53,6 +53,9 @@ const PR_UNIT_AFTER = /^\s+(?:secs?|seconds?|mins?|minutes?|hours?|hrs?|days?|we
 // `#45` alone names the pull request only as the first word after the verb ("merge #45", "squash merge #45", "please
 // close #7"); one in another clause ("the pr that closes #12", "merge the pr, see #99") is withheld
 const PR_HASH_LEAD = /^\s*(?:(?:please|pls|now|then|just|squash|rebase|merge|close|reopen|view|show|open|display|check|checkout|diff|review|approve|ready|edit)\s+)+$/i;
+// "merge the pull request by alice", "merge the pr from yesterday", "the pr that fixes login", "the pr opened last week": a
+// pull request picked out by who or when, which is not the current branch's (withheld)
+const PR_QUALIFIED = /^\s*(?:(?:by|from|since|before|after|about|titled|named|called|that|which|who|whose|where|od|autorstwa)\b|(?:\S+\s+)?(?:opened|created|authored|submitted|raised|written|made|sent|pushed|filed)\b)|\b(?:yesterday|today|tonight|tomorrow|ago|last\s+(?:week|month|year|night|friday|monday|tuesday|wednesday|thursday|saturday|sunday)|wczoraj\w*|dzisiaj|dzi[sś])\b/i;
 // "merge pr from the feature branch", "for my branch bob": a branch is named, but not one the parser read
 const PR_BRANCH_NAMED = /\b(?:for|of|on|from)\s+(?:\S+\s+){0,2}branch\b/i;
 /**
@@ -97,19 +100,43 @@ function prSelector(ex) {
   // quote after "pr" ("merge pr bob's", "merge pr feature/x's", "merge pr in repo v2"): withheld
   const p = text.match(PR_WORD);
   const after = p ? text.slice(p.index + p[0].length) : '';
-  if (ex.numbers?.length || /\d/.test(text) || /[/_#'"`„“”’]|\w[.-]\w/.test(after) || PR_BRANCH_NAMED.test(after)) return '?';
+  if (ex.numbers?.length || /\d/.test(text) || /[/_#'"`„“”’]|\w[.-]\w/.test(after) || PR_BRANCH_NAMED.test(after) || PR_QUALIFIED.test(after)) return '?';
   return null;
 }
 // "--repo a/b", "-R a/b", "in (the) repo(sitory) a/b", "in the a/b repo"; "in the other repo", "in another repository": named,
 // not readable ("this repo", "the current repository" are the working directory's)
 const PR_REPO_OPT = /(?:^|\s)(?:--repo(?:=|\s+|$)|-R(?:=|\s*))(\S*)/;
 const PR_REPO = /\b(?:in|of|on|from|for|at|to)\s+(?:the\s+|a\s+)?(?:github\s+)?(?:repo|repository|repozytorium)\s+(\S+)|\b(?:in|of|on|from|for|at|to)\s+(?:the\s+|a\s+)?(\S+(?:\s+\S+)?)\s+(?:github\s+)?(?:repo|repository)\b|\b(?:w|z)\s+repozytorium\s+(\S+)/i;
-const PR_REPO_HERE = /^(?:this|current|the\s+current|same|the\s+same|our|my|local|the\s+local|tym|tego|bieżącym|biezacym)$/i;
-/** The repository a gh pr request names: { repo (a value, or `?` when it is not readable), rest (the text without it) } or null. */
+// "this repo", "the repo", "my current repo", "our own repository": the working directory's
+const PR_REPO_HERE = /^(?:the|a|an|this|current|same|our|my|local|own|tym|tego|bieżącym|biezacym)(?:\s+(?:current|same|local|own))?$/i;
+// "org/repo#7": a repository and a pull request in one word
+const PR_REPO_HASH = /(?:^|\s)((?:https:\/\/)?(?:[\w-]+(?:\.[\w-]+)+\/)?[\w.-]+\/[\w.-]+)#(\d{1,12})(?=[\s.,!?;:]|$)/;
+// "merge pr 7 in other/repo", "of org/repo", "on github.com/org/repo", "at https://github.com/org/repo": a repository
+// without the word "repo" (a value gh -R takes); right after "pr for" / "pr from" / … the word is the branch selector
+const PR_REPO_PREP = /(?:^|\s)(in|of|on|from|for|at|to)\s+(?:the\s+)?(?:github\s+)?(\S+)/gi;
+const PR_SELECTOR_SPOT = /\b(?:pull[\s-]+requests?|pr|prs)\s+(?:(?:for|of|on|from|branch|number|no\.?|nr\.?|(?:the|a|my|our)(?=\s+branch\b))\s+)*$/i;
+const repoValue = (w) => w.replace(/[.,!?;:]+$/, '').replace(/^["'`]|["'`]$/g, '').replace(/^https:\/\/(?=github\.com\/)/i, '').replace(/(?:\.git)?\/?$/, '');
+/** The repository a gh pr request names: { repo (a value, or `?` when it is not readable), rest (the text without it), pr } or null. */
 function prRepo(text) {
+  const cut = (i, len, put = ' ') => (text.slice(0, i) + put + text.slice(i + len)).replace(/\s+/g, ' ').trim();
+  const h = text.match(PR_REPO_HASH);
+  if (h && RAW_OK.repo(repoValue(h[1]))) {
+    const at = h.index + h[0].indexOf(h[1]);
+    return { repo: repoValue(h[1]), rest: cut(at, h[1].length + 1 + h[2].length, ` #${h[2]} `), pr: h[2] };
+  }
   const m = text.match(PR_REPO_OPT) || text.match(PR_REPO);
-  if (!m) return null;
-  const w = (m[1] ?? m[2] ?? m[3] ?? '').replace(/[.,!?;:]+$/, '').replace(/^["'`]|["'`]$/g, '');
+  if (!m) {
+    for (const p of text.matchAll(PR_REPO_PREP)) {
+      const w = repoValue(p[2]);
+      if (!RAW_OK.repo(w)) continue;
+      const host = w.split('/').length === 3;
+      // "merge pr from feature/x", "view the pr for fix/a": the branch the pull request is for
+      if (!host && /^(?:of|on|from|for)$/i.test(p[1]) && PR_SELECTOR_SPOT.test(text.slice(0, p.index + p[0].indexOf(p[1])))) continue;
+      return { repo: w, rest: cut(p.index, p[0].length) };
+    }
+    return null;
+  }
+  const w = repoValue(m[1] ?? m[2] ?? m[3] ?? '');
   if (m[2] != null && PR_REPO_HERE.test(w)) return null;
   const rest = (text.slice(0, m.index) + ' ' + text.slice(m.index + m[0].length)).replace(/\s+/g, ' ').trim();
   return { repo: RAW_OK.repo(w) ? w : '?', rest };
@@ -220,7 +247,8 @@ export function resolveSlots(intent, ex) {
     // the pull request the user names: a URL or a branch is kept as it is (validation withholds an odd one), never
     // dropped for a bare `gh pr merge`, which acts on the current branch's pull request
     const sel = prSelector(rq ? { ...ex, text: rq.rest, numbers: (rq.rest.match(/\d+/g) || []).map(Number), quoted: ex.quoted.filter((q) => rq.rest.includes(q)) } : ex);
-    if (sel != null) v.pr = String(sel).replace(/^#(?=\d)/, '');
+    if (rq?.pr != null) v.pr = rq.pr;
+    else if (sel != null) v.pr = String(sel).replace(/^#(?=\d)/, '');
     else if (rq) v.pr = '?';
     delete v.count;
   }

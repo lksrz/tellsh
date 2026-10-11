@@ -38,8 +38,8 @@ test('minor: a quoted target ends at its matching quote; time / review words are
     assert.equal(run(q).command, 'gh pr merge <PR>', q);
   }
   assert.equal(run('merge pull request “feature/x”').command, 'gh pr merge feature/x');
-  for (const [q, cmd] of Object.entries({ 'view pr from yesterday': 'gh pr view', 'merge pr for review': 'gh pr merge',
-    'merge pr from fork': 'gh pr merge', 'merge pull request quickly': 'gh pr merge' })) assert.equal(run(q).command, cmd, q);
+  for (const [q, cmd] of Object.entries({ 'view pr from yesterday': 'gh pr view <PR>', 'merge pr for review': 'gh pr merge',
+    'merge pr from fork': 'gh pr merge <PR>', 'merge pull request quickly': 'gh pr merge' })) assert.equal(run(q).command, cmd, q);
 });
 
 test('major: systemd-run unit properties that move the filesystem keep history paths ambiguous', () => {

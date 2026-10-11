@@ -443,7 +443,8 @@ export function analyzeCommand(line, classify, kind = 'posix') {
   let intentStale = false;
   let cdAt = -1;
   let scoped = false;
-  let exportedScope = false;
+  const exportedScope = new Set(); // tools (git, docker, podman, gh) an `export VAR=…` earlier in the line pointed elsewhere
+  const exportAt = {}; // tool -> index of the segment that exported it
   let wrapCwd = false;
   const subCds = new Set(); // ids of `( … )` subshells in which a cd ran (posix)
   let searchDir = false;
@@ -480,9 +481,16 @@ export function analyzeCommand(line, classify, kind = 'posix') {
       w = [];
     }
     // `export GH_REPO=a/b; gh pr view 45`, `$env:DOCKER_HOST = …`: the later commands of the line are scoped as well
+    // (`$env:GH_REPO="a/b"` is one word); the values earlier segments named for that tool name things of the old scope
     const rw = raw.map((x) => String(rawOf(x)));
-    if ((/^(?:export|declare|typeset|set)$/.test(rw[0]) && rw.slice(1).some((x) => SCOPE_ENV.test(x))) ||
-      /^\$env:(\w+)$/i.test(rw[0]) && SCOPE_ENV.test(rw[0].slice(5) + '=')) exportedScope = true;
+    const exported = /^(?:export|declare|typeset|set)$/.test(rw[0]) ? rw.slice(1).filter((x) => SCOPE_ENV.test(x))
+      : /^\$env:\w+(?:=.*)?$/i.test(rw[0]) && SCOPE_ENV.test(rw[0].slice(5).replace(/=.*$/, '') + '=') ? [rw[0].slice(5)] : [];
+    for (const x of exported) {
+      const tool = scopeTool(x);
+      exportedScope.add(tool);
+      for (const t of SCOPE_ENTS[tool]) if (ents[t] != null && !isAmbiguous(ents[t])) ents[t] = AMB + rawOf(ents[t]);
+      exportAt[tool] = segIdx;
+    }
     if (w.length) segmentEnts(w, e, setIntent, split, k, segIdx, firstWord);
     // `git -C /repo blame notes.txt`, `docker --context prod logs web`: "delete it" / "stop it" here would hit a
     // different file / container than the one the command used (never resolved, never repeated)
@@ -548,7 +556,7 @@ export function analyzeCommand(line, classify, kind = 'posix') {
   if (inv && cdAt < 0) {
     // the whole line is a catalog/variant command: its slots are the most precise reading
     intent = inv.intent; slots = inv.slots; ambiguous = inv.ambiguous;
-    if (scoped) { slots = { ...slots }; markScoped(slots); }
+    if (scoped || Object.keys(exportAt).length) { slots = { ...slots }; markScoped(slots); }
     if (wrapCwd) { slots = { ...slots }; staleRelative({}, slots); }
     const ie = {};
     entsFromSlots(intent, slots, ie);
@@ -563,6 +571,8 @@ export function analyzeCommand(line, classify, kind = 'posix') {
   } else if (segIntent) {
     intent = segIntent; slots = { ...segSlots };
     if (segIntentAt < cdAt) { staleRelative({}, slots); staleRepo({}, slots); }
+    // `gh pr view 45; export GH_REPO=other/repo`: the pull request is one of the old repository
+    for (const [tool, i] of Object.entries(exportAt)) if (segIntentAt < i) for (const t of SCOPE_ENTS[tool]) if (slots[t] != null && !isAmbiguous(slots[t])) slots[t] = AMB + rawOf(slots[t]);
     // `kill 1111; ls newdir`: another command ran after the one tellsh could repeat
     if (split.segments.slice(segIntentAt, -1).some((s) => s.sep !== '|')) intentStale = true;
   }
@@ -597,14 +607,17 @@ const SCOPE_OPTS = {
   // gh has no global options: GH_REPO / GH_HOST (also exported earlier in the line) point it at another repository
   gh: /^-R|^--repo(?:=|$)/,
 };
+// the tool an exported variable scopes, and the values that tool's commands name
+const scopeTool = (x) => (/^GIT_/.test(x) ? 'git' : /^DOCKER_/.test(x) ? 'docker' : /^CONTAINER_/.test(x) ? 'podman' : 'gh');
+const SCOPE_ENTS = { git: ['branch'], docker: ['container'], podman: ['container'], gh: ['pr', 'branch'] };
 const SCOPE_ENV = /^(?:GIT_DIR|GIT_WORK_TREE|GIT_NAMESPACE|DOCKER_HOST|DOCKER_CONTEXT|DOCKER_CONFIG|CONTAINER_HOST|CONTAINER_CONNECTION|GH_REPO|GH_HOST)=/;
 /** `git -C /repo …`, `docker --context prod …`, `DOCKER_HOST=… docker …` (w: the unwrapped words, raw: before unwrap). */
-function scopedElsewhere(w, raw, exported = false) {
+function scopedElsewhere(w, raw, exported = new Set()) {
   if (isAmbiguous(w[0])) return false;
   const head = String(w[0]).replace(/^.*[\\/]/, '').replace(/\.exe$/i, '').toLowerCase();
   const re = SCOPE_OPTS[head];
   if (!re) return false;
-  if (exported) return true;
+  if (exported.has?.(head) || exported === true) return true;
   if (raw.slice(0, raw.length - w.length).some((x) => SCOPE_ENV.test(String(x)))) return true;
   const args = w.slice(1);
   return args.slice(0, args.length - afterGlobals(head, args).length).some((a) => re.test(String(a)));
@@ -803,11 +816,15 @@ function segmentEnts(w, e, setIntent, split, k, segIdx, firstWord) {
     if (pm) { e.port = pm[1]; setIntent('process_on_port', { port: pm[1] }); }
   } else if (head === 'gh' && nonFlags[0] === 'pr' && GH_PR_SELECTS.has(nonFlags[1])) {
     // `gh pr view 45`, `gh pr checkout feature/x`, `gh pr merge <url>`: the pull request ("merge that pr"); none named is
-    // the current branch's (left out); another repository's (-R / --repo) or several operands cannot be read
+    // the current branch's, another repository's (-R / --repo) or several operands: none can be read (an older
+    // selector of the line is replaced: `gh pr view 45; gh pr view` is about the current branch's pull request)
     const { pos, opts } = parseArgs(args.slice(args.indexOf(nonFlags[1]) + 1), GH_PR_VALUE_OPTS);
     const repo = opts['-R'] ?? opts['--repo'];
     if (pos.length === 1 && repo == null && !isAmbiguous(pos[0])) e.pr = rawOf(pos[0]);
-    else if (pos.length) e.pr = AMB + pos.map(rawOf).join(' ');
+    else e.pr = AMB + (pos.length ? pos.map(rawOf).join(' ') : 'the current branch');
+  } else if (head === 'gh' && nonFlags[0] === 'pr') {
+    // `gh pr list`, `gh pr status`, `gh pr create`: several pull requests, or one with no number yet
+    e.pr = AMB + w.map(rawOf).join(' ');
   } else if (head === 'git') {
     const sub = nonFlags[0];
     const rest = args.slice(args.indexOf(sub) + 1);

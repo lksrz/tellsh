@@ -344,6 +344,8 @@ retrain; `npm test && npm run eval`.
 * History: bash writes history late (see above); references are resolved to the most recent matching entity, there is no
   multi-turn memory of tellsh's own suggestions beyond the history file.
 * Composer: closed vocabulary, POSIX only, no pipelines, no `--format`/`-o` style arguments; it is a safety net, not a generator.
+* Negation is only read for pull request merges (`do not merge pr 45` is refused); elsewhere it is not (`do not delete
+  a.txt` still suggests `rm a.txt`). Always read the command before running it.
 * Slot F1 gold set is small (208 requests); relexicalised end-to-end numbers use silver spans for unreplaced values.
 
 ## License

@@ -38,7 +38,7 @@ test('major: a quoted pull request target is kept or withheld, never dropped', (
 test('minor: a describing word after "pr" is not a target; a bare unmarked word is withheld', () => {
   const plain = {
     'check pr status': 'gh pr checks', 'show pr status': 'gh pr checks', 'view pull request on github': 'gh pr view',
-    'merge PR by bob': 'gh pr merge', 'merge pull request quickly': 'gh pr merge', 'merge pull request for me': 'gh pr merge',
+    'merge PR by bob': 'gh pr merge <PR>', 'merge pull request quickly': 'gh pr merge', 'merge pull request for me': 'gh pr merge',
     'merge pr now': 'gh pr merge', 'merge the pull request': 'gh pr merge',
   };
   for (const [q, cmd] of Object.entries(plain)) assert.equal(run(q).command, cmd, q);

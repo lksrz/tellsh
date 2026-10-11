@@ -97,7 +97,12 @@ const PR_REFERENCE = /\b(?:that|this|its|the\s+same|the\s+previous|the\s+last|te
 // "the other pr", "the latest pr", "my last pull request", "the most recent pr": a pull request picked out among several, which
 // neither the current branch's pull request nor the one of the previous command is (withheld, also with history)
 const PR_PICKED = /\b(?:(?:the|a|an|my|our|your|his|her|their|some|any)\s+)?(?:other|another|latest|newest|most\s+recent|recent|oldest|older|newer|earlier|next|first|second|third|new|old|pending|approved|remaining|(?:(?:my|our|your|his|her|their)\s+)(?:last|previous|prior)|inn[yaeoy]\w*|ostatni\w*|najnowsz\w*|poprzedni\w*|kolejn\w*|nastepn\w*|następn\w*|starsz\w*)\s+(?:(?:open|opened|draft|merged|github)\s+)?(?:prs?|pull[\s-]+requests?)\b/i;
-const PR_CLOSE = /(?:^|[\s,;])(?:close|closing|shut|reject|decline|abandon|zamkn\S*)(?=[\s.,!?;:]|$)/i;
+const PR_CLOSE = /(?:^|[\s,;])(?:close|closing|shut|reject|decline|abandon|cancel|zamkn\S*)(?=[\s.,!?;:]|$)/i;
+// "merge and close pr 45": a merge the request asks for; "close pr 45 without merge", "do not merge pr 45", "unmerge pr 45":
+// one it does not (a negation within the two words before it, or a prefix that undoes it)
+const MERGE_WORD = /(?:^|[^\w-])((?:un|de)?merg\w*|(?:roz)?scal\w*)/gi;
+const MERGE_NEGATION = /(?:\b(?:not|no|never|without|nor|instead\s+of|rather\s+than|nie|bez)|n't|\bdont|\bundo(?:\s+the)?|\brevert(?:\s+the)?|\bcofnij)\s+(?:\S+\s+){0,2}$/i;
+const mergeAsked = (q) => [...String(q).matchAll(MERGE_WORD)].some((m) => !/^(?:un|de|roz)/i.test(m[1]) && !MERGE_NEGATION.test(q.slice(0, m.index + m[0].length - m[1].length)));
 // slots naming the one thing a command acts on, other than a path (not free text: pattern, message, glob, ...)
 const OPERAND_SLOT_NAMES = new Set(['name', 'service', 'container', 'pkg', 'host', 'target', 'branch', 'user', 'script', 'url', 'pid']);
 for (const k of PATH_SLOT_NAMES) if (k !== 'path') VALID_SLOT[k] = VALID_SLOT.path;
@@ -375,8 +380,17 @@ export function suggest(query, opts = {}) {
   }
   // "close that pr", "close pr 45": the catalog has no command that closes a pull request; the opposite one (`gh pr create`)
   // or another one (`gh pr view 45`) is never suggested in its place
-  if (['gh_pr_create', 'gh_pr_view', 'gh_pr_checks'].includes(intent) && PR_CLOSE.test(query)) {
-    return { ...out, understood: false, method: 'none', hint: 'closing a pull request is not supported (gh pr close <PR>)' };
+  // "close pr 45 and delete branch", "close pr 45 without merge": refused for gh_pr_merge too, unless the request also asks
+  // for the merge ("merge and close pr 45"); "do not merge pr 45", "unmerge pr 45": never `gh pr merge 45`
+  const closes = PR_CLOSE.test(query);
+  const merges = intent === 'gh_pr_merge' && mergeAsked(query);
+  // "revert pr 45": not `gh pr view 45` either
+  if (intent?.startsWith('gh_pr_') && /\brevert\w*\b/i.test(query) && !merges) {
+    return { ...out, understood: false, method: 'none', hint: 'reverting a pull request is not supported (gh pr revert <PR>)' };
+  }
+  if (intent?.startsWith('gh_pr_') && ((closes && !merges) || (intent === 'gh_pr_merge' && !merges && [...query.matchAll(MERGE_WORD)].length))) {
+    const hint = closes ? 'closing a pull request is not supported (gh pr close <PR>)' : 'the request does not ask for a merge (it negates or undoes one); not suggesting gh pr merge';
+    return { ...out, understood: false, method: 'none', hint };
   }
 
   const r = resolveWithTagger(intent, query, { model, tool: FAMILY_OF[intent], mode: opts.slotMode, tagger: opts.tagger });
@@ -481,9 +495,10 @@ export function suggest(query, opts = {}) {
     }
   };
   if (ref?.rule === 'refused') {
-    // the reference points at something we cannot read safely: leave the slot empty (placeholder)
+    // the reference points at something we cannot read safely: leave the slot empty (placeholder); a pull request stays
+    // `<PR>` even then (left out, `gh pr merge` would act on the current branch's)
     refWordsOnly();
-    for (const k of refDst ? [] : ref.blank || []) if (slots[k] == null && usesSlot(BY_ID[intent], k)) { blank.add(k); if (!ref.blanket) keep.add(k); }
+    for (const k of refDst ? [] : ref.blank || []) if (slots[k] == null && usesSlot(BY_ID[intent], k)) { blank.add(k); if (!ref.blanket || k === 'pr') keep.add(k); }
     finalizeSlots(BY_ID[intent], slots);
     method = 'history-rule';
   }
@@ -503,7 +518,8 @@ export function suggest(query, opts = {}) {
     // the value must not be changed (search root, listed directory, ...; see changeGuard) and the classifier
     // picked a modifying intent: refuse
     refWordsOnly();
-    for (const k of Object.keys(refFill)) if (slots[k] == null && usesSlot(BY_ID[intent], k)) blank.add(k);
+    // (a pull request keeps its `<PR>`: left out, `gh pr merge` would act on the current branch's)
+    for (const k of Object.keys(refFill)) if (slots[k] == null && usesSlot(BY_ID[intent], k)) { blank.add(k); if (k === 'pr') keep.add(k); }
     finalizeSlots(BY_ID[intent], slots);
     context.rule = 'refused';
     context.note = ref.guardNote;
