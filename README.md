@@ -288,7 +288,7 @@ confident it is a shell task), or when the request asks for a flag the catalog c
 trigger does not occur in ≥5% of that intent's own training paraphrases (`model/compose_explained.json`), so "hidden"
 does not re-route `hidden_files`. Value flags (`-n 5`, `-maxdepth 2`, `-t ext4`, `-k 2 -t ,`, `--since`), tar
 compression from the archive name, `bash -n` and an allowed-flag check validate the result; it is always
-**high risk (the trust rule below), shown as "composed (experimental)", needs an explicit `yes` and is refused by `--yes`**. POSIX shells only.
+**high risk (the trust rule below), shown as "composed (experimental)", shows a warning before Enter and is refused by `--yes`**. POSIX shells only.
 
 ## Safety model
 
@@ -297,7 +297,7 @@ compression from the archive name, `bash -n` and an allowed-flag check validate 
   own single quotes are the only ones), no `$`, backticks or `$'…'`, no `;` `|` `&` `<` `>`, no control characters, no
   find action (`-exec`, `-ok`, `-delete`, …), no leading `-` (a path is rendered `./-x`; a raw value must pass its
   validator), and a program slot (`{cmd} --version`) is a plain program name, never a path or `source` / `.` / `eval` /
-  a shell. Everything else is **at least high** and needs an explicit `yes`; `--yes` never runs it: a command you edit
+  a shell. Everything else is **at least high** and shows a red warning before Enter runs it; `--yes` never runs it: a command you edit
   (any change; an unchanged one keeps its rating), a composed command, a command resolved from history (a replay), and
   any typed text with an unknown program (`diskutil …`), construct or sed script. A catalog render of a medium / high
   intent with plain values keeps its intent's risk; with other values it is high. The parser below (deny rules,
@@ -319,11 +319,11 @@ compression from the archive name, `bash -n` and an allowed-flag check validate 
   …), an environment assignment in front of a command (`FOO=1 cmd`), an **unknown program** (`mywrap`, `cowsay`), an
   **unknown subcommand** (`git filter-branch`, `npx cowsay`, `gh pr close`) or an **unknown flag** for a known command
   (`gh pr merge --admin`, `git push --force-with-lease`, `rm -P`) makes the command **high** risk, with the reason, so
-  it needs an explicit `yes`. Known option clusters (`ls -la` when `-l` and `-a` are known) and attached numbers
+  it is high (red warning). Known option clusters (`ls -la` when `-l` and `-a` are known) and attached numbers
   (`tail -n5`) count as known. The composer's commands add the flags it validated against its tool vocabulary. Under
   the trust rule it no longer decides whether a typed or edited command is safe (none is); it raises catalog renders
   and adds reasons. Consequence: every catalog command that goes through `sudo` (service start/stop,
-  `apt install`, `chown`, `dmesg`, …) is high and needs `yes`.
+  `apt install`, `chown`, `dmesg`, …) is high (red warning).
 * `src/danger.js` also scans the **final** command — also edited ones — with deny rules, and can only escalate. It tokenizes each simple
   command (quotes, `--`, long options) and checks every command it may run: after a wrapper (`sudo`, `doas`, `su`,
   `runuser`, `pkexec`, `flock`, `nice`, `ionice`, `timeout`, `stdbuf`, `nohup`, `setsid`, `env`, `xargs`, `chrt`, `cgexec`,
@@ -442,7 +442,8 @@ retrain; `npm test && npm run eval`.
   `--prefix` / `--filter` / `--cwd` / `--project` (plus `-w` npm, `-R` gh, `-e` / `-c` wrangler) and "in workspace /
   repo / project / environment / config X"; other phrasings of a scope (`for the api package`) are not seen.
 * **The trust rule is deliberately blunt.** Every edit, however harmless (`ls -la` -> `ls -l`), every history replay
-  (`same for /var`, `count lines in it`) and every composed command is high and needs `yes`; a safe request with an
+  (`same for /var`, `count lines in it`) and every composed command is high and shows the red warning (since 0.3.2
+  Enter runs it; Esc aborts); a safe request with an
   unusual value (a file name with a quote, `$` or `&`, a grep pattern starting with `-`) is high too.
 * **The allowlist knows only what the catalog renders.** A command you type or edit with a flag tellsh never emits
   (`ls --color=never`, `git log --stat`) gets an extra "unknown option" reason. PowerShell expressions

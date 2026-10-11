@@ -1,6 +1,6 @@
 {
   "name": "tellsh",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "Offline natural-language (Polish & English) to shell command CLI: tool->intent->slot cascade of tiny linear models + templates for bash/zsh/sh/PowerShell (fish/cmd best effort). No LLM at runtime, zero dependencies.",
   "type": "module",
   "bin": {
