@@ -1,5 +1,6 @@
 // Dangerous-pattern checker. Runs on every final command (including user-edited ones)
-// and can only ever escalate risk, never lower it.
+// and can only ever escalate risk, never lower it. Whether a command can be safe at all is the
+// trust rule at the end of this file (checkDanger): only tellsh's own catalog renders with plain values.
 //
 // Regex rules run on the command text after `git`/`docker` global options are removed
 // (`git -C /repo -c x=y reset --hard` is checked as `git reset --hard`). Structural rules
@@ -19,6 +20,10 @@ export const maxRisk = (a, b) => (RANK[b] > RANK[a] ? b : a);
 const PS_SQ = /['\u2018\u2019\u201A\u201B]/;
 const PS_DQ = /["\u201C\u201D\u201E]/;
 
+// $'…' (bash, zsh, ksh): the index of its closing quote (`\'` does not close it)
+const ansiEnd = (s, i) => { let j = i + 2; while (j < s.length && s[j] !== "'") j += s[j] === '\\' ? 2 : 1; return Math.min(j, s.length); };
+const ANSI_ESC = { n: '\n', t: '\t', r: '\r', a: '\x07', b: '\b', e: '\x1b', E: '\x1b', f: '\f', v: '\v' };
+
 // winPaths: backslash is never an escape (cmd.exe / PowerShell paths such as "C:\"), and the
 // PowerShell typographic quotes ‘…’ “…” quote like ' and "
 export function simpleCommands(cmd, { winPaths = false } = {}) {
@@ -32,7 +37,12 @@ export function simpleCommands(cmd, { winPaths = false } = {}) {
   const isDq = (c) => (winPaths ? PS_DQ.test(c) : c === '"');
   for (let i = 0; i < s.length; i++) {
     const c = s[i];
-    if (isSq(c)) {
+    if (!winPaths && c === '$' && s[i + 1] === "'") {
+      // bash ANSI-C quoting $'…': a backslash escapes the next character, also a quote (`$'\''` is one ')
+      const end = ansiEnd(s, i);
+      w = (w ?? '') + s.slice(i + 2, end).replace(/\\(.)/gs, (m, x) => ANSI_ESC[x] ?? x);
+      i = end;
+    } else if (isSq(c)) {
       let j = i + 1;
       while (j < s.length && !isSq(s[j])) j++;
       const end = j;
@@ -319,6 +329,68 @@ function sysFileWriteCheck(w, head, hit) {
   }
 }
 
+// sed scripts that run a shell command or write a file: GNU `e` (command, or flag of s///), `w` / `W` (command, or flag of
+// s///); a script read from a file (-f) cannot be checked. `sed 's/a/b/e' f`, `sed -n '1e cmd' f`, `sed 'w out' f`.
+function sedScripts(a) {
+  const scripts = [];
+  let fromFile = false;
+  let first = !a.some((x) => /^-[a-zA-Z]*[ef]$|^--(?:expression|file)(?:=|$)|^-[a-zA-Z]*e./.test(x));
+  let opts = true;
+  for (let i = 0; i < a.length; i++) {
+    const x = String(a[i]);
+    if (opts && x === '--') { opts = false; continue; }
+    if (opts && /^-[a-zA-Z]*f$|^--file$/.test(x)) { fromFile = true; i++; continue; }
+    if (opts && /^--file=|^-[a-zA-Z]*f./.test(x)) { fromFile = true; continue; }
+    if (opts && /^-[a-zA-Z]*e$|^--expression$/.test(x)) { if (a[i + 1] != null) scripts.push(String(a[i + 1])); i++; continue; }
+    if (opts && /^--expression=/.test(x)) { scripts.push(x.slice(13)); continue; }
+    if (opts && /^-[a-df-zA-Z]*e./.test(x)) { scripts.push(x.slice(x.indexOf('e') + 1)); continue; }
+    if (opts && /^-./.test(x)) continue;
+    if (first) { scripts.push(x); first = false; }
+  }
+  return { scripts, fromFile };
+}
+function sedRunsOrWrites(script) {
+  const s = String(script);
+  let i = 0;
+  const skipAddr = () => {
+    for (;;) {
+      while (i < s.length && /[\s\d$,~+!{]/.test(s[i])) i++;
+      if (s[i] === '/' || (s[i] === '\\' && i + 1 < s.length)) {
+        const d = s[i] === '/' ? '/' : s[++i];
+        for (i++; i < s.length && s[i] !== d; i++) if (s[i] === '\\') i++;
+        i++;
+        while (i < s.length && /[IM]/.test(s[i])) i++;
+        continue;
+      }
+      return;
+    }
+  };
+  while (i < s.length) {
+    skipAddr();
+    const c = s[i];
+    if (c == null) break;
+    if (c === 'e' || c === 'w' || c === 'W') return true;
+    if (c === 's' || c === 'y') {
+      const d = s[i + 1];
+      if (d == null) break;
+      let n = 0;
+      for (i += 2; i < s.length && n < 2; i++) { if (s[i] === '\\') i++; else if (s[i] === d) n++; }
+      if (c === 's') { const fl = s.slice(i).match(/^[^;}\n]*/)[0]; if (/[ewW]/.test(fl)) return true; i += fl.length; }
+    } else if (/[aic:bTtrRqQlLv#]/.test(c)) {
+      // text / label / file-name arguments run to the end of the line
+      while (i < s.length && s[i] !== '\n') i++;
+    }
+    while (i < s.length && s[i] !== ';' && s[i] !== '\n' && s[i] !== '}') i++;
+    i++;
+  }
+  return false;
+}
+function sedCheck(w, hit) {
+  const { scripts, fromFile } = sedScripts(w.slice(1));
+  if (fromFile) hit('high', 'sed reads its script from a file; it cannot be checked');
+  if (scripts.some(sedRunsOrWrites)) hit('high', 'sed script runs a shell command or writes a file (e / w)');
+}
+
 // kill [-SIG | -s SIG | -n NUM | --signal SIG] [--] pid...   (pid 1 / -1 = init / every process)
 function killCheck(words, hit) {
   hit('high', 'terminates processes');
@@ -517,7 +589,7 @@ function codeCheck(ic, hit) {
   for (const m of ic.code.matchAll(/'([^']*)'|"([^"]*)"|`([^`]*)`|\bqq?\s*([{(\[])([^})\]]*)[})\]]/g)) lits.push(m[1] ?? m[2] ?? m[3] ?? m[5]);
   for (const c of lits) {
     if (!c || !c.trim()) continue;
-    const d = checkDanger(c, 'safe', { lenient: true });
+    const d = assessCommand(c, 'safe', { lenient: true });
     for (const m of d.warnings) hit(d.risk, m, d.critical);
   }
   for (const m of ic.code.matchAll(DELETE_CALL)) if (critTarget(m[1]) || SYS_PATH.test(normTarget(m[1]))) hit('high', `${ic.h} code deletes or changes /, ~ or a system directory`, true);
@@ -694,6 +766,7 @@ export function substitution(command) {
   for (let i = 0; i < s.length; i++) {
     const c = s[i];
     if (c === '\\') { i++; continue; }
+    if (c === '$' && s[i + 1] === "'" && !dq) { i = ansiEnd(s, i); continue; }
     if (c === "'" && !dq) { const j = s.indexOf("'", i + 1); if (j < 0) return null; i = j; continue; }
     if (c === '"') { dq = !dq; continue; }
     if (c === '`') return 'command';
@@ -753,8 +826,12 @@ export function allowlistProblems(command, { extra = null } = {}) {
   return out;
 }
 
-/** @returns {{risk:'safe'|'medium'|'high', warnings:string[], critical:boolean}} */
-export function checkDanger(command, baseRisk = 'safe', { lenient = false, allowlist = null } = {}) {
+/**
+ * The parser's reading of a command: deny rules, structural checks and the allowlist. It only ever raises `baseRisk`;
+ * a `safe` result here does not make a command safe (see checkDanger).
+ * @returns {{risk:'safe'|'medium'|'high', warnings:string[], critical:boolean}}
+ */
+export function assessCommand(command, baseRisk = 'safe', { lenient = false, allowlist = null } = {}) {
   let risk = baseRisk;
   const warnings = [];
   let critical = false;
@@ -788,6 +865,7 @@ export function checkDanger(command, baseRisk = 'safe', { lenient = false, allow
     else if (['chmod', 'chown', 'chgrp'].includes(head)) permCheck(w, hit);
     else if (head === 'tar' || head === 'bsdtar' || head === 'gtar') tarCheck(w, hit);
     else if (head === 'docker' || head === 'podman') dockerCheck(w, hit);
+    else if (lower === 'sed' || lower === 'gsed') sedCheck(w, hit);
     if (['tee', 'cp', 'install', 'sponge', 'pv', 'mv', 'ln'].includes(lower)) rawDiskWriteCheck(w, hit);
     interpCheck(w, hit);
     stdinCodeCheck(w, hit, inner);
@@ -800,17 +878,62 @@ export function checkDanger(command, baseRisk = 'safe', { lenient = false, allow
   // `-c` values of other programs: checked as commands, but a name like "$PAT" is not a command name there
   for (const c of new Set(flags.lenient || [])) {
     if (!c.trim() || inner.includes(c)) continue;
-    const d = checkDanger(c, 'safe', { lenient: true });
+    const d = assessCommand(c, 'safe', { lenient: true });
     for (const m of d.warnings) hit(d.risk, m, d.critical);
   }
   pipelineDeleteCheck(text, hit);
   for (const c of new Set(inner)) {
     if (c === command || !c.trim()) continue;
     // the allowlist judges the command as written (a wrapper around a payload is already high); payloads get the deny rules
-    const d = checkDanger(c, 'safe', { allowlist: { off: true } });
+    const d = assessCommand(c, 'safe', { allowlist: { off: true } });
     for (const m of d.warnings) hit(d.risk, m, d.critical);
   }
   for (const [re, r, msg, crit] of RULES) if (re.test(text)) hit(r, msg, crit);
   if (!lenient && !allowlist?.off) for (const m of allowlistProblems(command, { extra: allowlist?.extra })) hit('high', m);
   return { risk, warnings, critical };
+}
+
+// ---------------------------------------------------------------------------------------------
+// Trust rule (v0.3 close3). A command is rated safe ONLY when it is byte-identical to a render of a catalog template whose
+// intent is risk=safe, with slot values that are plain literals (plainSlotValue). Anything else (composer output, a
+// history replay, a user edit, an unknown program, a construct the parser does not read) is at least high and needs an
+// explicit "yes"; --yes never runs it. The parser above only raises risk, never lowers it: it adds the reasons and
+// catches what must be retyped (critical), but a command it finds nothing wrong with is still not trusted.
+
+export const UNTRUSTED = 'not a catalog command rendered by tellsh with plain values (edited, composed, from history or unknown); it is not checked as safe';
+
+// characters a plain slot value never has: quotes (tellsh's own single quotes are the only ones), $ and backticks
+// (expansion, $'…'), command separators and redirections, control characters, PowerShell's typographic quotes
+const NOT_PLAIN = /['"`$;|&<>\u0000-\u001f\u007f\u2018-\u201f]/;
+// find primaries that run, delete or write (`-exec`, `-ok`, `-delete`, `-fprint`, `-fls`)
+const FIND_ACTION = /(?:^|\s)-(?:exec|execdir|ok|okdir|delete|fprint0?|fprintf|fls)(?=\s|$)/;
+// a slot rendered where the program goes (`{cmd} --version`): a plain program name, never a path or a shell builtin
+// that runs a file or a string
+const COMMAND_SLOTS = new Set(['cmd']);
+const NOT_A_PROGRAM = /^(?:source|\.|eval|exec|builtin|command|sudo|doas|su|env|xargs|bash|sh|zsh|dash|ksh|fish|pwsh|powershell|cmd|iex|invoke-expression)$/i;
+/**
+ * Whether a slot value is a plain literal: a number, or a string without quotes, $, backticks, ; | & < >, control
+ * characters or find actions. `dashOk`: a leading `-` is fine (a path rendered as `./-x`, a raw value its validator
+ * accepted, `-mtime -1`); otherwise it could be read as an option.
+ */
+export function plainSlotValue(name, value, { dashOk = false } = {}) {
+  if (value == null) return true;
+  if (typeof value === 'number') return Number.isFinite(value);
+  if (typeof value !== 'string') return false;
+  if (NOT_PLAIN.test(value) || FIND_ACTION.test(value)) return false;
+  if (/^-/.test(value) && !dashOk) return false;
+  if (COMMAND_SLOTS.has(name) && (!/^[A-Za-z0-9][\w.+-]*$/.test(value) || NOT_A_PROGRAM.test(value))) return false;
+  return true;
+}
+
+/**
+ * The risk of a final command. `rendered`: the caller vouches that `command` is exactly what tellsh rendered from a catalog
+ * template with plain slot values (fill.js buildCommand); `baseRisk` is then the intent's risk. Without it the command
+ * is at least high.
+ * @returns {{risk:'safe'|'medium'|'high', warnings:string[], critical:boolean}}
+ */
+export function checkDanger(command, baseRisk = 'safe', { rendered = false, allowlist = null } = {}) {
+  const d = assessCommand(command, baseRisk, { allowlist });
+  if (rendered || d.risk === 'high') return d;
+  return { risk: 'high', warnings: [UNTRUSTED, ...d.warnings], critical: d.critical };
 }

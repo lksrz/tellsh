@@ -7,7 +7,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { suggest } from '../src/pipeline.js';
-import { checkDanger } from '../src/danger.js';
+// the parser on its own (it only raises risk); the trust rule (a non-catalog command is high) is in regressions27.test.js
+import { assessCommand as checkDanger } from '../src/danger.js';
 // v0.3: commands outside the catalog are high by the allowlist; these cases check the deny rules alone
 const denyOnly = (c, base = 'safe') => checkDanger(c, base, { allowlist: { off: true } });
 

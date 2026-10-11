@@ -12,7 +12,8 @@ import { suggest, validSlot } from '../src/pipeline.js';
 import { extractSlots, trimPathPunct } from '../src/slots.js';
 import { normPath, exFromSpans, tagFeatureSets } from '../src/tagger.js';
 import { tagTokens, tagFeatures } from '../src/features.js';
-import { checkDanger } from '../src/danger.js';
+// the parser on its own (it only raises risk); the trust rule (a non-catalog command is high) is in regressions27.test.js
+import { assessCommand as checkDanger } from '../src/danger.js';
 import { buildCommand, finalizeSlots } from '../src/fill.js';
 import { BY_ID } from '../src/catalog.js';
 import { shQuote, psQuote, cmdQuote, pwshNativeSlots } from '../src/render.js';

@@ -17,7 +17,7 @@ import { detectEnv, envFeatures } from './env.js';
 import { buildContext, resolveReference, hasPronoun, hasLocative, cwdFlags, sameBut, entityForSlot, isAmbiguous } from './history.js';
 import { AMB } from './shellwords.js';
 import { compose } from './compose.js';
-import { checkDanger } from './danger.js';
+import { assessCommand, maxRisk } from './danger.js';
 import { readFileSync } from 'node:fs';
 
 let EXPLAINED = null;
@@ -145,7 +145,7 @@ export function resolveWithTagger(intentId, text, { model = getModel(), tool, mo
   const partOfRejected = (v) => exT.rejectedPaths?.some((ch) => exR.spans.some((s) => s.type === 'PATH' && s.value === v && s.start < ch.end && ch.start < s.end && text.slice(s.start, s.end) !== ch.text));
   for (const k of new Set([...Object.keys(rT), ...Object.keys(rR)])) {
     if (k === 'namepat' || k === 'sedexpr') continue; // derived, recomputed below
-    if (validSlot(k, rT[k])) { slots[k] = rT[k]; sources[k] = 'tagger'; } else if (rR[k] != null && (validSlot(k, rR[k]) || !VALID_SLOT[k]) && !(PATH_SLOT_NAMES.has(k) && partOfRejected(rR[k]))) { slots[k] = rR[k]; sources[k] = 'regex'; }
+    if (validSlot(k, rT[k])) { slots[k] = rT[k]; sources[k] = 'tagger'; } else if (rR[k] != null && (validSlot(k, rR[k]) || (!VALID_SLOT[k] && !String(rR[k]).startsWith('?'))) && !(PATH_SLOT_NAMES.has(k) && partOfRejected(rR[k]))) { slots[k] = rR[k]; sources[k] = 'regex'; }
   }
   // "delete the folder out", "du of folder out sorted by size": a stop word right after the noun is its name
   for (const k of ['path', 'file']) {
@@ -253,12 +253,12 @@ function composeInput(text, model, tool, unclear = []) {
 }
 /**
  * A composed command that changes something and uses a path whose end is unclear (`chmod -R 777 /tmp/data!`).
- * Composed commands always carry at least medium risk, so "changes something" is: a writing tool (chmod,
+ * Composed commands are always high (the trust rule), so "changes something" is judged by the parser: a writing tool (chmod,
  * tar) or anything the danger checker flags on its own (find -delete, git/docker subcommands, ...).
  */
 const WRITING_TOOLS = new Set(['chmod', 'tar']);
 const blocksAmbiguous = (comp, amb) => !!comp && !comp.invalid && amb.some((p) => comp.command.includes(p)) &&
-  (WRITING_TOOLS.has(comp.tool) || checkDanger(comp.command, 'safe').risk !== 'safe');
+  (WRITING_TOOLS.has(comp.tool) || assessCommand(comp.command, 'safe').risk !== 'safe');
 
 /**
  * Pure function used by the CLI, eval and tests.
@@ -266,6 +266,18 @@ const blocksAmbiguous = (comp, amb) => !!comp && !comp.invalid && amb.some((p) =
  *         slotMode: 'merge'|'tagger'|'regex', model, rerank, rerankTop (candidates the rerank hook sees; default top) }
  */
 export function suggest(query, opts = {}) {
+  return replayFloor(suggestOnce(query, opts));
+}
+
+// the trust rule (danger.js): a command resolved from history (a reference, "same but …", a value from an earlier
+// command) is a replay, not a fresh render of what the request says: at least high, never auto-run
+const REPLAY = 'resolved from history (a replay of an earlier command, not a fresh catalog render); needs an explicit yes';
+function replayFloor(s) {
+  if (!s?.command || s.method !== 'history-rule' || s.risk === 'high') return s;
+  return { ...s, risk: maxRisk(s.risk, 'high'), warnings: [REPLAY, ...(s.warnings || [])] };
+}
+
+function suggestOnce(query, opts = {}) {
   const model = opts.model || getModel();
   const env = opts.env || detectEnv({ shell: opts.shell, os: opts.os });
   const top = opts.top ?? 3;

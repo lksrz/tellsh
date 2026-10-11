@@ -26,7 +26,7 @@ $ docker logs --tail 100 -f web
 
 $ tellsh list files sorted by modification time, oldest first, with details
 $ ls -l -t -r
-  composed (experimental) ls · bash/linux · risk: medium · confidence: 100%
+  composed (experimental) ls · bash/linux · risk: high · confidence: 100%
   ~ assembled from a flag vocabulary (request asks for -t -r not in the catalog command); check it carefully
 Experimental. Type "yes" to run, e to edit, anything else aborts:
 ```
@@ -87,7 +87,7 @@ before the first `/`). A changing command leaves that path (or name) as a placeh
    │                         score < threshold ───┼──► SECOND PASS: flag composer (experimental)
    │                         or ≥1 unexplained    │    head from stage-1 tools · flags from NL triggers
    │                         modifier             │    (+ tldr stems) · bash -n + allowed-flag check
-   ▼                                              ▼    · risk ≥ medium · explicit "yes"
+   ▼                                              ▼    · risk high · explicit "yes"
  STAGE 3  BIO slot tagger (tool = input feature, only the tool's slot types are candidates,
           constrained Viterbi)  ──► typed spans ──► validate ──► regex extractor fills misses / replaces
           invalid values  ──► template for (shell, OS, coreutils) ──► per-shell quoting
@@ -163,7 +163,18 @@ as a placeholder you fill before running, never a guess and never a bare command
 `gh pr merge <PR>`, `deploy worker in preview2` -> `npx wrangler deploy --env <WENV>`, `create a pr into develop` /
 `list closed prs` -> `gh pr create --fill <ARGS>` / `gh pr list <ARGS>`. An explicit value stays unless another one
 competes with it (`merge pr 45 or 46` -> `<PR>`), and an environment the request excludes is never the target
-(`deploy worker but not to production` -> `--env <WENV>`). `--env` is kept for `wrangler dev/tail/secret put` too,
+(`deploy worker but not to production` -> `--env <WENV>`).
+
+**Contested selectors (v0.3 close3).** When a request offers an alternative for a selector or negates one (`or`, `albo`,
+`lub`, `either`, `instead`, `zamiast`, `not`, `but not`, `don't`, `never`, `nie`, `oprócz`, `poza`, `except`,
+`without`, …: the selector value nearest after it within five words of the same clause, and for an alternative also
+the one nearest before it), or names two candidate values for one slot, that slot is rendered as a placeholder,
+never one of the candidates: `merge pr 4 or 44` -> `gh pr merge <PR>`, `merge pr 42 but not in repo acme/app` ->
+`gh pr merge 42 --repo <REPO>`, `deploy worker --env prod --env prodprod` / `deploy to prod, not staging` /
+`wdróż na produkcję, nie na staging` -> `--env <WENV>`, `install axios or lodash with npm` -> `npm install <PKG>`. Slots:
+pull request, run number, environment, repository and secret name (gh / wrangler), the package of `npm install` /
+`npm install -g` / `pip install` and the `npm run` script. A negation that describes a state (`co poszło nie tak`,
+`not passing`) is not one; `… and don't delete the branch` gives no `--delete-branch`. `--env` is kept for `wrangler dev/tail/secret put` too,
 `--repo` for `gh pr create/list` and `gh run list/view`, and `merge pr 45 and delete the branch` gives
 `gh pr merge 45 --delete-branch`. Installs, project scripts (also every `npx wrangler` command: `npx` prefers a project-local binary,
 and `wrangler dev` runs the project's build command), deploys, merges, secrets and tunnels are `medium` risk, so `--yes`
@@ -258,10 +269,22 @@ confident it is a shell task), or when the request asks for a flag the catalog c
 trigger does not occur in ≥5% of that intent's own training paraphrases (`model/compose_explained.json`), so "hidden"
 does not re-route `hidden_files`. Value flags (`-n 5`, `-maxdepth 2`, `-t ext4`, `-k 2 -t ,`, `--since`), tar
 compression from the archive name, `bash -n` and an allowed-flag check validate the result; it is always
-**risk ≥ medium, shown as "composed (experimental)", needs an explicit `yes` and is refused by `--yes`**. POSIX shells only.
+**high risk (the trust rule below), shown as "composed (experimental)", needs an explicit `yes` and is refused by `--yes`**. POSIX shells only.
 
 ## Safety model
 
+* **Trust rule (v0.3 close3).** A command is rated **safe only** when it is byte-identical to tellsh's own render of a
+  catalog template whose intent is `risk=safe`, with slot values that are plain literals: no quote characters (tellsh's
+  own single quotes are the only ones), no `$`, backticks or `$'…'`, no `;` `|` `&` `<` `>`, no control characters, no
+  find action (`-exec`, `-ok`, `-delete`, …), no leading `-` (a path is rendered `./-x`; a raw value must pass its
+  validator), and a program slot (`{cmd} --version`) is a plain program name, never a path or `source` / `.` / `eval` /
+  a shell. Everything else is **at least high** and needs an explicit `yes`; `--yes` never runs it: a command you edit
+  (any change; an unchanged one keeps its rating), a composed command, a command resolved from history (a replay), and
+  any typed text with an unknown program (`diskutil …`), construct or sed script. A catalog render of a medium / high
+  intent with plain values keeps its intent's risk; with other values it is high. The parser below (deny rules,
+  allowlist) only ever raises risk, never lowers it: it gives the reasons and decides what must be retyped
+  (critical), but finding nothing wrong does not make a command safe. It reads bash `$'…'` quoting (so
+  `echo $'\''; rm -rf ~ #'` is critical) and flags sed scripts that run a command or write a file (`e`, `w`, `W`, `-f`).
 * Every intent has a base risk: **safe** (read-only), **medium** (modifies state: archives, git checkout/pull/stash,
   chmod, mv, sudo, …), **high** (destructive: rm, kill, prune, discard). v0.2 raised 10 intents from safe to medium after
   the teacher review (see `EVAL.md`).
@@ -272,8 +295,9 @@ compression from the archive name, `bash -n` and an allowed-flag check validate 
   **unknown subcommand** (`git filter-branch`, `npx cowsay`, `gh pr close`) or an **unknown flag** for a known command
   (`gh pr merge --admin`, `git push --force-with-lease`, `rm -P`) makes the command **high** risk, with the reason, so
   it needs an explicit `yes`. Known option clusters (`ls -la` when `-l` and `-a` are known) and attached numbers
-  (`tail -n5`) count as known. The composer's commands add the flags it validated against its tool vocabulary. This
-  applies to edited commands too. Consequence: every catalog command that goes through `sudo` (service start/stop,
+  (`tail -n5`) count as known. The composer's commands add the flags it validated against its tool vocabulary. Under
+  the trust rule it no longer decides whether a typed or edited command is safe (none is); it raises catalog renders
+  and adds reasons. Consequence: every catalog command that goes through `sudo` (service start/stop,
   `apt install`, `chown`, `dmesg`, …) is high and needs `yes`.
 * `src/danger.js` also scans the **final** command — also edited ones — with deny rules, and can only escalate. It tokenizes each simple
   command (quotes, `--`, long options) and checks every command it may run: after a wrapper (`sudo`, `doas`, `su`,
@@ -305,8 +329,8 @@ compression from the archive name, `bash -n` and an allowed-flag check validate 
 * Raw slots (numbers, find flags) are validated before insertion; paths starting with `-` get `./`; other values
   (names, hosts, URLs, containers, …) may not start with `-`, and URLs must be `scheme://…` or `user@host:path`.
   Values taken from history pass the same validation.
-* `--yes` only runs `safe` commands that come straight from the catalog: never history-resolved, composed, incomplete
-  or medium/high-risk ones. Non-TTY use prints only.
+* `--yes` only runs `safe` commands, i.e. fresh catalog renders with plain values (the trust rule): never
+  history-resolved, composed, edited, incomplete or medium/high-risk ones. Non-TTY use prints only.
 
 ## Accuracy & speed (details: [EVAL.md](EVAL.md))
 
@@ -379,8 +403,11 @@ retrain; `npm test && npm run eval`.
   slots with the per-slot parsers: a descriptive word can still become a value there (`install the testing library`
   -> `python3 -m pip install testing`). Read the command before running it.
 * `<ARGS>` and `<WENV>` are placeholders, not values: tellsh never runs an incomplete command; edit it (`e`) first.
-* **The allowlist knows only what the catalog renders.** A perfectly safe command you type or edit with a flag tellsh
-  never emits (`ls --color=never`, `git log --stat`) is reported as high risk and needs `yes`. PowerShell expressions
+* **The trust rule is deliberately blunt.** Every edit, however harmless (`ls -la` -> `ls -l`), every history replay
+  (`same for /var`, `count lines in it`) and every composed command is high and needs `yes`; a safe request with an
+  unusual value (a file name with a quote, `$` or `&`, a grep pattern starting with `-`) is high too.
+* **The allowlist knows only what the catalog renders.** A command you type or edit with a flag tellsh never emits
+  (`ls --color=never`, `git log --stat`) gets an extra "unknown option" reason. PowerShell expressions
   are tokenized with the same light tokenizer: parts of an expression (`$_.Length -gt 1MB`, `.Count`) are not judged
   by the allowlist (a `$`-named program stays high by the deny rules). Payload strings of a runner (`forfiles /c "…"`,
   `bash -c '…'`) are checked by the deny rules; the wrapper itself already makes the command high.

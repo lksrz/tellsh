@@ -4,7 +4,7 @@
 //      weak evidence from tldr-pages flag descriptions; flags whose trigger score >= 1 are selected
 //   3. slot values (paths, patterns, numbers, ...) come from the tagger/regex extraction
 //   4. validation: only flags from the tool's vocabulary, then `bash -n` syntax check
-// Composed commands are always at least medium risk and must be confirmed explicitly (never --yes).
+// Composed commands are not catalog renders: high risk by the trust rule (danger.js), confirmed explicitly (never --yes).
 import { spawnSync } from 'node:child_process';
 import { readFileSync } from 'node:fs';
 import { foldKeepLength } from './slots.js';

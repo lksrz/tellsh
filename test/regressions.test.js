@@ -10,7 +10,8 @@ import { join } from 'node:path';
 import { INTENTS } from '../src/catalog.js';
 import { render, buildCommand } from '../src/fill.js';
 import { shQuote, psQuote, cmdQuote } from '../src/render.js';
-import { checkDanger } from '../src/danger.js';
+// the parser on its own (it only raises risk); the trust rule (a non-catalog command is high) is in regressions27.test.js
+import { assessCommand as checkDanger } from '../src/danger.js';
 import { suggest, validSlot } from '../src/pipeline.js';
 import { buildContext, resolveReference } from '../src/history.js';
 import { splitCommand } from '../src/shellwords.js';

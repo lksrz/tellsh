@@ -1,7 +1,7 @@
 // Turn (intent, slots) into a concrete, safely-quoted command for the target shell.
 import { BY_ID } from './catalog.js';
 import { extractSlots, pickArg, pickDest, pickDir, foldKeepLength, isStopWord } from './slots.js';
-import { checkDanger, maxRisk } from './danger.js';
+import { checkDanger, maxRisk, plainSlotValue } from './danger.js';
 import { shQuote, psQuote, chooseTemplate, quoteForKind, UnquotableError, pwshNativeSlots, unsafeNativePwshArg } from './render.js';
 
 export { shQuote };
@@ -105,7 +105,7 @@ const PR_DEM_NUMBER = /\b(?:ten|(?:that|this|which|the)\s+one)\s+(?:\S+\s+)?(?:p
 const PR_BRANCH_NAMED = /\b(?:for|of|on|from)\s+(?:\S+\s+){0,2}branch\b/i;
 // "and delete the branch", "delete the branch after", "usuń gałąź": the head branch goes with the merge (--delete-branch)
 const PR_DELETE_BRANCH = /\b(?:and\s+)?(?:delete|remove|usun)\s+(?:the\s+|its\s+|that\s+|tego\s+|ten\s+|t[ea]\s+)?(?:(?:local\s+and\s+remote|remote|head|feature)\s+)?(?:branch|branche?a?|galaz|galez)\b(?:\s+(?:after(?:wards)?|too|as\s+well|potem|tez))?/g;
-const PR_DELETE_BRANCH_TEST = new RegExp(PR_DELETE_BRANCH.source);
+const PR_DELETE_NEGATED = /(?:\b(?:not|no|never|without|nor|nie|bez)|n't|\bdont)\s+(?:\S+\s+){0,1}$/;
 // wrangler deploy: "dry run", "--dry-run", "na sucho", "without (actually) deploying/publishing" (wrangler deploy --dry-run);
 // "not a dry run", "without dry run", "skip the dry run": a real deploy, no flag (a dry run asked for elsewhere in the
 // request, "without a dry run first? no, do a dry run", still counts)
@@ -278,7 +278,8 @@ export function selectorResidue(intentId, text, values = {}) {
     const val = values[k];
     if (val == null || String(val).startsWith('?')) continue;
     const s = foldKeepLength(String(val)).toLowerCase();
-    t = t.split(s).join(' ');
+    // the value as a whole word: `prod` does not explain `prodprod`, `4` does not explain `44`
+    t = t.replace(new RegExp(`(?<![\\w-])${s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?![\\w-])`, 'g'), ' ');
   }
   if (/^wrangler_/.test(intentId)) t = t.replace(WR_DRY_NOT, ' ').replace(WR_DRY, ' ');
   if (values.delbranch) t = t.replace(PR_DELETE_BRANCH, ' ');
@@ -596,7 +597,11 @@ export function resolveSlots(intent, ex) {
     if (rq && rq.repo !== '?' && [...repoMentions(String(ex.text))].some((r) => r !== repoKey(rq.repo))) v.repo = '?';
   }
   // "merge pr 45 and delete the branch": gh pr merge --delete-branch
-  if (intent.id === 'gh_pr_merge' && PR_DELETE_BRANCH_TEST.test(foldKeepLength(String(ex.text)).toLowerCase())) v.delbranch = '--delete-branch';
+  // "… and don't delete the branch", "nie usuwaj brancha", "keep the branch, do not remove it": a negated delete is no flag
+  if (intent.id === 'gh_pr_merge') {
+    const f = foldKeepLength(String(ex.text)).toLowerCase();
+    if ([...f.matchAll(PR_DELETE_BRANCH)].some((m) => !PR_DELETE_NEGATED.test(f.slice(0, m.index + m[0].search(/delete|remove|usun/))))) v.delbranch = '--delete-branch';
+  }
   if (has('wenv')) {
     const t = String(ex.text);
     if (wranglerDry(t)) v.dryrun = '--dry-run';
@@ -654,8 +659,74 @@ export function resolveSlots(intent, ex) {
     const k = selectorWithhold(intent.id, String(ex.text), v);
     if (k && has(k)) v[k] = '?';
   }
+  for (const k of contestedSlots(intent.id, String(ex.text), v)) if (has(k)) v[k] = '?';
   for (const k of Object.keys(v)) if (v[k] === undefined) delete v[k];
   return v;
+}
+
+// ---------------------------------------------------------------------------------------------
+// Contested selectors (v0.3 close3): a selector the request offers alternatives for or negates ("merge pr 4 or 44", "merge
+// pr 42 but not in repo acme/app", "deploy to prod, not staging", "zainstaluj axios albo lodash"), or names two candidate
+// values for ("--env prod --env prodprod"), is withheld as a placeholder the user fills, never one of the candidates.
+const CONTESTED = (id) => (hasSelectorRule(id) ? ['pr', 'num', 'wenv', 'repo', 'var'] : /^(?:npm_install|npm_install_global|pip_install)$/.test(id) ? ['pkg'] : id === 'npm_run_script' ? ['script'] : []);
+// an alternative looks both ways ("4 or 44"); a negation at what follows it ("not in repo a/b", "nie na staging")
+const SEL_ALT = /^(?:or|either|vs|versus|instead|rather|albo|lub|zamiast|ewentualnie|badz)$/;
+const SEL_NEG = /^(?:not|never|nor|don't|dont|except|excluding|exclude|without|nie|oprocz|poza|bez|wykluczajac)$|n't$/;
+// a negation that describes a state ("what went wrong" = "co poszło nie tak", "not working", "nie przeszedł"), not a selector
+const SEL_NEG_STATE = /^(?:tak|dziala\w*|przeszl\w*|przeszedl|przechodz\w*|poszlo|wyszlo|work\w*|pass\w*|ok|okay|right|sure|good|green|zielon\w*)$/;
+// a word that ends a clause (the alternative / negation does not reach past it)
+const SEL_CLAUSE_END = /^(?:and|then|i|oraz|potem|so)$/;
+// a number of something else ("issue 12", "2 approvals", "in 5 minutes"), not a candidate pull request / run
+const SEL_NUM_OTHER_BEFORE = /^(?:issues?|tickets?|bugs?|zgloszeni\w*|fix(?:es)?|closes|resolves|line|lines|linii|top|last|first)$/;
+const SEL_NUM_UNIT_AFTER = /^(?:secs?|seconds?|mins?|minutes?|minut\w*|hours?|hrs?|godzin\w*|days?|dni|dzien|weeks?|tygodn\w*|months?|miesi\w*|years?|lat\w*|times?|razy|ago|temu|old|more|approvals?|reviews?|reviewers?|commits?|files?|lines?|changes?|comments?|checks?)$/;
+const SEL_ENV_ALIAS = (w) => (/^(?:prod|production|produkc\w*)$/.test(w) ? 'prod' : /^(?:staging|stage|stagingu|stagingowe\w*)$/.test(w) ? 'staging' : w);
+const tokenClean = (w) => w.replace(/^[("'`„“”]+|[)"'`“”.,!?;:]+$/g, '');
+/** The selector slots of a request that are contested (an alternative, a negation, two candidates): withheld (`?`). */
+export function contestedSlots(intentId, text, values = {}) {
+  // a slot already withheld (`?`) still takes the alternative / negation next to its candidates
+  const slots = CONTESTED(intentId).filter((k) => values[k] != null);
+  if (!slots.some((k) => !String(values[k]).startsWith('?'))) return [];
+  const raw = foldKeepLength(String(text)).toLowerCase().split(/\s+/).filter(Boolean);
+  const words = raw.map(tokenClean);
+  const ends = raw.map((w, i) => /[.,;!?:]$/.test(w) || SEL_CLAUSE_END.test(words[i]));
+  // the candidate values of a slot, by token index
+  const candidates = (k) => {
+    const out = new Map();
+    const v = foldKeepLength(String(values[k])).toLowerCase();
+    words.forEach((w, i) => {
+      const bare = w.replace(/^#(?=\d)/, '');
+      if (bare === v || (k === 'repo' && RAW_OK.repo(repoValue(w)) && repoKey(repoValue(w)) === repoKey(v))) out.set(i, k === 'repo' ? repoKey(v) : v);
+      if ((k === 'pr' || k === 'num') && /^\d{1,12}$/.test(bare) && !SEL_NUM_OTHER_BEFORE.test(words[i - 1] ?? '') && !SEL_NUM_UNIT_AFTER.test(words[i + 1] ?? '')) out.set(i, bare);
+      if (k === 'pr') { const u = w.match(/\/pull\/(\d{1,12})\/?$/); if (u) out.set(i, /^\d+$/.test(v) ? u[1] : w); }
+      if (k === 'repo' && /\//.test(w) && RAW_OK.repo(repoValue(w)) && (/^(?:--repo|-r|repo|repository|repozytorium|in|of|on|from|at|to|w|z)$/.test(words[i - 1] ?? '') || /^--repo=/.test(w))) out.set(i, repoKey(repoValue(w.replace(/^--repo=/, ''))));
+      if (k === 'wenv') {
+        const opt = w.match(/^(?:--env|env)=(.+)$/);
+        if (opt) out.set(i, SEL_ENV_ALIAS(opt[1]));
+        else if (/^(?:--env|-e)$/.test(words[i - 1] ?? '') && RAW_OK.wenv(w)) out.set(i, SEL_ENV_ALIAS(w));
+        else if (WR_ENV_STRONG.test(w) || /^produkc/.test(w)) out.set(i, SEL_ENV_ALIAS(w));
+        if (out.get(i) === SEL_ENV_ALIAS(v) || w === v) out.set(i, SEL_ENV_ALIAS(v));
+      }
+    });
+    return out;
+  };
+  const cand = Object.fromEntries(slots.map((k) => [k, candidates(k)]));
+  const out = new Set(slots.filter((k) => new Set(cand[k].values()).size > 1));
+  // the slots of the nearest candidate within n words of i, in the same clause
+  const nearest = (i, step, n) => {
+    for (let j = i + step, m = 0; j >= 0 && j < words.length && m < n; j += step, m++) {
+      const hit = slots.filter((k) => cand[k].has(j));
+      if (hit.length) return hit;
+      if (ends[step > 0 ? j : j - 1]) break;
+    }
+    return [];
+  };
+  words.forEach((w, i) => {
+    const alt = SEL_ALT.test(w);
+    if (!alt && (!SEL_NEG.test(w) || SEL_NEG_STATE.test(words[i + 1] ?? ''))) return;
+    const hit = [...(/[.,;!?:]$/.test(raw[i]) ? [] : nearest(i, 1, 5)), ...(alt ? nearest(i, -1, 3) : [])];
+    for (const k of hit) out.add(k);
+  });
+  return [...out].filter((k) => !String(values[k]).startsWith('?'));
 }
 
 function renderValue(name, raw, values, quote) {
@@ -803,7 +874,11 @@ export function buildCommand(intentId, text, { platform = process.platform, env,
     else { command = 'bash -c ' + psQuote(command); base.variant = 'bash -c (no native PowerShell variant)'; }
   }
   missing = [...new Set(missing)];
-  const danger = checkDanger(command, intent.risk);
+  // the trust rule (danger.js): this is tellsh's own render; it can be rated safe only when every value it was given is
+  // a plain literal (a missing value is tellsh's own <PLACEHOLDER>, and the command cannot run before it is edited)
+  const used = typeof tpl === 'function' ? Object.keys(values) : [...String(tpl).matchAll(/\{(\w+)(!raw)?\}/g)].map((m) => m[1]);
+  const plain = used.every((k) => !(k in values) || plainSlotValue(k, values[k], { dashOk: PATH_SLOTS.has(k) || (!!RAW_OK[k] && RAW_OK[k](values[k])) }));
+  const danger = checkDanger(command, intent.risk, { rendered: plain });
   return {
     ...base,
     command,

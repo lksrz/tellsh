@@ -6,7 +6,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { suggest } from '../src/pipeline.js';
-import { checkDanger } from '../src/danger.js';
+// the parser on its own (it only raises risk); the trust rule (a non-catalog command is high) is in regressions27.test.js
+import { assessCommand as checkDanger } from '../src/danger.js';
 import { splitCommand } from '../src/shellwords.js';
 import { sameCmd } from '../scripts/lib/cmdnorm.js';
 import { nearKey, heldOutIndex } from '../scripts/lib/heldout.js';

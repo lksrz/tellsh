@@ -236,7 +236,8 @@ export async function main(argv = process.argv.slice(2)) {
     if (ans === 'e' || ans === 'edit') {
       command = (await editLine(command)).trim();
       if (!command) return 130;
-      const d = checkDanger(command, s.baseRisk);
+      // unchanged: the suggestion as rated; any change is a user edit, at least high (danger.js trust rule)
+      const d = command === s.command ? { risk: s.risk, warnings: s.warnings, critical: s.critical } : checkDanger(command, s.baseRisk);
       risk = maxRisk(s.baseRisk, d.risk);
       critical = d.critical;
       incomplete = /<[A-Z_]+>/.test(command);

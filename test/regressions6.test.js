@@ -8,7 +8,8 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { readFileSync } from 'node:fs';
 import { suggest } from '../src/pipeline.js';
-import { checkDanger } from '../src/danger.js';
+// the parser on its own (it only raises risk); the trust rule (a non-catalog command is high) is in regressions27.test.js
+import { assessCommand as checkDanger } from '../src/danger.js';
 import { buildContext, changeGuard } from '../src/history.js';
 import { exclusionIndex } from '../scripts/lib/heldout.js';
 import { EVAL_VALUES } from '../scripts/lib/silver.js';

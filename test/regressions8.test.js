@@ -11,7 +11,8 @@ import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { suggest } from '../src/pipeline.js';
-import { checkDanger } from '../src/danger.js';
+// the parser on its own (it only raises risk); the trust rule (a non-catalog command is high) is in regressions27.test.js
+import { assessCommand as checkDanger } from '../src/danger.js';
 import { buildContext, tellshQuery, loadHistory } from '../src/history.js';
 import { joinWords } from '../src/shellwords.js';
 import { validateComposed } from '../src/compose.js';
