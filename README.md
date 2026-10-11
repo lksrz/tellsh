@@ -194,6 +194,8 @@ never the default scope: an npm workspace (`--workspace api`, `-w api`, `in work
 in project acme/backend` -> `gh pr merge 42 --repo acme/backend`, an unreadable one `--repo <REPO>`); a wrangler
 environment as `--env`. A scope the command cannot express (`npm run deploy --env prod`, `--prefix`, `--config`, `in
 project api` for npm, `--env` for gh) is a `<SCOPE>` placeholder (`<ARGS>` for wrangler), never dropped.
+A quoted value is one value (`--workspace "staging app"` -> `--workspace 'staging app'`), and pip's install directory is
+kept (`pip install requests --target /tmp/packages`, also `-t`) (v0.3 close5).
 
 ### Optional neural fallback (`--hybrid`)
 
@@ -448,9 +450,18 @@ retrain; `npm test && npm run eval`.
 * History: bash writes history late (see above); references are resolved to the most recent matching entity, there is no
   multi-turn memory of tellsh's own suggestions beyond the history file.
 * Composer: closed vocabulary, POSIX only, no pipelines, no `--format`/`-o` style arguments; it is a safety net, not a generator.
-* Negation is only read for pull request merges (`do not merge pr 45` is refused) and wrangler environments (an excluded
-  environment is withheld, `--env <WENV>`); elsewhere it is not (`do not delete a.txt` still suggests `rm a.txt`). Always
-  read the command before running it.
+* **Negation and exclusion are read with word lists (close5).** "except", "other than", "but not", "oprócz", "z
+  wyjątkiem", a value after "not" / "without" / "bez", and "don't / never / nie <verb>" are never ignored: the command
+  expresses the exclusion, a placeholder stands for it, or tellsh refuses (`kill all python processes except 1234`,
+  `don't delete a.txt`, `uninstall nginx` are refused: there is no exclusion pipeline and no package-removal command in the
+  catalog yet). A phrasing outside the lists can still be missed; a Polish prohibition later in a request is only caught
+  when the command's action is named in English (`stop nginx, don't restart it`).
+* **Two-path commands (close5).** mv / cp read the source before "to" / "do" / "na" and the destination after it. An
+  unquoted source that may be one name with a space or several files (`move /tmp/my file.txt to /tmp/dir`, `move a.txt
+  b.txt to /tmp/dir`) is a `<SRC>` placeholder: quote each path. `ln -s` is not split this way.
+* **Misread requests** (the classifier, not slot filling) can still produce a plausible command without a warning, e.g.
+  `forward port 3000 to db.example.com:5432` is a near tie between an ssh tunnel and `nc -zv db.example.com 3000`. Read
+  the command before running it.
 * The real-usage split's command groups keep some operands (`npm install express` ≠ `npm install react`): 552 of 2957
   eval rows share an operand-masked skeleton with train; A scores ~1 pt higher on those, ~0.2 pt overall
   ([HYBRID.md](HYBRID.md#v04-real-usage)).

@@ -559,8 +559,8 @@ export const VARIANTS = {
     cmd: 'ssh {target}',
   },
   ssh_port_forward: {
-    pwsh: 'ssh -N -L {port!raw}:localhost:{port!raw} {target}', // OpenSSH client ships with Windows 10 1809+
-    cmd: 'ssh -N -L {port!raw}:localhost:{port!raw} {target}',
+    pwsh: 'ssh -N -L {port!raw}:{rhost!raw}:{rport!raw} {target}', // OpenSSH client ships with Windows 10 1809+
+    cmd: 'ssh -N -L {port!raw}:{rhost!raw}:{rport!raw} {target}',
   },
 
   // ---------- git ----------

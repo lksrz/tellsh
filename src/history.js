@@ -1159,7 +1159,7 @@ export function resolveReference(query, ctx) {
       if (amb) return { rule: 'refused', intent: ctx.last.intent, blank: [amb[0]], note: `previous ${ctx.last.intent} has ${amb[0]}=${rawOf(amb[1])}, which depends on the shell state; not guessing` };
       if (rt.slot === 'ext') delete slots.glob;
       if (rt.slot === 'name') delete slots.namepat;
-      return { rule: 'same-for', intent: ctx.last.intent, slots, changed: rt.slot, note: `same as previous ${ctx.last.intent} with ${rt.slot}=${rt.value}` };
+      return { rule: 'same-for', intent: ctx.last.intent, slots, changed: rt.slot, arg, note: `same as previous ${ctx.last.intent} with ${rt.slot}=${rt.value}` };
     }
   }
   // "same for X", "same but …" when the previous command is not one tellsh can repeat (`ls newdir`, `clear`)

@@ -13,6 +13,9 @@ export const RAW_OK = {
   days: (v) => /^\d{1,5}$/.test(String(v)),
   pid: (v) => /^\d{1,7}$/.test(String(v)),
   port: (v) => /^\d{1,5}$/.test(String(v)) && +v > 0 && +v < 65536,
+  // ssh -L LOCAL:RHOST:RPORT: the remote end of a tunnel (a host name, an IPv4 address or a bracketed IPv6 address)
+  rport: (v) => /^\d{1,5}$/.test(String(v)) && +v > 0 && +v < 65536,
+  rhost: (v) => /^(?!-)[A-Za-z0-9](?:[\w.-]{0,252})$|^\[[0-9A-Fa-f:.]{2,45}\]$/.test(String(v)),
   size: (v) => /^\d+[ckMG]?$/.test(String(v)),
   age: (v) => /^-m(?:min|time) -\d+$/.test(String(v)),
   mode: (v) => /^[0-7]{3,4}$|^[ugoa]*[+=-][rwxXst]+$/.test(String(v)),
@@ -32,8 +35,10 @@ export const RAW_OK = {
   args: () => false,
   // a scope the request names that the command cannot express (`npm run deploy --env prod`): always the user's to fill (`<SCOPE>`)
   scope: () => false,
-  // an npm workspace (`--workspace api`, `-w packages/api`, `@scope/app`)
-  workspace: (v) => /^(?![-.])[\w@./-]{1,100}$/.test(String(v)) && !/\.\./.test(String(v)),
+  // an npm workspace (`--workspace api`, `-w packages/api`, `@scope/app`, a quoted `"staging app"`; rendered quoted)
+  // pip install --target DIR (rendered quoted)
+  piptarget: (v) => /^(?!-)[^\0\n\r]{1,255}$/.test(String(v)) && /[\w~./]/.test(String(v)),
+  workspace: (v) => /^(?![-.])[\w@./-](?:[\w@./ -]{0,98}[\w@./-])?$/.test(String(v)) && !/\.\./.test(String(v)),
   repo: (v) => /^(?:(?!-)[\w-]+(?:\.[\w-]+)+\/)?(?!-)[\w-][\w.-]{0,99}\/(?!-)[\w-][\w.-]{0,99}$/.test(String(v)) && !/\.\./.test(String(v)),
   // a pull request as gh selects it: number, URL or head branch
   pr: (v) => (/^\d+$/.test(String(v)) ? /^[1-9]\d{0,11}$/.test(String(v)) : /^https:\/\/github\.com\/[\w.-]+\/[\w.-]+\/pull\/\d{1,12}\/?$/.test(String(v)) || /^(?![-.])(?!.*\.\.)[\w./-]{1,100}$/.test(String(v))),
@@ -495,6 +500,59 @@ export function finalizeSlots(intent, v) {
   return v;
 }
 
+// ssh tunnel (v0.3 close5): "forward local port 8080 to remote port 5432 on db.example.com", "-L 8080:db.internal:5432 via
+// bastion", "forward 8080 to db.internal:5432 through bastion": both ends are kept, never `-L 8080:localhost:8080`. A remote
+// port the request names but that cannot be told apart from the local one (two bare numbers) is withheld (`<RPORT>`).
+const TUNNEL_WORD = /^(?:ssh|tunnel|tunel\w*|tunnels|port\w*|forward\w*|przekier\w*|local|remote|lokaln\w*|zdaln\w*|server|serwer\w*|host|localhost)$/i;
+const PORT_N = String.raw`(\d{1,5})(?![\w.:])`;
+function tunnelEnds(text, v) {
+  const t = foldKeepLength(text).toLowerCase();
+  const L = t.match(/(?:^|\s)-l\s*(\d{1,5}):([\w.-]+|\[[0-9a-f:.]+\]):(\d{1,5})(?=\s|$)/);
+  if (L) {
+    const at = t.indexOf(L[0]) + L[0].indexOf(L[2]);
+    v.port = +L[1]; v.rhost = text.slice(at, at + L[2].length); v.rport = +L[3];
+    // the ssh server is a host outside the -L spec ("-L 8080:db.internal:5432 bastion"), never the far host
+    const rest = (text.slice(0, t.indexOf(L[0])) + ' ' + text.slice(t.indexOf(L[0]) + L[0].length)).split(/\s+/).map((w) => w.replace(/[,;!?]+$/, ''));
+    const server = rest.filter((w) => /^(?!-)[\w.@-]+$/.test(w) && /[.@]/.test(w)).pop() ?? rest.filter((w) => /^[a-z][\w-]*$/i.test(w) && !TUNNEL_WORD.test(w) && !isStopWord(w.toLowerCase())).pop();
+    if (server) v.target = server; else delete v.target;
+    return;
+  }
+  const local = t.match(new RegExp(String.raw`(?:local|lokaln\w*)\s+(?:port\w*\s+)?` + PORT_N));
+  const remote = t.match(new RegExp(String.raw`(?:remote|zdaln\w*|destination|docelow\w*|target)\s+(?:port\w*\s+)?` + PORT_N));
+  // a far host other than the ssh server: HOST:PORT next to another host the connection goes through
+  const hp = [...text.matchAll(/(?:^|\s)((?!-)[A-Za-z0-9][\w.-]*):(\d{1,5})(?=[\s,.;!?]|$)/g)];
+  const via = /(?:^|\s)(?:via|through|thru|over|using|przez|poprzez|on|na|from|z|ze)\s+(?:the\s+)?(?:(?:server|host|bastion|jump\s*host|serwer\w*)\s+)?([\w.@-]+)/i;
+  if (local) v.port = +local[1];
+  if (remote) v.rport = +remote[1];
+  if (hp.length === 1) {
+    const [, h, p] = hp[0];
+    const other = [...text.matchAll(new RegExp(via.source, 'gi'))].map((m) => m[1].replace(/[.,;!?]+$/, '')).find((x) => x !== h && /[.@]|^[a-z][\w-]*$/i.test(x) && x !== 'ssh');
+    if (other && v.target !== other && v.target != null && String(v.target).startsWith(h)) v.target = other;
+    if (other) { v.rhost = h; v.target = other; } else if (v.target == null || String(v.target).startsWith(h + ':') || v.target === h) v.target = h;
+    v.rport = +p;
+    if (!local && v.port === +p) {
+      // the only number is the remote one: the local port is not named
+      const nums = [...t.matchAll(/(?<![\w.:])(\d{1,5})(?![\w.:])/g)].map((m) => +m[1]);
+      if (nums.length) v.port = nums[0]; else delete v.port;
+    }
+  } else if (hp.length > 1) v.rport = '?';
+  if (v.target != null && /:/.test(String(v.target)) && !/@/.test(String(v.target))) v.target = String(v.target).replace(/:\d+$/, '');
+  // "ssh tunnel … on web1": a word of the request ("tunnel") is never the server
+  if (v.target != null && TUNNEL_WORD.test(String(v.target))) {
+    const m = [...text.matchAll(new RegExp(via.source, 'gi'))].map((x) => x[1].replace(/[.,;!?]+$/, '')).find((x) => !TUNNEL_WORD.test(x) && !/^\d+$/.test(x));
+    if (m) v.target = m; else delete v.target;
+  }
+  if (remote == null && hp.length === 0) {
+    // "forward 8080 to 5432 on db": two different bare port numbers; which is which is not said with local / remote
+    const nums = [...t.matchAll(/(?<![\w.:])(\d{1,5})(?![\w.:])/g)].map((m) => +m[1]).filter((n) => n > 0 && n < 65536);
+    if (new Set(nums).size > 1) {
+      const ab = t.match(new RegExp(String.raw`(?<![\w.:])(\d{1,5})\s+(?:to|into|na|do|->)\s+(?:(?:the\s+)?port\w*\s+)?` + PORT_N));
+      if (local) v.rport = nums.find((n) => n !== +local[1]);
+      else if (ab) { v.port = +ab[1]; v.rport = +ab[2]; } else v.rport = '?';
+    }
+  }
+}
+
 /** Resolve the values an intent can use from the generic extraction. */
 export function resolveSlots(intent, ex) {
   const v = {};
@@ -663,6 +721,7 @@ export function resolveSlots(intent, ex) {
     const k = selectorWithhold(intent.id, String(ex.text), v);
     if (k && has(k)) v[k] = '?';
   }
+  if (intent.id === 'ssh_port_forward') tunnelEnds(String(ex.text), v);
   scopeSlots(intent.id, String(ex.text), v, has);
   for (const k of contestedSlots(intent.id, String(ex.text), v)) if (has(k)) v[k] = '?';
   for (const k of Object.keys(v)) if (v[k] === undefined) delete v[k];
@@ -678,11 +737,12 @@ const SCOPE_FAMILIES = /^(?:npm_|pip_install$|gh_|wrangler_)/;
 const SCOPE_KIND = {
   '--workspace': 'workspace', '-w': 'workspace', '--workspaces': 'workspace', '--ws': 'workspace', '--filter': 'workspace',
   '--repo': 'repo', '-r': 'repo', '--env': 'env', '-e': 'env', '--config': 'config', '-c': 'config',
-  '--prefix': 'dir', '--cwd': 'dir', '--dir': 'dir', '-c-dir': 'dir', '--project': 'project',
+  '--prefix': 'dir', '--cwd': 'dir', '--dir': 'dir', '-c-dir': 'dir', '--project': 'project', '--target': 'target', '-t': 'target',
 };
 // short forms are options of one tool only: npm -w, gh -R, wrangler -e / -c
-const SCOPE_SHORT = { '-w': /^npm_/, '-r': /^gh_/, '-e': /^wrangler_/, '-c': /^wrangler_/ };
-const SCOPE_OPT = /(?:^|\s)(--workspaces?|--ws|--filter|--repo|--env|--config|--prefix|--cwd|--dir|--project|-[wRec])(?:=(\S*)|\s+(?!-)([^\s,;!?]+)|(?=[\s,;!?]|$))/g;
+const SCOPE_SHORT = { '-w': /^npm_/, '-r': /^gh_/, '-e': /^wrangler_/, '-c': /^wrangler_/, '-t': /^pip_/ };
+// a quoted value is one value (`--workspace "staging app"`), never its first word
+const SCOPE_OPT = /(?:^|\s)(--workspaces?|--ws|--filter|--repo|--env|--config|--prefix|--cwd|--dir|--project|--target|-[wRect])(?:=(?:"([^"]*)"|'([^']*)'|(\S*))|\s+(?:"([^"]*)"|'([^']*)'|(?!-)([^\s,;!?]+))|(?=[\s,;!?]|$))/g;
 // "in workspace api", "for the project acme/app", "w projekcie api", "in the staging environment" is read by wranglerEnv
 const SCOPE_PHRASE = /(?:^|\s)(?:in|for|of|on|from|within|inside|under|at|w|we|dla|z)\s+(?:the\s+|a\s+)?(workspace|project|projek\w*|repo|repository|repozytori\w*|env|environment|srodowisk\w*|config|configuration|konfiguracj\w*)\s+(?!-)([^\s,;!?]+)/g;
 const SCOPE_PHRASE_KIND = (w) => /^(?:workspace)$/.test(w) ? 'workspace' : /^(?:repo|repository|repozytori)/.test(w) ? 'repo'
@@ -695,8 +755,9 @@ export function scopeMentions(intentId, text) {
   for (const m of t.matchAll(SCOPE_OPT)) {
     const opt = m[1].length === 2 ? m[1].toLowerCase() : m[1];
     if (SCOPE_SHORT[opt] && !SCOPE_SHORT[opt].test(intentId)) continue;
-    const raw = m[2] ?? m[3] ?? null;
-    out.push({ kind: SCOPE_KIND[opt], value: raw ? raw.replace(/[.,!?;:]+$/, '').replace(/^["'`]|["'`]$/g, '') || null : null, at: m.index });
+    const quoted = m[2] ?? m[3] ?? m[5] ?? m[6];
+    const raw = quoted ?? m[4] ?? m[7] ?? null;
+    out.push({ kind: SCOPE_KIND[opt], value: quoted != null ? quoted.trim() || null : raw ? raw.replace(/[.,!?;:]+$/, '').replace(/^["'`]|["'`]$/g, '') || null : null, at: m.index });
   }
   const f = foldKeepLength(t).toLowerCase();
   for (const m of f.matchAll(SCOPE_PHRASE)) {
@@ -724,6 +785,14 @@ function scopeSlots(intentId, text, v, has) {
       seen.workspace = w;
       // a workspace value is not the script / package ("run npm --workspace api" is not `npm run api`)
       for (const k of ['script', 'pkg']) if (s.value != null && v[k] === s.value) v[k] = '?';
+      continue;
+    }
+    // pip --target DIR: where the package is installed, kept (`python3 -m pip install requests --target /tmp/packages`)
+    if (kind === 'target' && has('piptarget')) {
+      const d = s.value != null && RAW_OK.piptarget(s.value) ? s.value : '?';
+      v.piptarget = seen.piptarget != null && seen.piptarget !== d ? '?' : d;
+      seen.piptarget = d;
+      if (s.value != null && v.pkg === s.value) v.pkg = '?';
       continue;
     }
     unexpressed.push(s);
@@ -807,7 +876,7 @@ function renderValue(name, raw, values, quote) {
   return quote(val, { tilde: PATH_SLOTS.has(name), name });
 }
 
-const SLOT_NAMES = /^(path|file|count|src|dst|archive|glob|namepat|sedexpr|age|days|size|depth|port|pid|mode|var|name|service|container|pkg|cmd|branch|user|pattern|host|target|message|url|since|dest|text|ext|minutes|sizeBytes|old|new)$/;
+const SLOT_NAMES = /^(path|file|count|src|dst|archive|glob|namepat|sedexpr|age|days|size|depth|port|rport|rhost|pid|mode|var|name|service|container|pkg|cmd|branch|user|pattern|host|target|message|url|since|dest|text|ext|minutes|sizeBytes|old|new)$/;
 
 /**
  * Fill a template. Returns { command, missing[] }.
@@ -848,6 +917,8 @@ const DERIVED_REQUIRED = { namepat: 'name', glob: 'ext', sedexpr: 'old' };
 const SIZE_MULT = { c: 1, k: 1024, M: 1024 ** 2, G: 1024 ** 3 };
 /** Slots derived from others so every shell can use the unit it needs (find: -mmin/-size, PowerShell: minutes/bytes). */
 export function deriveSlots(v) {
+  // ssh -L: the remote port is the local one unless the request names another
+  if (v.rhost != null && v.rport == null && v.port != null) v.rport = v.port;
   if (v.glob && v.ext == null) { const m = String(v.glob).match(/^\*\.([\w]+)$/); if (m) v.ext = m[1]; }
   if (v.minutes == null && v.age) {
     const m = String(v.age).match(/^-m(min|time) -(\d+)$/);
@@ -889,6 +960,8 @@ export function buildCommand(intentId, text, { platform = process.platform, env,
     for (const k of PATH_SLOTS) if (values[k] === '/') values[k] = 'C:\\';
   }
   deriveSlots(values);
+  // (a withheld slot is not derived from another one either: `<RPORT>`, never the local port)
+  for (const k of blank) if (resolved[k] == null) delete values[k];
   const required = [...new Set([...Object.entries(intent.slots).filter(([, d]) => d == null).map(([k]) => k), ...blank.filter((k) => !(k in values))])];
 
   const choice = chooseTemplate(intent, e);

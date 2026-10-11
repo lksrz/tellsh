@@ -210,6 +210,11 @@ export async function main(argv = process.argv.slice(2)) {
     console.log(C.dim('Name the target explicitly.'));
     return 3;
   }
+  if (!s.understood && s.hint && s.confidence >= s.threshold) {
+    // understood, but the only command the catalog has would contradict the request ("uninstall", "except 1234", "close pr")
+    console.log(`Not suggesting a command for "${query}": ${s.hint}.`);
+    return 3;
+  }
   if (!s.understood) {
     console.log(`I don't understand "${query}" (confidence ${(s.confidence * 100).toFixed(0)}% < ${(s.threshold * 100).toFixed(0)}%).`);
     console.log('Did you mean:');

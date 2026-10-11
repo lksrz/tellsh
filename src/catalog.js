@@ -212,8 +212,9 @@ export const INTENTS = [
     "curl -s -o /dev/null -w '%{http_code}\\n' {url}", { url: null }),
   T('download_file', 'Download a file from a URL', 'curl -fLO {url}', { url: null }, 'medium'),
   T('ssh_connect', 'Connect to a server over SSH', 'ssh {target}', { target: null }, 'medium'),
-  T('ssh_port_forward', 'Forward a local port to the same port on a server over SSH (tunnel)',
-    'ssh -N -L {port!raw}:localhost:{port!raw} {target}', { port: null, target: null }, 'medium'),
+  // rhost / rport: the far end of the tunnel as the server sees it (default: the same port on the server itself)
+  T('ssh_port_forward', 'Forward a local port to a port on (or behind) a server over SSH (tunnel)',
+    'ssh -N -L {port!raw}:{rhost!raw}:{rport!raw} {target}', { port: null, target: null, rhost: 'localhost' }, 'medium'),
 
   // ---------- git ----------
   T('git_status', 'Show git working tree status', 'git status', {}),
@@ -256,11 +257,11 @@ export const INTENTS = [
 
   // ---------- developer tools (v0.4, from real command usage) ----------
   // project scripts and installs run arbitrary package code: medium
-  T('npm_run_script', 'Run a package.json script with npm (npm run dev/build/test)', 'npm run {script}«--workspace {workspace!raw}»«{scope!raw}»', { script: null }, 'medium'),
-  T('npm_install', 'Install the project dependencies (or one package) with npm', 'npm {npmverb!raw}«{pkg}»«--workspace {workspace!raw}»«{scope!raw}»', { npmverb: 'install' }, 'medium'),
+  T('npm_run_script', 'Run a package.json script with npm (npm run dev/build/test)', 'npm run {script}«--workspace {workspace}»«{scope!raw}»', { script: null }, 'medium'),
+  T('npm_install', 'Install the project dependencies (or one package) with npm', 'npm {npmverb!raw}«{pkg}»«--workspace {workspace}»«{scope!raw}»', { npmverb: 'install' }, 'medium'),
   T('npm_install_global', 'Install an npm package globally', 'npm install -g {pkg}«{scope!raw}»', { pkg: null }, 'medium',
     { notes: 'may need sudo when the global prefix is not user-writable' }),
-  T('pip_install', 'Install a Python package with pip', 'python3 -m pip install {pkg}«{scope!raw}»', { pkg: null }, 'medium'),
+  T('pip_install', 'Install a Python package with pip', 'python3 -m pip install {pkg}«--target {piptarget}»«{scope!raw}»', { pkg: null }, 'medium'),
   T('activate_venv', 'Activate a Python virtual environment', '. {path}/bin/activate', { path: '.venv' }, 'medium',
     { notes: 'run it in your own shell: activating from tellsh only affects a subshell that exits right away' }),
   T('tool_version', 'Show the installed version of a command-line tool', '{cmd} --version', { cmd: null }),

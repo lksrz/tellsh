@@ -289,7 +289,7 @@ export const ALLOW = {
   "py": ["-m"],
   "pytest": ["--help","--version"],
   "python": ["--help","--version"],
-  "python3": ["--help","--version","-m"],
+  "python3": ["--help","--target","--version","-m"],
   "query": [],
   "readlink": [],
   "redis-cli": ["--help","--version"],

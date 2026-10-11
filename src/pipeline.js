@@ -18,6 +18,7 @@ import { buildContext, resolveReference, hasPronoun, hasLocative, cwdFlags, same
 import { AMB } from './shellwords.js';
 import { compose } from './compose.js';
 import { assessCommand, maxRisk } from './danger.js';
+import { releaseGuards } from './guards.js';
 import { readFileSync } from 'node:fs';
 
 let EXPLAINED = null;
@@ -113,6 +114,8 @@ const OPERAND_SLOT_NAMES = new Set(['name', 'service', 'container', 'pkg', 'host
 for (const k of PATH_SLOT_NAMES) if (k !== 'path') VALID_SLOT[k] = VALID_SLOT.path;
 export function validSlot(k, v) {
   if (v == null || v === '') return false;
+  // a negation word is never the thing a command acts on ("kill the process that is not responding" is not `pkill -f not`)
+  if (OPERAND_SLOT_NAMES.has(k) && /^(?:not|no|never|nie|bez|without|except|but|oprocz|oprócz|poza|ani)$/i.test(String(v))) return false;
   if (isAmbiguous(v)) return false;
   if (RAW_OK[k]) return RAW_OK[k](v);
   if (VALID_SLOT[k]) return VALID_SLOT[k](String(v));
@@ -171,7 +174,7 @@ export function resolveWithTagger(intentId, text, { model = getModel(), tool, mo
   // an operand the request names but that is not a valid value (`npm install @types/node;rm`): placeholder, never
   // silently dropped from an optional part of the template (`npm install`)
   const invalidOperands = [];
-  for (const k of ['pkg', 'name', 'service', 'container', 'cmd', 'branch', 'user', 'pr', 'repo', 'wenv', 'num', 'args', 'scope', 'workspace', 'script']) {
+  for (const k of ['pkg', 'name', 'service', 'container', 'cmd', 'branch', 'user', 'pr', 'repo', 'wenv', 'num', 'args', 'scope', 'workspace', 'piptarget', 'rport', 'rhost', 'script']) {
     if (!usesSlot(intent, k) || slots[k] != null || withheld.includes(k)) continue;
     if ([rT[k], rR[k]].some((v) => typeof v === 'string' && v !== '' && !validSlot(k, v))) { withheld.push(k); invalidOperands.push(k); }
   }
@@ -205,7 +208,7 @@ function insideSubstitution(text, v) {
 // words after a path up to the end of its span (the end of the request, a connector such as "to", a modifier such as
 // "recursively", a noun such as "files") are part of its name; when that end is unclear (another file name, a number or
 // another value, a name that already has an extension: `/tmp/a.txt b.txt`) the path is withheld as a placeholder.
-const PATH_END = /^(?:to|into|o|u|a|przy|nad|pod|przed|za|ku|onto|in|inside|within|under|on|at|from|with|without|and|or|then|as|by|for|than|but|except|excluding|not|instead|via|using|if|when|where|which|that|who|so|w|we|z|ze|do|na|i|oraz|lub|albo|potem|jako|po|bez|niz|oprocz|poza|zamiast|ktore|ktory|ktora|gdzie|older|newer|larger|bigger|smaller|greater|less|more|modified|changed|created|edited|named|called|containing|matching|sorted|sort|sorting|recursively|recursive|please|pls|now|force|forcibly|forcefully|here|there|everywhere|only|first|last|top|including|showing|show|it|its|permanently|completely|entirely|fully|safely|quickly|immediately|again|also|too|instead|trwale|calkowicie|calkiem|natychmiast|ponownie|tez|rowniez|starsz\w*|nowsz\w*|wieksz\w*|mniejsz\w*|zmienion\w*|zmodyfikowan\w*|nazwie|nazwan\w*|zawierajac\w*|posortowan\w*|rekurencyjnie|prosze|teraz|tylko|tutaj|tam|wszedzie|folder\w*|director(?:y|ies)|dirs?|katalog\w*|podkatalog\w*|files?|plik\w*|archive|archiwum|environments?|srodowisk\w*)$/i;
+const PATH_END = /^(?:to|into|o|u|a|przy|nad|pod|przed|za|ku|onto|in|inside|within|under|on|at|from|with|without|and|or|then|as|by|for|than|but|except|excluding|not|nie|nic|ani|nigdy|instead|via|using|if|when|where|which|that|who|so|w|we|z|ze|do|na|i|oraz|lub|albo|potem|jako|po|bez|niz|oprocz|poza|zamiast|ktore|ktory|ktora|gdzie|older|newer|larger|bigger|smaller|greater|less|more|modified|changed|created|edited|named|called|containing|matching|sorted|sort|sorting|recursively|recursive|please|pls|now|force|forcibly|forcefully|here|there|everywhere|only|first|last|top|including|showing|show|it|its|permanently|completely|entirely|fully|safely|quickly|immediately|again|also|too|instead|trwale|calkowicie|calkiem|natychmiast|ponownie|tez|rowniez|starsz\w*|nowsz\w*|wieksz\w*|mniejsz\w*|zmienion\w*|zmodyfikowan\w*|nazwie|nazwan\w*|zawierajac\w*|posortowan\w*|rekurencyjnie|prosze|teraz|tylko|tutaj|tam|wszedzie|folder\w*|director(?:y|ies)|dirs?|katalog\w*|podkatalog\w*|files?|plik\w*|archive|archiwum|environments?|srodowisk\w*)$/i;
 const PATH_EXT = /\.[A-Za-z][A-Za-z0-9]{0,4}$/;
 /**
  * The words that follow an unquoted path value in the request before the end of its span:
@@ -263,6 +266,69 @@ export function pathTail(text, v, spans = [], { used = [], strict = true } = {})
     return { value: v + text.slice(i + v.length, end), words };
   }
   return null;
+}
+
+// Source and destination of a two-path command (v0.3 close5): the request is split at its one connector ("to", "into",
+// "do", "na", "as", "jako") before the paths are read, so `rename /tmp/my file.txt to /tmp/new.txt` never becomes
+// `mv /tmp/my file.txt` (the third word silently dropped). Each side gives one value, the whole spaced name, or (when where
+// it ends is unclear: `/tmp/my file.txt`, `report.txt notes.txt`) null, a placeholder.
+// (not `ln -s`: "link to X" names the link's target, the first operand)
+const TWO_PATH_INTENTS = new Set(['copy', 'move_rename']);
+const DST_FILLER = /^(?:the|a|an|my|our|folder\w*|director(?:y|ies)|dir|katalog\w*|location|place|file|plik\w*|moj\w*)$/i;
+function splitTwoPaths(query, slots) {
+  const q = String(query);
+  const masked = foldKeepLength(q).toLowerCase().replace(/(["'])(?:(?!\1).)*\1/g, (m) => 'x'.repeat(m.length));
+  const cons = [...masked.matchAll(/\s(?:to|into|onto|as|do|na|jako|->|=>)\s/g)];
+  if (cons.length !== 1) return null;
+  const L = q.slice(0, cons[0].index);
+  const R = q.slice(cons[0].index + cons[0][0].length);
+  const vals = [slots.src, slots.dst].filter((v) => typeof v === 'string' && v !== '');
+  // the first slot value on a side ("…/tmp/my…" before "file.txt"); quoted values are whole names
+  // (a whole word: `build` is not the start of `build_old`)
+  const wordAt = (side, v) => { for (let i = side.indexOf(v); i >= 0; i = side.indexOf(v, i + 1)) if ((i === 0 || /[\s"'„“`]/.test(side[i - 1])) && /^(?:$|[\s"'”`.,;:!?)])/.test(side.slice(i + v.length))) return i; return -1; };
+  const anchor = (side) => vals.map((v) => ({ v, i: wordAt(side, v) })).filter((x) => x.i >= 0).sort((a, b) => a.i - b.i || b.v.length - a.v.length)[0]?.v ?? null;
+  const read = (side, v) => {
+    if (v == null) return { v: null, found: false };
+    const t = pathTail(side, v, [], { strict: true });
+    if (!t) return { v, found: true };
+    return t.value != null && validSlot('src', t.value) ? { v: t.value, found: true } : { v: null, found: true, words: [v, ...t.words].join(' ') };
+  };
+  const src = read(L, anchor(L));
+  let dv = anchor(R);
+  if (dv == null) {
+    const first = R.trim().split(/\s+/).find((w) => !DST_FILLER.test(w)) ?? '';
+    const bare = first.replace(/[.,;:!?)]+$/, '');
+    if (bare && !FUNCTION_WORD.test(bare) && !PRONOUN_VALUE.test(bare) && !/^["'„“`]/.test(bare)) dv = bare;
+  }
+  const dst = read(R, dv);
+  if (!src.found && !dst.found) return null;
+  // "move it to /tmp/old": a side without a value of its own never takes the other side's ("mv /tmp/old /tmp/old")
+  if (!src.found && slots.src != null && slots.src === dst.v) return { src: { v: null, found: true, quiet: true }, dst };
+  // "rename my notes.txt to notes.txt": the same name on both sides; the source is unclear ("my notes.txt"?)
+  if (src.v != null && src.v === dst.v) return { src: { v: null, found: true, words: L.trim() }, dst };
+  return { src, dst };
+}
+
+// An operand that is the noun of the request (v0.3 close5): "stop docker container web" names the container `web`, never
+// `docker`. A value that is the tool or the noun itself is replaced by the word after the last such noun, or withheld.
+const NOUN_VALUE = {
+  container: /^(?:docker|dockera|podman|containers?|kontener\w*)$/i,
+  service: /^(?:services?|systemd|systemctl|uslug\w*|usług\w*|serwis\w*|daemon|unit)$/i,
+  pkg: /^(?:packages?|pakiet\w*|apt|apt-get|pip3?|npm|brew|dnf|yum)$/i,
+  name: /^(?:process(?:es)?|proces\w*)$/i,
+};
+const NOUN_SKIP = /^(?:the|a|an|named|called|o|nazwie|nazwan\w*|id)$/i;
+const NOUN_VERB = /^(?:stop|start|restart|run|show|list|ls|ps|logs?|remove|rm|kill|exec|status|enable|disable|reload|install|inspect|zatrzymaj|uruchom|zrestartuj|restartuj|usu[nń]|zabij|poka[zż]|wy[sś]wietl|zainstaluj|w[lł][aą]cz|wy[lł][aą]cz|logi)$/i;
+function nounOperand(k, v, query) {
+  const words = String(query).trim().split(/\s+/).map((w) => w.replace(/[.,;:!?]+$/, ''));
+  let last = -1;
+  words.forEach((w, i) => { if (NOUN_VALUE[k].test(w)) last = i; });
+  // past the request's own words after it: "docker logs nginx", "docker exec -it api-server sh", "docker exec do api-server"
+  let i = last + 1;
+  while (i < words.length && (NOUN_SKIP.test(words[i]) || NOUN_VERB.test(words[i]) || FUNCTION_WORD.test(words[i]) || /^-/.test(words[i]))) i++;
+  // nothing after it: the word right after the opening verb ("put eslint in the global npm packages", "instal pytest via pip")
+  const c = words[i] ?? (words.length > 2 && !NOUN_VALUE[k].test(words[0]) && !FUNCTION_WORD.test(words[1]) && !NOUN_VERB.test(words[1]) && !NOUN_SKIP.test(words[1]) && !isStopWord(foldKeepLength(words[1]).toLowerCase()) ? words[1] : null);
+  return c != null && !NOUN_VALUE[k].test(c) && validSlot(k, c) ? c : null;
 }
 
 /** `v` occurs in `text` only directly followed by punctuation that trimPathPunct removed (`/tmp/x!`). */
@@ -339,7 +405,8 @@ const blocksAmbiguous = (comp, amb) => !!comp && !comp.invalid && ((amb.some((p)
  *         slotMode: 'merge'|'tagger'|'regex', model, rerank, rerankTop (candidates the rerank hook sees; default top) }
  */
 export function suggest(query, opts = {}) {
-  return replayFloor(suggestOnce(query, opts));
+  // a command that contradicts the request (ignores "except" / "don't", installs for "uninstall") is refused (guards.js)
+  return releaseGuards(query, replayFloor(suggestOnce(query, opts)));
 }
 
 // the trust rule (danger.js): a command resolved from history (a reference, "same but …", a value from an earlier
@@ -389,6 +456,19 @@ function suggestOnce(query, opts = {}) {
     const slots = validHistorySlots(ref.slots);
     // a value that fails validation (a 300-character path, ...) is a placeholder, never `find .`
     const blank = invalidHistorySlots(ref.slots);
+    // `same for ~/Old Projects`, `same for ~/'Old Projects'`: the whole new name, or a placeholder when where it ends is
+    // unclear (`same for /tmp/a.txt b.txt`; the words after "same for" are the target, so a read-only command reads them
+    // strictly too); never its first word (`rm -r ~/Old`) or the part before a quote (`rm -r ~/`)
+    let cutHistory = null;
+    if (PATH_SLOT_NAMES.has(ref.changed) && slots[ref.changed] != null) {
+      const v = String(slots[ref.changed]);
+      const a = String(ref.arg ?? '').trim();
+      const q = a.match(/^([^\s"']*)(["'])([^"']+)\2([^\s"']*)$/);
+      const whole = /["']/.test(a) ? (q ? q[1] + q[3] + q[4] : null)
+        : (() => { const t = pathTail(query, v, [], { strict: true }); return t ? t.value ?? null : v; })();
+      if (whole != null && validSlot(ref.changed, whole)) slots[ref.changed] = whole;
+      else { cutHistory = `${ref.changed}=${a}`; blank.push(ref.changed); delete slots[ref.changed]; }
+    }
     // the new path ends in sentence punctuation (`same for /tmp/data!`): placeholder, as for any request
     if (PATH_SLOT_NAMES.has(ref.changed) && slots[ref.changed] != null && BY_ID[ref.intent].risk !== 'safe' && trailingPunctAfter(query, slots[ref.changed])) {
       blank.push(ref.changed);
@@ -396,9 +476,10 @@ function suggestOnce(query, opts = {}) {
     }
     const b = buildCommand(ref.intent, query, { env, resolved: finalizeSlots(BY_ID[ref.intent], slots), blank, keepOptional: blank });
     const res = { ...base, understood: true, method: 'history-rule', confidence: 1, tool: FAMILY_OF[ref.intent], candidates: [], tools: [], ...b };
-    const punct = blank.filter((k) => !invalidHistorySlots(ref.slots).includes(k));
+    const punct = blank.filter((k) => !invalidHistorySlots(ref.slots).includes(k) && !(cutHistory && k === ref.changed));
+    if (cutHistory) res.warnings = [...(res.warnings || []), `path left as a placeholder: unclear where the new name ends (${cutHistory}); quote the path`];
     if (punct.length) res.warnings = [...(res.warnings || []), `path left as a placeholder: unclear whether the trailing punctuation is part of the name (${punct.join(', ')}); quote the path`];
-    if (punct.length < blank.length) res.warnings = [...(res.warnings || []), `value left as a placeholder: it is not a valid value (${blank.filter((k) => !punct.includes(k)).join(', ')})`];
+    if (punct.length + (cutHistory ? 1 : 0) < blank.length) res.warnings = [...(res.warnings || []), `value left as a placeholder: it is not a valid value (${blank.filter((k) => !punct.includes(k) && !(cutHistory && k === ref.changed)).join(', ')})`];
     return res;
   }
   // ---- the reference cannot be resolved at all ("what about this", an older command to replay) ----
@@ -491,15 +572,22 @@ function suggestOnce(query, opts = {}) {
 
   const r = resolveWithTagger(intent, query, { model, tool: FAMILY_OF[intent], mode: opts.slotMode, tagger: opts.tagger });
   const slots = r.slots;
+  // "stop docker container web": the operand is never the tool or noun word (`docker stop docker`)
+  const nounBlank = [];
+  for (const k of Object.keys(NOUN_VALUE)) {
+    if (slots[k] == null || !NOUN_VALUE[k].test(String(slots[k]))) continue;
+    const c = nounOperand(k, String(slots[k]), query);
+    if (c != null) slots[k] = c; else { delete slots[k]; delete r.sources[k]; nounBlank.push(k); }
+  }
   // a changing command never guesses where a path ends: `/tmp/data!` or `/tmp/a.txt.` is either the
   // whole name or a name plus sentence punctuation, so the slot stays empty (placeholder)
   const ambiguousPaths = [];
   // slots that were withheld on purpose: rendered as placeholders, never replaced by a catalog default
   // (an ambiguous `/tmp/data!` must not turn `find {path} … -delete` into `find . … -delete`)
-  const blank = new Set(r.withheld || []);
+  const blank = new Set([...(r.withheld || []), ...nounBlank]);
   // withheld operands whose optional part keeps its placeholder: an invalid operand, a history value that is ambiguous or
   // invalid (`gh pr merge <PR>` for "same but merge" after `tellsh merge pr nightly`, never the current branch's pull request)
-  const keep = new Set(r.invalidOperands);
+  const keep = new Set([...r.invalidOperands, ...nounBlank]);
   // an unquoted path followed by more words of its name (`~/Old Projects`): the whole name, or a placeholder when where it
   // ends is unclear; never the first word alone
   const cutPaths = [];
@@ -517,6 +605,17 @@ function suggestOnce(query, opts = {}) {
       if (PATH_SLOT_NAMES.has(k) && r.sources[k] !== 'history' && trailingPunctAfter(query, slots[k])) { ambiguousPaths.push(`${k}=${slots[k]}`); delete slots[k]; delete r.sources[k]; blank.add(k); }
     }
     if (ambiguousPaths.length) finalizeSlots(BY_ID[intent], slots);
+  }
+  // `rename /tmp/my file.txt to /tmp/new.txt`, `move report.txt notes.txt to /tmp/dir`: the source is what precedes "to",
+  // the destination what follows it; an unclear side is a placeholder + warning, never another word of the request
+  const splitPaths = [];
+  if (TWO_PATH_INTENTS.has(intent) && !ref && !sb && !hasLocative(query)) {
+    const sp = splitTwoPaths(query, slots);
+    for (const [k, side] of sp ? [['src', sp.src], ['dst', sp.dst]] : []) {
+      if (!side.found || r.sources[k] === 'history') continue;
+      if (side.v == null) { if (!side.quiet) splitPaths.push(`${k}=${side.words}`); delete slots[k]; delete r.sources[k]; blank.add(k); keep.add(k); } else if (slots[k] !== side.v) { slots[k] = side.v; r.sources[k] = 'regex'; }
+    }
+    if (sp) finalizeSlots(BY_ID[intent], slots);
   }
   // a changing command whose path is the output of a command (`in \`pwd\``, `$(pwd)`), or a request that names more
   // explicit paths than the command takes (`in /tmp/x and /tmp/y`: only one would be used): placeholder + warning
@@ -702,6 +801,7 @@ function suggestOnce(query, opts = {}) {
   if (Object.values(r.sources).includes('history')) method = 'history-rule';
   const res = { ...out, understood: true, method, ...b, slotSources: r.sources, spans: r.spans.map((s) => ({ type: s.type, text: s.text })) };
   if (ambiguousText.length) res.warnings = [...(res.warnings || []), `value left as a placeholder: unclear where the quoted text ends (\\" may be an escaped quote) (${ambiguousText.join(', ')})`];
+  if (splitPaths.length) res.warnings = [...(res.warnings || []), `path left as a placeholder: unclear which words name the ${splitPaths.map((x) => x.split('=')[0] === 'src' ? 'source' : 'destination').join(' and ')} (${splitPaths.join(', ')}); quote each path`];
   if (cutPaths.length) res.warnings = [...(res.warnings || []), `path left as a placeholder: unclear where the unquoted name ends (${cutPaths.join(', ')}); quote the path`];
   if (ambiguousPaths.length) res.warnings = [...(res.warnings || []), `path left as a placeholder: unclear whether the trailing punctuation is part of the name (${ambiguousPaths.join(', ')}); quote the path`];
   if (unclearArgs.length) res.warnings = [...(res.warnings || []), `${unclearArgs.every((x) => PATH_SLOT_NAMES.has(x.split('=')[0])) ? 'path' : 'value'} left as a placeholder: unclear whether the quoted argument is a name or part of the request (${unclearArgs.join(', ')}); pass the whole request as one quoted argument`];
