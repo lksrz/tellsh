@@ -411,7 +411,7 @@ export function suggest(query, opts = {}) {
 
 // the trust rule (danger.js): a command resolved from history (a reference, "same but …", a value from an earlier
 // command) is a replay, not a fresh render of what the request says: at least high, never auto-run
-const REPLAY = 'resolved from history (a replay of an earlier command, not a fresh catalog render); needs an explicit yes';
+const REPLAY = 'resolved from history (a replay of an earlier command, not a fresh catalog render); high risk: read it before pressing Enter';
 function replayFloor(s) {
   if (!s?.command || s.method !== 'history-rule' || s.risk === 'high') return s;
   return { ...s, risk: maxRisk(s.risk, 'high'), warnings: [REPLAY, ...(s.warnings || [])] };

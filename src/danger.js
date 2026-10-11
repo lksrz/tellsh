@@ -936,8 +936,8 @@ export function assessCommand(command, baseRisk = 'safe', { lenient = false, all
 // ---------------------------------------------------------------------------------------------
 // Trust rule (v0.3 close3). A command is rated safe ONLY when it is byte-identical to a render of a catalog template whose
 // intent is risk=safe, with slot values that are plain literals (plainSlotValue). Anything else (composer output, a
-// history replay, a user edit, an unknown program, a construct the parser does not read) is at least high and needs an
-// explicit "yes"; --yes never runs it. The parser above only raises risk, never lowers it: it adds the reasons and
+// history replay, a user edit, an unknown program, a construct the parser does not read) is at least high and shows a red
+// warning before the prompt; --yes never runs it. The parser above only raises risk, never lowers it: it adds the reasons and
 // catches what must be retyped (critical), but a command it finds nothing wrong with is still not trusted.
 
 export const UNTRUSTED = 'not a catalog command rendered by tellsh with plain values (edited, composed, from history or unknown); it is not checked as safe';

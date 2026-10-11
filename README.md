@@ -60,7 +60,7 @@ tellsh [options] <request...>
 ```
 
 At the prompt (a single keypress, since 0.3.2): **Enter** runs the command at every risk level, **e** edits (prefilled
-readline), **Esc** / **Ctrl+C** (or **n**) aborts. Medium- and high-risk and composed commands print a colored warning line
+readline), **Esc** / **Ctrl+C** (or **n** / **q**) aborts; keys typed ahead or pasted never confirm. Medium- and high-risk and composed commands print a colored warning line
 first, so read it before Enter; catastrophic patterns (`rm -rf /`, `mkfs`, `Format-Volume`, …) need the whole command retyped. The command
 runs in the target shell (`$SHELL -c`, `fish -c`, `pwsh -NoProfile -Command`, `cmd /d /s /c`). Without a TTY tellsh
 only prints. Exit codes: command's own · `0` printed · `2` usage · `3` not understood · `4` `--yes` refused ·
@@ -97,7 +97,7 @@ explicit path to the end of the request (`list files in ~/Old Projects`) and oth
    │                         score < threshold ───┼──► SECOND PASS: flag composer (experimental)
    │                         or ≥1 unexplained    │    head from stage-1 tools · flags from NL triggers
    │                         modifier             │    (+ tldr stems) · bash -n + allowed-flag check
-   ▼                                              ▼    · risk high · red warning   
+   ▼                                              ▼    · risk high · red warning
  STAGE 3  BIO slot tagger (tool = input feature, only the tool's slot types are candidates,
           constrained Viterbi)  ──► typed spans ──► validate ──► regex extractor fills misses / replaces
           invalid values  ──► template for (shell, OS, coreutils) ──► per-shell quoting

@@ -42,7 +42,7 @@ Options:
   -v, --version     print version
   -h, --help        this help
 
-At the prompt: [Enter] runs the command at every risk level · e edit · Esc or Ctrl+C aborts. Medium-
+At the prompt: [Enter] runs the command at every risk level · e edit · Esc, Ctrl+C, n or q aborts. Medium-
 and high-risk (and composed, experimental) commands show a colored warning first; commands that could
 destroy the system must be typed again. Without a TTY (piped), tellsh only prints the command unless
 --yes is given.`;
@@ -157,51 +157,103 @@ function printSuggestion(s, opts) {
 }
 
 /**
- * The prompt and warning for a command at its risk (0.3.2): [Enter] runs at EVERY risk level, Esc / Ctrl+C / n / q
- * aborts, e edits. Medium, high, composed (experimental) and unrated commands keep a colored warning line.
- * An incomplete command (placeholder left) never runs: Enter opens the editor instead.
- * -> { warning, prompt, decide(key) } where decide returns 'run' | 'edit' | 'abort' | null (ignore the key)
+ * The prompt and warning for a command at its risk (0.3.2): [Enter] runs at EVERY risk level, Esc / Ctrl+C / Ctrl+D /
+ * n / q aborts, e edits. Medium risk shows a yellow warning line; high, unrated and composed (experimental, always high)
+ * a red one. An incomplete command (placeholder left) never runs: Enter opens the editor instead.
+ * -> { warning, prompt, decide(chunk, state) } (see decideChunk)
  */
 export function confirmRule(risk, { composed = false, incomplete = false } = {}) {
   let warning = null;
-  if (risk === 'high' || (risk !== 'safe' && risk !== 'medium')) warning = C.red('! High risk: check the command before pressing Enter.');
-  else if (composed) warning = C.yellow('! Experimental (composed) command: check it before pressing Enter.');
+  if (composed) warning = C.red('! High risk, experimental (composed) command: check it before pressing Enter.');
   else if (risk === 'medium') warning = C.yellow('! Medium risk: check the command before pressing Enter.');
+  else if (risk !== 'safe') warning = C.red('! High risk: check the command before pressing Enter.'); // unknown rating = high
   const prompt = incomplete ? '[Enter]/e edit · Esc abort ' : '[Enter] run · e edit · Esc abort ';
-  return { warning, prompt, decide: (key) => decideKey(key, incomplete) };
+  return { warning, prompt, decide: (chunk, state) => decideChunk(chunk, incomplete, state) };
 }
 
-/** One raw keypress chunk -> action. A lone ESC aborts; longer escape sequences (arrows, F-keys) are ignored. */
-export function decideKey(key, incomplete = false) {
-  const k = String(key ?? '');
-  if (k === '\r' || k === '\n' || k === '\r\n') return incomplete ? 'edit' : 'run';
-  if (k === '\x1b' || k === '\x03' || k === '\x04') return 'abort';
-  const c = k.toLowerCase();
-  if (c === 'e') return 'edit';
-  if (c === 'n' || c === 'q') return 'abort';
-  return null;
+const PASTE_START = '\x1b[200~';
+const PASTE_END = '\x1b[201~';
+/**
+ * One raw stdin chunk -> 'run' | 'edit' | 'abort' | 'pending-esc' | null (keep waiting). Deliberately strict, because
+ * Enter now runs high-risk commands:
+ *  - only a chunk that is exactly one carriage return runs (`\n` / Ctrl+J, `\r\n` and an Enter inside a burst of other
+ *    keys, i.e. typed ahead or pasted, never run);
+ *  - bracketed paste content (state.paste, across chunks) is ignored, except Ctrl+C;
+ *  - an abort key (Ctrl+C, Ctrl+D, lone Esc, n, q) anywhere in a chunk outside a paste aborts;
+ *  - escape sequences (arrows, F-keys) are skipped; a chunk that ends in a bare ESC is 'pending-esc' (the caller aborts
+ *    unless the rest of a sequence follows within a short delay; state.esc carries it to the next chunk).
+ * `e` edits only as a chunk of its own.
+ */
+export function decideChunk(chunk, incomplete = false, state = {}) {
+  let k = (state.esc || '') + String(chunk ?? '');
+  state.esc = '';
+  if (k.includes('\x03')) return 'abort';
+  if (!state.paste && k === '\r') return incomplete ? 'edit' : 'run';
+  if (!state.paste && (k === 'e' || k === 'E')) return 'edit';
+  let abort = false;
+  let i = 0;
+  while (i < k.length) {
+    if (state.paste) {
+      const j = k.indexOf(PASTE_END, i);
+      if (j < 0) return null;
+      state.paste = false; i = j + PASTE_END.length; continue;
+    }
+    if (k.startsWith(PASTE_START, i)) { state.paste = true; i += PASTE_START.length; continue; }
+    const c = k[i];
+    if (c === '\x1b') {
+      if (i + 1 >= k.length) { if (abort) return 'abort'; state.esc = '\x1b'; return 'pending-esc'; }
+      const n = k[i + 1];
+      if (n === '[' || n === 'O') {
+        let j = i + 2;
+        while (j < k.length && !(k.charCodeAt(j) >= 0x40 && k.charCodeAt(j) <= 0x7e)) j++;
+        if (j >= k.length) { state.esc = k.slice(i); return abort ? 'abort' : null; } // sequence continues in the next chunk
+        i = j + 1; continue;
+      }
+      if (n === '\x1b') { abort = true; i += 1; continue; }
+      i += 2; continue; // Alt+key
+    }
+    if (c === '\x04' || c === 'n' || c === 'N' || c === 'q' || c === 'Q') abort = true;
+    i++;
+  }
+  return abort ? 'abort' : null;
 }
 
-/** Wait for a single key in raw mode (no line buffering, no echo). */
+/** Wait for a single deliberate key in raw mode (no line buffering, no echo). Typed-ahead input is discarded. */
 function readKey(rule) {
   return new Promise((res) => {
     const input = process.stdin;
-    process.stdout.write(rule.prompt);
+    const out = process.stdout;
     const wasRaw = input.isRaw;
+    const state = { paste: false, esc: '' };
+    let escTimer = null;
+    let ready = false;
+    let armTimer = null;
     input.setRawMode(true);
-    input.resume();
+    out.write('\x1b[?2004h'); // bracketed paste on
+    out.write(rule.prompt);
     const done = (action) => {
+      clearTimeout(escTimer);
+      clearTimeout(armTimer);
       input.removeListener('data', onData);
+      out.write('\x1b[?2004l');
       input.setRawMode(wasRaw);
       input.pause();
-      process.stdout.write('\n');
+      out.write('\n');
       res(action);
     };
     const onData = (buf) => {
-      const action = rule.decide(buf.toString('utf8'));
+      const s = buf.toString('utf8');
+      // input that was already waiting (typed or pasted while the suggestion was computed) is never a confirmation,
+      // but an abort key in it still aborts
+      if (!ready) { if (s.includes('\x03') || s.includes('\x04')) done('abort'); return; }
+      clearTimeout(escTimer);
+      const action = rule.decide(s, state);
+      if (action === 'pending-esc') { escTimer = setTimeout(() => done('abort'), 60); return; }
       if (action) done(action);
     };
     input.on('data', onData);
+    input.resume();
+    armTimer = setTimeout(() => { ready = true; }, 150);
   });
 }
 

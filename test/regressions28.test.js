@@ -91,20 +91,35 @@ test('paths: the one-argument and the several-argument forms agree', () => {
 // ---------- (2) prompt ----------
 test('0.3.2 UX: Enter runs at every risk level, Esc/Ctrl+C abort, medium/high keep a warning', () => {
   for (const r of ['safe', 'medium', 'high', undefined]) {
-    const rule = confirmRule(r);
-    for (const k of ['\r', '\n']) assert.equal(rule.decide(k), 'run', `${r} ${JSON.stringify(k)}`);
-    for (const k of ['\x1b', '\x03', 'n', 'q']) assert.equal(rule.decide(k), 'abort', `${r} ${JSON.stringify(k)}`);
-    assert.equal(rule.decide('e'), 'edit');
-    // arrows / other keys / typed words are ignored, never run
-    for (const k of ['\x1b[A', 'y', 'yes', 'x', ' ']) assert.equal(rule.decide(k), null, `${r} ${JSON.stringify(k)}`);
+    const d = (k, st = {}) => confirmRule(r).decide(k, st);
+    assert.equal(d('\r'), 'run', String(r));
+    for (const k of ['\x03', '\x04', 'n', 'q', 'x\x03', 'n\r', '\x1b\x1b']) assert.equal(d(k), 'abort', `${r} ${JSON.stringify(k)}`);
+    assert.equal(d('\x1b'), 'pending-esc'); // lone Esc: the caller aborts unless a sequence follows
+    assert.equal(d('e'), 'edit');
+    // review r1: \n (Ctrl+J), \r\n, an Enter inside a burst, arrows, typed words never run
+    for (const k of ['\n', '\r\n', 'ls\r', '\r\r', '\x1b[A', 'y', 'yes', 'x', ' ']) assert.equal(d(k), null, `${r} ${JSON.stringify(k)}`);
   }
+  const rule = confirmRule('high');
+  // an arrow split across chunks is not an Esc
+  let st = {};
+  assert.equal(rule.decide('\x1b', st), 'pending-esc');
+  assert.equal(rule.decide('[A', st), null);
+  st = {};
+  assert.equal(rule.decide('\x1b[', st), null);
+  assert.equal(rule.decide('A', st), null);
+  // bracketed paste: contents (newlines, n, q, Esc) are ignored across chunks; Enter after the paste runs
+  st = {};
+  assert.equal(rule.decide('\x1b[200~rm -rf x\r', st), null);
+  assert.equal(rule.decide('\r', st), null);
+  assert.equal(rule.decide('more\nq\x1b[201~', st), null);
+  assert.equal(rule.decide('\r', st), 'run');
+  assert.equal(rule.decide('\x1b[200~text\x03', {}), 'abort');
   assert.equal(confirmRule('safe').warning, null);
   assert.match(confirmRule('medium').warning, /Medium risk/);
   assert.match(confirmRule('high').warning, /High risk/);
   assert.match(confirmRule(undefined).warning, /High risk/);
-  assert.match(confirmRule('safe', { composed: true }).warning, /Experimental/);
-  // incomplete: never runs as is, Enter opens the editor
-  for (const r of ['safe', 'medium', 'high']) assert.equal(confirmRule(r, { incomplete: true }).decide('\r'), 'edit', r);
+  assert.match(confirmRule('high', { composed: true }).warning, /High risk, experimental/);
+  for (const r of ['safe', 'medium', 'high']) assert.equal(confirmRule(r, { incomplete: true }).decide('\r', {}), 'edit', r);
   // the reviewed medium rows still carry the medium warning
   for (const q of ['chmod 777 /srv/my app', 'move /tmp/old notes to /tmp/archive']) assert.equal(run(q).risk, 'medium', q);
 });
