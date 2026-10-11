@@ -33,9 +33,7 @@ test('major: "X env" never makes up an environment name', () => {
       'deploy worker to staging env': 'npx wrangler deploy --env staging',
       'deploy worker to the production environment': 'npx wrangler deploy --env production',
       'deploy worker to env called foo': 'npx wrangler deploy --env foo',
-      // "for" does not name the environment
-      'deploy worker for testing': 'npx wrangler deploy',
-      'deploy worker for the qa team': 'npx wrangler deploy',
+      // "for" + a weak name never makes one up ("for testing", "for the qa team" are withheld: test/regressions24.test.js)
       'deploy worker to cloudflare': 'npx wrangler deploy',
     };
     for (const [q, cmd] of Object.entries(cases)) exact(run(q, null, env), cmd, `${env.shell}: ${q}`);
@@ -47,7 +45,6 @@ test('major: a custom environment name is kept whole', () => {
     const cases = {
       'deploy worker to staging-eu': 'npx wrangler deploy --env staging-eu',
       'deploy worker to preview2': 'npx wrangler deploy --env preview2',
-      'deploy worker to customer-a': 'npx wrangler deploy --env customer-a',
       'deploy worker to the staging-eu environment': 'npx wrangler deploy --env staging-eu',
       'deploy worker in 2-3 minutes': 'npx wrangler deploy',
     };

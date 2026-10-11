@@ -98,6 +98,8 @@ const PR_REFERENCE = /\b(?:that|this|its|the\s+same|the\s+previous|the\s+last|te
 // "the other pr", "the latest pr", "my last pull request", "the most recent pr": a pull request picked out among several, which
 // neither the current branch's pull request nor the one of the previous command is (withheld, also with history)
 const PR_PICKED = /\b(?:(?:the|a|an|my|our|your|his|her|their|some|any)\s+)?(?:other|another|latest|newest|most\s+recent|recent|oldest|older|newer|earlier|next|first|second|third|new|old|pending|approved|remaining|(?:(?:my|our|your|his|her|their)\s+)(?:last|previous|prior)|inn[yaeoy]\w*|ostatni\w*|najnowsz\w*|poprzedni\w*|kolejn\w*|nastepn\w*|następn\w*|starsz\w*)\s+(?:(?:open|opened|draft|merged|github)\s+)?(?:prs?|pull[\s-]+requests?)\b/i;
+const PR_CREATE_WORD = /(?<![\p{L}\d_])(?:create|creating|new|make|submit|raise|file|send|draft|utw[oó]rz\p{L}*|stw[oó]rz\p{L}*|now[yaeią]\p{L}*|za[lł][oó][zż]\p{L}*|wy[sś]lij\p{L}*)(?![\p{L}\d_])/iu;
+const PR_NOT_CREATE = /(?<![\p{L}\d_])(?:approve\w*|accept\w*|lgtm|zatwierd[zź]\w*|zaakceptuj\w*|akceptuj\w*)(?![\p{L}\d_])|\b(?:in|on|w)\s+(?:the\s+|a\s+)?(?:web|browser|przegl[aą]dar\w*)\b/iu;
 const PR_CLOSE = /(?:^|[\s,;])(?:close|closing|shut|reject|decline|abandon|cancel|zamkn\S*)(?=[\s.,!?;:]|$)/i;
 // "merge and close pr 45": a merge the request asks for; "close pr 45 without merge", "do not merge pr 45", "unmerge pr 45":
 // one it does not (a negation within the two words before it, or a prefix that undoes it)
@@ -388,6 +390,10 @@ export function suggest(query, opts = {}) {
   // "revert pr 45": not `gh pr view 45` either
   if (intent?.startsWith('gh_pr_') && /\brevert\w*\b/i.test(query) && !merges) {
     return { ...out, understood: false, method: 'none', hint: 'reverting a pull request is not supported (gh pr revert <PR>)' };
+  }
+  // "approve pr", "open pr in web": approving or viewing a pull request, never `gh pr create` (which publishes a new one)
+  if (intent === 'gh_pr_create' && !PR_CREATE_WORD.test(query) && PR_NOT_CREATE.test(query)) {
+    return { ...out, understood: false, method: 'none', hint: 'approving or opening an existing pull request is not supported (gh pr review --approve <PR>, gh pr view --web <PR>); not suggesting gh pr create' };
   }
   if (intent?.startsWith('gh_pr_') && ((closes && !merges) || (intent === 'gh_pr_merge' && !merges && [...query.matchAll(MERGE_WORD)].length))) {
     const hint = closes ? 'closing a pull request is not supported (gh pr close <PR>)' : 'the request does not ask for a merge (it negates or undoes one); not suggesting gh pr merge';

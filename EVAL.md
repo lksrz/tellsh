@@ -200,6 +200,16 @@ skeleton keeps some operands (`npm install express` ≠ `npm install react`); un
 inflation; [HYBRID.md](HYBRID.md#v04-real-usage)). The shipped split is unchanged; `prepare_real.js --group structural`
 is there for the next retrain. Every eval number is unchanged. Bench re-run.
 
+**Round 23 (reviews r21, r22; A unchanged, A+B policy unchanged).** wrangler deploy: after "for", a strong environment name
+is kept (`for production`, `for prod`, `for qa` -> `--env …`; fix21 dropped them to the default target) and a weak one is
+withheld (`for testing`, `for dev`, `for the qa team` -> `--env <WENV>`); a quoted name is decoded (`to "preview2"` ->
+`--env preview2`, was a bare deploy), `env=staging` is read, a marked word after a preposition without a known name in it
+(`to v2`, `to the worker-2 script`) is withheld, and a dry run asked for after a negated one is kept. gh pr: a selector
+after "pr" (`merge pr for the login fix`, `merge pr: fix login`, `merge pr with dependabot`, `merge pr of my colleague`) and
+a related pull request's URL (`merge the pr that depends on <url>`) are withheld as `<PR>`, also with history (gave a bare
+`gh pr merge` / `gh pr merge <url>`); `merge current branch pr` is the current branch's again; `approve pr` and `open pr in
+web` are refused instead of `gh pr create --fill`. Every eval number is unchanged. Bench re-run.
+
 <!-- eval:start -->
 ## Model
 
@@ -342,13 +352,13 @@ Machine: Intel(R) Xeon(R) Processor, Node v20.19.2, linux; CPU affinity: `0` (ru
 
 | measurement | p50 | p95 | runs |
 |---|---|---|---|
-| bare `node -e 0` startup (baseline) | 83.3 ms | 113.7 ms | 10 |
-| **cold**: `node bin/tellsh.js --dry-run --json --shell bash <query>` (new process, model load, full pipeline) | **174.8 ms** | **205.8 ms** | 40 |
-| model load (in-process, one-off) | 4.4 ms | – | 1 |
-| **warm**: full cascade + tagger + render (bash, composer off) | **0.387 ms** | **4.5 ms** | 2000 |
-| warm, incl. composer modifier check (shipped default) | 0.572 ms | 6.7 ms | 2000 |
-| warm, PowerShell rendering | 0.354 ms | 0.734 ms | 2000 |
-| warm, 5 history lines given (only the previous one is read; context build + reference rules) | 0.677 ms | 6.9 ms | 2000 |
+| bare `node -e 0` startup (baseline) | 87.1 ms | 124.1 ms | 10 |
+| **cold**: `node bin/tellsh.js --dry-run --json --shell bash <query>` (new process, model load, full pipeline) | **179.4 ms** | **241.0 ms** | 40 |
+| model load (in-process, one-off) | 4.6 ms | – | 1 |
+| **warm**: full cascade + tagger + render (bash, composer off) | **0.409 ms** | **4.5 ms** | 2000 |
+| warm, incl. composer modifier check (shipped default) | 0.573 ms | 6.5 ms | 2000 |
+| warm, PowerShell rendering | 0.349 ms | 0.704 ms | 2000 |
+| warm, 5 history lines given (only the previous one is read; context build + reference rules) | 0.666 ms | 7.0 ms | 2000 |
 
 The composer runs `bash -n` (a subprocess, ~2 ms) only when it actually returns a composed command.
 <!-- bench:end -->
