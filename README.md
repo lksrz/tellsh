@@ -415,6 +415,12 @@ retrain; `npm test && npm run eval`.
 
 ## Known limits
 
+* **Template matrix (v0.3.1).** `scripts/matrix.js` renders every intent for bash / sh / zsh (Linux, GNU and BusyBox),
+  zsh / bash on macOS (BSD and Homebrew GNU coreutils) and Windows PowerShell 5.1 / cmd, checks syntax, allowlist, risk
+  and that the programs exist, and runs the safe ones in a throwaway fixture; results are in [MATRIX.md](MATRIX.md).
+  Known Windows limits from it: `create_symlink` in Windows PowerShell 5.1 and `temperature` / `last_logins` need an
+  elevated prompt; `disk_free` has no non-admin cmd.exe command (use PowerShell); cmd's `history_search` only sees the
+  current session.
 * **The selector rule trades recall for safety.** Its vocabulary is closed and hand-written (English and Polish): a
   harmless paraphrase with a word it does not list (`deploy the api worker to cloudflare`, `run the worker on
   localhost:8787`) gets a placeholder (`<ARGS>`, `<WENV>`) you have to fill or delete. On the 1097 gh / wrangler

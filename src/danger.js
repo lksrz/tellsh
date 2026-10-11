@@ -684,13 +684,20 @@ const RULES = [
   // PowerShell
   [/\bRemove-Item\b|\bClear-Content\b/i, 'high', 'deletes files permanently'],
   [/\bStop-Process\b|\bspps\b|\btaskkill\b/i, 'high', 'terminates processes'],
+  [/\bfuser\b[^|;&]*\s-[a-zA-Z]*k/, 'high', 'fuser -k terminates the processes using the file / port'],
   [/\bFormat-Volume\b|\bClear-Disk\b|\bInitialize-Disk\b|(?:^|[;&|(]\s*)format\s+[a-z]:/i, 'high', 'formats a disk', true],
   [/\b(?:Stop|Restart)-Computer\b|\bshutdown(?:\.exe)?\s+\/[srp]\b/i, 'high', 'shuts down / reboots the machine'],
   [/\b(?:iwr|irm|Invoke-WebRequest|Invoke-RestMethod|curl|wget)\b[^|;]*\|\s*(?:iex|Invoke-Expression)\b/i, 'high', 'pipes a download straight into PowerShell'],
   [/\b(?:iex|Invoke-Expression)\b[^|;]*\b(?:iwr|irm|Invoke-WebRequest|Invoke-RestMethod|curl|wget|DownloadString|DownloadData|Net\.WebClient)\b|\[scriptblock\]::Create\([^;]*\b(?:iwr|irm|Invoke-WebRequest|Invoke-RestMethod|DownloadString)\b/i, 'high', 'runs a downloaded script'],
   [/\bSet-ExecutionPolicy\b|\bStart-Process\b.*-Verb\s+RunAs/i, 'medium', 'changes security policy / elevates'],
   [/\b(?:Stop|Restart|Start|Set)-Service\b/i, 'medium', 'changes a service'],
-  [/\b(?:Set-Content|Out-File|Add-Content|Rename-Item|Move-Item|Copy-Item|New-Item|Set-Acl|Compress-Archive|Expand-Archive)\b/i, 'medium', 'modifies files'],
+  [/\b(?:Set-Content|Out-File|Add-Content|Rename-Item|Move-Item|Copy-Item|Set-Acl|Compress-Archive|Expand-Archive)\b/i, 'medium', 'modifies files'],
+  // New-Item without -Force fails on an existing item (file, directory or registry key) and overwrites nothing; -Force
+  // replaces a file or a registry key whatever -ItemType says, -Value writes content
+  [/\bNew-Item\b[^|;}]*\s-(?:Force|Value)\b/i, 'medium', 'modifies files'],
+  // -Target is an alias of -Value, and pipeline input binds to -Value: both write content
+  [/\bNew-Item\b[^|;}]*\s-(?:Target|Va|Val|Valu|Fo|For|Forc)\b/i, 'medium', 'modifies files'],
+  [/\|\s*(?:New-Item|ni)\b/i, 'medium', 'pipes content into New-Item'],
   [/\bdocker\s+stop\b/, 'medium', 'stops containers'],
 ];
 
@@ -848,7 +855,13 @@ export function allowlistProblems(command, { extra = null } = {}) {
  * a `safe` result here does not make a command safe (see checkDanger).
  * @returns {{risk:'safe'|'medium'|'high', warnings:string[], critical:boolean}}
  */
-export function assessCommand(command, baseRisk = 'safe', { lenient = false, allowlist = null } = {}) {
+// PowerShell: a statement that starts with `$x` is an expression (`$_.Name -like …`, `$env:PATH -split …`), not a call; a
+// variable runs as a command only through the call or dot-source operator. Any `&` / `.` operator in the text (`& $tool`,
+// `. ($env:X)`, `& (@($x) | Select -First 1)`) keeps the rule for every $-head: computed operands are not analysed.
+const PS_CALL_VAR = /(?:^|[\s;|({])[&.](?=[\s('"{$@])/;
+
+export function assessCommand(command, baseRisk = 'safe', { lenient = false, allowlist = null, shell = null, os = null } = {}) {
+  const psExpr = shell === 'powershell' && !PS_CALL_VAR.test(command);
   let risk = baseRisk;
   const warnings = [];
   let critical = false;
@@ -868,7 +881,7 @@ export function assessCommand(command, baseRisk = 'safe', { lenient = false, all
     // a lone string with spaces is a command handed to another program ('…' | bash)
     if (w.length === 1 && /\s/.test(w[0])) inner.push(w[0]);
     // the program itself depends on the shell state (`$CMD -rf /`, `$(which rm) -rf /`, `& $tool`): unknown
-    if (!lenient && /^[$`]/.test(head)) hit('high', 'runs a command whose name depends on the shell state; it cannot be checked');
+    if (!lenient && /^[$`]/.test(head) && !(psExpr && head[0] === '$')) hit('high', 'runs a command whose name depends on the shell state; it cannot be checked');
     if (head === 'rm' || head === 'unlink') rmCheck(w, hit);
     else if (head === 'kill') killCheck(w, hit);
     else if (/^(?:rd|rmdir|del|erase)$/i.test(head)) {
@@ -908,7 +921,14 @@ export function assessCommand(command, baseRisk = 'safe', { lenient = false, all
     const d = assessCommand(c, 'safe', { allowlist: { off: true } });
     for (const m of d.warnings) hit(d.risk, m, d.critical);
   }
-  for (const [re, r, msg, crit] of RULES) if (re.test(text)) hit(r, msg, crit);
+  // Windows shells: a redirect to the NUL device (`2>nul`, an unquoted nul ending the operand) writes no file, and cmd.exe's
+  // `type nul >> file` appends nothing (the touch idiom). Elsewhere `nul` is an ordinary file name.
+  // (PowerShell on Linux / macOS: nul is a plain file)
+  const win = shell === 'cmd' || (shell === 'powershell' && os === 'win32');
+  let noTouch = text;
+  if (shell === 'cmd') noTouch = noTouch.replace(/(?:^|[&|(]\s*)type\s+nul\s*>>\s*(?:"[^"]*"|[^\s&|()"]+)\s*(?=$|[&|)])/gi, ' ');
+  if (win) noTouch = noTouch.replace(/(?:\d|&)?>>?\s*nul(?=$|[\s&|;)])/gi, ' ');
+  for (const [re, r, msg, crit] of RULES) if (re.test(msg === 'redirect writes to a file' ? noTouch : text)) hit(r, msg, crit);
   if (!lenient && !allowlist?.off) for (const m of allowlistProblems(command, { extra: allowlist?.extra })) hit('high', m);
   return { risk, warnings, critical };
 }
@@ -950,10 +970,11 @@ export function plainSlotValue(name, value, { dashOk = false } = {}) {
  * The risk of a final command. `rendered`: the caller vouches that `command` is exactly what tellsh rendered from a catalog
  * template with plain slot values (fill.js buildCommand); `baseRisk` is then the intent's risk. Without it the command
  * is at least high.
+ * `shell: 'powershell'`: the command is native PowerShell (a leading `$x` is an expression, see PS_CALL_VAR).
  * @returns {{risk:'safe'|'medium'|'high', warnings:string[], critical:boolean}}
  */
-export function checkDanger(command, baseRisk = 'safe', { rendered = false, allowlist = null } = {}) {
-  const d = assessCommand(command, baseRisk, { allowlist });
+export function checkDanger(command, baseRisk = 'safe', { rendered = false, allowlist = null, shell = null, os = null } = {}) {
+  const d = assessCommand(command, baseRisk, { allowlist, shell, os });
   if (rendered || d.risk === 'high') return d;
   return { risk: 'high', warnings: [UNTRUSTED, ...d.warnings], critical: d.critical };
 }

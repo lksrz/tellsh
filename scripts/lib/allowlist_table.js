@@ -13,7 +13,8 @@ const V = { path: 'zqdir', file: 'zqf.txt', src: 'zqa.txt', dst: 'zqb.txt', dest
   glob: '*.log', minutes: 5, sizeBytes: 1000 };
 const ENVS = [
   { shell: 'bash', os: 'linux', coreutils: 'gnu' }, { shell: 'zsh', os: 'darwin', coreutils: 'bsd' }, { shell: 'bash', os: 'darwin', coreutils: 'bsd' },
-  { shell: 'sh', os: 'linux', coreutils: 'gnu' }, { shell: 'fish', os: 'linux', coreutils: 'gnu' }, { shell: 'fish', os: 'darwin', coreutils: 'bsd' },
+  { shell: 'sh', os: 'linux', coreutils: 'gnu' }, { shell: 'sh', os: 'linux', coreutils: 'busybox' },
+  { shell: 'zsh', os: 'linux', coreutils: 'gnu' }, { shell: 'zsh', os: 'darwin', coreutils: 'gnu' }, { shell: 'fish', os: 'linux', coreutils: 'gnu' }, { shell: 'fish', os: 'darwin', coreutils: 'bsd' },
   { shell: 'powershell', os: 'win32', coreutils: 'gnu' }, { shell: 'powershell', os: 'linux', coreutils: 'gnu' }, { shell: 'powershell', os: 'darwin', coreutils: 'bsd' },
   { shell: 'cmd', os: 'win32', coreutils: 'gnu' },
 ];

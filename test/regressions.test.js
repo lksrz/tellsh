@@ -11,7 +11,7 @@ import { INTENTS } from '../src/catalog.js';
 import { render, buildCommand } from '../src/fill.js';
 import { shQuote, psQuote, cmdQuote } from '../src/render.js';
 // the parser on its own (it only raises risk); the trust rule (a non-catalog command is high) is in regressions27.test.js
-import { assessCommand as checkDanger } from '../src/danger.js';
+import { assessCommand as checkDanger, allowlistProblems } from '../src/danger.js';
 import { suggest, validSlot } from '../src/pipeline.js';
 import { buildContext, resolveReference } from '../src/history.js';
 import { splitCommand } from '../src/shellwords.js';
@@ -350,4 +350,11 @@ test('critical flag for recursive deletes of root/home in every shell and path f
     const ok = buildCommand('delete_dir', '', { env, resolved: { path: 'build' } });
     assert.equal(ok.critical, false, `${env.shell}: ${ok.command}`);
   }
+});
+
+test('macOS GNU coreutils twins (gsort, gdu) are treated like their allowlisted originals', () => {
+  const ok = (c) => allowlistProblems(c).filter((p) => /unknown command/.test(p));
+  assert.deepEqual(ok('find /var -xdev -type f -exec du -h {} + 2>/dev/null | gsort -rh | head -n 10'), []);
+  assert.deepEqual(ok('gdu -h -d 1 /var 2>/dev/null | gsort -rh | head -n 10'), []);
+  assert.ok(ok('gfoo /var').length > 0);
 });

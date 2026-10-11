@@ -912,7 +912,8 @@ export function render(template, values, required = [], quote = shQuote, keepOpt
     }
     return val;
   });
-  return { command: out, missing };
+  // an optional segment at the very start (`«mkdir -p {dest} && »tar …`) must not leave a leading space
+  return { command: out.replace(/^\s+/, ''), missing };
 }
 
 const DERIVED_REQUIRED = { namepat: 'name', glob: 'ext', sedexpr: 'old' };
@@ -1024,7 +1025,7 @@ export function buildCommand(intentId, text, { platform = process.platform, env,
   // a plain literal (a missing value is tellsh's own <PLACEHOLDER>, and the command cannot run before it is edited)
   const used = typeof tpl === 'function' ? Object.keys(values) : [...String(tpl).matchAll(/\{(\w+)(!raw)?\}/g)].map((m) => m[1]);
   const plain = used.every((k) => !(k in values) || plainSlotValue(k, values[k], { dashOk: PATH_SLOTS.has(k) || (!!RAW_OK[k] && RAW_OK[k](values[k])) }));
-  const danger = checkDanger(command, intent.risk, { rendered: plain });
+  const danger = checkDanger(command, intent.risk, { rendered: plain, shell: choice.kind === 'pwsh' && !choice.wrapPosix ? 'powershell' : e.shell, os: e.os });
   return {
     ...base,
     command,

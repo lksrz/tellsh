@@ -21,10 +21,10 @@ test('final5-claude major 1: extract requests never create or overwrite the arch
     'untar archive.tar.gz': 'tar -xzvf archive.tar.gz',
     'unpack archive.tar.gz': 'tar -xzvf archive.tar.gz',
     'decompress backup.tar.gz': 'tar -xzvf backup.tar.gz',
-    'extract files from archive.tar.gz to /tmp': 'tar -xzvf archive.tar.gz -C /tmp',
+    'extract files from archive.tar.gz to /tmp': 'mkdir -p /tmp && tar -xzvf archive.tar.gz -C /tmp',
     'rozpakuj archive.tar.gz': 'tar -xzvf archive.tar.gz',
     'rozpakuj archiwum backup.tar.gz': 'tar -xzvf backup.tar.gz',
-    'wypakuj archiwum archive.tar.gz do /tmp': 'tar -xzvf archive.tar.gz -C /tmp',
+    'wypakuj archiwum archive.tar.gz do /tmp': 'mkdir -p /tmp && tar -xzvf archive.tar.gz -C /tmp',
     'extract archive.zip': 'unzip archive.zip',
   };
   for (const [q, want] of Object.entries(cases)) {

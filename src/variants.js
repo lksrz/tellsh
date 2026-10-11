@@ -42,7 +42,7 @@ export const VARIANTS = {
   },
   disk_free: {
     pwsh: { win: 'Get-PSDrive -PSProvider FileSystem', unix: 'df -h' },
-    cmd: 'fsutil volume diskfree C:',
+    gaps: { cmd: 'fsutil volume diskfree needs an elevated prompt; use PowerShell (Get-PSDrive)' },
   },
   dir_size: {
     pwsh: `${PS_FILES} | Measure-Object -Property Length -Sum | Select-Object Count, Sum, @{ Name = 'MB'; Expression = { [math]::Round($_.Sum / 1MB, 1) } }`,
@@ -120,7 +120,7 @@ export const VARIANTS = {
   duplicate_files: {
     gnuMac: 'find {path} -type f -exec gmd5sum {} + | gsort | guniq -w32 -dD',
     busybox: "find {path} -type f -exec md5sum {} + | sort | awk '{ k = substr($0, 1, 32) } k == p { if (!shown) print last; print; shown = 1; next } { p = k; last = $0; shown = 0 }'",
-    pwsh: `${PS_FILES} | Get-FileHash -Algorithm MD5 | Group-Object -Property Hash | Where-Object Count -GT 1 | ForEach-Object Group | Select-Object Hash, Path`,
+    pwsh: `${PS_FILES} | Get-FileHash -Algorithm MD5 -ErrorAction SilentlyContinue | Group-Object -Property Hash | Where-Object Count -GT 1 | ForEach-Object Group | Select-Object Hash, Path`,
     gaps: { cmd: 'cmd.exe cannot hash and group files' },
   },
   find_symlinks: {
@@ -130,7 +130,7 @@ export const VARIANTS = {
   },
   broken_symlinks: {
     busybox: 'find -L {path} -type l',
-    pwsh: `${PS_ALL} | Where-Object { $_.LinkType -eq 'SymbolicLink' -and -not (Test-Path -LiteralPath ([System.IO.Path]::Combine((Split-Path -LiteralPath $_.FullName -Parent), [string]$_.Target))) } | ${PS_FULLNAME}`,
+    pwsh: `${PS_ALL} | Where-Object { $_.LinkType -eq 'SymbolicLink' -and -not (Test-Path -LiteralPath ([System.IO.Path]::Combine([System.IO.Path]::GetDirectoryName($_.FullName), [string]$_.Target))) } | ${PS_FULLNAME}`,
     gaps: { cmd: 'cmd.exe cannot check symlink targets' },
   },
   list_files: {
@@ -143,7 +143,8 @@ export const VARIANTS = {
   },
   hidden_files: {
     pwsh: "Get-ChildItem -LiteralPath {path} -Force | Where-Object { $_.Name -like '.*' -or $_.Attributes -band [System.IO.FileAttributes]::Hidden }",
-    cmd: 'dir /a:h {path}',
+    // dotfiles are not hidden on Windows: list both the Hidden attribute and names starting with a dot
+    cmd: 'pushd {path} && (dir /a:h /b 2>nul & dir /a /b .* & popd)',
   },
   file_type: {
     // Windows has no content sniffing like file(1); show what the filesystem knows instead.
@@ -179,16 +180,19 @@ export const VARIANTS = {
     cmd: 'tar -czvf {archive} {path}',
   },
   extract_targz: {
-    pwsh: 'tar -xzvf {file}«-C {dest}»',
-    cmd: 'tar -xzvf {file}«-C {dest}»',
+    // tar -C needs an existing directory (like the POSIX template, create it first)
+    pwsh: '«if (-not (Test-Path -LiteralPath {dest} -PathType Container)) { New-Item -ItemType Directory -Path {dest} | Out-Null }; »tar -xzvf {file}«-C {dest}»',
+    cmd: '«mkdir {dest} 2>nul & »tar -xzvf {file}«-C {dest}»',
   },
   compress_zip: {
-    pwsh: 'Compress-Archive -LiteralPath {path} -DestinationPath {archive}',
+    // Windows: Compress-Archive aborts on a broken symlink or a locked file; bsdtar (Windows 10+) picks zip from .zip.
+    // Elsewhere tar may be GNU tar (no zip format): keep Compress-Archive.
+    pwsh: { win: 'tar -a -c -f {archive} {path}', unix: 'Compress-Archive -LiteralPath {path} -DestinationPath {archive}' },
     cmd: 'tar -a -c -f {archive} {path}', // bsdtar picks zip format from the .zip suffix
   },
   extract_zip: {
     pwsh: (s, q) => `Expand-Archive -LiteralPath ${q(s.file)} -DestinationPath ${s.dest ? q(s.dest) : '.'}`,
-    cmd: 'tar -xf {file}«-C {dest}»',
+    cmd: '«mkdir {dest} 2>nul & »tar -xf {file}«-C {dest}»',
   },
   list_archive: {
     // bsdtar on Windows lists zip archives too; GNU tar on Linux does not.
@@ -231,9 +235,12 @@ export const VARIANTS = {
     cmd: 'pushd {path} && (del /s {glob} & popd)',
   },
   mkdir: {
-    // -Force on a directory only means "create parents, do not fail if it exists" (mkdir -p).
-    pwsh: 'New-Item -ItemType Directory -Force -Path {path}',
-    cmd: 'mkdir {path}',
+    // mkdir -p without -Force: an existing directory is left alone, New-Item never replaces anything (-Force would replace a
+    // registry key on HKCU:, whatever -ItemType says)
+    pwsh: 'if (-not (Test-Path -LiteralPath {path} -PathType Container)) { New-Item -ItemType Directory -Path {path} }',
+    // mkdir -p: an existing directory is not an error (cmd's mkdir already creates parents); a trailing \ makes
+    // `if exist` test for a directory, so an existing file of that name still fails like mkdir -p does
+    cmd: (s, q) => { const p = q(s.path); const dir = /"$/.test(p) ? p.slice(0, -1) + '\\"' : p + '\\'; return `if not exist ${dir} mkdir ${p}`; },
   },
   touch_file: {
     pwsh: 'if (Test-Path -LiteralPath {file}) { (Get-Item -LiteralPath {file}).LastWriteTime = Get-Date } else { New-Item -ItemType File -Path {file} }',

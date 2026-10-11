@@ -39,7 +39,7 @@ export const SLOT_CASES = [
   ['move_rename', "move 'my file.txt' to ~/Desktop", "mv -i 'my file.txt' ~/Desktop"],
   ['compress_targz', 'spakuj folder projekt do tar.gz', 'tar -czvf projekt.tar.gz projekt'],
   ['compress_targz', 'compress ./src into src-backup.tar.gz', 'tar -czvf src-backup.tar.gz ./src'],
-  ['extract_targz', 'extract backup.tar.gz to /opt', 'tar -xzvf backup.tar.gz -C /opt'],
+  ['extract_targz', 'extract backup.tar.gz to /opt', 'mkdir -p /opt && tar -xzvf backup.tar.gz -C /opt'],
   ['extract_zip', 'rozpakuj archiwum.zip', 'unzip archiwum.zip'],
   ['list_archive', 'what is in backup.zip', 'unzip -l backup.zip'],
   ['list_archive', 'co jest w logs.tar.gz', 'tar -tvf logs.tar.gz'],
