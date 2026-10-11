@@ -2,6 +2,7 @@
 import { BY_ID } from './catalog.js';
 import { extractSlots, pickArg, pickDest, pickDir, foldKeepLength, isStopWord } from './slots.js';
 import { checkDanger, maxRisk, plainSlotValue } from './danger.js';
+import { protectedNumbers } from './guards.js';
 import { shQuote, psQuote, chooseTemplate, quoteForKind, UnquotableError, pwshNativeSlots, unsafeNativePwshArg } from './render.js';
 
 export { shQuote };
@@ -618,8 +619,10 @@ export function resolveSlots(intent, ex) {
   }
   if (ex.port) v.port = ex.port;
   if (has('pid')) {
-    if (ex.pid) v.pid = ex.pid;
-    else if (ex.numbers?.length) v.pid = ex.numbers.find((n) => n > 1);
+    // a number the request protects ("kill 1234 but keep 5678", "zostaw 5678") is never the target: another one, else <PID>
+    const kept = new Set(protectedNumbers(ex.text));
+    if (ex.pid && !kept.has(+ex.pid)) v.pid = ex.pid;
+    else if (ex.numbers?.length) v.pid = ex.numbers.find((n) => n > 1 && !kept.has(n));
   }
   if (has('port') && !v.port && ex.numbers?.length) v.port = ex.numbers.find((n) => n >= 20 && n < 65536);
   if (ex.mode && has('mode')) v.mode = ex.mode;

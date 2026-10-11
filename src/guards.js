@@ -4,6 +4,8 @@
 //     "remove all .log files without app.log": the exclusion is never ignored. A command that cannot express it (no
 //     --exclude, ! -name, grep -v, ...) is not suggested; the request is refused with a hint.
 //   opposite action: "uninstall nginx", "odinstaluj nginx", "pip uninstall requests" is never `apt install` / `pip install`.
+//   extract: "extract archive.tar.gz", "untar …", "rozpakuj …" is never `tar -c` / `zip` (which would overwrite the archive).
+//   protected PID: "kill 1234 but keep 5678", "zabij 1234, nie ruszaj 5678" never kills 5678.
 import { foldKeepLength } from './slots.js';
 
 // exclusion words that always exclude something ("except", "other than", "oprócz", "z wyjątkiem", "everything but")
@@ -67,7 +69,8 @@ export function negationIssue(query, res) {
   if (ex) {
     const v = excludedValue(q.slice(q.length - ex[1].length));
     // a placeholder stands for the excluded part ("merge pr 42 but not in repo acme/app" -> `--repo <REPO>`): the user fills it
-    const held = res.missing?.length > 0 && (v == null || !cmdHas(res.command, v));
+    // (an excluded PID left out as `kill <PID>` is no stand-in: "kill python except 1234" stays refused)
+    const held = res.missing?.length > 0 && (v == null || !cmdHas(res.command, v)) && !(res.missing.includes('pid') && /^\d+$/.test(cleanTok(String(v))));
     // a read-only command only when a value is excluded ("list files except .txt"; "czy ktoś poza mną" is no exclusion)
     if (!held && (changing || (v != null && (VALUE.test(v) || cmdHas(res.command, v))))) {
       return `the request excludes something (${q.slice(ex.index, ex.index + ex[0].length - ex[1].length).trim()} ${v ?? ''}) that ${res.intent || 'the command'} cannot leave out; not suggesting a command that would include it`;
@@ -96,9 +99,59 @@ export function uninstallIssue(query, res) {
   return 'removing a package is not supported (apt remove <PKG>, pip uninstall <PKG>, npm uninstall <PKG>); not suggesting the install command';
 }
 
+// unpacking an archive: never a command that creates or rewrites one
+const EXTRACT = /(?:^|[\s,(])(?:extract|extracting|untar\w*|unpack\w*|unzip\w*|decompress\w*|uncompress\w*|gunzip|rozpakuj\w*|rozpakow\w*|wypakuj\w*|wypakow\w*|dekompres\w*)(?=[\s,;:.!?]|$)/i;
+/** The command creates, appends to or rewrites an archive (`tar -c`, `tar czf`, `--create`, `zip`, `7z a`, `gzip`). */
+export function createsArchive(cmd) {
+  for (const seg of String(cmd ?? '').split(/\s*(?:\|\|?|;|&&)\s*/)) {
+    const w = seg.trim().replace(/^(?:sudo\s+)+/, '').split(/\s+/);
+    const head = (w[0] || '').split('/').pop().toLowerCase();
+    if (/^(?:g|bsd)?tar$/.test(head)) {
+      const args = w.slice(1);
+      if (args.some((a) => /^--(?:create|append|update|catenate|concatenate)\b/.test(a))) return true;
+      // a short option cluster (`-czf`; `-C dir` is the directory option, not a mode), or the old-style first word (`czf`)
+      if (args.some((a) => /^-(?!-)[A-Za-z]*[cruA]/.test(a)) || /^[A-Za-z]*[cruA][A-Za-z]*$/.test(args[0] || '')) return true;
+    }
+    if (/^(?:zip|7z|7za|7zr)$/.test(head) && (head === 'zip' || /^a$|^u$|^d$/.test(w[1] || ''))) return true;
+    if (/^(?:gzip|bzip2|xz|zstd|lz4)$/.test(head) && !w.slice(1).some((a) => /^-[A-Za-z]*d|^--decompress$/.test(a))) return true;
+    if (/^Compress-Archive$/i.test(head)) return true;
+  }
+  return false;
+}
+/** The request unpacks an archive but the command creates or rewrites one. */
+export function extractIssue(query, res) {
+  if (!res?.command || !createsArchive(res.command)) return null;
+  const f = foldKeepLength(String(query)).toLowerCase();
+  if (!EXTRACT.test(f) && !/^extract_/.test(res.intent || '')) return null;
+  return 'the request unpacks an archive; not suggesting a command that creates or overwrites one (tar -xzvf <FILE>, unzip <FILE>)';
+}
+
+// words that protect a number from a kill: "keep 5678", "leave 5678 running", "spare 5678", "zostaw 5678", "nie ruszaj 5678",
+// "except 5678", "but not 5678", "oprócz 5678"
+const PROTECT = /(?:^|[\s,;(])(?:keep(?:ing)?|leave|leaving|spare|sparing|preserve|save|not|except(?:\s+for)?|excluding|without|other\s+than|apart\s+from|besides|zostaw\w*|pozostaw\w*|oszczedz\w*|nie\s+(?:ruszaj\w*|zabijaj\w*|ubijaj\w*|zatrzymuj\w*|kasuj\w*)|oprocz|procz|poza|z\s+wyjatkiem|bez)(?=[\s,;:]|$)((?:\s+(?:the|a|an|for|process\w*|proces\w*|pid|pids|id|nr|numer\w*|number|alone|alive|running|przy|zyciu|w|spokoju|i|and|or|lub|,))*)\s+(\d+)\b/gi;
+/** The numbers a request protects from a kill ("kill 1234 but keep 5678" -> [5678]); and/or lists are followed. */
+export function protectedNumbers(text) {
+  const f = foldKeepLength(String(text ?? '')).toLowerCase();
+  const out = new Set();
+  for (const m of f.matchAll(PROTECT)) {
+    out.add(+m[2]);
+    // "keep 5678 and 9012", "zostaw 5678, 9012 i 3456"
+    const tail = f.slice(m.index + m[0].length).match(/^(?:\s*(?:,|and|or|i|lub|oraz)\s*\d+\b)+/);
+    if (tail) for (const n of tail[0].match(/\d+/g)) out.add(+n);
+  }
+  return [...out];
+}
+const KILLS = /(?:^|[\s|;&])(?:sudo\s+)?(?:kill|pkill|killall|Stop-Process|taskkill|fuser)(?=\s|$)/i;
+/** A kill command that targets a number the request protects. */
+export function protectedIssue(query, res) {
+  if (!res?.command || !(KILLS.test(res.command) || /^kill_/.test(res.intent || ''))) return null;
+  const hit = protectedNumbers(query).find((n) => cmdHas(res.command, String(n)));
+  return hit == null ? null : `the request protects ${hit}; not suggesting a command that would kill it`;
+}
+
 /** A suggestion that contradicts its request becomes a refusal with a hint. */
 export function releaseGuards(query, res) {
-  const hint = uninstallIssue(query, res) || negationIssue(query, res);
+  const hint = uninstallIssue(query, res) || extractIssue(query, res) || protectedIssue(query, res) || negationIssue(query, res);
   if (!hint) return res;
   const { shell, os, coreutils, threshold, context, confidence, tool, tools, candidates } = res;
   return { query, shell, os, coreutils, threshold, context, confidence, tool, tools, candidates, understood: false, method: 'none', command: null, missing: [], hint, refusedIntent: res.intent ?? null };

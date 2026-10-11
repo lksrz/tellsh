@@ -18,7 +18,7 @@ import { buildContext, resolveReference, hasPronoun, hasLocative, cwdFlags, same
 import { AMB } from './shellwords.js';
 import { compose } from './compose.js';
 import { assessCommand, maxRisk } from './danger.js';
-import { releaseGuards } from './guards.js';
+import { releaseGuards, createsArchive } from './guards.js';
 import { readFileSync } from 'node:fs';
 
 let EXPLAINED = null;
@@ -835,8 +835,9 @@ function suggestOnce(query, opts = {}) {
       const ux = alt && !alt.invalid && headOf(alt.command) !== headOf(b.command) ? unexplained(alt) : [];
       if (ux.length >= 2) { comp = alt; extra = ux; }
     }
-    // a value with a line break is never composed into a command (the catalog rejects it as a path)
-    if (comp && !comp.invalid && comp.command !== b.command && !/[\r\n]/.test(comp.command)) {
+    // a value with a line break is never composed into a command (the catalog rejects it as a path); an extract intent is
+    // never replaced by a command that creates or rewrites an archive ("extract archive.tar.gz" is not `tar -c -f archive.tar.gz`)
+    if (comp && !comp.invalid && comp.command !== b.command && !/[\r\n]/.test(comp.command) && !(/^extract_/.test(intent) && createsArchive(comp.command))) {
       if (extra.length >= 1 || composeMode === 'force') {
         return { ...res, method: 'composed', experimental: true, reason: `request asks for ${extra.join(' ')} not in the catalog command`,
           catalogCommand: b.command, description: `composed ${comp.tool}${comp.sub ? ' ' + comp.sub : ''} command (experimental)`,

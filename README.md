@@ -462,6 +462,20 @@ retrain; `npm test && npm run eval`.
 * **Misread requests** (the classifier, not slot filling) can still produce a plausible command without a warning, e.g.
   `forward port 3000 to db.example.com:5432` is a near tie between an ssh tunnel and `nc -zv db.example.com 3000`. Read
   the command before running it.
+* **Release v0.3: open review findings** (details in [EVAL.md](EVAL.md#known-limits-release-v03-open-review-findings-not-fixed)).
+  These give a complete command with no warning:
+  - attached pip target is dropped: `pip install requests -t/tmp/pkgs` -> `python3 -m pip install requests` (write `-t /tmp/pkgs`);
+  - a quoted workspace with a space after "in workspace" is cut: `run npm deploy in workspace "staging app"` ->
+    `--workspace staging` (`--workspace "staging app"` is kept whole);
+  - ssh `-L` with a bind address (4-part spec): `-L 127.0.0.1:8080:db.internal:5432` -> `-L 8080:localhost:8080` (only
+    `-L PORT:HOST:PORT` is read);
+  - `~` in a pip target is quoted literally: `--target ~/packages` -> `--target '~/packages'` (use an absolute path; `$HOME/…` is quoted too);
+  - two bare PIDs for one slot: `kill 1234 5678` -> `kill 5678`;
+  - some composer flags are no longer explained for their intents (`pull all branches` -> `git branch -a`; read-only);
+  - `kill 1234` is read as `pkill -9 -f <NAME>` (a placeholder; `kill pid 1234` -> `kill 1234`).
+* **Extract and protected PIDs (close6).** An extract / untar / unpack / rozpakuj request never becomes `tar -c` / `zip`
+  (the composer keeps `tar -x…`, a guard refuses otherwise), and a PID after keep / leave / spare / except / zostaw / nie
+  ruszaj is never the kill target (the other PID, else `<PID>`). Both read closed English / Polish word lists.
 * The real-usage split's command groups keep some operands (`npm install express` ≠ `npm install react`): 552 of 2957
   eval rows share an operand-masked skeleton with train; A scores ~1 pt higher on those, ~0.2 pt overall
   ([HYBRID.md](HYBRID.md#v04-real-usage)).

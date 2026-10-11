@@ -24,9 +24,13 @@ test('final4-claude major 2: an excluded process is never killed (or killed alon
   for (const env of SHELLS) {
     for (const q of ['kill python except pid 1234', 'kill all python processes except pid 1234', 'kill all python processes except 1234',
       'kill every python process but not 1234', 'zabij wszystkie procesy python oprócz 1234', 'kill python not 1234',
-      'kill all node processes except 4242', "kill python, but don't kill 1234", 'kill 1234 and not 5678']) {
+      'kill all node processes except 4242', "kill python, but don't kill 1234"]) {
       refused(run(q, env), `${env.shell}: ${q}`);
     }
+    // final5: the excluded PID is no longer the tagger's pick; refused or the other PID alone, never 5678
+    const r = run('kill 1234 and not 5678', env);
+    assert.ok(r.command == null || /^(?:kill 1234|Stop-Process -Id 1234|taskkill \/PID 1234)\b/i.test(r.command), `${env.shell}: ${r.command}`);
+    assert.ok(!/5678/.test(r.command ?? ''), `${env.shell}: ${r.command}`);
   }
   // the excluded value is left alone and nothing else is acted on: kept
   assert.equal(run('kill process 1234 not 5678').command, 'kill 1234');
