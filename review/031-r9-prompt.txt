@@ -1,0 +1,180 @@
+Round 5 review of the tellsh cmd quoting fix. Round-4 / r8: Claude APPROVE; Codex REQUEST_CHANGES (P2): function-template q inferred path-ness by value equality (fill.js pathVals), so when pattern === path (e.g. both C:\Program Files\) findstr /c: rewrote the pattern to \. instead of gapping. Fix (commit 745a432): q(s, o) now takes explicit { name } / { tilde }; pathVals heuristic removed; every function-template q() call in variants.js and catalog.js passes { name: '<slot>' }; regression test covers equal path+pattern for grep_text / grep_files_containing (must gap) while path-only still rewrites to \.. Look for real bugs only (regressions from this change, missed call sites still using bare q(value), attached-switch / cmdTemplate interaction, pwsh native name forwarding). End with exactly one line: VERDICT: APPROVE or VERDICT: REQUEST_CHANGES.
+
+DIFF (r8 Codex RC fix, commit 745a432):
+commit 745a432b530c83b2e8d463cfa048bf2f23d7299c
+Author: lksrz <lukasz@wearfits.com>
+Date:   Sun Oct 11 21:10:35 2026 +0200
+
+    cmd: function-template q takes explicit slot role (r8 Codex RC: equal path+pattern no longer rewritten)
+
+ review/031-r8-claude.md     |   18 +
+ review/031-r8-codex.md      | 3324 +++++++++++++++++++++++++++++++++++++++++++
+ review/031-r8-fix-needed.md |   10 +
+ review/031-r8-prompt.txt    |  120 ++
+ review/STATUS_031           |    2 +-
+ src/catalog.js              |    6 +-
+ src/fill.js                 |    9 +-
+ src/variants.js             |   24 +-
+ test/matrix.test.js         |   13 +
+ 9 files changed, 3506 insertions(+), 20 deletions(-)
+
+commit 745a432b530c83b2e8d463cfa048bf2f23d7299c
+Author: lksrz <lukasz@wearfits.com>
+Date:   Sun Oct 11 21:10:35 2026 +0200
+
+    cmd: function-template q takes explicit slot role (r8 Codex RC: equal path+pattern no longer rewritten)
+
+diff --git a/src/catalog.js b/src/catalog.js
+index a141fb5..23b63bb 100644
+--- a/src/catalog.js
++++ b/src/catalog.js
+@@ -80,7 +80,7 @@ export const INTENTS = [
+   T('compress_zip', 'Compress into a zip archive', 'zip -r {archive} {path}', { path: '.', archive: null }, 'medium'),
+   T('extract_zip', 'Extract a zip archive', 'unzip {file}«-d {dest}»', { file: null }, 'medium'),
+   T('list_archive', 'List contents of an archive (tar/zip)',
+-    (s, q) => /\.zip$/i.test(s.file || '') ? `unzip -l ${q(s.file)}` : `tar -tvf ${q(s.file)}`,
++    (s, q) => /\.zip$/i.test(s.file || '') ? `unzip -l ${q(s.file, { name: 'file' })}` : `tar -tvf ${q(s.file, { name: 'file' })}`,
+     { file: null }),
+   T('chmod', 'Change file permissions', 'chmod {mode!raw} {file}', { file: null, mode: null }, 'medium'),
+   T('make_executable', 'Make a file executable', 'chmod +x {file}', { file: null }, 'medium'),
+@@ -106,12 +106,12 @@ export const INTENTS = [
+   T('hash_md5', 'Compute MD5 checksum', 'md5sum {file}', { file: null }, 'safe', { darwin: 'md5 {file}' }),
+   T('base64_encode', 'Base64-encode text or a file',
+     // macOS base64 takes no positional file operand: it needs -i FILE
+-    (s, q, os) => s.file ? (os === 'darwin' ? `base64 -i ${q(s.file)}` : `base64 ${q(s.file)}`) : `printf '%s' ${q(s.text ?? '<TEXT>')} | base64`,
++    (s, q, os) => s.file ? (os === 'darwin' ? `base64 -i ${q(s.file, { name: 'file' })}` : `base64 ${q(s.file, { name: 'file' })}`) : `printf '%s' ${q(s.text ?? '<TEXT>', { name: 'text' })} | base64`,
+     {}),
+   T('base64_decode', 'Decode base64 text or a file',
+     (s, q, os) => {
+       const d = os === 'darwin' ? 'base64 -D' : 'base64 -d';
+-      return s.file ? `${d} ${os === 'darwin' ? '-i ' : ''}${q(s.file)}` : `printf '%s' ${q(s.text ?? '<TEXT>')} | ${d}`;
++      return s.file ? `${d} ${os === 'darwin' ? '-i ' : ''}${q(s.file, { name: 'file' })}` : `printf '%s' ${q(s.text ?? '<TEXT>', { name: 'text' })} | ${d}`;
+     }, {}),
+ 
+   // ---------- processes ----------
+diff --git a/src/fill.js b/src/fill.js
+index ab06388..c27cb2d 100644
+--- a/src/fill.js
++++ b/src/fill.js
+@@ -998,10 +998,11 @@ export function buildCommand(intentId, text, { platform = process.platform, env,
+       for (const [k, v] of Object.entries(vals)) {
+         if (!PATH_SLOTS.has(k) && !RAW_OK[k] && typeof v === 'string' && /^-/.test(v)) { missing.push(k); vals[k] = PLACEHOLDER(k); }
+       }
+-      const pathVals = new Set([...PATH_SLOTS].filter((k) => vals[k] != null).map((k) => String(vals[k])));
+-      const q = (s) => {
+-        const isPath = pathVals.has(String(s));
+-        return quote(isPath && /^-/.test(String(s)) ? './' + s : s, { tilde: isPath });
++      // slot role must be passed explicitly ({ name } or { tilde }); never infer from value
++      // equality — a pattern equal to a path would otherwise be rewritten like a path
++      const q = (s, o = {}) => {
++        const isPath = 'tilde' in o ? !!o.tilde : PATH_SLOTS.has(o.name);
++        return quote(isPath && /^-/.test(String(s)) ? './' + s : s, { ...o, tilde: isPath });
+       };
+       // catalog functions take the OS string, variant functions a ctx object
+       command = tpl(vals, q, tpl === intent.template || tpl === intent.darwin ? e.os : e);
+diff --git a/src/variants.js b/src/variants.js
+index cc734fd..9dc3b85 100644
+--- a/src/variants.js
++++ b/src/variants.js
+@@ -77,12 +77,12 @@ export const VARIANTS = {
+   grep_text: {
+     busybox: 'find {path} -type f«-iname {glob}» -exec grep -Hn -- {pattern} {} +',
+     pwsh: `${PS_FILES}«| Where-Object Name -Like {glob}» | Select-String -CaseSensitive -Pattern {pattern}`,
+-    cmd: (s, q) => `pushd ${q(s.path ?? '.')} && (findstr /s /n /c:${q(s.pattern)} ${s.glob ? q(s.glob) : '*'} & popd)`,
++    cmd: (s, q) => `pushd ${q(s.path ?? '.', { name: 'path' })} && (findstr /s /n /c:${q(s.pattern, { name: 'pattern' })} ${s.glob ? q(s.glob, { name: 'glob' }) : '*'} & popd)`,
+   },
+   grep_files_containing: {
+     busybox: 'find {path} -type f«-iname {glob}» -exec grep -l -- {pattern} {} +',
+     pwsh: `${PS_FILES}«| Where-Object Name -Like {glob}» | Select-String -CaseSensitive -List -Pattern {pattern} | Select-Object -ExpandProperty Path`,
+-    cmd: (s, q) => `pushd ${q(s.path ?? '.')} && (findstr /s /m /c:${q(s.pattern)} ${s.glob ? q(s.glob) : '*'} & popd)`,
++    cmd: (s, q) => `pushd ${q(s.path ?? '.', { name: 'path' })} && (findstr /s /m /c:${q(s.pattern, { name: 'pattern' })} ${s.glob ? q(s.glob, { name: 'glob' }) : '*'} & popd)`,
+   },
+   count_lines: {
+     pwsh: '@(Get-Content -LiteralPath {file}).Count',
+@@ -94,7 +94,7 @@ export const VARIANTS = {
+   },
+   count_files: {
+     pwsh: `(${PS_FILES}«| Where-Object Name -Like {glob}» | Measure-Object).Count`,
+-    cmd: (s, q) => `where /r ${q(s.path ?? '.')} ${s.glob ? q(s.glob) : '*'} | find /c /v ""`,
++    cmd: (s, q) => `where /r ${q(s.path ?? '.', { name: 'path' })} ${s.glob ? q(s.glob, { name: 'glob' }) : '*'} | find /c /v ""`,
+   },
+   count_words: {
+     pwsh: '(Get-Content -LiteralPath {file} -Raw | Measure-Object -Word).Words',
+@@ -191,12 +191,12 @@ export const VARIANTS = {
+     cmd: 'tar -a -c -f {archive} {path}', // bsdtar picks zip format from the .zip suffix
+   },
+   extract_zip: {
+-    pwsh: (s, q) => `Expand-Archive -LiteralPath ${q(s.file)} -DestinationPath ${s.dest ? q(s.dest) : '.'}`,
++    pwsh: (s, q) => `Expand-Archive -LiteralPath ${q(s.file, { name: 'file' })} -DestinationPath ${s.dest ? q(s.dest, { name: 'dest' }) : '.'}`,
+     cmd: '«mkdir {dest} 2>nul & »tar -xf {file}«-C {dest}»',
+   },
+   list_archive: {
+     // bsdtar on Windows lists zip archives too; GNU tar on Linux does not.
+-    pwsh: (s, q, ctx) => (!isWin(ctx) && /\.zip$/i.test(s.file || '') ? `unzip -l ${q(s.file)}` : `tar -tvf ${q(s.file)}`),
++    pwsh: (s, q, ctx) => (!isWin(ctx) && /\.zip$/i.test(s.file || '') ? `unzip -l ${q(s.file, { name: 'file' })}` : `tar -tvf ${q(s.file, { name: 'file' })}`),
+     cmd: 'tar -tvf {file}',
+   },
+   chmod: {
+@@ -240,7 +240,7 @@ export const VARIANTS = {
+     pwsh: 'if (-not (Test-Path -LiteralPath {path} -PathType Container)) { New-Item -ItemType Directory -Path {path} }',
+     // mkdir -p: an existing directory is not an error (cmd's mkdir already creates parents); a trailing \ makes
+     // `if exist` test for a directory, so an existing file of that name still fails like mkdir -p does
+-    cmd: (s, q) => { const p = q(s.path); const dir = /"$/.test(p) ? p.slice(0, -1) + '\\"' : p + '\\'; return `if not exist ${dir} mkdir ${p}`; },
++    cmd: (s, q) => { const p = q(s.path, { name: 'path' }); const dir = /"$/.test(p) ? p.slice(0, -1) + '\\"' : p + '\\'; return `if not exist ${dir} mkdir ${p}`; },
+   },
+   touch_file: {
+     pwsh: 'if (Test-Path -LiteralPath {file}) { (Get-Item -LiteralPath {file}).LastWriteTime = Get-Date } else { New-Item -ItemType File -Path {file} }',
+@@ -285,14 +285,14 @@ export const VARIANTS = {
+   },
+   base64_encode: {
+     pwsh: (s, q) => (s.file
+-      ? `[Convert]::ToBase64String([System.IO.File]::ReadAllBytes((Resolve-Path -LiteralPath ${q(s.file)}).ProviderPath))`
+-      : `[Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes(${q(s.text ?? '<TEXT>')}))`),
++      ? `[Convert]::ToBase64String([System.IO.File]::ReadAllBytes((Resolve-Path -LiteralPath ${q(s.file, { name: 'file' })}).ProviderPath))`
++      : `[Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes(${q(s.text ?? '<TEXT>', { name: 'text' })}))`),
+     gaps: { cmd: 'certutil -encode writes to a file with PEM headers, not to stdout' },
+   },
+   base64_decode: {
+     pwsh: (s, q) => (s.file
+-      ? `[System.Text.Encoding]::UTF8.GetString([Convert]::FromBase64String((Get-Content -LiteralPath ${q(s.file)} -Raw)))`
+-      : `[System.Text.Encoding]::UTF8.GetString([Convert]::FromBase64String(${q(s.text ?? '<TEXT>')}))`),
++      ? `[System.Text.Encoding]::UTF8.GetString([Convert]::FromBase64String((Get-Content -LiteralPath ${q(s.file, { name: 'file' })} -Raw)))`
++      : `[System.Text.Encoding]::UTF8.GetString([Convert]::FromBase64String(${q(s.text ?? '<TEXT>', { name: 'text' })}))`),
+     gaps: { cmd: 'certutil -decode writes to a file, not to stdout' },
+   },
+ 
+@@ -313,11 +313,11 @@ export const VARIANTS = {
+   },
+   kill_by_name: {
+     pwsh: { win: `${PS_PROC_MATCH} | Stop-Process`, unix: 'pkill -f {name}' },
+-    cmd: (s, q) => `taskkill /im ${q(/\.\w+$/.test(s.name) ? s.name : `${s.name}.exe`)}`,
++    cmd: (s, q) => `taskkill /im ${q(/\.\w+$/.test(s.name) ? s.name : `${s.name}.exe`, { name: 'name' })}`,
+   },
+   kill_force: {
+     pwsh: { win: `${PS_PROC_MATCH} | Stop-Process -Force`, unix: 'pkill -9 -f {name}' },
+-    cmd: (s, q) => `taskkill /f /im ${q(/\.\w+$/.test(s.name) ? s.name : `${s.name}.exe`)}`,
++    cmd: (s, q) => `taskkill /f /im ${q(/\.\w+$/.test(s.name) ? s.name : `${s.name}.exe`, { name: 'name' })}`,
+   },
+   kill_by_pid: {
+     // `kill` is an alias of Stop-Process (SIGKILL on Unix) in PowerShell; call the real binary for SIGTERM.
+diff --git a/test/matrix.test.js b/test/matrix.test.js
+index ac57b41..78fa3ca 100644
+--- a/test/matrix.test.js
++++ b/test/matrix.test.js
+@@ -210,3 +210,16 @@ test('cmd: a non-path value ending in \\ is a gap, never silently rewritten', as
+   const r = b('git_commit', { shell: 'cmd', os: 'win32' }, { message: 'Document C:\\' });
+   assert.ok(r.gap || !/C:\\\./.test(r.command), r.command);
+ });
++
++test('cmd: pattern equal to a path slot still gaps (no value-equality tilde inference)', () => {
++  const CMD = { shell: 'cmd', os: 'win32' };
++  const p = 'C:\\Program Files\\';
++  for (const id of ['grep_text', 'grep_files_containing']) {
++    const same = b(id, CMD, { path: p, pattern: p });
++    assert.ok(same.gap, `${id}: expected gap, got ${same.command}`);
++    assert.doesNotMatch(String(same.command || ''), /Program Files\\\./, id);
++    const pathOnly = b(id, CMD, { path: p, pattern: 'x' });
++    assert.match(pathOnly.command, /pushd "C:\\Program Files\\."/, id);
++    assert.match(pathOnly.command, /\/c:x/, id);
++  }
++});
