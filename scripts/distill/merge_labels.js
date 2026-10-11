@@ -52,5 +52,5 @@ for (const l of rj(join(D, 'labels.jsonl'))) {
     spans: null, split: 'train', src: 'teacher', w: W * (r.tmpl ? TW : 1) });
   st.kept++;
 }
-writeFileSync(join(ROOT, 'build/hybrid/train_distill.jsonl'), base + extra.map((r) => JSON.stringify(r)).join('\n') + '\n');
+writeFileSync(join(ROOT, 'build/hybrid/train_distill.jsonl'), base.replace(/\n*$/, '\n') + extra.map((r) => JSON.stringify(r) + '\n').join(''));
 console.log(JSON.stringify(st));

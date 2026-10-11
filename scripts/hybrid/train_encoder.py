@@ -119,7 +119,7 @@ def main():
     random.seed(a.seed)
     torch.manual_seed(a.seed)
     meta = json.load(open(os.path.join(ROOT, 'build/hybrid/meta.json')))
-    rows = [json.loads(l) for l in open(a.train_file, encoding='utf-8')]
+    rows = [json.loads(l) for l in open(a.train_file, encoding='utf-8') if l.strip()]
     rows = [r for r in rows if a.all or r['split'] == 'train']
     tok = AutoTokenizer.from_pretrained(a.base)
     data = encode(tok, rows, meta)
