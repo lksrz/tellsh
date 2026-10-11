@@ -89,22 +89,23 @@ test('paths: the one-argument and the several-argument forms agree', () => {
 });
 
 // ---------- (2) prompt ----------
-test('final3-claude major: a medium-risk command never runs on a plain Enter', () => {
-  const med = confirmRule('medium');
-  for (const a of ['', ' ', 'n', 'no', 'x']) assert.equal(med.accepts(a), false, JSON.stringify(a));
-  for (const a of ['y', 'Y', 'yes', 't', 'tak']) assert.equal(med.accepts(a), true, a);
-  assert.match(med.prompt, /Type y to run/);
-  const high = confirmRule('high');
-  for (const a of ['', 'y', 't']) assert.equal(high.accepts(a), false, JSON.stringify(a));
-  for (const a of ['yes', 'YES', 'tak']) assert.equal(high.accepts(a), true, a);
-  // composed (experimental) is like high; an unknown rating too
-  assert.equal(confirmRule('medium', { composed: true }).accepts('y'), false);
-  assert.equal(confirmRule(undefined).accepts(''), false);
-  // safe: Enter runs
-  for (const a of ['', 'y', 'yes']) assert.equal(confirmRule('safe').accepts(a), true, JSON.stringify(a));
-  // incomplete: never runs as is
-  for (const r of ['safe', 'medium', 'high']) assert.equal(confirmRule(r, { incomplete: true }).accepts('yes'), false, r);
-  // the reviewed medium rows need "y"
+test('0.3.2 UX: Enter runs at every risk level, Esc/Ctrl+C abort, medium/high keep a warning', () => {
+  for (const r of ['safe', 'medium', 'high', undefined]) {
+    const rule = confirmRule(r);
+    for (const k of ['\r', '\n']) assert.equal(rule.decide(k), 'run', `${r} ${JSON.stringify(k)}`);
+    for (const k of ['\x1b', '\x03', 'n', 'q']) assert.equal(rule.decide(k), 'abort', `${r} ${JSON.stringify(k)}`);
+    assert.equal(rule.decide('e'), 'edit');
+    // arrows / other keys / typed words are ignored, never run
+    for (const k of ['\x1b[A', 'y', 'yes', 'x', ' ']) assert.equal(rule.decide(k), null, `${r} ${JSON.stringify(k)}`);
+  }
+  assert.equal(confirmRule('safe').warning, null);
+  assert.match(confirmRule('medium').warning, /Medium risk/);
+  assert.match(confirmRule('high').warning, /High risk/);
+  assert.match(confirmRule(undefined).warning, /High risk/);
+  assert.match(confirmRule('safe', { composed: true }).warning, /Experimental/);
+  // incomplete: never runs as is, Enter opens the editor
+  for (const r of ['safe', 'medium', 'high']) assert.equal(confirmRule(r, { incomplete: true }).decide('\r'), 'edit', r);
+  // the reviewed medium rows still carry the medium warning
   for (const q of ['chmod 777 /srv/my app', 'move /tmp/old notes to /tmp/archive']) assert.equal(run(q).risk, 'medium', q);
 });
 
