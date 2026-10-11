@@ -77,6 +77,8 @@ suggesting a command for …: <reason>" instead of a contradictory "confidence 8
 | tests | 418 | 428 |
 | warm latency p50 (bash, composer off; same machine, varies run to run) | 0.468 ms | 0.478 ms |
 
+- PowerShell/cmd: a quoted `--workspace` value containing spaces or another flag can be split into separate arguments, and an explicit pip `--target` can be dropped (install goes to the active Python). Always read the shown command before confirming.
+
 ### Known limits (close5): what remains of the final4 findings
 
 * **Refused, not rendered.** An exclusion the catalog command cannot express is refused, not rewritten (`kill all python

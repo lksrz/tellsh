@@ -481,6 +481,8 @@ retrain; `npm test && npm run eval`.
   ([HYBRID.md](HYBRID.md#v04-real-usage)).
 * Slot F1 gold set is small (208 requests); relexicalised end-to-end numbers use silver spans for unreplaced values.
 
+- PowerShell/cmd: a quoted `--workspace` value containing spaces or another flag can be split into separate arguments, and an explicit pip `--target` can be dropped (install goes to the active Python). Always read the shown command before confirming.
+
 ## License
 
 MIT (code). Model weights partly derived from tldr-pages (CC-BY-4.0) — see [DATA_LICENSES.md](DATA_LICENSES.md).
