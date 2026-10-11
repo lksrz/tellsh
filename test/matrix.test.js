@@ -198,7 +198,15 @@ test('cmd: a quoted path ending in \\ ends in \\. instead (MSVC argv would read 
   const CMD = { shell: 'cmd', os: 'win32' };
   assert.equal(b('mkdir', CMD, { path: '~/new/' }).command, 'if not exist "%USERPROFILE%\\new\\.\\" mkdir "%USERPROFILE%\\new\\."');
   assert.doesNotMatch(b('compress_targz', CMD, { path: '~/foo/', archive: 'out.tar.gz' }).command, /[^\\]\\"/);
-  for (const c of ['rd /s /q "%USERPROFILE%\\."', 'rd /s "%USERPROFILE%\\"', 'rd /s /q "%USERPROFILE%"', 'del /s /q "%USERPROFILE%\\*"', 'rd /s /q "C:\\Users"', 'rd /s /q C:\\Windows\\', 'rd /s /q "C:\\Program Files\\."'])
+  for (const c of ['rd /s /q "%USERPROFILE%\\."', 'rd /s "%USERPROFILE%\\"', 'rd /s /q "%USERPROFILE%"', 'del /s /q "%USERPROFILE%\\*"', 'rd /s /q "C:\\Users"', 'rd /s /q C:\\Windows\\', 'rd /s /q "C:\\Program Files\\."', 'rd /s /q C:\\.', 'rd /s /q \\.'])
     assert.equal(checkDanger(c, 'high', { rendered: true, shell: 'cmd', os: 'win32' }).critical, true, c);
   assert.notEqual(checkDanger('rd /s /q "%USERPROFILE%\\foo"', 'high', { rendered: true, shell: 'cmd', os: 'win32' }).critical, true);
+});
+
+test('cmd: a non-path value ending in \\ is a gap, never silently rewritten', async () => {
+  const { cmdQuote, UnquotableError } = await import('../src/render.js');
+  assert.throws(() => cmdQuote('Document C:\\', { tilde: false }), UnquotableError);
+  assert.equal(cmdQuote('a\\', { tilde: false }), 'a\\');
+  const r = b('git_commit', { shell: 'cmd', os: 'win32' }, { message: 'Document C:\\' });
+  assert.ok(r.gap || !/C:\\\./.test(r.command), r.command);
 });

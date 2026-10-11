@@ -81,7 +81,11 @@ export function cmdQuote(value, { tilde: expand = true, attached = false } = {})
   // a closing quote after a backslash ("x\\") is an escaped quote for MSVC-parsed programs (where, tar, git) and
   // bsdtar rejects a doubled one; dropping it would let copy/move create a file. "x\\." keeps the directory meaning
   // for built-ins and native programs alike (checked on Windows: copy, if exist, where /r, dir, tar, forfiles, rmdir)
-  s = s.replace(/\\+$/, '\\.');
+  if (/\\$/.test(s)) {
+    // only a path may change form; a message or pattern ending in \ has no safe cmd.exe spelling (reported as a gap)
+    if (!expand) throw new UnquotableError(`value ${JSON.stringify(String(value))} ends in \\ and cannot be quoted safely for cmd.exe`);
+    s = s.replace(/\\+$/, '\\.');
+  }
   return '"' + s + '"';
 }
 
