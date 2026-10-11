@@ -235,6 +235,13 @@ const DEFAULT_MAC_PATH = '/usr/bin:/bin:/usr/sbin:/sbin';
 // The environment of every spawned process is built from an allowlist, never inherited wholesale: GIT_DIR / GIT_WORK_TREE /
 // GIT_CONFIG_* would point git at a real repository, BASH_ENV / ENV / ZDOTDIR would run startup files, etc.
 const KEEP_ENV = /^(PATH|PATHEXT|SystemRoot|SYSTEMROOT|windir|WINDIR|ComSpec|COMSPEC|SystemDrive|TEMP|TMP|TMPDIR|OS|NUMBER_OF_PROCESSORS|PROCESSOR_\w+|ProgramFiles|ProgramFiles\(x86\)|ProgramW6432|ProgramData|CommonProgramFiles|CommonProgramFiles\(x86\)|CommonProgramW6432|PSModulePath|USER|LOGNAME|USERNAME|USERDOMAIN|COMPUTERNAME|LANG|TERM)$/;
+// a cases file is trusted input, but its cwd must still resolve inside the fixture
+function inside(root, rel) {
+  const p = path.resolve(root, rel || '.');
+  if (p !== path.resolve(root) && !p.startsWith(path.resolve(root) + path.sep)) throw new Error(`cwd escapes the fixture: ${rel}`);
+  return p;
+}
+
 function cleanEnv(home) {
   const env = {};
   for (const [k, v] of Object.entries(process.env)) if (KEEP_ENV.test(k)) env[k] = v;
@@ -255,7 +262,7 @@ function run(casesFile, out) {
   const { platform, container, cases } = JSON.parse(fs.readFileSync(casesFile, 'utf8'));
   // a cases file generated with --container runs high-risk cells: refuse that anywhere but inside a container
   const inContainer = fs.existsSync('/.dockerenv') || fs.existsSync('/run/.containerenv');
-  if (container && !inContainer) {
+  if (!inContainer) {
     for (const c of cases) if (c.exec && c.exec.run && (c.risk === 'high' || c.critical)) c.exec = { run: false, why: 'risk high: container only' };
   }
   const tmp = fs.mkdtempSync(path.join(os.tmpdir(), 'tellsh-matrix-'));
@@ -330,7 +337,7 @@ function run(casesFile, out) {
       if (c.env.shell === 'powershell') body = `$ProgressPreference = 'SilentlyContinue'\n${c.command}\nif (-not $?) { exit 1 }\n`;
       if (c.env.shell === 'cmd') body = `@echo off\r\n${c.command}\r\n`;
       fs.writeFileSync(scriptFile, body + '\n');
-      const p = spawnSync(sh.bin, sh.file(scriptFile), { cwd: path.join(fixture, c.exec.cwd), env: envVars, encoding: 'utf8', timeout: 20000, input: '', maxBuffer: 8 << 20 });
+      const p = spawnSync(sh.bin, sh.file(scriptFile), { cwd: inside(fixture, c.exec.cwd), env: envVars, encoding: 'utf8', timeout: 20000, input: '', maxBuffer: 8 << 20 });
       res.exit = p.error && p.error.code === 'ETIMEDOUT' ? 'timeout' : p.status;
       res.stdout = (p.stdout || '').slice(0, 600);
       res.stderr = (p.stderr || '').slice(0, 600);
@@ -405,5 +412,5 @@ const flags = new Set(args.filter((a) => a.startsWith('--')));
 const pos = args.filter((a) => !a.startsWith('--'));
 if (mode === 'gen') await gen(pos[0], pos[1], { container: flags.has('--container') });
 else if (mode === 'run') run(pos[0], pos[1]);
-else if (mode === 'report') { const bi = args.indexOf('--before'); const before = bi >= 0 ? args[bi + 1].split(',') : []; report(pos.filter((x) => x !== args[bi + 1]), { before }); }
+else if (mode === 'report') { const bi = args.indexOf('--before'); const bv = bi >= 0 ? args[bi + 1] : null; if (bi >= 0 && !bv) { console.error('--before needs a comma-separated list'); process.exit(2); } const before = bv ? bv.split(',') : []; report(pos.filter((x) => x !== bv), { before }); }
 else { console.error('usage: matrix.js gen <linux|busybox|darwin|win32> [out] [--container] | run <cases> [out] | report <results...>'); process.exit(2); }

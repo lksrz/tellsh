@@ -156,3 +156,18 @@ test('New-Item: -Target alias and pipeline input are content writes', () => {
     assert.notEqual(checkDanger(c, 'safe', { rendered: true, shell: 'powershell' }).risk, 'safe', c);
   assert.equal(checkDanger("New-Item -ItemType Directory -Path 'x'", 'safe', { rendered: true, shell: 'powershell' }).risk, 'safe');
 });
+
+test('cmd: type nul >> a & a real redirect stays a write', () => {
+  assert.notEqual(checkDanger('type nul >> a.txt & echo x > b.txt', 'safe', { rendered: true, shell: 'cmd', os: 'win32' }).risk, 'safe');
+});
+
+test('matrix report: without --before every results file is kept', () => {
+  const dir = mkdtempSync(join(tmpdir(), 'mxr-'));
+  try {
+    const res = (platform) => JSON.stringify({ platform, results: [{ id: 'list_files', label: 'bash/' + platform, status: 'pass' }] });
+    writeFileSync(join(dir, 'a.json'), res('linux')); writeFileSync(join(dir, 'b.json'), res('darwin'));
+    const r = spawnSync(process.execPath, [join(process.cwd(), 'scripts/matrix.js'), 'report', join(dir, 'a.json'), join(dir, 'b.json')], { encoding: 'utf8', cwd: dir });
+    const md = readFileSync(join(dir, 'MATRIX.md'), 'utf8');
+    assert.match(md, /linux/); assert.match(md, /darwin/);
+  } finally { rmSync(dir, { recursive: true, force: true }); }
+});
