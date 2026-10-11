@@ -634,10 +634,10 @@ export const VARIANTS = {
   gh_auth_status: { pwsh: 'gh auth status', cmd: 'gh auth status' },
   gh_auth_login: { pwsh: 'gh auth login', cmd: 'gh auth login' },
   gh_pr_list: { pwsh: 'gh pr list', cmd: 'gh pr list' },
-  gh_pr_view: { pwsh: 'gh pr view«{pr!raw}»', cmd: 'gh pr view«{pr!raw}»' },
+  gh_pr_view: { pwsh: 'gh pr view«{pr!raw}»«--repo {repo!raw}»', cmd: 'gh pr view«{pr!raw}»«--repo {repo!raw}»' },
   gh_pr_create: { pwsh: 'gh pr create --fill', cmd: 'gh pr create --fill' },
-  gh_pr_checks: { pwsh: 'gh pr checks«{pr!raw}»', cmd: 'gh pr checks«{pr!raw}»' },
-  gh_pr_merge: { pwsh: 'gh pr merge«{pr!raw}»', cmd: 'gh pr merge«{pr!raw}»' },
+  gh_pr_checks: { pwsh: 'gh pr checks«{pr!raw}»«--repo {repo!raw}»', cmd: 'gh pr checks«{pr!raw}»«--repo {repo!raw}»' },
+  gh_pr_merge: { pwsh: 'gh pr merge«{pr!raw}»«--repo {repo!raw}»', cmd: 'gh pr merge«{pr!raw}»«--repo {repo!raw}»' },
   gh_run_list: { pwsh: 'gh run list', cmd: 'gh run list' },
   gh_run_view: { pwsh: 'gh run view«{num!raw}»', cmd: 'gh run view«{num!raw}»' },
   activate_venv: {

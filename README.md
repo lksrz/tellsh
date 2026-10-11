@@ -142,7 +142,8 @@ feature/login`, also quoted, `merge pull request "feature/login"`, never a bare 
 pull request; a word that may not be a branch, `merge pr main`, gives `gh pr merge <PR>`, while `feature/apply` or
 `hotfix/weekly` are kept; a number counts only next to "pr" (`pr 45`, `pr #45`) or as `#45` right after the verb: `merge pr with 2 approvals`,
 `merge pr for issue #45` and `merge the pr that closes #12` give `gh pr merge <PR>`; "merge that pr" after `gh pr view 45`
-gives `gh pr merge 45`, after any other command `gh pr merge <PR>`). A package version constraint is kept
+gives `gh pr merge 45`, after any other command, a trailing `cd` or under `GH_REPO` `gh pr merge <PR>`; `merge the other pr`
+or `merge my last pr` give `gh pr merge <PR>`; a named repository is kept, `merge pr 45 in repo a/b` -> `gh pr merge 45 --repo a/b`). A package version constraint is kept
 (`install requests==2.32.0 with pip` -> `python3 -m pip install requests==2.32.0`). Installs, project scripts (also every `npx wrangler` command: `npx` prefers a project-local binary,
 and `wrangler dev` runs the project's build command), deploys, merges, secrets and tunnels are `medium` risk, so `--yes`
 never runs them.

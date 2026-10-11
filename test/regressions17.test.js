@@ -31,9 +31,13 @@ test('major: a number that is not next to "pr" is never the pull request', () =>
 
 test('major: a named pull request that does not parse is withheld, never a bare merge', () => {
   for (const env of SHELLS) {
-    for (const q of ["merge pr feature/x's", "merge pr it's-fix", "merge pr bob's", 'merge pr bob’s', 'merge pr in repo v2']) {
+    for (const q of ["merge pr feature/x's", "merge pr it's-fix", "merge pr bob's", 'merge pr bob’s']) {
       withheld(run(q, null, env), 'gh pr merge <PR>', 'pr', `${env.shell}: ${q}`);
     }
+    // (round 18: the unreadable repository is withheld as well)
+    const r = run('merge pr in repo v2', null, env);
+    assert.equal(r.command, 'gh pr merge <PR> --repo <REPO>', env.shell);
+    assert.deepEqual(r.missing.sort(), ['pr', 'repo'], env.shell);
   }
   // nothing named: the current branch's pull request, as before
   for (const q of ['merge pr', 'merge the pr', 'merge pr now', 'merge pr for review']) assert.equal(run(q).command, 'gh pr merge', q);
@@ -53,7 +57,8 @@ test('major: history replay keeps the placeholder of an optional operand it with
 
 test('minor: abbreviations, hosts and issues are not pull request selectors', () => {
   for (const q of ['merge pr e.g. main', 'merge pr w/o checks', 'merge pr on github.com']) withheld(run(q), 'gh pr merge <PR>', 'pr', q);
-  withheld(run('close pr for issue 45'), 'gh pr view <PR>', 'pr');
+  // (round 18: closing a pull request is not supported: refused, never `gh pr view`)
+  assert.equal(run('close pr for issue 45').understood, false);
 });
 
 test('minor: clustered -p and more root-changing systemd-run properties keep history paths ambiguous', () => {

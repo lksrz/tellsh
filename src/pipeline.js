@@ -86,7 +86,7 @@ const VALID_SLOT = {
   branch: (v) => /^(?!-)[\w./-]{1,100}$/.test(v), user: (v) => /^[a-z_][\w.-]{0,31}$/i.test(v),
   glob: (v) => /^\*\.[\w]{1,8}$/.test(v),
   url: (v) => v.length < 2048 && (/^(?:https?|ftp|ftps|ssh|git|file):\/\/[^\s/?#]*[^\s]*$/i.test(v) || /^(?!-)[\w.-]+@[\w.-]+:[^\s]+$/.test(v)),
-  pr: (v) => RAW_OK.pr(v),
+  pr: (v) => RAW_OK.pr(v), repo: (v) => RAW_OK.repo(v),
   host: (v) => /^(?!-)[\w.@:-]+$/.test(v), target: (v) => /^(?!-)[\w.@:-]+$/.test(v),
   pattern: (v) => v.length < 300 && !/[\n\0]/.test(v), message: (v) => v.length < 300 && !/\0/.test(v),
   old: (v) => v.length > 0 && v.length < 300 && !/[\n\r\0]/.test(v), new: (v) => v.length < 300 && !/[\n\r\0]/.test(v),
@@ -94,6 +94,10 @@ const VALID_SLOT = {
 const PATH_SLOT_NAMES = new Set(['path', 'file', 'src', 'dst', 'dest', 'archive']);
 // "that pr", "this pull request", "the same pr": a pull request named by reference
 const PR_REFERENCE = /\b(?:that|this|its|the\s+same|the\s+previous|the\s+last|ten|tego|tamten)\s+(?:\w+\s+)?(?:prs?|pull[\s-]+requests?)\b/i;
+// "the other pr", "the latest pr", "my last pull request", "the most recent pr": a pull request picked out among several, which
+// neither the current branch's pull request nor the one of the previous command is (withheld, also with history)
+const PR_PICKED = /\b(?:(?:the|a|an|my|our|your|his|her|their|some|any)\s+)?(?:other|another|latest|newest|most\s+recent|recent|oldest|older|newer|earlier|next|first|second|third|new|old|pending|approved|remaining|(?:(?:my|our|your|his|her|their)\s+)(?:last|previous|prior)|inn[yaeoy]\w*|ostatni\w*|najnowsz\w*|poprzedni\w*|kolejn\w*|nastepn\w*|następn\w*|starsz\w*)\s+(?:(?:open|opened|draft|merged|github)\s+)?(?:prs?|pull[\s-]+requests?)\b/i;
+const PR_CLOSE = /(?:^|[\s,;])(?:close|closing|shut|reject|decline|abandon|zamkn\S*)(?=[\s.,!?;:]|$)/i;
 // slots naming the one thing a command acts on, other than a path (not free text: pattern, message, glob, ...)
 const OPERAND_SLOT_NAMES = new Set(['name', 'service', 'container', 'pkg', 'host', 'target', 'branch', 'user', 'script', 'url', 'pid']);
 for (const k of PATH_SLOT_NAMES) if (k !== 'path') VALID_SLOT[k] = VALID_SLOT.path;
@@ -156,7 +160,7 @@ export function resolveWithTagger(intentId, text, { model = getModel(), tool, mo
   // an operand the request names but that is not a valid value (`npm install @types/node;rm`): placeholder, never
   // silently dropped from an optional part of the template (`npm install`)
   const invalidOperands = [];
-  for (const k of ['pkg', 'name', 'service', 'container', 'cmd', 'branch', 'user', 'pr']) {
+  for (const k of ['pkg', 'name', 'service', 'container', 'cmd', 'branch', 'user', 'pr', 'repo']) {
     if (!usesSlot(intent, k) || slots[k] != null || withheld.includes(k)) continue;
     if ([rT[k], rR[k]].some((v) => typeof v === 'string' && v !== '' && !validSlot(k, v))) { withheld.push(k); invalidOperands.push(k); }
   }
@@ -369,6 +373,11 @@ export function suggest(query, opts = {}) {
     }
     return { ...out, understood: false, method: 'none', hint, composeError: comp?.invalid || null };
   }
+  // "close that pr", "close pr 45": the catalog has no command that closes a pull request; the opposite one (`gh pr create`)
+  // or another one (`gh pr view 45`) is never suggested in its place
+  if (['gh_pr_create', 'gh_pr_view', 'gh_pr_checks'].includes(intent) && PR_CLOSE.test(query)) {
+    return { ...out, understood: false, method: 'none', hint: 'closing a pull request is not supported (gh pr close <PR>)' };
+  }
 
   const r = resolveWithTagger(intent, query, { model, tool: FAMILY_OF[intent], mode: opts.slotMode, tagger: opts.tagger });
   const slots = r.slots;
@@ -528,6 +537,14 @@ export function suggest(query, opts = {}) {
     for (const k of withheld) { blank.add(k); keep.add(k); }
     if (withheld.length) { context.rule = 'refused'; context.note = `previous ${sb.lastIntent} has ${withheld.join(', ')} that depends on the shell state or is not a valid value; not guessing`; }
     finalizeSlots(it, slots);
+  }
+  // "merge the other pr", "merge my last pr": not the previous command's pull request either, unless the request names one;
+  // "merge that pr in repo a/b": the previous command's pull request was one of the working directory's repository
+  if (usesSlot(BY_ID[intent], 'pr') && (slots.pr == null || r.sources.pr === 'history') && (PR_PICKED.test(query) || (r.sources.pr === 'history' && slots.repo != null))) {
+    delete slots.pr; delete r.sources.pr;
+    blank.add('pr'); keep.add('pr');
+    context.rule = ctx ? 'refused' : context.rule;
+    if (ctx) context.note = 'the request means a pull request (another one, or one in another repository) the history does not name; not guessing';
   }
   // "merge that pr" with no history to read it from: the pull request is withheld, never the current branch's
   if (!ref && slots.pr == null && usesSlot(BY_ID[intent], 'pr') && PR_REFERENCE.test(query)) {

@@ -22,6 +22,8 @@ export const RAW_OK = {
   start: (v) => /^\d{1,9}$/.test(String(v)) && +v > 0,
   end: (v) => /^\d{1,9}$/.test(String(v)) && +v > 0,
   num: (v) => /^\d{1,12}$/.test(String(v)),
+  // a repository as gh -R takes it: [HOST/]OWNER/REPO
+  repo: (v) => /^(?:[\w-]+(?:\.[\w-]+)+\/)?[\w-][\w.-]{0,99}\/[\w-][\w.-]{0,99}$/.test(String(v)) && !/\.\./.test(String(v)),
   // a pull request as gh selects it: number, URL or head branch
   pr: (v) => (/^\d+$/.test(String(v)) ? /^[1-9]\d{0,11}$/.test(String(v)) : /^https:\/\/github\.com\/[\w.-]+\/[\w.-]+\/pull\/\d{1,12}\/?$/.test(String(v)) || /^(?![-.])(?!.*\.\.)[\w./-]{1,100}$/.test(String(v))),
 };
@@ -97,6 +99,20 @@ function prSelector(ex) {
   const after = p ? text.slice(p.index + p[0].length) : '';
   if (ex.numbers?.length || /\d/.test(text) || /[/_#'"`„“”’]|\w[.-]\w/.test(after) || PR_BRANCH_NAMED.test(after)) return '?';
   return null;
+}
+// "--repo a/b", "-R a/b", "in (the) repo(sitory) a/b", "in the a/b repo"; "in the other repo", "in another repository": named,
+// not readable ("this repo", "the current repository" are the working directory's)
+const PR_REPO_OPT = /(?:^|\s)(?:--repo(?:=|\s+|$)|-R(?:=|\s*))(\S*)/;
+const PR_REPO = /\b(?:in|of|on|from|for|at|to)\s+(?:the\s+|a\s+)?(?:github\s+)?(?:repo|repository|repozytorium)\s+(\S+)|\b(?:in|of|on|from|for|at|to)\s+(?:the\s+|a\s+)?(\S+(?:\s+\S+)?)\s+(?:github\s+)?(?:repo|repository)\b|\b(?:w|z)\s+repozytorium\s+(\S+)/i;
+const PR_REPO_HERE = /^(?:this|current|the\s+current|same|the\s+same|our|my|local|the\s+local|tym|tego|bieżącym|biezacym)$/i;
+/** The repository a gh pr request names: { repo (a value, or `?` when it is not readable), rest (the text without it) } or null. */
+function prRepo(text) {
+  const m = text.match(PR_REPO_OPT) || text.match(PR_REPO);
+  if (!m) return null;
+  const w = (m[1] ?? m[2] ?? m[3] ?? '').replace(/[.,!?;:]+$/, '').replace(/^["'`]|["'`]$/g, '');
+  if (m[2] != null && PR_REPO_HERE.test(w)) return null;
+  const rest = (text.slice(0, m.index) + ' ' + text.slice(m.index + m[0].length)).replace(/\s+/g, ' ').trim();
+  return { repo: RAW_OK.repo(w) ? w : '?', rest };
 }
 const PATH_SLOTS = new Set(['path', 'file', 'src', 'dst', 'dest', 'archive']);
 const PLACEHOLDER = (name) => `<${name.toUpperCase()}>`;
@@ -197,10 +213,15 @@ export function resolveSlots(intent, ex) {
     delete v.count;
   }
   if (has('pr')) {
+    // "merge pr 45 in repository other/repo", "… --repo other/repo": the repository is kept (`--repo`), an unreadable one
+    // ("in the other repo", "in repo v2") withheld, never dropped; gh needs a pull request named with it
+    const rq = has('repo') ? prRepo(String(ex.text)) : null;
+    if (rq) v.repo = rq.repo;
     // the pull request the user names: a URL or a branch is kept as it is (validation withholds an odd one), never
     // dropped for a bare `gh pr merge`, which acts on the current branch's pull request
-    const sel = prSelector(ex);
+    const sel = prSelector(rq ? { ...ex, text: rq.rest, numbers: (rq.rest.match(/\d+/g) || []).map(Number), quoted: ex.quoted.filter((q) => rq.rest.includes(q)) } : ex);
     if (sel != null) v.pr = String(sel).replace(/^#(?=\d)/, '');
+    else if (rq) v.pr = '?';
     delete v.count;
   }
   if (ex.ext) v.glob = `*.${ex.ext}`;

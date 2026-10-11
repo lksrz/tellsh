@@ -297,6 +297,11 @@ function staleRelative(ents, slots) {
   if (slots) for (const k of PATH_SLOT_KEYS) if (slots[k] != null && !isAmbiguous(slots[k]) && isRelativePath(slots[k])) slots[k] = AMB + slots[k];
 }
 
+/** Mark a pull request / branch as ambiguous (after a cd): it names one only in the repository of the working directory. */
+function staleRepo(ents, slots) {
+  for (const o of [ents, slots || {}]) for (const t of ['pr', 'branch']) if (o[t] != null && !isAmbiguous(o[t])) o[t] = AMB + rawOf(o[t]);
+}
+
 // output/input redirection operator words (splitCommand keepRedirects): `>`, `2>>`, `&>`, `>|`, `<`, `>&`
 const REDIR_TARGET_OP = /^\d*(?:[<>]{1,2}[&|]?|&>>?)$/;
 const REDIR_DUP_OP = /^\d*[<>]+&[\d-]+$/;
@@ -438,6 +443,7 @@ export function analyzeCommand(line, classify, kind = 'posix') {
   let intentStale = false;
   let cdAt = -1;
   let scoped = false;
+  let exportedScope = false;
   let wrapCwd = false;
   const subCds = new Set(); // ids of `( … )` subshells in which a cd ran (posix)
   let searchDir = false;
@@ -473,10 +479,14 @@ export function analyzeCommand(line, classify, kind = 'posix') {
       for (const x of ENT_TYPES) listed[x] = segIdx;
       w = [];
     }
+    // `export GH_REPO=a/b; gh pr view 45`, `$env:DOCKER_HOST = …`: the later commands of the line are scoped as well
+    const rw = raw.map((x) => String(rawOf(x)));
+    if ((/^(?:export|declare|typeset|set)$/.test(rw[0]) && rw.slice(1).some((x) => SCOPE_ENV.test(x))) ||
+      /^\$env:(\w+)$/i.test(rw[0]) && SCOPE_ENV.test(rw[0].slice(5) + '=')) exportedScope = true;
     if (w.length) segmentEnts(w, e, setIntent, split, k, segIdx, firstWord);
     // `git -C /repo blame notes.txt`, `docker --context prod logs web`: "delete it" / "stop it" here would hit a
     // different file / container than the one the command used (never resolved, never repeated)
-    if (w.length && scopedElsewhere(w, raw)) {
+    if (w.length && scopedElsewhere(w, raw, exportedScope)) {
       scoped = true;
       for (const x of [...ENT_TYPES, 'current', 'created']) if (e[x] != null && !isAmbiguous(e[x])) e[x] = AMB + rawOf(e[x]);
       if (segIntentAt === segIdx) { segSlots = { ...segSlots }; markScoped(segSlots); }
@@ -519,6 +529,7 @@ export function analyzeCommand(line, classify, kind = 'posix') {
       cdAt = segIdx;
       if (k === 'posix' && subs) subCds.add(subs[subs.length - 1]);
       staleRelative(ents, null);
+      staleRepo(ents, null);
       const target = w.slice(1).filter((a) => !/^-/.test(a))[0];
       if (target != null && !isAmbiguous(target) && !isRelativePath(target) && target !== '-') e.dir = target;
       else e.dir = AMB + (target ?? '-');
@@ -551,7 +562,7 @@ export function analyzeCommand(line, classify, kind = 'posix') {
     ents = { ...ents, ...ie };
   } else if (segIntent) {
     intent = segIntent; slots = { ...segSlots };
-    if (segIntentAt < cdAt) staleRelative({}, slots);
+    if (segIntentAt < cdAt) { staleRelative({}, slots); staleRepo({}, slots); }
     // `kill 1111; ls newdir`: another command ran after the one tellsh could repeat
     if (split.segments.slice(segIntentAt, -1).some((s) => s.sep !== '|')) intentStale = true;
   }
@@ -583,14 +594,17 @@ const SCOPE_OPTS = {
   git: /^-C|^--(?:git-dir|work-tree|namespace)(?:=|$)/,
   docker: /^-[Hc]|^--(?:host|context|config)(?:=|$)/,
   podman: /^-c|^--(?:connection|url|root|runroot|identity|ssh)(?:=|$)/,
+  // gh has no global options: GH_REPO / GH_HOST (also exported earlier in the line) point it at another repository
+  gh: /^-R|^--repo(?:=|$)/,
 };
-const SCOPE_ENV = /^(?:GIT_DIR|GIT_WORK_TREE|GIT_NAMESPACE|DOCKER_HOST|DOCKER_CONTEXT|DOCKER_CONFIG|CONTAINER_HOST|CONTAINER_CONNECTION)=/;
+const SCOPE_ENV = /^(?:GIT_DIR|GIT_WORK_TREE|GIT_NAMESPACE|DOCKER_HOST|DOCKER_CONTEXT|DOCKER_CONFIG|CONTAINER_HOST|CONTAINER_CONNECTION|GH_REPO|GH_HOST)=/;
 /** `git -C /repo …`, `docker --context prod …`, `DOCKER_HOST=… docker …` (w: the unwrapped words, raw: before unwrap). */
-function scopedElsewhere(w, raw) {
+function scopedElsewhere(w, raw, exported = false) {
   if (isAmbiguous(w[0])) return false;
   const head = String(w[0]).replace(/^.*[\\/]/, '').replace(/\.exe$/i, '').toLowerCase();
   const re = SCOPE_OPTS[head];
   if (!re) return false;
+  if (exported) return true;
   if (raw.slice(0, raw.length - w.length).some((x) => SCOPE_ENV.test(String(x)))) return true;
   const args = w.slice(1);
   return args.slice(0, args.length - afterGlobals(head, args).length).some((a) => re.test(String(a)));
@@ -877,9 +891,10 @@ const ENT_TYPES = ['container', 'service', 'pid', 'proc', 'port', 'file', 'dir',
 // gh pr subcommands whose operand selects one pull request, and the options of those that take a value
 const GH_PR_SELECTS = new Set(['view', 'checkout', 'co', 'merge', 'close', 'reopen', 'diff', 'checks', 'review', 'ready', 'edit', 'comment']);
 const GH_PR_VALUE_OPTS = new Set(['-R', '--repo', '--json', '-q', '--jq', '-t', '--template', '--title', '-b', '--body', '-F',
-  '--body-file', '--subject', '-A', '--author-email', '--match-head-commit', '-B', '--base', '--branch', '-a', '--add-assignee',
+  '--body-file', '--subject', '-A', '--author-email', '--match-head-commit', '-B', '--base', '--branch', '--add-assignee',
   '--remove-assignee', '-l', '--add-label', '--remove-label', '-m', '--milestone', '-p', '--add-project', '--remove-project',
-  '--add-reviewer', '--remove-reviewer', '-c', '--comment', '-e', '--color']);
+  '--add-reviewer', '--remove-reviewer', '--color']);
+// (`view -c` is --comments, `review -c` / `-a` are --comment / --approve, `comment -e` is --editor: switches, no value)
 
 /**
  * Build the context object from history commands (oldest first). Only the single most recent command is a

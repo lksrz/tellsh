@@ -281,10 +281,10 @@ export const INTENTS = [
   T('gh_auth_status', 'Show GitHub CLI login status', 'gh auth status', {}),
   T('gh_auth_login', 'Log in to GitHub with the gh CLI', 'gh auth login', {}),
   T('gh_pr_list', 'List pull requests of the repository', 'gh pr list', {}),
-  T('gh_pr_view', 'Show a pull request', 'gh pr view«{pr!raw}»', {}),
+  T('gh_pr_view', 'Show a pull request', 'gh pr view«{pr!raw}»«--repo {repo!raw}»', {}),
   T('gh_pr_create', 'Create a pull request from the current branch', 'gh pr create --fill', {}, 'medium'),
-  T('gh_pr_checks', 'Show CI check status of a pull request', 'gh pr checks«{pr!raw}»', {}),
-  T('gh_pr_merge', 'Merge a pull request', 'gh pr merge«{pr!raw}»', {}, 'medium'),
+  T('gh_pr_checks', 'Show CI check status of a pull request', 'gh pr checks«{pr!raw}»«--repo {repo!raw}»', {}),
+  T('gh_pr_merge', 'Merge a pull request', 'gh pr merge«{pr!raw}»«--repo {repo!raw}»', {}, 'medium'),
   T('gh_run_list', 'List recent GitHub Actions workflow runs', 'gh run list', {}),
   T('gh_run_view', 'Show a GitHub Actions run (and its failed logs)', 'gh run view«{num!raw}»', {}),
 ];
