@@ -82,7 +82,7 @@ test('cmd: mkdir -p semantics, dotfiles in hidden_files, no admin-only disk_free
   const h = b('hidden_files', CMD, { path: 'my docs' });
   assert.equal(h.command, 'pushd "my docs" && (dir /a:h /b 2>nul & dir /a /b .* & popd)');
   assert.equal(h.risk, 'safe');
-  assert.equal(b('hidden_files', CMD, { path: '~' }).command, 'pushd %USERPROFILE% && (dir /a:h /b 2>nul & dir /a /b .* & popd)');
+  assert.equal(b('hidden_files', CMD, { path: '~' }).command, 'pushd "%USERPROFILE%" && (dir /a:h /b 2>nul & dir /a /b .* & popd)');
   assert.equal(b('hidden_files', CMD, { path: '~/my docs' }).command, 'pushd "%USERPROFILE%\\my docs" && (dir /a:h /b 2>nul & dir /a /b .* & popd)');
   assert.ok(b('disk_free', CMD, {}).gap);
 });
@@ -170,4 +170,18 @@ test('matrix report: without --before every results file is kept', () => {
     const md = readFileSync(join(dir, 'MATRIX.md'), 'utf8');
     assert.match(md, /linux/); assert.match(md, /darwin/);
   } finally { rmSync(dir, { recursive: true, force: true }); }
+});
+
+test('cmd: ~ paths become a double-quoted %USERPROFILE% (a user name may contain a space)', async () => {
+  const { cmdQuote, psQuote } = await import('../src/render.js');
+  assert.equal(cmdQuote('~'), '"%USERPROFILE%"');
+  assert.equal(cmdQuote('~/foo'), '"%USERPROFILE%\\foo"');
+  assert.equal(cmdQuote('~/my docs'), '"%USERPROFILE%\\my docs"');
+  assert.equal(psQuote('~/foo'), '"$HOME/foo"');
+  for (const [id, slots] of [['delete_dir', { path: '~/foo' }], ['mkdir', { path: '~/foo' }], ['hidden_files', { path: '~' }], ['list_files', { path: '~/foo' }]]) {
+    const r = buildCommand(id, slots, { shell: 'cmd', os: 'win32' });
+    if (r.gap) continue;
+    assert.doesNotMatch(r.command, /(?<!")%USERPROFILE%/, `${id}: ${r.command}`);
+  }
+  assert.equal(checkDanger('rd /s /q "%USERPROFILE%"', 'high', { rendered: true, shell: 'cmd', os: 'win32' }).critical, true);
 });

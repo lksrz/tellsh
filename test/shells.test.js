@@ -124,7 +124,7 @@ test('fish / PowerShell / cmd quoting rules', () => {
   assert.throws(() => cmdQuote('a "b"'), /cmd.exe/);
   assert.throws(() => cmdQuote('%PATH%'), /cmd.exe/);
   assert.equal(cmdQuote('a b'), '"a b"');
-  assert.equal(cmdQuote('~/Downloads'), '%USERPROFILE%\\Downloads');
+  assert.equal(cmdQuote('~/Downloads'), '"%USERPROFILE%\\Downloads"');
 });
 
 test('per-shell variants: intent shared, rendering differs', () => {

@@ -265,7 +265,7 @@ test('cmd.exe: values with % ! or " are refused instead of being expanded', () =
   const r = buildCommand('cat_file', '', { env: { shell: 'cmd', os: 'win32', coreutils: 'gnu' }, resolved: { file: '%USERNAME%.txt' } });
   assert.equal(r.command, null);
   assert.match(r.gap, /cmd\.exe/);
-  assert.equal(cmdQuote('~/Downloads'), '%USERPROFILE%\\Downloads');
+  assert.equal(cmdQuote('~/Downloads'), '"%USERPROFILE%\\Downloads"');
 });
 
 // ---------------------------------------------------------------------------------------------
