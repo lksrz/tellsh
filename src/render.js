@@ -78,7 +78,9 @@ export function cmdQuote(value, { tilde: expand = true, attached = false } = {})
   if (expand || /^[A-Za-z]:|%USERPROFILE%/.test(s)) s = s.replace(/\//g, '\\');
   // an expanded %VAR% may contain spaces (C:\Users\John Smith): always double-quote it
   if (!s.includes('%') && /^[A-Za-z0-9_\\.:@+=-]+$/.test(s)) return s;
-  return '"' + s + '"';
+  // a closing quote after a backslash ("C:\\x\\") is an escaped quote for MSVC-parsed programs (where, tar, git...):
+  // double the trailing backslash; cmd built-ins read the doubled separator as one
+  return '"' + s.replace(/\\$/, '\\\\') + '"';
 }
 
 export const QUOTE = { bash: shQuote, zsh: shQuote, sh: shQuote, fish: fishQuote, powershell: psQuote, cmd: cmdQuote };

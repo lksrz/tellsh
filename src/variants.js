@@ -240,7 +240,7 @@ export const VARIANTS = {
     pwsh: 'if (-not (Test-Path -LiteralPath {path} -PathType Container)) { New-Item -ItemType Directory -Path {path} }',
     // mkdir -p: an existing directory is not an error (cmd's mkdir already creates parents); a trailing \ makes
     // `if exist` test for a directory, so an existing file of that name still fails like mkdir -p does
-    cmd: (s, q) => { const p = q(s.path); const dir = /"$/.test(p) ? p.slice(0, -1) + '\\"' : p + '\\'; return `if not exist ${dir} mkdir ${p}`; },
+    cmd: (s, q) => { const p = q(s.path); const dir = /\\\\"$/.test(p) ? p : /"$/.test(p) ? p.slice(0, -1) + '\\"' : p + '\\'; return `if not exist ${dir} mkdir ${p}`; },
   },
   touch_file: {
     pwsh: 'if (Test-Path -LiteralPath {file}) { (Get-Item -LiteralPath {file}).LastWriteTime = Get-Date } else { New-Item -ItemType File -Path {file} }',
