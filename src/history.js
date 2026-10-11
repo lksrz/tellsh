@@ -630,13 +630,14 @@ const WRAPPER_HOST = {
 };
 // wrappers that always run the command on another machine / container (`machinectl shell web ps -p 42`)
 const HOST_WRAPPERS = new Set(['machinectl']);
-// unit properties (`systemd-run -p WorkingDirectory=/srv …`, `-pX=…`, `--property=X=…`, `--property X=…`, also run0) that
-// run the command in another directory ('cwd') or under another root / mounts / namespaces ('root')
+// unit properties (`systemd-run -p WorkingDirectory=/srv …`, `-pX=…`, `--property=X=…`, `--property X=…`, clustered after
+// flags that take no value `-tp X=…` / `-tpX=…`, also run0) that run the command in another directory ('cwd') or under
+// another root / mounts / namespaces ('root')
 const PROP_WRAPPERS = new Set(['systemd-run', 'run0']);
-const PROP_OPT = /^(?:-p|--property)$/;
-const PROP_ATTACHED = /^(?:-p|--property=)(.+)$/;
+const PROP_OPT = /^(?:-[tPqGdSr]*p|--property)$/;
+const PROP_ATTACHED = /^(?:-[tPqGdSr]*p|--property=)(.+)$/;
 const PROP_CWD = /^WorkingDirectory=/i;
-const PROP_ROOT = /^(?:RootDirectory|RootImage|RootEphemeral|MountImages|ExtensionImages|ExtensionDirectories|BindPaths|BindReadOnlyPaths|TemporaryFileSystem|PrivateTmp|PrivateMounts|MountAPIVFS|PrivatePIDs|PrivateNetwork|NetworkNamespacePath|IPCNamespacePath|PrivateUsers|JoinsNamespaceOf)=/i;
+const PROP_ROOT = /^(?:RootDirectory|RootImage|RootEphemeral|MountImages|ExtensionImages|ExtensionDirectories|BindPaths|BindReadOnlyPaths|TemporaryFileSystem|PrivateTmp|PrivateMounts|MountAPIVFS|PrivatePIDs|PrivateNetwork|NetworkNamespacePath|IPCNamespacePath|PrivateUsers|JoinsNamespaceOf|PrivateIPC|PrivateDevices)=|^ProtectHome=tmpfs\b/i;
 /**
  * 'root' when a wrapper in the removed prefix of `raw` (before the unwrapped words `w`) runs the command under another
  * root (every path names something else), 'cwd' when it runs it in another working directory (relative paths do).
@@ -1111,10 +1112,11 @@ export function resolveReference(query, ctx) {
   if (named.length && !types?.length) {
     return { rule: 'refused', intent: null, ent: named[0], blank: [...new Set(named.flatMap((t) => SLOT_FROM_ENT[t] || []))], note: `the previous command names no ${named[0]}; not guessing` };
   }
-  // "delete it" after `ls`, `clear`, `make`: nothing in the previous command it could mean
+  // "delete it" after `ls`, `clear`, `make`: nothing in the previous command it could mean (blanket: every slot type is
+  // withheld, an optional one is simply left out: "push it" after `git commit` is `git push`)
   if (!ctx.entOrder.length) {
     const listed = Object.keys(ctx.listing || {});
-    return { rule: 'refused', intent: null, blank: [...new Set(Object.values(SLOT_FROM_ENT).flat())],
+    return { rule: 'refused', intent: null, blanket: true, blank: [...new Set(Object.values(SLOT_FROM_ENT).flat())],
       note: listed.length ? `the previous command listed ${listed.join('/')} values; the reference may mean any of them; not guessing`
         : 'the previous command names nothing the reference could mean; not guessing' };
   }

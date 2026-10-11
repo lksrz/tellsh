@@ -147,6 +147,16 @@ for branch status`). A quoted target ends at its matching quote (`"bob's-fix"` i
 similar) scope history values like `--working-directory` / `chroot` (`systemd-run -p RootDirectory=/srv cat /etc/x` +
 "delete it" no longer gives a host-side `rm /etc/x`). Every eval number is unchanged. Bench re-run.
 
+**Round 16 (review r15; A unchanged, A+B policy unchanged).** A number names the pull request only right after "pr" /
+"pull request" (`pr 45`, `pr #45`, `pr number 45`) or as `#45`; any other number is no longer used
+(`merge pr with 2 approvals`, `merge my pr from 2 days ago`, `merge the 2 open prs` gave `gh pr merge 2`; now
+`gh pr merge <PR>`). A request that names a pull request the parser cannot read (`merge pr bob's`, `merge pr feature/x's`,
+`merge pr in repo v2`), an abbreviation (`e.g.`, `w/o`), a host (`on github.com`) or `issue 45` is withheld as `<PR>`, never
+a bare `gh pr merge`. History replay keeps the placeholder of an optional operand it withholds ("same but merge" after
+`tellsh merge pr nightly` is `gh pr merge <PR>`, "same for foo/bar" after `npm install lodash` is `npm install <PKG>`; both
+were bare). Clustered `systemd-run -tp WorkingDirectory=…` and `PrivateIPC=`, `PrivateDevices=`, `ProtectHome=tmpfs` scope
+history values. Every eval number is unchanged. Bench re-run.
+
 <!-- eval:start -->
 ## Model
 
@@ -289,13 +299,13 @@ Machine: Intel(R) Xeon(R) Processor, Node v20.19.2, linux; CPU affinity: `0` (ru
 
 | measurement | p50 | p95 | runs |
 |---|---|---|---|
-| bare `node -e 0` startup (baseline) | 86.4 ms | 90.4 ms | 10 |
-| **cold**: `node bin/tellsh.js --dry-run --json --shell bash <query>` (new process, model load, full pipeline) | **175.6 ms** | **202.4 ms** | 40 |
-| model load (in-process, one-off) | 5.1 ms | – | 1 |
-| **warm**: full cascade + tagger + render (bash, composer off) | **0.415 ms** | **4.5 ms** | 2000 |
-| warm, incl. composer modifier check (shipped default) | 0.644 ms | 7.4 ms | 2000 |
-| warm, PowerShell rendering | 0.365 ms | 0.856 ms | 2000 |
-| warm, 5 history lines given (only the previous one is read; context build + reference rules) | 0.695 ms | 7.2 ms | 2000 |
+| bare `node -e 0` startup (baseline) | 84.1 ms | 91.1 ms | 10 |
+| **cold**: `node bin/tellsh.js --dry-run --json --shell bash <query>` (new process, model load, full pipeline) | **179.3 ms** | **233.9 ms** | 40 |
+| model load (in-process, one-off) | 5.3 ms | – | 1 |
+| **warm**: full cascade + tagger + render (bash, composer off) | **0.400 ms** | **4.5 ms** | 2000 |
+| warm, incl. composer modifier check (shipped default) | 0.606 ms | 7.4 ms | 2000 |
+| warm, PowerShell rendering | 0.376 ms | 0.775 ms | 2000 |
+| warm, 5 history lines given (only the previous one is read; context build + reference rules) | 0.708 ms | 7.3 ms | 2000 |
 
 The composer runs `bash -n` (a subprocess, ~2 ms) only when it actually returns a composed command.
 <!-- bench:end -->

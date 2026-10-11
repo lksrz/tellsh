@@ -293,7 +293,7 @@ export function suggest(query, opts = {}) {
       blank.push(ref.changed);
       delete slots[ref.changed];
     }
-    const b = buildCommand(ref.intent, query, { env, resolved: finalizeSlots(BY_ID[ref.intent], slots), blank });
+    const b = buildCommand(ref.intent, query, { env, resolved: finalizeSlots(BY_ID[ref.intent], slots), blank, keepOptional: blank });
     const res = { ...base, understood: true, method: 'history-rule', confidence: 1, tool: FAMILY_OF[ref.intent], candidates: [], tools: [], ...b };
     const punct = blank.filter((k) => !invalidHistorySlots(ref.slots).includes(k));
     if (punct.length) res.warnings = [...(res.warnings || []), `path left as a placeholder: unclear whether the trailing punctuation is part of the name (${punct.join(', ')}); quote the path`];
@@ -376,6 +376,9 @@ export function suggest(query, opts = {}) {
   // slots that were withheld on purpose: rendered as placeholders, never replaced by a catalog default
   // (an ambiguous `/tmp/data!` must not turn `find {path} … -delete` into `find . … -delete`)
   const blank = new Set(r.withheld || []);
+  // withheld operands whose optional part keeps its placeholder: an invalid operand, a history value that is ambiguous or
+  // invalid (`gh pr merge <PR>` for "same but merge" after `tellsh merge pr nightly`, never the current branch's pull request)
+  const keep = new Set(r.invalidOperands);
   if (BY_ID[intent].risk !== 'safe') {
     for (const k of Object.keys(slots)) {
       if (PATH_SLOT_NAMES.has(k) && r.sources[k] !== 'history' && trailingPunctAfter(query, slots[k])) { ambiguousPaths.push(`${k}=${slots[k]}`); delete slots[k]; delete r.sources[k]; blank.add(k); }
@@ -469,7 +472,7 @@ export function suggest(query, opts = {}) {
   if (ref?.rule === 'refused') {
     // the reference points at something we cannot read safely: leave the slot empty (placeholder)
     refWordsOnly();
-    for (const k of refDst ? [] : ref.blank || []) if (slots[k] == null && usesSlot(BY_ID[intent], k)) blank.add(k);
+    for (const k of refDst ? [] : ref.blank || []) if (slots[k] == null && usesSlot(BY_ID[intent], k)) { blank.add(k); if (!ref.blanket) keep.add(k); }
     finalizeSlots(BY_ID[intent], slots);
     method = 'history-rule';
   }
@@ -500,7 +503,7 @@ export function suggest(query, opts = {}) {
       if (!validSlot(k, v)) {
         // the referenced value cannot be used (too long, a newline, ...): placeholder, never the catalog default
         if (slots[k] != null && PRONOUN_VALUE.test(String(slots[k]))) { delete slots[k]; delete r.sources[k]; }
-        if (slots[k] == null && usesSlot(it, k)) blank.add(k);
+        if (slots[k] == null && usesSlot(it, k)) { blank.add(k); keep.add(k); }
         continue;
       }
       // the referenced value wins unless the request spells out its own value literally ("kill 4242")
@@ -520,11 +523,11 @@ export function suggest(query, opts = {}) {
     // a slot of the previous command that depends on the shell state (`find "$DIR" …`) or is not a valid value
     // (a 300-character path): placeholder, not `.`
     const withheld = [...(sb.blank || []), ...invalidHistorySlots(sb.lastSlots)].filter((k) => usesSlot(it, k) && slots[k] == null && !['namepat', 'sedexpr'].includes(k));
-    for (const k of withheld) blank.add(k);
+    for (const k of withheld) { blank.add(k); keep.add(k); }
     if (withheld.length) { context.rule = 'refused'; context.note = `previous ${sb.lastIntent} has ${withheld.join(', ')} that depends on the shell state or is not a valid value; not guessing`; }
     finalizeSlots(it, slots);
   }
-  let b = buildCommand(intent, query, { env, resolved: slots, blank: [...blank], keepOptional: r.invalidOperands });
+  let b = buildCommand(intent, query, { env, resolved: slots, blank: [...blank], keepOptional: [...keep] });
   // implicit reference: a required slot is still missing and the history has a value of that type.
   // Only for safe intents: a destructive command ("delete the folder") is never aimed at a history
   // value without an explicit reference word ("delete it"), which goes through resolveReference.
@@ -539,7 +542,7 @@ export function suggest(query, opts = {}) {
     }
     if (filled.length) {
       finalizeSlots(BY_ID[intent], slots);
-      b = buildCommand(intent, query, { env, resolved: slots, blank: [...blank], keepOptional: r.invalidOperands });
+      b = buildCommand(intent, query, { env, resolved: slots, blank: [...blank], keepOptional: [...keep] });
       method = 'history-rule'; // history-derived: never auto-run by --yes
       context.rule ??= 'implicit';
       context.note = [context.note, `filled from history: ${filled.join(', ')}`].filter(Boolean).join('; ');

@@ -31,33 +31,57 @@ export const RAW_OK = {
 // close, `'it''s'`, is m[7] and withheld)
 const PR_SELECTOR = /\b(?:pull[\s-]+requests?|pr|prs)\s+((?:(?:for|of|on|from|branch|number|no\.?|nr\.?)\s+)*)(?:(?:"([^"]*)"|'([^']*)'|`([^`]*)`|[„“”]([^„“”"]*)[“”])(?=[\s.,!?;:]|$)|(#?[^\s"'`„“”]+?)[.,!?]?(?=\s|$)|(["'`„“”]))/i;
 // a function or describing word after "pull request" is not a selector ("merge the pull request and …", "merge pr now",
-// "check pr status", "view pull request on github", "merge pr by bob", "merge pull request quickly", "view pr from yesterday");
-// only checked for an unmarked word (`feature/apply`, `fix-reply`, `#12-only` are selectors); another unmarked word,
-// `nightly`, is withheld
-const PR_NOT_SELECTOR = /^(?:the|a|an|this|that|it|its|my|our|your|their|me|us|you|him|her|them|and|or|then|now|please|pls|into|to|with|in|at|by|is|was|which|again|request|requests|status|state|checks?|details?|info|summary|description|diff|changes|comments?|github|gh|web|browser|online|here|there|today|yesterday|tomorrow|earlier|later|review|fork|upstream|fast|asap|already|first|too|also|quickly|immediately|directly|safely|manually|automatically|finally|only|just|really|simply|properly|carefully|right|soon|instantly)$/i;
+// "check pr status", "view pull request on github", "merge pr by bob", "merge pull request quickly", "view pr from yesterday",
+// "close pr for issue 45"); only checked for an unmarked word (`feature/apply`, `fix-reply`, `#12-only` are selectors);
+// another unmarked word, `nightly`, is withheld
+const PR_NOT_SELECTOR = /^(?:the|a|an|this|that|it|its|my|our|your|their|me|us|you|him|her|them|and|or|then|now|please|pls|into|to|with|without|in|at|by|is|was|which|again|request|requests|status|state|checks?|details?|info|summary|description|diff|changes|comments?|github|gh|web|browser|online|here|there|today|yesterday|tomorrow|earlier|later|review|fork|upstream|fast|asap|already|first|too|also|quickly|immediately|directly|safely|manually|automatically|finally|only|just|really|simply|properly|carefully|right|soon|instantly|issues?|tickets?|bugs?)$/i;
 // an unmarked word (no digit, '/', '-', '_', '.', '#') names a branch only after "branch", "for" or "from" ("merge pr from bob");
 // otherwise it is withheld (the `?` fails validation)
 const PR_MARKED = /[\d/_.#-]/;
-/** The pull request the user names (quoted: kept as written, validation withholds an odd one), else null. */
+// an abbreviation ("merge pr e.g. main", "merge pr w/o checks") or a host ("merge pr on github.com") is not a branch
+const PR_ABBREV = /^(?:e\.g|i\.e|w\/o|w\/|etc|vs|cf|a\.k\.a|n\/a|b\/c)$/i;
+const PR_HOST = /^(?:[\w-]+\.)+(?:com|org|net|io|dev|app|co|me)$/i;
+// a number names the pull request only right after "pr" / "pull request" (`pr 45`, `pr #45`, `pr number 45`) or as `#45`
+const PR_NUMBER_LEAD = /^(?:(?:number|no\.?|nr\.?)\s+)*$/i;
+const PR_WORD = /\b(?:pull[\s-]+requests?|pr|prs)\b/i;
+/**
+ * The pull request the user names (quoted: kept as written, validation withholds an odd one), else null (`gh pr merge`
+ * acts on the current branch's pull request). A number elsewhere in the request ("merge pr with 2 approvals", "merge the
+ * 2 open prs") is never the pull request; a request that names something the parser cannot read (`bob's`, `in repo v2`)
+ * is withheld (`?`, shown as `<PR>`), never a bare `gh pr merge`.
+ */
 function prSelector(ex) {
   if (ex.urls[0] != null) return ex.urls[0];
-  const m = String(ex.text).match(PR_SELECTOR);
+  const text = String(ex.text);
+  const m = text.match(PR_SELECTOR);
   if (m) {
     const quoted = m[2] ?? m[3] ?? m[4] ?? m[5];
     if (quoted != null) return quoted || '?'; // `""`: named but empty, withheld
     if (m[7] != null) return '?'; // an unclosed / odd quote: withheld
     const w = m[6];
+    const branch = /\bbranch\s+$/i.test(m[1]);
+    // "merge my pr from 2 days ago", "view pr for 3 days": a number after a connective is not the pull request
+    if (/^\d+$/.test(w)) return branch || PR_NUMBER_LEAD.test(m[1]) ? w : '?';
+    if (PR_ABBREV.test(w) || (PR_HOST.test(w) && !branch)) return '?';
     if (PR_MARKED.test(w)) return w;
     // "merge pr for branch status": after "branch" any word is the selector, a describing one is withheld
-    if (/\bbranch\s+$/i.test(m[1])) return PR_NOT_SELECTOR.test(w) ? `?${w}` : w;
+    if (branch) return PR_NOT_SELECTOR.test(w) ? `?${w}` : w;
     if (!PR_NOT_SELECTOR.test(w)) {
       if (/\b(?:for|from)\s+$/i.test(m[1])) return w;
       // "merge pr main": a bare word may be a branch or say something else: withheld (`gh pr merge <PR>`), never dropped
       return `?${w}`;
     }
   }
+  const hash = text.match(/(?:^|\s)#(\d{1,12})(?=[\s.,!?;:]|$)/);
+  if (hash) return hash[1];
   // 'merge the "feature/login" pull request': an explicitly quoted value is the target
-  return ex.quoted.length ? ex.quoted[0] : null;
+  if (ex.quoted.length) return ex.quoted[0];
+  // named but not readable: a number anywhere ("merge the 2 open prs", "merge pr in 2 minutes"), or a marked word or a
+  // quote after "pr" ("merge pr bob's", "merge pr feature/x's", "merge pr in repo v2"): withheld
+  const p = text.match(PR_WORD);
+  const after = p ? text.slice(p.index + p[0].length) : '';
+  if (ex.numbers?.length || /\d/.test(text) || /[/_#'"`„“”’]|\w[.-]\w/.test(after)) return '?';
+  return null;
 }
 const PATH_SLOTS = new Set(['path', 'file', 'src', 'dst', 'dest', 'archive']);
 const PLACEHOLDER = (name) => `<${name.toUpperCase()}>`;
@@ -161,9 +185,7 @@ export function resolveSlots(intent, ex) {
     // the pull request the user names: a URL or a branch is kept as it is (validation withholds an odd one), never
     // dropped for a bare `gh pr merge`, which acts on the current branch's pull request
     const sel = prSelector(ex);
-    const n = ex.pid ?? ex.numbers?.find((x) => x > 0) ?? ex.count;
     if (sel != null) v.pr = String(sel).replace(/^#(?=\d)/, '');
-    else if (n != null) v.pr = n;
     delete v.count;
   }
   if (ex.ext) v.glob = `*.${ex.ext}`;
@@ -239,8 +261,8 @@ export function render(template, values, required = [], quote = shQuote, keepOpt
       const r = seg.replace(/\{(\w+)(!raw)?\}/g, (m2, n2, raw2) => {
         if (!ok) return m2;
         const val = renderValue(n2, !!raw2, values, quote);
-        // an operand the request named but that is not valid (keepOptional) keeps its placeholder: the optional part
-        // is not silently dropped (`npm install <PKG>`, never `npm install`)
+        // an operand withheld on purpose (keepOptional: an invalid operand, an unresolved history value) keeps its
+        // placeholder: the optional part is not silently dropped (`npm install <PKG>`, never `npm install`)
         if (val == null && keepOptional.includes(n2)) { missing.push(n2); return PLACEHOLDER(n2); }
         if (val == null) { ok = false; return m2; }
         return val;
