@@ -5,9 +5,9 @@
 // Output is PRIVATE: $TELLSH_DISTILL_DIR (default /workspace/tellsh-data/distill)/pool.jsonl
 //   {id, text, lang, shell, os, src, tmpl, gold|null, cands:[intent...]}   (gold = dataset/public label, may be null)
 //   node scripts/distill/make_pool.js [--k 8] [--max 60000]
-import { readFileSync, readdirSync, existsSync, mkdirSync, writeFileSync } from 'node:fs';
+import { readFileSync, readdirSync, existsSync, mkdirSync, writeFileSync, realpathSync } from 'node:fs';
 import { createHash } from 'node:crypto';
-import { join, relative, resolve, isAbsolute, sep } from 'node:path';
+import { join, relative, resolve, isAbsolute, sep, basename, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { exclusionIndex } from '../lib/heldout.js';
 import { readReal } from '../real/real_rows.js';
@@ -22,7 +22,8 @@ const OUT = process.env.TELLSH_DISTILL_DIR || '/workspace/tellsh-data/distill';
 const args = process.argv.slice(2);
 const arg = (k, d) => { const i = args.indexOf(k); return i >= 0 ? args[i + 1] : d; };
 // private output must stay outside the repo (or inside gitignored build/)
-{ const rel = relative(ROOT, resolve(OUT)); if (!rel.startsWith('..') && !isAbsolute(rel) && !(rel === 'build' || rel.startsWith('build' + sep))) { console.error(`make_pool: ${OUT} is inside the repo; use a path outside it or under build/`); process.exit(1); } }
+{ const real = (p) => { let q = resolve(p); const tail = []; while (!existsSync(q)) { tail.unshift(basename(q)); q = dirname(q); } return join(realpathSync(q), ...tail); };
+  const rel = relative(realpathSync(ROOT), real(OUT)); if (!(rel === '..' || rel.startsWith('..' + sep)) && !isAbsolute(rel) && !(rel === 'build' || rel.startsWith('build' + sep))) { console.error(`make_pool: ${OUT} is inside the repo; use a path outside it or under build/`); process.exit(1); } }
 const K = +arg('--k', 8), MAX = +arg('--max', 60000);
 const rj = (p) => (existsSync(p) ? readFileSync(p, 'utf8').split('\n').filter((l) => l.trim()).map((l) => JSON.parse(l)) : []);
 const rd = (d) => (existsSync(d) ? readdirSync(d).filter((f) => f.endsWith('.jsonl')).sort().flatMap((f) => rj(join(d, f))) : []);
@@ -41,16 +42,19 @@ const src = [
   ...[...rd(join(ROOT, 'data/intents')), ...rj(join(ROOT, 'data/shell/train.jsonl'))].map((r) => ({ ...r, src: 'public', gold: r.intent })),
 ];
 const seen = new Set(), pool = [];
-const push = (r, text, s) => {
+const blocked = (text) => { const n = normalize(text); return !n || dev.has(n) || excl.has(text) || excl.has(n); };
+const push = (r, text, s, parent) => {
   const n = normalize(text);
-  if (!n || seen.has(n) || dev.has(n) || excl.has(text) || excl.has(n)) return;
+  if (seen.has(n) || blocked(text)) return;
   seen.add(n);
-  pool.push({ text, lang: r.lang || '', shell: r.shell || 'bash', os: r.os || 'linux', src: s, tmpl: !!r.tmpl, gold: r.gold ?? null });
+  pool.push({ text, ...(parent ? { parent } : {}), lang: r.lang || '', shell: r.shell || 'bash', os: r.os || 'linux', src: s, tmpl: !!r.tmpl, gold: r.gold ?? null });
 };
 for (const r0 of src) {
   const r = decided(r0); if (!r) continue;
+  // a dev / held-out sentence is not paraphrased either (relex swaps values, which would defeat the near-key match)
+  if (blocked(r.text)) continue;
   push(r, r.text, r.src);
-  if (r.src === 'public' && r.intent) { const x = relex(r.text, silverSpans(r.text, r.intent).spans, { lang: r.lang || 'en', rng, split: 'train' }).text; if (x && x !== r.text) push(r, x, 'public-relex'); }
+  if (r.src === 'public' && r.intent) { const x = relex(r.text, silverSpans(r.text, r.intent).spans, { lang: r.lang || 'en', rng, split: 'train' }).text; if (x && x !== r.text) push(r, x, 'public-relex', r.text); }
 }
 // deterministic subsample: non-template rows (public and real) first, then template-generated real rows, each by hash
 pool.sort((a, b) => (a.tmpl - b.tmpl) || fnv1a(a.text) - fnv1a(b.text));

@@ -25,7 +25,10 @@ const want = existsSync(join(D, 'pool.sha256')) ? readFileSync(join(D, 'pool.sha
 if (!want || createHash('sha256').update(poolBody).digest('hex') !== want) { console.error('merge_labels: pool.jsonl changed since labelling (or no pool.sha256); relabel'); process.exit(1); }
 const excl = exclusionIndex(ROOT);
 const dev = new Set(JSON.parse(readFileSync(join(ROOT, 'build/hybrid/dev_texts.json'), 'utf8')));
-const dropped = new Set(rj(join(ROOT, 'data/teacher/decisions.jsonl')).filter((d) => d.text && d.field !== 'risk' && d.action === 'drop').map((d) => normalize(d.text)));
+const decisions = rj(join(ROOT, 'data/teacher/decisions.jsonl')).filter((d) => d.text && d.field !== 'risk');
+const dropped = new Set(decisions.filter((d) => d.action === 'drop').map((d) => normalize(d.text)));
+const relabel = new Map(decisions.filter((d) => d.action === 'relabel' && d.intent).map((d) => [normalize(d.text), d.intent]));
+const TW = Number.isFinite(parseFloat(process.env.TELLSH_TMPL_W)) ? parseFloat(process.env.TELLSH_TMPL_W) : 1;
 const pool = new Map(rj(join(D, 'pool.jsonl')).map((r) => [r.id, r]));
 const base = readFileSync(join(ROOT, 'build/hybrid/train.jsonl'), 'utf8');
 const st = { labels: 0, kept: 0, lowConf: 0, goldConflict: 0, none: 0, heldOut: 0 };
@@ -33,17 +36,20 @@ const extra = [];
 for (const l of rj(join(D, 'labels.jsonl'))) {
   st.labels++;
   const r = pool.get(l.id); if (!r) continue;
-  if (l.h && l.h !== createHash('sha1').update(r.text).digest('hex').slice(0, 12)) { console.error(`merge_labels: label ${l.id} does not match the pool text`); process.exit(1); }
-  if (excl.has(r.text) || dev.has(normalize(r.text)) || dropped.has(normalize(r.text))) { st.heldOut++; continue; }
+  if (!l.h || l.h !== createHash('sha1').update(r.text).digest('hex').slice(0, 12)) { console.error(`merge_labels: label ${l.id} does not match the pool text`); process.exit(1); }
+  const bad = (t) => excl.has(t) || dev.has(normalize(t)) || dropped.has(normalize(t));
+  // relex copies: the parent sentence must pass too; copies from pools without provenance are skipped
+  if (bad(r.text) || (r.src === 'public-relex' && (!r.parent || bad(r.parent)))) { st.heldOut++; continue; }
+  const gold = relabel.get(normalize(r.parent || r.text)) || r.gold;
   if (l.soft[l.top] < MINP) { st.lowConf++; continue; }
   // teacher 'none' = no candidate fits; pool rows are shell requests (real out-of-catalog commands included), never
   // chit-chat, so they must not become NONE (tool-head rejection) rows: skip them
   if (l.top === 'none') { st.none++; continue; }
   let intent = l.top;
-  if (r.gold && intent !== r.gold) { st.goldConflict++; if (!TRUST) continue; }
+  if (gold && intent !== gold) { st.goldConflict++; if (!TRUST) continue; }
   const soft = Object.fromEntries(Object.entries(l.soft).filter(([k]) => k !== 'none'));
   extra.push({ text: r.text, tool: FAMILY_OF[intent], intent: '', soft, lang: r.lang, shell: r.shell, os: r.os,
-    spans: null, split: 'train', src: 'teacher', w: r.tmpl ? W / 2 : W });
+    spans: null, split: 'train', src: 'teacher', w: W * (r.tmpl ? TW : 1) });
   st.kept++;
 }
 writeFileSync(join(ROOT, 'build/hybrid/train_distill.jsonl'), base + extra.map((r) => JSON.stringify(r)).join('\n') + '\n');

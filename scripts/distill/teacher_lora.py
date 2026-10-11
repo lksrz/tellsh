@@ -82,7 +82,7 @@ def label(a):
         for l in open(a.out):
             if not l.strip(): continue
             x = json.loads(l)
-            if 'h' in x and pool_h.get(x['id']) != x['h']: sys.exit(f'label: {a.out} was made for a different pool (id {x["id"]}); use a new --out')
+            if pool_h.get(x['id']) != x.get('h'): sys.exit(f'label: {a.out} was made for a different pool (id {x["id"]}); use a new --out')
             done.add(x['id'])
     out = open(a.out, 'a')
     for l in open(a.pool):
@@ -119,13 +119,15 @@ if __name__ == '__main__':
     ap.add_argument('--k', type=int, default=8); ap.add_argument('--max-rows', type=int, default=40000)
     a = ap.parse_args()
     # adapters and labels come from private text: refuse an output inside a git work tree unless under its build/
-    d = os.path.abspath(a.out)
+    out_real = os.path.realpath(a.out)
+    d = out_real
     while True:
-        up = os.path.dirname(d)
-        if os.path.isdir(os.path.join(up, '.git')) or os.path.isfile(os.path.join(up, '.git')):
-            rel = os.path.relpath(os.path.abspath(a.out), up)
+        up = d
+        if os.path.exists(os.path.join(up, '.git')):
+            rel = os.path.relpath(out_real, up)
             if not (rel == 'build' or rel.startswith('build' + os.sep)): sys.exit(f'refusing --out inside the repo {up} (use a path outside it or under build/)')
             break
-        if up == d: break
-        d = up
+        nxt = os.path.dirname(d)
+        if nxt == d: break
+        d = nxt
     train(a) if a.cmd == 'train' else label(a)
