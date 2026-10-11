@@ -637,7 +637,17 @@ const flagKey = (head, f) => {
 // a word that is an option: -x, --long, -Param (PowerShell), /x (cmd.exe, short: never a path like /tmp); `-3`, `-10M`
 // (find -mtime -3) and `-` (stdin) are values
 const isFlag = (w) => /^-(?!\d)[^\s]/.test(w) && w !== '--' || /^\/[A-Za-z?]{1,2}(?::\S*)?$/.test(w) || /^\/[+-]\w*$/.test(w);
-const baseName = (w) => String(w).replace(/^.*[\\/]/, '').replace(/\.exe$/i, '').toLowerCase();
+// the program as written: a path (`./x`, `/tmp/ls`, `C:\\t\\ls.exe`) is not the allowlisted program of the same name
+const baseName = (w) => String(w).replace(/\.exe$/i, '').toLowerCase();
+// a value the catalog renders where the tokenizer expects a program, by its shape: a number (`(Get-Date).AddMinutes(-4320)`),
+// an argument list item (`.Replace('a', 'b')`), an environment variable (`$env:FOO`). Any other word is a program as written.
+export const headKey = (w) => {
+  const x = baseName(w);
+  if (/^-?\d+(?:\.\d+)?$/.test(x)) return '<num>';
+  if (/,$/.test(x) && x.length > 1) return '<arg>,';
+  if (/^\$env:[a-z_]\w*$/.test(x)) return '$env:<var>';
+  return x;
+};
 
 /**
  * The shape of one simple command: { head, key (head + known subcommand words), flags, assign, rest }.
@@ -648,7 +658,7 @@ export function commandShape(words, { known, literal = () => true } = {}) {
   let i = 0;
   const assign = [];
   while (i < words.length && /^[A-Za-z_]\w*=/.test(words[i])) assign.push(words[i++]);
-  const head = baseName(words[i] ?? '');
+  const head = headKey(words[i] ?? '');
   let key = head;
   let j = i + 1;
   const depth = SUB_DEPTH[head] ?? 0;
@@ -676,9 +686,26 @@ const SSH_OPTARG = /^-[BbcDEeFIiJLlmOoPpQRSWw]$/;
 const sshOperands = (words) => { let n = 0; for (let k = 1; k < words.length; k++) { if (SSH_OPTARG.test(words[k])) k++; else if (!/^-/.test(words[k])) n++; } return n; };
 // shell keywords in front of a command (`… do taskkill`, `else New-Item …`, `& 'node'`): syntax, not a wrapper
 export const KEYWORDS = new Set(['then', 'do', 'else', 'elif', '&', '!', 'time']);
-// a piece of a PowerShell expression the tokenizer splits off (`$_.Length -gt 1MB`, `.Count`, `-Force`, `[math]::Round`):
-// not a program (a `$`-named program is high risk by the rule above)
-export const FRAGMENT = /^(?:[$@[(,*{}<%]|-|\d|\.[\w.:])|,$/;
+// `$(…)`, `` `…` `` (also inside "…") and `<(…)` / `>(…)` outside '…' run a command the allowlist cannot see as written;
+// `$((…))` with an arithmetic body is arithmetic, not a command
+export function substitution(command) {
+  const s = String(command);
+  let dq = false;
+  for (let i = 0; i < s.length; i++) {
+    const c = s[i];
+    if (c === '\\') { i++; continue; }
+    if (c === "'" && !dq) { const j = s.indexOf("'", i + 1); if (j < 0) return null; i = j; continue; }
+    if (c === '"') { dq = !dq; continue; }
+    if (c === '`') return 'command';
+    if (c === '$' && s[i + 1] === '(') {
+      const m = s.slice(i).match(/^\$\(\(([^()]*(?:\([^()]*\)[^()]*)*)\)\)/);
+      if (m && !m[1].includes('$(') && /^[\w\s+\-*/%$]*$/.test(m[1].replace(/[()]/g, ''))) { i += m[0].length - 1; continue; }
+      return 'command';
+    }
+    if (!dq && (c === '<' || c === '>') && s[i + 1] === '(') return 'process';
+  }
+  return null;
+}
 
 let PREFIXES = null;
 /** Problems the allowlist finds in a command ([] when every simple command, subcommand and flag is known). */
@@ -691,9 +718,11 @@ export function allowlistProblems(command, { extra = null } = {}) {
   const out = [];
   const seen = new Set();
   const add = (m) => { if (!seen.has(m)) { seen.add(m); out.push(m); } };
+  const subst = substitution(command);
+  if (subst) add(`runs a ${subst} substitution; not on the allowlist`);
   for (let words of [...simpleCommands(command), ...simpleCommands(command, { winPaths: true })]) {
     while (words.length && KEYWORDS.has(String(words[0]).toLowerCase())) words = words.slice(1);
-    if (!words.length || FRAGMENT.test(String(words[0]))) continue;
+    if (!words.length) continue;
     const sh = commandShape(words, { known: (k) => keyFlags(k) != null || prefix(k) });
     if (sh.assign.length) add(`sets environment variables for the command (${sh.assign.map((a) => a.split('=')[0]).join(', ')}); not on the allowlist`);
     if (!sh.head) continue;

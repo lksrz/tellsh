@@ -138,7 +138,7 @@ test('rule 2: wrappers, assignments, unknown programs, subcommands and flags are
   assert.equal(checkDanger('rm -rf /').critical, true);
 });
 
-test('rule 2: every catalog command is on the allowlist (only its sudo, bash -c and xargs wrappers escalate)', async () => {
+test('rule 2: every catalog command is on the allowlist (only its sudo, bash -c and xargs wrappers and the substitution of a high-risk intent escalate)', async () => {
   const { INTENTS } = await import('../src/catalog.js');
   const { buildCommand } = await import('../src/fill.js');
   const V = { path: 'dir', file: 'f.txt', src: 'a.txt', dst: 'b.txt', dest: 'd', archive: 'x.tar.gz', count: 5, depth: 2, size: '10M',
@@ -150,7 +150,8 @@ test('rule 2: every catalog command is on the allowlist (only its sudo, bash -c 
     for (const env of [BASH, { shell: 'zsh', os: 'darwin', coreutils: 'bsd' }, { shell: 'fish', os: 'linux' }, { shell: 'powershell', os: 'win32' }, { shell: 'cmd', os: 'win32' }]) {
       const r = buildCommand(it.id, '', { env, resolved: { ...V } });
       if (!r.command) continue;
-      const p = allowlistProblems(r.command).filter((m) => !/^runs another command through a wrapper \((?:sudo|bash|xargs)\)/.test(m));
+      const p = allowlistProblems(r.command).filter((m) => !/^runs another command through a wrapper \((?:sudo|bash|xargs)\)/.test(m)
+        && !(it.risk === 'high' && /^runs a command substitution/.test(m)));
       if (p.length) bad.push(`${it.id}/${env.shell}: ${r.command} -> ${p.join('; ')}`);
     }
   }

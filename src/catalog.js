@@ -182,7 +182,7 @@ export const INTENTS = [
   T('failed_services', 'List failed services', 'systemctl --failed --no-pager', {}),
   T('dmesg', 'Kernel messages (dmesg)', 'sudo dmesg | tail -n {count!raw}', { count: 50 }),
   T('battery', 'Battery level/status',
-    'cat /sys/class/power_supply/BAT*/capacity 2>/dev/null || upower -i "$(upower -e | grep -m1 BAT)"',
+    'cat /sys/class/power_supply/BAT*/capacity 2>/dev/null || upower -i /org/freedesktop/UPower/devices/DisplayDevice',
     {}, 'safe', { darwin: 'pmset -g batt' }),
   T('temperature', 'CPU temperature sensors', 'sensors', {}, 'safe',
     { darwin: 'sudo powermetrics --samplers smc -n 1 | grep -i temp', notes: 'needs lm-sensors on Linux' }),

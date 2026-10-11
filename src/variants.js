@@ -436,7 +436,7 @@ export const VARIANTS = {
     cmd: 'taskschd.msc',
   },
   journal_service: {
-    pwsh: { win: "Get-WinEvent -FilterHashtable @{ LogName = 'System'; ProviderName = 'Service Control Manager' } -MaxEvents 1000 -ErrorAction SilentlyContinue | Where-Object Message -Like ('*' + {service} + '*')«| Where-Object TimeCreated -GT (Get-Date).AddMinutes(-{minutes!raw})» | Select-Object -First {count!raw}" },
+    pwsh: { win: "Get-WinEvent -FilterHashtable @{ LogName = 'System'; ProviderName = 'Service Control Manager' } -MaxEvents 1000 -ErrorAction SilentlyContinue | Where-Object Message -Match ([regex]::Escape({service}))«| Where-Object TimeCreated -GT (Get-Date).AddMinutes(-{minutes!raw})» | Select-Object -First {count!raw}" },
     gaps: { cmd: 'wevtutil cannot filter events by message text' },
   },
   journal_errors: {
@@ -480,7 +480,7 @@ export const VARIANTS = {
   battery: {
     fish: (s, q, ctx) => ((ctx && ctx.os) === 'darwin'
       ? 'pmset -g batt'
-      : 'set -l b /sys/class/power_supply/BAT*/capacity; if test (count $b) -gt 0; cat $b; else; upower -i (upower -e | grep -m1 BAT); end'),
+      : 'set -l b /sys/class/power_supply/BAT*/capacity; if test (count $b) -gt 0; cat $b; else; upower -i /org/freedesktop/UPower/devices/DisplayDevice; end'),
     pwsh: { win: 'Get-CimInstance -ClassName Win32_Battery | Select-Object Name, EstimatedChargeRemaining, BatteryStatus' },
     gaps: { cmd: 'powercfg /batteryreport only writes an HTML report' },
   },

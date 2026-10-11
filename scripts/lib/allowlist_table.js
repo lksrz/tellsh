@@ -2,7 +2,7 @@
 // tokenised like the danger checker reads commands.
 import { INTENTS } from '../../src/catalog.js';
 import { buildCommand } from '../../src/fill.js';
-import { simpleCommands, commandShape, SUB_DEPTH, KEYWORDS, FRAGMENT } from '../../src/danger.js';
+import { simpleCommands, commandShape, SUB_DEPTH, KEYWORDS, headKey } from '../../src/danger.js';
 import { KNOWN_TOOLS } from '../../src/slots.js';
 
 const V = { path: 'zqdir', file: 'zqf.txt', src: 'zqa.txt', dst: 'zqb.txt', dest: 'zqd', archive: 'zqx.tar.gz', count: 5, depth: 2, size: '10M',
@@ -32,7 +32,8 @@ export function allowlistTable() {
         for (const words of [...simpleCommands(r.command), ...simpleCommands(r.command, { winPaths: true })]) {
           let w = words;
           while (w.length && KEYWORDS.has(String(w[0]).toLowerCase())) w = w.slice(1);
-          if (!w.length || FRAGMENT.test(String(w[0])) || !literal(w[0])) continue; // `{cmd} --version`: the program is a value (below)
+          // a piece of a PowerShell expression (`$_.Length -gt 1MB`, `.Count`, `[math]::Round`) is recorded as written, like a program
+          if (!w.length || !literal(headKey(w[0]))) continue; // `{cmd} --version`: the program is a value (below)
           const sh = commandShape(w, { literal });
           put(sh.key);
           if ((SUB_DEPTH[sh.head] ?? 0) > 0 && sh.key === sh.head && sh.rest.length) put(sh.key, '*sub');

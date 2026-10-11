@@ -25,6 +25,24 @@ The 27 renders that became high are all `sudo` templates (service start/stop/res
 was not regenerated: it needs the private dataset and the encoder; the selector rule changes only gh / wrangler /
 `npm install` slots, which that report does not score separately.
 
+**v0.3 close, final-review majors (2026-10-11)** (model unchanged, regression tests in `test/regressions26.test.js`).
+(1) A command substitution `$(…)` / `` `…` `` anywhere outside '…' (also inside "…", e.g. `ls "$(rm -rf ~)"`, which was
+safe) and a process substitution `<(…)` / `>(…)` are high risk; `$((…))` arithmetic is not a substitution. (2) Only
+allowlisted programs are safe: the "expression fragment" exemption is gone (`7z …`, `.hidden …` were safe) and a program
+is matched as written, so a path (`./ls`, `/tmp/x/ls`, `C:\t\ls.exe`) is not the allowlisted `ls`. The pieces of the
+catalog's PowerShell expressions (`$_.Name`, `.Count`, `[math]::Round`) are recorded in the generated allowlist like
+programs; a number, an argument-list item (`'a',`) and `$env:NAME` are matched by shape. (3) An explicit wrangler `--env`
+no longer drops the other unexplained words: `deploy worker --env staging --config other.toml` is
+`npx wrangler deploy --env staging <ARGS>` (was `… --env staging`, nothing missing). (4) Competing repositories are
+withheld even beside an explicit pull request: two `--repo`, `a/b or c/d`, `a/b#42 --repo c/d`, or a pull request URL of
+another repository than `--repo` give `--repo <REPO>`. Two templates changed so the catalog stays on the allowlist:
+Linux `battery` reads `upower -i /org/freedesktop/UPower/devices/DisplayDevice` instead of `"$(upower -e | grep …)"`
+(bash and fish), and the PowerShell `journal_service` filter is `-Match ([regex]::Escape(…))` instead of
+`-Like ('*' + … + '*')` (a bare `*` in the allowlist would have trusted a glob as a program). Measured: public
+`npm run eval` sections byte-identical; dev-tools eval exact 294 / 324 before and after; of all catalog renders only
+these two templates changed (the PowerShell `journal_service` with a `<SERVICE>` placeholder went medium -> safe: the old
+`<SERVICE>` inside `( … )` was read as a redirect); `docker stop $(docker ps -q)` was already high.
+
 ### Known limits
 
 * The selector vocabulary is closed and hand-written (EN/PL): harmless paraphrases with an unlisted word get a
@@ -33,8 +51,9 @@ was not regenerated: it needs the private dataset and the encoder; the selector 
   is not caught (`merge the pr into main` stays `gh pr merge`).
 * The rule covers gh / wrangler (and `npm install` dependency words) only; other intents keep their per-slot parsers.
 * The allowlist knows only what the catalog renders: a safe edit with an unseen flag (`git log --stat`) is high and needs
-  `yes`. PowerShell expression fragments are not judged by it (the deny rules still are). Every `sudo` catalog command
-  is high.
+  `yes`. Any `$(…)`, backtick or `<(…)` is high, also a
+  harmless one typed in an edit (`echo "$(date)"`); a backtick in a PowerShell edit (its escape character) is high too.
+  Every `sudo` catalog command is high.
 * Dev-tools exact-match losses against the gold: `show live logs from the worker in production` is now
   `npx wrangler tail --env production` (gold: no `--env`), Polish `z produkcji` / `na produkcji` give `--env <WENV>`.
 

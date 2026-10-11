@@ -318,6 +318,9 @@ export function selectorWithhold(intentId, text, values = {}) {
   if (['pr', 'num', 'wenv', 'repo'].some((k) => String(values[k] ?? '').startsWith('?'))) return null;
   const res = selectorResidue(intentId, text, values);
   if (!res.length) return null;
+  // "merge pr 42 in acme/app or other/repo": another repository beside the one read is a competing target, whatever else
+  // the request names (an explicit pull request included)
+  if (values.repo != null && res.some((r) => RAW_OK.repo(repoValue(r.w)))) return 'repo';
   const main = SEL_SLOT[intentId];
   if (main && main !== 'wenv') {
     const v = values[main];
@@ -329,9 +332,8 @@ export function selectorWithhold(intentId, text, values = {}) {
     // target (also when one was read)
     const negated = res.some((r) => SEL_NEGATION.test(r.w));
     if (negated && (values.wenv != null || res.some(selEnvish) || WR_ENV_ANY.test(text))) return 'wenv';
-    const envish = res.some(selEnvish);
-    if (values.wenv != null && RAW_OK.wenv(values.wenv) && !envish) return null;
-    return envish ? 'wenv' : 'args';
+    // an explicit environment stays; the words nothing explains (`--config other.toml`) are withheld beside it, never dropped
+    return res.some(selEnvish) ? 'wenv' : 'args';
   }
   return 'args';
 }
@@ -434,6 +436,20 @@ const PR_REPO_PREP = /(?:^|\s)(in|of|on|from|for|at|to)\s+(?:the\s+)?(?:github\s
 const PR_SELECTOR_SPOT = /\b(?:pull[\s-]+requests?|pr|prs)\s+(?:(?:for|of|on|from|branch|number|no\.?|nr\.?|(?:the|a|my|our)(?=\s+branch\b))\s+)*$/i;
 const repoValue = (w) => w.replace(/[.,!?;:]+$/, '').replace(/^["'`]|["'`]$/g, '').replace(/^https:\/\/(?=github\.com\/)/i, '').replace(/(?:\.git)?\/?$/, '');
 /** The repository a gh pr request names: { repo (a value, or `?` when it is not readable), rest (the text without it), pr } or null. */
+// every repository a request names in a readable form: options (`--repo a/b`, `-R a/b`), `a/b#7`, a pull request URL,
+// "in repo a/b"
+const PR_URL_REPO = /(?:https?:\/\/)?github\.com\/([\w.-]+\/[\w.-]+)\/pull\/\d+/gi;
+const repoKey = (w) => w.toLowerCase().replace(/^github\.com\//, '');
+function repoMentions(text) {
+  const out = new Set();
+  for (const re of [PR_REPO_OPT, PR_REPO_HASH, PR_URL_REPO, PR_REPO]) {
+    for (const m of text.matchAll(new RegExp(re.source, re.flags.includes('g') ? re.flags : re.flags + 'g'))) {
+      const w = repoValue(m[1] ?? m[2] ?? m[3] ?? '');
+      if (RAW_OK.repo(w)) out.add(repoKey(w));
+    }
+  }
+  return out;
+}
 function prRepo(text) {
   const cut = (i, len, put = ' ') => (text.slice(0, i) + put + text.slice(i + len)).replace(/\s+/g, ' ').trim();
   const h = text.match(PR_REPO_HASH);
@@ -561,6 +577,8 @@ export function resolveSlots(intent, ex) {
     // ("in the other repo", "in repo v2") withheld, never dropped; gh needs a pull request named with it
     const rq = has('repo') ? prRepo(String(ex.text)) : null;
     if (rq) v.repo = rq.repo;
+    // "--repo a/b or --repo c/d", a pull request URL of a/b with `--repo c/d`: competing repositories are withheld
+    if (rq && rq.repo !== '?' && [...repoMentions(String(ex.text))].some((r) => r !== repoKey(rq.repo))) v.repo = '?';
     // the pull request the user names: a URL or a branch is kept as it is (validation withholds an odd one), never
     // dropped for a bare `gh pr merge`, which acts on the current branch's pull request
     // a literal gh command ("gh pr view 42"): its subcommand word is not a selector
@@ -575,6 +593,7 @@ export function resolveSlots(intent, ex) {
   if (has('repo') && !has('pr')) {
     const rq = prRepo(String(ex.text));
     if (rq) v.repo = rq.repo;
+    if (rq && rq.repo !== '?' && [...repoMentions(String(ex.text))].some((r) => r !== repoKey(rq.repo))) v.repo = '?';
   }
   // "merge pr 45 and delete the branch": gh pr merge --delete-branch
   if (intent.id === 'gh_pr_merge' && PR_DELETE_BRANCH_TEST.test(foldKeepLength(String(ex.text)).toLowerCase())) v.delbranch = '--delete-branch';
