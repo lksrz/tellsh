@@ -30,6 +30,10 @@ export const RAW_OK = {
   wenv: (v) => /^[A-Za-z0-9][\w-]{0,62}$/.test(String(v)),
   // a part of a gh / wrangler request the command does not express: always the user's to fill (`<ARGS>`)
   args: () => false,
+  // a scope the request names that the command cannot express (`npm run deploy --env prod`): always the user's to fill (`<SCOPE>`)
+  scope: () => false,
+  // an npm workspace (`--workspace api`, `-w packages/api`, `@scope/app`)
+  workspace: (v) => /^(?![-.])[\w@./-]{1,100}$/.test(String(v)) && !/\.\./.test(String(v)),
   repo: (v) => /^(?:(?!-)[\w-]+(?:\.[\w-]+)+\/)?(?!-)[\w-][\w.-]{0,99}\/(?!-)[\w-][\w.-]{0,99}$/.test(String(v)) && !/\.\./.test(String(v)),
   // a pull request as gh selects it: number, URL or head branch
   pr: (v) => (/^\d+$/.test(String(v)) ? /^[1-9]\d{0,11}$/.test(String(v)) : /^https:\/\/github\.com\/[\w.-]+\/[\w.-]+\/pull\/\d{1,12}\/?$/.test(String(v)) || /^(?![-.])(?!.*\.\.)[\w./-]{1,100}$/.test(String(v))),
@@ -426,7 +430,7 @@ function prSelector(ex) {
 // "--repo a/b", "-R a/b", "in (the) repo(sitory) a/b", "in the a/b repo"; "in the other repo", "in another repository": named,
 // not readable ("this repo", "the current repository" are the working directory's)
 const PR_REPO_OPT = /(?:^|\s)(?:--repo(?:=|\s+|$)|-R(?:=|\s*))(\S*)/;
-const PR_REPO = /\b(?:in|of|on|from|for|at|to)\s+(?:the\s+|a\s+)?(?:github\s+)?(?:repo|repository|repozytorium)\s+(\S+)|\b(?:in|of|on|from|for|at|to)\s+(?:the\s+|a\s+)?(\S+(?:\s+\S+)?)\s+(?:github\s+)?(?:repo|repository)\b|\b(?:w|z)\s+repozytorium\s+(\S+)/i;
+const PR_REPO = /\b(?:in|of|on|from|for|at|to)\s+(?:the\s+|a\s+)?(?:github\s+)?(?:repo|repository|repozytorium|project)\s+(\S+)|\b(?:in|of|on|from|for|at|to)\s+(?:the\s+|a\s+)?(\S+(?:\s+\S+)?)\s+(?:github\s+)?(?:repo|repository)\b|\b(?:w|z)\s+(?:repozytorium|projek\w*)\s+(\S+)/i;
 // "this repo", "the repo", "my current repo", "our own repository": the working directory's
 const PR_REPO_HERE = /^(?:the|a|an|this|current|same|our|my|local|own|tym|tego|bieżącym|biezacym)(?:\s+(?:current|same|local|own))?$/i;
 // "org/repo#7": a repository and a pull request in one word
@@ -659,9 +663,75 @@ export function resolveSlots(intent, ex) {
     const k = selectorWithhold(intent.id, String(ex.text), v);
     if (k && has(k)) v[k] = '?';
   }
+  scopeSlots(intent.id, String(ex.text), v, has);
   for (const k of contestedSlots(intent.id, String(ex.text), v)) if (has(k)) v[k] = '?';
   for (const k of Object.keys(v)) if (v[k] === undefined) delete v[k];
   return v;
+}
+
+// ---------------------------------------------------------------------------------------------
+// Scope options (v0.3 close4): a dev-tool request that says where its command acts (a workspace, a repository or project, an
+// environment, a config file, a prefix / directory) keeps it, rendered as the option, or gets a placeholder; never the
+// default scope. `npm run deploy --workspace staging` -> `npm run deploy --workspace staging`; `npm run deploy --env prod`
+// -> `npm run deploy <SCOPE>` (npm has no such scope); `merge pr 42 in project acme/backend` -> `--repo acme/backend`.
+const SCOPE_FAMILIES = /^(?:npm_|pip_install$|gh_|wrangler_)/;
+const SCOPE_KIND = {
+  '--workspace': 'workspace', '-w': 'workspace', '--workspaces': 'workspace', '--ws': 'workspace', '--filter': 'workspace',
+  '--repo': 'repo', '-r': 'repo', '--env': 'env', '-e': 'env', '--config': 'config', '-c': 'config',
+  '--prefix': 'dir', '--cwd': 'dir', '--dir': 'dir', '-c-dir': 'dir', '--project': 'project',
+};
+// short forms are options of one tool only: npm -w, gh -R, wrangler -e / -c
+const SCOPE_SHORT = { '-w': /^npm_/, '-r': /^gh_/, '-e': /^wrangler_/, '-c': /^wrangler_/ };
+const SCOPE_OPT = /(?:^|\s)(--workspaces?|--ws|--filter|--repo|--env|--config|--prefix|--cwd|--dir|--project|-[wRec])(?:=(\S*)|\s+(?!-)([^\s,;!?]+)|(?=[\s,;!?]|$))/g;
+// "in workspace api", "for the project acme/app", "w projekcie api", "in the staging environment" is read by wranglerEnv
+const SCOPE_PHRASE = /(?:^|\s)(?:in|for|of|on|from|within|inside|under|at|w|we|dla|z)\s+(?:the\s+|a\s+)?(workspace|project|projek\w*|repo|repository|repozytori\w*|env|environment|srodowisk\w*|config|configuration|konfiguracj\w*)\s+(?!-)([^\s,;!?]+)/g;
+const SCOPE_PHRASE_KIND = (w) => /^(?:workspace)$/.test(w) ? 'workspace' : /^(?:repo|repository|repozytori)/.test(w) ? 'repo'
+  : /^(?:env|environment|srodowisk)/.test(w) ? 'env' : /^(?:config|configuration|konfiguracj)/.test(w) ? 'config' : 'project';
+const SCOPE_NOT_VALUE = /^(?:the|a|an|this|that|current|same|my|our|own|local|default|root|here|it|tym|tego|bieżącym|biezacym|obecnym|moim|naszym)$/i;
+/** The scopes a request names: [{ kind, value (null: named without a readable value) }]. */
+export function scopeMentions(intentId, text) {
+  const out = [];
+  const t = String(text);
+  for (const m of t.matchAll(SCOPE_OPT)) {
+    const opt = m[1].length === 2 ? m[1].toLowerCase() : m[1];
+    if (SCOPE_SHORT[opt] && !SCOPE_SHORT[opt].test(intentId)) continue;
+    const raw = m[2] ?? m[3] ?? null;
+    out.push({ kind: SCOPE_KIND[opt], value: raw ? raw.replace(/[.,!?;:]+$/, '').replace(/^["'`]|["'`]$/g, '') || null : null, at: m.index });
+  }
+  const f = foldKeepLength(t).toLowerCase();
+  for (const m of f.matchAll(SCOPE_PHRASE)) {
+    const at = m.index + m[0].length - m[2].length;
+    const value = t.slice(at, at + m[2].length).replace(/[.,!?;:]+$/, '').replace(/^["'`]|["'`]$/g, '');
+    // "w projekcie na macu", "in the project with npm": a function word is no scope value
+    if (SCOPE_NOT_VALUE.test(value) || isStopWord(value) || /^(?:on|onto|under|over|via|using|w|we|z|ze|na|do|od|po|przez|pod|nad)$/i.test(value)) continue;
+    out.push({ kind: SCOPE_PHRASE_KIND(m[1]), value: value || null, at });
+  }
+  return out;
+}
+function scopeSlots(intentId, text, v, has) {
+  if (!SCOPE_FAMILIES.test(intentId)) return;
+  const unexpressed = [];
+  const seen = {};
+  for (const s of scopeMentions(intentId, text)) {
+    // gh: a project is the repository; the repository and a wrangler environment are read by prRepo / wranglerEnv
+    const kind = s.kind === 'project' && /^gh_/.test(intentId) ? 'repo' : s.kind;
+    if (kind === 'repo' && has('repo')) { if (v.repo == null) v.repo = s.value != null && RAW_OK.repo(s.value) ? s.value : '?'; continue; }
+    if (kind === 'env' && has('wenv')) { if (v.wenv == null) v.wenv = s.value != null && RAW_OK.wenv(s.value) ? s.value : '?'; continue; }
+    if (kind === 'workspace' && has('workspace')) {
+      const w = s.value != null && RAW_OK.workspace(s.value) ? s.value : '?';
+      // two different workspaces: neither is guessed
+      v.workspace = seen.workspace != null && seen.workspace !== w ? '?' : w;
+      seen.workspace = w;
+      // a workspace value is not the script / package ("run npm --workspace api" is not `npm run api`)
+      for (const k of ['script', 'pkg']) if (s.value != null && v[k] === s.value) v[k] = '?';
+      continue;
+    }
+    unexpressed.push(s);
+  }
+  if (!unexpressed.length) return;
+  for (const s of unexpressed) for (const k of ['script', 'pkg']) if (s.value != null && v[k] === s.value) v[k] = '?';
+  if (has('scope')) v.scope = '?';
+  else if (has('args')) v.args = '?';
 }
 
 // ---------------------------------------------------------------------------------------------

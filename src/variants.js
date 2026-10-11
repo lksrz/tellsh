@@ -619,10 +619,10 @@ export const VARIANTS = {
 
   // ---------- developer tools (v0.4) ----------
   // npm / npx / gh / ssh are the same native programs in PowerShell and cmd.exe
-  npm_run_script: { pwsh: 'npm run {script}', cmd: 'npm run {script}' },
-  npm_install: { pwsh: 'npm {npmverb!raw}«{pkg}»', cmd: 'npm {npmverb!raw}«{pkg}»' },
-  npm_install_global: { pwsh: 'npm install -g {pkg}', cmd: 'npm install -g {pkg}' },
-  pip_install: { pwsh: { win: 'py -m pip install {pkg}', unix: 'python3 -m pip install {pkg}' }, cmd: 'py -m pip install {pkg}' },
+  npm_run_script: { pwsh: 'npm run {script}«--workspace {workspace!raw}»«{scope!raw}»', cmd: 'npm run {script}«--workspace {workspace!raw}»«{scope!raw}»' },
+  npm_install: { pwsh: 'npm {npmverb!raw}«{pkg}»«--workspace {workspace!raw}»«{scope!raw}»', cmd: 'npm {npmverb!raw}«{pkg}»«--workspace {workspace!raw}»«{scope!raw}»' },
+  npm_install_global: { pwsh: 'npm install -g {pkg}«{scope!raw}»', cmd: 'npm install -g {pkg}«{scope!raw}»' },
+  pip_install: { pwsh: { win: 'py -m pip install {pkg}«{scope!raw}»', unix: 'python3 -m pip install {pkg}«{scope!raw}»' }, cmd: 'py -m pip install {pkg}«{scope!raw}»' },
   tool_version: { pwsh: '& {cmd} --version', cmd: '{cmd} --version' },
   cli_help: { pwsh: '& {cmd} --help', cmd: '{cmd} --help' },
   wrangler_deploy: { pwsh: 'npx wrangler deploy«{dryrun!raw}»«--env {wenv!raw}»«{args!raw}»', cmd: 'npx wrangler deploy«{dryrun!raw}»«--env {wenv!raw}»«{args!raw}»' },
@@ -634,12 +634,12 @@ export const VARIANTS = {
   gh_auth_status: { pwsh: 'gh auth status«{args!raw}»', cmd: 'gh auth status«{args!raw}»' },
   gh_auth_login: { pwsh: 'gh auth login«{args!raw}»', cmd: 'gh auth login«{args!raw}»' },
   gh_pr_list: { pwsh: 'gh pr list«--repo {repo!raw}»«{args!raw}»', cmd: 'gh pr list«--repo {repo!raw}»«{args!raw}»' },
-  gh_pr_view: { pwsh: 'gh pr view«{pr!raw}»«--repo {repo!raw}»', cmd: 'gh pr view«{pr!raw}»«--repo {repo!raw}»' },
+  gh_pr_view: { pwsh: 'gh pr view«{pr!raw}»«--repo {repo!raw}»«{scope!raw}»', cmd: 'gh pr view«{pr!raw}»«--repo {repo!raw}»«{scope!raw}»' },
   gh_pr_create: { pwsh: 'gh pr create --fill«--repo {repo!raw}»«{args!raw}»', cmd: 'gh pr create --fill«--repo {repo!raw}»«{args!raw}»' },
-  gh_pr_checks: { pwsh: 'gh pr checks«{pr!raw}»«--repo {repo!raw}»', cmd: 'gh pr checks«{pr!raw}»«--repo {repo!raw}»' },
-  gh_pr_merge: { pwsh: 'gh pr merge«{pr!raw}»«--repo {repo!raw}»«{delbranch!raw}»', cmd: 'gh pr merge«{pr!raw}»«--repo {repo!raw}»«{delbranch!raw}»' },
+  gh_pr_checks: { pwsh: 'gh pr checks«{pr!raw}»«--repo {repo!raw}»«{scope!raw}»', cmd: 'gh pr checks«{pr!raw}»«--repo {repo!raw}»«{scope!raw}»' },
+  gh_pr_merge: { pwsh: 'gh pr merge«{pr!raw}»«--repo {repo!raw}»«{delbranch!raw}»«{scope!raw}»', cmd: 'gh pr merge«{pr!raw}»«--repo {repo!raw}»«{delbranch!raw}»«{scope!raw}»' },
   gh_run_list: { pwsh: 'gh run list«--repo {repo!raw}»«{args!raw}»', cmd: 'gh run list«--repo {repo!raw}»«{args!raw}»' },
-  gh_run_view: { pwsh: 'gh run view«{num!raw}»«--repo {repo!raw}»', cmd: 'gh run view«{num!raw}»«--repo {repo!raw}»' },
+  gh_run_view: { pwsh: 'gh run view«{num!raw}»«--repo {repo!raw}»«{scope!raw}»', cmd: 'gh run view«{num!raw}»«--repo {repo!raw}»«{scope!raw}»' },
   activate_venv: {
     fish: 'source {path}/bin/activate.fish',
     pwsh: { win: "& (Join-Path {path} 'Scripts/Activate.ps1')", unix: "& (Join-Path {path} 'bin/Activate.ps1')" },

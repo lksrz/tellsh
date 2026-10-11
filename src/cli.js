@@ -42,8 +42,9 @@ Options:
   -v, --version     print version
   -h, --help        this help
 
-At the prompt: [Enter] run · e edit · n abort. High-risk and composed (experimental) commands
-require typing "yes". Without a TTY (piped), tellsh only prints the command unless --yes is given.`;
+At the prompt: [Enter] runs a safe command · e edit · n abort. Medium-risk commands never run on a
+plain Enter: type "y". High-risk and composed (experimental) commands require typing "yes". Without a TTY
+(piped), tellsh only prints the command unless --yes is given.`;
 
 const C = process.stdout.isTTY && !process.env.NO_COLOR
   ? { dim: (s) => `\x1b[2m${s}\x1b[0m`, bold: (s) => `\x1b[1m${s}\x1b[0m`, red: (s) => `\x1b[31m${s}\x1b[0m`,
@@ -154,6 +155,24 @@ function printSuggestion(s, opts) {
   }
 }
 
+/**
+ * The prompt and the answer a command needs at its risk: safe runs on Enter (or y/yes); medium never runs on a plain
+ * Enter, it needs an explicit "y"; high and composed (experimental) need the word "yes". `tak`/`t` are the Polish forms.
+ * -> { prompt, accepts(answer) }
+ */
+export function confirmRule(risk, { composed = false, incomplete = false } = {}) {
+  const ans = (a) => String(a ?? '').trim().toLowerCase();
+  // a placeholder is left: it is edited first, never run as is
+  if (incomplete) return { prompt: 'e edit · n abort: ', accepts: () => false };
+  // an unknown rating is treated as high
+  if (composed || (risk !== 'safe' && risk !== 'medium')) {
+    return { prompt: `${risk === 'high' ? C.red('High risk.') : C.yellow('Experimental.')} Type "yes" to run, e to edit, anything else aborts: `,
+      accepts: (a) => ['yes', 'tak'].includes(ans(a)) };
+  }
+  if (risk === 'medium') return { prompt: `${C.yellow('Medium risk.')} Type y to run, e to edit, anything else aborts: `, accepts: (a) => ['y', 'yes', 't', 'tak'].includes(ans(a)) };
+  return { prompt: '[Enter] run · e edit · n abort: ', accepts: (a) => ['', 'y', 'yes', 't', 'tak'].includes(ans(a)) };
+}
+
 export async function main(argv = process.argv.slice(2)) {
   const opts = parseArgs(argv);
   if (opts.version) { console.log(pkg.version); return 0; }
@@ -225,13 +244,10 @@ export async function main(argv = process.argv.slice(2)) {
   let risk = s.risk;
   let critical = s.critical;
   let incomplete = s.missing.length > 0;
-  const strict = () => risk === 'high' || s.method === 'composed';
   for (;;) {
+    const rule = confirmRule(risk, { composed: s.method === 'composed', incomplete });
     const rl = createInterface({ input: process.stdin, output: process.stdout });
-    const prompt = strict()
-      ? `${risk === 'high' ? C.red('High risk.') : C.yellow('Experimental.')} Type "yes" to run, e to edit, anything else aborts: `
-      : incomplete ? 'e edit · n abort: ' : '[Enter] run · e edit · n abort: ';
-    const ans = (await ask(rl, prompt)).trim().toLowerCase();
+    const ans = (await ask(rl, rule.prompt)).trim().toLowerCase();
     rl.close();
     if (ans === 'e' || ans === 'edit') {
       command = (await editLine(command)).trim();
@@ -245,9 +261,8 @@ export async function main(argv = process.argv.slice(2)) {
       for (const w of d.warnings) process.stdout.write(riskColor(risk)(`  ! ${w}`) + '\n');
       continue;
     }
-    if (incomplete) { if (ans === '' ) continue; return 130; }
-    const go = strict() ? ans === 'yes' || ans === 'tak' : ans === '' || ans === 'y' || ans === 'yes' || ans === 't' || ans === 'tak';
-    if (!go) { console.log('aborted'); return 130; }
+    if (incomplete) { if (ans === '') continue; return 130; }
+    if (!rule.accepts(ans)) { console.log('aborted'); return 130; }
     if (critical) {
       const rl2 = createInterface({ input: process.stdin, output: process.stdout });
       const a2 = (await ask(rl2, C.red('This command can destroy the system. Type the full command again to confirm: '))).trim();

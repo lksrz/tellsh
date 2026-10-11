@@ -140,7 +140,9 @@ test('danger: more command wrappers, whole-disk shred', () => {
   }
   assert.equal(checkDanger('shred -u notes.txt').critical, false);
   assert.equal(denyOnly('watch ls').risk, 'safe');
-  assert.equal(denyOnly('taskset 1 node bench.js').risk, 'safe');
+  assert.equal(denyOnly('taskset 1 ls').risk, 'safe');
+  // a script of the project: medium (v0.3 close4)
+  assert.equal(denyOnly('taskset 1 node bench.js').risk, 'medium');
 });
 
 test('grep pattern slot: option words are not the pattern, a path-like pattern keeps the search dir', () => {

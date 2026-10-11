@@ -121,10 +121,12 @@ test('danger: generic -c/--command payloads, trailing commands of wrappers, unsu
   for (const c of ['su - bob', 'sudo -u bob ls', 'pkexec ls', 'runuser -u bob ls']) assert.notEqual(checkDanger(c).risk, 'safe', c);
   // unchanged: ordinary -c options and wrapped harmless commands
   for (const c of ['grep -c foo file', 'grep -c "$PAT" file', 'wc -c file', 'head -c 10 f', 'ssh user@host', 'ssh -p 22 host uptime',
-    'docker exec -it web sh', 'tar -czvf a.tgz dir', 'nohup node server.js &', 'timeout 5 ping -c 3 x.org',
-    'nice -n 10 make', 'watch -n 1 df -h', 'xargs -n1 echo', 'ls | shuf', 'ls | sha256sum', 'tmux new -s work', 'kubectl exec -it pod -- ls /']) {
+    'docker exec -it web sh', 'tar -czvf a.tgz dir', 'timeout 5 ping -c 3 x.org',
+    'watch -n 1 df -h', 'xargs -n1 echo', 'ls | shuf', 'ls | sha256sum', 'tmux new -s work', 'kubectl exec -it pod -- ls /']) {
     assert.equal(denyOnly(c).risk, 'safe', `${c}: ${denyOnly(c).warnings.join('; ')}`);
   }
+  // a script of the project: medium (v0.3 close4)
+  for (const c of ['nohup node server.js &', 'nice -n 10 make']) assert.equal(denyOnly(c).risk, 'medium', c);
 });
 
 test('a function word never turns a path into `.`: placeholder instead', () => {

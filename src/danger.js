@@ -564,6 +564,23 @@ function interpCheck(w, hit) {
   hit('high', `${ic.h} runs inline code; it cannot be checked`);
   codeCheck(ic, hit);
 }
+// tools that load and run code of the project they start in (conftest.py, package.json scripts, a Makefile, build.rs,
+// a project-local binary for npx, .yarnrc's yarnPath, ...), also for --help/--version: at least medium, never auto-run.
+// Package managers and go only for a subcommand (`npm run …`, `go test`), interpreters only for a script or module
+// (`node app.js`, `python3 -m x`); their bare --help/--version is the tool's own.
+const PROJECT_TOOL = /^(?:pytest|py\.test|npx|pnpx|bunx|make|gmake|cargo|wrangler|tox|nox|gradlew?|mvnw?|rake|just|yarn)$/;
+// package managers and project runners: with a subcommand (`npm run …`, `poetry run …`, `bundle exec …`)
+const PROJECT_PM = /^(?:npm|pnpm|bun|deno|poetry|pipenv|pdm|hatch|uv|rye|bundle)$/;
+const PROJECT_GO_INFO = /^(?:version|help|env)$/;
+function projectCodeCheck(w, flags) {
+  const h = (w[0] || '').replace(/^.*[\\/]/, '').replace(/\.(?:exe|cmd|bat)$/i, '').toLowerCase();
+  const pos = w.slice(1).filter((x) => !/^-/.test(String(x)));
+  let runs = PROJECT_TOOL.test(h);
+  if (PROJECT_PM.test(h)) runs = pos.some((x) => !/^(?:help|version)$/.test(x));
+  else if (h === 'go') runs = pos.length > 0 && !PROJECT_GO_INFO.test(pos[0]);
+  else if (INTERP_HEAD.test(h) && !/awk$/.test(h)) runs = pos.length > 0 || w.slice(1).some((x) => /^-m/.test(String(x)));
+  if (runs) flags.projectCode ??= h;
+}
 const INTERP_HEAD = /^(?:python[\d.]*|pypy[\d.]*|perl[\d.]*|(?:j?ruby)[\d.]*|node|nodejs|bun|deno|php[\d.]*|lua[\d.]*|luajit|julia|rscript|osascript|tclsh|awk|gawk|mawk|nawk)$/;
 /**
  * Code fed to a shell or an interpreter on stdin by a here-string or heredoc (`bash <<< 'rm -rf /'`,
@@ -868,6 +885,7 @@ export function assessCommand(command, baseRisk = 'safe', { lenient = false, all
     else if (lower === 'sed' || lower === 'gsed') sedCheck(w, hit);
     if (['tee', 'cp', 'install', 'sponge', 'pv', 'mv', 'ln'].includes(lower)) rawDiskWriteCheck(w, hit);
     interpCheck(w, hit);
+    projectCodeCheck(w, flags);
     stdinCodeCheck(w, hit, inner);
     if (head === 'git' && w[1] === 'rm') hit('high', 'rm deletes files permanently (no trash)');
     sysFileWriteCheck(w, head, hit);
@@ -875,6 +893,8 @@ export function assessCommand(command, baseRisk = 'safe', { lenient = false, all
   }
   if (flags.unsure) hit('high', flags.unsure);
   if (flags.privileged) hit('medium', 'runs with root privileges');
+  // said only where it raises the rating (`pytest --help`); `npm run build` is medium already
+  if (flags.projectCode && risk === 'safe') hit('medium', `${flags.projectCode} runs code from the project it is started in (conftest.py, package scripts, a Makefile, build scripts, ...), even for --help`);
   // `-c` values of other programs: checked as commands, but a name like "$PAT" is not a command name there
   for (const c of new Set(flags.lenient || [])) {
     if (!c.trim() || inner.includes(c)) continue;

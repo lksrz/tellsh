@@ -58,8 +58,8 @@ tellsh [options] <request...>
       --top <k>, --threshold <p>, -v/--version, -h/--help
 ```
 
-At the prompt: **Enter** runs, **e** edits (prefilled readline), **n** aborts. High-risk and composed commands need
-`yes`; catastrophic patterns (`rm -rf /`, `mkfs`, `Format-Volume`, …) need the whole command retyped. The command
+At the prompt: **Enter** runs a safe command, **e** edits (prefilled readline), **n** aborts. A medium-risk command never
+runs on a plain Enter: it needs **y**. High-risk and composed commands need `yes`; catastrophic patterns (`rm -rf /`, `mkfs`, `Format-Volume`, …) need the whole command retyped. The command
 runs in the target shell (`$SHELL -c`, `fish -c`, `pwsh -NoProfile -Command`, `cmd /d /s /c`). Without a TTY tellsh
 only prints. Exit codes: command's own · `0` printed · `2` usage · `3` not understood · `4` `--yes` refused ·
 `5` no rendering for this shell · `130` aborted.
@@ -70,6 +70,14 @@ like a file name (`"My Notes.txt"`, `"data/my notes.txt"`), and request text whe
 (`tellsh "delete folder" /tmp/x`). Anything else is unclear: `tellsh delete folder "my data"`, and arguments that mix
 request words with a path (`delete "folder /tmp/x"`, `delete "the file notes.txt"`, `usuń "plik raport.pdf"`, a space
 before the first `/`). A changing command leaves that path (or name) as a placeholder, with a warning.
+
+Unquoted paths with spaces (v0.3 close4): a path or name is never cut at its first space. `delete the folder ~/Old
+Projects` gives `rm -r ~/'Old Projects'`: the words after a path up to the end of its span (the end of the request, a
+connector like `to` / `do`, a modifier like `recursively` / `please`, a noun like `folder` / `files`) are part of its
+name. When that end is unclear (another file name follows, `delete file /tmp/a.txt b.txt`, or name words run into other
+words of the request) a changing command shows the path as a placeholder with a warning. A read-only command takes an
+explicit path to the end of the request (`list files in ~/Old Projects`) and otherwise keeps the first reading
+(`which folder in node_modules is the largest`). Quote the path to be sure.
 
 ## How it works
 
@@ -180,6 +188,13 @@ pull request, run number, environment, repository and secret name (gh / wrangler
 and `wrangler dev` runs the project's build command), deploys, merges, secrets and tunnels are `medium` risk, so `--yes`
 never runs them.
 
+**Scope options (v0.3 close4).** A dev-tool request that says where its command acts keeps it or gets a placeholder,
+never the default scope: an npm workspace (`--workspace api`, `-w api`, `in workspace api`) is rendered as
+`--workspace api`; a repository (`--repo a/b`, `-R a/b`, `in repo a/b`, `in project a/b`) as gh `--repo` (`merge pr 42
+in project acme/backend` -> `gh pr merge 42 --repo acme/backend`, an unreadable one `--repo <REPO>`); a wrangler
+environment as `--env`. A scope the command cannot express (`npm run deploy --env prod`, `--prefix`, `--config`, `in
+project api` for npm, `--env` for gh) is a `<SCOPE>` placeholder (`<ARGS>` for wrangler), never dropped.
+
 ### Optional neural fallback (`--hybrid`)
 
 `tellsh --hybrid …` (or `TELLSH_HYBRID=1`) keeps the cascade's answer when it is confident (≥ 0.9, most requests) and
@@ -288,6 +303,12 @@ compression from the archive name, `bash -n` and an allowed-flag check validate 
 * Every intent has a base risk: **safe** (read-only), **medium** (modifies state: archives, git checkout/pull/stash,
   chmod, mv, sudo, …), **high** (destructive: rm, kill, prune, discard). v0.2 raised 10 intents from safe to medium after
   the teacher review (see `EVAL.md`).
+* **Project code (v0.3 close4).** A tool that loads code of the project it starts in is at least **medium**, also for
+  `--help` / `--version`: `pytest` (imports `conftest.py`), `make`, `cargo`, `npx`, `wrangler`, `yarn` (`yarnPath`),
+  `tox`, `gradle`, `mvn`, `rake`, `just`; `npm` / `pnpm` / `bun` / `poetry` / `uv` / `bundle` / … with a subcommand
+  (`npm run …`, `npm test`, `poetry run …`); `go` with
+  a subcommand other than `version` / `help` / `env`; `node` / `python` with a script or `-m`. So `show the help for
+  pytest` is `pytest --help`, medium, and `--yes` does not run it; `node --version`, `npm --help` stay safe.
 * **Allowlist (v0.3).** Only the commands, subcommands and flags tellsh itself renders are trusted
   (`src/allowlist-data.js`, generated from every catalog template for every shell by `scripts/build_allowlist.js`; a test
   fails when it is stale). Any **wrapper** (`sudo`, `env CMD`, `timeout`, `nohup`, `xargs`, `bash -c`, `ssh host CMD`,
@@ -402,7 +423,14 @@ retrain; `npm test && npm run eval`.
 * The selector rule covers gh and wrangler only (plus `npm install` dependency words). Other intents still read their
   slots with the per-slot parsers: a descriptive word can still become a value there (`install the testing library`
   -> `python3 -m pip install testing`). Read the command before running it.
-* `<ARGS>` and `<WENV>` are placeholders, not values: tellsh never runs an incomplete command; edit it (`e`) first.
+* `<ARGS>`, `<WENV>` and `<SCOPE>` are placeholders, not values: tellsh never runs an incomplete command; edit it (`e`) first.
+* **Unquoted paths with spaces are read with word lists (close4).** Request words that are not on the lists can become
+  part of a name (`delete folder /tmp/build output` -> `rm -r '/tmp/build output'`, a name that most likely does not
+  exist), and a noun right after a path ends it (`extract a.tar.gz to /tmp/my dir` -> `-C /tmp/my`). A name with an
+  extension is taken as whole (`rm /tmp/notes.txt` for `… notes.txt permanently`). Quote paths with spaces.
+* **Scope options are read for npm, pip, gh and wrangler only**, from `--workspace` / `--repo` / `--env` / `--config` /
+  `--prefix` / `--filter` / `--cwd` / `--project` (plus `-w` npm, `-R` gh, `-e` / `-c` wrangler) and "in workspace /
+  repo / project / environment / config X"; other phrasings of a scope (`for the api package`) are not seen.
 * **The trust rule is deliberately blunt.** Every edit, however harmless (`ls -la` -> `ls -l`), every history replay
   (`same for /var`, `count lines in it`) and every composed command is high and needs `yes`; a safe request with an
   unusual value (a file name with a quote, `$` or `&`, a grep pattern starting with `-`) is high too.

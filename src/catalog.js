@@ -256,11 +256,11 @@ export const INTENTS = [
 
   // ---------- developer tools (v0.4, from real command usage) ----------
   // project scripts and installs run arbitrary package code: medium
-  T('npm_run_script', 'Run a package.json script with npm (npm run dev/build/test)', 'npm run {script}', { script: null }, 'medium'),
-  T('npm_install', 'Install the project dependencies (or one package) with npm', 'npm {npmverb!raw}«{pkg}»', { npmverb: 'install' }, 'medium'),
-  T('npm_install_global', 'Install an npm package globally', 'npm install -g {pkg}', { pkg: null }, 'medium',
+  T('npm_run_script', 'Run a package.json script with npm (npm run dev/build/test)', 'npm run {script}«--workspace {workspace!raw}»«{scope!raw}»', { script: null }, 'medium'),
+  T('npm_install', 'Install the project dependencies (or one package) with npm', 'npm {npmverb!raw}«{pkg}»«--workspace {workspace!raw}»«{scope!raw}»', { npmverb: 'install' }, 'medium'),
+  T('npm_install_global', 'Install an npm package globally', 'npm install -g {pkg}«{scope!raw}»', { pkg: null }, 'medium',
     { notes: 'may need sudo when the global prefix is not user-writable' }),
-  T('pip_install', 'Install a Python package with pip', 'python3 -m pip install {pkg}', { pkg: null }, 'medium'),
+  T('pip_install', 'Install a Python package with pip', 'python3 -m pip install {pkg}«{scope!raw}»', { pkg: null }, 'medium'),
   T('activate_venv', 'Activate a Python virtual environment', '. {path}/bin/activate', { path: '.venv' }, 'medium',
     { notes: 'run it in your own shell: activating from tellsh only affects a subshell that exits right away' }),
   T('tool_version', 'Show the installed version of a command-line tool', '{cmd} --version', { cmd: null }),
@@ -283,12 +283,12 @@ export const INTENTS = [
   T('gh_auth_status', 'Show GitHub CLI login status', 'gh auth status«{args!raw}»', {}),
   T('gh_auth_login', 'Log in to GitHub with the gh CLI', 'gh auth login«{args!raw}»', {}),
   T('gh_pr_list', 'List pull requests of the repository', 'gh pr list«--repo {repo!raw}»«{args!raw}»', {}),
-  T('gh_pr_view', 'Show a pull request', 'gh pr view«{pr!raw}»«--repo {repo!raw}»', {}),
+  T('gh_pr_view', 'Show a pull request', 'gh pr view«{pr!raw}»«--repo {repo!raw}»«{scope!raw}»', {}),
   T('gh_pr_create', 'Create a pull request from the current branch', 'gh pr create --fill«--repo {repo!raw}»«{args!raw}»', {}, 'medium'),
-  T('gh_pr_checks', 'Show CI check status of a pull request', 'gh pr checks«{pr!raw}»«--repo {repo!raw}»', {}),
-  T('gh_pr_merge', 'Merge a pull request', 'gh pr merge«{pr!raw}»«--repo {repo!raw}»«{delbranch!raw}»', {}, 'medium'),
+  T('gh_pr_checks', 'Show CI check status of a pull request', 'gh pr checks«{pr!raw}»«--repo {repo!raw}»«{scope!raw}»', {}),
+  T('gh_pr_merge', 'Merge a pull request', 'gh pr merge«{pr!raw}»«--repo {repo!raw}»«{delbranch!raw}»«{scope!raw}»', {}, 'medium'),
   T('gh_run_list', 'List recent GitHub Actions workflow runs', 'gh run list«--repo {repo!raw}»«{args!raw}»', {}),
-  T('gh_run_view', 'Show a GitHub Actions run (and its failed logs)', 'gh run view«{num!raw}»«--repo {repo!raw}»', {}),
+  T('gh_run_view', 'Show a GitHub Actions run (and its failed logs)', 'gh run view«{num!raw}»«--repo {repo!raw}»«{scope!raw}»', {}),
 ];
 
 export const BY_ID = Object.fromEntries(INTENTS.map((i) => [i.id, i]));

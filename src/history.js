@@ -129,6 +129,8 @@ function inverters() {
   INV = [];
   const add = (id, tpl) => {
     if (typeof tpl !== 'string') return;
+    // `«{scope!raw}»` only ever renders a placeholder: no command has a value there (`gh pr view 1 2` is not pr 1, scope 2)
+    tpl = tpl.replace(/«\{scope!raw\}»/g, '');
     const names = [];
     const raws = [];
     const src = { posix: '', pwsh: '' };

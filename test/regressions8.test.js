@@ -189,7 +189,9 @@ test('minor: danger checker: here-strings, sh -c with positional arguments, trun
     assert.equal(d.risk, 'high', c);
     assert.ok(!d.critical, `${c}: ${d.warnings.join('; ')}`);
   }
-  for (const c of ['cat a.json | python3 -m json.tool', 'grep x <<< "rm -rf /"', 'echo hi 2>/dev/null']) assert.equal(checkDanger(c).risk, 'safe', c);
+  // `python3 -m` imports from the working directory first: medium (v0.3 close4)
+  assert.equal(checkDanger('cat a.json | python3 -m json.tool').risk, 'medium');
+  for (const c of ['grep x <<< "rm -rf /"', 'echo hi 2>/dev/null']) assert.equal(checkDanger(c).risk, 'safe', c);
 });
 
 test('minor: a NUL byte never reaches spawnSync', () => {

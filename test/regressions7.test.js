@@ -140,7 +140,8 @@ test('danger: inline interpreter code, chmod/chown of /, raw disk writes, unknow
     assert.ok(!d.critical, c);
   }
   // unchanged
-  for (const c of ['awk "{print $1}" f', 'chmod +x script.sh', 'chmod 755 ./x', 'grep -r rm src', 'man rm', 'echo rm -rf /', 'python3 script.py']) {
+  for (const c of ['awk "{print $1}" f', 'chmod +x script.sh', 'chmod 755 ./x', 'grep -r rm src', 'man rm', 'echo rm -rf /']) {
     assert.equal(denyOnly(c).risk, 'safe', `${c}: ${denyOnly(c).warnings.join('; ')}`);
-  }
+  }  // a script of the project: medium (v0.3 close4)
+  assert.equal(denyOnly('python3 script.py').risk, 'medium');
 });
