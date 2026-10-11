@@ -630,6 +630,13 @@ const WRAPPER_HOST = {
 };
 // wrappers that always run the command on another machine / container (`machinectl shell web ps -p 42`)
 const HOST_WRAPPERS = new Set(['machinectl']);
+// unit properties (`systemd-run -p WorkingDirectory=/srv …`, `-pX=…`, `--property=X=…`, `--property X=…`, also run0) that
+// run the command in another directory ('cwd') or under another root / mounts / namespaces ('root')
+const PROP_WRAPPERS = new Set(['systemd-run', 'run0']);
+const PROP_OPT = /^(?:-p|--property)$/;
+const PROP_ATTACHED = /^(?:-p|--property=)(.+)$/;
+const PROP_CWD = /^WorkingDirectory=/i;
+const PROP_ROOT = /^(?:RootDirectory|RootImage|RootEphemeral|MountImages|ExtensionImages|ExtensionDirectories|BindPaths|BindReadOnlyPaths|TemporaryFileSystem|PrivateTmp|PrivateMounts|MountAPIVFS|PrivatePIDs|PrivateNetwork|NetworkNamespacePath|IPCNamespacePath|PrivateUsers|JoinsNamespaceOf)=/i;
 /**
  * 'root' when a wrapper in the removed prefix of `raw` (before the unwrapped words `w`) runs the command under another
  * root (every path names something else), 'cwd' when it runs it in another working directory (relative paths do).
@@ -637,7 +644,15 @@ const HOST_WRAPPERS = new Set(['machinectl']);
 function wrapperScope(w, raw) {
   let cur = null;
   let scope = null;
+  let prop = false;
   for (const x of raw.slice(0, raw.length - w.length).map((v) => String(rawOf(v)))) {
+    const p = prop ? x : PROP_WRAPPERS.has(cur) ? x.match(PROP_ATTACHED)?.[1] : null;
+    prop = PROP_WRAPPERS.has(cur) && PROP_OPT.test(x);
+    if (p != null) {
+      if (PROP_ROOT.test(p)) return 'root';
+      if (PROP_CWD.test(p)) scope = 'cwd';
+      continue;
+    }
     const h = x.replace(/^.*[\\/]/, '').toLowerCase();
     if (ROOT_WRAPPERS.has(h) || NS_WRAPPERS.has(h) || HOST_WRAPPERS.has(h)) return 'root';
     if (CWD_WRAPPERS.has(h)) { scope = 'cwd'; continue; }

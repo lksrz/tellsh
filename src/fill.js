@@ -27,10 +27,14 @@ export const RAW_OK = {
 };
 
 // "merge pull request feature/login", "view the pr for branch fix-1", "pr #45", 'merge pull request "feature/login"'
-const PR_SELECTOR = /\b(?:pull[\s-]+requests?|pr|prs)\s+((?:(?:for|of|on|from|branch|number|no\.?|nr\.?)\s+)*)(?:(["'`„“”])(.*?)["'`“”]|(#?[^\s"'`]+?)[.,!?]?(?=\s|$))/i;
+// (a quoted value ends at its matching quote, `“”„` being one family: "bob's-fix" is one value; a quote with no matching
+// close, `'it''s'`, is m[7] and withheld)
+const PR_SELECTOR = /\b(?:pull[\s-]+requests?|pr|prs)\s+((?:(?:for|of|on|from|branch|number|no\.?|nr\.?)\s+)*)(?:(?:"([^"]*)"|'([^']*)'|`([^`]*)`|[„“”]([^„“”"]*)[“”])(?=[\s.,!?;:]|$)|(#?[^\s"'`„“”]+?)[.,!?]?(?=\s|$)|(["'`„“”]))/i;
 // a function or describing word after "pull request" is not a selector ("merge the pull request and …", "merge pr now",
-// "check pr status", "view pull request on github", "merge pr by bob", "merge pull request quickly")
-const PR_NOT_SELECTOR = /^(?:the|a|an|this|that|it|its|my|our|your|their|me|us|you|him|her|them|and|or|then|now|please|pls|into|to|with|in|at|by|is|was|which|again|request|requests|status|state|checks?|details?|info|summary|description|diff|changes|comments?|github|gh|web|browser|online|here|there|today|quickly|fast|asap|immediately|already|first|too|also)$|ly$/i;
+// "check pr status", "view pull request on github", "merge pr by bob", "merge pull request quickly", "view pr from yesterday");
+// only checked for an unmarked word (`feature/apply`, `fix-reply`, `#12-only` are selectors); another unmarked word,
+// `nightly`, is withheld
+const PR_NOT_SELECTOR = /^(?:the|a|an|this|that|it|its|my|our|your|their|me|us|you|him|her|them|and|or|then|now|please|pls|into|to|with|in|at|by|is|was|which|again|request|requests|status|state|checks?|details?|info|summary|description|diff|changes|comments?|github|gh|web|browser|online|here|there|today|yesterday|tomorrow|earlier|later|review|fork|upstream|fast|asap|already|first|too|also|quickly|immediately|directly|safely|manually|automatically|finally|only|just|really|simply|properly|carefully|right|soon|instantly)$/i;
 // an unmarked word (no digit, '/', '-', '_', '.', '#') names a branch only after "branch", "for" or "from" ("merge pr from bob");
 // otherwise it is withheld (the `?` fails validation)
 const PR_MARKED = /[\d/_.#-]/;
@@ -38,11 +42,19 @@ const PR_MARKED = /[\d/_.#-]/;
 function prSelector(ex) {
   if (ex.urls[0] != null) return ex.urls[0];
   const m = String(ex.text).match(PR_SELECTOR);
-  if (m && m[3] != null) return m[3] || '?'; // `""`: named but empty, withheld
-  if (m && m[4] != null && !PR_NOT_SELECTOR.test(m[4])) {
-    if (PR_MARKED.test(m[4]) || /\b(?:for|from|branch)\s+$/i.test(m[1])) return m[4];
-    // "merge pr main": a bare word may be a branch or say something else: withheld (`gh pr merge <PR>`), never dropped
-    return `?${m[4]}`;
+  if (m) {
+    const quoted = m[2] ?? m[3] ?? m[4] ?? m[5];
+    if (quoted != null) return quoted || '?'; // `""`: named but empty, withheld
+    if (m[7] != null) return '?'; // an unclosed / odd quote: withheld
+    const w = m[6];
+    if (PR_MARKED.test(w)) return w;
+    // "merge pr for branch status": after "branch" any word is the selector, a describing one is withheld
+    if (/\bbranch\s+$/i.test(m[1])) return PR_NOT_SELECTOR.test(w) ? `?${w}` : w;
+    if (!PR_NOT_SELECTOR.test(w)) {
+      if (/\b(?:for|from)\s+$/i.test(m[1])) return w;
+      // "merge pr main": a bare word may be a branch or say something else: withheld (`gh pr merge <PR>`), never dropped
+      return `?${w}`;
+    }
   }
   // 'merge the "feature/login" pull request': an explicitly quoted value is the target
   return ex.quoted.length ? ex.quoted[0] : null;
