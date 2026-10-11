@@ -173,49 +173,54 @@ export function confirmRule(risk, { composed = false, incomplete = false } = {})
 
 const PASTE_START = '\x1b[200~';
 const PASTE_END = '\x1b[201~';
+// the longest tail of `s` that is a proper prefix of `marker` (kept for the next chunk)
+const markerTail = (s, marker) => { for (let n = Math.min(marker.length - 1, s.length); n > 0; n--) if (marker.startsWith(s.slice(-n))) return s.slice(-n); return ''; };
 /**
  * One raw stdin chunk -> 'run' | 'edit' | 'abort' | 'pending-esc' | null (keep waiting). Deliberately strict, because
- * Enter now runs high-risk commands:
- *  - only a chunk that is exactly one carriage return runs (`\n` / Ctrl+J, `\r\n` and an Enter inside a burst of other
- *    keys, i.e. typed ahead or pasted, never run);
- *  - bracketed paste content (state.paste, across chunks) is ignored, except Ctrl+C;
- *  - an abort key (Ctrl+C, Ctrl+D, lone Esc, n, q) anywhere in a chunk outside a paste aborts;
- *  - escape sequences (arrows, F-keys) are skipped; a chunk that ends in a bare ESC is 'pending-esc' (the caller aborts
- *    unless the rest of a sequence follows within a short delay; state.esc carries it to the next chunk).
- * `e` edits only as a chunk of its own.
+ * Enter runs high-risk commands. `state` ({ paste, pend, armed }) carries a bracketed paste, an unfinished escape
+ * sequence or paste marker across chunks; `armed: false` (the first moments after the prompt) never confirms.
+ *  - only a chunk that is exactly one carriage return confirms (`\n` / Ctrl+J, `\r\n` and an Enter inside a burst of
+ *    other keys, i.e. typed ahead or pasted, never do); `e` edits only as a chunk of its own;
+ *  - bracketed paste content is ignored (except Ctrl+C), also when the markers are split across chunks;
+ *  - an abort key (Ctrl+C, Ctrl+D, Esc, n, q) anywhere outside a paste aborts at once, also before the prompt is armed;
+ *  - escape sequences (arrows, F-keys) are skipped; Esc followed by Enter, Esc or a control key, or a malformed
+ *    sequence, is an Esc (abort); a chunk ending in a bare ESC is 'pending-esc' (the caller aborts unless the rest of
+ *    a sequence follows within a short delay).
  */
 export function decideChunk(chunk, incomplete = false, state = {}) {
-  let k = (state.esc || '') + String(chunk ?? '');
-  state.esc = '';
+  const armed = state.armed !== false;
+  const k = (state.pend || '') + String(chunk ?? '');
+  state.pend = '';
   if (k.includes('\x03')) return 'abort';
-  if (!state.paste && k === '\r') return incomplete ? 'edit' : 'run';
-  if (!state.paste && (k === 'e' || k === 'E')) return 'edit';
-  let abort = false;
+  if (!state.paste && armed && k === '\r') return incomplete ? 'edit' : 'run';
+  if (!state.paste && armed && (k === 'e' || k === 'E')) return 'edit';
   let i = 0;
   while (i < k.length) {
     if (state.paste) {
       const j = k.indexOf(PASTE_END, i);
-      if (j < 0) return null;
+      if (j < 0) { state.pend = markerTail(k.slice(i), PASTE_END); return null; }
       state.paste = false; i = j + PASTE_END.length; continue;
     }
-    if (k.startsWith(PASTE_START, i)) { state.paste = true; i += PASTE_START.length; continue; }
     const c = k[i];
     if (c === '\x1b') {
-      if (i + 1 >= k.length) { if (abort) return 'abort'; state.esc = '\x1b'; return 'pending-esc'; }
+      if (i + 1 >= k.length) { state.pend = '\x1b'; return 'pending-esc'; }
       const n = k[i + 1];
       if (n === '[' || n === 'O') {
         let j = i + 2;
-        while (j < k.length && !(k.charCodeAt(j) >= 0x40 && k.charCodeAt(j) <= 0x7e)) j++;
-        if (j >= k.length) { state.esc = k.slice(i); return abort ? 'abort' : null; } // sequence continues in the next chunk
+        while (j < k.length && k.charCodeAt(j) >= 0x20 && k.charCodeAt(j) <= 0x3f) j++;
+        if (j >= k.length) { state.pend = k.slice(i); return null; } // the sequence continues in the next chunk
+        const f = k.charCodeAt(j);
+        if (!(f >= 0x40 && f <= 0x7e)) return 'abort'; // Esc, then other keys
+        if (k.slice(i, j + 1) === PASTE_START) state.paste = true;
         i = j + 1; continue;
       }
-      if (n === '\x1b') { abort = true; i += 1; continue; }
+      if (n === '\x1b' || k.charCodeAt(i + 1) < 0x20 || n === '\x7f') return 'abort';
       i += 2; continue; // Alt+key
     }
-    if (c === '\x04' || c === 'n' || c === 'N' || c === 'q' || c === 'Q') abort = true;
+    if (c === '\x04' || c === 'n' || c === 'N' || c === 'q' || c === 'Q') return 'abort';
     i++;
   }
-  return abort ? 'abort' : null;
+  return null;
 }
 
 /** Wait for a single deliberate key in raw mode (no line buffering, no echo). Typed-ahead input is discarded. */
@@ -224,7 +229,7 @@ function readKey(rule) {
     const input = process.stdin;
     const out = process.stdout;
     const wasRaw = input.isRaw;
-    const state = { paste: false, esc: '' };
+    const state = { paste: false, pend: '', armed: false };
     let escTimer = null;
     let ready = false;
     let armTimer = null;
@@ -243,11 +248,12 @@ function readKey(rule) {
     };
     const onData = (buf) => {
       const s = buf.toString('utf8');
-      // input that was already waiting (typed or pasted while the suggestion was computed) is never a confirmation,
-      // but an abort key in it still aborts
-      if (!ready) { if (s.includes('\x03') || s.includes('\x04')) done('abort'); return; }
+      // input that was already waiting (typed or pasted while the suggestion was computed) is parsed (paste state,
+      // abort keys) but never confirms: state.armed is false until the prompt has been shown for a moment
       clearTimeout(escTimer);
+      state.armed = ready;
       const action = rule.decide(s, state);
+      if ((action === 'run' || action === 'edit') && !ready) return;
       if (action === 'pending-esc') { escTimer = setTimeout(() => done('abort'), 60); return; }
       if (action) done(action);
     };

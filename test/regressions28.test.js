@@ -114,6 +114,25 @@ test('0.3.2 UX: Enter runs at every risk level, Esc/Ctrl+C abort, medium/high ke
   assert.equal(rule.decide('more\nq\x1b[201~', st), null);
   assert.equal(rule.decide('\r', st), 'run');
   assert.equal(rule.decide('\x1b[200~text\x03', {}), 'abort');
+  // review r2: an abort before a paste starts is kept; split paste-end marker; a paste begun before the prompt is
+  // armed stays a paste; Esc then Enter / Esc is an abort; malformed sequence aborts; abort keys work unarmed
+  assert.equal(rule.decide('n\x1b[200~text', {}), 'abort');
+  st = {};
+  assert.equal(rule.decide('\x1b[200~text\x1b[201', st), null);
+  assert.equal(rule.decide('~', st), null);
+  assert.equal(st.paste, false);
+  assert.equal(rule.decide('\r', st), 'run');
+  st = { armed: false };
+  assert.equal(rule.decide('\x1b[200~text', st), null);
+  st.armed = true;
+  assert.equal(rule.decide('\r', st), null);
+  assert.equal(rule.decide('\x1b[2', st), null);
+  assert.equal(rule.decide('01~', st), null);
+  assert.equal(rule.decide('\r', st), 'run');
+  for (const k of ['\x1b\r', '\x1b\x1b', '\x1b[\r']) assert.equal(rule.decide(k, {}), 'abort', JSON.stringify(k));
+  for (const k of ['\x1b', 'n', 'q', '\x04']) assert.notEqual(rule.decide(k, { armed: false }), null, JSON.stringify(k));
+  assert.equal(rule.decide('\r', { armed: false }), null);
+  assert.equal(rule.decide('e', { armed: false }), null);
   assert.equal(confirmRule('safe').warning, null);
   assert.match(confirmRule('medium').warning, /Medium risk/);
   assert.match(confirmRule('high').warning, /High risk/);
