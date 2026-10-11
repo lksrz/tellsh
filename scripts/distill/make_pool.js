@@ -7,7 +7,7 @@
 //   node scripts/distill/make_pool.js [--k 8] [--max 60000]
 import { readFileSync, readdirSync, existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
-import { join } from 'node:path';
+import { join, relative, resolve, isAbsolute } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { exclusionIndex } from '../lib/heldout.js';
 import { readReal } from '../real/real_rows.js';
@@ -21,6 +21,8 @@ const ROOT = fileURLToPath(new URL('../..', import.meta.url));
 const OUT = process.env.TELLSH_DISTILL_DIR || '/workspace/tellsh-data/distill';
 const args = process.argv.slice(2);
 const arg = (k, d) => { const i = args.indexOf(k); return i >= 0 ? args[i + 1] : d; };
+// private output must stay outside the repo (or inside gitignored build/)
+{ const rel = relative(ROOT, resolve(OUT)); if (!rel.startsWith('..') && !isAbsolute(rel) && !rel.startsWith('build')) { console.error(`make_pool: ${OUT} is inside the repo; use a path outside it or under build/`); process.exit(1); } }
 const K = +arg('--k', 8), MAX = +arg('--max', 60000);
 const rj = (p) => (existsSync(p) ? readFileSync(p, 'utf8').split('\n').filter((l) => l.trim()).map((l) => JSON.parse(l)) : []);
 const rd = (d) => (existsSync(d) ? readdirSync(d).filter((f) => f.endsWith('.jsonl')).sort().flatMap((f) => rj(join(d, f))) : []);

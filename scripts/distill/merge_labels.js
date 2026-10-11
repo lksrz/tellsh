@@ -15,6 +15,7 @@ import { FAMILY_OF, NONE } from '../../src/tools.js';
 
 const ROOT = fileURLToPath(new URL('../..', import.meta.url));
 const D = process.env.TELLSH_DISTILL_DIR || '/workspace/tellsh-data/distill';
+// labels are private: merge only writes build/hybrid/train_distill.jsonl (gitignored)
 const args = process.argv.slice(2);
 const arg = (k, d) => { const i = args.indexOf(k); return i >= 0 ? args[i + 1] : d; };
 const MINP = +arg('--min-p', 0.5), W = +arg('--w', 0.5), TRUST = args.includes('--trust-teacher');
@@ -31,6 +32,7 @@ const extra = [];
 for (const l of rj(join(D, 'labels.jsonl'))) {
   st.labels++;
   const r = pool.get(l.id); if (!r) continue;
+  if (l.h && l.h !== createHash('sha1').update(r.text).digest('hex').slice(0, 12)) { console.error(`merge_labels: label ${l.id} does not match the pool text`); process.exit(1); }
   if (excl.has(r.text) || dev.has(normalize(r.text))) { st.heldOut++; continue; }
   if (l.soft[l.top] < MINP) { st.lowConf++; continue; }
   let intent = l.top === 'none' ? '' : l.top;

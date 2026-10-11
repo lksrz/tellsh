@@ -96,7 +96,7 @@ function main() {
     const env = () => (r.shell ? { shell: r.shell, os: r.os || 'linux' } : sampleEnv());
     const { spans } = silverSpans(r.text, r.intent);
     const sp = (s) => s.map((x) => [x.type, x.start, x.end]);
-    push({ text: r.text, tool, intent: r.intent, lang: r.lang, ...env(), spans: sp(spans), gid: g, src: r.src, split, kind: 'orig' });
+    push({ text: r.text, tool, intent: r.intent, lang: r.lang, ...env(), spans: sp(spans), gid: g, src: r.src, split, kind: 'orig', ...(r.tmpl ? { w: 0.5 } : {}) });
     push({ text: typo(r.text), tool, intent: r.intent, lang: r.lang, ...env(), spans: null, gid: g, src: r.src, split, kind: 'typo' });
     for (let k = 0; k < 2; k++) {
       const rx = relex(r.text, spans, { lang: r.lang, rng, split: 'train' });

@@ -8,7 +8,7 @@ The teacher is never shipped. `label` scores every candidate intent id (pool row
 log-likelihood after the prompt and writes a softmax distribution: {id, soft:{intent: p}, top, margin}.
 Resumable: `label` skips ids already in --out. Needs: torch, transformers, peft (bitsandbytes optional for --4bit).
 """
-import argparse, json, math, os, random, sys
+import argparse, hashlib, json, math, os, random, sys
 import torch
 
 SYS = ("You map a terminal request (English or Polish) to one intent id from the tellsh catalog. "
@@ -34,7 +34,7 @@ def load(a, train=False):
 
 def descs(meta_path):
     m = json.load(open(meta_path))
-    return m.get('intentDesc') or {i: i.replace('_', ' ') for i in m['intents']}
+    return m.get('descriptions') or m.get('intentDesc') or {i: i.replace('_', ' ') for i in m['intents']}
 
 
 def train(a):
@@ -45,7 +45,8 @@ def train(a):
                                              target_modules=['q_proj', 'k_proj', 'v_proj', 'o_proj', 'gate_proj', 'up_proj', 'down_proj']))
     desc = descs(a.meta)
     rows = [json.loads(l) for l in open(a.train) if l.strip()]
-    rows = [r for r in rows if r.get('split') == 'train']
+    # 'none' targets only from explicit out-of-domain rows; tldr rows carry a tool label but no intent (not a rejection)
+    rows = [r for r in rows if r.get('split') == 'train' and (r.get('intent') or r.get('src') == 'ood')]
     random.Random(17).shuffle(rows); rows = rows[:a.max_rows]
     intents = list(desc)
     opt = torch.optim.AdamW([p for p in model.parameters() if p.requires_grad], lr=a.lr)
@@ -75,7 +76,14 @@ def label(a):
     desc = descs(a.meta)
     done = set()
     if os.path.exists(a.out):
-        done = {json.loads(l)['id'] for l in open(a.out) if l.strip()}
+        pool_h = {}
+        for l in open(a.pool, encoding='utf-8'):
+            r = json.loads(l); pool_h[r['id']] = hashlib.sha1(r['text'].encode('utf-8')).hexdigest()[:12]
+        for l in open(a.out):
+            if not l.strip(): continue
+            x = json.loads(l)
+            if 'h' in x and pool_h.get(x['id']) != x['h']: sys.exit(f'label: {a.out} was made for a different pool (id {x["id"]}); use a new --out')
+            done.add(x['id'])
     out = open(a.out, 'a')
     for l in open(a.pool):
         r = json.loads(l)
@@ -96,7 +104,7 @@ def label(a):
         z = max(sc); e = [math.exp(x - z) for x in sc]; Z = sum(e)
         soft = {c: round(v / Z, 5) for c, v in zip(cands, e)}
         top = sorted(soft, key=soft.get, reverse=True)
-        out.write(json.dumps({'id': r['id'], 'soft': soft, 'top': top[0], 'margin': round(soft[top[0]] - soft[top[1]], 4)}) + '\n')
+        out.write(json.dumps({'id': r['id'], 'h': hashlib.sha1(r['text'].encode('utf-8')).hexdigest()[:12], 'soft': soft, 'top': top[0], 'margin': round(soft[top[0]] - soft[top[1]], 4)}) + '\n')
         out.flush()
 
 
