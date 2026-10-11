@@ -998,10 +998,11 @@ export function buildCommand(intentId, text, { platform = process.platform, env,
       for (const [k, v] of Object.entries(vals)) {
         if (!PATH_SLOTS.has(k) && !RAW_OK[k] && typeof v === 'string' && /^-/.test(v)) { missing.push(k); vals[k] = PLACEHOLDER(k); }
       }
-      const pathVals = new Set([...PATH_SLOTS].filter((k) => vals[k] != null).map((k) => String(vals[k])));
-      const q = (s) => {
-        const isPath = pathVals.has(String(s));
-        return quote(isPath && /^-/.test(String(s)) ? './' + s : s, { tilde: isPath });
+      // slot role must be passed explicitly ({ name } or { tilde }); never infer from value
+      // equality — a pattern equal to a path would otherwise be rewritten like a path
+      const q = (s, o = {}) => {
+        const isPath = 'tilde' in o ? !!o.tilde : PATH_SLOTS.has(o.name);
+        return quote(isPath && /^-/.test(String(s)) ? './' + s : s, { ...o, tilde: isPath });
       };
       // catalog functions take the OS string, variant functions a ctx object
       command = tpl(vals, q, tpl === intent.template || tpl === intent.darwin ? e.os : e);

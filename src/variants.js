@@ -77,12 +77,12 @@ export const VARIANTS = {
   grep_text: {
     busybox: 'find {path} -type f«-iname {glob}» -exec grep -Hn -- {pattern} {} +',
     pwsh: `${PS_FILES}«| Where-Object Name -Like {glob}» | Select-String -CaseSensitive -Pattern {pattern}`,
-    cmd: (s, q) => `pushd ${q(s.path ?? '.')} && (findstr /s /n /c:${q(s.pattern)} ${s.glob ? q(s.glob) : '*'} & popd)`,
+    cmd: (s, q) => `pushd ${q(s.path ?? '.', { name: 'path' })} && (findstr /s /n /c:${q(s.pattern, { name: 'pattern' })} ${s.glob ? q(s.glob, { name: 'glob' }) : '*'} & popd)`,
   },
   grep_files_containing: {
     busybox: 'find {path} -type f«-iname {glob}» -exec grep -l -- {pattern} {} +',
     pwsh: `${PS_FILES}«| Where-Object Name -Like {glob}» | Select-String -CaseSensitive -List -Pattern {pattern} | Select-Object -ExpandProperty Path`,
-    cmd: (s, q) => `pushd ${q(s.path ?? '.')} && (findstr /s /m /c:${q(s.pattern)} ${s.glob ? q(s.glob) : '*'} & popd)`,
+    cmd: (s, q) => `pushd ${q(s.path ?? '.', { name: 'path' })} && (findstr /s /m /c:${q(s.pattern, { name: 'pattern' })} ${s.glob ? q(s.glob, { name: 'glob' }) : '*'} & popd)`,
   },
   count_lines: {
     pwsh: '@(Get-Content -LiteralPath {file}).Count',
@@ -94,7 +94,7 @@ export const VARIANTS = {
   },
   count_files: {
     pwsh: `(${PS_FILES}«| Where-Object Name -Like {glob}» | Measure-Object).Count`,
-    cmd: (s, q) => `where /r ${q(s.path ?? '.')} ${s.glob ? q(s.glob) : '*'} | find /c /v ""`,
+    cmd: (s, q) => `where /r ${q(s.path ?? '.', { name: 'path' })} ${s.glob ? q(s.glob, { name: 'glob' }) : '*'} | find /c /v ""`,
   },
   count_words: {
     pwsh: '(Get-Content -LiteralPath {file} -Raw | Measure-Object -Word).Words',
@@ -191,12 +191,12 @@ export const VARIANTS = {
     cmd: 'tar -a -c -f {archive} {path}', // bsdtar picks zip format from the .zip suffix
   },
   extract_zip: {
-    pwsh: (s, q) => `Expand-Archive -LiteralPath ${q(s.file)} -DestinationPath ${s.dest ? q(s.dest) : '.'}`,
+    pwsh: (s, q) => `Expand-Archive -LiteralPath ${q(s.file, { name: 'file' })} -DestinationPath ${s.dest ? q(s.dest, { name: 'dest' }) : '.'}`,
     cmd: '«mkdir {dest} 2>nul & »tar -xf {file}«-C {dest}»',
   },
   list_archive: {
     // bsdtar on Windows lists zip archives too; GNU tar on Linux does not.
-    pwsh: (s, q, ctx) => (!isWin(ctx) && /\.zip$/i.test(s.file || '') ? `unzip -l ${q(s.file)}` : `tar -tvf ${q(s.file)}`),
+    pwsh: (s, q, ctx) => (!isWin(ctx) && /\.zip$/i.test(s.file || '') ? `unzip -l ${q(s.file, { name: 'file' })}` : `tar -tvf ${q(s.file, { name: 'file' })}`),
     cmd: 'tar -tvf {file}',
   },
   chmod: {
@@ -240,7 +240,7 @@ export const VARIANTS = {
     pwsh: 'if (-not (Test-Path -LiteralPath {path} -PathType Container)) { New-Item -ItemType Directory -Path {path} }',
     // mkdir -p: an existing directory is not an error (cmd's mkdir already creates parents); a trailing \ makes
     // `if exist` test for a directory, so an existing file of that name still fails like mkdir -p does
-    cmd: (s, q) => { const p = q(s.path); const dir = /"$/.test(p) ? p.slice(0, -1) + '\\"' : p + '\\'; return `if not exist ${dir} mkdir ${p}`; },
+    cmd: (s, q) => { const p = q(s.path, { name: 'path' }); const dir = /"$/.test(p) ? p.slice(0, -1) + '\\"' : p + '\\'; return `if not exist ${dir} mkdir ${p}`; },
   },
   touch_file: {
     pwsh: 'if (Test-Path -LiteralPath {file}) { (Get-Item -LiteralPath {file}).LastWriteTime = Get-Date } else { New-Item -ItemType File -Path {file} }',
@@ -285,14 +285,14 @@ export const VARIANTS = {
   },
   base64_encode: {
     pwsh: (s, q) => (s.file
-      ? `[Convert]::ToBase64String([System.IO.File]::ReadAllBytes((Resolve-Path -LiteralPath ${q(s.file)}).ProviderPath))`
-      : `[Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes(${q(s.text ?? '<TEXT>')}))`),
+      ? `[Convert]::ToBase64String([System.IO.File]::ReadAllBytes((Resolve-Path -LiteralPath ${q(s.file, { name: 'file' })}).ProviderPath))`
+      : `[Convert]::ToBase64String([System.Text.Encoding]::UTF8.GetBytes(${q(s.text ?? '<TEXT>', { name: 'text' })}))`),
     gaps: { cmd: 'certutil -encode writes to a file with PEM headers, not to stdout' },
   },
   base64_decode: {
     pwsh: (s, q) => (s.file
-      ? `[System.Text.Encoding]::UTF8.GetString([Convert]::FromBase64String((Get-Content -LiteralPath ${q(s.file)} -Raw)))`
-      : `[System.Text.Encoding]::UTF8.GetString([Convert]::FromBase64String(${q(s.text ?? '<TEXT>')}))`),
+      ? `[System.Text.Encoding]::UTF8.GetString([Convert]::FromBase64String((Get-Content -LiteralPath ${q(s.file, { name: 'file' })} -Raw)))`
+      : `[System.Text.Encoding]::UTF8.GetString([Convert]::FromBase64String(${q(s.text ?? '<TEXT>', { name: 'text' })}))`),
     gaps: { cmd: 'certutil -decode writes to a file, not to stdout' },
   },
 
@@ -313,11 +313,11 @@ export const VARIANTS = {
   },
   kill_by_name: {
     pwsh: { win: `${PS_PROC_MATCH} | Stop-Process`, unix: 'pkill -f {name}' },
-    cmd: (s, q) => `taskkill /im ${q(/\.\w+$/.test(s.name) ? s.name : `${s.name}.exe`)}`,
+    cmd: (s, q) => `taskkill /im ${q(/\.\w+$/.test(s.name) ? s.name : `${s.name}.exe`, { name: 'name' })}`,
   },
   kill_force: {
     pwsh: { win: `${PS_PROC_MATCH} | Stop-Process -Force`, unix: 'pkill -9 -f {name}' },
-    cmd: (s, q) => `taskkill /f /im ${q(/\.\w+$/.test(s.name) ? s.name : `${s.name}.exe`)}`,
+    cmd: (s, q) => `taskkill /f /im ${q(/\.\w+$/.test(s.name) ? s.name : `${s.name}.exe`, { name: 'name' })}`,
   },
   kill_by_pid: {
     // `kill` is an alias of Stop-Process (SIGKILL on Unix) in PowerShell; call the real binary for SIGTERM.

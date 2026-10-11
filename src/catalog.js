@@ -80,7 +80,7 @@ export const INTENTS = [
   T('compress_zip', 'Compress into a zip archive', 'zip -r {archive} {path}', { path: '.', archive: null }, 'medium'),
   T('extract_zip', 'Extract a zip archive', 'unzip {file}«-d {dest}»', { file: null }, 'medium'),
   T('list_archive', 'List contents of an archive (tar/zip)',
-    (s, q) => /\.zip$/i.test(s.file || '') ? `unzip -l ${q(s.file)}` : `tar -tvf ${q(s.file)}`,
+    (s, q) => /\.zip$/i.test(s.file || '') ? `unzip -l ${q(s.file, { name: 'file' })}` : `tar -tvf ${q(s.file, { name: 'file' })}`,
     { file: null }),
   T('chmod', 'Change file permissions', 'chmod {mode!raw} {file}', { file: null, mode: null }, 'medium'),
   T('make_executable', 'Make a file executable', 'chmod +x {file}', { file: null }, 'medium'),
@@ -106,12 +106,12 @@ export const INTENTS = [
   T('hash_md5', 'Compute MD5 checksum', 'md5sum {file}', { file: null }, 'safe', { darwin: 'md5 {file}' }),
   T('base64_encode', 'Base64-encode text or a file',
     // macOS base64 takes no positional file operand: it needs -i FILE
-    (s, q, os) => s.file ? (os === 'darwin' ? `base64 -i ${q(s.file)}` : `base64 ${q(s.file)}`) : `printf '%s' ${q(s.text ?? '<TEXT>')} | base64`,
+    (s, q, os) => s.file ? (os === 'darwin' ? `base64 -i ${q(s.file, { name: 'file' })}` : `base64 ${q(s.file, { name: 'file' })}`) : `printf '%s' ${q(s.text ?? '<TEXT>', { name: 'text' })} | base64`,
     {}),
   T('base64_decode', 'Decode base64 text or a file',
     (s, q, os) => {
       const d = os === 'darwin' ? 'base64 -D' : 'base64 -d';
-      return s.file ? `${d} ${os === 'darwin' ? '-i ' : ''}${q(s.file)}` : `printf '%s' ${q(s.text ?? '<TEXT>')} | ${d}`;
+      return s.file ? `${d} ${os === 'darwin' ? '-i ' : ''}${q(s.file, { name: 'file' })}` : `printf '%s' ${q(s.text ?? '<TEXT>', { name: 'text' })} | ${d}`;
     }, {}),
 
   // ---------- processes ----------

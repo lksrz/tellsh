@@ -1,0 +1,120 @@
+Round 4 review of the tellsh cmd quoting fix. Round-3 finding (both reviewers): the trailing \ -> \. rewrite also hit non-path values (git commit -m "Document C:\." , findstr patterns). Now the rewrite applies only to path slots (tilde:true, set by fill.js only for PATH_SLOTS); a quoted non-path value ending in \ throws UnquotableError, so the intent is reported as a gap for cmd (no correct spelling exists: built-ins and MSVC programs disagree). Unquoted values are unchanged. CMD_CRIT_TARGET also accepts C:\. and \. Look for real bugs only. End with exactly one line: VERDICT: APPROVE or VERDICT: REQUEST_CHANGES.
+
+DIFF (since v0.3.1 matrix commit):
+diff --git a/src/danger.js b/src/danger.js
+index 9bad233..7530e7d 100644
+--- a/src/danger.js
++++ b/src/danger.js
+@@ -422,7 +422,7 @@ function removeItemCheck(words, hit) {
+   if (recurse && targets.some((t) => PS_CRIT_TARGET.test(t.trim()))) hit('high', 'recursive Remove-Item on a drive root, home or *', true);
+ }
+ 
+-const CMD_CRIT_TARGET = /^(?:[A-Za-z]:[\\/]*\*?(?:\.\*)?|[\\/]+\*?|\*(?:\.\*)?|%(?:USERPROFILE|HOMEDRIVE|HOMEPATH|SystemDrive|SystemRoot|windir)%[\\/]*\*?(?:\.\*)?)$/i;
++const CMD_CRIT_TARGET = /^(?:[A-Za-z]:[\\/]*(?:\.|\*?(?:\.\*)?)|[\\/]+(?:\.|\*?)|\*(?:\.\*)?|%(?:USERPROFILE|HOMEDRIVE|HOMEPATH|SystemDrive|SystemRoot|windir)%[\\/]*(?:\.|\*?(?:\.\*)?)|[A-Za-z]:[\\/]+(?:Windows|Users|Program Files(?: \(x86\))?|ProgramData)[\\/]*(?:\.|\*?(?:\.\*)?))$/i;
+ 
+ // cmd.exe rd/rmdir/del/erase (also reached from PowerShell aliases with cmd-style switches)
+ function cmdDelCheck(words, hit) {
+diff --git a/src/render.js b/src/render.js
+index 6f5ef6f..9a459b5 100644
+--- a/src/render.js
++++ b/src/render.js
+@@ -76,7 +76,16 @@ export function cmdQuote(value, { tilde: expand = true, attached = false } = {})
+   // Windows paths: / -> \ (an unquoted foo/q could be read as foo /q by built-ins); other values that
+   // contain / are double-quoted
+   if (expand || /^[A-Za-z]:|%USERPROFILE%/.test(s)) s = s.replace(/\//g, '\\');
+-  if (/^[A-Za-z0-9_\\.:@+=%-]+$/.test(s)) return s;
++  // an expanded %VAR% may contain spaces (C:\Users\John Smith): always double-quote it
++  if (!s.includes('%') && /^[A-Za-z0-9_\\.:@+=-]+$/.test(s)) return s;
++  // a closing quote after a backslash ("x\\") is an escaped quote for MSVC-parsed programs (where, tar, git) and
++  // bsdtar rejects a doubled one; dropping it would let copy/move create a file. "x\\." keeps the directory meaning
++  // for built-ins and native programs alike (checked on Windows: copy, if exist, where /r, dir, tar, forfiles, rmdir)
++  if (/\\$/.test(s)) {
++    // only a path may change form; a message or pattern ending in \ has no safe cmd.exe spelling (reported as a gap)
++    if (!expand) throw new UnquotableError(`value ${JSON.stringify(String(value))} ends in \\ and cannot be quoted safely for cmd.exe`);
++    s = s.replace(/\\+$/, '\\.');
++  }
+   return '"' + s + '"';
+ }
+ 
+diff --git a/test/matrix.test.js b/test/matrix.test.js
+index 09df03a..ac57b41 100644
+--- a/test/matrix.test.js
++++ b/test/matrix.test.js
+@@ -82,7 +82,7 @@ test('cmd: mkdir -p semantics, dotfiles in hidden_files, no admin-only disk_free
+   const h = b('hidden_files', CMD, { path: 'my docs' });
+   assert.equal(h.command, 'pushd "my docs" && (dir /a:h /b 2>nul & dir /a /b .* & popd)');
+   assert.equal(h.risk, 'safe');
+-  assert.equal(b('hidden_files', CMD, { path: '~' }).command, 'pushd %USERPROFILE% && (dir /a:h /b 2>nul & dir /a /b .* & popd)');
++  assert.equal(b('hidden_files', CMD, { path: '~' }).command, 'pushd "%USERPROFILE%" && (dir /a:h /b 2>nul & dir /a /b .* & popd)');
+   assert.equal(b('hidden_files', CMD, { path: '~/my docs' }).command, 'pushd "%USERPROFILE%\\my docs" && (dir /a:h /b 2>nul & dir /a /b .* & popd)');
+   assert.ok(b('disk_free', CMD, {}).gap);
+ });
+@@ -171,3 +171,42 @@ test('matrix report: without --before every results file is kept', () => {
+     assert.match(md, /linux/); assert.match(md, /darwin/);
+   } finally { rmSync(dir, { recursive: true, force: true }); }
+ });
++
++test('cmd: ~ paths become a double-quoted %USERPROFILE% (a user name may contain a space)', async () => {
++  const { cmdQuote, psQuote } = await import('../src/render.js');
++  assert.equal(cmdQuote('~'), '"%USERPROFILE%"');
++  assert.equal(cmdQuote('~/foo'), '"%USERPROFILE%\\foo"');
++  assert.equal(cmdQuote('~/my docs'), '"%USERPROFILE%\\my docs"');
++  assert.equal(psQuote('~/foo'), '"$HOME/foo"');
++  for (const [id, slots] of [['delete_dir', { path: '~/foo' }], ['mkdir', { path: '~/foo' }], ['hidden_files', { path: '~' }], ['list_files', { path: '~/foo' }]]) {
++    const r = b(id, { shell: 'cmd', os: 'win32' }, slots);
++    assert.match(r.gap ? '%USERPROFILE%' : r.command, /%USERPROFILE%/, id);
++    if (r.gap) continue;
++    assert.doesNotMatch(r.command, /(?<!")%USERPROFILE%/, `${id}: ${r.command}`);
++  }
++  assert.equal(checkDanger('rd /s /q "%USERPROFILE%"', 'high', { rendered: true, shell: 'cmd', os: 'win32' }).critical, true);
++});
++
++test('cmd: a quoted path ending in \\ ends in \\. instead (MSVC argv would read \\" as a literal quote)', async () => {
++  const { cmdQuote } = await import('../src/render.js');
++  assert.equal(cmdQuote('~/'), '"%USERPROFILE%\\."');
++  assert.equal(cmdQuote('~/Downloads/'), '"%USERPROFILE%\\Downloads\\."');
++  assert.equal(cmdQuote('my docs/'), '"my docs\\."');
++  // copy into a missing folder must fail, not create a file named after it
++  assert.equal(b('copy', { shell: 'cmd', os: 'win32' }, { src: 'report.txt', dst: 'new folder/' }).command, 'copy /-y report.txt "new folder\\."');
++  assert.equal(cmdQuote('docs/'), 'docs\\');
++  const CMD = { shell: 'cmd', os: 'win32' };
++  assert.equal(b('mkdir', CMD, { path: '~/new/' }).command, 'if not exist "%USERPROFILE%\\new\\.\\" mkdir "%USERPROFILE%\\new\\."');
++  assert.doesNotMatch(b('compress_targz', CMD, { path: '~/foo/', archive: 'out.tar.gz' }).command, /[^\\]\\"/);
++  for (const c of ['rd /s /q "%USERPROFILE%\\."', 'rd /s "%USERPROFILE%\\"', 'rd /s /q "%USERPROFILE%"', 'del /s /q "%USERPROFILE%\\*"', 'rd /s /q "C:\\Users"', 'rd /s /q C:\\Windows\\', 'rd /s /q "C:\\Program Files\\."', 'rd /s /q C:\\.', 'rd /s /q \\.'])
++    assert.equal(checkDanger(c, 'high', { rendered: true, shell: 'cmd', os: 'win32' }).critical, true, c);
++  assert.notEqual(checkDanger('rd /s /q "%USERPROFILE%\\foo"', 'high', { rendered: true, shell: 'cmd', os: 'win32' }).critical, true);
++});
++
++test('cmd: a non-path value ending in \\ is a gap, never silently rewritten', async () => {
++  const { cmdQuote, UnquotableError } = await import('../src/render.js');
++  assert.throws(() => cmdQuote('Document C:\\', { tilde: false }), UnquotableError);
++  assert.equal(cmdQuote('a\\', { tilde: false }), 'a\\');
++  const r = b('git_commit', { shell: 'cmd', os: 'win32' }, { message: 'Document C:\\' });
++  assert.ok(r.gap || !/C:\\\./.test(r.command), r.command);
++});
+diff --git a/test/regressions.test.js b/test/regressions.test.js
+index 3d68fd9..1d21d90 100644
+--- a/test/regressions.test.js
++++ b/test/regressions.test.js
+@@ -265,7 +265,7 @@ test('cmd.exe: values with % ! or " are refused instead of being expanded', () =
+   const r = buildCommand('cat_file', '', { env: { shell: 'cmd', os: 'win32', coreutils: 'gnu' }, resolved: { file: '%USERNAME%.txt' } });
+   assert.equal(r.command, null);
+   assert.match(r.gap, /cmd\.exe/);
+-  assert.equal(cmdQuote('~/Downloads'), '%USERPROFILE%\\Downloads');
++  assert.equal(cmdQuote('~/Downloads'), '"%USERPROFILE%\\Downloads"');
+ });
+ 
+ // ---------------------------------------------------------------------------------------------
+diff --git a/test/shells.test.js b/test/shells.test.js
+index dfd8144..7faf92c 100644
+--- a/test/shells.test.js
++++ b/test/shells.test.js
+@@ -124,7 +124,7 @@ test('fish / PowerShell / cmd quoting rules', () => {
+   assert.throws(() => cmdQuote('a "b"'), /cmd.exe/);
+   assert.throws(() => cmdQuote('%PATH%'), /cmd.exe/);
+   assert.equal(cmdQuote('a b'), '"a b"');
+-  assert.equal(cmdQuote('~/Downloads'), '%USERPROFILE%\\Downloads');
++  assert.equal(cmdQuote('~/Downloads'), '"%USERPROFILE%\\Downloads"');
+ });
+ 
+ test('per-shell variants: intent shared, rendering differs', () => {

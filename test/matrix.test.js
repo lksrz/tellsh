@@ -210,3 +210,16 @@ test('cmd: a non-path value ending in \\ is a gap, never silently rewritten', as
   const r = b('git_commit', { shell: 'cmd', os: 'win32' }, { message: 'Document C:\\' });
   assert.ok(r.gap || !/C:\\\./.test(r.command), r.command);
 });
+
+test('cmd: pattern equal to a path slot still gaps (no value-equality tilde inference)', () => {
+  const CMD = { shell: 'cmd', os: 'win32' };
+  const p = 'C:\\Program Files\\';
+  for (const id of ['grep_text', 'grep_files_containing']) {
+    const same = b(id, CMD, { path: p, pattern: p });
+    assert.ok(same.gap, `${id}: expected gap, got ${same.command}`);
+    assert.doesNotMatch(String(same.command || ''), /Program Files\\\./, id);
+    const pathOnly = b(id, CMD, { path: p, pattern: 'x' });
+    assert.match(pathOnly.command, /pushd "C:\\Program Files\\."/, id);
+    assert.match(pathOnly.command, /\/c:x/, id);
+  }
+});
