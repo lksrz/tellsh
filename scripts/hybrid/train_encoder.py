@@ -94,7 +94,7 @@ def collate(batch, pad_id):
 
 def soft_batch(batch, n_intent):
     # distillation targets (teacher soft labels) and per-row weights; rows without soft labels get a zero mask
-    m = torch.tensor([1.0 if b.get('soft') else 0.0 for b in batch])
+    m = torch.tensor([1.0 if b.get('soft') and sum(b['soft']) > 0 else 0.0 for b in batch])
     s = torch.tensor([b['soft'] if b.get('soft') else [0.0] * n_intent for b in batch])
     s = s / s.sum(-1, keepdim=True).clamp(min=1e-9)
     return s, m, torch.tensor([b.get('w', 1.0) for b in batch])

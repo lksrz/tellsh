@@ -63,6 +63,7 @@ def train(a):
         if (step + 1) % a.accum == 0: opt.step(); opt.zero_grad()
         if step % 200 == 0: print(f'step {step}/{len(rows)} loss {loss.item() * a.accum:.4f}', flush=True)
         if step and step % 2000 == 0: model.save_pretrained(a.out)
+    if len(rows) % a.accum: opt.step(); opt.zero_grad()
     model.save_pretrained(a.out)
 
 

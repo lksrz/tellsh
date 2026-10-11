@@ -6,6 +6,7 @@
 //   {id, text, lang, shell, os, src, tmpl, gold|null, cands:[intent...]}   (gold = dataset/public label, may be null)
 //   node scripts/distill/make_pool.js [--k 8] [--max 60000]
 import { readFileSync, readdirSync, existsSync, mkdirSync, writeFileSync } from 'node:fs';
+import { createHash } from 'node:crypto';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { exclusionIndex } from '../lib/heldout.js';
@@ -15,7 +16,6 @@ import { getModel } from '../../src/model.js';
 import { envFeatures } from '../../src/env.js';
 import { normalize, fnv1a } from '../../src/features.js';
 import { relex, silverSpans, mulberry32 } from '../lib/silver.js';
-import { NONE } from '../../src/tools.js';
 
 const ROOT = fileURLToPath(new URL('../..', import.meta.url));
 const OUT = process.env.TELLSH_DISTILL_DIR || '/workspace/tellsh-data/distill';
@@ -26,6 +26,10 @@ const rj = (p) => (existsSync(p) ? readFileSync(p, 'utf8').split('\n').filter((l
 const rd = (d) => (existsSync(d) ? readdirSync(d).filter((f) => f.endsWith('.jsonl')).sort().flatMap((f) => rj(join(d, f))) : []);
 
 const excl = exclusionIndex(ROOT);
+// the hybrid dev split (build/hybrid/dev_texts.json, export_data.js) calibrates A+B: never pseudo-label it
+const devP = join(ROOT, 'build/hybrid/dev_texts.json');
+if (!existsSync(devP)) { console.error('make_pool: run scripts/hybrid/export_data.js first (dev_texts.json)'); process.exit(1); }
+const dev = new Set(JSON.parse(readFileSync(devP, 'utf8')));
 const rng = mulberry32(7);
 const src = [
   ...readReal(ROOT).filter((r) => r.split === 'train').map((r) => ({ ...r, src: 'real', gold: r.intent || null })),
@@ -34,7 +38,7 @@ const src = [
 const seen = new Set(), pool = [];
 const push = (r, text, s) => {
   const n = normalize(text);
-  if (!n || seen.has(n) || excl.has(text) || excl.has(n)) return;
+  if (!n || seen.has(n) || dev.has(n) || excl.has(text) || excl.has(n)) return;
   seen.add(n);
   pool.push({ text, lang: r.lang || '', shell: r.shell || 'bash', os: r.os || 'linux', src: s, tmpl: !!r.tmpl, gold: r.gold ?? null });
 };
@@ -54,6 +58,9 @@ for (const [i, r] of sel.entries()) {
   r.pNone = +c.pNone.toFixed(4);
 }
 mkdirSync(OUT, { recursive: true, mode: 0o700 });
-writeFileSync(join(OUT, 'pool.jsonl'), sel.map((r) => JSON.stringify(r)).join('\n') + '\n', { mode: 0o600 });
+const body = sel.map((r) => JSON.stringify(r)).join('\n') + '\n';
+writeFileSync(join(OUT, 'pool.jsonl'), body, { mode: 0o600 });
+// labels.jsonl refers to pool rows by position: merge_labels.js refuses a pool whose hash changed since labelling
+writeFileSync(join(OUT, 'pool.sha256'), createHash('sha256').update(body).digest('hex') + '\n', { mode: 0o600 });
 const by = (f) => sel.reduce((m, r) => ((m[f(r)] = (m[f(r)] || 0) + 1), m), {});
-console.log(JSON.stringify({ pool: pool.length, written: sel.length, bySrc: by((r) => r.src), byLang: by((r) => r.lang), none: NONE }));
+console.log(JSON.stringify({ pool: pool.length, written: sel.length, bySrc: by((r) => r.src), byLang: by((r) => r.lang) }));

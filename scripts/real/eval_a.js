@@ -1,6 +1,7 @@
 #!/usr/bin/env node
 // Model A top-1 intent accuracy (cascade, no reject threshold) on the private real-usage eval split
-// (build/real/rows.jsonl) and the public held-out sets. Aggregates only.
+// (build/real/rows.jsonl) and the public held-out sets. Aggregates only. A model trained on a different split (e.g. the
+// shipped 0.3.x model, trained on --group v04) has seen some of these eval texts: retrain on the current split before comparing.
 //   node scripts/real/eval_a.js [model.bin] [--json out.json]
 import { readFileSync, readdirSync, existsSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
