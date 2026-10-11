@@ -618,6 +618,9 @@ const WRAPPER_ROOT = {
   'start-stop-daemon': /^-r|^--chroot(?:=|$)/,
 };
 const ROOT_WRAPPERS = new Set(['chroot', 'proot', 'firejail', 'bwrap', 'systemd-nspawn']);
+// namespace wrappers: the command saw another PID / network / mount namespace (`nsenter -t 1234 -p ps -p 42`,
+// `unshare -n ss -ltn`), so a pid, port, process or path it named is not the one "kill it" would hit here
+const NS_WRAPPERS = new Set(['nsenter', 'unshare']);
 /**
  * 'root' when a wrapper in the removed prefix of `raw` (before the unwrapped words `w`) runs the command under another
  * root (every path names something else), 'cwd' when it runs it in another working directory (relative paths do).
@@ -627,7 +630,7 @@ function wrapperScope(w, raw) {
   let scope = null;
   for (const x of raw.slice(0, raw.length - w.length).map((v) => String(rawOf(v)))) {
     const h = x.replace(/^.*[\\/]/, '').toLowerCase();
-    if (ROOT_WRAPPERS.has(h)) return 'root';
+    if (ROOT_WRAPPERS.has(h) || NS_WRAPPERS.has(h)) return 'root';
     if (CWD_WRAPPERS.has(h)) { scope = 'cwd'; continue; }
     if (!x.startsWith('-')) { if (WRAPPER_CWD[h] || WRAPPER_ROOT[h]) cur = h; continue; }
     if (WRAPPER_ROOT[cur]?.test(x)) return 'root';

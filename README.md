@@ -137,7 +137,9 @@ Added from real command usage: `npm run <script>`, `npm install [pkg]`, `npm ins
 (`py -m pip` on Windows), activating a virtualenv (per shell), `<tool> --version` / `--help`, printing a line range
 (`sed -n 'N,Mp'`, `Get-Content … -Index` in PowerShell), SSH local port forwarding, Cloudflare `wrangler`
 (deploy, dev, tail, secret put, login, whoami) and the GitHub CLI (`gh auth`, `gh pr list/view/create/checks/merge`,
-`gh run list/view`). Installs, project scripts (also every `npx wrangler` command: `npx` prefers a project-local binary,
+`gh run list/view`; a pull request the request names, by number, URL or branch, is passed on: `gh pr merge
+feature/login`, never a bare `gh pr merge` for the current branch's pull request). A package version constraint is kept
+(`install requests==2.32.0 with pip` -> `python3 -m pip install requests==2.32.0`). Installs, project scripts (also every `npx wrangler` command: `npx` prefers a project-local binary,
 and `wrangler dev` runs the project's build command), deploys, merges, secrets and tunnels are `medium` risk, so `--yes`
 never runs them.
 
@@ -184,7 +186,9 @@ value only when it is unambiguous; otherwise the slot stays a placeholder:
   * the checked-out branch is never the one deleted;
   * the command ran against another repository, directory or daemon (`git -C /repo blame notes.txt`, `git -C/repo …`,
     `git --work-tree=…`, `docker --context prod logs web`, `docker -H …`/`-Htcp://…`, `DOCKER_HOST=… docker …`) or under
-    another root (`chroot /srv …`, `sudo --chroot=/srv …`): "delete it", "stop it" and "same for api" are refused, here
+    another root (`chroot /srv …`, `sudo --chroot=/srv …`) or in other namespaces (`nsenter -t 1234 -p ps -p 42`,
+    `nsenter -n lsof -i :8080`, `unshare …`: "kill it" would hit another pid / port here): "delete it", "stop it",
+    "kill it" and "same for api" are refused, here
     they would hit something else; after a wrapper that changes the working directory (`env -C /repo cat notes.txt`,
     `sudo -D /repo …`, a login shell: `sudo -i …`, `sudo -iu bob …`, `runuser -l …`, `pkexec …`, `run0 --chdir=/srv …`,
     `run0 --user=bob …`) or a `cd` inside a `( … )` subshell (`(cd /repo && cat notes.txt)`, also a redirection there:

@@ -88,7 +88,7 @@ export const SLOT_TAG = {
   path: 'PATH', file: 'PATH', src: 'PATH', dst: 'PATH', dest: 'PATH', archive: 'PATH',
   count: 'NUM', depth: 'NUM', size: 'SIZE', age: 'TIME', days: 'TIME', since: 'TIME',
   port: 'PORT', pid: 'PID', mode: 'MODE', ext: 'EXT', glob: 'EXT', url: 'URL', host: 'HOST', target: 'HOST',
-  name: 'NAME', service: 'NAME', container: 'NAME', pkg: 'NAME', cmd: 'NAME', script: 'NAME', start: 'NUM', end: 'NUM', num: 'NUM', branch: 'BRANCH', user: 'USER',
+  name: 'NAME', service: 'NAME', container: 'NAME', pkg: 'NAME', cmd: 'NAME', script: 'NAME', start: 'NUM', end: 'NUM', num: 'NUM', pr: 'NUM', branch: 'BRANCH', user: 'USER',
   pattern: 'PATTERN', old: 'PATTERN', new: 'REPL', message: 'MSG', var: 'VAR', text: 'TEXT',
 };
 

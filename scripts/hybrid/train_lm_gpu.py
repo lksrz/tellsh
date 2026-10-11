@@ -50,6 +50,8 @@ def main():
     lid = torch.tensor(P.letter_ids, device=dev)
     train = [r for r in read_cands(a.cands, {'train'}) if r['intent']]
     val = [r for r in read_cands(a.cands, {'dev'}) if r['intent']][:1000]
+    if not train:
+        raise SystemExit('no labeled train rows in ' + a.cands)
     steps = int(math.ceil(len(train) / a.bs) * a.epochs)
     params = [p for p in m.parameters() if p.requires_grad]
     opt = torch.optim.AdamW(params, lr=a.lr, weight_decay=0.0)
@@ -81,7 +83,8 @@ def main():
     m.train()
     while step < steps:
         random.Random(step).shuffle(train)
-        for i in range(0, len(train) - a.bs + 1, a.bs):
+        # the last, partial batch too: with fewer rows than --bs a full-batch-only loop never advances `step`
+        for i in range(0, len(train), a.bs):
             lg, y = batch_logits(train[i:i + a.bs], rng, True)
             loss = torch.nn.functional.cross_entropy(lg, y)
             opt.zero_grad(); loss.backward(); torch.nn.utils.clip_grad_norm_(params, 1.0); opt.step(); sched.step(); step += 1

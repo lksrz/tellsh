@@ -16,7 +16,7 @@ const SAMPLE = {
   service: 'nginx', container: 'web', pkg: 'htop', cmd: 'git', var: 'HOME', branch: 'feature/x', user: 'www-data',
   pattern: "a'b $x", host: 'example.com', target: 'root@example.com', message: 'fix "quotes" & $HOME', url: 'https://x.org/a?b=1&c',
   port: 8080, pid: 4242, mode: '755', old: 'a/b', new: 'c&d', text: 'hello world', glob: '*.pdf', age: '-mtime -3', size: '100M',
-  count: 5, days: 30, since: '3 days ago', depth: 2, start: 10, end: 20, num: 42, script: 'build:prod',
+  count: 5, days: 30, since: '3 days ago', depth: 2, start: 10, end: 20, num: 42, pr: 42, script: 'build:prod',
 };
 function sampleFor(intent) {
   const v = {};

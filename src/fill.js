@@ -22,8 +22,14 @@ export const RAW_OK = {
   start: (v) => /^\d{1,9}$/.test(String(v)) && +v > 0,
   end: (v) => /^\d{1,9}$/.test(String(v)) && +v > 0,
   num: (v) => /^\d{1,12}$/.test(String(v)),
+  // a pull request as gh selects it: number, URL or head branch
+  pr: (v) => /^\d{1,12}$|^https:\/\/github\.com\/[\w.-]+\/[\w.-]+\/pull\/\d{1,12}\/?$/.test(String(v)) || /^(?![-.])(?!.*\.\.)[\w./-]{1,100}$/.test(String(v)),
 };
 
+// "merge pull request feature/login", "view the pr for branch fix-1", "pr #45"
+const PR_SELECTOR = /\b(?:pull[\s-]+requests?|pr|prs)\s+(?:(?:for|of|on|from|branch|number|no\.?|nr\.?)\s+)*(#?[^\s"'`]+?)[.,!?]?(?=\s|$)/i;
+// a function word after "pull request" is not a selector ("merge the pull request and …", "merge pr now")
+const PR_NOT_SELECTOR = /^(?:the|a|an|this|that|it|its|my|our|and|or|then|now|please|pls|into|to|with|in|at|is|was|which|again|request|requests)$/i;
 const PATH_SLOTS = new Set(['path', 'file', 'src', 'dst', 'dest', 'archive']);
 const PLACEHOLDER = (name) => `<${name.toUpperCase()}>`;
 
@@ -120,6 +126,15 @@ export function resolveSlots(intent, ex) {
   if (has('num')) {
     const n = ex.pid ?? ex.numbers?.find((x) => x > 0) ?? ex.count;
     if (n != null) v.num = n;
+    delete v.count;
+  }
+  if (has('pr')) {
+    // the pull request the user names: a URL or a branch is kept as it is (validation withholds an odd one), never
+    // dropped for a bare `gh pr merge`, which acts on the current branch's pull request
+    const sel = ex.urls[0] ?? String(ex.text).match(PR_SELECTOR)?.[1];
+    const n = ex.pid ?? ex.numbers?.find((x) => x > 0) ?? ex.count;
+    if (sel != null && !PR_NOT_SELECTOR.test(sel)) v.pr = String(sel).replace(/^#/, '');
+    else if (n != null) v.pr = n;
     delete v.count;
   }
   if (ex.ext) v.glob = `*.${ex.ext}`;

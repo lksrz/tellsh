@@ -115,6 +115,16 @@ there: `(cd /repo && echo hi > notes.txt)` + "delete it" is refused (a redirecti
 longer answers in its place (before, `list directories recursively with sizes` with pNone 0.99 gave `ls -l -R`). The
 hybrid eval runs with the composer off, so every A and A+B number is unchanged. Bench re-run.
 
+**Round 13 (review r12; A unchanged, A+B policy unchanged).** `gh pr view/checks/merge` take a `pr` slot (number,
+`https://github.com/…/pull/N` URL or head branch): `merge pull request feature/login` gives `gh pr merge feature/login`
+and a URL is passed as it is (before, both gave a bare `gh pr merge`, which merges the current branch's pull request);
+a selector that is none of these (`merge pull request ../x`, a GitLab URL) shows `gh pr merge <PR>`. `nsenter` and
+`unshare` make every history value ambiguous like `chroot` (the command saw another pid / network / mount namespace:
+`nsenter -t 1234 -p ps -p 42` + "kill it" is refused instead of `kill 42`). A package's version constraint is kept
+(`install requests==2.32.0 with pip`, `install django>=4,<5 with pip`, `install typescript@^5.4 with npm`; before, the
+bare name, and for the npm case `npm install npm`). `train_lm_gpu.py` trains on the last partial batch (with fewer rows
+than `--bs` it looped forever) and stops on an empty train split. Every eval number is unchanged. Bench re-run.
+
 <!-- eval:start -->
 ## Model
 
@@ -257,13 +267,13 @@ Machine: Intel(R) Xeon(R) Processor, Node v20.19.2, linux; CPU affinity: `0` (ru
 
 | measurement | p50 | p95 | runs |
 |---|---|---|---|
-| bare `node -e 0` startup (baseline) | 90.2 ms | 104.2 ms | 10 |
-| **cold**: `node bin/tellsh.js --dry-run --json --shell bash <query>` (new process, model load, full pipeline) | **168.8 ms** | **203.2 ms** | 40 |
-| model load (in-process, one-off) | 4.6 ms | – | 1 |
-| **warm**: full cascade + tagger + render (bash, composer off) | **0.389 ms** | **4.5 ms** | 2000 |
-| warm, incl. composer modifier check (shipped default) | 0.605 ms | 7.1 ms | 2000 |
-| warm, PowerShell rendering | 0.363 ms | 0.773 ms | 2000 |
-| warm, 5 history lines given (only the previous one is read; context build + reference rules) | 0.704 ms | 7.4 ms | 2000 |
+| bare `node -e 0` startup (baseline) | 85.8 ms | 123.9 ms | 10 |
+| **cold**: `node bin/tellsh.js --dry-run --json --shell bash <query>` (new process, model load, full pipeline) | **193.0 ms** | **230.8 ms** | 40 |
+| model load (in-process, one-off) | 5.2 ms | – | 1 |
+| **warm**: full cascade + tagger + render (bash, composer off) | **0.442 ms** | **4.5 ms** | 2000 |
+| warm, incl. composer modifier check (shipped default) | 0.752 ms | 8.9 ms | 2000 |
+| warm, PowerShell rendering | 0.426 ms | 1.1 ms | 2000 |
+| warm, 5 history lines given (only the previous one is read; context build + reference rules) | 0.749 ms | 8.1 ms | 2000 |
 
 The composer runs `bash -n` (a subprocess, ~2 ms) only when it actually returns a composed command.
 <!-- bench:end -->

@@ -61,7 +61,7 @@ test('installer words are not package names; apt installs keep working', () => {
 });
 
 test('per-shell renders of the new intents', () => {
-  const R = { script: 'dev', pkg: 'requests', cmd: 'node', start: 10, end: 20, file: 'app.log', port: 5432, target: 'db.example.com', num: 42 };
+  const R = { script: 'dev', pkg: 'requests', cmd: 'node', start: 10, end: 20, file: 'app.log', port: 5432, target: 'db.example.com', num: 42, pr: 42 };
   const r = (id, env) => buildCommand(id, '', { env, resolved: { ...R } });
   const PS = { shell: 'powershell', os: 'win32' };
   const CMD = { shell: 'cmd', os: 'win32' };
