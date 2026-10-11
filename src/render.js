@@ -78,9 +78,10 @@ export function cmdQuote(value, { tilde: expand = true, attached = false } = {})
   if (expand || /^[A-Za-z]:|%USERPROFILE%/.test(s)) s = s.replace(/\//g, '\\');
   // an expanded %VAR% may contain spaces (C:\Users\John Smith): always double-quote it
   if (!s.includes('%') && /^[A-Za-z0-9_\\.:@+=-]+$/.test(s)) return s;
-  // a closing quote after a backslash ("x\\") is an escaped quote for MSVC-parsed programs (where, tar, git), and
-  // bsdtar rejects a doubled one: drop trailing separators (C:\ and other drive roots never reach here unquoted-unsafe)
-  if (!/^[A-Za-z]:\\+$/.test(s)) s = s.replace(/\\+$/, '');
+  // a closing quote after a backslash ("x\\") is an escaped quote for MSVC-parsed programs (where, tar, git) and
+  // bsdtar rejects a doubled one; dropping it would let copy/move create a file. "x\\." keeps the directory meaning
+  // for built-ins and native programs alike (checked on Windows: copy, if exist, where /r, dir, tar, forfiles, rmdir)
+  s = s.replace(/\\+$/, '\\.');
   return '"' + s + '"';
 }
 

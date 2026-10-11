@@ -187,16 +187,18 @@ test('cmd: ~ paths become a double-quoted %USERPROFILE% (a user name may contain
   assert.equal(checkDanger('rd /s /q "%USERPROFILE%"', 'high', { rendered: true, shell: 'cmd', os: 'win32' }).critical, true);
 });
 
-test('cmd: a quoted path drops its trailing \\ (MSVC argv would read \\" as a literal quote)', async () => {
+test('cmd: a quoted path ending in \\ ends in \\. instead (MSVC argv would read \\" as a literal quote)', async () => {
   const { cmdQuote } = await import('../src/render.js');
-  assert.equal(cmdQuote('~/'), '"%USERPROFILE%"');
-  assert.equal(cmdQuote('~/Downloads/'), '"%USERPROFILE%\\Downloads"');
-  assert.equal(cmdQuote('my docs/'), '"my docs"');
+  assert.equal(cmdQuote('~/'), '"%USERPROFILE%\\."');
+  assert.equal(cmdQuote('~/Downloads/'), '"%USERPROFILE%\\Downloads\\."');
+  assert.equal(cmdQuote('my docs/'), '"my docs\\."');
+  // copy into a missing folder must fail, not create a file named after it
+  assert.equal(b('copy', { shell: 'cmd', os: 'win32' }, { src: 'report.txt', dst: 'new folder/' }).command, 'copy /-y report.txt "new folder\\."');
   assert.equal(cmdQuote('docs/'), 'docs\\');
   const CMD = { shell: 'cmd', os: 'win32' };
-  assert.equal(b('mkdir', CMD, { path: '~/new/' }).command, 'if not exist "%USERPROFILE%\\new\\" mkdir "%USERPROFILE%\\new"');
+  assert.equal(b('mkdir', CMD, { path: '~/new/' }).command, 'if not exist "%USERPROFILE%\\new\\.\\" mkdir "%USERPROFILE%\\new\\."');
   assert.doesNotMatch(b('compress_targz', CMD, { path: '~/foo/', archive: 'out.tar.gz' }).command, /[^\\]\\"/);
-  for (const c of ['rd /s /q "%USERPROFILE%\\\\"', 'rd /s /q "%USERPROFILE%"', 'del /s /q "%USERPROFILE%\\*"'])
+  for (const c of ['rd /s /q "%USERPROFILE%\\."', 'rd /s "%USERPROFILE%\\"', 'rd /s /q "%USERPROFILE%"', 'del /s /q "%USERPROFILE%\\*"', 'rd /s /q "C:\\Users"', 'rd /s /q C:\\Windows\\', 'rd /s /q "C:\\Program Files\\."'])
     assert.equal(checkDanger(c, 'high', { rendered: true, shell: 'cmd', os: 'win32' }).critical, true, c);
   assert.notEqual(checkDanger('rd /s /q "%USERPROFILE%\\foo"', 'high', { rendered: true, shell: 'cmd', os: 'win32' }).critical, true);
 });
