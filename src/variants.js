@@ -625,7 +625,7 @@ export const VARIANTS = {
   pip_install: { pwsh: { win: 'py -m pip install {pkg}', unix: 'python3 -m pip install {pkg}' }, cmd: 'py -m pip install {pkg}' },
   tool_version: { pwsh: '& {cmd} --version', cmd: '{cmd} --version' },
   cli_help: { pwsh: '& {cmd} --help', cmd: '{cmd} --help' },
-  wrangler_deploy: { pwsh: 'npx wrangler deploy', cmd: 'npx wrangler deploy' },
+  wrangler_deploy: { pwsh: 'npx wrangler deploy«{dryrun!raw}»«--env {wenv!raw}»', cmd: 'npx wrangler deploy«{dryrun!raw}»«--env {wenv!raw}»' },
   wrangler_dev: { pwsh: 'npx wrangler dev', cmd: 'npx wrangler dev' },
   wrangler_tail: { pwsh: 'npx wrangler tail', cmd: 'npx wrangler tail' },
   wrangler_secret_put: { pwsh: 'npx wrangler secret put {var!raw}', cmd: 'npx wrangler secret put {var!raw}' },

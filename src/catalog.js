@@ -267,7 +267,9 @@ export const INTENTS = [
   T('cli_help', 'Show the built-in help (--help) of a command', '{cmd} --help', { cmd: null }),
 
   // ---------- Cloudflare wrangler ----------
-  T('wrangler_deploy', 'Deploy a Cloudflare Worker with wrangler', 'npx wrangler deploy', {}, 'medium'),
+  // a dry run ("do a dry run of wrangler deploy") and an environment ("deploy worker to staging") are kept, never dropped
+  // for a deploy to the default target
+  T('wrangler_deploy', 'Deploy a Cloudflare Worker with wrangler', 'npx wrangler deploy«{dryrun!raw}»«--env {wenv!raw}»', {}, 'medium'),
   // npx prefers a project-local wrangler binary, so every npx wrangler command may run project code (and wrangler dev
   // runs the configured build command): medium, like npm_run_script, never auto-run with --yes
   T('wrangler_dev', 'Run a Cloudflare Worker locally (wrangler dev)', 'npx wrangler dev', {}, 'medium'),
