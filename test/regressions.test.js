@@ -18,6 +18,8 @@ import { validateComposed } from '../src/compose.js';
 import { runShell } from '../src/cli.js';
 import { sameCmd } from '../scripts/lib/cmdnorm.js';
 import { pwshParses } from '../scripts/lib/pwsh_parse.js';
+// v0.3: commands outside the catalog are high by the allowlist; these cases check the deny rules alone
+const denyOnly = (c, base = 'safe') => checkDanger(c, base, { allowlist: { off: true } });
 
 const BIN = fileURLToPath(new URL('../bin/tellsh.js', import.meta.url));
 const cli = (args, opts = {}) => spawnSync(process.execPath, [BIN, ...args], { encoding: 'utf8', env: { ...process.env, NO_COLOR: '1' }, ...opts });
@@ -140,11 +142,11 @@ for (const c of NOW_CRITICAL) {
 }
 
 test('danger: no false alarms for docker --rm and SIGHUP', () => {
-  assert.equal(checkDanger('docker run --rm -it ubuntu bash').risk, 'safe');
+  assert.equal(denyOnly('docker run --rm -it ubuntu bash').risk, 'safe');
   const k = checkDanger('kill -1 1234');
   assert.equal(k.risk, 'high');
   assert.equal(k.critical, false);
-  assert.equal(checkDanger('ls 2>/dev/null > /dev/null; cmd 2>&1 | less').risk, 'safe');
+  assert.equal(denyOnly('ls 2>/dev/null > /dev/null; cmd 2>&1 | less').risk, 'safe');
 });
 
 test('catalog commands rendered with ~/ for cmd are recognised as home-directory wipes', () => {
@@ -322,7 +324,8 @@ test('existing danger behaviour for catalog templates: every safe intent still r
   for (const it of INTENTS) {
     if (it.risk !== 'safe') continue;
     const r = buildCommand(it.id, '', { env: BASH, resolved: SAMPLE });
-    if (r.warnings.some((w) => w !== 'runs with root privileges')) bad.push(`${it.id}: ${r.command} (${r.warnings})`);
+    // v0.3: a sudo template is high by the allowlist (a wrapper); nothing else may warn
+    if (r.warnings.some((w) => w !== 'runs with root privileges' && !/^runs another command through a wrapper \(sudo\)/.test(w))) bad.push(`${it.id}: ${r.command} (${r.warnings})`);
   }
   assert.deepEqual(bad, []);
 });

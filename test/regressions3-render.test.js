@@ -10,6 +10,8 @@ import { buildCommand } from '../src/fill.js';
 import { cmdQuote, pwshNativeSlots } from '../src/render.js';
 import { compose, validateComposed } from '../src/compose.js';
 import { extractSlots } from '../src/slots.js';
+// v0.3: commands outside the catalog are high by the allowlist; these cases check the deny rules alone
+const denyOnly = (c, base = 'safe') => checkDanger(c, base, { allowlist: { off: true } });
 
 const PS_WIN = { shell: 'powershell', os: 'win32', coreutils: 'gnu' };
 const CMD = { shell: 'cmd', os: 'win32', coreutils: 'gnu' };
@@ -86,7 +88,7 @@ test('docker -v=/:/h and --mount=…source=/ mount the host root', () => {
   const ro = checkDanger('docker run -v=/:/h:ro alpine');
   assert.equal(ro.risk, 'high');
   assert.equal(ro.critical, false);
-  assert.equal(checkDanger('docker run -v=/srv/data:/data alpine').risk, 'safe');
+  assert.equal(denyOnly('docker run -v=/srv/data:/data alpine').risk, 'safe');
 });
 
 // ---------------------------------------------------------------------------------------------

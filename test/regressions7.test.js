@@ -8,6 +8,8 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { suggest } from '../src/pipeline.js';
 import { checkDanger } from '../src/danger.js';
+// v0.3: commands outside the catalog are high by the allowlist; these cases check the deny rules alone
+const denyOnly = (c, base = 'safe') => checkDanger(c, base, { allowlist: { off: true } });
 
 const BASH = { shell: 'bash', os: 'linux', coreutils: 'gnu' };
 const run = (q, history) => suggest(q, { env: BASH, ...(history ? { history } : {}) });
@@ -138,6 +140,6 @@ test('danger: inline interpreter code, chmod/chown of /, raw disk writes, unknow
   }
   // unchanged
   for (const c of ['awk "{print $1}" f', 'chmod +x script.sh', 'chmod 755 ./x', 'grep -r rm src', 'man rm', 'echo rm -rf /', 'python3 script.py']) {
-    assert.equal(checkDanger(c).risk, 'safe', `${c}: ${checkDanger(c).warnings.join('; ')}`);
+    assert.equal(denyOnly(c).risk, 'safe', `${c}: ${denyOnly(c).warnings.join('; ')}`);
   }
 });

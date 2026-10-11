@@ -110,7 +110,8 @@ test('major: a pull request picked out by who or when is withheld', () => {
       withheld(run(q, null, env), 'gh pr merge <PR>', 'pr', `${env.shell}: ${q}`);
     }
     // nothing picked out: the current branch's pull request
-    for (const q of ['merge the pr', 'merge pr now', 'merge the pr and delete the branch', 'merge pull request quickly']) exact(run(q, null, env), 'gh pr merge', `${env.shell}: ${q}`);
+    for (const q of ['merge the pr', 'merge pr now', 'merge pull request quickly']) exact(run(q, null, env), 'gh pr merge', `${env.shell}: ${q}`);
+    exact(run('merge the pr and delete the branch', null, env), 'gh pr merge --delete-branch', env.shell);
   }
   exact(run('view pull request on github'), 'gh pr view');
 });

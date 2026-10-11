@@ -1,6 +1,6 @@
 // Turn (intent, slots) into a concrete, safely-quoted command for the target shell.
 import { BY_ID } from './catalog.js';
-import { extractSlots, pickArg, pickDest, pickDir, foldKeepLength } from './slots.js';
+import { extractSlots, pickArg, pickDest, pickDir, foldKeepLength, isStopWord } from './slots.js';
 import { checkDanger, maxRisk } from './danger.js';
 import { shQuote, psQuote, chooseTemplate, quoteForKind, UnquotableError, pwshNativeSlots, unsafeNativePwshArg } from './render.js';
 
@@ -24,8 +24,12 @@ export const RAW_OK = {
   num: (v) => /^\d{1,12}$/.test(String(v)),
   // a repository as gh -R takes it: [HOST/]OWNER/REPO
   dryrun: (v) => v === '--dry-run',
+  delbranch: (v) => v === '--delete-branch',
+  npmverb: (v) => v === 'install' || v === 'ci',
   // a wrangler environment name (wrangler.toml [env.NAME])
   wenv: (v) => /^[A-Za-z0-9][\w-]{0,62}$/.test(String(v)),
+  // a part of a gh / wrangler request the command does not express: always the user's to fill (`<ARGS>`)
+  args: () => false,
   repo: (v) => /^(?:(?!-)[\w-]+(?:\.[\w-]+)+\/)?(?!-)[\w-][\w.-]{0,99}\/(?!-)[\w-][\w.-]{0,99}$/.test(String(v)) && !/\.\./.test(String(v)),
   // a pull request as gh selects it: number, URL or head branch
   pr: (v) => (/^\d+$/.test(String(v)) ? /^[1-9]\d{0,11}$/.test(String(v)) : /^https:\/\/github\.com\/[\w.-]+\/[\w.-]+\/pull\/\d{1,12}\/?$/.test(String(v)) || /^(?![-.])(?!.*\.\.)[\w./-]{1,100}$/.test(String(v))),
@@ -94,11 +98,14 @@ const prPickedAfter = (after) => {
   return m != null && !PR_AFTER_NEUTRAL.test(m[1]);
 };
 // a URL names the pull request when only a verb, a determiner or "pr" comes before it
-const PR_URL_LEAD = /^\s*(?:(?:please|pls|now|then|just|squash|rebase|and|merge|close|reopen|view|show|open|display|check|checkout|diff|review|approve|ready|edit|the|this|that|a|pull|requests?|pr|prs|at|is|zmerguj\w*|scal\w*|poka[zż]\w*|zobacz\w*|otw[oó]rz\w*|zamknij\w*|sprawd[zź]\w*)[\s:,]+)*$/i;
+const PR_URL_LEAD = /^\s*(?:(?:please|pls|now|then|just|squash|rebase|and|merge|close|reopen|view|show|open|display|check|checkout|diff|review|approve|ready|edit|the|this|that|a|pull|requests?|pr|prs|at|is|me|you|can|could|would|i|want|to|url|link|[(]|zmerguj\w*|scal\w*|poka[zż]\w*|zobacz\w*|otw[oó]rz\w*|zamknij\w*|sprawd[zź]\w*)[\s:,]+)*[(<]?$/i;
 // "merge ten pr" (Polish "this"), "merge that one pr": a number word that is a demonstrative, not a number
 const PR_DEM_NUMBER = /\b(?:ten|(?:that|this|which|the)\s+one)\s+(?:\S+\s+)?(?:prs?|pull[\s-]+requests?)\b/gi;
 // "merge pr from the feature branch", "for my branch bob": a branch is named, but not one the parser read
 const PR_BRANCH_NAMED = /\b(?:for|of|on|from)\s+(?:\S+\s+){0,2}branch\b/i;
+// "and delete the branch", "delete the branch after", "usuń gałąź": the head branch goes with the merge (--delete-branch)
+const PR_DELETE_BRANCH = /\b(?:and\s+)?(?:delete|remove|usun)\s+(?:the\s+|its\s+|that\s+|tego\s+|ten\s+|t[ea]\s+)?(?:(?:local\s+and\s+remote|remote|head|feature)\s+)?(?:branch|branche?a?|galaz|galez)\b(?:\s+(?:after(?:wards)?|too|as\s+well|potem|tez))?/g;
+const PR_DELETE_BRANCH_TEST = new RegExp(PR_DELETE_BRANCH.source);
 // wrangler deploy: "dry run", "--dry-run", "na sucho", "without (actually) deploying/publishing" (wrangler deploy --dry-run);
 // "not a dry run", "without dry run", "skip the dry run": a real deploy, no flag (a dry run asked for elsewhere in the
 // request, "without a dry run first? no, do a dry run", still counts)
@@ -163,6 +170,199 @@ function wranglerEnv(t) {
   }
   return WR_ENV_ANY.test(t) ? '?' : null;
 }
+// ---------------------------------------------------------------------------------------------
+// gh / wrangler selector rule (v0.3): a request is read against a closed vocabulary. Every word must be a command word of
+// the intent's family, a function word, or part of a value that was read (a pull request, a repository, an environment, a
+// secret name). Any other word ("merge the pr about auth", "deploy worker in preview2", "create a pr into develop") names
+// or describes something the command does not express: the selector is withheld as a placeholder the user has to fill
+// (`gh pr merge <PR>`, `npx wrangler deploy --env <WENV>`, `gh pr create --fill <ARGS>`), never guessed and never dropped
+// for a bare command. A word that is not in the vocabulary is never accepted as harmless.
+const SEL_WORDS = (s) => {
+  const words = s.trim().split(/\s+/);
+  return { words: new Set(words.filter((w) => !w.endsWith('*'))), stems: words.filter((w) => w.endsWith('*')).map((w) => w.slice(0, -1)) };
+};
+const selHas = (v, w) => v.words.has(w) || v.stems.some((s) => w.startsWith(s));
+const SEL_COMMON = SEL_WORDS(`
+  the a an my our your this that these those it its me us i i'm im you we he she they them
+  to on in into onto for from of at with by via using through over up out as
+  please pls plz now just quickly again also too and then so ok okay hey hi go ahead
+  can could would will shall do does did done how what whats what's is are am be been should want wanna need needs gonna let lets
+  help run running execute use command commands line cli terminal shell console here there current currently same local
+  right away asap today actually real really properly correctly give get tell print read see show display
+  powershell* pwsh mac macu maca macos osx windows* linux* cmd cmd.exe fish fishu bash bashu zsh zshu terminal*
+  z ze w we na do dla przez od o po i oraz a to ten ta te tego tej tym tych mi mnie sobie sie się jest sa są co
+  prosze pls jak jakie jaki jakiego jakim czy mozesz moge mozna chce chcialbym chcialabym musze zrob zrobic zrobmy teraz
+  szybko juz tutaj tu obecny obecnego obecnej obecnym aktualny aktualnego aktualnej aktualne biezacy biezacego biezacej
+  moj moja moje mojego mojej moim moich naszego nasz nasza nasze polecenie* komend* konsol* linii
+  uzyj uzywajac pomoca za daj odpal* pokaz* zobacz* sprawdz* wyswietl* wypisz* zerknij smialo dawaj
+  jako dalej jakies jakis any some are there about their time czas* pod otworz set skonfiguruj* zebym mogl moc robic dodac edge
+  same but first one yes no if whether says saying mowi done finished skonczylem gotowe give access dostep* daj* what's whats did does before after przed zanim byl byla bylo byly verify* weryfik* dziala* works working still have has which who ktore ktory ktora jeszcze ma mamy mam powiedz confirm potwierdz* check sprawdzic`);
+// command words per family; a pull request, run or environment the request picks out ("the latest", "my last", "for the
+// login fix") is never one of them
+const SEL_FAMILY = {
+  gh: SEL_WORDS(`project projekt* scopes scope scope'y token valid details szczegol* uwierzytelnion* authenticated logged zalogowan* stan setup flow tool narzedzi* credentials danymi dane konfiguracj* first-time pierwsza feature ficzer messages message description opis* commit* pushed wypchnalem wypchnij* turn zamien* tests testy pass przechodza zacznij pracy wrzuc* queue kolejce outstanding enumerate wymien* lately succeed* ran today dzis few kilka overview executions status statusem najnowszych runow odpalily wylistowac gh github* git hub
+    repo repos repository repozytori* pr prs pra prka prke prki prku prow pr-y pr-ow pull pulla pull-request* request* requescie
+    view open look check checks checking ci status statuses state otworz web browser online przegladar*
+    branch branchu brancha branchem galezi galaz changes zmian zmiany`),
+  wrangler: SEL_WORDS(`project projekt* zdeploy* session sesj* instance instancj* function funkcj* log* authenticated configured skonfigurowan* oauth browser przegladar* expired wygasl* valid wazn* details szczegol* using uzywa* uzywam account* konta konto koncie organizac* org tozsamosc* aktualn* say env environment environments srodowisk* called named nazwie npx wrangler* cloudflare* cf worker workers worker's workera workerze workerem workerow workerowi`),
+};
+const SEL_INTENT = {
+  gh_pr_merge: SEL_WORDS(`merge* land squash squash-merge squashing rebase rebasing auto automerge auto-merge admin
+    zmerguj* zmergow* zmerdz* wmerguj* merguj* scal* polacz* main master maina mastera base bazow* review* zatwierdz*
+    accept approve* zaakceptuj complete finalize sfinalizuj checki`),
+  gh_pr_view: SEL_WORDS(`view details detail info information diff description summary web browser online przegladarce przegladarka
+    szczegol* opis* podsumowan* przeczytaj`),
+  gh_pr_checks: SEL_WORDS(`tests test build builds passing passed failing failed pass fail green red results result
+    workflow workflows actions action pipeline pipelines testy testow buildy przechodz* przeszl* checki checkow wynik*
+    zielon* padl* padaj*`),
+  gh_pr_create: SEL_WORDS(`create creating make new submit raise file send open put start propose utworz* stworz* zaloz* wystaw*
+    nowy nowa nowe zglos* zrob wyslij* zaproponuj zacznij for these those my changes work zmiany zmian zmianach commit commits`),
+  gh_pr_list: SEL_WORDS(`pry list listing all open opened pending show which there any lista liste wylistuj* listuj* wszystkie otwarte otwartych`),
+  gh_run_list: SEL_WORDS(`list listing recent recently latest last all show workflow workflows run runs action actions ci pipeline pipelines
+    build builds job jobs history happened happen* recently fail* failed failing passed przeszl* padl* ostatni* wszystkie uruchomien* przebieg* runy runow workflowy workflowow akcj* histori*
+    wylistuj* listuj* lista liste buildow`),
+  gh_run_view: SEL_WORDS(`view details logs log output failed failing failure why workflow run runa runie action ci pipeline build job
+    szczegol* logi`),
+  gh_auth_status: SEL_WORDS(`auth authenticated authentication logged log login signed sign status who account whoami am which user
+    zalogowan* konto konta koncie kim kto jestem uwierzytelnien* logowani* token valid wazn* expired wygasl* session sesj*
+    authorized autoryzacj* loguje credentials dane still nadal`),
+  gh_auth_login: SEL_WORDS(`not nie auth authenticate authentication log login sign signin zaloguj* zalogowac logowani* konto account
+    uwierzytelnij* autoryzuj* kont* konc* connect podlacz* polacz* link authorize re-authenticate re-login again ponownie setup configure skonfiguruj* konfiguracj*`),
+  wrangler_deploy: SEL_WORDS(`depl* redeploy publish* ship push release upload go wdroz* zdeployuj* deployuj* opublikuj* wypchnij*
+    wrzuc* wgraj* make roll rollout wypusc* wydaj* pusc* code kod kodu version wersj* new nowa nowy najnowsz* latest fresh swiez*
+    changed changes zmienilem zmian* after po`),
+  wrangler_dev: SEL_WORDS(`dev develop development locally local server serve start preview mode lokaln* serwer* uruchom* odpal*
+    tryb* developersk* deweloper* localhos* 127.0.0.1 machine maszyn* depl* pusc* przetest* spin launch fire boot try test przetestuj* emul* serwuj* hot reload* odpal*`),
+  wrangler_tail: SEL_WORDS(`thrown right now teraz tail* logs log live stream* realtime real-time watch follow logi logow zywo strumien*
+    podglad* sledz* obserwuj* rzeczywist* czasie biezaco monitor* errors bledy exceptions wyjatki console.log requests requesty
+    happen* happening debug* output wdrozon* wyjscie zdebug* print* wypisuj* feed attach podepnij* podlacz* deployed zdeployowan* dzialajac* running`),
+  wrangler_secret_put: SEL_WORDS(`new nowy nowa nowe push wypchnij* secret secrets set put add store save update change create rotate register encrypted configure sekret*
+    ustaw* dodaj* zapisz* zmien* zaktualizuj* zaszyfrowan* zarejestruj* zrotuj* utworz* jako value variable called named nazwie`),
+  wrangler_login: SEL_WORDS(`not nie kont* konc* podlacz* login log sign signin re-login authenticate re-authenticate authentication auth authorize account konto kontem
+    zaloguj* zalogowac logowani* autoryz* uwierzytelni* polacz* connect browser przegladarce first najpierw ponownie again`),
+  wrangler_whoami: SEL_WORDS(`whoami who account logged log signed status which user am konto konta koncie zalogowan* kim kto jestem
+    identity tozsamosc* id identyfikator* email mail maila whose czyje* active aktywn* uses using uzywa* uzywam`),
+};
+// words that pick one pull request / run / target out of several ("the latest pr", "the draft pr", "the failing run"):
+// explained only for the intents that list them (gh_pr_list "open prs", gh_run_list "recent runs"), never by the family
+const SEL_PICKERS = new Set(('latest last recent recently newest new old older oldest first second third next previous prior other another ' +
+  'approved pending draft failing failed fail passing passed pass green red open opened closed merged ready big small ' +
+  'ostatni ostatnie ostatniego najnowszy najnowsze nowy nowa nowe stary inny inne poprzedni kolejny otwarte otwartych').split(' '));
+const selFamilyAll = {};
+for (const [id, v] of Object.entries(SEL_INTENT)) {
+  const f = id.split('_')[0];
+  const all = (selFamilyAll[f] ??= { words: new Set(), stems: [] });
+  // a negation ("not logged in" for a login) is explained only for the intent that lists it, never family-wide
+  for (const w of v.words) if (!SEL_PICKERS.has(w) && !/^(?:not|nie|never|without|bez)$/.test(w)) all.words.add(w);
+  all.stems.push(...v.stems.filter((x) => !SEL_PICKERS.has(x)));
+}
+// the slot that takes the placeholder when a request has words the vocabulary does not explain
+const SEL_SLOT = { gh_pr_merge: 'pr', gh_pr_view: 'pr', gh_pr_checks: 'pr', gh_run_view: 'num' };
+export const hasSelectorRule = (intentId) => /^(?:gh|wrangler)_/.test(intentId);
+// "for issue #3", "for ticket 12", "the pr that fixes #12": a number of another kind, explained as not the pull request
+const SEL_OTHER_NUMBER = /\b(?:issues?|tickets?|bugs?|zgloszeni\w*|fix(?:es)?|closes|resolves|naprawia\w*|zamyka\w*)\s+#?\d+\b/g;
+const SEL_ENV_PREP = /^(?:to|on|in|into|for|na|do|w|dla|env|environment|srodowisk\w*|called|named|nazwie)$/;
+const SEL_NEGATION = /^(?:not|never|don't|dont|nor|except|excluding|without|instead|rather|nie|bez|oprocz|poza|zamiast)$/;
+const SEL_DET = /^(?:the|a|an|my|our|this|that)$/;
+/**
+ * The words of a gh / wrangler request the vocabulary and the read values do not explain, each with the word before it
+ * ([] : nothing unexplained).
+ */
+export function selectorResidue(intentId, text, values = {}) {
+  if (!hasSelectorRule(intentId)) return [];
+  const fam = SEL_FAMILY[intentId.split('_')[0]];
+  const own = SEL_INTENT[intentId];
+  let t = foldKeepLength(String(text)).toLowerCase();
+  // values that were read, and the option / phrase forms they come in, are explained
+  for (const k of ['pr', 'repo', 'wenv', 'var', 'num', 'url']) {
+    const val = values[k];
+    if (val == null || String(val).startsWith('?')) continue;
+    const s = foldKeepLength(String(val)).toLowerCase();
+    t = t.split(s).join(' ');
+  }
+  if (/^wrangler_/.test(intentId)) t = t.replace(WR_DRY_NOT, ' ').replace(WR_DRY, ' ');
+  if (values.delbranch) t = t.replace(PR_DELETE_BRANCH, ' ');
+  t = t.replace(/(?:^|\s)(?:--env|-e|--repo|-r|env=|--repo=|--env=)(?=\s|$)/g, ' ')
+    .replace(/(?:^|\s)(?:https?:\/\/|github\.com\/)(?=\s|$)/g, ' ')
+    .replace(/\b(?:number|numer|nr|no\.|num)(?=\s|$)/g, ' ')
+    .replace(/\benv(?:ironment)?\s+var(?:iable)?s?\b|\bzmienn\w*(?:\s+srodowiskow\w*)?|\bsrodowiskow\w*/g, ' ')
+    .replace(/\b(?:the\s+)?command\s+line\b|\bz\s+linii\s+komend\b/g, ' ');
+  if (/^gh_pr_/.test(intentId) && values.pr != null && !String(values.pr).startsWith('?')) t = t.replace(SEL_OTHER_NUMBER, ' ');
+  const out = [];
+  let prev = '';
+  for (let w of t.split(/[\s,;!?()]+|:(?!\/\/)/)) {
+    w = w.replace(/^[#"'`„“”.]+|["'`„“”.]+$/g, '').replace(/'s$/, '');
+    if (!w || /^[-–—]+$/.test(w)) continue;
+    // "merge pr with --squash": an option word the intent knows (gh asks for the merge method itself)
+    const famAll = selFamilyAll[intentId.split('_')[0]];
+    if (selHas(SEL_COMMON, w) || selHas(fam, w) || (!SEL_PICKERS.has(w) && famAll && selHas(famAll, w)) || (own && selHas(own, w.replace(/^--(?=[a-z])/, '')))) {
+      if (!SEL_DET.test(w)) prev = w;
+      continue;
+    }
+    out.push({ w, prev });
+    prev = w;
+  }
+  return out;
+}
+const SEL_EXPLICIT = { pr: (v) => /^\d+$|^https?:\/\//.test(v), num: (v) => /^\d+$/.test(v), wenv: (v) => RAW_OK.wenv(v) };
+const selEnvish = (r) => /[a-z]/.test(r.w) && (SEL_ENV_PREP.test(r.prev) || WR_ENV_KNOWN.test(r.w) || WR_ENV_STEM.test(r.w) || /^(?:prod|produkc|staging|stage)/.test(r.w));
+/**
+ * gh / wrangler selector rule: the slot to withhold (`?`, a placeholder the user fills) for the words of a request
+ * nothing explains, or null. An explicit value that was read (pull request 45, a URL, `--env staging`) stays unless an
+ * unexplained word competes with it (another number, another environment); otherwise the intent's selector is withheld:
+ * the pull request (`<PR>`), the run (`<NUM>`), the environment (`<WENV>`, for a word placed as one) or the rest of the
+ * request (`<ARGS>`).
+ */
+export function selectorWithhold(intentId, text, values = {}) {
+  // a selector already withheld ("merge pr bob's", "my environment is set") already has its placeholder
+  if (['pr', 'num', 'wenv', 'repo'].some((k) => String(values[k] ?? '').startsWith('?'))) return null;
+  const res = selectorResidue(intentId, text, values);
+  if (!res.length) return null;
+  const main = SEL_SLOT[intentId];
+  if (main && main !== 'wenv') {
+    const v = values[main];
+    if (v != null && SEL_EXPLICIT[main](String(v)) && !res.some((r) => /^\d+$|^https?:/.test(r.w))) return null;
+    return main;
+  }
+  if (/^wrangler_/.test(intentId)) {
+    // "deploy worker but not to production", "don't deploy to prod": an environment the request excludes is never the
+    // target (also when one was read)
+    const negated = res.some((r) => SEL_NEGATION.test(r.w));
+    if (negated && (values.wenv != null || res.some(selEnvish) || WR_ENV_ANY.test(text))) return 'wenv';
+    const envish = res.some(selEnvish);
+    if (values.wenv != null && RAW_OK.wenv(values.wenv) && !envish) return null;
+    return envish ? 'wenv' : 'args';
+  }
+  return 'args';
+}
+// npm install: words that name the project's dependencies (or the tool), never a package to add
+const NPM_NOT_PKG = new Set(('dependencies dependency dependecies dependancies deps dep zaleznosci zaleznosc project projekt projektu ' +
+  'packages package pakiety paczki modules module moduly node_modules node npm ci clean czysta czysty everything all wszystko ' +
+  'package.json lockfile lock repo repository it this them')
+  .split(' '));
+const NPM_INSTALL_VERB = /^(?:install|instal|add|i|zainstaluj|instaluj|doinstaluj|dodaj|pobierz|get|reinstall)$/;
+// "npm ci", "a clean install", "czysta instalacja": npm ci (installs exactly the lockfile)
+const NPM_CI = /(?:^|\s)npm\s+ci(?=\s|$)|\bclean[\s-]+install\w*|\bczyst\w*\s+instalacj\w*/i;
+/**
+ * npm install: "install the project dependencies" is `npm install` (no package); a package word the request does not
+ * pick out clearly ("add express to the project with npm" read as `npm`) is the word right after the install verb, or
+ * withheld (`npm install <PKG>`), never made up from "dependencies", "project" or "npm".
+ */
+function npmInstallTarget(text, v) {
+  const f = foldKeepLength(text).toLowerCase();
+  if (NPM_CI.test(f) && (v.pkg == null || NPM_NOT_PKG.has(String(v.pkg).toLowerCase()))) { delete v.pkg; v.npmverb = 'ci'; return; }
+  const p0 = foldKeepLength(String(v.pkg ?? '')).toLowerCase();
+  if (v.pkg == null || !(NPM_NOT_PKG.has(p0) || isStopWord(p0))) return;
+  const words = f.split(/[\s,;!?()]+/).map((w) => w.replace(/^["'`]+|["'`.:]+$/g, '')).filter(Boolean);
+  const named = words.filter((w) => !NPM_NOT_PKG.has(w) && !NPM_INSTALL_VERB.test(w) && !isStopWord(w) &&
+    !/^(?:the|a|an|my|our|for|from|with|via|using|to|into|in|of|this|these|please|pls|i|just|cloned|z|ze|do|dla|przez|w|mojego|tego|tym|ten|naszego)$/.test(w));
+  delete v.pkg;
+  if (!named.length) return;
+  const at = words.findIndex((w) => w === named[0]);
+  const prev = words.slice(0, at).filter((w) => !/^(?:the|a|an|package|pakiet|paczke)$/.test(w)).pop();
+  v.pkg = named.length === 1 && NPM_INSTALL_VERB.test(prev || '') ? text.split(/\s+/).find((w) => foldKeepLength(w).toLowerCase().replace(/[.,!?;:]+$/, '') === named[0])?.replace(/[.,!?;:]+$/, '') ?? '?' : '?';
+}
+
 /**
  * The pull request the user names (quoted: kept as written, validation withholds an odd one), else null (`gh pr merge`
  * acts on the current branch's pull request). A number elsewhere in the request ("merge pr with 2 approvals", "merge the
@@ -363,12 +563,21 @@ export function resolveSlots(intent, ex) {
     if (rq) v.repo = rq.repo;
     // the pull request the user names: a URL or a branch is kept as it is (validation withholds an odd one), never
     // dropped for a bare `gh pr merge`, which acts on the current branch's pull request
-    const sel = prSelector(rq ? { ...ex, text: rq.rest, numbers: (rq.rest.match(/\d+/g) || []).map(Number), quoted: ex.quoted.filter((q) => rq.rest.includes(q)) } : ex);
+    // a literal gh command ("gh pr view 42"): its subcommand word is not a selector
+    const lit = (t) => String(t).replace(/^(\s*(?:\S+\s+)?)gh\s+pr\s+(?:view|merge|checks)(?=\s|$)/i, '$1pr');
+    const sel = prSelector(rq ? { ...ex, text: lit(rq.rest), numbers: (rq.rest.match(/\d+/g) || []).map(Number), quoted: ex.quoted.filter((q) => rq.rest.includes(q)) } : { ...ex, text: lit(ex.text) });
     if (rq?.pr != null) v.pr = rq.pr;
     else if (sel != null) v.pr = String(sel).replace(/^#(?=\d)/, '');
     else if (rq) v.pr = '?';
     delete v.count;
   }
+  // "create a pull request in repo acme/app", "list prs of other/repo": the repository is kept (`--repo`) or withheld
+  if (has('repo') && !has('pr')) {
+    const rq = prRepo(String(ex.text));
+    if (rq) v.repo = rq.repo;
+  }
+  // "merge pr 45 and delete the branch": gh pr merge --delete-branch
+  if (intent.id === 'gh_pr_merge' && PR_DELETE_BRANCH_TEST.test(foldKeepLength(String(ex.text)).toLowerCase())) v.delbranch = '--delete-branch';
   if (has('wenv')) {
     const t = String(ex.text);
     if (wranglerDry(t)) v.dryrun = '--dry-run';
@@ -420,6 +629,12 @@ export function resolveSlots(intent, ex) {
     if (v.file && (v.file === o || v.file === n)) v.file = paths.find((p) => p !== o && p !== n);
   }
   if (intent.id === 'chown' && v.user && v.path === v.user) delete v.path;
+  if (intent.id === 'npm_install') npmInstallTarget(String(ex.text), v);
+  // gh / wrangler: a word the request has that neither the vocabulary nor a read value explains withholds the selector
+  if (hasSelectorRule(intent.id)) {
+    const k = selectorWithhold(intent.id, String(ex.text), v);
+    if (k && has(k)) v[k] = '?';
+  }
   for (const k of Object.keys(v)) if (v[k] === undefined) delete v[k];
   return v;
 }

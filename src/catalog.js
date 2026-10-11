@@ -257,7 +257,7 @@ export const INTENTS = [
   // ---------- developer tools (v0.4, from real command usage) ----------
   // project scripts and installs run arbitrary package code: medium
   T('npm_run_script', 'Run a package.json script with npm (npm run dev/build/test)', 'npm run {script}', { script: null }, 'medium'),
-  T('npm_install', 'Install the project dependencies (or one package) with npm', 'npm install«{pkg}»', {}, 'medium'),
+  T('npm_install', 'Install the project dependencies (or one package) with npm', 'npm {npmverb!raw}«{pkg}»', { npmverb: 'install' }, 'medium'),
   T('npm_install_global', 'Install an npm package globally', 'npm install -g {pkg}', { pkg: null }, 'medium',
     { notes: 'may need sudo when the global prefix is not user-writable' }),
   T('pip_install', 'Install a Python package with pip', 'python3 -m pip install {pkg}', { pkg: null }, 'medium'),
@@ -269,26 +269,26 @@ export const INTENTS = [
   // ---------- Cloudflare wrangler ----------
   // a dry run ("do a dry run of wrangler deploy") and an environment ("deploy worker to staging") are kept, never dropped
   // for a deploy to the default target
-  T('wrangler_deploy', 'Deploy a Cloudflare Worker with wrangler', 'npx wrangler deploy«{dryrun!raw}»«--env {wenv!raw}»', {}, 'medium'),
+  T('wrangler_deploy', 'Deploy a Cloudflare Worker with wrangler', 'npx wrangler deploy«{dryrun!raw}»«--env {wenv!raw}»«{args!raw}»', {}, 'medium'),
   // npx prefers a project-local wrangler binary, so every npx wrangler command may run project code (and wrangler dev
   // runs the configured build command): medium, like npm_run_script, never auto-run with --yes
-  T('wrangler_dev', 'Run a Cloudflare Worker locally (wrangler dev)', 'npx wrangler dev', {}, 'medium'),
-  T('wrangler_tail', 'Stream live logs of a deployed Cloudflare Worker', 'npx wrangler tail', {}, 'medium'),
-  T('wrangler_secret_put', 'Set a secret (environment variable) on a Cloudflare Worker', 'npx wrangler secret put {var!raw}',
+  T('wrangler_dev', 'Run a Cloudflare Worker locally (wrangler dev)', 'npx wrangler dev«--env {wenv!raw}»«{args!raw}»', {}, 'medium'),
+  T('wrangler_tail', 'Stream live logs of a deployed Cloudflare Worker', 'npx wrangler tail«--env {wenv!raw}»«{args!raw}»', {}, 'medium'),
+  T('wrangler_secret_put', 'Set a secret (environment variable) on a Cloudflare Worker', 'npx wrangler secret put {var!raw}«--env {wenv!raw}»«{args!raw}»',
     { var: null }, 'medium', { notes: 'wrangler prompts for the value, so it never lands in shell history' }),
-  T('wrangler_login', 'Log in to Cloudflare with wrangler', 'npx wrangler login', {}, 'medium'),
-  T('wrangler_whoami', 'Show which Cloudflare account wrangler is logged in as', 'npx wrangler whoami', {}, 'medium'),
+  T('wrangler_login', 'Log in to Cloudflare with wrangler', 'npx wrangler login«{args!raw}»', {}, 'medium'),
+  T('wrangler_whoami', 'Show which Cloudflare account wrangler is logged in as', 'npx wrangler whoami«{args!raw}»', {}, 'medium'),
 
   // ---------- GitHub CLI ----------
-  T('gh_auth_status', 'Show GitHub CLI login status', 'gh auth status', {}),
-  T('gh_auth_login', 'Log in to GitHub with the gh CLI', 'gh auth login', {}),
-  T('gh_pr_list', 'List pull requests of the repository', 'gh pr list', {}),
+  T('gh_auth_status', 'Show GitHub CLI login status', 'gh auth status«{args!raw}»', {}),
+  T('gh_auth_login', 'Log in to GitHub with the gh CLI', 'gh auth login«{args!raw}»', {}),
+  T('gh_pr_list', 'List pull requests of the repository', 'gh pr list«--repo {repo!raw}»«{args!raw}»', {}),
   T('gh_pr_view', 'Show a pull request', 'gh pr view«{pr!raw}»«--repo {repo!raw}»', {}),
-  T('gh_pr_create', 'Create a pull request from the current branch', 'gh pr create --fill', {}, 'medium'),
+  T('gh_pr_create', 'Create a pull request from the current branch', 'gh pr create --fill«--repo {repo!raw}»«{args!raw}»', {}, 'medium'),
   T('gh_pr_checks', 'Show CI check status of a pull request', 'gh pr checks«{pr!raw}»«--repo {repo!raw}»', {}),
-  T('gh_pr_merge', 'Merge a pull request', 'gh pr merge«{pr!raw}»«--repo {repo!raw}»', {}, 'medium'),
-  T('gh_run_list', 'List recent GitHub Actions workflow runs', 'gh run list', {}),
-  T('gh_run_view', 'Show a GitHub Actions run (and its failed logs)', 'gh run view«{num!raw}»', {}),
+  T('gh_pr_merge', 'Merge a pull request', 'gh pr merge«{pr!raw}»«--repo {repo!raw}»«{delbranch!raw}»', {}, 'medium'),
+  T('gh_run_list', 'List recent GitHub Actions workflow runs', 'gh run list«--repo {repo!raw}»«{args!raw}»', {}),
+  T('gh_run_view', 'Show a GitHub Actions run (and its failed logs)', 'gh run view«{num!raw}»«--repo {repo!raw}»', {}),
 ];
 
 export const BY_ID = Object.fromEntries(INTENTS.map((i) => [i.id, i]));

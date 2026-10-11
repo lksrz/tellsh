@@ -12,6 +12,8 @@ import { checkDanger } from '../src/danger.js';
 import { buildContext, changeGuard } from '../src/history.js';
 import { exclusionIndex } from '../scripts/lib/heldout.js';
 import { EVAL_VALUES } from '../scripts/lib/silver.js';
+// v0.3: commands outside the catalog are high by the allowlist; these cases check the deny rules alone
+const denyOnly = (c, base = 'safe') => checkDanger(c, base, { allowlist: { off: true } });
 
 const BASH = { shell: 'bash', os: 'linux', coreutils: 'gnu' };
 const PWSH = { shell: 'powershell', os: 'win32', coreutils: 'gnu' };
@@ -120,7 +122,7 @@ test('danger: generic -c/--command payloads, trailing commands of wrappers, unsu
   for (const c of ['grep -c foo file', 'grep -c "$PAT" file', 'wc -c file', 'head -c 10 f', 'ssh user@host', 'ssh -p 22 host uptime',
     'docker exec -it web sh', 'tar -czvf a.tgz dir', 'nohup node server.js &', 'timeout 5 ping -c 3 x.org',
     'nice -n 10 make', 'watch -n 1 df -h', 'xargs -n1 echo', 'ls | shuf', 'ls | sha256sum', 'tmux new -s work', 'kubectl exec -it pod -- ls /']) {
-    assert.equal(checkDanger(c).risk, 'safe', `${c}: ${checkDanger(c).warnings.join('; ')}`);
+    assert.equal(denyOnly(c).risk, 'safe', `${c}: ${denyOnly(c).warnings.join('; ')}`);
   }
 });
 

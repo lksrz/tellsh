@@ -541,7 +541,9 @@ export function compose(query, tools, ex, { patternOf, nameOf } = {}) {
   const command = parts.join(' ');
   const validation = validateComposed(command, tn, sub);
   if (!validation.ok) return { command, tool: tn, sub, flags: used, invalid: validation.error, experimental: true };
-  const d = checkDanger(command, 'medium');
+  // the allowlist knows the tool and the flags the composer validated against its vocabulary
+  // (validateComposed passed: every option of the command is from the tool's vocabulary)
+  const d = checkDanger(command, 'medium', { allowlist: { extra: { [[spec.head, sub].filter(Boolean).join(' ')]: parts.join(' ').split(/\s+/).filter((f) => /^-(?!\d)./.test(f)) } } });
   const triggered = flags.filter((f) => !f.always && !f.implied && !f.compress).map((f) => f.flag).filter((f) => used.includes(f));
   return { command, tool: tn, sub, flags: used, triggered, risk: maxRisk('medium', d.risk), warnings: d.warnings, critical: d.critical, validation, experimental: true };
 }

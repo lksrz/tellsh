@@ -33,7 +33,9 @@ test('major: an explicit pull request target is kept or withheld, never dropped'
     assert.deepEqual(r.missing, ['pr'], q);
   }
   // no selector named: the current branch's pull request
-  for (const q of ['merge the pull request', 'merge pr now', 'merge the pull request and delete the branch']) assert.equal(run(q).command, 'gh pr merge', q);
+  for (const q of ['merge the pull request', 'merge pr now']) assert.equal(run(q).command, 'gh pr merge', q);
+  // v0.3: "and delete the branch" is kept as --delete-branch
+  assert.equal(run('merge the pull request and delete the branch').command, 'gh pr merge --delete-branch');
   assert.equal(run('view run 123456').command, 'gh run view 123456');
 });
 

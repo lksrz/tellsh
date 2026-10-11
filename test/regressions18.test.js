@@ -52,7 +52,7 @@ test('major: a branch named as "from the branch X" is read, an unreadable one is
       'merge pr from branch main': 'gh pr merge main' })) exact(run(q, null, env), cmd, `${env.shell}: ${q}`);
     for (const q of ['merge pr from the feature branch', 'merge pr from the branch']) withheld(run(q, null, env), 'gh pr merge <PR>', 'pr', `${env.shell}: ${q}`);
   }
-  exact(run('merge pr and delete the branch'), 'gh pr merge');
+  exact(run('merge pr and delete the branch'), 'gh pr merge --delete-branch');
 });
 
 test('minor: an amount after "pr" and a zero or zero-padded number are not pull requests', () => {

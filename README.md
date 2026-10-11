@@ -152,7 +152,20 @@ a word before "pr" or by a label or title (`merge the dependabot pr`, `merge dep
 https://github.com/o/r/pull/12`); plain `merge the pr`, `merge pr on github` stay `gh pr merge`); "merge that pr" after `gh pr view 45`
 gives `gh pr merge 45`, after any other command, a trailing `cd` or under `GH_REPO` `gh pr merge <PR>`; `merge the other pr`
 or `merge my last pr` give `gh pr merge <PR>`; a named repository is kept, `merge pr 45 in repo a/b` -> `gh pr merge 45 --repo a/b`). A package version constraint is kept
-(`install requests==2.32.0 with pip` -> `python3 -m pip install requests==2.32.0`). Installs, project scripts (also every `npx wrangler` command: `npx` prefers a project-local binary,
+(`install requests==2.32.0 with pip` -> `python3 -m pip install requests==2.32.0`). "Install the project dependencies"
+is `npm install` (never `npm install dependencies` / `project` / `npm`), "npm ci" / "a clean install" is `npm ci`.
+
+**Selector rule (v0.3, gh and wrangler).** A gh / wrangler request is read against a closed vocabulary: every word must
+be a command word of the tool family (`merge`, `pr`, `worker`, `deploy`, `logs`, …), a function word, a shell name, or
+part of a value that was read (pull request number / URL / branch, `--repo` repository, environment, secret name). A
+word that nothing explains — a description, a picked-out item, a quoted or uncertain name — withholds the selector
+as a placeholder you fill before running, never a guess and never a bare command: `merge the pr about auth` ->
+`gh pr merge <PR>`, `deploy worker in preview2` -> `npx wrangler deploy --env <WENV>`, `create a pr into develop` /
+`list closed prs` -> `gh pr create --fill <ARGS>` / `gh pr list <ARGS>`. An explicit value stays unless another one
+competes with it (`merge pr 45 or 46` -> `<PR>`), and an environment the request excludes is never the target
+(`deploy worker but not to production` -> `--env <WENV>`). `--env` is kept for `wrangler dev/tail/secret put` too,
+`--repo` for `gh pr create/list` and `gh run list/view`, and `merge pr 45 and delete the branch` gives
+`gh pr merge 45 --delete-branch`. Installs, project scripts (also every `npx wrangler` command: `npx` prefers a project-local binary,
 and `wrangler dev` runs the project's build command), deploys, merges, secrets and tunnels are `medium` risk, so `--yes`
 never runs them.
 
@@ -252,7 +265,17 @@ compression from the archive name, `bash -n` and an allowed-flag check validate 
 * Every intent has a base risk: **safe** (read-only), **medium** (modifies state: archives, git checkout/pull/stash,
   chmod, mv, sudo, …), **high** (destructive: rm, kill, prune, discard). v0.2 raised 10 intents from safe to medium after
   the teacher review (see `EVAL.md`).
-* `src/danger.js` scans the **final** command — also edited ones — and can only escalate. It tokenizes each simple
+* **Allowlist (v0.3).** Only the commands, subcommands and flags tellsh itself renders are trusted
+  (`src/allowlist-data.js`, generated from every catalog template for every shell by `scripts/build_allowlist.js`; a test
+  fails when it is stale). Any **wrapper** (`sudo`, `env CMD`, `timeout`, `nohup`, `xargs`, `bash -c`, `ssh host CMD`,
+  …), an environment assignment in front of a command (`FOO=1 cmd`), an **unknown program** (`mywrap`, `cowsay`), an
+  **unknown subcommand** (`git filter-branch`, `npx cowsay`, `gh pr close`) or an **unknown flag** for a known command
+  (`gh pr merge --admin`, `git push --force-with-lease`, `rm -P`) makes the command **high** risk, with the reason, so
+  it needs an explicit `yes`. Known option clusters (`ls -la` when `-l` and `-a` are known) and attached numbers
+  (`tail -n5`) count as known. The composer's commands add the flags it validated against its tool vocabulary. This
+  applies to edited commands too. Consequence: every catalog command that goes through `sudo` (service start/stop,
+  `apt install`, `chown`, `dmesg`, …) is high and needs `yes`.
+* `src/danger.js` also scans the **final** command — also edited ones — with deny rules, and can only escalate. It tokenizes each simple
   command (quotes, `--`, long options) and checks every command it may run: after a wrapper (`sudo`, `doas`, `su`,
   `runuser`, `pkexec`, `flock`, `nice`, `ionice`, `timeout`, `stdbuf`, `nohup`, `setsid`, `env`, `xargs`, `chrt`, `cgexec`,
   `eatmydata`, `torsocks`, `catchsegv`, `parallel`, `tmux`, …) the command starting at **every** later non-option word,
@@ -266,7 +289,7 @@ compression from the archive name, `bash -n` and an allowed-flag check validate 
   (`mywrap rm -rf /`). `chmod`/`chown` of `/` or a top-level system directory (even without `-R`) and `tee`/`cp` onto a
   whole disk device (`… | sudo tee /dev/sda`) are critical, and so is deleting, overwriting or editing in place a
   system file under `/etc`, `/boot`, `/usr`, `/bin`, `/sbin`, `/lib*` (`rm`, `unlink`, `sed -i`, `perl -i`, `tee`
-  without `-a`, `dd of=`, `cp`/`install`/`mv`/`ln -f` onto it, `chmod 000`). Switching user (`su`, `runuser`, `pkexec`) is at least medium, like `sudo`. It
+  without `-a`, `dd of=`, `cp`/`install`/`mv`/`ln -f` onto it, `chmod 000`). Switching user (`su`, `runuser`, `pkexec`) is at least medium, like `sudo` (high by the allowlist). It
   strips `git`/`docker` global options (`git -C dir -c k=v reset --hard` = `git reset --hard`). POSIX: `rm -rf` /
   `rm --recursive --force` on `/`, `~`, `~/*`, `"/"`, `/usr`, …, `mkfs`, `dd of=/dev/…`, fork bombs, `curl | sh`,
   `bash <(curl …)`, `sh -c "$(curl …)"`, force-push (incl. `+branch`), redirects into `/etc` (`>>`, `1>`, `&>`),
@@ -343,8 +366,26 @@ To add an intent: template in `src/catalog.js` (+ shell variants in `src/variant
 ~60 paraphrases in `data/intents/`, ~16 eval rows written by someone else (`data/eval_v04/` for the v0.4 intents);
 retrain; `npm test && npm run eval`.
 
-## Known gaps
+## Known limits
 
+* **The selector rule trades recall for safety.** Its vocabulary is closed and hand-written (English and Polish): a
+  harmless paraphrase with a word it does not list (`deploy the api worker to cloudflare`, `run the worker on
+  localhost:8787`) gets a placeholder (`<ARGS>`, `<WENV>`) you have to fill or delete. On the 1097 gh / wrangler
+  phrasings of the training and dev-tools eval data, 103 now end in a placeholder (57 before). Options the commands do
+  not render (`--draft`, `--base`, `--label`, `--state`, `--squash`, `--port`, `--hostname`) are never added: their
+  requests get `<ARGS>`. Words the vocabulary does list are trusted, so a selector hidden in one of them (e.g.
+  "merge the pr into main" reads "main" as the merge base, not as a pull request) is not caught.
+* The selector rule covers gh and wrangler only (plus `npm install` dependency words). Other intents still read their
+  slots with the per-slot parsers: a descriptive word can still become a value there (`install the testing library`
+  -> `python3 -m pip install testing`). Read the command before running it.
+* `<ARGS>` and `<WENV>` are placeholders, not values: tellsh never runs an incomplete command; edit it (`e`) first.
+* **The allowlist knows only what the catalog renders.** A perfectly safe command you type or edit with a flag tellsh
+  never emits (`ls --color=never`, `git log --stat`) is reported as high risk and needs `yes`. PowerShell expressions
+  are tokenized with the same light tokenizer: parts of an expression (`$_.Length -gt 1MB`, `.Count`) are not judged
+  by the allowlist (a `$`-named program stays high by the deny rules). Payload strings of a runner (`forfiles /c "…"`,
+  `bash -c '…'`) are checked by the deny rules; the wrapper itself already makes the command high.
+* **sudo is a wrapper.** Every `sudo` catalog command (and the `bash -c` fallback for PowerShell on Linux/macOS without a
+  native variant, and `… | xargs kill`) is high risk by the allowlist; the deny rules alone would call most of them medium.
 * fish / cmd renders are not syntax-checked here (no fish/pwsh in CI); PowerShell variants are hand-written and only
   linted structurally — `pwsh` parser checks run automatically where `pwsh` is installed.
 * zsh is validated with `bash -n` (no zsh in CI); zsh-only behaviour (e.g. `NOMATCH` on unquoted globs) is avoided by quoting.
@@ -352,8 +393,9 @@ retrain; `npm test && npm run eval`.
 * History: bash writes history late (see above); references are resolved to the most recent matching entity, there is no
   multi-turn memory of tellsh's own suggestions beyond the history file.
 * Composer: closed vocabulary, POSIX only, no pipelines, no `--format`/`-o` style arguments; it is a safety net, not a generator.
-* Negation is only read for pull request merges (`do not merge pr 45` is refused); elsewhere it is not (`do not delete
-  a.txt` still suggests `rm a.txt`). Always read the command before running it.
+* Negation is only read for pull request merges (`do not merge pr 45` is refused) and wrangler environments (an excluded
+  environment is withheld, `--env <WENV>`); elsewhere it is not (`do not delete a.txt` still suggests `rm a.txt`). Always
+  read the command before running it.
 * The real-usage split's command groups keep some operands (`npm install express` ≠ `npm install react`): 552 of 2957
   eval rows share an operand-masked skeleton with train; A scores ~1 pt higher on those, ~0.2 pt overall
   ([HYBRID.md](HYBRID.md#v04-real-usage)).

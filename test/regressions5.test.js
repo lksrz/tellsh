@@ -11,6 +11,8 @@ import { checkDanger } from '../src/danger.js';
 import { buildContext } from '../src/history.js';
 import { heldOutTexts, heldOutIndex } from '../scripts/lib/heldout.js';
 import { SLOT_CASES } from './slot-cases.js';
+// v0.3: commands outside the catalog are high by the allowlist; these cases check the deny rules alone
+const denyOnly = (c, base = 'safe') => checkDanger(c, base, { allowlist: { off: true } });
 
 const BASH = { shell: 'bash', os: 'linux', coreutils: 'gnu' };
 const PWSH = { shell: 'powershell', os: 'win32', coreutils: 'gnu' };
@@ -127,9 +129,10 @@ test('danger: -c command strings and more wrappers are unwrapped', () => {
     assert.equal(d.risk, 'high', c);
     assert.equal(d.critical, true, c);
   }
-  for (const c of ['flock /tmp/l echo hi', 'cgexec -g cpu:x ls', 'chrt -p 1234']) assert.equal(checkDanger(c, 'safe').risk, 'safe', c);
+  for (const c of ['flock /tmp/l echo hi', 'cgexec -g cpu:x ls', 'chrt -p 1234']) assert.equal(denyOnly(c, 'safe').risk, 'safe', c);
   // switching user is a privilege change, like sudo (round 4b)
-  assert.equal(checkDanger('su - bob', 'safe').risk, 'medium');
+  assert.equal(denyOnly('su - bob', 'safe').risk, 'medium');
+  assert.equal(checkDanger('su - bob', 'safe').risk, 'high'); // v0.3: su is a wrapper
 });
 
 test('teacher.js and gen_data.js exclude the same held-out texts, including the slot cases', () => {

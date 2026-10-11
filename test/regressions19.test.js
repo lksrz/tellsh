@@ -98,7 +98,7 @@ test('minor: closing a pull request is refused, never `gh pr create` or `gh pr v
     }
     assert.equal(run('close that pr', ['gh pr view 45'], env).command ?? null, null, env.shell);
   }
-  for (const [q, cmd] of Object.entries({ 'create a pr': 'gh pr create --fill', 'show closed prs': 'gh pr list', 'view pr 45': 'gh pr view 45' })) {
+  for (const [q, cmd] of Object.entries({ 'create a pr': 'gh pr create --fill', 'show closed prs': 'gh pr list <ARGS>', 'view pr 45': 'gh pr view 45' })) {
     assert.equal(run(q).command, cmd, q);
   }
 });

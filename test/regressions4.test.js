@@ -10,6 +10,8 @@ import { checkDanger } from '../src/danger.js';
 import { splitCommand } from '../src/shellwords.js';
 import { sameCmd } from '../scripts/lib/cmdnorm.js';
 import { nearKey, heldOutIndex } from '../scripts/lib/heldout.js';
+// v0.3: commands outside the catalog are high by the allowlist; these cases check the deny rules alone
+const denyOnly = (c, base = 'safe') => checkDanger(c, base, { allowlist: { off: true } });
 
 const BASH = { shell: 'bash', os: 'linux', coreutils: 'gnu' };
 const PWSH = { shell: 'powershell', os: 'win32', coreutils: 'gnu' };
@@ -136,8 +138,8 @@ test('danger: more command wrappers, whole-disk shred', () => {
     assert.equal(checkDanger(c).critical, true, c);
   }
   assert.equal(checkDanger('shred -u notes.txt').critical, false);
-  assert.equal(checkDanger('watch ls').risk, 'safe');
-  assert.equal(checkDanger('taskset 1 node bench.js').risk, 'safe');
+  assert.equal(denyOnly('watch ls').risk, 'safe');
+  assert.equal(denyOnly('taskset 1 node bench.js').risk, 'safe');
 });
 
 test('grep pattern slot: option words are not the pattern, a path-like pattern keeps the search dir', () => {

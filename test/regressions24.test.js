@@ -35,7 +35,9 @@ test('major: after "for" a strong environment is taken, a weak one is withheld, 
       withheld(run(q, null, env), 'npx wrangler deploy --env <WENV>', 'wenv', `${env.shell}: ${q}`);
     }
     // a word after "for" that is not an environment name leaves the default target
-    for (const q of ['deploy worker for real', 'deploy worker for a customer']) exact(run(q, null, env), 'npx wrangler deploy', `${env.shell}: ${q}`);
+    exact(run('deploy worker for real', null, env), 'npx wrangler deploy', env.shell);
+    // v0.3 selector rule: a descriptive target is the user's to fill
+    withheld(run('deploy worker for a customer', null, env), 'npx wrangler deploy --env <WENV>', 'wenv', env.shell);
   }
 });
 
@@ -66,7 +68,10 @@ test('minor: a marked word after a preposition is an environment only with a kno
 
 test('minor: a dry run asked for after a negated one is still a dry run', () => {
   exact(run('deploy worker without a dry run first? no, do a dry run'), 'npx wrangler deploy --dry-run');
-  exact(run('deploy worker, not just a dry run'), 'npx wrangler deploy --dry-run');
+  // v0.3 selector rule: "not just" leaves something the command does not express: the user fills it
+  const r = run('deploy worker, not just a dry run');
+  assert.equal(r.command, 'npx wrangler deploy --dry-run <ARGS>');
+  assert.deepEqual(r.missing, ['args']);
   exact(run('deploy the worker, not a dry run'), 'npx wrangler deploy');
 });
 

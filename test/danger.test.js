@@ -1,6 +1,8 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { checkDanger } from '../src/danger.js';
+// v0.3: commands outside the catalog are high by the allowlist; these cases check the deny rules alone
+const denyOnly = (c, base = 'safe') => checkDanger(c, base, { allowlist: { off: true } });
 
 const critical = [
   'rm -rf /', 'rm -rf /*', 'sudo rm -rf ~', 'rm -fr *', 'rm -r -f $HOME', 'rm -rf --no-preserve-root /',
@@ -32,7 +34,9 @@ for (const c of safe) {
 }
 
 test('medium escalations', () => {
-  assert.equal(checkDanger('sudo apt update').risk, 'medium');
+  // v0.3: sudo is a wrapper: high by the allowlist; the deny rules alone call it medium
+  assert.equal(checkDanger('sudo apt update').risk, 'high');
+  assert.equal(denyOnly('sudo apt update').risk, 'medium');
   assert.equal(checkDanger('echo hi > out.txt').risk, 'medium');
   assert.equal(checkDanger('chmod 777 file').risk, 'medium');
 });

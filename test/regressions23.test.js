@@ -46,9 +46,12 @@ test('major: a custom environment name is kept whole', () => {
       'deploy worker to staging-eu': 'npx wrangler deploy --env staging-eu',
       'deploy worker to preview2': 'npx wrangler deploy --env preview2',
       'deploy worker to the staging-eu environment': 'npx wrangler deploy --env staging-eu',
-      'deploy worker in 2-3 minutes': 'npx wrangler deploy',
     };
     for (const [q, cmd] of Object.entries(cases)) exact(run(q, null, env), cmd, `${env.shell}: ${q}`);
+    // v0.3 selector rule: a time the command does not express is the user's to fill
+    const r = run('deploy worker in 2-3 minutes', null, env);
+    assert.equal(r.command, 'npx wrangler deploy <ARGS>', env.shell);
+    assert.deepEqual(r.missing, ['args'], env.shell);
   }
 });
 
