@@ -33,7 +33,7 @@ const args = process.argv.slice(2);
 const arg = (k, d) => { const i = args.indexOf(k); return i >= 0 ? args[i + 1] : d; };
 const SRC = arg('--data', process.env.TELLSH_REAL_DATA || '/workspace/tellsh-data/dataset.jsonl');
 const EVAL_FRAC = +arg('--eval-frac', 0.25);
-const GROUP = arg('--group', 'v04');
+const GROUP = arg('--group', 'structural');
 if (!existsSync(SRC)) { console.error(`prepare_real: no dataset at ${SRC}`); process.exit(1); }
 
 // v0.4 intents: label = the command itself (sudo / npx / env prefixes stripped)
@@ -97,7 +97,9 @@ for (const r of rows) {
   else { intent = null; st.byLabelSource.outOfCatalog++; }
   const shell = r.shell === 'powershell' ? 'powershell' : r.shell || 'bash';
   const os = r.os === 'windows' ? 'win32' : r.os || 'linux';
-  cmds.push({ cmd, intent, shell, os, group: group(cmd, GROUP), seed, src: r.source_type,
+    // aic-studio-only rows: descriptions were template-generated there (lower training weight, see real_rows.js)
+  const tmpl = Array.isArray(r.hosts) && r.hosts.length > 0 && r.hosts.every((x) => x === 'aic-studio');
+  cmds.push({ cmd, intent, shell, os, group: group(cmd, GROUP), seed, src: r.source_type, tmpl,
     texts: [...r.descriptions_en.map((t) => [t, 'en']), ...r.descriptions_pl.map((t) => [t, 'pl'])] });
   st.commands++;
 }
@@ -132,7 +134,7 @@ for (const c of cmds) {
     if (!t || t.length > 300) continue;
     const text = fill(t, c.seed);
     out.push({ text, intent: c.intent, lang, shell: c.shell, os: c.os, group: c.group, split, cmd: c.cmd,
-      literal: norm(text) === norm(c.cmd), src: c.src });
+      literal: norm(text) === norm(c.cmd), src: c.src, tmpl: c.tmpl });
   }
 }
 // a text that occurs in both splits (short generic descriptions) is held out: dropped from train

@@ -19,7 +19,8 @@ export const realEvalTexts = (rows) => rows.filter((r) => r.split === 'eval').ma
 export function realTrain(rows, ids, cap = CAP) {
   const n = {};
   return rows.filter((r) => r.split === 'train' && r.intent && ids.has(r.intent))
-    .map((r) => ({ r, k: fnv1a('real:' + r.text) })).sort((a, b) => a.k - b.k).map(({ r }) => r)
+        // non-template rows first: aic-studio descriptions are template-generated, so they only fill what is left of the cap
+    .map((r) => ({ r, k: fnv1a('real:' + r.text) })).sort((a, b) => (a.r.tmpl ? 1 : 0) - (b.r.tmpl ? 1 : 0) || a.k - b.k).map(({ r }) => r)
     .filter((r) => (n[r.intent + r.lang] = (n[r.intent + r.lang] || 0) + 1) <= cap)
-    .map((r) => ({ text: r.text, intent: r.intent, lang: r.lang, shell: r.shell, os: r.os, src: 'real' }));
+    .map((r) => ({ text: r.text, intent: r.intent, lang: r.lang, shell: r.shell, os: r.os, src: 'real', tmpl: !!r.tmpl }));
 }
