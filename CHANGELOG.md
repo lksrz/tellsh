@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.3.3
+
+Republish of 0.3.2 (reviewed): 0.3.2 was accidentally published from an unreviewed working tree.
+
 ## 0.3.2
 
 **Prompt (UX).** A single keypress: **Enter runs the command at every risk level** (no more `y` / `yes`), **Esc** or
