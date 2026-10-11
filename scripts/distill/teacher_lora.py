@@ -76,13 +76,13 @@ def label(a):
     desc = descs(a.meta)
     done = set()
     if os.path.exists(a.out):
-        pool_h = {}
+        pool_h, pool_c = {}, {}
         for l in open(a.pool, encoding='utf-8'):
-            r = json.loads(l); pool_h[r['id']] = hashlib.sha1(r['text'].encode('utf-8')).hexdigest()[:12]
+            r = json.loads(l); pool_h[r['id']] = hashlib.sha1(r['text'].encode('utf-8')).hexdigest()[:12]; pool_c[r['id']] = set(r['cands'] + ['none'])
         for l in open(a.out):
             if not l.strip(): continue
             x = json.loads(l)
-            if pool_h.get(x['id']) != x.get('h'): sys.exit(f'label: {a.out} was made for a different pool (id {x["id"]}); use a new --out')
+            if pool_h.get(x['id']) != x.get('h') or set(x.get('soft', {})) != pool_c.get(x['id']): sys.exit(f'label: {a.out} was made for a different pool (id {x["id"]}); use a new --out')
             done.add(x['id'])
     out = open(a.out, 'a')
     for l in open(a.pool):
@@ -119,6 +119,9 @@ if __name__ == '__main__':
     ap.add_argument('--k', type=int, default=8); ap.add_argument('--max-rows', type=int, default=40000)
     a = ap.parse_args()
     # adapters and labels come from private text: refuse an output inside a git work tree unless under its build/
+    # no symlinks inside an existing output (save_pretrained / labels would write through them)
+    for p_ in [a.out] + ([os.path.join(dp, f) for dp, dn, fn in os.walk(a.out) for f in dn + fn] if os.path.isdir(a.out) else []):
+        if os.path.islink(p_): sys.exit(f'refusing: symlink in output {p_}')
     out_real = os.path.realpath(a.out)
     d = out_real
     while True:

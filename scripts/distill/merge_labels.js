@@ -37,6 +37,9 @@ const extra = [];
 for (const l of rj(join(D, 'labels.jsonl'))) {
   st.labels++;
   const r = pool.get(l.id); if (!r) continue;
+  // the label must have been made for this row's current candidate set (cands + none)
+  const ks = Object.keys(l.soft || {}).sort().join('|'), cs = [...new Set([...r.cands, 'none'])].sort().join('|');
+  if (ks !== cs) { console.error(`merge_labels: label ${l.id} was made for different candidates; relabel`); process.exit(1); }
   if (!l.h || l.h !== createHash('sha1').update(r.text).digest('hex').slice(0, 12)) { console.error(`merge_labels: label ${l.id} does not match the pool text`); process.exit(1); }
   const bad = (t) => excl.has(t) || dev.has(normalize(t)) || decide.get(normalize(t))?.action === 'drop';
   // relex copies: the parent sentence must pass too; copies from pools without provenance are skipped
