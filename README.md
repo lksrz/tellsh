@@ -137,14 +137,16 @@ Added from real command usage: `npm run <script>`, `npm install [pkg]`, `npm ins
 (`py -m pip` on Windows), activating a virtualenv (per shell), `<tool> --version` / `--help`, printing a line range
 (`sed -n 'N,Mp'`, `Get-Content … -Index` in PowerShell), SSH local port forwarding, Cloudflare `wrangler`
 (deploy, dev, tail, secret put, login, whoami; a dry run and an environment are kept, `do a dry run of wrangler deploy` ->
-`npx wrangler deploy --dry-run`, `deploy worker to staging` -> `npx wrangler deploy --env staging`, an unreadable one
-`--env <WENV>`) and the GitHub CLI (`gh auth`, `gh pr list/view/create/checks/merge`,
+`npx wrangler deploy --dry-run`, `deploy worker to staging` -> `npx wrangler deploy --env staging`, a custom name whole,
+`to staging-eu` -> `--env staging-eu`; an unreadable one or one it would have to guess, `deploy worker env`, `with env vars`,
+gives `--env <WENV>`) and the GitHub CLI (`gh auth`, `gh pr list/view/create/checks/merge`,
 `gh run list/view`; a pull request the request names, by number, URL or branch, is passed on: `gh pr merge
 feature/login`, also quoted, `merge pull request "feature/login"`, never a bare `gh pr merge` for the current branch's
 pull request; a word that may not be a branch, `merge pr main`, gives `gh pr merge <PR>`, while `feature/apply` or
 `hotfix/weekly` are kept; a number counts only next to "pr" (`pr 45`, `pr #45`) or as `#45` right after the verb: `merge pr with 2 approvals`,
 `merge pr for issue #45` and `merge the pr that closes #12` give `gh pr merge <PR>`; so do a pull request picked out by
-a word before "pr" or by a label or title (`merge the dependabot pr`, `merge said pr`, `merge the pr with label urgent`;
+a word before "pr" or by a label or title (`merge the dependabot pr`, `merge dependabot pr`, `merge alice's pr`, `merge said pr`,
+`merge the pr with label urgent`, `merge the pr with title "fix-login"`;
 plain `merge the pr` stays `gh pr merge`); "merge that pr" after `gh pr view 45`
 gives `gh pr merge 45`, after any other command, a trailing `cd` or under `GH_REPO` `gh pr merge <PR>`; `merge the other pr`
 or `merge my last pr` give `gh pr merge <PR>`; a named repository is kept, `merge pr 45 in repo a/b` -> `gh pr merge 45 --repo a/b`). A package version constraint is kept

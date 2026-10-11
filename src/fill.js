@@ -58,7 +58,7 @@ const PR_UNIT_AFTER = /^\s+(?:secs?|seconds?|mins?|minutes?|hours?|hrs?|days?|we
 const PR_HASH_LEAD = /^\s*(?:(?:please|pls|now|then|just|squash|rebase|merge|close|reopen|view|show|open|display|check|checkout|diff|review|approve|ready|edit)\s+)+$/i;
 // "merge the pull request by alice", "merge the pr from yesterday", "the pr that fixes login", "the pr opened last week": a
 // pull request picked out by who or when, which is not the current branch's (withheld)
-const PR_QUALIFIED = /^\s*(?:(?:by|from|since|before|after|about|titled|named|called|that|which|who|whose|where|od|autorstwa)\b|(?:\S+\s+)?(?:opened|created|authored|submitted|raised|written|made|sent|pushed|filed)\b)|\b(?:yesterday|today|tonight|tomorrow|ago|last\s+(?:week|month|year|night|friday|monday|tuesday|wednesday|thursday|saturday|sunday)|wczoraj\w*|dzisiaj|dzi[sś])\b/i;
+const PR_QUALIFIED = /^\s*(?:in\s+question\b|(?:by|from|since|before|after|about|titled|named|called|that|which|who|whose|where|od|autorstwa)\b|(?:\S+\s+)?(?:opened|created|authored|submitted|raised|written|made|sent|pushed|filed)\b)|\b(?:yesterday|today|tonight|tomorrow|ago|last\s+(?:week|month|year|night|friday|monday|tuesday|wednesday|thursday|saturday|sunday)|wczoraj\w*|dzisiaj|dzi[sś])\b/i;
 // "merge the pr with label urgent", "the pull request with title fix login", "z etykietą pilne": picked out by a label,
 // title, author, ... (withheld)
 const PR_DESCRIBED = /^\s*(?:with|having|z|o)\s+(?:the\s+|a\s+)?(?:labels?|title|titled|name|tags?|authors?|assignees?|milestone|description|text|keywords?|words?|subject|commits?|etykiet\w*|tytu\w*|nazw\w*|autor\w*)\b|^\s*(?:labell?ed|tagged|assigned|mentioning|containing|regarding|concerning|touching|fixing|adding|removing|updating|changing)\b/i;
@@ -71,17 +71,57 @@ const PR_WHEN = /^(?:last|this|next|past|previous|previously|before|earlier|ages
 const PR_DET_WORD = /(?:^|\s)(?:the|a|an|my|our|your|his|her|their|this|that|these|those|its|ten|tego|ta|tamten|to)\s+((?:\S+\s+){1,3})$/i;
 const PR_DET_NEUTRAL = /^(?:current|own|one|same|previous|last|prior|single|github|gh|pull|this|that|the|my|our|bieżący\w*|biezacy\w*|obecn\w*|aktualn\w*|mój|moj\w*|nasz\w*|sw[oó]j|swoj\w*|ten|tego)$/i;
 const PR_ANAPHOR = /(?:^|\s)(?:said|above|aforementioned|abovementioned|above-mentioned|mentioned|referenced|aforesaid|forementioned|wspomnian\w*|powy[zż]sz\w*|ww\.?)\s+(?:\S+\s+)?$/i;
+// "merge dependabot pr", "merge draft pr", "merge alice's pr": without a determiner, a word between the request's verb and
+// "pr" picks out a pull request just the same (withheld); "merge pr", "squash and merge my pr", "zmerguj to pr" stay as they are
+const PR_VERB = /^(?:merge|squash|rebase|land|ship|accept|view|show|open|display|see|check|checkout|diff|review|approve|close|reopen|edit|ready|comment|list|get|fetch|print|describe|zmerguj\w*|scal\w*|poka[zż]\w*|zobacz\w*|otw[oó]rz\w*|zamknij\w*|sprawd[zź]\w*|wy[sś]wietl\w*|zatwierd[zź]\w*|zaakceptuj\w*|przejrzyj\w*)$/i;
+const PR_FILLER = /^(?:please|pls|now|then|just|and|also|out|up|go|ahead|to|it|tamten|that|this|ten|tego|gh|github|pull|i|you|can|could|would|will|let's|lets|me|us|want|need|prosz[eę]|teraz|i|oraz|a)$/i;
+// "merge open pr", "merge ready pr": after the verb, a state word picks a pull request out
+const PR_STATE = /^(?:open|ready|review|close)$/i;
+function prWordBefore(before) {
+  const words = before.replace(/[,;:]/g, ' ').trim().split(/\s+/).filter(Boolean);
+  const v = words.findIndex((x) => PR_VERB.test(x));
+  // "show checks for that pr", "view the diff of my pr": the words before the last preposition say what to show
+  const at = Math.max(v, words.findLastIndex((x) => /^(?:for|of|on|in|from|about|with|dla|z|w)$/i.test(x)));
+  return words.slice(at + 1).some((x) => !(PR_VERB.test(x) && !PR_STATE.test(x)) && !PR_FILLER.test(x) && !PR_DET_NEUTRAL.test(x));
+}
 // "merge ten pr" (Polish "this"), "merge that one pr": a number word that is a demonstrative, not a number
 const PR_DEM_NUMBER = /\b(?:ten|(?:that|this|which|the)\s+one)\s+(?:\S+\s+)?(?:prs?|pull[\s-]+requests?)\b/gi;
 // "merge pr from the feature branch", "for my branch bob": a branch is named, but not one the parser read
 const PR_BRANCH_NAMED = /\b(?:for|of|on|from)\s+(?:\S+\s+){0,2}branch\b/i;
-// wrangler deploy: "dry run", "--dry-run", "na sucho", "without (actually) deploying/publishing" (wrangler deploy --dry-run)
+// wrangler deploy: "dry run", "--dry-run", "na sucho", "without (actually) deploying/publishing" (wrangler deploy --dry-run);
+// "not a dry run", "without dry run", "skip the dry run": a real deploy, no flag
 const WR_DRY = /\bdry[\s-]*run\b|\bna\s+sucho\b|\bwithout\s+(?:actually\s+)?(?:deploying|publishing|uploading)\b|\b(?:don'?t|do\s+not)\s+actually\s+(?:deploy|publish|upload)\b|\bbez\s+(?:faktycznego\s+)?(?:wdra[zż]ania|publikowania|deployu?)\b/i;
-// the environment: "--env staging", "-e staging", "env staging", "to the staging environment", "to staging", "na produkcję"
+const WR_DRY_NOT = /\b(?:not|no|without|skip|skipping|nie|bez)\s+(?:a\s+|the\s+|any\s+)?dry[\s-]*run\b|\b(?:don'?t|do\s+not)\s+(?:do\s+)?(?:a\s+|the\s+)?dry[\s-]*run\b/i;
+// the environment: "--env staging", "-e staging", "env staging", "to the staging environment", "to staging", "na produkcję";
+// a name is taken only when it is a known one ("staging", "prod", ...) or a marked one ("staging-eu", "preview2", "qa_1"),
+// as a whole word: "worker env", "with env vars", "env file", "my environment is set" never make up `--env worker/with/is`
+// (the environment is withheld, `<WENV>`); a plain unknown word after "to" ("to cloudflare") is not an environment
 const WR_ENV_OPT = /(?:^|\s)(?:--env|-e)(?:=|\s+)(\S+)/i;
-const WR_ENV_WORD = /\b(?:env|environment|środowisk\w*|srodowisk\w*)\s+(?:called\s+|named\s+|o\s+nazwie\s+)?(?!to\b|for\b|the\b|called\b|named\b)([A-Za-z0-9][\w-]*\S*)|\b(?!(?:to|my|our|your|the|a|an|this|that|its|on|in|for|into|of|na|do|w)\b)([A-Za-z0-9][\w-]*)\s+(?:env|environment)\b/i;
-const WR_ENV_KNOWN = /\b(?:to|on|in|into|for|na|do|w)\s+(?:the\s+|my\s+|our\s+)?(staging|stage|production|prod|preview|dev|development|test|testing|qa|uat|sandbox|canary|beta)\b/i;
+const WR_ENV_AFTER = /\b(?:env|environment|środowisk\w*|srodowisk\w*)\s+(called\s+|named\s+|o\s+nazwie\s+)?(\S+)/gi;
+const WR_ENV_BEFORE = /(?:^|\s)(\S+)\s+(?:env|environment)\b/gi;
+const WR_ENV_PREP = /\b(to|on|in|into|na|do|w)\s+(?:the\s+|my\s+|our\s+)?(\S+)/gi;
+const WR_ENV_KNOWN = /^(?:staging|stage|production|prod|preview|dev|development|test|testing|qa|uat|sandbox|canary|beta)$/i;
 const WR_ENV_ANY = /\b(?:env|environment|środowisk\w*|srodowisk\w*|produkcj\w*|staging\w*)\b/i;
+const wrEnvWord = (w) => String(w).replace(/[.,!?;:]+$/, '');
+// a marked name: letters with a digit, '-' or '_' ("staging-eu", "preview2"), not "2-3" or "src/worker.js"
+const wrEnvMarked = (w) => RAW_OK.wenv(w) && /[A-Za-z]/.test(w) && /[\d_-]/.test(w);
+/** The wrangler environment a deploy request names: a name, `?` (named, not readable) or null (the default). */
+function wranglerEnv(t) {
+  const o = t.match(WR_ENV_OPT);
+  if (o) { const w = wrEnvWord(o[1]); return RAW_OK.wenv(w) ? w : '?'; }
+  for (const m of t.matchAll(WR_ENV_AFTER)) {
+    const w = wrEnvWord(m[2]);
+    if (WR_ENV_KNOWN.test(w) || wrEnvMarked(w) || (m[1] && RAW_OK.wenv(w))) return w;
+  }
+  for (const m of t.matchAll(WR_ENV_BEFORE)) {
+    if (WR_ENV_KNOWN.test(m[1]) || wrEnvMarked(m[1])) return m[1];
+  }
+  for (const m of t.matchAll(WR_ENV_PREP)) {
+    const w = wrEnvWord(m[2]);
+    if (WR_ENV_KNOWN.test(w) || (/^(?:to|into|na|do)$/i.test(m[1]) && wrEnvMarked(w))) return w;
+  }
+  return WR_ENV_ANY.test(t) ? '?' : null;
+}
 /**
  * The pull request the user names (quoted: kept as written, validation withholds an odd one), else null (`gh pr merge`
  * acts on the current branch's pull request). A number elsewhere in the request ("merge pr with 2 approvals", "merge the
@@ -118,15 +158,17 @@ function prSelector(ex) {
   }
   const hash = text.match(/(?:^|\s)#(\d{1,12})(?=[\s.,!?;:]|$)/);
   if (hash && PR_HASH_LEAD.test(text.slice(0, hash.index + hash[0].indexOf('#')))) return hash[1];
+  const p = text.match(PR_WORD);
+  const after = p ? text.slice(p.index + p[0].length) : '';
+  const before = p ? text.slice(0, p.index) : '';
+  // 'merge the pr with label "urgent"', 'the pr titled "fix"': a quoted description, not the pull request (withheld)
+  if (ex.quoted.length && (PR_DESCRIBED.test(after) || PR_QUALIFIED.test(after))) return '?';
   // 'merge the "feature/login" pull request': an explicitly quoted value is the target
   if (ex.quoted.length) return ex.quoted[0];
   // named but not readable: a number anywhere ("merge the 2 open prs", "merge pr in 2 minutes"), or a marked word or a
   // quote after "pr" ("merge pr bob's", "merge pr feature/x's", "merge pr in repo v2"): withheld
-  const p = text.match(PR_WORD);
-  const after = p ? text.slice(p.index + p[0].length) : '';
-  const before = p ? text.slice(0, p.index) : '';
   const det = before.match(PR_DET_WORD);
-  if (PR_ANAPHOR.test(before) || (det && det[1].trim().split(/\s+/).some((x) => !PR_DET_NEUTRAL.test(x)))) return '?';
+  if (PR_ANAPHOR.test(before) || (det && det[1].trim().split(/\s+/).some((x) => !PR_DET_NEUTRAL.test(x))) || (p && prWordBefore(before))) return '?';
   if (PR_DESCRIBED.test(after)) return '?';
   const numbers = !/\d/.test(text) && (ex.numbers?.length ?? 0) <= [...text.matchAll(PR_DEM_NUMBER)].length ? [] : ex.numbers || [];
   if (numbers.length || /\d/.test(text) || /[/_#'"`„“”’]|\w[.-]\w/.test(after) || PR_BRANCH_NAMED.test(after) || PR_QUALIFIED.test(after)) return '?';
@@ -283,12 +325,10 @@ export function resolveSlots(intent, ex) {
   }
   if (has('wenv')) {
     const t = String(ex.text);
-    if (WR_DRY.test(t)) v.dryrun = '--dry-run';
-    const m = t.match(WR_ENV_OPT) || t.match(WR_ENV_WORD) || t.match(WR_ENV_KNOWN);
-    // an environment named but not readable ("to the env called 'a b'") is withheld, never the default target
-    const w = m ? String(m[1] ?? m[2]).replace(/[.,!?;:]+$/, '') : null;
-    if (w != null) v.wenv = RAW_OK.wenv(w) ? w : '?';
-    else if (WR_ENV_ANY.test(t)) v.wenv = '?';
+    if (WR_DRY.test(t) && !WR_DRY_NOT.test(t)) v.dryrun = '--dry-run';
+    // an environment named but not readable ("to the env called 'a b'", "worker env") is withheld, never the default target
+    const w = wranglerEnv(t);
+    if (w != null) v.wenv = w;
   }
   if (ex.ext) v.glob = `*.${ex.ext}`;
   if (ex.urls.length) v.url = ex.urls[0];
