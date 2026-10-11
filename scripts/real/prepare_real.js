@@ -14,18 +14,26 @@
 // `gh pr view 12 --repo a/b` and `gh pr view 40 --repo c/d` are one group. Per label, whole groups go to eval
 // until >= 25% of that label's commands are held out (labels with one group stay in train).
 //
-// Usage: node scripts/real/prepare_real.js [--data <dataset.jsonl>] [--eval-frac 0.25]
+// `--group v04` (default) reproduces the split the shipped model was trained on; its skeleton keeps up to two lower-case
+// words after the head, so operands leak into it (`npm install express` / `npm install react` are two groups). On that
+// split 552 of the 2957 labelled eval rows share a --group structural skeleton (per-tool subcommand depth, operands
+// masked) with a train row; A scores 84.6% on them vs 83.5% on the rest (scripts/real/group_leak.js,
+// HYBRID.md#v04-real-usage). The next retrain should use `--group structural`.
+//
+// Usage: node scripts/real/prepare_real.js [--data <dataset.jsonl>] [--eval-frac 0.25] [--group v04|structural]
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { join } from 'node:path';
 import { BY_ID } from '../../src/catalog.js';
+import { strip, group } from './group.js';
 
 const ROOT = fileURLToPath(new URL('../..', import.meta.url));
 const args = process.argv.slice(2);
 const arg = (k, d) => { const i = args.indexOf(k); return i >= 0 ? args[i + 1] : d; };
 const SRC = arg('--data', process.env.TELLSH_REAL_DATA || '/workspace/tellsh-data/dataset.jsonl');
 const EVAL_FRAC = +arg('--eval-frac', 0.25);
+const GROUP = arg('--group', 'v04');
 if (!existsSync(SRC)) { console.error(`prepare_real: no dataset at ${SRC}`); process.exit(1); }
 
 // v0.4 intents: label = the command itself (sudo / npx / env prefixes stripped)
@@ -56,26 +64,10 @@ const NEW = [
   ['cli_help', /^[\w.-]+(?: [a-z][\w-]*){0,2} (?:--help|-h|help)$/],
 ];
 const COMPOUND = /^(sleep|cd|for|while|if|echo|printf|bash|sh|zsh|pwd|export|time|timeout|-n|until|then|do)$/;
-const strip = (c) => c.trim().replace(/^(?:sudo |npx (?:-y )?|env \w+=\S+ )+/, '');
 function newIntentOf(cmd) {
   const c = strip(cmd);
   for (const [id, re] of NEW) if (re.test(c)) return id;
   return null;
-}
-
-// value-masked command skeleton (see header)
-function group(cmd) {
-  const w = strip(cmd).split(/\s+/);
-  const head = [w[0]];
-  let i = 1;
-  while (i < w.length && head.length < 3 && /^[a-z][a-z-]*$/.test(w[i])) head.push(w[i++]);
-  const flags = new Set();
-  let ops = 0;
-  for (; i < w.length; i++) {
-    if (/^-{1,2}[A-Za-z][\w-]*/.test(w[i])) flags.add(w[i].replace(/=.*/, ''));
-    else if (!/^[|;&]/.test(w[i])) ops++;
-  }
-  return `${head.join(' ')} ${[...flags].sort().join(' ')} #${Math.min(ops, 3)}`;
 }
 
 // redaction placeholders -> plausible values (same value in the command and its descriptions)
@@ -105,7 +97,7 @@ for (const r of rows) {
   else { intent = null; st.byLabelSource.outOfCatalog++; }
   const shell = r.shell === 'powershell' ? 'powershell' : r.shell || 'bash';
   const os = r.os === 'windows' ? 'win32' : r.os || 'linux';
-  cmds.push({ cmd, intent, shell, os, group: group(cmd), seed, src: r.source_type,
+  cmds.push({ cmd, intent, shell, os, group: group(cmd, GROUP), seed, src: r.source_type,
     texts: [...r.descriptions_en.map((t) => [t, 'en']), ...r.descriptions_pl.map((t) => [t, 'pl'])] });
   st.commands++;
 }

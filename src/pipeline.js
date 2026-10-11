@@ -527,6 +527,9 @@ export function suggest(query, opts = {}) {
   } else if (ref?.rule === 'pronoun') {
     const it = BY_ID[intent];
     for (const [k, v] of Object.entries(refFill)) {
+      // a pull request the request names but that cannot be read ("merge the pr that fixes login", `that pr "bob's"`): the
+      // request means that one, not the history's, so it stays withheld (as without history)
+      if (k === 'pr' && r.invalidOperands.includes(k)) { if (usesSlot(it, k)) { blank.add(k); keep.add(k); } continue; }
       if (!validSlot(k, v)) {
         // the referenced value cannot be used (too long, a newline, ...): placeholder, never the catalog default
         if (slots[k] != null && PRONOUN_VALUE.test(String(slots[k]))) { delete slots[k]; delete r.sources[k]; }

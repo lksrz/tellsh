@@ -444,7 +444,8 @@ export function analyzeCommand(line, classify, kind = 'posix') {
   let cdAt = -1;
   let scoped = false;
   const exportedScope = new Set(); // tools (git, docker, podman, gh) an `export VAR=…` earlier in the line pointed elsewhere
-  const exportAt = {}; // tool -> index of the segment that exported it
+  const exportAt = {}; // tool -> index of the segment that exported (or removed) its scope variable
+  let setEnvCall = false;
   let wrapCwd = false;
   const subCds = new Set(); // ids of `( … )` subshells in which a cd ran (posix)
   let searchDir = false;
@@ -485,9 +486,14 @@ export function analyzeCommand(line, classify, kind = 'posix') {
     const rw = raw.map((x) => String(rawOf(x)));
     const exported = /^(?:export|declare|typeset|set)$/.test(rw[0]) ? rw.slice(1).filter((x) => SCOPE_ENV.test(x))
       : /^\$env:\w+(?:=.*)?$/i.test(rw[0]) && SCOPE_ENV.test(rw[0].slice(5).replace(/=.*$/, '') + '=') ? [rw[0].slice(5)] : [];
-    for (const x of exported) {
+    // `unset GH_REPO`, `export -n GH_REPO`, `Remove-Item Env:GH_REPO`, `[Environment]::SetEnvironmentVariable('GH_REPO', $null)`:
+    // a scope inherited from outside the line is dropped, so the values earlier segments named are of that other scope too
+    // (later segments run in the scope tellsh runs in, so they are not marked)
+    const removed = unsetScopeVars(rw, setEnvCall);
+    setEnvCall = /SetEnvironmentVariable$/i.test(rw[rw.length - 1] ?? ''); // the call's arguments are the next segment
+    for (const x of [...exported, ...removed]) {
       const tool = scopeTool(x);
-      exportedScope.add(tool);
+      if (exported.includes(x)) exportedScope.add(tool);
       for (const t of SCOPE_ENTS[tool]) if (ents[t] != null && !isAmbiguous(ents[t])) ents[t] = AMB + rawOf(ents[t]);
       exportAt[tool] = segIdx;
     }
@@ -611,6 +617,15 @@ const SCOPE_OPTS = {
 const scopeTool = (x) => (/^GIT_/.test(x) ? 'git' : /^DOCKER_/.test(x) ? 'docker' : /^CONTAINER_/.test(x) ? 'podman' : 'gh');
 const SCOPE_ENTS = { git: ['branch'], docker: ['container'], podman: ['container'], gh: ['pr', 'branch'] };
 const SCOPE_ENV = /^(?:GIT_DIR|GIT_WORK_TREE|GIT_NAMESPACE|DOCKER_HOST|DOCKER_CONTEXT|DOCKER_CONFIG|CONTAINER_HOST|CONTAINER_CONNECTION|GH_REPO|GH_HOST)=/;
+/** The scope variables a segment removes (`unset`, `export -n`, `Remove-Item Env:…`, `SetEnvironmentVariable(…)`), as `NAME=`. */
+function unsetScopeVars(rw, setEnvCall = false) {
+  const head = String(rw[0] ?? '');
+  let names = [];
+  if (setEnvCall) names = [head.replace(/^['"]|['"]?,?$/g, '')];
+  else if (head === 'unset' || (head === 'export' && rw.includes('-n'))) names = rw.slice(1).filter((x) => !/^-/.test(x));
+  else if (/^(?:Remove-Item|ri|rm|del|erase|rd|rmdir|Clear-Item|cli)$/i.test(head)) names = rw.slice(1).map((x) => (x.match(/^(?:-\w+:)?Env:[\\/]?(\w+)$/i) || [])[1]).filter(Boolean);
+  return names.map((x) => `${x}=`).filter((x) => SCOPE_ENV.test(x));
+}
 /** `git -C /repo …`, `docker --context prod …`, `DOCKER_HOST=… docker …` (w: the unwrapped words, raw: before unwrap). */
 function scopedElsewhere(w, raw, exported = new Set()) {
   if (isAmbiguous(w[0])) return false;

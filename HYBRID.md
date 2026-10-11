@@ -85,6 +85,13 @@ machine, back-to-back.
   so `gh pr view 12 --repo a/b` and `gh pr view 40 --repo c/d` never straddle train and eval; whole groups go to eval per
   label until ≥25% (never more than half of a label). Any eval text is held out from every training path through the
   shared `exclusionIndex()` (A, B, the teacher), like the other eval sets.
+  **Caveat (review r19):** the skeleton of the shipped split (`--group v04`) keeps up to two lower-case words after the
+  head, so some operands count as subcommands (`npm install express` / `npm install react`, `cat alpha` / `cat beta` are
+  different groups). Under a structural skeleton (per-tool subcommand depth, operands masked; `--group structural`,
+  `scripts/real/group.js`) 552 of the 2957 labelled eval rows share a group with a train row. A's intent accuracy (cascade
+  top-1, `node scripts/real/group_leak.js`) is 84.6% on those rows and 83.5% on the other 2405, so the leak inflates the
+  real-usage number by ~0.2 pt. The shipped split is kept for reproducibility; the next retrain should use
+  `--group structural`.
 * **Training**: A and B use at most 120 real rows per intent and language (the line-range commands alone are ~2500
   rows), A at half weight and without tagger rows (the regex silver spans are unreliable on these texts). A's accept
   threshold is calibrated on curated rows only (noisy real labels pushed it from 0.34 to 0.41 and cost ~1 pt on
