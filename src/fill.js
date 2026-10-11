@@ -238,6 +238,16 @@ const SEL_INTENT = {
     authorized autoryzacj* loguje credentials dane still nadal`),
   gh_auth_login: SEL_WORDS(`not nie auth authenticate authentication log login sign signin zaloguj* zalogowac logowani* konto account
     uwierzytelnij* autoryzuj* kont* konc* connect podlacz* polacz* link authorize re-authenticate re-login again ponownie setup configure skonfiguruj* konfiguracj*`),
+  gh_run_watch: SEL_WORDS(`watch watching follow live progress until finish* finishes done complete* wait waiting ends end status run runa runie
+    action ci pipeline build job workflow obserwuj* sledz* czekaj* poczekaj* zaczekaj* zakonczy* skonczy* skonczenia zakonczenia na zywo postep* biezac*`),
+  gh_issue_list: SEL_WORDS(`issue issues list listing all open opened show which there any bugs tickets problems zgloszenia zgloszen issue'y issuesy
+    lista liste wylistuj* listuj* wszystkie otwarte otwartych pokaz* tickety bledy`),
+  gh_issue_view: SEL_WORDS(`issue view details detail info information description summary show read open web browser online
+    szczegol* opis* zgloszeni* przeczytaj pokaz* ticket bug`),
+  wrangler_d1_list: SEL_WORDS(`d1 database databases db dbs baza bazy baz danych list listing all show which there my moje wszystkie
+    lista liste wylistuj* listuj* pokaz*`),
+  wrangler_pages_deploy: SEL_WORDS(`pages page static site website strona strone stron* statyczn* frontend build output folder directory katalog* dist public out
+    depl* publish* upload wdroz* zdeployuj* deployuj* opublikuj* wrzuc* wgraj*`),
   wrangler_deploy: SEL_WORDS(`depl* redeploy publish* ship push release upload go wdroz* zdeployuj* deployuj* opublikuj* wypchnij*
     wrzuc* wgraj* make roll rollout wypusc* wydaj* pusc* code kod kodu version wersj* new nowa nowy najnowsz* latest fresh swiez*
     changed changes zmienilem zmian* after po`),
@@ -267,7 +277,7 @@ for (const [id, v] of Object.entries(SEL_INTENT)) {
   all.stems.push(...v.stems.filter((x) => !SEL_PICKERS.has(x)));
 }
 // the slot that takes the placeholder when a request has words the vocabulary does not explain
-const SEL_SLOT = { gh_pr_merge: 'pr', gh_pr_view: 'pr', gh_pr_checks: 'pr', gh_run_view: 'num' };
+const SEL_SLOT = { gh_pr_merge: 'pr', gh_pr_view: 'pr', gh_pr_checks: 'pr', gh_run_view: 'num', gh_run_watch: 'num', gh_issue_view: 'num' };
 export const hasSelectorRule = (intentId) => /^(?:gh|wrangler)_/.test(intentId);
 // "for issue #3", "for ticket 12", "the pr that fixes #12": a number of another kind, explained as not the pull request
 const SEL_OTHER_NUMBER = /\b(?:issues?|tickets?|bugs?|zgloszeni\w*|fix(?:es)?|closes|resolves|naprawia\w*|zamyka\w*)\s+#?\d+\b/g;
@@ -284,7 +294,7 @@ export function selectorResidue(intentId, text, values = {}) {
   const own = SEL_INTENT[intentId];
   let t = foldKeepLength(String(text)).toLowerCase();
   // values that were read, and the option / phrase forms they come in, are explained
-  for (const k of ['pr', 'repo', 'wenv', 'var', 'num', 'url']) {
+  for (const k of ['pr', 'repo', 'wenv', 'var', 'num', 'url', 'path']) {
     const val = values[k];
     if (val == null || String(val).startsWith('?')) continue;
     const s = foldKeepLength(String(val)).toLowerCase();
@@ -747,7 +757,9 @@ const SCOPE_SHORT = { '-w': /^npm_/, '-r': /^gh_/, '-e': /^wrangler_/, '-c': /^w
 // a quoted value is one value (`--workspace "staging app"`), never its first word
 const SCOPE_OPT = /(?:^|\s)(--workspaces?|--ws|--filter|--repo|--env|--config|--prefix|--cwd|--dir|--project|--target|-[wRect])(?:=(?:"([^"]*)"|'([^']*)'|(\S*))|\s+(?:"([^"]*)"|'([^']*)'|(?!-)([^\s,;!?]+))|(?=[\s,;!?]|$))/g;
 // "in workspace api", "for the project acme/app", "w projekcie api", "in the staging environment" is read by wranglerEnv
-const SCOPE_PHRASE = /(?:^|\s)(?:in|for|of|on|from|within|inside|under|at|w|we|dla|z)\s+(?:the\s+|a\s+)?(workspace|project|projek\w*|repo|repository|repozytori\w*|env|environment|srodowisk\w*|config|configuration|konfiguracj\w*)\s+(?!-)([^\s,;!?]+)/g;
+const SCOPE_PHRASE = /(?:^|\s)(?:in|for|of|on|from|within|inside|under|at|w|we|dla|z)\s+(?:the\s+|a\s+)?(workspace|project|projek\w*|repo|repository|repozytori\w*|env|environment|srodowisk\w*|config|configuration|konfiguracj\w*)\s+(?!-)("[^"\n]*"|'[^'\n]*'|[^\s,;!?]+)/g;
+// pip's attached short form: `-t/tmp/pkgs`, `-t~/pkgs` (the separated `-t DIR` is read by SCOPE_OPT)
+const SCOPE_ATTACHED_T = /(?:^|\s)-t((?:"[^"\n]*"|'[^'\n]*'|[/~.\w][^\s,;!?]*))/g;
 const SCOPE_PHRASE_KIND = (w) => /^(?:workspace)$/.test(w) ? 'workspace' : /^(?:repo|repository|repozytori)/.test(w) ? 'repo'
   : /^(?:env|environment|srodowisk)/.test(w) ? 'env' : /^(?:config|configuration|konfiguracj)/.test(w) ? 'config' : 'project';
 const SCOPE_NOT_VALUE = /^(?:the|a|an|this|that|current|same|my|our|own|local|default|root|here|it|tym|tego|bieżącym|biezacym|obecnym|moim|naszym)$/i;
@@ -762,10 +774,19 @@ export function scopeMentions(intentId, text) {
     const raw = quoted ?? m[4] ?? m[7] ?? null;
     out.push({ kind: SCOPE_KIND[opt], value: quoted != null ? quoted.trim() || null : raw ? raw.replace(/[.,!?;:]+$/, '').replace(/^["'`]|["'`]$/g, '') || null : null, at: m.index });
   }
+  if (/^pip_/.test(intentId)) {
+    for (const m of t.matchAll(SCOPE_ATTACHED_T)) {
+      const value = m[1].replace(/^(["'])([\s\S]*)\1$/, '$2').replace(/[.,!?;:]+$/, '').trim();
+      out.push({ kind: 'target', value: value || null, at: m.index });
+    }
+  }
   const f = foldKeepLength(t).toLowerCase();
   for (const m of f.matchAll(SCOPE_PHRASE)) {
     const at = m.index + m[0].length - m[2].length;
-    const value = t.slice(at, at + m[2].length).replace(/[.,!?;:]+$/, '').replace(/^["'`]|["'`]$/g, '');
+    const rawv = t.slice(at, at + m[2].length);
+    const quotedv = /^(["'])[\s\S]*\1$/.test(rawv) && rawv.length >= 2;
+    const value = quotedv ? rawv.slice(1, -1).trim() : rawv.replace(/[.,!?;:]+$/, '').replace(/^["'`]|["'`]$/g, '');
+    if (quotedv) { if (value) out.push({ kind: SCOPE_PHRASE_KIND(m[1]), value, at }); continue; }
     // "w projekcie na macu", "in the project with npm": a function word is no scope value
     if (SCOPE_NOT_VALUE.test(value) || isStopWord(value) || /^(?:on|onto|under|over|via|using|w|we|z|ze|na|do|od|po|przez|pod|nad)$/i.test(value)) continue;
     out.push({ kind: SCOPE_PHRASE_KIND(m[1]), value: value || null, at });

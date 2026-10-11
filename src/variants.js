@@ -603,6 +603,11 @@ export const VARIANTS = {
   git_remote: { pwsh: 'git remote -v', cmd: 'git remote -v' },
   git_blame: { pwsh: 'git blame {file}', cmd: 'git blame {file}' },
   git_init: { pwsh: 'git init', cmd: 'git init' },
+  git_show: { pwsh: 'git show«{branch}»', cmd: 'git show«{branch}»' },
+  git_fetch: { pwsh: 'git fetch --all', cmd: 'git fetch --all' },
+  git_ls_files: { pwsh: 'git ls-files', cmd: 'git ls-files' },
+  // a bare `--` can be swallowed by PowerShell before reaching native commands; quote it
+  git_grep: { pwsh: "git grep -n '--' {pattern}", cmd: 'git grep -n -- {pattern}' },
 
   // ---------- docker ----------
   docker_ps: { pwsh: 'docker ps', cmd: 'docker ps' },
@@ -626,10 +631,10 @@ export const VARIANTS = {
 
   // ---------- developer tools (v0.4) ----------
   // npm / npx / gh / ssh are the same native programs in PowerShell and cmd.exe
-  npm_run_script: { pwsh: 'npm run {script}«--workspace {workspace!raw}»«{scope!raw}»', cmd: 'npm run {script}«--workspace {workspace!raw}»«{scope!raw}»' },
-  npm_install: { pwsh: 'npm {npmverb!raw}«{pkg}»«--workspace {workspace!raw}»«{scope!raw}»', cmd: 'npm {npmverb!raw}«{pkg}»«--workspace {workspace!raw}»«{scope!raw}»' },
+  npm_run_script: { pwsh: 'npm run {script}«--workspace {workspace}»«{scope!raw}»', cmd: 'npm run {script}«--workspace {workspace}»«{scope!raw}»' },
+  npm_install: { pwsh: 'npm {npmverb!raw}«{pkg}»«--workspace {workspace}»«{scope!raw}»', cmd: 'npm {npmverb!raw}«{pkg}»«--workspace {workspace}»«{scope!raw}»' },
   npm_install_global: { pwsh: 'npm install -g {pkg}«{scope!raw}»', cmd: 'npm install -g {pkg}«{scope!raw}»' },
-  pip_install: { pwsh: { win: 'py -m pip install {pkg}«{scope!raw}»', unix: 'python3 -m pip install {pkg}«{scope!raw}»' }, cmd: 'py -m pip install {pkg}«{scope!raw}»' },
+  pip_install: { pwsh: { win: 'py -m pip install {pkg}«--target {piptarget}»«{scope!raw}»', unix: 'python3 -m pip install {pkg}«--target {piptarget}»«{scope!raw}»' }, cmd: 'py -m pip install {pkg}«--target {piptarget}»«{scope!raw}»' },
   tool_version: { pwsh: '& {cmd} --version', cmd: '{cmd} --version' },
   cli_help: { pwsh: '& {cmd} --help', cmd: '{cmd} --help' },
   wrangler_deploy: { pwsh: 'npx wrangler deploy«{dryrun!raw}»«--env {wenv!raw}»«{args!raw}»', cmd: 'npx wrangler deploy«{dryrun!raw}»«--env {wenv!raw}»«{args!raw}»' },
@@ -638,6 +643,11 @@ export const VARIANTS = {
   wrangler_secret_put: { pwsh: 'npx wrangler secret put {var!raw}«--env {wenv!raw}»«{args!raw}»', cmd: 'npx wrangler secret put {var!raw}«--env {wenv!raw}»«{args!raw}»' },
   wrangler_login: { pwsh: 'npx wrangler login«{args!raw}»', cmd: 'npx wrangler login«{args!raw}»' },
   wrangler_whoami: { pwsh: 'npx wrangler whoami«{args!raw}»', cmd: 'npx wrangler whoami«{args!raw}»' },
+  wrangler_d1_list: { pwsh: 'npx wrangler d1 list«{args!raw}»', cmd: 'npx wrangler d1 list«{args!raw}»' },
+  wrangler_pages_deploy: { pwsh: 'npx wrangler pages deploy {path}«{args!raw}»', cmd: 'npx wrangler pages deploy {path}«{args!raw}»' },
+  gh_run_watch: { pwsh: 'gh run watch«{num!raw}»«--repo {repo!raw}»«{scope!raw}»', cmd: 'gh run watch«{num!raw}»«--repo {repo!raw}»«{scope!raw}»' },
+  gh_issue_list: { pwsh: 'gh issue list«--repo {repo!raw}»«{args!raw}»', cmd: 'gh issue list«--repo {repo!raw}»«{args!raw}»' },
+  gh_issue_view: { pwsh: 'gh issue view {num!raw}«--repo {repo!raw}»«{scope!raw}»', cmd: 'gh issue view {num!raw}«--repo {repo!raw}»«{scope!raw}»' },
   gh_auth_status: { pwsh: 'gh auth status«{args!raw}»', cmd: 'gh auth status«{args!raw}»' },
   gh_auth_login: { pwsh: 'gh auth login«{args!raw}»', cmd: 'gh auth login«{args!raw}»' },
   gh_pr_list: { pwsh: 'gh pr list«--repo {repo!raw}»«{args!raw}»', cmd: 'gh pr list«--repo {repo!raw}»«{args!raw}»' },

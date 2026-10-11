@@ -1,0 +1,171 @@
+{"text": "git show", "intent": "git_show", "lang": "en"}
+{"text": "show the last commit", "intent": "git_show", "lang": "en"}
+{"text": "show me the latest commit with its diff", "intent": "git_show", "lang": "en"}
+{"text": "what changed in the last commit", "intent": "git_show", "lang": "en"}
+{"text": "show commit abc1234", "intent": "git_show", "lang": "en"}
+{"text": "display commit 9f3e2a1", "intent": "git_show", "lang": "en"}
+{"text": "show the changes of commit deadbeef", "intent": "git_show", "lang": "en"}
+{"text": "show details of the most recent commit", "intent": "git_show", "lang": "en"}
+{"text": "inspect the last commit", "intent": "git_show", "lang": "en"}
+{"text": "what did the previous commit change", "intent": "git_show", "lang": "en"}
+{"text": "show the diff of the last commit", "intent": "git_show", "lang": "en"}
+{"text": "git show HEAD", "intent": "git_show", "lang": "en"}
+{"text": "show the commit HEAD~2", "intent": "git_show", "lang": "en"}
+{"text": "view commit a1b2c3d", "intent": "git_show", "lang": "en"}
+{"text": "show what commit 4e5f6a7 changed", "intent": "git_show", "lang": "en"}
+{"text": "print the last commit and its patch", "intent": "git_show", "lang": "en"}
+{"text": "show the latest commit message and diff", "intent": "git_show", "lang": "en"}
+{"text": "see the contents of commit 77aa88b", "intent": "git_show", "lang": "en"}
+{"text": "pokaż ostatni commit", "intent": "git_show", "lang": "pl"}
+{"text": "pokaż ostatni commit z diffem", "intent": "git_show", "lang": "pl"}
+{"text": "co zmienił ostatni commit", "intent": "git_show", "lang": "pl"}
+{"text": "pokaż commit abc1234", "intent": "git_show", "lang": "pl"}
+{"text": "wyświetl commit 9f3e2a1", "intent": "git_show", "lang": "pl"}
+{"text": "pokaż zmiany z commita deadbeef", "intent": "git_show", "lang": "pl"}
+{"text": "szczegóły ostatniego commita", "intent": "git_show", "lang": "pl"}
+{"text": "co było w poprzednim commicie", "intent": "git_show", "lang": "pl"}
+{"text": "pokaż diff ostatniego commita", "intent": "git_show", "lang": "pl"}
+{"text": "zobacz commit a1b2c3d", "intent": "git_show", "lang": "pl"}
+{"text": "pokaż co zmienił commit 4e5f6a7", "intent": "git_show", "lang": "pl"}
+{"text": "pokaż najnowszy commit", "intent": "git_show", "lang": "pl"}
+{"text": "wyświetl ostatni commit i jego zmiany", "intent": "git_show", "lang": "pl"}
+{"text": "git show", "intent": "git_show", "lang": "pl"}
+{"text": "git fetch", "intent": "git_fetch", "lang": "en"}
+{"text": "fetch from all remotes", "intent": "git_fetch", "lang": "en"}
+{"text": "fetch the latest changes without merging", "intent": "git_fetch", "lang": "en"}
+{"text": "download new commits from the remote but don't merge", "intent": "git_fetch", "lang": "en"}
+{"text": "update remote branches", "intent": "git_fetch", "lang": "en"}
+{"text": "fetch new branches from origin", "intent": "git_fetch", "lang": "en"}
+{"text": "get the latest refs from the server", "intent": "git_fetch", "lang": "en"}
+{"text": "fetch everything from the remotes", "intent": "git_fetch", "lang": "en"}
+{"text": "sync remote tracking branches without pulling", "intent": "git_fetch", "lang": "en"}
+{"text": "check the remote for new commits", "intent": "git_fetch", "lang": "en"}
+{"text": "fetch updates from github", "intent": "git_fetch", "lang": "en"}
+{"text": "refresh the remote branches", "intent": "git_fetch", "lang": "en"}
+{"text": "pobierz zmiany z remote bez mergowania", "intent": "git_fetch", "lang": "pl"}
+{"text": "git fetch", "intent": "git_fetch", "lang": "pl"}
+{"text": "zrób fetch ze wszystkich remote", "intent": "git_fetch", "lang": "pl"}
+{"text": "pobierz nowe gałęzie z origin", "intent": "git_fetch", "lang": "pl"}
+{"text": "zaktualizuj gałęzie zdalne", "intent": "git_fetch", "lang": "pl"}
+{"text": "ściągnij nowe commity bez łączenia", "intent": "git_fetch", "lang": "pl"}
+{"text": "odśwież zdalne branche", "intent": "git_fetch", "lang": "pl"}
+{"text": "pobierz najnowsze zmiany ale nie merguj", "intent": "git_fetch", "lang": "pl"}
+{"text": "zrób fetcha", "intent": "git_fetch", "lang": "pl"}
+{"text": "sprawdź czy są nowe commity na serwerze", "intent": "git_fetch", "lang": "pl"}
+{"text": "git ls-files", "intent": "git_ls_files", "lang": "en"}
+{"text": "list the files tracked by git", "intent": "git_ls_files", "lang": "en"}
+{"text": "show all files in the repository index", "intent": "git_ls_files", "lang": "en"}
+{"text": "which files are under version control", "intent": "git_ls_files", "lang": "en"}
+{"text": "list tracked files", "intent": "git_ls_files", "lang": "en"}
+{"text": "show every file git knows about", "intent": "git_ls_files", "lang": "en"}
+{"text": "list all committed files in this repo", "intent": "git_ls_files", "lang": "en"}
+{"text": "what files does git track here", "intent": "git_ls_files", "lang": "en"}
+{"text": "list files in the git repo", "intent": "git_ls_files", "lang": "en"}
+{"text": "wylistuj pliki śledzone przez gita", "intent": "git_ls_files", "lang": "pl"}
+{"text": "pokaż pliki w repozytorium git", "intent": "git_ls_files", "lang": "pl"}
+{"text": "które pliki są pod kontrolą wersji", "intent": "git_ls_files", "lang": "pl"}
+{"text": "lista plików w gicie", "intent": "git_ls_files", "lang": "pl"}
+{"text": "pokaż wszystkie pliki śledzone w repo", "intent": "git_ls_files", "lang": "pl"}
+{"text": "jakie pliki śledzi git", "intent": "git_ls_files", "lang": "pl"}
+{"text": "git ls-files", "intent": "git_ls_files", "lang": "pl"}
+{"text": "git grep TODO", "intent": "git_grep", "lang": "en"}
+{"text": "search the repo for TODO", "intent": "git_grep", "lang": "en"}
+{"text": "find where handleLogin is used in the git repo", "intent": "git_grep", "lang": "en"}
+{"text": "grep tracked files for FIXME", "intent": "git_grep", "lang": "en"}
+{"text": "search for apiKey in the repository", "intent": "git_grep", "lang": "en"}
+{"text": "git grep for parseConfig", "intent": "git_grep", "lang": "en"}
+{"text": "find occurrences of useEffect in tracked files", "intent": "git_grep", "lang": "en"}
+{"text": "search the codebase for 'deprecated'", "intent": "git_grep", "lang": "en"}
+{"text": "look for console.log in the repo files", "intent": "git_grep", "lang": "en"}
+{"text": "search git files for the word timeout", "intent": "git_grep", "lang": "en"}
+{"text": "find which tracked files mention stripe", "intent": "git_grep", "lang": "en"}
+{"text": "przeszukaj repo w poszukiwaniu TODO", "intent": "git_grep", "lang": "pl"}
+{"text": "znajdź gdzie jest użyte handleLogin w repozytorium", "intent": "git_grep", "lang": "pl"}
+{"text": "git grep FIXME", "intent": "git_grep", "lang": "pl"}
+{"text": "szukaj apiKey w plikach repo", "intent": "git_grep", "lang": "pl"}
+{"text": "znajdź wystąpienia useEffect w śledzonych plikach", "intent": "git_grep", "lang": "pl"}
+{"text": "przeszukaj kod w repo pod kątem console.log", "intent": "git_grep", "lang": "pl"}
+{"text": "w których plikach repo jest słowo timeout", "intent": "git_grep", "lang": "pl"}
+{"text": "szukaj parseConfig w repozytorium git", "intent": "git_grep", "lang": "pl"}
+{"text": "gh run watch", "intent": "gh_run_watch", "lang": "en"}
+{"text": "watch the github actions run", "intent": "gh_run_watch", "lang": "en"}
+{"text": "follow the ci run until it finishes", "intent": "gh_run_watch", "lang": "en"}
+{"text": "wait for the workflow run to complete", "intent": "gh_run_watch", "lang": "en"}
+{"text": "watch run 123456789", "intent": "gh_run_watch", "lang": "en"}
+{"text": "watch the current ci build live", "intent": "gh_run_watch", "lang": "en"}
+{"text": "keep an eye on the running workflow until it's done", "intent": "gh_run_watch", "lang": "en"}
+{"text": "show live progress of the actions run", "intent": "gh_run_watch", "lang": "en"}
+{"text": "watch the pipeline run in real time", "intent": "gh_run_watch", "lang": "en"}
+{"text": "wait until ci finishes", "intent": "gh_run_watch", "lang": "en"}
+{"text": "watch github actions run 987654321", "intent": "gh_run_watch", "lang": "en"}
+{"text": "obserwuj run github actions", "intent": "gh_run_watch", "lang": "pl"}
+{"text": "śledź build ci aż się skończy", "intent": "gh_run_watch", "lang": "pl"}
+{"text": "poczekaj aż workflow się zakończy", "intent": "gh_run_watch", "lang": "pl"}
+{"text": "obserwuj run 123456789", "intent": "gh_run_watch", "lang": "pl"}
+{"text": "pokaż na żywo postęp ci", "intent": "gh_run_watch", "lang": "pl"}
+{"text": "czekaj na zakończenie pipeline", "intent": "gh_run_watch", "lang": "pl"}
+{"text": "śledź bieżący run akcji", "intent": "gh_run_watch", "lang": "pl"}
+{"text": "gh run watch", "intent": "gh_run_watch", "lang": "pl"}
+{"text": "patrz na build ci do końca", "intent": "gh_run_watch", "lang": "pl"}
+{"text": "gh issue list", "intent": "gh_issue_list", "lang": "en"}
+{"text": "list github issues", "intent": "gh_issue_list", "lang": "en"}
+{"text": "show open issues", "intent": "gh_issue_list", "lang": "en"}
+{"text": "what issues are open in this repo", "intent": "gh_issue_list", "lang": "en"}
+{"text": "list issues in repo acme/app", "intent": "gh_issue_list", "lang": "en"}
+{"text": "show me the github issues", "intent": "gh_issue_list", "lang": "en"}
+{"text": "list all issues", "intent": "gh_issue_list", "lang": "en"}
+{"text": "which bugs are reported on github", "intent": "gh_issue_list", "lang": "en"}
+{"text": "show the issue list of lksrz/tellsh", "intent": "gh_issue_list", "lang": "en"}
+{"text": "list open tickets on github", "intent": "gh_issue_list", "lang": "en"}
+{"text": "any new issues on github", "intent": "gh_issue_list", "lang": "en"}
+{"text": "pokaż issue na githubie", "intent": "gh_issue_list", "lang": "pl"}
+{"text": "wylistuj otwarte issues", "intent": "gh_issue_list", "lang": "pl"}
+{"text": "jakie są otwarte zgłoszenia w repo", "intent": "gh_issue_list", "lang": "pl"}
+{"text": "lista issues w repo acme/app", "intent": "gh_issue_list", "lang": "pl"}
+{"text": "pokaż zgłoszenia na githubie", "intent": "gh_issue_list", "lang": "pl"}
+{"text": "wylistuj wszystkie issue", "intent": "gh_issue_list", "lang": "pl"}
+{"text": "jakie bugi są zgłoszone na githubie", "intent": "gh_issue_list", "lang": "pl"}
+{"text": "pokaż listę issues", "intent": "gh_issue_list", "lang": "pl"}
+{"text": "gh issue view 42", "intent": "gh_issue_view", "lang": "en"}
+{"text": "show issue 42", "intent": "gh_issue_view", "lang": "en"}
+{"text": "show github issue #17", "intent": "gh_issue_view", "lang": "en"}
+{"text": "open issue 128 details", "intent": "gh_issue_view", "lang": "en"}
+{"text": "what does issue 7 say", "intent": "gh_issue_view", "lang": "en"}
+{"text": "view issue 305 in repo acme/app", "intent": "gh_issue_view", "lang": "en"}
+{"text": "read github issue number 12", "intent": "gh_issue_view", "lang": "en"}
+{"text": "show me issue #99", "intent": "gh_issue_view", "lang": "en"}
+{"text": "display the details of issue 64", "intent": "gh_issue_view", "lang": "en"}
+{"text": "view the description of issue 3", "intent": "gh_issue_view", "lang": "en"}
+{"text": "pokaż issue 42", "intent": "gh_issue_view", "lang": "pl"}
+{"text": "pokaż zgłoszenie #17 na githubie", "intent": "gh_issue_view", "lang": "pl"}
+{"text": "szczegóły issue 128", "intent": "gh_issue_view", "lang": "pl"}
+{"text": "co jest w issue 7", "intent": "gh_issue_view", "lang": "pl"}
+{"text": "pokaż issue 305 w repo acme/app", "intent": "gh_issue_view", "lang": "pl"}
+{"text": "przeczytaj issue numer 12", "intent": "gh_issue_view", "lang": "pl"}
+{"text": "wyświetl zgłoszenie 64", "intent": "gh_issue_view", "lang": "pl"}
+{"text": "pokaż opis issue 3", "intent": "gh_issue_view", "lang": "pl"}
+{"text": "wrangler d1 list", "intent": "wrangler_d1_list", "lang": "en"}
+{"text": "list my d1 databases", "intent": "wrangler_d1_list", "lang": "en"}
+{"text": "show cloudflare d1 databases", "intent": "wrangler_d1_list", "lang": "en"}
+{"text": "which d1 databases do I have", "intent": "wrangler_d1_list", "lang": "en"}
+{"text": "list all databases in cloudflare d1", "intent": "wrangler_d1_list", "lang": "en"}
+{"text": "show the d1 dbs on my account", "intent": "wrangler_d1_list", "lang": "en"}
+{"text": "wylistuj bazy d1", "intent": "wrangler_d1_list", "lang": "pl"}
+{"text": "pokaż bazy danych d1 na cloudflare", "intent": "wrangler_d1_list", "lang": "pl"}
+{"text": "jakie mam bazy d1", "intent": "wrangler_d1_list", "lang": "pl"}
+{"text": "lista baz d1", "intent": "wrangler_d1_list", "lang": "pl"}
+{"text": "pokaż wszystkie bazy d1 na koncie", "intent": "wrangler_d1_list", "lang": "pl"}
+{"text": "wrangler pages deploy dist", "intent": "wrangler_pages_deploy", "lang": "en"}
+{"text": "deploy the site to cloudflare pages", "intent": "wrangler_pages_deploy", "lang": "en"}
+{"text": "publish the dist folder to cloudflare pages", "intent": "wrangler_pages_deploy", "lang": "en"}
+{"text": "deploy ./build to pages", "intent": "wrangler_pages_deploy", "lang": "en"}
+{"text": "upload the static site to cloudflare pages", "intent": "wrangler_pages_deploy", "lang": "en"}
+{"text": "deploy pages from public", "intent": "wrangler_pages_deploy", "lang": "en"}
+{"text": "push the frontend build to cloudflare pages", "intent": "wrangler_pages_deploy", "lang": "en"}
+{"text": "deploy the out directory to pages", "intent": "wrangler_pages_deploy", "lang": "en"}
+{"text": "wdroż stronę na cloudflare pages", "intent": "wrangler_pages_deploy", "lang": "pl"}
+{"text": "opublikuj folder dist na cloudflare pages", "intent": "wrangler_pages_deploy", "lang": "pl"}
+{"text": "zdeployuj build na pages", "intent": "wrangler_pages_deploy", "lang": "pl"}
+{"text": "wrzuć statyczną stronę na cloudflare pages", "intent": "wrangler_pages_deploy", "lang": "pl"}
+{"text": "wdroż katalog public na pages", "intent": "wrangler_pages_deploy", "lang": "pl"}
+{"text": "wgraj frontend na cloudflare pages", "intent": "wrangler_pages_deploy", "lang": "pl"}

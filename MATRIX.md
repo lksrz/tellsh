@@ -9,28 +9,25 @@ allowlist / risk, binaries present by default, and (when safe to run) executed w
 - **gap**: the shell has no equivalent; tellsh says so instead of rendering a command
 - **fail**: anything else (listed below)
 
-## Summary (first run → after the v0.3.1 fixes)
+## Summary (v0.3.1 → feat/templates-catalog; 9 new intents, 182 intents per cell)
 
 | platform | pass | fail | static | gap |
 |---|---|---|---|---|
-| linux | 297 → 318 | 150 → 0 | 72 → 201 | 0 → 0 |
-| busybox | 87 → 106 | 66 → 0 | 20 → 67 | 0 → 0 |
-| darwin | 298 → 316 | 99 → 0 | 122 → 203 | 0 → 0 |
-| win32 | 145 → 174 | 58 → 0 | 107 → 135 | 36 → 37 |
-
-The first run also counted harness problems (fixture gaps, optional tools missing on the test machine, native
-stderr in PowerShell); those were fixed in the harness, the template / allowlist fixes are in the v0.3.1 changelog.
+| linux (container, bash/sh/zsh) | 318 → 330 | 0 → 0 | 201 → 216 | 0 → 0 |
+| busybox (container) | 106 → 110 | 0 → 0 | 67 → 72 | 0 → 0 |
+| darwin (zsh/bash BSD, zsh GNU) | 316 → 328 | 0 → 0 | 203 → 218 | 0 → 0 |
+| win32 (PowerShell 5.1, cmd) | 174 → 182 | 0 → 0 | 135 → 145 | 37 → 37 |
 
 ## linux (container)
 
-Host `297eca0a156d`, run 2026-10-11T16:16:26.100Z.
+Host `2ced0dbdc2a2`, run 2026-10-11T20:51:55.486Z.
 
 | cell | pass | fail | static | gap |
 |---|---|---|---|---|
-| bash/linux | 106 | 0 | 67 | 0 |
-| sh/linux | 106 | 0 | 67 | 0 |
-| zsh/linux | 106 | 0 | 67 | 0 |
-| **total** | 318 | 0 | 201 | 0 |
+| bash/linux | 110 | 0 | 72 | 0 |
+| sh/linux | 110 | 0 | 72 | 0 |
+| zsh/linux | 110 | 0 | 72 | 0 |
+| **total** | 330 | 0 | 216 | 0 |
 
 No failures.
 
@@ -46,7 +43,7 @@ No failures.
 - needs sensors (not installed on this test machine): temperature
 - needs lspci (not installed on this test machine): gpu_info
 - needs lsusb (not installed on this test machine): usb_devices
-- needs network: public_ip, curl_headers, http_status, download_file, ssh_connect, ssh_port_forward, git_pull, git_push, git_clone, wrangler_deploy, wrangler_dev, wrangler_tail, wrangler_secret_put, wrangler_login, wrangler_whoami
+- needs network: public_ip, curl_headers, http_status, download_file, ssh_connect, ssh_port_forward, git_pull, git_push, git_clone, wrangler_deploy, wrangler_dev, wrangler_tail, wrangler_secret_put, wrangler_login, wrangler_whoami, wrangler_d1_list, wrangler_pages_deploy
 - needs ping (not installed on this test machine): ping_host
 - needs dig (not installed on this test machine): dns_lookup
 - needs traceroute (not installed on this test machine): traceroute
@@ -54,18 +51,18 @@ No failures.
 - needs docker (not installed on this test machine): docker_ps, docker_ps_all, docker_logs, docker_images, docker_stop, docker_stop_all, docker_prune, docker_exec, docker_stats, docker_compose_up, docker_compose_down
 - runs project code: npm_run_script
 - package install: npm_install, npm_install_global, pip_install
-- needs gh (not installed on this test machine): gh_auth_status, gh_auth_login, gh_pr_list, gh_pr_view, gh_pr_create, gh_pr_checks, gh_pr_merge, gh_run_list, gh_run_view
+- needs gh (not installed on this test machine): gh_auth_status, gh_auth_login, gh_pr_list, gh_pr_view, gh_pr_create, gh_pr_checks, gh_pr_merge, gh_run_list, gh_run_view, gh_run_watch, gh_issue_list, gh_issue_view
 
 </details>
 
 ## busybox (container)
 
-Host `285bf246569e`, run 2026-10-11T16:16:36.588Z.
+Host `1b4dac7039cd`, run 2026-10-11T20:51:24.077Z.
 
 | cell | pass | fail | static | gap |
 |---|---|---|---|---|
-| sh/linux/busybox | 106 | 0 | 67 | 0 |
-| **total** | 106 | 0 | 67 | 0 |
+| sh/linux/busybox | 110 | 0 | 72 | 0 |
+| **total** | 110 | 0 | 72 | 0 |
 
 No failures.
 
@@ -83,26 +80,26 @@ No failures.
 - needs lspci (not installed on this test machine): gpu_info
 - needs dpkg (not installed on this test machine): package_installed
 - needs curl (not installed on this test machine): public_ip, curl_headers, http_status, download_file
-- needs network: ping_host, dns_lookup, traceroute, port_check, git_pull, git_push, git_clone, wrangler_deploy, wrangler_dev, wrangler_tail, wrangler_secret_put, wrangler_login, wrangler_whoami
+- needs network: ping_host, dns_lookup, traceroute, port_check, git_pull, git_push, git_clone, wrangler_deploy, wrangler_dev, wrangler_tail, wrangler_secret_put, wrangler_login, wrangler_whoami, wrangler_d1_list, wrangler_pages_deploy
 - needs ssh (not installed on this test machine): ssh_connect, ssh_port_forward
 - needs docker (not installed on this test machine): docker_ps, docker_ps_all, docker_logs, docker_images, docker_stop, docker_stop_all, docker_prune, docker_exec, docker_stats, docker_compose_up, docker_compose_down
 - runs project code: npm_run_script
 - package install: npm_install, npm_install_global
 - needs python3 (not installed on this test machine): pip_install
-- needs gh (not installed on this test machine): gh_auth_status, gh_auth_login, gh_pr_list, gh_pr_view, gh_pr_create, gh_pr_checks, gh_pr_merge, gh_run_list, gh_run_view
+- needs gh (not installed on this test machine): gh_auth_status, gh_auth_login, gh_pr_list, gh_pr_view, gh_pr_create, gh_pr_checks, gh_pr_merge, gh_run_list, gh_run_view, gh_run_watch, gh_issue_list, gh_issue_view
 
 </details>
 
 ## darwin
 
-Host `studio.lan`, run 2026-10-11T16:15:33.166Z.
+Host `studio.lan`, run 2026-10-11T20:52:54.355Z.
 
 | cell | pass | fail | static | gap |
 |---|---|---|---|---|
-| zsh/darwin/bsd | 105 | 0 | 68 | 0 |
-| bash/darwin/bsd | 105 | 0 | 68 | 0 |
-| zsh/darwin/gnu | 106 | 0 | 67 | 0 |
-| **total** | 316 | 0 | 203 | 0 |
+| zsh/darwin/bsd | 109 | 0 | 73 | 0 |
+| bash/darwin/bsd | 109 | 0 | 73 | 0 |
+| zsh/darwin/gnu | 110 | 0 | 72 | 0 |
+| **total** | 328 | 0 | 218 | 0 |
 
 No failures.
 
@@ -118,26 +115,26 @@ No failures.
 - service (sudo): service_restart, service_stop, service_start, service_enable
 - sudo: dmesg
 - package install (sudo): install_package, system_update
-- needs network: public_ip, ping_host, dns_lookup, traceroute, port_check, curl_headers, http_status, download_file, ssh_connect, ssh_port_forward, git_pull, git_push, git_clone, wrangler_deploy, wrangler_dev, wrangler_tail, wrangler_secret_put, wrangler_login, wrangler_whoami, gh_auth_status, gh_auth_login, gh_pr_list, gh_pr_view, gh_pr_create, gh_pr_checks, gh_pr_merge, gh_run_list, gh_run_view
+- needs network: public_ip, ping_host, dns_lookup, traceroute, port_check, curl_headers, http_status, download_file, ssh_connect, ssh_port_forward, git_pull, git_push, git_clone, wrangler_deploy, wrangler_dev, wrangler_tail, wrangler_secret_put, wrangler_login, wrangler_whoami, wrangler_d1_list, wrangler_pages_deploy, gh_auth_status, gh_auth_login, gh_pr_list, gh_pr_view, gh_pr_create, gh_pr_checks, gh_pr_merge, gh_run_list, gh_run_view, gh_run_watch, gh_issue_list, gh_issue_view
 - needs docker (not installed on this test machine): docker_ps, docker_ps_all, docker_logs, docker_images, docker_stop, docker_stop_all, docker_prune, docker_exec, docker_stats, docker_compose_up, docker_compose_down
 - docker: docker_ps, docker_ps_all, docker_logs, docker_images, docker_stop, docker_stop_all, docker_prune, docker_exec, docker_stats, docker_compose_up, docker_compose_down
 - needs npm (not installed on this test machine): npm_run_script, npm_install, npm_install_global
 - runs project code: npm_run_script
 - package install: npm_install, npm_install_global, pip_install
-- needs npx (not installed on this test machine): wrangler_deploy, wrangler_dev, wrangler_tail, wrangler_secret_put, wrangler_login, wrangler_whoami
-- needs gh (not installed on this test machine): gh_auth_status, gh_auth_login, gh_pr_list, gh_pr_view, gh_pr_create, gh_pr_checks, gh_pr_merge, gh_run_list, gh_run_view
+- needs npx (not installed on this test machine): wrangler_deploy, wrangler_dev, wrangler_tail, wrangler_secret_put, wrangler_login, wrangler_whoami, wrangler_d1_list, wrangler_pages_deploy
+- needs gh (not installed on this test machine): gh_auth_status, gh_auth_login, gh_pr_list, gh_pr_view, gh_pr_create, gh_pr_checks, gh_pr_merge, gh_run_list, gh_run_view, gh_run_watch, gh_issue_list, gh_issue_view
 
 </details>
 
 ## win32
 
-Host `lr-pc`, run 2026-10-11T18:14:21.976Z.
+Host `lr-pc`, run 2026-10-11T20:55:41.341Z.
 
 | cell | pass | fail | static | gap |
 |---|---|---|---|---|
-| powershell/win32 | 98 | 0 | 72 | 3 |
-| cmd/win32 | 76 | 0 | 63 | 34 |
-| **total** | 174 | 0 | 135 | 37 |
+| powershell/win32 | 102 | 0 | 77 | 3 |
+| cmd/win32 | 80 | 0 | 68 | 34 |
+| **total** | 182 | 0 | 145 | 37 |
 
 No failures.
 
@@ -158,10 +155,10 @@ No failures.
 - MSAcpi_ThermalZoneTemperature needs an elevated prompt: temperature
 - package install (sudo): install_package, system_update
 - winget list refreshes its sources over the network: package_installed
-- needs network: public_ip, ping_host, dns_lookup, traceroute, port_check, curl_headers, http_status, download_file, ssh_connect, ssh_port_forward, git_pull, git_push, git_clone, wrangler_deploy, wrangler_dev, wrangler_tail, wrangler_secret_put, wrangler_login, wrangler_whoami
+- needs network: public_ip, ping_host, dns_lookup, traceroute, port_check, curl_headers, http_status, download_file, ssh_connect, ssh_port_forward, git_pull, git_push, git_clone, wrangler_deploy, wrangler_dev, wrangler_tail, wrangler_secret_put, wrangler_login, wrangler_whoami, wrangler_d1_list, wrangler_pages_deploy
 - docker: docker_ps, docker_ps_all, docker_logs, docker_images, docker_stop, docker_stop_all, docker_prune, docker_exec, docker_stats, docker_compose_up, docker_compose_down
 - runs project code: npm_run_script
 - package install: npm_install, npm_install_global, pip_install
-- needs gh (not installed on this test machine): gh_auth_status, gh_auth_login, gh_pr_list, gh_pr_view, gh_pr_create, gh_pr_checks, gh_pr_merge, gh_run_list, gh_run_view
+- needs gh (not installed on this test machine): gh_auth_status, gh_auth_login, gh_pr_list, gh_pr_view, gh_pr_create, gh_pr_checks, gh_pr_merge, gh_run_list, gh_run_view, gh_run_watch, gh_issue_list, gh_issue_view
 
 </details>

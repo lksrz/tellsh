@@ -143,6 +143,12 @@ The intent and slots are shared; only the rendering differs (`src/render.js`, va
 
 ### Developer tools (v0.4)
 
+**New templates (feat/templates-catalog)** (ranked by frequency in real command usage): `git show [ref]`, `git fetch --all`, `git ls-files`,
+`git grep -n -- <pattern>`, `gh run watch [id]`, `gh issue list`, `gh issue view <n>`, `npx wrangler d1 list`,
+`npx wrangler pages deploy <dir>`. pip's install directory is kept in PowerShell and cmd too, also in the attached form
+(`-t/tmp/pkgs`), and a quoted workspace after "in workspace" stays one value (`in workspace "staging app"` ->
+`--workspace 'staging app'`, quoted in PowerShell / cmd as well).
+
 Added from real command usage: `npm run <script>`, `npm install [pkg]`, `npm install -g`, `pip install`
 (`py -m pip` on Windows), activating a virtualenv (per shell), `<tool> --version` / `--help`, printing a line range
 (`sed -n 'N,Mp'`, `Get-Content … -Index` in PowerShell), SSH local port forwarding, Cloudflare `wrangler`
@@ -151,7 +157,7 @@ Added from real command usage: `npm run <script>`, `npm install [pkg]`, `npm ins
 `--env production`, a custom name whole, also quoted, `to staging-eu`, `to "preview2"` -> `--env staging-eu` / `preview2`; an
 unreadable one or one it would have to guess, `deploy worker env`, `with env vars`, `for testing`, `for the qa team`, `to v2`,
 gives `--env <WENV>`) and the GitHub CLI (`gh auth`, `gh pr list/view/create/checks/merge`,
-`gh run list/view`; a pull request the request names, by number, URL or branch, is passed on: `gh pr merge
+`gh run list/view/watch`, `gh issue list/view`; a pull request the request names, by number, URL or branch, is passed on: `gh pr merge
 feature/login`, also quoted, `merge pull request "feature/login"`, never a bare `gh pr merge` for the current branch's
 pull request; a word that may not be a branch, `merge pr main`, gives `gh pr merge <PR>`, while `feature/apply` or
 `hotfix/weekly` are kept; a number counts only next to "pr" (`pr 45`, `pr #45`) or as `#45` right after the verb: `merge pr with 2 approvals`,
@@ -473,9 +479,6 @@ retrain; `npm test && npm run eval`.
   the command before running it.
 * **Release v0.3: open review findings** (details in [EVAL.md](EVAL.md#known-limits-release-v03-open-review-findings-not-fixed)).
   These give a complete command with no warning:
-  - attached pip target is dropped: `pip install requests -t/tmp/pkgs` -> `python3 -m pip install requests` (write `-t /tmp/pkgs`);
-  - a quoted workspace with a space after "in workspace" is cut: `run npm deploy in workspace "staging app"` ->
-    `--workspace staging` (`--workspace "staging app"` is kept whole);
   - ssh `-L` with a bind address (4-part spec): `-L 127.0.0.1:8080:db.internal:5432` -> `-L 8080:localhost:8080` (only
     `-L PORT:HOST:PORT` is read);
   - `~` in a pip target is quoted literally: `--target ~/packages` -> `--target '~/packages'` (use an absolute path; `$HOME/…` is quoted too);
@@ -490,7 +493,10 @@ retrain; `npm test && npm run eval`.
   ([HYBRID.md](HYBRID.md#v04-real-usage)).
 * Slot F1 gold set is small (208 requests); relexicalised end-to-end numbers use silver spans for unreplaced values.
 
-- PowerShell/cmd: a quoted `--workspace` value containing spaces or another flag can be split into separate arguments, and an explicit pip `--target` can be dropped (install goes to the active Python). Always read the shown command before confirming.
+- Fixed (feat/templates-catalog): PowerShell / cmd quote a `--workspace` value with spaces and keep pip `--target`; the attached
+  `-t/tmp/pkgs` form and a quoted workspace after "in workspace" are read. Still: a request with several shell arguments
+  where one of them carries its own quotes (`tellsh run npm deploy in workspace '"staging app"'`) may be re-quoted; pass
+  the request as one argument. Always read the shown command before confirming.
 
 ## License
 
