@@ -26,10 +26,27 @@ export const RAW_OK = {
   pr: (v) => /^\d{1,12}$|^https:\/\/github\.com\/[\w.-]+\/[\w.-]+\/pull\/\d{1,12}\/?$/.test(String(v)) || /^(?![-.])(?!.*\.\.)[\w./-]{1,100}$/.test(String(v)),
 };
 
-// "merge pull request feature/login", "view the pr for branch fix-1", "pr #45"
-const PR_SELECTOR = /\b(?:pull[\s-]+requests?|pr|prs)\s+(?:(?:for|of|on|from|branch|number|no\.?|nr\.?)\s+)*(#?[^\s"'`]+?)[.,!?]?(?=\s|$)/i;
-// a function word after "pull request" is not a selector ("merge the pull request and …", "merge pr now")
-const PR_NOT_SELECTOR = /^(?:the|a|an|this|that|it|its|my|our|and|or|then|now|please|pls|into|to|with|in|at|is|was|which|again|request|requests)$/i;
+// "merge pull request feature/login", "view the pr for branch fix-1", "pr #45", 'merge pull request "feature/login"'
+const PR_SELECTOR = /\b(?:pull[\s-]+requests?|pr|prs)\s+((?:(?:for|of|on|from|branch|number|no\.?|nr\.?)\s+)*)(?:(["'`„“”])(.*?)["'`“”]|(#?[^\s"'`]+?)[.,!?]?(?=\s|$))/i;
+// a function or describing word after "pull request" is not a selector ("merge the pull request and …", "merge pr now",
+// "check pr status", "view pull request on github", "merge pr by bob", "merge pull request quickly")
+const PR_NOT_SELECTOR = /^(?:the|a|an|this|that|it|its|my|our|your|their|me|us|you|him|her|them|and|or|then|now|please|pls|into|to|with|in|at|by|is|was|which|again|request|requests|status|state|checks?|details?|info|summary|description|diff|changes|comments?|github|gh|web|browser|online|here|there|today|quickly|fast|asap|immediately|already|first|too|also)$|ly$/i;
+// an unmarked word (no digit, '/', '-', '_', '.', '#') names a branch only after "branch", "for" or "from" ("merge pr from bob");
+// otherwise it is withheld (the `?` fails validation)
+const PR_MARKED = /[\d/_.#-]/;
+/** The pull request the user names (quoted: kept as written, validation withholds an odd one), else null. */
+function prSelector(ex) {
+  if (ex.urls[0] != null) return ex.urls[0];
+  const m = String(ex.text).match(PR_SELECTOR);
+  if (m && m[3] != null) return m[3] || '?'; // `""`: named but empty, withheld
+  if (m && m[4] != null && !PR_NOT_SELECTOR.test(m[4])) {
+    if (PR_MARKED.test(m[4]) || /\b(?:for|from|branch)\s+$/i.test(m[1])) return m[4];
+    // "merge pr main": a bare word may be a branch or say something else: withheld (`gh pr merge <PR>`), never dropped
+    return `?${m[4]}`;
+  }
+  // 'merge the "feature/login" pull request': an explicitly quoted value is the target
+  return ex.quoted.length ? ex.quoted[0] : null;
+}
 const PATH_SLOTS = new Set(['path', 'file', 'src', 'dst', 'dest', 'archive']);
 const PLACEHOLDER = (name) => `<${name.toUpperCase()}>`;
 
@@ -131,9 +148,9 @@ export function resolveSlots(intent, ex) {
   if (has('pr')) {
     // the pull request the user names: a URL or a branch is kept as it is (validation withholds an odd one), never
     // dropped for a bare `gh pr merge`, which acts on the current branch's pull request
-    const sel = ex.urls[0] ?? String(ex.text).match(PR_SELECTOR)?.[1];
+    const sel = prSelector(ex);
     const n = ex.pid ?? ex.numbers?.find((x) => x > 0) ?? ex.count;
-    if (sel != null && !PR_NOT_SELECTOR.test(sel)) v.pr = String(sel).replace(/^#/, '');
+    if (sel != null) v.pr = String(sel).replace(/^#(?=\d)/, '');
     else if (n != null) v.pr = n;
     delete v.count;
   }

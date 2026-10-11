@@ -125,6 +125,17 @@ a selector that is none of these (`merge pull request ../x`, a GitLab URL) shows
 bare name, and for the npm case `npm install npm`). `train_lm_gpu.py` trains on the last partial batch (with fewer rows
 than `--bs` it looped forever) and stops on an empty train split. Every eval number is unchanged. Bench re-run.
 
+**Round 14 (review r13; A unchanged, A+B policy unchanged).** A quoted pull request target is kept in every shell
+(`merge pull request "feature/login"` gives `gh pr merge feature/login`; a quoted value that is not a number, URL or
+branch, `"foo bar"`, shows `gh pr merge <PR>`; before, all of these gave a bare `gh pr merge`). A describing word after
+"pr" is no longer a target (`check pr status` gives `gh pr checks`, not `gh pr checks status`; also `on github`, `by bob`,
+`quickly`, `for me`), and an unmarked bare word that may or may not be a branch (`merge pr main`) is withheld as `<PR>`;
+it is kept after "branch", "for" or "from" (`merge pull request from bob`). Wrappers that run the command on another
+machine or host (`systemd-run --machine=…`/`-M`/`--host=…`/`-H`, `run0 --machine=…`, `sudo --host=…`, `machinectl shell`)
+make every history value ambiguous like `nsenter` (`systemd-run --machine=web ps -p 42` + "kill it" no longer gives a
+local `kill 42`). pip extras without a version are accepted (`install requests[socks] with pip`; before, `<PKG>`).
+Every eval number is unchanged. Bench re-run.
+
 <!-- eval:start -->
 ## Model
 
@@ -267,13 +278,13 @@ Machine: Intel(R) Xeon(R) Processor, Node v20.19.2, linux; CPU affinity: `0` (ru
 
 | measurement | p50 | p95 | runs |
 |---|---|---|---|
-| bare `node -e 0` startup (baseline) | 85.8 ms | 123.9 ms | 10 |
-| **cold**: `node bin/tellsh.js --dry-run --json --shell bash <query>` (new process, model load, full pipeline) | **193.0 ms** | **230.8 ms** | 40 |
-| model load (in-process, one-off) | 5.2 ms | – | 1 |
-| **warm**: full cascade + tagger + render (bash, composer off) | **0.442 ms** | **4.5 ms** | 2000 |
-| warm, incl. composer modifier check (shipped default) | 0.752 ms | 8.9 ms | 2000 |
-| warm, PowerShell rendering | 0.426 ms | 1.1 ms | 2000 |
-| warm, 5 history lines given (only the previous one is read; context build + reference rules) | 0.749 ms | 8.1 ms | 2000 |
+| bare `node -e 0` startup (baseline) | 86.8 ms | 98.0 ms | 10 |
+| **cold**: `node bin/tellsh.js --dry-run --json --shell bash <query>` (new process, model load, full pipeline) | **178.0 ms** | **204.7 ms** | 40 |
+| model load (in-process, one-off) | 4.8 ms | – | 1 |
+| **warm**: full cascade + tagger + render (bash, composer off) | **0.441 ms** | **4.6 ms** | 2000 |
+| warm, incl. composer modifier check (shipped default) | 0.641 ms | 7.5 ms | 2000 |
+| warm, PowerShell rendering | 0.358 ms | 0.755 ms | 2000 |
+| warm, 5 history lines given (only the previous one is read; context build + reference rules) | 0.670 ms | 7.2 ms | 2000 |
 
 The composer runs `bash -n` (a subprocess, ~2 ms) only when it actually returns a composed command.
 <!-- bench:end -->

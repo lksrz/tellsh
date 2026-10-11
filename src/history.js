@@ -621,6 +621,15 @@ const ROOT_WRAPPERS = new Set(['chroot', 'proot', 'firejail', 'bwrap', 'systemd-
 // namespace wrappers: the command saw another PID / network / mount namespace (`nsenter -t 1234 -p ps -p 42`,
 // `unshare -n ss -ltn`), so a pid, port, process or path it named is not the one "kill it" would hit here
 const NS_WRAPPERS = new Set(['nsenter', 'unshare']);
+// wrapper options that run the command on another machine / host (`systemd-run --machine=web ps -p 42`,
+// `systemd-run -H user@host …`, `run0 --machine=web …`, `sudo --host=web …`): like a namespace, nothing it named is here
+const WRAPPER_HOST = {
+  'systemd-run': /^-[a-zA-Z]*[MH]|^--(?:machine|host)(?:=|$)/,
+  run0: /^-[a-zA-Z]*M|^--machine(?:=|$)/,
+  sudo: /^-[a-zA-Z]*h|^--host(?:=|$)/,
+};
+// wrappers that always run the command on another machine / container (`machinectl shell web ps -p 42`)
+const HOST_WRAPPERS = new Set(['machinectl']);
 /**
  * 'root' when a wrapper in the removed prefix of `raw` (before the unwrapped words `w`) runs the command under another
  * root (every path names something else), 'cwd' when it runs it in another working directory (relative paths do).
@@ -630,10 +639,10 @@ function wrapperScope(w, raw) {
   let scope = null;
   for (const x of raw.slice(0, raw.length - w.length).map((v) => String(rawOf(v)))) {
     const h = x.replace(/^.*[\\/]/, '').toLowerCase();
-    if (ROOT_WRAPPERS.has(h) || NS_WRAPPERS.has(h)) return 'root';
+    if (ROOT_WRAPPERS.has(h) || NS_WRAPPERS.has(h) || HOST_WRAPPERS.has(h)) return 'root';
     if (CWD_WRAPPERS.has(h)) { scope = 'cwd'; continue; }
-    if (!x.startsWith('-')) { if (WRAPPER_CWD[h] || WRAPPER_ROOT[h]) cur = h; continue; }
-    if (WRAPPER_ROOT[cur]?.test(x)) return 'root';
+    if (!x.startsWith('-')) { if (WRAPPER_CWD[h] || WRAPPER_ROOT[h] || WRAPPER_HOST[h]) cur = h; continue; }
+    if (WRAPPER_ROOT[cur]?.test(x) || WRAPPER_HOST[cur]?.test(x)) return 'root';
     if (WRAPPER_CWD[cur]?.test(x)) scope = 'cwd';
   }
   return scope;
