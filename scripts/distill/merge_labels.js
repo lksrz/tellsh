@@ -5,7 +5,7 @@
 // Teacher rows carry only the soft distribution (no hard intent label), so the teacher argmax is not counted twice. Writes build/hybrid/train_distill.jsonl (gitignored build/): the base train.jsonl rows plus
 //   {text, tool, intent, soft:{intent:p}, lang, shell, os, spans:null, split:'train', src:'teacher', w}
 //   node scripts/distill/merge_labels.js [--min-p 0.5] [--w 0.5]
-import { readFileSync, writeFileSync, existsSync } from 'node:fs';
+import { readFileSync, writeFileSync, existsSync, lstatSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { exclusionIndex } from '../lib/heldout.js';
 import { normalize } from '../../src/features.js';
@@ -26,8 +26,9 @@ if (!want || createHash('sha256').update(poolBody).digest('hex') !== want) { con
 const excl = exclusionIndex(ROOT);
 const dev = new Set(JSON.parse(readFileSync(join(ROOT, 'build/hybrid/dev_texts.json'), 'utf8')));
 const decisions = rj(join(ROOT, 'data/teacher/decisions.jsonl')).filter((d) => d.text && d.field !== 'risk');
-const dropped = new Set(decisions.filter((d) => d.action === 'drop').map((d) => normalize(d.text)));
-const relabel = new Map(decisions.filter((d) => d.action === 'relabel' && d.intent).map((d) => [normalize(d.text), d.intent]));
+// one current decision per text (last entry wins, as in gen_data.js / export_data.js)
+const decide = new Map(decisions.map((d) => [normalize(d.text), d]));
+const current = (r) => decide.get(normalize(r.text)) || (r.parent ? decide.get(normalize(r.parent)) : undefined);
 const TW = Number.isFinite(parseFloat(process.env.TELLSH_TMPL_W)) ? parseFloat(process.env.TELLSH_TMPL_W) : 1;
 const pool = new Map(rj(join(D, 'pool.jsonl')).map((r) => [r.id, r]));
 const base = readFileSync(join(ROOT, 'build/hybrid/train.jsonl'), 'utf8');
@@ -37,10 +38,12 @@ for (const l of rj(join(D, 'labels.jsonl'))) {
   st.labels++;
   const r = pool.get(l.id); if (!r) continue;
   if (!l.h || l.h !== createHash('sha1').update(r.text).digest('hex').slice(0, 12)) { console.error(`merge_labels: label ${l.id} does not match the pool text`); process.exit(1); }
-  const bad = (t) => excl.has(t) || dev.has(normalize(t)) || dropped.has(normalize(t));
+  const bad = (t) => excl.has(t) || dev.has(normalize(t)) || decide.get(normalize(t))?.action === 'drop';
   // relex copies: the parent sentence must pass too; copies from pools without provenance are skipped
   if (bad(r.text) || (r.src === 'public-relex' && (!r.parent || bad(r.parent)))) { st.heldOut++; continue; }
-  const gold = relabel.get(normalize(r.parent || r.text)) || r.gold;
+  const d = current(r);
+  if (d?.action === 'drop') { st.heldOut++; continue; }
+  const gold = (d?.action === 'relabel' && d.intent) || r.gold;
   if (l.soft[l.top] < MINP) { st.lowConf++; continue; }
   // teacher 'none' = no candidate fits; pool rows are shell requests (real out-of-catalog commands included), never
   // chit-chat, so they must not become NONE (tool-head rejection) rows: skip them
@@ -52,5 +55,8 @@ for (const l of rj(join(D, 'labels.jsonl'))) {
     spans: null, split: 'train', src: 'teacher', w: W * (r.tmpl ? TW : 1) });
   st.kept++;
 }
-writeFileSync(join(ROOT, 'build/hybrid/train_distill.jsonl'), base.replace(/\n*$/, '\n') + extra.map((r) => JSON.stringify(r) + '\n').join(''));
+const outP = join(ROOT, 'build/hybrid/train_distill.jsonl');
+try { if (lstatSync(outP).isSymbolicLink()) { console.error(`merge_labels: refusing to write through symlink ${outP}`); process.exit(1); } } catch {}
+if (existsSync(join(ROOT, 'build')) && lstatSync(join(ROOT, 'build')).isSymbolicLink() || existsSync(join(ROOT, 'build/hybrid')) && lstatSync(join(ROOT, 'build/hybrid')).isSymbolicLink()) { console.error('merge_labels: build/ or build/hybrid is a symlink; refusing'); process.exit(1); }
+writeFileSync(outP, base.replace(/\n*$/, '\n') + extra.map((r) => JSON.stringify(r) + '\n').join(''));
 console.log(JSON.stringify(st));

@@ -120,6 +120,7 @@ def main():
     torch.manual_seed(a.seed)
     meta = json.load(open(os.path.join(ROOT, 'build/hybrid/meta.json')))
     rows = [json.loads(l) for l in open(a.train_file, encoding='utf-8') if l.strip()]
+    rows = [r for r in rows if float(r.get('w', 1)) > 0]  # zero-weight rows (e.g. TELLSH_TMPL_W=0) are not trained on
     rows = [r for r in rows if a.all or r['split'] == 'train']
     tok = AutoTokenizer.from_pretrained(a.base)
     data = encode(tok, rows, meta)
@@ -161,7 +162,7 @@ def main():
             ids, att, yt, yi, ytag = collate(bb, pad)
             sp, sm, w = soft_batch(bb, len(meta['intents']))
             lt, li, lg = model(ids, att)
-            wn = w / w.mean()
+            wn = w / w.mean().clamp(min=1e-9)
             lti = (cer(lt, yt) * wn).mean()
             hard = yi >= 0
             lii = ((cer(li, yi) * wn)[hard].mean() if hard.any() else 0)

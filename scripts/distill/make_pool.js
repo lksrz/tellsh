@@ -5,7 +5,7 @@
 // Output is PRIVATE: $TELLSH_DISTILL_DIR (default /workspace/tellsh-data/distill)/pool.jsonl
 //   {id, text, lang, shell, os, src, tmpl, gold|null, cands:[intent...]}   (gold = dataset/public label, may be null)
 //   node scripts/distill/make_pool.js [--k 8] [--max 60000]
-import { readFileSync, readdirSync, existsSync, mkdirSync, writeFileSync, realpathSync } from 'node:fs';
+import { readFileSync, readdirSync, existsSync, mkdirSync, writeFileSync, realpathSync, lstatSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { join, relative, resolve, isAbsolute, sep, basename, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -43,9 +43,11 @@ const src = [
 ];
 const seen = new Set(), pool = [];
 const blocked = (text) => { const n = normalize(text); return !n || dev.has(n) || excl.has(text) || excl.has(n); };
-const push = (r, text, s, parent) => {
+const push = (r0, text, s, parent) => {
   const n = normalize(text);
   if (seen.has(n) || blocked(text)) return;
+  // the decision on the generated text itself wins (drop / relabel), as in the exports
+  const r = decided({ ...r0, text }); if (!r) return;
   seen.add(n);
   pool.push({ text, ...(parent ? { parent } : {}), lang: r.lang || '', shell: r.shell || 'bash', os: r.os || 'linux', src: s, tmpl: !!r.tmpl, gold: r.gold ?? null });
 };
@@ -69,8 +71,9 @@ for (const [i, r] of sel.entries()) {
 }
 mkdirSync(OUT, { recursive: true, mode: 0o700 });
 const body = sel.map((r) => JSON.stringify(r)).join('\n') + '\n';
-writeFileSync(join(OUT, 'pool.jsonl'), body, { mode: 0o600 });
+const noLink = (f) => { try { if (lstatSync(f).isSymbolicLink()) { console.error(`make_pool: refusing to write through symlink ${f}`); process.exit(1); } } catch {} return f; };
+writeFileSync(noLink(join(OUT, 'pool.jsonl')), body, { mode: 0o600 });
 // labels.jsonl refers to pool rows by position: merge_labels.js refuses a pool whose hash changed since labelling
-writeFileSync(join(OUT, 'pool.sha256'), createHash('sha256').update(body).digest('hex') + '\n', { mode: 0o600 });
+writeFileSync(noLink(join(OUT, 'pool.sha256')), createHash('sha256').update(body).digest('hex') + '\n', { mode: 0o600 });
 const by = (f) => sel.reduce((m, r) => ((m[f(r)] = (m[f(r)] || 0) + 1), m), {});
 console.log(JSON.stringify({ pool: pool.length, written: sel.length, bySrc: by((r) => r.src), byLang: by((r) => r.lang) }));
