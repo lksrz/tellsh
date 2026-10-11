@@ -104,32 +104,40 @@ for (const r of rows) {
   st.commands++;
 }
 
-// group-wise split, per label (null = out-of-catalog counts as one label)
-const byLabel = new Map();
+// group-wise split: every command skeleton goes to ONE side, whatever the labels of its commands. A group is owned by
+// its majority label; per label, whole owned groups go to eval until >= EVAL_FRAC of that label's commands are held out
+// (never more than half; labels with one group stay in train).
+const gLabels = new Map();
 for (const c of cmds) {
   const k = c.intent || '__ooc__';
-  if (!byLabel.has(k)) byLabel.set(k, new Map());
-  const g = byLabel.get(k);
-  g.set(c.group, (g.get(c.group) || 0) + 1);
+  if (!gLabels.has(c.group)) gLabels.set(c.group, new Map());
+  const m = gLabels.get(c.group); m.set(k, (m.get(k) || 0) + 1);
 }
-const evalGroups = new Set();
+const byLabel = new Map();
+for (const [g, m] of gLabels) {
+  const owner = [...m.entries()].sort((x, y) => y[1] - x[1] || (x[0] < y[0] ? -1 : 1))[0][0];
+  if (!byLabel.has(owner)) byLabel.set(owner, new Map());
+  byLabel.get(owner).set(g, [...m.values()].reduce((x, y) => x + y, 0));
+}
+const evalSkeletons = new Set();
 for (const [label, groups] of byLabel) {
   if (groups.size < 2) continue;
-  const total = [...groups.values()].reduce((a, b) => a + b, 0);
-  const order = [...groups.keys()].sort((a, b) => h(label + a).compare(h(label + b)));
+  const total = [...groups.values()].reduce((x, y) => x + y, 0);
+  const order = [...groups.keys()].sort((x, y) => h(label + x).compare(h(label + y)));
   let n = 0;
   for (const g of order) {
     if (n >= EVAL_FRAC * total) break;
     if (n + groups.get(g) > 0.5 * total) continue; // never hold out more than half of a label
-    evalGroups.add(label + '\u0000' + g);
+    evalSkeletons.add(g);
     n += groups.get(g);
   }
 }
+const evalGroups = evalSkeletons;
 
 const out = [];
 const norm = (s) => s.toLowerCase().replace(/\s+/g, ' ').trim();
 for (const c of cmds) {
-  const split = evalGroups.has((c.intent || '__ooc__') + '\u0000' + c.group) ? 'eval' : 'train';
+  const split = evalSkeletons.has(c.group) ? 'eval' : 'train';
   for (const [t, lang] of c.texts) {
     if (!t || t.length > 300) continue;
     const text = fill(t, c.seed);
