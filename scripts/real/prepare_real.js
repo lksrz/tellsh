@@ -97,7 +97,7 @@ for (const r of rows) {
   else { intent = null; st.byLabelSource.outOfCatalog++; }
   const shell = r.shell === 'powershell' ? 'powershell' : r.shell || 'bash';
   const os = r.os === 'windows' ? 'win32' : r.os || 'linux';
-    // aic-studio-only rows: descriptions were template-generated there (lower training weight, see real_rows.js)
+  // aic-studio-only rows: descriptions were template-generated there (lower training weight, see real_rows.js)
   const tmpl = Array.isArray(r.hosts) && r.hosts.length > 0 && r.hosts.every((x) => x === 'aic-studio');
   cmds.push({ cmd, intent, shell, os, group: group(cmd, GROUP), seed, src: r.source_type, tmpl,
     texts: [...r.descriptions_en.map((t) => [t, 'en']), ...r.descriptions_pl.map((t) => [t, 'pl'])] });
@@ -132,7 +132,6 @@ for (const [label, groups] of byLabel) {
     n += groups.get(g);
   }
 }
-const evalGroups = evalSkeletons;
 
 const out = [];
 const norm = (s) => s.toLowerCase().replace(/\s+/g, ' ').trim();
@@ -161,7 +160,7 @@ Object.assign(st, {
     byShell: Object.fromEntries(['bash', 'zsh', 'powershell'].map((s) => [s, cnt((r) => r.split === 'eval' && r.intent && r.shell === s)])) },
   labels: { train: new Set(final.filter((r) => r.split === 'train' && r.intent).map((r) => r.intent)).size,
     eval: new Set(final.filter((r) => r.split === 'eval' && r.intent).map((r) => r.intent)).size },
-  groups: { total: new Set(cmds.map((c) => c.group)).size, eval: evalGroups.size },
+  groups: { total: new Set(cmds.map((c) => c.group)).size, eval: evalSkeletons.size },
   perNewIntent: Object.fromEntries(NEW.map(([id]) => [id, { train: cnt((r) => r.intent === id && r.split === 'train'), eval: cnt((r) => r.intent === id && r.split === 'eval') }])),
 });
 mkdirSync(join(ROOT, 'build', 'real'), { recursive: true });

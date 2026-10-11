@@ -7,7 +7,7 @@
 //   node scripts/distill/make_pool.js [--k 8] [--max 60000]
 import { readFileSync, readdirSync, existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { createHash } from 'node:crypto';
-import { join, relative, resolve, isAbsolute } from 'node:path';
+import { join, relative, resolve, isAbsolute, sep } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { exclusionIndex } from '../lib/heldout.js';
 import { readReal } from '../real/real_rows.js';
@@ -22,7 +22,7 @@ const OUT = process.env.TELLSH_DISTILL_DIR || '/workspace/tellsh-data/distill';
 const args = process.argv.slice(2);
 const arg = (k, d) => { const i = args.indexOf(k); return i >= 0 ? args[i + 1] : d; };
 // private output must stay outside the repo (or inside gitignored build/)
-{ const rel = relative(ROOT, resolve(OUT)); if (!rel.startsWith('..') && !isAbsolute(rel) && !rel.startsWith('build')) { console.error(`make_pool: ${OUT} is inside the repo; use a path outside it or under build/`); process.exit(1); } }
+{ const rel = relative(ROOT, resolve(OUT)); if (!rel.startsWith('..') && !isAbsolute(rel) && !(rel === 'build' || rel.startsWith('build' + sep))) { console.error(`make_pool: ${OUT} is inside the repo; use a path outside it or under build/`); process.exit(1); } }
 const K = +arg('--k', 8), MAX = +arg('--max', 60000);
 const rj = (p) => (existsSync(p) ? readFileSync(p, 'utf8').split('\n').filter((l) => l.trim()).map((l) => JSON.parse(l)) : []);
 const rd = (d) => (existsSync(d) ? readdirSync(d).filter((f) => f.endsWith('.jsonl')).sort().flatMap((f) => rj(join(d, f))) : []);
@@ -33,6 +33,9 @@ const devP = join(ROOT, 'build/hybrid/dev_texts.json');
 if (!existsSync(devP)) { console.error('make_pool: run scripts/hybrid/export_data.js first (dev_texts.json)'); process.exit(1); }
 const dev = new Set(JSON.parse(readFileSync(devP, 'utf8')));
 const rng = mulberry32(7);
+// same teacher decisions as gen_data.js / export_data.js: dropped rows stay out, relabelled rows carry the new gold
+const decide = new Map(rj(join(ROOT, 'data/teacher/decisions.jsonl')).filter((d) => d.text && d.field !== 'risk').map((d) => [normalize(d.text), d]));
+const decided = (r) => { const d = decide.get(normalize(r.text)); if (d?.action === 'drop') return null; return d?.action === 'relabel' && d.intent ? { ...r, intent: d.intent, gold: d.intent } : r; };
 const src = [
   ...readReal(ROOT).filter((r) => r.split === 'train').map((r) => ({ ...r, src: 'real', gold: r.intent || null })),
   ...[...rd(join(ROOT, 'data/intents')), ...rj(join(ROOT, 'data/shell/train.jsonl'))].map((r) => ({ ...r, src: 'public', gold: r.intent })),
@@ -44,11 +47,12 @@ const push = (r, text, s) => {
   seen.add(n);
   pool.push({ text, lang: r.lang || '', shell: r.shell || 'bash', os: r.os || 'linux', src: s, tmpl: !!r.tmpl, gold: r.gold ?? null });
 };
-for (const r of src) {
+for (const r0 of src) {
+  const r = decided(r0); if (!r) continue;
   push(r, r.text, r.src);
   if (r.src === 'public' && r.intent) { const x = relex(r.text, silverSpans(r.text, r.intent).spans, { lang: r.lang || 'en', rng, split: 'train' }).text; if (x && x !== r.text) push(r, x, 'public-relex'); }
 }
-// deterministic subsample: non-template real rows first, then the rest by hash
+// deterministic subsample: non-template rows (public and real) first, then template-generated real rows, each by hash
 pool.sort((a, b) => (a.tmpl - b.tmpl) || fnv1a(a.text) - fnv1a(b.text));
 const sel = pool.slice(0, MAX);
 const model = getModel();

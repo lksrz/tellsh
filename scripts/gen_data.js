@@ -173,7 +173,9 @@ function main() {
     const ctx = () => (rng() < 0.25 ? randomCtx() : []);
     // real-usage rows: LLM-written requests with noisy labels -> half weight, and no tagger rows (their regex silver
     // spans are unreliable: long paths, backticks, command fragments)
-    const w = r.src === 'real' ? (r.tmpl ? (Number.isFinite(parseFloat(process.env.TELLSH_TMPL_W)) ? parseFloat(process.env.TELLSH_TMPL_W) : 0.5) : 0.5) : 1; // template-generated (aic-studio) rows fill the cap last (real_rows.js); weight tunable via TELLSH_TMPL_W
+    // template-generated (aic-studio) rows fill the per-intent cap last (real_rows.js); TELLSH_TMPL_W is an extra weight
+    // multiplier for them (default 1: measured, the cap ordering helps and extra down-weighting does not)
+    const w = r.src === 'real' ? 0.5 * (r.tmpl && Number.isFinite(parseFloat(process.env.TELLSH_TMPL_W)) ? parseFloat(process.env.TELLSH_TMPL_W) : 1) : 1;
     emit(r.text, fam, r.intent, [...env(), ...ctx()], w, r.src, r.lang, g);
     if (boost.has(normalize(r.text) + '|' + r.intent)) { emit(r.text, fam, r.intent, [...env(), ...ctx()], 1, r.src, r.lang, g); nBoost++; }
     emit(typo(r.text), fam, r.intent, [...env(), ...ctx()], w, r.src, r.lang, g);

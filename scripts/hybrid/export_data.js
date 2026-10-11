@@ -69,6 +69,9 @@ function main() {
   const heldOut = { has: (n) => excl.has(n) };
   const intentRows = [...readDir(join(ROOT, 'data', 'intents')), ...readJsonl(join(ROOT, 'data', 'train.jsonl'))].map((r) => ({ ...r, src: 'intents' }));
   const shellRows = readJsonl(join(ROOT, 'data', 'shell', 'train.jsonl')).map((r) => ({ ...r, src: 'shell' }));
+  // template-generated real rows: TELLSH_TMPL_W multiplier (same meaning as gen_data.js; default 1 = no extra down-weighting)
+  const TW = Number.isFinite(parseFloat(process.env.TELLSH_TMPL_W)) ? parseFloat(process.env.TELLSH_TMPL_W) : 1;
+  const tw = (r) => (r.tmpl && TW !== 1 ? { w: TW } : {});
   const decisions = readJsonl(join(ROOT, 'data', 'teacher', 'decisions.jsonl')).filter((d) => d.text && d.field !== 'risk');
   const decide = new Map(decisions.map((d) => [normalize(d.text), d]));
   const seen = new Set();
@@ -96,11 +99,11 @@ function main() {
     const env = () => (r.shell ? { shell: r.shell, os: r.os || 'linux' } : sampleEnv());
     const { spans } = silverSpans(r.text, r.intent);
     const sp = (s) => s.map((x) => [x.type, x.start, x.end]);
-    push({ text: r.text, tool, intent: r.intent, lang: r.lang, ...env(), spans: sp(spans), gid: g, src: r.src, split, kind: 'orig', ...(r.tmpl ? { w: 0.5 } : {}) });
-    push({ text: typo(r.text), tool, intent: r.intent, lang: r.lang, ...env(), spans: null, gid: g, src: r.src, split, kind: 'typo' });
+    push({ text: r.text, tool, intent: r.intent, lang: r.lang, ...env(), spans: sp(spans), gid: g, src: r.src, split, kind: 'orig', ...tw(r) });
+    push({ text: typo(r.text), tool, intent: r.intent, lang: r.lang, ...env(), spans: null, gid: g, src: r.src, split, kind: 'typo', ...tw(r) });
     for (let k = 0; k < 2; k++) {
       const rx = relex(r.text, spans, { lang: r.lang, rng, split: 'train' });
-      if (rx.text !== r.text) push({ text: rx.text, tool, intent: r.intent, lang: r.lang, ...env(), spans: sp(rx.spans), gid: g, src: r.src, split, kind: 'relex' });
+      if (rx.text !== r.text) push({ text: rx.text, tool, intent: r.intent, lang: r.lang, ...env(), spans: sp(rx.spans), gid: g, src: r.src, split, kind: 'relex', ...tw(r) });
     }
   }
   // tldr descriptions: tool label only (intent ''), capped per family/lang as in gen_data

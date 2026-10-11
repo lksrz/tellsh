@@ -118,4 +118,14 @@ if __name__ == '__main__':
     ap.add_argument('--lr', type=float, default=1e-4); ap.add_argument('--accum', type=int, default=16)
     ap.add_argument('--k', type=int, default=8); ap.add_argument('--max-rows', type=int, default=40000)
     a = ap.parse_args()
+    # adapters and labels come from private text: refuse an output inside a git work tree unless under its build/
+    d = os.path.abspath(a.out)
+    while True:
+        up = os.path.dirname(d)
+        if os.path.isdir(os.path.join(up, '.git')) or os.path.isfile(os.path.join(up, '.git')):
+            rel = os.path.relpath(os.path.abspath(a.out), up)
+            if not (rel == 'build' or rel.startswith('build' + os.sep)): sys.exit(f'refusing --out inside the repo {up} (use a path outside it or under build/)')
+            break
+        if up == d: break
+        d = up
     train(a) if a.cmd == 'train' else label(a)
