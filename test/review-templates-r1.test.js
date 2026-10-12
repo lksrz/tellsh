@@ -128,3 +128,12 @@ test('review r7: issue state after the word repo, quoted pip operands, relative 
   assert.equal(r.missing.length, 1);
   assert.doesNotMatch(r.missing[0], /code -- code/);
 });
+
+test('review r8: one value explains one word across quoted and bare forms; explicit HEAD~1 with a relative word; quoted repo names', async () => {
+  const held = async (q) => { const r = await run(q); assert.ok(r.command == null || r.missing.length > 0, `${q}: ${r.command} must not run on Enter`); };
+  for (const q of ['grep tracked files for "src" in src', 'search tracked files for "foo" and FOO', 'show the previous commit from HEAD~1', 'show the previous commit HEAD~1']) await held(q);
+  assert.equal((await run('list open issues in repo "acme/closed"')).command, 'gh issue list --repo acme/closed');
+  assert.equal((await run('list all issues in repository "acme/open"')).command, 'gh issue list --repo acme/open --state all');
+  assert.equal((await run('list issues of acme/closed')).command, 'gh issue list --repo acme/closed');
+  assert.equal((await run('show the previous commit')).missing.length, 0);
+});

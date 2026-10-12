@@ -1132,7 +1132,9 @@ export function newTemplateSlots(id, text, v, quoted) {
     if (m) v.num = m[1]; else delete v.num;
   }
   if (id === 'gh_issue_list') {
-    t = t.replace(/--repo[=\s]+\S+|\b(?:repo|repository|repozytori\w*)\s+[\w.-]+\/[\w.-]+/gi, ' ');
+    // a repository name (`acme/closed`, quoted or not, or the value read into the repo slot) never sets the state
+    t = t.replace(/--repo[=\s]+\S+|(["']?)[\w.-]+\/[\w.-]+\1/gi, ' ');
+    if (typeof v.repo === 'string' && v.repo) t = t.split(v.repo).join(' ');
     if (/\b(?:closed|zamkni\w*)\b/i.test(t)) v.state = 'closed';
     else if (/\b(?:all|every|wszystkie|wszystkich)\b/i.test(t) && !/\b(?:open|opened|otwart\w*)\b/i.test(t)) v.state = 'all';
     if (/\b(?:closed|zamkni\w*)\b/i.test(t) && /\b(?:open|opened|otwart\w*)\b/i.test(t)) v.state = 'all';
@@ -1189,14 +1191,14 @@ export function newTemplateWithhold(id, text, slots = {}, command = null) {
     // each rendered value explains one occurrence only (`for "src" in "src"`, `"foo" and "FOO"`)
     const vals = raw.map((x) => x.toLowerCase().replace(/^#/, ''));
     const left = [...vals];
+    // quoted occurrences consumed by whTokens are removed from `left` first, so they never explain a second copy
+    { const used = [...raw]; for (const m of t.matchAll(/(["'])([^"']*)\1/g)) { const i = used.indexOf(m[2]); if (i >= 0) { used.splice(i, 1); const j = left.indexOf(m[2].toLowerCase().replace(/^#/, '')); if (j >= 0) left.splice(j, 1); } } }
     const rest = whTokens(t, raw).filter((w) => { if (ok.has(w)) return false; const i = left.indexOf(w.replace(/^#/, '')); if (i >= 0) { left.splice(i, 1); return false; } return true; });
-    // a quoted value already consumed by whTokens
-    for (const x of raw) if (new RegExp(`(["'])${x.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\1`).test(t)) { const i = left.indexOf(x.toLowerCase()); if (i >= 0) left.splice(i, 1); }
     // the literal form: nothing may follow the pattern (`git grep TODO -- code` is a pathspec, not vocabulary)
     if (id === 'git_grep') { const g = t.match(/\bgit\s+grep\s+(?:-n\s+)?(?:--\s+)?(?:"[^"]*"|'[^']*'|[^\s"']+)\s+(\S.*)$/i); if (g) { rest.length = 0; rest.push(g[1]); } }
     if (id === 'git_show') { const g = t.match(/\bgit\s+show\s+(?:"[^"]*"|'[^']*'|[^\s"']+)\s+(\S.*)$/i); if (g) { rest.length = 0; rest.push(g[1]); } }
     if (id === 'git_ls_files') { const g = t.match(/\bgit\s+ls-files\s+(\S.*)$/i); if (g) { rest.length = 0; rest.push(g[1]); } }
-    if (id === 'git_show' && slots.rev != null && slots.rev !== 'HEAD~1' && /\b(?:previous|prior|second[- ]to[- ]last|before|poprzedni\w*|przedostatni\w*|parent|rodzic\w*)\b/i.test(t)) rest.push('(relative to the named revision)');
+    if (id === 'git_show' && slots.rev != null && (REF_TOKEN.test(t) || /\bgit\s+show\s+\S/i.test(t)) && /\b(?:previous|prior|second[- ]to[- ]last|before|poprzedni\w*|przedostatni\w*|parent|rodzic\w*)\b/i.test(t)) rest.push('(relative to the named revision)');
     if (rest.length) out.push(`${id === 'git_grep' ? 'pattern' : id === 'git_show' ? 'rev' : 'args'} (not expressed: ${[...new Set(rest)].slice(0, 4).join(' ')})`);
     if (Object.values(slots).some((x) => glued(x)) || /\\["']/.test(t)) out.push('value (unclear where the quoted text ends)');
   }
