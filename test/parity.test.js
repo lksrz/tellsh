@@ -39,3 +39,13 @@ test('tagger matches Python probabilities', () => {
     for (const [label, pp] of s.top) assert.ok(Math.abs(p[m.labels.indexOf(label)] - pp) < 1e-5);
   }
 });
+
+// 0.3.4: the templates model (model/model_templates.bin) has its own parity fixture
+import { loadModel as loadTM } from '../src/model.js';
+const fxT = JSON.parse(readFileSync(new URL('./fixtures/parity_templates.json', import.meta.url), 'utf8'));
+test('templates model matches its Python probabilities (classifier + tagger)', () => {
+  const tm = loadTM(new URL('../model/model_templates.bin', import.meta.url).pathname);
+  for (const s of fxT.cls) { const m = tm.models[s.model]; const p = predictProba(m, s.f); for (const [label, pp] of s.top) assert.ok(Math.abs(p[m.labels.indexOf(label)] - pp) < 1e-5, `${s.model} ${label}`); }
+  const t = tm.models.tagger;
+  for (const s of fxT.tag) { const p = predictProba(t, s.f); for (const [label, pp] of s.top) assert.ok(Math.abs(p[t.labels.indexOf(label)] - pp) < 1e-5); }
+});

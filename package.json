@@ -1,6 +1,6 @@
 {
   "name": "tellsh",
-  "version": "0.3.3",
+  "version": "0.3.4",
   "description": "Offline natural-language (Polish & English) to shell command CLI: tool->intent->slot cascade of tiny linear models + templates for bash/zsh/sh/PowerShell (fish/cmd best effort). No LLM at runtime, zero dependencies.",
   "type": "module",
   "bin": {
@@ -28,6 +28,7 @@
     "src/*.js",
     "src/rerank/*.js",
     "model/model.bin",
+    "model/model_templates.bin",
     "model/tldr_triggers.json",
     "model/compose_explained.json",
     "README.md",
@@ -45,7 +46,7 @@
     "teacher": "node scripts/teacher.js",
     "eval": "node scripts/eval.js",
     "bench": "taskset -c 0 node scripts/bench.js",
-    "prepack": "node -e \"for (const f of ['model/model.bin','model/tldr_triggers.json','model/compose_explained.json']) require('fs').statSync(f)\""
+    "prepack": "node -e \"for (const f of ['model/model.bin','model/model_templates.bin','model/tldr_triggers.json','model/compose_explained.json']) require('fs').statSync(f)\""
   },
   "keywords": [
     "cli",

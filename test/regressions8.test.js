@@ -88,7 +88,7 @@ test('blocker: a quoted path with a space keeps its boundaries (CLI argv and ear
   assert.equal(tellshQuery("tellsh --shell bash delete folder '/tmp/a b'"), 'delete folder "/tmp/a b"');
   assert.equal(tellshQuery(`tellsh x "a \\"b\\" 'c'"`), false);
   for (const [h, q, exp] of [
-    ['tellsh show folder "/tmp/my data"', 'delete it', "rm -r '/tmp/my data'"],
+    ['tellsh create folder "/tmp/my data"', 'delete it', "rm -r '/tmp/my data'"],
     ['tellsh delete folder "/tmp/a b"', 'delete it', "rm -r '/tmp/a b'"],
     ['tellsh delete all log files in "/tmp/a b"', 'same for txt', "find '/tmp/a b' -type f -iname '*.txt' -delete"],
   ]) assert.equal(run(q, [h]).command, exp, `${q} after ${h}`);

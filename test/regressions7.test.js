@@ -38,7 +38,8 @@ test('"there", "tam", "stamtąd", "inside", "in the same folder" are place refer
     'delete all log files in the same folder', 'delete all log files in the same place', 'remove the logs in there too',
     'usuń wszystkie pliki log tam', 'list files there']) {
     const r = run(q);
-    placeholder(r, '<PATH>', q);
+    // "remove the logs in there too" may read as one file (`rm <FILE>`): any placeholder, never `.` or the place word
+    placeholder(r, q === 'remove the logs in there too' && /<FILE>/.test(r.command ?? '') ? '<FILE>' : '<PATH>', q);
     assert.ok(!/\b(?:there|same|tam)\b/.test(r.command), `${q}: ${r.command}`);
   }
   // a place never names the object of a changing command

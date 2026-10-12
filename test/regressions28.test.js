@@ -170,7 +170,7 @@ test('final3-codex major: tools that run project code are at least medium, also 
 test('final3-codex major: an npm workspace is kept, never dropped', () => {
   for (const env of SHELLS) {
     const r = run('run npm deploy --workspace staging', env);
-    assert.match(r.command, /^npm run '?deploy'? --workspace staging$/, `${env.shell}: ${r.command}`);
+    assert.match(r.command, /^npm run '?deploy'? --workspace '?staging'?$/, `${env.shell}: ${r.command}`);
   }
   for (const [q, cmd] of [
     ['run npm deploy -w staging', 'npm run deploy --workspace staging'],

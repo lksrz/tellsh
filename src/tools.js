@@ -62,15 +62,15 @@ export const FAMILIES = {
   git: ['git_status', 'git_log', 'git_diff', 'git_diff_staged', 'git_branches', 'git_current_branch',
     'git_new_branch', 'git_switch_branch', 'git_delete_branch', 'git_undo_commit', 'git_discard_changes',
     'git_stash', 'git_stash_pop', 'git_pull', 'git_push', 'git_clone', 'git_add_all', 'git_commit',
-    'git_remote', 'git_blame', 'git_init'],
+    'git_remote', 'git_blame', 'git_init', 'git_show', 'git_fetch', 'git_ls_files', 'git_grep'],
   docker: ['docker_ps', 'docker_ps_all', 'docker_logs', 'docker_images', 'docker_stop', 'docker_stop_all',
     'docker_prune', 'docker_exec', 'docker_stats', 'docker_compose_up', 'docker_compose_down'],
   npm: ['npm_run_script', 'npm_install', 'npm_install_global'],
   python: ['pip_install', 'activate_venv'],
   cli: ['tool_version', 'cli_help'],
-  wrangler: ['wrangler_deploy', 'wrangler_dev', 'wrangler_tail', 'wrangler_secret_put', 'wrangler_login', 'wrangler_whoami'],
+  wrangler: ['wrangler_deploy', 'wrangler_dev', 'wrangler_tail', 'wrangler_secret_put', 'wrangler_login', 'wrangler_whoami', 'wrangler_d1_list', 'wrangler_pages_deploy'],
   gh: ['gh_auth_status', 'gh_auth_login', 'gh_pr_list', 'gh_pr_view', 'gh_pr_create', 'gh_pr_checks', 'gh_pr_merge',
-    'gh_run_list', 'gh_run_view'],
+    'gh_run_list', 'gh_run_view', 'gh_run_watch', 'gh_issue_list', 'gh_issue_view'],
 };
 
 /** Label used by stage 1 for requests that are not shell tasks at all (chit-chat). */

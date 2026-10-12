@@ -53,7 +53,7 @@ const OPTIONAL_TOOLS = new Set(['docker', 'gh', 'npm', 'npx', 'node', 'brew', 'p
   'curl.exe', 'ssh.exe']);
 
 // intents whose success prints nothing (writes inside the fixture, or a lookup that may legitimately be empty)
-const NO_OUTPUT = new Set(['routes', 'mkdir', 'touch_file', 'chmod', 'make_executable', 'copy', 'move_rename', 'delete_file', 'delete_dir',
+const NO_OUTPUT = new Set(['routes', 'git_fetch', 'mkdir', 'touch_file', 'chmod', 'make_executable', 'copy', 'move_rename', 'delete_file', 'delete_dir',
   'delete_by_ext', 'create_symlink', 'replace_text', 'git_add_all', 'git_new_branch', 'git_switch_branch', 'git_delete_branch',
   'git_undo_commit', 'git_discard_changes', 'git_stash', 'git_stash_pop', 'git_diff', 'git_diff_staged', 'git_remote', 'cron_list',
   'users_logged_in', 'last_logins', 'activate_venv', 'compress_zip', 'compress_targz', 'extract_zip', 'extract_targz',
@@ -71,13 +71,14 @@ const SAMPLE = {
   archive: 'backup.tar.gz', count: 5, depth: 2, days: 30, size: '1k', age: '-mtime -1', ext: 'txt', name: 'notes',
   pattern: 'hello', mode: '644', old: 'hello', new: 'bye', text: 'hello world', var: 'HOME', cmd: 'git', branch: 'feature-x',
   start: 1, end: 3, user: 'nobody', service: 'ssh', container: 'web', pkg: 'git', host: 'example.com', url: 'https://example.com',
-  port: 8080, pid: 4242, target: 'me@example.com', message: 'test commit', script: 'build',
+  port: 8080, pid: 4242, target: 'me@example.com', message: 'test commit', script: 'build', num: 7,
 };
 const PER_INTENT = {
   extract_targz: { file: 'arch/sample.tar.gz', dest: 'out' }, extract_zip: { file: 'arch/sample.zip', dest: 'out' },
   list_archive: { file: 'arch/sample.tar.gz' }, compress_zip: { archive: 'backup.zip' },
   find_larger_than: { size: '10k' }, find_smaller_than: { size: '1k' }, sort_uniq: { file: 'my docs/log lines.txt' },
   base64_decode: { file: 'my docs/encoded.b64' }, git_blame: { file: 'README.md' }, git_diff: { file: 'src.txt' },
+  git_show: { rev: 'HEAD' }, git_grep: { pattern: 'alpha' }, wrangler_pages_deploy: { path: 'my docs' },
   git_discard_changes: { file: 'src.txt' }, git_switch_branch: { branch: 'dev' }, git_delete_branch: { branch: 'dev' },
   delete_dir: { path: 'my docs/empty dir' }, activate_venv: { path: '.venv' }, find_by_name: { name: 'notes' },
   diff_files: { src: 'my docs/notes.txt', dst: 'my docs/notes copy.txt' }, create_symlink: { src: 'my docs/notes.txt', dst: 'link to notes' },

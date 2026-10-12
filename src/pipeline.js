@@ -6,11 +6,12 @@
 //   slots: BIO tagger (tool-conditioned) ─► validated values; regex extraction fills/overrides failures
 //   render for shell/os ─► danger check
 //   low confidence (or unexplained modifiers) ─► second pass: experimental flag composer
-import { getModel } from './model.js';
+import { getModel, loadModel } from './model.js';
+import { fileURLToPath } from 'node:url';
 import { cascade } from './cascade.js';
 import { tag, exFromSpans } from './tagger.js';
 import { extractSlots, pickArg, isOptionWord, foldKeepLength, isStopWord } from './slots.js';
-import { resolveSlots, buildCommand, finalizeSlots, RAW_OK } from './fill.js';
+import { resolveSlots, buildCommand, finalizeSlots, RAW_OK, newTemplateWithhold } from './fill.js';
 import { BY_ID } from './catalog.js';
 import { FAMILY_OF, NONE } from './tools.js';
 import { detectEnv, envFeatures } from './env.js';
@@ -404,9 +405,51 @@ const blocksAmbiguous = (comp, amb) => !!comp && !comp.invalid && ((amb.some((p)
  * opts: { shell, os, env, history: string[] (commands, oldest first), cwd, threshold, top, compose: 'auto'|'force'|'off',
  *         slotMode: 'merge'|'tagger'|'regex', model, rerank, rerankTop (candidates the rerank hook sees; default top) }
  */
+// the intents a typed command may become (a translation for the shell, never another program)
+const LIT_FAMILY = { cargo: /^cargo_/, python: /^python_|^pip_|^run_python/, python3: /^python_|^pip_|^run_python/, py: /^python_|^pip_/, node: /^node_|^run_node/, go: /^go_/, make: /^make_/, terraform: /^terraform_/, helm: /^helm_/, brew: /^brew_|^pkg_/, apt: /^apt_|^pkg_/, 'apt-get': /^apt_|^pkg_/, winget: /^winget_|^pkg_/, mv: /^move_|rename/, 'move-item': /^move_|rename/, cp: /^copy_/, 'copy-item': /^copy_/, rm: /^delete_|^remove_/, rmdir: /^delete_dir/, 'remove-item': /^delete_|^remove_/, del: /^delete_/, erase: /^delete_/, rd: /^delete_dir/,
+  ls: /^list_|^ls|dir_list|show_dir/, cat: /^cat_|^show_file|view_file/, git: /^git_/, gh: /^gh_/, docker: /^docker_/, kubectl: /^k8s_|^kube/, npm: /^npm_/, npx: /^npx_|^wrangler_|^npm_/, pnpm: /^pnpm_|^npm_/, yarn: /^yarn_|^npm_/,
+  pip: /^pip_/, pip3: /^pip_/, wrangler: /^wrangler_/, ssh: /^ssh_/, scp: /^scp_|^copy_remote/, rsync: /^rsync|^sync_/, find: /^find_/, tar: /^tar_|^archive|^extract/, zip: /^zip_|^archive/, unzip: /^unzip|^extract/,
+  kill: /^kill_/, pkill: /^kill_/, killall: /^kill_/, 'stop-process': /^kill_/, chmod: /^chmod|^perm/, chown: /^chown|^owner/, curl: /^download_|^http_|^curl/, wget: /^download_/, du: /^dir_size|^disk_/, df: /^disk_/,
+  ps: /^process_|^list_process/, top: /^process_|^top/, ping: /^ping_/, grep: /^grep_|^search_/, head: /^head_|^show_file/, tail: /^tail_|^follow_/, wc: /^count_/, sort: /^sort_/, systemctl: /^service_/, service: /^service_/, history: /^history/, crontab: /^cron/ };
+function literalIntentOk(first, intent) { const f = LIT_FAMILY[String(first).toLowerCase()]; return f ? f.test(String(intent)) : false; }
+
+// 0.3.4 two-model gate: the 0.3.3 model (model/model.bin) answers everything it already knew; the retrained model
+// (model/model_templates.bin) is used only when it picks one of the new 0.3.4 template intents, so a retrain can never
+// change the pre-existing intents (their classification and slots stay exactly as on 0.3.3).
+export const NEW_TEMPLATE_INTENTS = new Set(['git_fetch', 'git_ls_files', 'gh_run_watch', 'gh_issue_list', 'gh_issue_view', 'wrangler_d1_list', 'wrangler_pages_deploy', 'git_grep', 'git_show']);
+const TEMPLATES_MODEL = fileURLToPath(new URL('../model/model_templates.bin', import.meta.url));
+let templatesModel;
+function getTemplatesModel() {
+  if (templatesModel === undefined) { try { templatesModel = loadModel(TEMPLATES_MODEL); } catch { templatesModel = null; } }
+  return templatesModel;
+}
+// applied to every answer (fresh, history replay, composed): a pip target a shell would expand or unescape is never runnable
+function pipTargetGuard(res) {
+  if (!res || !res.command || (res.missing || []).length || !/^pip_/.test(res.intent || '')) return res;
+  const m = String(res.command).match(/--target\s+("([^"]*)"|'([^']*)'|(\S+))/);
+  const pt = res.slots?.piptarget ?? (m ? (m[2] ?? m[3] ?? m[4]) : null);
+  if (pt == null) return res;
+  const win = /^(?:powershell|pwsh|cmd)$/.test(res.shell);
+  const ok = win ? /^(?:[A-Za-z]:)?[\w.\-\/\\ ]+$/.test(String(pt)) : /^[\w.\-\/ ]+$/.test(String(pt));
+  return ok ? res : { ...res, missing: ['piptarget (a variable or escape the shell would expand)'] };
+}
+// a request that refers back to the previous command: a pronoun, a place word, or same/again/them/its/that/those/this
+const REFERS_BACK = /\b(?:it|its|it's|them|their|they|that|those|this|these|there|here|same|again|previous|above|tam|tu|tego|tej|ten|je|ich|go|jego|samo|znowu|ponownie|jeszcze)\b/i;
+function refersBack(q) { return hasPronoun(q) || hasLocative(q) || REFERS_BACK.test(String(q)); }
 export function suggest(query, opts = {}) {
-  // a command that contradicts the request (ignores "except" / "don't", installs for "uninstall") is refused (guards.js)
-  return releaseGuards(query, replayFloor(suggestOnce(query, opts)));
+  const once = (o) => pipTargetGuard(releaseGuards(query, replayFloor(suggestOnce(query, o))));
+  if (opts.model) return once(opts);
+  const tm = getTemplatesModel();
+  if (!tm) return once(opts);
+  // the templates model is probed without the rerank hook; with the hook, the reranked answer of either model may be consulted, and only a 0.3.4 template intent is kept from the templates model
+  const probe = once({ ...opts, model: tm, rerank: undefined, gated: true });
+  // a history refusal of the templates model (the previous line is a 0.3.4 template) is kept, never re-asked of 0.3.3
+  if (probe && opts.history?.length && probe.context?.rule === 'refused' && !probe.command && probe.context.newTemplateLast) return probe;
+  if (!probe || !NEW_TEMPLATE_INTENTS.has(probe.intent)) return once({ ...opts, gated: true });
+  if (!opts.rerank) return probe;
+  // with the hook: the reranked templates answer is kept only if it is still a 0.3.4 template intent, otherwise 0.3.3 answers
+  const alt = once({ ...opts, model: tm, gated: true });
+  return alt && NEW_TEMPLATE_INTENTS.has(alt.intent) ? alt : once({ ...opts, gated: true });
 }
 
 // the trust rule (danger.js): a command resolved from history (a reference, "same but …", a value from an earlier
@@ -435,7 +478,8 @@ function suggestOnce(query, opts = {}) {
     // an earlier `tellsh <query>`: what that request produced on its own (no history, no composer). Slots it left as
     // placeholders (refused, ambiguous, rejected) are ambiguous values here, never the catalog default or a guess.
     const quick = (q, unclearArgs) => {
-      const r = suggest(q, { model, env, threshold: thr, compose: 'off', unclearArgs });
+      // with the two-model gate, an earlier request is classified by the gate too (both models read history the same way)
+      const r = opts.gated ? suggest(q, { env, compose: 'off', unclearArgs, ...(opts.threshold != null ? { threshold: opts.threshold } : {}) }) : suggest(q, { model, env, threshold: thr, compose: 'off', unclearArgs });
       if (!r.understood || !r.intent || r.method !== 'catalog') return null;
       const slots = { ...(r.slots || {}) };
       for (const k of r.missing || []) slots[k] = AMB + `<${k}>`;
@@ -444,12 +488,23 @@ function suggestOnce(query, opts = {}) {
     const kind = opts.historyKind || opts.history.kind || (env.shell === 'powershell' ? 'pwsh' : 'posix');
     ctx = buildContext(opts.history, { classify: quick, cwd: opts.cwd, kind, query });
   }
-  const ctxFeats = ctx ? ctx.features : (opts.cwd ? cwdFlags(opts.cwd).map((c) => 'ctx_cwd=' + c) : []);
+  // 0.3.4: the previous history line is one of the new templates (git fetch, gh issue view, wrangler pages deploy, ...).
+  // The 0.3.3 model never saw these lines as history, so they add no history features (the request is read as on 0.3.3),
+  // and every follow-up that refers to that command is refused, except a "same for X" replay of the identical operation.
+  const newLast = !!ctx && NEW_TEMPLATE_INTENTS.has(ctx.last?.intent);
+  const cwdFeats = opts.cwd ? cwdFlags(opts.cwd).map((c) => 'ctx_cwd=' + c) : [];
+  const ctxFeats = ctx && !newLast ? ctx.features : cwdFeats;
   const extras = [...envFeatures(env), ...ctxFeats];
   const ref = ctx ? resolveReference(query, ctx) : null;
   const context = ctx ? { used: true, commands: ctx.n, rule: ref?.rule || null, note: ref?.note || null } : { used: false };
 
   const base = { query, shell: env.shell, os: env.os, coreutils: env.coreutils, threshold: thr, context };
+  if (newLast && ref?.rule !== 'same-for' && (ref || sameBut(query, ctx) || refersBack(query))) {
+    context.rule = 'refused';
+    context.newTemplateLast = true;
+    context.note = `the previous command (${ctx.last.intent}) is new in this release; a follow-up that refers to it is only supported as "same for X"; not guessing`;
+    return { ...base, understood: false, method: 'history-rule', confidence: 0, candidates: [], tools: [], command: null, missing: [], hint: context.note };
+  }
 
   // ---- rule: "same for X" reuses the previous intent with one slot replaced ----
   if (ref?.rule === 'same-for') {
@@ -479,6 +534,8 @@ function suggestOnce(query, opts = {}) {
     const punct = blank.filter((k) => !invalidHistorySlots(ref.slots).includes(k) && !(cutHistory && k === ref.changed));
     if (cutHistory) res.warnings = [...(res.warnings || []), `path left as a placeholder: unclear where the new name ends (${cutHistory}); quote the path`];
     if (punct.length) res.warnings = [...(res.warnings || []), `path left as a placeholder: unclear whether the trailing punctuation is part of the name (${punct.join(', ')}); quote the path`];
+    // a replayed 0.3.4-template command gets the same withholding as a fresh request ("same for / without publishing")
+    if (!(res.missing || []).length) { const w = newTemplateWithhold(ref.intent, query, slots, res.command); if (w.length) res.missing = w; }
     if (punct.length + (cutHistory ? 1 : 0) < blank.length) res.warnings = [...(res.warnings || []), `value left as a placeholder: it is not a valid value (${blank.filter((k) => !punct.includes(k) && !(cutHistory && k === ref.changed)).join(', ')})`];
     return res;
   }
@@ -507,6 +564,13 @@ function suggestOnce(query, opts = {}) {
   if (sb?.skipped && (BY_ID[sb.lastIntent].risk !== 'safe' || BY_ID[intent].risk !== 'safe')) {
     context.rule = 'refused';
     context.note = `the newest command that tellsh can modify (${sb.lastIntent}) is not the previous command; not guessing`;
+    return { ...base, understood: false, method: 'history-rule', confidence: 0, candidates, tools, command: null, missing: [], hint: context.note };
+  }
+  // "same but no push" after `git fetch --all`: a 0.3.4 template replayed as "same but ..." keeps its operation; a modification
+  // that lands on another intent (git push, git pull, gh pr list) is refused, never a runnable different command
+  if (sb && intent !== sb.lastIntent && (NEW_TEMPLATE_INTENTS.has(sb.lastIntent) || NEW_TEMPLATE_INTENTS.has(intent))) {
+    context.rule = 'refused';
+    context.note = `"same but ..." would change the previous command (${sb.lastIntent}) into another operation (${intent}); not guessing`;
     return { ...base, understood: false, method: 'history-rule', confidence: 0, candidates, tools, command: null, missing: [], hint: context.note };
   }
   // "same for api" after `docker --context prod logs web`: repeated here it would run against the default daemon
@@ -706,13 +770,23 @@ function suggestOnce(query, opts = {}) {
     // `<PR>` even then (left out, `gh pr merge` would act on the current branch's)
     refWordsOnly();
     for (const k of refDst ? [] : ref.blank || []) if (slots[k] == null && usesSlot(BY_ID[intent], k)) { blank.add(k); if (!ref.blanket || k === 'pr') keep.add(k); }
+    // "show it" after an unreadable command: the pronoun is not the default `.` either
+    if (hasPronoun(query)) for (const k of PATH_SLOT_NAMES) if (slots[k] == null && usesSlot(BY_ID[intent], k)) blank.add(k);
     finalizeSlots(BY_ID[intent], slots);
     method = 'history-rule';
   }
   // "remove the logs there", "delete notes.txt there": a place reference never names the object of a changing
   // command (`rm -r DIR`, `mv DIR …`); only the location a search-and-change runs in (`find DIR … -delete`). Any path
   // the request names is relative to the wrong directory, so every path slot is withheld (with or without history).
-  if (locative && !refDst && !bothRefs && BY_ID[intent].risk !== 'safe' && FAMILY_OF[intent] !== 'find' && [...PATH_SLOT_NAMES].some((k) => usesSlot(BY_ID[intent], k))) {
+  // "move it there" with history: an object and a place reference at once is refused for any changing intent, at any confidence
+  if (ctx && ref?.rule !== 'refused' && hasPronoun(query) && locative && BY_ID[intent].risk !== 'safe') {
+    for (const k of Object.keys(slots)) if (PATH_SLOT_NAMES.has(k) || r.sources[k] === 'history') { delete slots[k]; delete r.sources[k]; }
+    for (const k of Object.keys(BY_ID[intent].slots || {})) if (usesSlot(BY_ID[intent], k)) blank.add(k);
+    finalizeSlots(BY_ID[intent], slots);
+    context.rule = 'refused';
+    context.note = 'the request names both an object ("it") and a place ("there") from the previous command; not guessing which is which';
+    method = 'history-rule';
+  } else if (locative && !refDst && !bothRefs && BY_ID[intent].risk !== 'safe' && FAMILY_OF[intent] !== 'find' && [...PATH_SLOT_NAMES].some((k) => usesSlot(BY_ID[intent], k))) {
     for (const k of Object.keys(slots)) if (PATH_SLOT_NAMES.has(k)) { delete slots[k]; delete r.sources[k]; }
     for (const k of PATH_SLOT_NAMES) if (usesSlot(BY_ID[intent], k)) blank.add(k);
     finalizeSlots(BY_ID[intent], slots);
@@ -781,7 +855,8 @@ function suggestOnce(query, opts = {}) {
   // implicit reference: a required slot is still missing and the history has a value of that type.
   // Only for safe intents: a destructive command ("delete the folder") is never aimed at a history
   // value without an explicit reference word ("delete it"), which goes through resolveReference.
-  if (ctx && b.missing.length && ref?.rule !== 'refused' && BY_ID[intent].risk === 'safe' && b.risk === 'safe') {
+  // 0.3.4: never from a 0.3.4 template history line (`deploy site.v2` + "show contents" is not `cat site.v2`)
+  if (ctx && !newLast && b.missing.length && ref?.rule !== 'refused' && BY_ID[intent].risk === 'safe' && b.risk === 'safe') {
     const filled = [];
     for (const m of b.missing) {
       if (r.withheld?.includes(m)) continue; // "list files in the": not a reference to history either
@@ -800,6 +875,74 @@ function suggestOnce(query, opts = {}) {
   }
   if (Object.values(r.sources).includes('history')) method = 'history-rule';
   const res = { ...out, understood: true, method, ...b, slotSources: r.sources, spans: r.spans.map((s) => ({ type: s.type, text: s.text })) };
+  // a refused history reference is never runnable as is, even when the intent has no slot left to blank (`git push`)
+  if (context.rule === 'refused' && !(res.missing || []).length) res.missing = ['reference (refused: edit the command)'];
+  // 0.3.4 templates: a restriction / option / value boundary the template cannot express is withheld, never dropped
+  if (!(res.missing || []).length && res.intent) { const w = newTemplateWithhold(res.intent, query, slots, res.command); if (w.length) res.missing = w; }
+  // 0.3.4 retrain guard: a request that already is a shell command is never rewritten into a different runnable one —
+  // a compound line (| ; && > $( `) or an option the rendered command drops is withheld; nothing is moved/copied into a null device
+  if (!(res.missing || []).length && res.command) {
+    const q = String(query).trim();
+    const LIT = /^(?:sudo|mv|cp|rm|rmdir|ln|chmod|chown|git|wget|curl|ssh|scp|rsync|find|ls|cat|tar|zip|unzip|kill|pkill|killall|docker|kubectl|npm|npx|pnpm|yarn|pip|pip3|python|python3|node|gh|wrangler|dd|mkfs|shutdown|reboot|systemctl|service|iex|iwr|irm|invoke-expression|invoke-webrequest|remove-item|move-item|copy-item|set-content|stop-process|powershell|pwsh|bash|sh|zsh|cmd|del|erase|rd|format|reg|netsh|crontab|truncate|shred|history|grep|sed|awk|xargs|head|tail|sort|uniq|wc|du|df|ps|top|ping|nc|ncat|telnet)$/i;
+    const first = q.split(/\s+/)[0] || '';
+    const PROG = /^(?:cargo|python|python3|py|node|deno|bun|go|make|cmake|ruby|java|javac|rustc|gcc|clang|perl|php|dotnet|mvn|gradle|terraform|helm|ansible|brew|apt|apt-get|dnf|yum|pacman|choco|winget|scoop)$/i;
+    const looksLiteral = /(?:^|\s)(?:-{1,2}[A-Za-z]|[~.]{0,2}\/|~(?=\s|$))|[|;&<>`*]|\$\(/.test(q);
+    const shortSame = LIT.test(first) && /^[a-z][\w.-]*(?:\s+[a-z0-9][\w.:@/-]*){1,2}$/.test(q) && (String(res.command).toLowerCase().replace(/^sudo\s+/, '').split(/\s+/)[0] || '') === first.toLowerCase();
+    // a wrapper (time, env, nohup, watch, exec, nice, timeout, xargs) in front of a typed command is never rewritten
+    if (/^(?:time|env|nohup|watch|exec|nice|ionice|timeout|xargs|command|builtin|stdbuf|strace|caffeinate|nsenter|systemd-run|pkexec|faketime|doas|su|chroot|unshare|firejail|flatpak-spawn|runuser|setsid|script|echo|printf|tee|tellsh|:)$/i.test(first) && looksLiteral) res.missing = ['request (a wrapped shell command is not rewritten)'];
+    else if ((LIT.test(first) || PROG.test(first)) && q.split(/\s+/).length > 1 && (looksLiteral || PROG.test(first) || shortSame)) {
+      if (/[|;&<>`]|\$\(/.test(q.replace(/(["'])(?:(?!\1).)*\1/g, ' '))) res.missing = ['request (a compound shell command is not rewritten)'];
+      else if (!literalIntentOk(first, res.intent) && (String(res.command).toLowerCase().replace(/^sudo\s+/, '').split(/\s+/)[0] || '') !== first.toLowerCase()) res.missing = [`request (the typed ${first} command is not rewritten as ${res.intent})`];
+      else {
+        const cmd = String(res.command).toLowerCase().replace(/\$home/g, '~');
+        const same = (cmd.replace(/^sudo\s+/, '').split(/\s+/)[0] || '') === first.toLowerCase();
+        // a translation for another shell (du -sh -> Get-ChildItem … Measure-Object) keeps the operands, not the unix flags
+        const lost = same ? q.split(/\s+/).slice(1).filter((w) => /^-{1,2}[A-Za-z]/.test(w) && !cmd.includes(w.toLowerCase())) : [];
+        // every operand of the typed command reaches the rendered one (`du -sh src` is never `du -sh .`)
+        const ops = q.split(/\s+/).slice(1).filter((w) => !/^-/.test(w)).map((w) => w.replace(/^["']|["']$/g, '').toLowerCase()).filter((w) => w && !cmd.includes(w) && !cmd.includes(w.replace(/\\/g, '/')) && !cmd.includes(w.replace(/\//g, '\\')));
+        if (lost.length) res.missing = [`options (not rendered: ${lost.slice(0, 3).join(' ')})`];
+        else if (ops.length) res.missing = [`operands (not rendered: ${ops.slice(0, 3).join(' ')})`];
+      }
+    }
+    // a bare URL is never a mutating action (`https://github.com/o/r/pull/12` is not `gh pr merge`)
+    if (!(res.missing || []).length && /^\S+:\/\/\S+$/.test(q) && res.risk !== 'safe') res.missing = ['action (a bare URL names no action)'];
+    if (!(res.missing || []).length && /^(?:move_rename|copy_file|copy_dir|move_file)$/.test(res.intent) && /(?:^|[\s'"])(?:\/dev\/null|nul|\$null)(?=$|[\s'"])/i.test(String(res.command))) res.missing = ['destination (a null device)'];
+  }
+  // 0.3.4 known-limits guard: a pip target that a shell would expand or unescape ($VAR, $env:X, %X%, a backtick, or a backslash in
+  // a POSIX shell) is never rendered as a literal folder name; a git fetch request with an option or a fetch modifier is withheld
+  if (!(res.missing || []).length && /^pip_/.test(res.intent || '') && slots.piptarget != null) {
+    const pt = String(slots.piptarget);
+    const win = /^(?:powershell|pwsh|cmd)$/.test(res.shell);
+    // allow-list: letters, digits, _ . - / and spaces; a drive (C:) and backslashes only in PowerShell / cmd; never a ~ (it would be quoted as a literal folder)
+    const ok = win ? /^(?:[A-Za-z]:)?[\w.\-\/\\ ]+$/.test(pt) : /^[\w.\-\/ ]+$/.test(pt);
+    if (!ok) res.missing = ['piptarget (a variable or escape the shell would expand)'];
+  }
+  if (!(res.missing || []).length && res.intent === 'git_fetch') {
+    // allow-list: only words that ask for a plain fetch of everything
+    const FETCH_OK = /^(?:git|fetch|fetching|get|download|pull|all|every|everything|the|a|latest|new|newest|recent|remote|remotes|branch|branches|ref|refs|commits?|changes|updates?|from|repo|repository|now|please|pls|just|me|my|for|of|pobierz|pobrać|pobrac|ściągnij|sciagnij|wszystkie|wszystko|nowe|najnowsze|gałęzie|galezie|gałęzi|galezi|zmiany|z|ze|repozytorium|teraz|proszę|prosze)$/i;
+    const words = String(query).replace(/^\s*git\s+fetch\s+--all\s*$/i, 'fetch').split(/\s+/).filter(Boolean);
+    if (words.some((w) => !FETCH_OK.test(w.replace(/[.!?]+$/, '')))) res.missing = ['options (git fetch is always git fetch --all)'];
+    // a second operation ("fetch ... and git pull", "fetch, then merge"): never a fetch that drops it
+    if (/\b(?:and|then|i|oraz|potem)\b|[,;&|]/i.test(String(query)) || (/\bfetch/i.test(query) && /\bpull/i.test(query))
+      || /[^\S ]|[\u0085\u3002]|[.!?:](?=\s*\S)/.test(String(query)) || (String(query).match(/\bgit\b/gi) || []).length > 1) res.missing = ['args (a second action)'];
+    if (/(?:^|\s)-{1,2}[A-Za-z]|\b(?:dry|prune|pruning|tags?|depth|shallow|unshallow|remote|origin|upstream|force|refspec|no|not|without|only|just)\b/i.test(String(query).replace(/^\s*git\s+fetch\s+--all\s*$/i, ''))) res.missing = ['options (git fetch is always git fetch --all)'];
+  }
+  // 0.3.4 retrain guard (model-independent): a slot value carrying shell substitution (`...`, $(...), ${...}) in a command
+  // that is not read-only, or one value read into two slots from a single occurrence, is withheld, never run
+  if (!(res.missing || []).length && res.intent) {
+    const vals = Object.entries(slots).filter(([k, v]) => !k.startsWith('_') && typeof v === 'string' && v && !v.startsWith('?'));
+    const subst = vals.filter(([, v]) => /`|\$\(|\$\{/.test(v));
+    if (subst.length && res.risk !== 'safe') res.missing = subst.map(([k]) => `${k} (contains shell substitution)`);
+    else {
+      const q = String(query);
+      const occ = (v) => q.split(v).length - 1;
+      const PLACE = /^(?:path|src|dst|dest|dir|file|target|piptarget)$/;
+      const dup = vals.filter(([k, v], i) => vals.some(([k2, v2], j) => j !== i && v2 === v && (PLACE.test(k) || PLACE.test(k2))) && occ(v) < 2).map(([k]) => k);
+      if (dup.length) res.missing = [...new Set(dup)].slice(1).map((k) => `${k} (the same text was read into two slots)`);
+    }
+  }
+  // "npm install there": a place word rejected as a package / name is still missing, also where that slot is optional
+  if (slots._placeRejected?.length && !(res.missing || []).length) res.missing = slots._placeRejected.map((k) => `${k} (a place word is not a ${k} name)`);
   if (ambiguousText.length) res.warnings = [...(res.warnings || []), `value left as a placeholder: unclear where the quoted text ends (\\" may be an escaped quote) (${ambiguousText.join(', ')})`];
   if (splitPaths.length) res.warnings = [...(res.warnings || []), `path left as a placeholder: unclear which words name the ${splitPaths.map((x) => x.split('=')[0] === 'src' ? 'source' : 'destination').join(' and ')} (${splitPaths.join(', ')}); quote each path`];
   if (cutPaths.length) res.warnings = [...(res.warnings || []), `path left as a placeholder: unclear where the unquoted name ends (${cutPaths.join(', ')}); quote the path`];
@@ -837,6 +980,8 @@ function suggestOnce(query, opts = {}) {
     }
     // a value with a line break is never composed into a command (the catalog rejects it as a path); an extract intent is
     // never replaced by a command that creates or rewrites an archive ("extract archive.tar.gz" is not `tar -c -f archive.tar.gz`)
+    // a 0.3.4-template suggestion that was withheld is never replaced by a composed command that drops what was withheld
+    if (comp && NEW_TEMPLATE_INTENTS.has(intent) && (res.missing || []).length) comp = null;
     if (comp && !comp.invalid && comp.command !== b.command && !/[\r\n]/.test(comp.command) && !(/^extract_/.test(intent) && createsArchive(comp.command))) {
       if (extra.length >= 1 || composeMode === 'force') {
         return { ...res, method: 'composed', experimental: true, reason: `request asks for ${extra.join(' ')} not in the catalog command`,

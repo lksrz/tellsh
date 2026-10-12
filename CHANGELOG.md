@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.3.4
+
+**New catalog templates** (from a separate retrained model, `model/model_templates.bin`, consulted only when it picks one
+of them; every pre-existing intent is still answered by the unchanged 0.3.3 model): `git fetch --all`, `git ls-files`,
+`gh issue list`, `gh issue view <N>`, `gh run watch [N]`, `npx wrangler d1 list`, `npx wrangler pages deploy <dir>`.
+Values are explicit only; a request the template cannot render is marked incomplete and withheld from execution.
+
+**Known-limits fixes:** PowerShell `--workspace` quoting, `pip install --target` (an allow-listed target only).
+
+**Safety:** a follow-up that refers to a 0.3.4 template (or to a `git
+grep` / `git show` line) in history is refused except "same for X"; git grep / git show are not suggested as runnable (kept for a later release).
+
 ## 0.3.3
 
 Republish of 0.3.2 (reviewed): 0.3.2 was accidentally published from an unreviewed working tree.

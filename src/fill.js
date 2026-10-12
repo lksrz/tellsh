@@ -238,6 +238,16 @@ const SEL_INTENT = {
     authorized autoryzacj* loguje credentials dane still nadal`),
   gh_auth_login: SEL_WORDS(`not nie auth authenticate authentication log login sign signin zaloguj* zalogowac logowani* konto account
     uwierzytelnij* autoryzuj* kont* konc* connect podlacz* polacz* link authorize re-authenticate re-login again ponownie setup configure skonfiguruj* konfiguracj*`),
+  gh_run_watch: SEL_WORDS(`watch watching follow live progress until finish* finishes done complete* wait waiting ends end status run runa runie
+    action ci pipeline build job workflow obserwuj* sledz* czekaj* poczekaj* zaczekaj* zakonczy* skonczy* skonczenia zakonczenia na zywo postep* biezac*`),
+  gh_issue_list: SEL_WORDS(`issue issues list listing all open opened closed state zamkniete zamknietych show which there any bugs tickets problems zgloszenia zgloszen issue'y issuesy
+    lista liste wylistuj* listuj* wszystkie otwarte otwartych pokaz* tickety bledy`),
+  gh_issue_view: SEL_WORDS(`issue view details detail info information description summary show read open web browser online
+    szczegol* opis* zgloszeni* przeczytaj pokaz* ticket bug`),
+  wrangler_d1_list: SEL_WORDS(`d1 database databases db dbs baza bazy baz danych list listing all show which there my moje wszystkie
+    lista liste wylistuj* listuj* pokaz*`),
+  wrangler_pages_deploy: SEL_WORDS(`pages page static site website strona strone stron* statyczn* frontend build output folder directory katalog* dist public out
+    depl* publish* upload wdroz* zdeployuj* deployuj* opublikuj* wrzuc* wgraj*`),
   wrangler_deploy: SEL_WORDS(`depl* redeploy publish* ship push release upload go wdroz* zdeployuj* deployuj* opublikuj* wypchnij*
     wrzuc* wgraj* make roll rollout wypusc* wydaj* pusc* code kod kodu version wersj* new nowa nowy najnowsz* latest fresh swiez*
     changed changes zmienilem zmian* after po`),
@@ -260,6 +270,8 @@ const SEL_PICKERS = new Set(('latest last recent recently newest new old older o
   'ostatni ostatnie ostatniego najnowszy najnowsze nowy nowa nowe stary inny inne poprzedni kolejny otwarte otwartych').split(' '));
 const selFamilyAll = {};
 for (const [id, v] of Object.entries(SEL_INTENT)) {
+  // the 0.3.4 template words (pages folders, d1, issues, runs) explain nothing for the older intents of the family
+  if (/^(?:wrangler_pages_deploy|wrangler_d1_list|gh_run_watch|gh_issue_list|gh_issue_view)$/.test(id)) continue;
   const f = id.split('_')[0];
   const all = (selFamilyAll[f] ??= { words: new Set(), stems: [] });
   // a negation ("not logged in" for a login) is explained only for the intent that lists it, never family-wide
@@ -267,7 +279,7 @@ for (const [id, v] of Object.entries(SEL_INTENT)) {
   all.stems.push(...v.stems.filter((x) => !SEL_PICKERS.has(x)));
 }
 // the slot that takes the placeholder when a request has words the vocabulary does not explain
-const SEL_SLOT = { gh_pr_merge: 'pr', gh_pr_view: 'pr', gh_pr_checks: 'pr', gh_run_view: 'num' };
+const SEL_SLOT = { gh_pr_merge: 'pr', gh_pr_view: 'pr', gh_pr_checks: 'pr', gh_run_view: 'num', gh_run_watch: 'num', gh_issue_view: 'num' };
 export const hasSelectorRule = (intentId) => /^(?:gh|wrangler)_/.test(intentId);
 // "for issue #3", "for ticket 12", "the pr that fixes #12": a number of another kind, explained as not the pull request
 const SEL_OTHER_NUMBER = /\b(?:issues?|tickets?|bugs?|zgloszeni\w*|fix(?:es)?|closes|resolves|naprawia\w*|zamyka\w*)\s+#?\d+\b/g;
@@ -284,7 +296,7 @@ export function selectorResidue(intentId, text, values = {}) {
   const own = SEL_INTENT[intentId];
   let t = foldKeepLength(String(text)).toLowerCase();
   // values that were read, and the option / phrase forms they come in, are explained
-  for (const k of ['pr', 'repo', 'wenv', 'var', 'num', 'url']) {
+  for (const k of ['pr', 'repo', 'wenv', 'var', 'num', 'url', 'path']) {
     const val = values[k];
     if (val == null || String(val).startsWith('?')) continue;
     const s = foldKeepLength(String(val)).toLowerCase();
@@ -494,7 +506,15 @@ const sedEscapeOld = (s) => s.replace(/[\\/.*^$[\]]/g, '\\$&').replace(/\n/g, '\
 const sedEscapeNew = (s) => s.replace(/[\\/&]/g, '\\$&').replace(/\n/g, '\\n');
 
 /** Recompute derived slots after values were merged/overridden (tagger, history rules). */
+// a place word ("there", "tam", "inside") is a reference to a directory, never a container / service / process / branch name
+const PLACE_WORD = /^(?:there|here|inside|over\s+there|tam|tu|tutaj|stamt[aą]d|tamże|wewn[aą]trz)$/i;
 export function finalizeSlots(intent, v) {
+  for (const k of ['container', 'service', 'name', 'branch', 'user', 'pkg', 'script']) if (typeof v[k] === 'string' && PLACE_WORD.test(v[k].trim())) {
+    // left empty (never a literal '?'); recorded so the pipeline keeps it missing even where the slot is optional
+    delete v[k];
+    if (!v._placeRejected) Object.defineProperty(v, '_placeRejected', { value: [], enumerable: false, writable: true });
+    if (!v._placeRejected.includes(k)) v._placeRejected.push(k);
+  }
   if (v.ext != null && v.glob == null) v.glob = `*.${v.ext}`;
   if (intent.id === 'find_by_name' && v.name) v.namepat = /[*?]/.test(v.name) || /\.\w+$/.test(v.name) ? v.name : `*${v.name}*`;
   if (intent.id === 'replace_text' && v.old != null && v.new != null) v.sedexpr = `s/${sedEscapeOld(v.old)}/${sedEscapeNew(v.new)}/g`;
@@ -685,6 +705,15 @@ export function resolveSlots(intent, ex) {
       if (val != null && val !== '') v[k] = val;
     }
   }
+  // a literal npm script name (`npm run build --workspace "staging app"`, `run npm deploy …`) is the script, whatever else
+  // the request quotes
+  if (intent.id === 'npm_run_script' && (v.script == null || String(v.script).startsWith('?'))) {
+    const t = String(ex.text);
+    const m = t.match(/\bnpm\s+run(?:-script)?\s+([A-Za-z0-9][\w:.-]*)(?=\s|$)/) || t.match(/^\s*run\s+npm\s+(?!(?:run|install|i|ci|scripts?|the|a|my|publish|unpublish|audit|update|upgrade|uninstall|remove|rm|outdated|login|logout|link|pack|version|init|exec|config|cache|deprecate|dist-tag|owner|access|token|adduser)\b)([A-Za-z0-9][\w:.-]*)(?=\s|$)/i);
+    if (m) v.script = m[1];
+  }
+  // the new git / gh / wrangler templates: a value the request does not name explicitly is never guessed
+  newTemplateSlots(intent.id, String(ex.text), v, ex.quoted || []);
   if (intent.id === 'base64_encode' || intent.id === 'base64_decode') {
     const t = pickArg('text', ex);
     const fileWord = /\b(plik\w*|files?)\s+\S+\.\w+/i.test(ex.text);
@@ -747,7 +776,11 @@ const SCOPE_SHORT = { '-w': /^npm_/, '-r': /^gh_/, '-e': /^wrangler_/, '-c': /^w
 // a quoted value is one value (`--workspace "staging app"`), never its first word
 const SCOPE_OPT = /(?:^|\s)(--workspaces?|--ws|--filter|--repo|--env|--config|--prefix|--cwd|--dir|--project|--target|-[wRect])(?:=(?:"([^"]*)"|'([^']*)'|(\S*))|\s+(?:"([^"]*)"|'([^']*)'|(?!-)([^\s,;!?]+))|(?=[\s,;!?]|$))/g;
 // "in workspace api", "for the project acme/app", "w projekcie api", "in the staging environment" is read by wranglerEnv
-const SCOPE_PHRASE = /(?:^|\s)(?:in|for|of|on|from|within|inside|under|at|w|we|dla|z)\s+(?:the\s+|a\s+)?(workspace|project|projek\w*|repo|repository|repozytori\w*|env|environment|srodowisk\w*|config|configuration|konfiguracj\w*)\s+(?!-)([^\s,;!?]+)/g;
+const SCOPE_PHRASE = /(?:^|\s)(?:in|for|of|on|from|within|inside|under|at|w|we|dla|z)\s+(?:the\s+|a\s+)?(workspace|project|projek\w*|repo|repository|repozytori\w*|env|environment|srodowisk\w*|config|configuration|konfiguracj\w*)\s+(?!-)("[^"\n]*"|'[^'\n]*'|[^\s,;!?]+)/g;
+// pip's attached short form: `-t/tmp/pkgs`, `-t~/pkgs` (the separated `-t DIR` is read by SCOPE_OPT)
+// trailing sentence punctuation is dropped, but never a `.` / `..` path segment (`-t lib/..`, `..\..`)
+const stripScopePunct = (x) => (/(?:^|[\/\\:])\.{1,2}$/.test(x) || /^[a-z]:$/i.test(x) ? x : x.replace(/[.,!?;:]+$/, ''));
+const SCOPE_ATTACHED_T = /(?:^|\s)-t((?:"[^"\n]*"|'[^'\n]*'|[/~.\w][^\s,;!?]*))/g;
 const SCOPE_PHRASE_KIND = (w) => /^(?:workspace)$/.test(w) ? 'workspace' : /^(?:repo|repository|repozytori)/.test(w) ? 'repo'
   : /^(?:env|environment|srodowisk)/.test(w) ? 'env' : /^(?:config|configuration|konfiguracj)/.test(w) ? 'config' : 'project';
 const SCOPE_NOT_VALUE = /^(?:the|a|an|this|that|current|same|my|our|own|local|default|root|here|it|tym|tego|bieżącym|biezacym|obecnym|moim|naszym)$/i;
@@ -760,17 +793,51 @@ export function scopeMentions(intentId, text) {
     if (SCOPE_SHORT[opt] && !SCOPE_SHORT[opt].test(intentId)) continue;
     const quoted = m[2] ?? m[3] ?? m[5] ?? m[6];
     const raw = quoted ?? m[4] ?? m[7] ?? null;
-    out.push({ kind: SCOPE_KIND[opt], value: quoted != null ? quoted.trim() || null : raw ? raw.replace(/[.,!?;:]+$/, '').replace(/^["'`]|["'`]$/g, '') || null : null, at: m.index });
+    // a quoted value glued to more text (`--target "lib"cache`, `-t "lib",cache`) or an operand cut at punctuation is a placeholder
+    const after = t.slice(m.index + m[0].length);
+    const gluedQ = quoted != null && (SCOPE_KIND[opt] === 'target' ? /^\S/.test(after) || quoted !== quoted.trim() : (/^\S/.test(after) && !/^[.!?;:)]+(?:\s|$)/.test(after)) || quoted !== quoted.trim());
+    const punctTarget = SCOPE_KIND[opt] === 'target' && quoted == null && raw != null && (/^[,;!?]/.test(after) || (/[,;:.!?]$/.test(raw) && !/^[a-z]:$/i.test(raw) && !/(?:^|[\/\\:])\.{1,2}$/.test(raw)));
+    const cutRaw = quoted == null && raw != null && (punctTarget || /\\$/.test(raw) || /^[,;!?]\S/.test(after) || /["'`]/.test(raw) || /^["'`]/.test(after));
+    out.push({ kind: SCOPE_KIND[opt], value: gluedQ || cutRaw ? null : quoted != null ? quoted.trim() || null : raw ? stripScopePunct(raw).replace(/^["'`]|["'`]$/g, '') || null : null, at: m.index });
+  }
+  if (/^pip_/.test(intentId)) {
+    // `-t@foo`: an attached target the parser does not read is still a target (placeholder), never dropped
+    for (const m of t.matchAll(/(?:^|\s)-t([^\s/~.\w"'][^\s]*)/g)) out.push({ kind: 'target', value: null, at: m.index });
+    // a pip target in a multi-line request: the shell reading of the operand is unclear: a placeholder
+    if (/[^\x20-\x7eąćęłńóśźżĄĆĘŁŃÓŚŹŻ]/.test(t) && /(?:^|\s)(?:-t|--target)/.test(t)) out.push({ kind: 'target', value: null, at: t.search(/(?:-t|--target)/) });
+    // r37: a backslash before a quote in a pip request with a target: where the operand ends is unclear: a placeholder
+    if (/\\["']/.test(t) && /(?:^|\s)(?:-t|--target)/.test(t)) out.push({ kind: 'target', value: null, at: t.search(/(?:-t|--target)/) });
+    // `-t"lib` / `--target "lib`: an unterminated quote is unreadable: a placeholder, never dropped
+    for (const m of t.matchAll(/(?:^|\s)(?:-t|--target)(?:=|\s*)(["'])/g)) { const rest = t.slice(m.index + m[0].length); if (!rest.includes(m[1])) out.push({ kind: 'target', value: null, at: m.index }); }
+    for (const m of t.matchAll(SCOPE_ATTACHED_T)) {
+      // quoted contents are literal; only an unquoted value loses trailing punctuation
+      const q = /^(["'])([\s\S]*)\1$/.exec(m[1]);
+      // `-t"/tmp/a\"b"`: an escaped quote makes the end unclear: a placeholder
+      const escaped = q && (q[2].endsWith('\\') || t.charAt(m.index + m[0].length) === q[1] || /^\S/.test(t.slice(m.index + m[0].length)));
+      // the operand pip reads is everything up to the next space (`-t/tmp/lib,cache`): anything else is a placeholder
+      const whole = (t.slice(m.index).match(/^\s*-t(\S+)/) || [])[1] ?? '';
+      const cut = !q && (stripScopePunct(whole) !== stripScopePunct(m[1]) || /["'`]/.test(whole) || /\\\s|\\$/.test(t.slice(m.index, m.index + m[0].length + 1)));
+      // `-tlib,`: a trailing comma / semicolon / colon is part of what pip reads: placeholder
+      const whole0 = (t.slice(m.index).match(/^\s*-t(\S+)/) || [])[1] ?? '';
+      if (!q && /[,;:.!?]$/.test(whole0) && !/^[a-z]:$/i.test(whole0) && !/(?:^|[\/\\:])\.{1,2}$/.test(whole0)) { out.push({ kind: 'target', value: null, at: m.index }); continue; }
+      const bare = stripScopePunct(m[1]).trim(); // `-t./lib/..` keeps its `..`
+      const value = escaped || cut ? null : q ? q[2] : bare;
+      out.push({ kind: 'target', value: value || null, at: m.index });
+    }
   }
   const f = foldKeepLength(t).toLowerCase();
   for (const m of f.matchAll(SCOPE_PHRASE)) {
     const at = m.index + m[0].length - m[2].length;
-    const value = t.slice(at, at + m[2].length).replace(/[.,!?;:]+$/, '').replace(/^["'`]|["'`]$/g, '');
+    const rawv = t.slice(at, at + m[2].length);
+    const quotedv = /^(["'])[\s\S]*\1$/.test(rawv) && rawv.length >= 2;
+    const value = quotedv ? (rawv.slice(1, -1).trim() === rawv.slice(1, -1) ? rawv.slice(1, -1) : '') : rawv.replace(/[.,!?;:]+$/, '').replace(/^["'`]|["'`]$/g, '');
+    // an empty quoted value (`in workspace ""`) is a placeholder, never a dropped scope
+    if (quotedv) { const aft = t.slice(at + m[2].length); const glued = (/^\S/.test(aft) && !/^[,.;:!?)]+(?:\s|$)/.test(aft)) || /\\$/.test(rawv.slice(1, -1)); out.push({ kind: SCOPE_PHRASE_KIND(m[1]), value: glued ? null : value || null, at }); continue; }
     // "w projekcie na macu", "in the project with npm": a function word is no scope value
     if (SCOPE_NOT_VALUE.test(value) || isStopWord(value) || /^(?:on|onto|under|over|via|using|w|we|z|ze|na|do|od|po|przez|pod|nad)$/i.test(value)) continue;
     out.push({ kind: SCOPE_PHRASE_KIND(m[1]), value: value || null, at });
   }
-  return out;
+  return [...new Set(out)];
 }
 function scopeSlots(intentId, text, v, has) {
   if (!SCOPE_FAMILIES.test(intentId)) return;
@@ -1035,4 +1102,214 @@ export function buildCommand(intentId, text, { platform = process.platform, env,
     critical: danger.critical,
     missing,
   };
+}
+
+const markMissing = (v, k) => {
+  if (!v._placeRejected) Object.defineProperty(v, '_placeRejected', { value: [], enumerable: false, writable: true });
+  if (!v._placeRejected.includes(k)) v._placeRejected.push(k);
+};
+const NPM_BUILTIN = /^(?:publish|unpublish|audit|update|upgrade|uninstall|remove|rm|outdated|login|logout|link|pack|version|init|exec|config|cache|deprecate|dist-tag|owner|access|token|adduser|trust|undeprecate|rebuild|prune|dedupe|fund|doctor|ls|list|explain|query|search|view|info|star|stars|unstar|ping|prefix|root|bin|bugs|docs|edit|help|hook|org|profile|repo|shrinkwrap|team|whoami|set|get|pkg|sbom|diff|ci|install-test|it|completion|find-dupes|exec|x)$/i;
+const REF_TOKEN = /(?:^|\s)((?:HEAD|@)(?:[~^]\d*)*|(?=[0-9a-f]*\d)[0-9a-f]{7,40}|v\d+(?:\.\d+)*)(?=[\s,.;:!?]|$)/;
+/** Explicit values only for the 0.3.4 templates (git show/fetch/grep, gh issue/run, wrangler pages deploy). */
+export function newTemplateSlots(id, text, v, quoted) {
+  let t = text.trim();
+  if (id === 'git_show') {
+    delete v.branch; delete v.rev;
+    const lit = t.match(/\bgit\s+show\s+(["']?)([^\s"']+)\1(?=\s|$)/i) || t.match(/\b(?:commit|revision|tag|rewizj\w*|tagu?)\s+(["']?)([^\s"']+)\1(?=[\s,.;!?]*$|\s)/i);
+    const m = t.match(REF_TOKEN);
+    // after "commit" / "tag" only something ref-shaped (a hash, HEAD~1, v1.2, a/b), never an English word ("commit with its diff")
+    const litOk = lit && (/^git\s+show/i.test(lit[0]) || /[\d~^@:\/]/.test(lit[2]) || /^HEAD$/i.test(lit[2]));
+    const cand = litOk ? lit[2] : m ? m[1] : null;
+    if (cand != null) {
+      if (lit && /^git\s+show/i.test(lit[0]) && /^[\w./~^@{}:!-]+$/.test(cand) && !cand.startsWith('-')) v.rev = cand; // literal: as typed
+      else if (/^(?:the|a|last|latest|newest|ostatni\w*|previous|prior|poprzedni\w*|that|this|it)$/i.test(cand)) { if (/^(?:previous|prior|poprzedni\w*)$/i.test(cand)) v.rev = 'HEAD~1'; }
+      else if (/^[\w./~^@{}:!-]+$/.test(cand) && !cand.startsWith('-')) v.rev = cand;
+    } else if (/\b(?:previous|prior|one before|second[- ]to[- ]last|przedostatni\w*|poprzedni\w*)\b/i.test(t)) v.rev = 'HEAD~1';
+  }
+  // git_fetch is always `git fetch --all` (a superset of one remote; --prune is not offered): a known limit
+  if (id === 'grep_text' && typeof v.pattern === 'string' && v.pattern.startsWith('-') && !quoted.includes(v.pattern)) delete v.pattern;
+  if (id === 'npm_run_script' && typeof v.script === 'string' && NPM_BUILTIN.test(v.script) && !new RegExp(`\\bnpm\\s+run(?:-script)?\\s+${v.script}\\b|\\bscript\\s+${v.script}\\b`, 'i').test(t)) delete v.script;
+  if (id === 'git_grep') {
+    const lit = t.match(/\bgit\s+grep\s+((?:-\S+\s+)*)(?:--\s+)?(?:for\s+)?(["']?)([^\s"']+)\2/i);
+    const flags = lit ? lit[1].trim().split(/\s+/).filter((x) => x && x !== '-n' && x !== '--') : [];
+    if (quoted.length) v.pattern = quoted[0];
+    else if (lit && !lit[3].startsWith('-')) v.pattern = lit[3];
+    else {
+      const f = t.match(/\b(?:for|na|fraz\w*|słowo|slowo)\s+(["']?)([^\s"']+)\1\s*$/i);
+      if (f && !f[2].startsWith('-')) v.pattern = f[2];
+    }
+    if (typeof v.pattern === 'string' && (v.pattern.startsWith('-') || /^(?:tracked|repo|repository|files?|the|git|for)$/i.test(v.pattern))) delete v.pattern;
+    // options the template cannot express (`-i`, `-w`, `-e`): withheld, never silently dropped
+    if (flags.length || /\b(?:case[- ]insensitive|ignore case|bez wzgl[eę]du na wielko\w*)\b/i.test(t)) delete v.pattern;
+  }
+  if (id === 'gh_issue_view' || id === 'gh_run_watch') {
+    const UNIT = String.raw`(?!\s*(?:comments?|komentarz\w*|days?|weeks?|months?|years?|hours?|minutes?|mins?|seconds?|dni|dzie\w*|tygodn\w*|miesi\w*|godzin\w*|minut\w*|times?|razy|old|ago|temu)\b)`;
+    const re = id === 'gh_issue_view'
+      ? new RegExp(String.raw`(?:\bgh\s+issue\s+view\s+#?|^\s*#|\b(?:issue|ticket|bug|zgloszeni\w*|zgłoszeni\w*)\s+(?:(?:nr|no\.?|number|numer)\s*)?#?)(\d+)\b` + UNIT, 'i')
+      : new RegExp(String.raw`(?:\bgh\s+run\s+watch\s+|\b(?:run|runa|runu)\s+(?:(?:id|nr|no\.?|number|numer)\s*)?#?)(\d+)\b` + UNIT, 'i');
+    const m = t.match(re);
+    if (m) v.num = m[1]; else delete v.num;
+  }
+  if (id === 'gh_issue_list') {
+    // a repository name (`acme/closed`, quoted or not, or the value read into the repo slot) never sets the state
+    t = t.replace(/--repo[=\s]+\S+|(["']?)(?:[\w.-]+\/)+[\w.-]+\1/gi, ' ');
+    if (typeof v.repo === 'string' && v.repo) t = t.split(v.repo).join(' ');
+    if (/\b(?:closed|zamkni\w*)\b/i.test(t)) v.state = 'closed';
+    else if (/\b(?:all|every|wszystkie|wszystkich)\b/i.test(t) && !/\b(?:open|opened|otwart\w*)\b/i.test(t)) v.state = 'all';
+    if (/\b(?:closed|zamkni\w*)\b/i.test(t) && /\b(?:open|opened|otwart\w*)\b/i.test(t)) v.state = 'all';
+    if (v.state && typeof v.args === 'string' && v.args.startsWith('?')) delete v.args;
+  }
+  if (id === 'wrangler_pages_deploy') {
+    // the upload directory only when it is named right after "deploy" and looks like a directory; otherwise <PATH>
+    const DIR = /^(?:\.|\.\/\S+|\.\.\/\S+|~\/\S+|\/\S+|\S+\/\S*|build|dist|public|out|_site|output)$/i;
+    const m = t.match(/\bpages\s+deploy\s+(["']?)([^\s"']+)\1(?=\s|$)/i) || (t.match(/\b(?:deploy|publish|upload|wdr[oó]ż|opublikuj|wrzuć|wrzuc)\s+(?:the\s+)?(?:(?:folder|dir|directory|katalog)\s+)?(["']?)([^\s"']+)\1(?:\s+(?:folder|dir|directory|katalog))?\s+(?:to|on|onto|na|do)\b/i));
+    const qm = t.match(/\b(?:pages\s+deploy|deploy|publish|upload)\s+(?:the\s+)?(["'])([^"']+)\1/i);
+    delete v.path;
+    if (qm) v.path = qm[2];
+    else if (m && DIR.test(m[2].replace(/[,;!?]+$/, ''))) v.path = m[2].replace(/[,;!?]+$/, '');
+    // a dry run, a preview / branch / project / message the template cannot express: withheld, never a real deploy
+    if (/\bdry[\s-]*run\b|\bna\s+sucho\b|\bwithout\s+(?:actually\s+)?(?:deploying|publishing|uploading)\b|\b(?:don'?t|do\s+not)\s+actually\b|\bpreview\b|\bbranch\b|\bga[lł][eę]zi\w*|\bproject\b|\bprojekt\w*|\bmessage\b|\bcommit\b|\bproduction\b|\bprod\b|\bstaging\b|--\w/i.test(t)) v.args = '?';
+  }
+  return v;
+}
+
+// Words the 0.3.4 templates explain; anything else in the request is a restriction / option the template cannot express.
+const WH_COMMON = 'same again instead too also but tak samo zamiast też tez the a an our this that please now pls to on in of for with from and git npx gh wrangler cloudflare github pokaz pokaż mi na do w z dla prosze proszę teraz';
+const WH_WORDS = {
+  git_show: `${WH_COMMON} my me show display view see print commit commits revision tag last latest newest most recent previous prior second-to-last its diff changes change patch details what was changed in latest ostatni ostatniego ostatnia ostatnie poprzedni poprzedniego przedostatni commita commit zmiany zmian szczegoly szczegóły rewizje rewizję tagu tag`,
+  git_grep: `${WH_COMMON} my me grep search find look lookup text string pattern word occurrences tracked files file repo repository codebase all every across szukaj wyszukaj znajdz znajdź poszukaj plikach plikow plików sledzonych śledzonych repozytorium kodzie kod -n --`,
+  wrangler_pages_deploy: `${WH_COMMON} my me pages page deploy redeploy publish upload ship push static strona strone stronę stron statyczna statyczną folder directory dir katalog katalogu wdroz wdroż wdróż zdeployuj deployuj opublikuj wrzuc wrzuć wgraj`,
+  gh_run_watch: `${WH_COMMON} me --repo repo repository watch watching follow live progress until it its is finishes finish finished done complete completes wait ends end run github actions action ci workflow build status obserwuj śledź sledz czekaj poczekaj zaczekaj aż az zakończy zakonczy skończy skonczy żywo zywo postęp postep runa runu`,
+  gh_issue_view: `${WH_COMMON} me --repo repo repository show view issue details detail info information description summary read zgłoszenie zgloszenie zgłoszenia zgloszenia ticket bug szczegóły szczegoly opis przeczytaj nr number numer no`,
+  gh_issue_list: `${WH_COMMON} --repo list listing show which what are there any issues issue bugs tickets problems all open opened closed state zgłoszenia zgloszenia zgłoszeń zgloszen lista listę liste wylistuj wszystkie otwarte otwartych zamknięte zamkniete repo repository`,
+  wrangler_d1_list: `${WH_COMMON} me d1 database databases db dbs baza bazy baz danych list listing all show which what are there my moje moich wszystkie lista listę liste wylistuj listuj pokaż pokaz account konto konta`,
+  git_ls_files: `${WH_COMMON} me ls-files list listing show which what are is all every files file tracked by git repo repository lista listę pliki plików plikow śledzone sledzone śledzonych sledzonych pokaż wszystkie przez`,
+};
+// only the slots a template renders explain words of the request (an extracted `since: yesterday` that never reaches
+// `git show` does not)
+const WH_RENDERED = { git_show: ['rev'], git_grep: ['pattern'], wrangler_pages_deploy: ['path'], gh_run_watch: ['num', 'repo'], gh_issue_view: ['num', 'repo'], gh_issue_list: ['repo', 'state'], git_ls_files: [], wrangler_d1_list: [] };
+const whTokens = (t, vals = []) => { const left = [...vals]; return t.replace(/(["'])([^"']*)\1/g, (q, _, inner) => { const i = left.indexOf(inner); if (i >= 0) { left.splice(i, 1); return ' '; } return ` ${q} `; }).split(/\s+/).map((w) => { const c = w.replace(/^[(]+|[),.;:!?]+$/g, '').toLowerCase(); return /^\.+$/.test(w) || (!c && /\.\./.test(w)) ? w : c; }).filter(Boolean); };
+const UNIT_AFTER = /^\s*-?(?:comments?|labels?|assignees?|reactions?|commits?|files?|failures?|errors?|checks?|runs?|issues?|prs?|people|users?|minutes?|komentarz\w*|days?|d|weeks?|wks?|w|months?|mos?|years?|yrs?|y|hours?|hrs?|h|minutes?|mins?|m|seconds?|secs?|s|dni|dzie\w*|tygodn\w*|miesi\w*|godz\w*|minut\w*|sekund\w*|times?|razy|old|ago|temu|jobs?|attempts?|steps?|items?|of|out|x|%|th|st|nd|rd)\b|^-\w/i;
+/**
+ * Why a suggestion for one of the 0.3.4 templates must not run as is ([] : fine): the request has a restriction, option,
+ * scope or value boundary the template cannot express. The pipeline puts these in `missing`.
+ */
+// 0.3.4: the free-text git grep / git show templates are disabled (never runnable). Their parsing is kept for a later
+// release (branch feat/templates-grep-show); set TELLSH_ENABLE_GREP_SHOW=1 only in development to exercise it.
+export const DISABLED_TEMPLATES = new Set(process.env.TELLSH_ENABLE_GREP_SHOW === '1' ? [] : ['git_grep', 'git_show']);
+export function newTemplateWithhold(id, text, slots = {}, command = null) {
+  const t = String(text);
+  if (DISABLED_TEMPLATES.has(id)) return [`${id === 'git_grep' ? 'pattern' : 'rev'} (template disabled in this release)`];
+  const out = [];
+  const glued = (val) => {
+    if (val == null) return false;
+    for (const m of t.matchAll(/(["'])((?:[^"'\\]|\\.)*)\1/g)) if (m[2] === String(val) || m[2].includes('\\')) {
+      if (m[2].includes('\\') || /^[^\s,;!?)]/.test(t.slice(m.index + m[0].length)) || /[^\s(=]$/.test(t.slice(0, m.index))) return true;
+    }
+    return false;
+  };
+  // r21: a multi-line (or control-character) request is never read as one of these templates: the line-based checks cannot vouch for it
+  if (WH_WORDS[id] && /[\r\n\t\v\f\u0085\u2028\u2029]/.test(t)) return ['request (spans several lines)'];
+  // r30: typographic quotes or backticks are not read as quoting: the 0.3.4 templates never render them as runnable
+  // r31: structural — any non-ASCII punctuation, symbol, space or control character (quote-likes of every script) and any backtick
+  // r32: allow-list instead — only ASCII and Polish letters; anything else (saltillo ꞌ, other scripts' quote-likes) withholds
+  if (WH_WORDS[id] && (/[^\x20-\x7eąćęłńóśźżĄĆĘŁŃÓŚŹŻ]/u.test(t) || /`/.test(t))) return ['value (characters outside ASCII / Polish letters)'];
+  if (WH_WORDS[id]) {
+    // (the --repo value and the option itself are explained by the rendered repo slot)
+    const ok = new Set(WH_WORDS[id].split(/\s+/));
+    const raw = (WH_RENDERED[id] || []).map((k) => slots[k]).filter((x) => x != null).map((x) => String(x));
+    // each rendered value explains one occurrence only (`for "src" in "src"`, `"foo" and "FOO"`)
+    const vals = raw.map((x) => x.toLowerCase().replace(/^#/, ''));
+    const left = [...vals];
+    // quoted occurrences consumed by whTokens are removed from `left` first, so they never explain a second copy
+    { const used = [...raw]; for (const m of t.matchAll(/(["'])([^"']*)\1/g)) { const i = used.indexOf(m[2]); if (i >= 0) { used.splice(i, 1); const j = left.indexOf(m[2].toLowerCase().replace(/^#/, '')); if (j >= 0) left.splice(j, 1); } } }
+    const usedUp = new Set(vals.filter((x) => !left.includes(x)));
+    const rest = whTokens(t, raw).filter((w) => { if (usedUp.has(w.replace(/^#/, '')) && !left.includes(w.replace(/^#/, ''))) return true; if (ok.has(w)) return false; const i = left.indexOf(w.replace(/^#/, '')); if (i >= 0) { left.splice(i, 1); return false; } return true; });
+    // the literal form: nothing may follow the pattern (`git grep TODO -- code` is a pathspec, not vocabulary)
+    if (id === 'git_grep') { const g = t.match(/\bgit\s+grep\s+(?:-n\s+)?(?:--\s+)?(?:"[^"]*"|'[^']*'|[^\s"']+)\s+(\S.*)$/i); if (g) { rest.length = 0; rest.push(g[1]); } }
+    if (id === 'git_show') { const g = t.match(/\bgit\s+show\s+(?:"[^"]*"|'[^']*'|[^\s"']+)\s+(\S.*)$/i); if (g) { rest.length = 0; rest.push(g[1]); } }
+    if (id === 'git_ls_files') { const g = t.match(/\bgit\s+ls-files\s+(\S.*)$/i); if (g) { rest.length = 0; rest.push(g[1]); } }
+    // the derived `HEAD~1` ("the previous commit") does not appear in the request; a revision that does is explicit
+    if (id === 'git_show' && slots.rev != null && t.toLowerCase().includes(String(slots.rev).toLowerCase()) && /\b(?:previous|prior|second[- ]to[- ]last|before|poprzedni\w*|przedostatni\w*|parent|rodzic\w*)\b/i.test(t)) rest.push('(relative to the named revision)');
+    // two relative selectors ("the previous commit of the previous commit") or a named ref/tag/branch position
+    if (id === 'git_show') {
+      const rel = t.match(/\b(?:previous|prior|second[- ]to[- ]last|before|poprzedni\w*|przedostatni\w*|parent|rodzic\w*)\b/gi) || [];
+      if (rel.length > 1) rest.push('(nested relative revision)');
+      // several commit selectors ("the latest commit and the previous commit") name more than one object
+      const sel = t.match(/\b(?:latest|last|newest|most recent|previous|prior|second[- ]to[- ]last|ostatni\w*|najnowsz\w*|poprzedni\w*|przedostatni\w*)\b/gi) || [];
+      if (sel.length > 1 || (sel.length && slots.rev != null && t.toLowerCase().includes(String(slots.rev).toLowerCase()))) rest.push('(more than one commit selected)');
+      // a tag / revision / branch named without a value read into rev is not HEAD
+      if ((slots.rev == null || !t.toLowerCase().includes(String(slots.rev).toLowerCase())) && /\b(?:tags?|tagu|tagi|revision|rewizj\w*|branch\w*|gał[eę]zi\w*|galezi\w*)\b/i.test(t)) rest.push('(a tag, revision or branch without a value)');
+      for (const m of t.matchAll(/\b(?:tag|branch|ref|revision|of|from|on|at|with|for|in|to|across|z|na|w|dla)\s+(?:the\s+)?(?=(["']?)([^\s"']+)\1)/gi)) if (String(slots.rev ?? '').toLowerCase() !== m[2].toLowerCase() && !/^(?:commit|commits|repo|repository|head|its|it|diff|changes|me|my|this|that)$/i.test(m[2])) rest.push(m[2]);
+    }
+    if (id === 'wrangler_pages_deploy') for (const m of t.matchAll(/\b(?:to|for|into|onto|on|as|named|called|in|at|under|across|pages|na|do|dla|w|jako)\s+(?:the\s+|my\s+)?(?=(["']?)([^\s"']+)\1)/gi)) if (!/^(?:cloudflare|pages|page)$/i.test(m[2]) && String(slots.path ?? '').toLowerCase() !== m[2].toLowerCase()) rest.push(m[2]);
+    // a second pattern ("for "word" and TEXT", "foo or bar") is never searched
+    if (id === 'git_grep') for (const m of t.matchAll(/(?:\b(?:and|or|but|instead|rather|oraz|lub|albo|i|ale|zamiast)|[,;])\s+(?:also\s+|than\s+|of\s+)?((?:(?:the|a|an|for|word|words|text|string|pattern|phrase|słowo|slowo|fraz\w*)\s+)*)(?=(["']?)([^\s"']+)\2)/gi)) if (/^[,;]/.test(m[0]) || /^(?:but|instead|rather|ale|zamiast)\b/i.test(m[0]) || /\balso\s/i.test(m[0]) || /\b(?:the|a|an)\s+$/i.test(m[1]) || /\b(?:word|words|text|string|pattern|phrase|for|słowo|slowo|fraz\w*)\b/i.test(m[1]) || !/^(?:tracked|files?|the|repo|repository|show|list|print|line|lines|numbers?)$/i.test(m[3])) rest.push(m[3]);
+    // r22: structural — git grep with more than one pattern-marker group; git show with a , ; clause or a selector word naming anything but the read revision
+    if (id === 'git_grep') { const M = '(?:for|with|to|word|words|text|string|pattern|phrase|słowo|slowo|fraz\\w*)'; const groups = t.match(new RegExp(`\\b${M}(?:\\s+(?:the|a|an|${M}))*\\b`, 'gi')) || []; if (groups.length > 1) rest.push(groups[1]); }
+    if (id === 'git_show') { if (/[,;]/.test(t)) rest.push(';'); for (const m of t.matchAll(/\b(?:tag|branch|ref|revision|rewizj\w*|gałęź|galez)(?:\s*[:=\-–—.!?)(]+\s*|\s+)(?:named\s+|called\s+)?(["']?)([^\s"']+)\1/gi)) if (String(slots.rev ?? slots.revision ?? '').toLowerCase() !== m[2].toLowerCase()) rest.push(m[2]); }
+    // r23: "in the tracked file X" names a file restriction git grep -n does not render
+    if (id === 'git_grep') for (const m of t.matchAll(/\b(?:file|files|plik|pliku|plikach)\s*[:=,\-–—]*\s+(?:named\s+|called\s+)?(["']?)([^\s"']+)\1/gi)) if (!/^(?:for|with|to|and|or|containing|that|which|in|matching|word|text|pattern|za|na|z|w|zawierając\w*|zawierajac\w*)$/i.test(m[2])) rest.push(m[2]);
+    // r25: structural — git grep -n renders no file restriction: a singular file word, or files followed by punctuation, is always withheld
+    if ((id === 'git_grep' || id === 'git_ls_files') && (/\b(?:file|plik|pliku)\b/i.test(t) || /\b(?:files|plikach|plikow|plików)\s*[^\w\s"']+\s*\S/i.test(t))) rest.push('(a file restriction)');
+    // r26: structural — any option-looking token (`--`, `-i`, `--cached`) in a git grep request is withheld: only `-n --` is rendered
+    if (id === 'git_grep' && /(?:^|\s)-{1,2}(?=\s|$|[^\s\d])/.test(t.replace(/\bgit\s+grep\s+-n\s+--(?=\s)/i, ' '))) rest.push('(an option or pathspec)');
+    // r31: pages — a source/folder word naming anything but the rendered path is a directory the command does not express
+    if (id === 'wrangler_pages_deploy') for (const m of t.matchAll(/\b(?:from|source|src|directory|dir|folder|katalog\w*|folder\w*|z|ze)\s*[:=]?\s+(?:the\s+|my\s+)?(["']?)([^\s"']+)\1/gi)) if (!/^(?:cloudflare|pages|page|the|my|a|to)$/i.test(m[2]) && String(slots.path ?? '').toLowerCase() !== m[2].toLowerCase()) rest.push(m[2]);
+    // r21: for git show, and/or/plus/then always adds another selector (withheld)
+    if (id === 'git_show') for (const m of t.matchAll(/\b(?:and|or|plus|then|oraz|lub|albo|i|potem)\s+(\S+)/gi)) rest.push(m[1]);
+    // r20: or always starts another pattern; and only continues into show/print/list/display (line numbers); too/also/as well add a pattern
+    if (id === 'git_grep') { for (const m of t.matchAll(/\b(?:or|lub|albo)\s+(\S+)/gi)) rest.push(m[1]); for (const m of t.matchAll(/\b(?:and|oraz|i)\s+(?!(?:show|print|list|display|pokaż|pokaz|wypisz)\b)(\S+)/gi)) rest.push(m[1]); if (/\b(?:too|also|as\s+well|też|tez|również|rowniez)\b/i.test(t)) rest.push('too'); }
+    if (id === 'git_ls_files' || id === 'git_grep') for (const m of t.matchAll(/\b(?:repo|repository|repozytorium)\s+(?:named\s+|called\s+)?(?=(["']?)([^\s"']+)\1)/gi)) if (!/^(?:and|or|but|for|with|only|too|instead|please|i|oraz)$/i.test(m[2])) rest.push(m[2]);
+    if (id === 'git_ls_files') for (const m of t.matchAll(/\b(?:in|inside|within|under|of|at|from|below|for|on|with|w|we|z)\s+(?:(?:the|all|my|a|this|git|repo|repository|repozytorium)\s+)*(?=(["']?)([^\s"']+)\1)/gi)) if (!/^(?:repo|repository|repozytorium|git|this)$/i.test(m[2])) rest.push(m[2]);
+    // a place for git grep ("in files", "under src") is a pathspec unless it names the repository itself
+    if (id === 'git_grep') for (const m of t.matchAll(/\b(?:in|inside|within|under|on|of|at|across|except|excluding|from|w|we|na|poza|oprócz|oprocz)\s+(?:the\s+|all\s+|my\s+|a\s+)?(?=(["']?)([^\s"']+)\1)/gi)) if (!/^(?:repo|repository|repozytorium|tracked|git|codebase|plikach|sledzonych|śledzonych)$/i.test(m[2])) rest.push(m[2]);
+    // r28: structural — clause punctuation outside quotes and the rendered values (`in: files`, `repo: x`) is never explained
+    { let u = t.replace(/(["'])[^"']*\1/g, ' '); for (const x of Object.values(slots)) if (x != null && String(x).length) u = u.split(String(x)).join(' '); if (/[:;,=()\[\]{}|&<>]/.test(u) || /[.!?]+\s+\S/.test(u)) rest.push('(punctuation)');
+      // r29: a negation or exclusion ("with no description") is never rendered; `no 42` / `no. 42` is a number marker
+      if (/\b(?:no|not|without|except|excluding|minus|never|don'?t|bez|nie|oprócz|oprocz|poza)\b(?!\.?\s*#?\d)/i.test(t.replace(/(["'])[^"']*\1/g, ' '))) rest.push('(an exclusion)'); }
+    // r34: structural — pages deploys only a relative directory below the current one: any absolute, drive, UNC, device, home or parent form withholds
+    if (id === 'wrangler_pages_deploy' && slots.path != null) { const pv = String(slots.path); if (/^(?:[\/\\~]|[a-z]:|\$)/i.test(pv) || /(?:^|[\/\\])\.\.(?:[\/\\]|$)/.test(pv) || /[?$*:]/.test(pv)) rest.push('(a directory outside the project)'); }
+    // r35: structural — gh issue view / run watch / issue list render one object: any with/including/along/together/plus relation, or a repo word without a read repo, withholds
+    if (/^(?:gh_issue_view|gh_run_watch|gh_issue_list)$/.test(id)) { const u3 = t.replace(/(["'])[^"']*\1/g, ' '); if (/\b(?:with|including|incl|along|together|alongside|z|wraz|razem|łącznie|lacznie)\b/i.test(u3)) rest.push('(an extra output)'); const rw = u3.match(/(?:^|\s)(?:--)?(?:repo|repos|repository|repozytori\w*)\b/gi) || []; if (rw.length && slots.repo == null) rest.push('(a repository without a value)'); if (slots.repo != null) { const rv = String(slots.repo).replace(/[.*+?^${}()|[\]\\]/g, '\\$&'); const adj = new RegExp(`(?:\\b(?:in|from|on|w|we|z|ze|na)\\s+(?:the\\s+)?(?:repo|repository|repozytori\\w*)\\s*[=:]?\\s*${rv}|(?:^|\\s)--repo[=\\s]+${rv})`, 'i'); if (rw.length > 1 || (rw.length === 1 && !adj.test(u3))) rest.push('(a repository relation the command does not render)'); } }
+    // r32: structural — a second action (and / then / plus / oraz / potem) is never rendered; only "open and closed" issues are one list
+    { const u2 = id === 'gh_issue_list' ? t.replace(/\b(?:open|opened|otwarte)\s+(?:and|i|oraz)\s+(?:closed|zamkni\w*)\b/gi, ' ') : t; if (/\b(?:and|but|yet|while|then|plus|afterwards|also|ale|lecz|too|additionally|as\s+well|after\s+that|oraz|potem|następnie|nastepnie|też|tez|również|rowniez|dodatkowo)\b|(?:^|\s)i(?=\s)/i.test(u2.replace(/(["'])[^"']*\1/g, ' '))) rest.push('(a second action)'); }
+    if (rest.length) out.push(`${id === 'git_grep' ? 'pattern' : id === 'git_show' ? 'rev' : 'args'} (not expressed: ${[...new Set(rest)].slice(0, 4).join(' ')})`);
+    if (Object.values(slots).some((x) => glued(x)) || /\\["']/.test(t)) out.push('value (unclear where the quoted text ends)');
+  }
+  if (id === 'wrangler_pages_deploy') {
+    // also for a replay ("same for production"): environments, branches, projects, dry runs are never expressed
+    if (/\bdry[\s-]*run\b|\bna\s+sucho\b|\bwithout\s+(?:actually\s+)?(?:deploying|publishing|uploading)\b|\b(?:don'?t|do\s+not)\s+actually\b|\b(?:preview|production|prod|staging|stage|main|master|dev|test|branch|project|message|commit)\b|\bga[lł][eę]zi\w*|\bprojekt\w*|--\w/i.test(t)) out.push('args (an environment, branch, project or dry run is not expressed)');
+    const pv = slots.path == null ? null : String(slots.path);
+    if (pv != null && !t.includes(`"${pv}"`) && !t.includes(`'${pv}'`) && !/^(?:\.|\.\/\S+|\.\.\/\S+|~\/\S+|\/\S+|\S+[\/\\]\S*|[a-z]:\S*|build|dist|public|out|_site|output)$/i.test(pv)) out.push('path (not a directory name)');
+  }
+  if (id === 'wrangler_pages_deploy' && slots.path != null) {
+    let p = String(slots.path).trim().replace(/^(["'])(.*)\1$/, '$2').replace(/\\/g, '/').toLowerCase();
+    const drive = /^[a-z]:/.exec(p); const driveRel = drive && !/^[a-z]:\//.test(p);
+    if (drive) p = p.slice(2) || '/';
+    if (driveRel && p !== '/') p = `./${p}`; // `C:..` is relative to the drive's current directory
+    p = p.replace(/^(?:\$home|%userprofile%|\$env:userprofile)(?=\/|$)/, '~');
+    const segs = []; let up = 0; const abs = p.startsWith('/'); const home = p.startsWith('~');
+    for (const seg of p.replace(/^~/, '').split('/')) { if (!seg || seg === '.') continue; if (seg === '..') { if (segs.length) segs.pop(); else up++; } else segs.push(seg); }
+    const sensitive = segs.some((x) => x.startsWith('.')) || ((abs || drive) && (segs.length === 1 || (segs.length === 2 && /^(?:home|users|mnt|media|volumes)$/.test(segs[0]))));
+    const unc = /^\/\/[^/]/.test(p) && segs.length <= 2; // \\server\share is a volume root
+    if (up > 0 || ((abs || home || drive) && segs.length === 0) || sensitive || unc) out.push('path (a root, home or parent directory is never uploaded as is)');
+  }
+  if (id === 'gh_issue_list' && /\b(?:but|except|excluding|without|not|no|nie|bez|opr[oó]cz|poza)\b/i.test(t.replace(/(["']?)(?:[\w.-]+\/)+[\w.-]+\1/g, ' '))) out.push('state (an exclusion is not expressed)');
+  if (/^(?:gh_issue_view|gh_run_watch|gh_issue_list|git_ls_files)$/.test(id)) {
+    // an option the template cannot express (`--exit-status`, `--json`, `--others`, `-- src`) is withheld
+    const opts = whTokens(t).filter((w) => /^-/.test(w) && w !== '--repo' && !/^--repo=/.test(w));
+    if (opts.length) out.push(`args (not expressed: ${opts.slice(0, 3).join(' ')})`);
+    if (id === 'git_ls_files' && /\b(?:untracked|ignored|deleted|modified|others|staged|nieśledzon\w*|niesledzon\w*|usunięt\w*|zmodyfikowan\w*)\b/i.test(t)) out.push('args (a filter git ls-files is not rendered with)');
+  }
+  if ((id === 'gh_issue_view' || id === 'gh_run_watch') && slots.num != null && command != null && !new RegExp(`(?:^|\\s)${slots.num}(?:\\s|$)`).test(command)) out.push('num (the number named is not a valid id)');
+  if ((id === 'gh_issue_view' || id === 'gh_run_watch') && slots.num == null && /(?:\b(?:run|runs|issue|issues|watch|view)\s+#?|#)\d+/i.test(t)) out.push('num (the number named is not a valid id)');
+  if (id === 'gh_issue_view' || id === 'gh_run_watch') {
+    if (slots.num != null) {
+      const at = t.search(new RegExp(String.raw`(?:^|[^\d])${slots.num}(?!\d)`));
+      const after = at >= 0 ? t.slice(t.indexOf(String(slots.num), at) + String(slots.num).length) : '';
+      if (UNIT_AFTER.test(after)) out.push('num (the number is a count or an age, not an id)');
+    }
+  }
+  return [...new Set(out)];
 }
