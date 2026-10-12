@@ -306,3 +306,14 @@ test('r25: single-file grep restrictions are withheld whatever the punctuation o
     assert.deepEqual(suggest('search tracked files for "TODO"', env).missing, []);
   }
 });
+
+// review r26: options / pathspecs in git grep requests; a tab in a pip target request
+test('r26: grep pathspecs/options and tabbed pip targets are withheld', () => {
+  for (const env of [{ shell: 'bash', os: 'linux' }, { shell: 'pwsh', os: 'win32' }, { shell: 'cmd', os: 'win32' }]) {
+    for (const q of ['search tracked files for "TODO" -- codebase', 'search tracked files for "TODO" -- repo', 'search tracked files for "TODO" -i', 'pip install requests -t lib\tcache']) {
+      const r = suggest(q, env);
+      assert.ok(!r.command || r.missing.length > 0, `${env.shell}: ${JSON.stringify(q)}`);
+    }
+    for (const q of ['search tracked files for "TODO"']) assert.deepEqual(suggest(q, env).missing, [], `${env.shell}: ${q}`);
+  }
+});

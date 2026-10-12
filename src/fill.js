@@ -804,7 +804,7 @@ export function scopeMentions(intentId, text) {
     // `-t@foo`: an attached target the parser does not read is still a target (placeholder), never dropped
     for (const m of t.matchAll(/(?:^|\s)-t([^\s/~.\w"'][^\s]*)/g)) out.push({ kind: 'target', value: null, at: m.index });
     // a pip target in a multi-line request: the shell reading of the operand is unclear: a placeholder
-    if (/[\r\n\v\f\u0085\u2028\u2029]/.test(t) && /(?:^|\s)(?:-t|--target)/.test(t)) out.push({ kind: 'target', value: null, at: t.search(/(?:-t|--target)/) });
+    if (/[\r\n\t\v\f\u0085\u2028\u2029]/.test(t) && /(?:^|\s)(?:-t|--target)/.test(t)) out.push({ kind: 'target', value: null, at: t.search(/(?:-t|--target)/) });
     // `-t"lib` / `--target "lib`: an unterminated quote is unreadable: a placeholder, never dropped
     for (const m of t.matchAll(/(?:^|\s)(?:-t|--target)(?:=|\s*)(["'])/g)) { const rest = t.slice(m.index + m[0].length); if (!rest.includes(m[1])) out.push({ kind: 'target', value: null, at: m.index }); }
     for (const m of t.matchAll(SCOPE_ATTACHED_T)) {
@@ -1242,6 +1242,8 @@ export function newTemplateWithhold(id, text, slots = {}, command = null) {
     if (id === 'git_grep') for (const m of t.matchAll(/\b(?:file|files|plik|pliku|plikach)\s*[:=,\-–—]*\s+(?:named\s+|called\s+)?(["']?)([^\s"']+)\1/gi)) if (!/^(?:for|with|to|and|or|containing|that|which|in|matching|word|text|pattern|za|na|z|w|zawierając\w*|zawierajac\w*)$/i.test(m[2])) rest.push(m[2]);
     // r25: structural — git grep -n renders no file restriction: a singular file word, or files followed by punctuation, is always withheld
     if (id === 'git_grep' && (/\b(?:file|plik|pliku)\b/i.test(t) || /\b(?:files|plikach|plikow|plików)\s*[^\w\s"']/i.test(t))) rest.push('(a file restriction)');
+    // r26: structural — any option-looking token (`--`, `-i`, `--cached`) in a git grep request is withheld: only `-n --` is rendered
+    if (id === 'git_grep' && /(?:^|\s)-{1,2}(?=\s|$|[^\s\d])/.test(t.replace(/\bgit\s+grep\s+-n\s+--(?=\s)/i, ' '))) rest.push('(an option or pathspec)');
     // r21: for git show, and/or/plus/then always adds another selector (withheld)
     if (id === 'git_show') for (const m of t.matchAll(/\b(?:and|or|plus|then|oraz|lub|albo|i|potem)\s+(\S+)/gi)) rest.push(m[1]);
     // r20: or always starts another pattern; and only continues into show/print/list/display (line numbers); too/also/as well add a pattern
