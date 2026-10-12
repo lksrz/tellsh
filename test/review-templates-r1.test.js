@@ -117,3 +117,14 @@ test('review r6: history replays, attached pip operands, case, glued suffixes, r
   for (const q of ['watch run 42 in repo foo/bar', 'pip install requests -t/tmp/pkgs', 'deploy /tmp/site/dist to pages']) assert.equal((await run(q)).missing.length, 0, q);
   assert.equal((await run('same for ./build', BASH, H)).missing.length, 0);
 });
+
+test('review r7: issue state after the word repo, quoted pip operands, relative revisions, repeated values', async () => {
+  const held = async (q) => { const r = await run(q); assert.ok(r.command == null || r.missing.length > 0, `${q}: ${r.command} must not run on Enter`); };
+  assert.equal((await run('list closed issues in the repo')).command, 'gh issue list --state closed');
+  for (const q of ['pip install requests -t"lib",cache', 'show the previous commit from HEAD', 'show the second-to-last commit from HEAD',
+    'grep tracked files for "src" in "src"', 'search tracked files for "foo" and "FOO"']) await held(q);
+  assert.equal((await run('pip install requests -t"/tmp/a b"')).missing.length, 0);
+  const r = await run('Git grep TODO -- code');
+  assert.equal(r.missing.length, 1);
+  assert.doesNotMatch(r.missing[0], /code -- code/);
+});

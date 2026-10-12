@@ -798,7 +798,7 @@ export function scopeMentions(intentId, text) {
       // quoted contents are literal; only an unquoted value loses trailing punctuation
       const q = /^(["'])([\s\S]*)\1$/.exec(m[1]);
       // `-t"/tmp/a\"b"`: an escaped quote makes the end unclear: a placeholder
-      const escaped = q && (q[2].endsWith('\\') || t.charAt(m.index + m[0].length) === q[1] || /^[^\s,;!?]/.test(t.slice(m.index + m[0].length)));
+      const escaped = q && (q[2].endsWith('\\') || t.charAt(m.index + m[0].length) === q[1] || /^\S/.test(t.slice(m.index + m[0].length)));
       // the operand pip reads is everything up to the next space (`-t/tmp/lib,cache`): anything else is a placeholder
       const whole = (t.slice(m.index).match(/^\s*-t(\S+)/) || [])[1] ?? '';
       const cut = !q && whole.replace(/[.,!?;:]+$/, '') !== m[1].replace(/[.,!?;:]+$/, '');
@@ -1132,7 +1132,7 @@ export function newTemplateSlots(id, text, v, quoted) {
     if (m) v.num = m[1]; else delete v.num;
   }
   if (id === 'gh_issue_list') {
-    t = t.replace(/(?:--repo[=\s]+|\b(?:repo|repository|repozytori\w*)\s+)\S+/gi, ' ');
+    t = t.replace(/--repo[=\s]+\S+|\b(?:repo|repository|repozytori\w*)\s+[\w.-]+\/[\w.-]+/gi, ' ');
     if (/\b(?:closed|zamkni\w*)\b/i.test(t)) v.state = 'closed';
     else if (/\b(?:all|every|wszystkie|wszystkich)\b/i.test(t) && !/\b(?:open|opened|otwart\w*)\b/i.test(t)) v.state = 'all';
     if (/\b(?:closed|zamkni\w*)\b/i.test(t) && /\b(?:open|opened|otwart\w*)\b/i.test(t)) v.state = 'all';
@@ -1166,7 +1166,7 @@ const WH_WORDS = {
 // only the slots a template renders explain words of the request (an extracted `since: yesterday` that never reaches
 // `git show` does not)
 const WH_RENDERED = { git_show: ['rev'], git_grep: ['pattern'], wrangler_pages_deploy: ['path'], gh_run_watch: ['num', 'repo'], gh_issue_view: ['num', 'repo'], gh_issue_list: ['repo', 'state'], git_ls_files: [] };
-const whTokens = (t, vals = []) => t.replace(/(["'])([^"']*)\1/g, (q, _, inner) => (vals.includes(inner.toLowerCase()) ? ' ' : ` ${q} `)).split(/\s+/).map((w) => w.replace(/^[(]+|[),.;:!?]+$/g, '').toLowerCase()).filter(Boolean);
+const whTokens = (t, vals = []) => { const left = [...vals]; return t.replace(/(["'])([^"']*)\1/g, (q, _, inner) => { const i = left.indexOf(inner); if (i >= 0) { left.splice(i, 1); return ' '; } return ` ${q} `; }).split(/\s+/).map((w) => w.replace(/^[(]+|[),.;:!?]+$/g, '').toLowerCase()).filter(Boolean); };
 const UNIT_AFTER = /^\s*-?(?:comments?|labels?|assignees?|reactions?|commits?|files?|failures?|errors?|checks?|runs?|issues?|prs?|people|users?|minutes?|komentarz\w*|days?|d|weeks?|wks?|w|months?|mos?|years?|yrs?|y|hours?|hrs?|h|minutes?|mins?|m|seconds?|secs?|s|dni|dzie\w*|tygodn\w*|miesi\w*|godz\w*|minut\w*|sekund\w*|times?|razy|old|ago|temu|jobs?|attempts?|steps?|items?|of|out|x|%|th|st|nd|rd)\b|^-\w/i;
 /**
  * Why a suggestion for one of the 0.3.4 templates must not run as is ([] : fine): the request has a restriction, option,
@@ -1185,13 +1185,19 @@ export function newTemplateWithhold(id, text, slots = {}, command = null) {
   if (WH_WORDS[id]) {
     // (the --repo value and the option itself are explained by the rendered repo slot)
     const ok = new Set(WH_WORDS[id].split(/\s+/));
-    const vals = (WH_RENDERED[id] || []).map((k) => slots[k]).filter((x) => x != null).map((x) => String(x).toLowerCase().replace(/^#/, ''));
-    const rest = whTokens(t, vals).filter((w) => !ok.has(w) && !vals.includes(w.replace(/^#/, '')));
+    const raw = (WH_RENDERED[id] || []).map((k) => slots[k]).filter((x) => x != null).map((x) => String(x));
+    // each rendered value explains one occurrence only (`for "src" in "src"`, `"foo" and "FOO"`)
+    const vals = raw.map((x) => x.toLowerCase().replace(/^#/, ''));
+    const left = [...vals];
+    const rest = whTokens(t, raw).filter((w) => { if (ok.has(w)) return false; const i = left.indexOf(w.replace(/^#/, '')); if (i >= 0) { left.splice(i, 1); return false; } return true; });
+    // a quoted value already consumed by whTokens
+    for (const x of raw) if (new RegExp(`(["'])${x.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\1`).test(t)) { const i = left.indexOf(x.toLowerCase()); if (i >= 0) left.splice(i, 1); }
     // the literal form: nothing may follow the pattern (`git grep TODO -- code` is a pathspec, not vocabulary)
-    if (id === 'git_grep') { const g = t.match(/\bgit\s+grep\s+(?:-n\s+)?(?:--\s+)?(?:"[^"]*"|'[^']*'|[^\s"']+)\s+(\S.*)$/i); if (g) rest.push(g[1]); }
-    if (id === 'git_show') { const g = t.match(/\bgit\s+show\s+(?:"[^"]*"|'[^']*'|[^\s"']+)\s+(\S.*)$/i); if (g) rest.push(g[1]); }
-    if (id === 'git_ls_files') { const g = t.match(/\bgit\s+ls-files\s+(\S.*)$/i); if (g) rest.push(g[1]); }
-    if (rest.length) out.push(`${id === 'git_grep' ? 'pattern' : id === 'git_show' ? 'rev' : 'args'} (not expressed: ${rest.slice(0, 4).join(' ')})`);
+    if (id === 'git_grep') { const g = t.match(/\bgit\s+grep\s+(?:-n\s+)?(?:--\s+)?(?:"[^"]*"|'[^']*'|[^\s"']+)\s+(\S.*)$/i); if (g) { rest.length = 0; rest.push(g[1]); } }
+    if (id === 'git_show') { const g = t.match(/\bgit\s+show\s+(?:"[^"]*"|'[^']*'|[^\s"']+)\s+(\S.*)$/i); if (g) { rest.length = 0; rest.push(g[1]); } }
+    if (id === 'git_ls_files') { const g = t.match(/\bgit\s+ls-files\s+(\S.*)$/i); if (g) { rest.length = 0; rest.push(g[1]); } }
+    if (id === 'git_show' && slots.rev != null && slots.rev !== 'HEAD~1' && /\b(?:previous|prior|second[- ]to[- ]last|before|poprzedni\w*|przedostatni\w*|parent|rodzic\w*)\b/i.test(t)) rest.push('(relative to the named revision)');
+    if (rest.length) out.push(`${id === 'git_grep' ? 'pattern' : id === 'git_show' ? 'rev' : 'args'} (not expressed: ${[...new Set(rest)].slice(0, 4).join(' ')})`);
     if (Object.values(slots).some((x) => glued(x)) || /\\["']/.test(t)) out.push('value (unclear where the quoted text ends)');
   }
   if (id === 'wrangler_pages_deploy' && slots.path != null) {
