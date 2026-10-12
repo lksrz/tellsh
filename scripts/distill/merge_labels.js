@@ -19,6 +19,7 @@ const D = process.env.TELLSH_DISTILL_DIR || '/workspace/tellsh-data/distill';
 // labels are private: merge only writes build/hybrid/train_distill.jsonl (gitignored)
 const args = process.argv.slice(2);
 const arg = (k, d) => { const i = args.indexOf(k); return i >= 0 ? args[i + 1] : d; };
+const MINP_OOC = +arg('--min-p-ooc', 0.9);
 const MINP = +arg('--min-p', 0.5), W = +arg('--w', 0.5), TRUST = args.includes('--trust-teacher');
 const rj = (p) => (existsSync(p) ? readFileSync(p, 'utf8').split('\n').filter((l) => l.trim()).map((l) => JSON.parse(l)) : []);
 const poolBody = readFileSync(join(D, 'pool.jsonl'), 'utf8');
@@ -41,7 +42,9 @@ const dev = new Set(JSON.parse(readFileSync(join(ROOT, 'build/hybrid/dev_texts.j
 const decisions = rj(join(ROOT, 'data/teacher/decisions.jsonl')).filter((d) => d.text && d.field !== 'risk');
 // one current decision per text (last entry wins, as in gen_data.js / export_data.js)
 const decide = new Map(decisions.map((d) => [normalize(d.text), d]));
-const current = (r) => decide.get(normalize(r.text)) || (r.parent ? decide.get(normalize(r.parent)) : undefined);
+// a copy's own drop/relabel wins; otherwise (no decision or keep) it inherits the parent's decision
+const active = (d) => d && (d.action === 'drop' || (d.action === 'relabel' && d.intent)) ? d : undefined;
+const current = (r) => active(decide.get(normalize(r.text))) || (r.parent ? active(decide.get(normalize(r.parent))) : undefined);
 const TW = Number.isFinite(parseFloat(process.env.TELLSH_TMPL_W)) ? parseFloat(process.env.TELLSH_TMPL_W) : 1;
 const pool = new Map(rj(join(D, 'pool.jsonl')).map((r) => [r.id, r]));
 const base = readFileSync(join(ROOT, 'build/hybrid/train.jsonl'), 'utf8');
@@ -67,6 +70,8 @@ for (const l of rj(join(D, 'labels.jsonl'))) {
   // chit-chat, so they must not become NONE (tool-head rejection) rows: skip them
   if (l.top === 'none') { st.none++; continue; }
   let intent = l.top;
+  // no gold (real out-of-catalog commands): the teacher had no shell-request 'none' training, so only confident labels
+  if (!gold && l.soft[l.top] < MINP_OOC) { st.lowConfOoc = (st.lowConfOoc || 0) + 1; continue; }
   if (gold && intent !== gold) { st.goldConflict++; if (!TRUST) continue; }
   const soft = Object.fromEntries(Object.entries(l.soft).filter(([k]) => k !== 'none'));
   extra.push({ text: r.text, tool: FAMILY_OF[intent], intent: '', soft, lang: r.lang, shell: r.shell, os: r.os,

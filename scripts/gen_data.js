@@ -158,6 +158,8 @@ function main() {
   };
   const emitTag = (text, spans, tool, group) => {
     if (leaks(text)) { droppedDerived++; return; }
+    // decided texts: a drop drops the tagger row too; a relabel invalidates the silver spans (other intent) -> no tag row
+    { const d = decide.get(normalize(text)); if (d?.action === 'drop' || (d?.action === 'relabel' && d.intent)) return; }
     const toks = tagTokens(text);
     if (!toks.length) return;
     const y = bioLabels(toks, spans);

@@ -98,7 +98,7 @@ function main() {
     if (o.kind !== 'orig' && o.intent) {
       const d = decide.get(normalize(o.text));
       if (d?.action === 'drop') return;
-      if (d?.action === 'relabel' && d.intent) o = { ...o, intent: d.intent, tool: FAMILY_OF[d.intent] };
+      if (d?.action === 'relabel' && d.intent) o = { ...o, intent: d.intent, tool: FAMILY_OF[d.intent], spans: null }; // spans belonged to the old intent
     }
     out.push(o);
   };
