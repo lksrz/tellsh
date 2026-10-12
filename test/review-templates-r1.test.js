@@ -114,7 +114,9 @@ test('review r6: history replays, attached pip operands, case, glued suffixes, r
   assert.equal((await run('Git show previous')).command, 'git show previous');
   assert.equal((await run('list open issues in repo acme/closed')).command, 'gh issue list --repo acme/closed');
   assert.equal((await run('gh issue list --repo acme/closed')).command, 'gh issue list --repo acme/closed');
-  for (const q of ['watch run 42 in repo foo/bar', 'pip install requests -t/tmp/pkgs', 'deploy /tmp/site/dist to pages']) assert.equal((await run(q)).missing.length, 0, q);
+  for (const q of ['watch run 42 in repo foo/bar', 'pip install requests -t/tmp/pkgs']) assert.equal((await run(q)).missing.length, 0, q);
+  // r34: pages deploys only relative project directories; an absolute path is withheld (recall loss accepted)
+  await held('deploy /tmp/site/dist to pages');
   assert.equal((await run('same for ./build', BASH, H)).missing.length, 0);
 });
 
@@ -392,5 +394,16 @@ test('r33: control characters and also/too second actions are withheld', () => {
       assert.ok(!r.command || r.missing.length > 0, `${env.shell}: ${JSON.stringify(q)}`);
     }
     for (const q of ['search tracked files for "TODO"', 'show issue 42']) assert.deepEqual(suggest(q, env).missing, [], `${env.shell}: ${q}`);
+  }
+});
+
+// review r34: pages only deploys relative directories; but/yet/while start a second action
+test('r34: absolute/device/UNC pages paths and but-clauses are withheld', () => {
+  for (const env of [{ shell: 'bash', os: 'linux' }, { shell: 'pwsh', os: 'win32' }, { shell: 'cmd', os: 'win32' }]) {
+    for (const q of ['deploy //?/C:/Users/me to pages', 'deploy //./C:/Users/me to pages', 'deploy //localhost/C$/Users/me to pages', 'deploy //?/UNC/server/share to pages', 'deploy /c/Users/me to pages', 'deploy /mnt/c/Users/me to pages', 'deploy dist/../.. to pages', 'show github issue 42 but read the repo description']) {
+      const r = suggest(q, env);
+      assert.ok(!r.command || r.missing.length > 0, `${env.shell}: ${q}`);
+    }
+    for (const q of ['deploy ./dist to cloudflare pages', 'show issue 42']) assert.deepEqual(suggest(q, env).missing, [], `${env.shell}: ${q}`);
   }
 });

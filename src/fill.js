@@ -1262,8 +1262,10 @@ export function newTemplateWithhold(id, text, slots = {}, command = null) {
     { let u = t.replace(/(["'])[^"']*\1/g, ' '); for (const x of Object.values(slots)) if (x != null && String(x).length) u = u.split(String(x)).join(' '); if (/[:;,=()\[\]{}|&<>]/.test(u) || /[.!?]+\s+\S/.test(u)) rest.push('(punctuation)');
       // r29: a negation or exclusion ("with no description") is never rendered; `no 42` / `no. 42` is a number marker
       if (/\b(?:no|not|without|except|excluding|minus|never|don'?t|bez|nie|oprócz|oprocz|poza)\b(?!\.?\s*#?\d)/i.test(t.replace(/(["'])[^"']*\1/g, ' '))) rest.push('(an exclusion)'); }
+    // r34: structural — pages deploys only a relative directory below the current one: any absolute, drive, UNC, device, home or parent form withholds
+    if (id === 'wrangler_pages_deploy' && slots.path != null) { const pv = String(slots.path); if (/^(?:[\/\\~]|[a-z]:|\$)/i.test(pv) || /(?:^|[\/\\])\.\.(?:[\/\\]|$)/.test(pv) || /[?$*:]/.test(pv)) rest.push('(a directory outside the project)'); }
     // r32: structural — a second action (and / then / plus / oraz / potem) is never rendered; only "open and closed" issues are one list
-    { const u2 = id === 'gh_issue_list' ? t.replace(/\b(?:open|opened|otwarte)\s+(?:and|i|oraz)\s+(?:closed|zamkni\w*)\b/gi, ' ') : t; if (/\b(?:and|then|plus|afterwards|also|too|additionally|as\s+well|after\s+that|oraz|potem|następnie|nastepnie|też|tez|również|rowniez|dodatkowo)\b|(?:^|\s)i(?=\s)/i.test(u2.replace(/(["'])[^"']*\1/g, ' '))) rest.push('(a second action)'); }
+    { const u2 = id === 'gh_issue_list' ? t.replace(/\b(?:open|opened|otwarte)\s+(?:and|i|oraz)\s+(?:closed|zamkni\w*)\b/gi, ' ') : t; if (/\b(?:and|but|yet|while|then|plus|afterwards|also|ale|lecz|too|additionally|as\s+well|after\s+that|oraz|potem|następnie|nastepnie|też|tez|również|rowniez|dodatkowo)\b|(?:^|\s)i(?=\s)/i.test(u2.replace(/(["'])[^"']*\1/g, ' '))) rest.push('(a second action)'); }
     if (rest.length) out.push(`${id === 'git_grep' ? 'pattern' : id === 'git_show' ? 'rev' : 'args'} (not expressed: ${[...new Set(rest)].slice(0, 4).join(' ')})`);
     if (Object.values(slots).some((x) => glued(x)) || /\\["']/.test(t)) out.push('value (unclear where the quoted text ends)');
   }
