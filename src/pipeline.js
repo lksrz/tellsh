@@ -404,6 +404,14 @@ const blocksAmbiguous = (comp, amb) => !!comp && !comp.invalid && ((amb.some((p)
  * opts: { shell, os, env, history: string[] (commands, oldest first), cwd, threshold, top, compose: 'auto'|'force'|'off',
  *         slotMode: 'merge'|'tagger'|'regex', model, rerank, rerankTop (candidates the rerank hook sees; default top) }
  */
+// the intents a typed command may become (a translation for the shell, never another program)
+const LIT_FAMILY = { cargo: /^cargo_/, python: /^python_|^pip_|^run_python/, python3: /^python_|^pip_|^run_python/, py: /^python_|^pip_/, node: /^node_|^run_node/, go: /^go_/, make: /^make_/, terraform: /^terraform_/, helm: /^helm_/, brew: /^brew_|^pkg_/, apt: /^apt_|^pkg_/, 'apt-get': /^apt_|^pkg_/, winget: /^winget_|^pkg_/, mv: /^move_|rename/, 'move-item': /^move_|rename/, cp: /^copy_/, 'copy-item': /^copy_/, rm: /^delete_|^remove_/, rmdir: /^delete_dir/, 'remove-item': /^delete_|^remove_/, del: /^delete_/, erase: /^delete_/, rd: /^delete_dir/,
+  ls: /^list_|^ls|dir_list|show_dir/, cat: /^cat_|^show_file|view_file/, git: /^git_/, gh: /^gh_/, docker: /^docker_/, kubectl: /^k8s_|^kube/, npm: /^npm_/, npx: /^npx_|^wrangler_|^npm_/, pnpm: /^pnpm_|^npm_/, yarn: /^yarn_|^npm_/,
+  pip: /^pip_/, pip3: /^pip_/, wrangler: /^wrangler_/, ssh: /^ssh_/, scp: /^scp_|^copy_remote/, rsync: /^rsync|^sync_/, find: /^find_/, tar: /^tar_|^archive|^extract/, zip: /^zip_|^archive/, unzip: /^unzip|^extract/,
+  kill: /^kill_/, pkill: /^kill_/, killall: /^kill_/, 'stop-process': /^kill_/, chmod: /^chmod|^perm/, chown: /^chown|^owner/, curl: /^download_|^http_|^curl/, wget: /^download_/, du: /^dir_size|^disk_/, df: /^disk_/,
+  ps: /^process_|^list_process/, top: /^process_|^top/, ping: /^ping_/, grep: /^grep_|^search_/, head: /^head_|^show_file/, tail: /^tail_|^follow_/, wc: /^count_/, sort: /^sort_/, systemctl: /^service_/, service: /^service_/, history: /^history/, crontab: /^cron/ };
+function literalIntentOk(first, intent) { const f = LIT_FAMILY[String(first).toLowerCase()]; return f ? f.test(String(intent)) : false; }
+
 export function suggest(query, opts = {}) {
   // a command that contradicts the request (ignores "except" / "don't", installs for "uninstall") is refused (guards.js)
   return releaseGuards(query, replayFloor(suggestOnce(query, opts)));
@@ -816,6 +824,48 @@ function suggestOnce(query, opts = {}) {
   if (context.rule === 'refused' && !(res.missing || []).length) res.missing = ['reference (refused: edit the command)'];
   // 0.3.4 templates: a restriction / option / value boundary the template cannot express is withheld, never dropped
   if (!(res.missing || []).length && res.intent) { const w = newTemplateWithhold(res.intent, query, slots, res.command); if (w.length) res.missing = w; }
+  // 0.3.4 retrain guard: a request that already is a shell command is never rewritten into a different runnable one —
+  // a compound line (| ; && > $( `) or an option the rendered command drops is withheld; nothing is moved/copied into a null device
+  if (!(res.missing || []).length && res.command) {
+    const q = String(query).trim();
+    const LIT = /^(?:sudo|mv|cp|rm|rmdir|ln|chmod|chown|git|wget|curl|ssh|scp|rsync|find|ls|cat|tar|zip|unzip|kill|pkill|killall|docker|kubectl|npm|npx|pnpm|yarn|pip|pip3|python|python3|node|gh|wrangler|dd|mkfs|shutdown|reboot|systemctl|service|iex|iwr|irm|invoke-expression|invoke-webrequest|remove-item|move-item|copy-item|set-content|stop-process|powershell|pwsh|bash|sh|zsh|cmd|del|erase|rd|format|reg|netsh|crontab|truncate|shred|history|grep|sed|awk|xargs|head|tail|sort|uniq|wc|du|df|ps|top|ping|nc|ncat|telnet)$/i;
+    const first = q.split(/\s+/)[0] || '';
+    const PROG = /^(?:cargo|python|python3|py|node|deno|bun|go|make|cmake|ruby|java|javac|rustc|gcc|clang|perl|php|dotnet|mvn|gradle|terraform|helm|ansible|brew|apt|apt-get|dnf|yum|pacman|choco|winget|scoop)$/i;
+    const looksLiteral = /(?:^|\s)(?:-{1,2}[A-Za-z]|[~.]{0,2}\/|~(?=\s|$))|[|;&<>`*]|\$\(/.test(q);
+    // a wrapper (time, env, nohup, watch, exec, nice, timeout, xargs) in front of a typed command is never rewritten
+    if (/^(?:time|env|nohup|watch|exec|nice|ionice|timeout|xargs|command|builtin|stdbuf|strace|caffeinate|nsenter|systemd-run|pkexec|faketime|doas|su|chroot|unshare|firejail|flatpak-spawn|runuser|setsid|script|echo|printf|tee|tellsh|:)$/i.test(first) && looksLiteral) res.missing = ['request (a wrapped shell command is not rewritten)'];
+    else if ((LIT.test(first) || PROG.test(first)) && q.split(/\s+/).length > 1 && (looksLiteral || PROG.test(first))) {
+      if (/[|;&<>`]|\$\(/.test(q.replace(/(["'])(?:(?!\1).)*\1/g, ' '))) res.missing = ['request (a compound shell command is not rewritten)'];
+      else if (!literalIntentOk(first, res.intent)) res.missing = [`request (the typed ${first} command is not rewritten as ${res.intent})`];
+      else {
+        const cmd = String(res.command).toLowerCase().replace(/\$home/g, '~');
+        const same = (cmd.replace(/^sudo\s+/, '').split(/\s+/)[0] || '') === first.toLowerCase();
+        // a translation for another shell (du -sh -> Get-ChildItem … Measure-Object) keeps the operands, not the unix flags
+        const lost = same ? q.split(/\s+/).slice(1).filter((w) => /^-{1,2}[A-Za-z]/.test(w) && !cmd.includes(w.toLowerCase())) : [];
+        // every operand of the typed command reaches the rendered one (`du -sh src` is never `du -sh .`)
+        const ops = q.split(/\s+/).slice(1).filter((w) => !/^-/.test(w)).map((w) => w.replace(/^["']|["']$/g, '').toLowerCase()).filter((w) => w && !cmd.includes(w) && !cmd.includes(w.replace(/\\/g, '/')) && !cmd.includes(w.replace(/\//g, '\\')));
+        if (lost.length) res.missing = [`options (not rendered: ${lost.slice(0, 3).join(' ')})`];
+        else if (ops.length) res.missing = [`operands (not rendered: ${ops.slice(0, 3).join(' ')})`];
+      }
+    }
+    // a bare URL is never a mutating action (`https://github.com/o/r/pull/12` is not `gh pr merge`)
+    if (!(res.missing || []).length && /^\S+:\/\/\S+$/.test(q) && res.risk !== 'safe') res.missing = ['action (a bare URL names no action)'];
+    if (!(res.missing || []).length && /^(?:move_rename|copy_file|copy_dir|move_file)$/.test(res.intent) && /(?:^|[\s'"])(?:\/dev\/null|nul|\$null)(?=$|[\s'"])/i.test(String(res.command))) res.missing = ['destination (a null device)'];
+  }
+  // 0.3.4 retrain guard (model-independent): a slot value carrying shell substitution (`...`, $(...), ${...}) in a command
+  // that is not read-only, or one value read into two slots from a single occurrence, is withheld, never run
+  if (!(res.missing || []).length && res.intent) {
+    const vals = Object.entries(slots).filter(([k, v]) => !k.startsWith('_') && typeof v === 'string' && v && !v.startsWith('?'));
+    const subst = vals.filter(([, v]) => /`|\$\(|\$\{/.test(v));
+    if (subst.length && res.risk !== 'safe') res.missing = subst.map(([k]) => `${k} (contains shell substitution)`);
+    else {
+      const q = String(query);
+      const occ = (v) => q.split(v).length - 1;
+      const PLACE = /^(?:path|src|dst|dest|dir|file|target|piptarget)$/;
+      const dup = vals.filter(([k, v], i) => vals.some(([k2, v2], j) => j !== i && v2 === v && (PLACE.test(k) || PLACE.test(k2))) && occ(v) < 2).map(([k]) => k);
+      if (dup.length) res.missing = [...new Set(dup)].slice(1).map((k) => `${k} (the same text was read into two slots)`);
+    }
+  }
   // "npm install there": a place word rejected as a package / name is still missing, also where that slot is optional
   if (slots._placeRejected?.length && !(res.missing || []).length) res.missing = slots._placeRejected.map((k) => `${k} (a place word is not a ${k} name)`);
   if (ambiguousText.length) res.warnings = [...(res.warnings || []), `value left as a placeholder: unclear where the quoted text ends (\\" may be an escaped quote) (${ambiguousText.join(', ')})`];
