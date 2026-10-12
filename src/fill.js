@@ -504,7 +504,10 @@ const sedEscapeOld = (s) => s.replace(/[\\/.*^$[\]]/g, '\\$&').replace(/\n/g, '\
 const sedEscapeNew = (s) => s.replace(/[\\/&]/g, '\\$&').replace(/\n/g, '\\n');
 
 /** Recompute derived slots after values were merged/overridden (tagger, history rules). */
+// a place word ("there", "tam", "inside") is a reference to a directory, never a container / service / process / branch name
+const PLACE_WORD = /^(?:there|here|inside|over\s+there|tam|tu|tutaj|stamt[aą]d|tamże|wewn[aą]trz)$/i;
 export function finalizeSlots(intent, v) {
+  for (const k of ['container', 'service', 'name', 'branch', 'user', 'pkg', 'script']) if (typeof v[k] === 'string' && PLACE_WORD.test(v[k].trim())) v[k] = '?';
   if (v.ext != null && v.glob == null) v.glob = `*.${v.ext}`;
   if (intent.id === 'find_by_name' && v.name) v.namepat = /[*?]/.test(v.name) || /\.\w+$/.test(v.name) ? v.name : `*${v.name}*`;
   if (intent.id === 'replace_text' && v.old != null && v.new != null) v.sedexpr = `s/${sedEscapeOld(v.old)}/${sedEscapeNew(v.new)}/g`;
@@ -694,6 +697,13 @@ export function resolveSlots(intent, ex) {
       const val = pickArg(k, ex);
       if (val != null && val !== '') v[k] = val;
     }
+  }
+  // a literal npm script name (`npm run build --workspace "staging app"`, `run npm deploy …`) is the script, whatever else
+  // the request quotes
+  if (intent.id === 'npm_run_script' && (v.script == null || String(v.script).startsWith('?'))) {
+    const t = String(ex.text);
+    const m = t.match(/\bnpm\s+run(?:-script)?\s+([A-Za-z0-9][\w:.-]*)(?=\s|$)/) || t.match(/^\s*run\s+npm\s+(?!run\b|install\b|i\b|ci\b|scripts?\b|the\b|a\b|my\b)([A-Za-z0-9][\w:.-]*)(?=\s|$)/i);
+    if (m) v.script = m[1];
   }
   if (intent.id === 'base64_encode' || intent.id === 'base64_decode') {
     const t = pickArg('text', ex);

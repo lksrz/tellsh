@@ -52,7 +52,7 @@ test('known limits: pip --target and quoted --workspace in PowerShell / cmd; att
   assert.equal(run('run npm deploy in workspace api').command, 'npm run deploy --workspace api');
 });
 
-test('new-template intents end to end (retrained model)', { skip: 'needs the retrained model (r1 regressed 11 existing tests; not shipped)' }, () => {
+test('new-template intents end to end (retrained model)', () => {
   for (const [q, want] of [
     ['show the last commit', 'git show'],
     ['pokaż ostatni commit', 'git show'],

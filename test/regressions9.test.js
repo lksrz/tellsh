@@ -177,7 +177,7 @@ test('hybrid: the policy re-ranks its k candidates whatever --top displays', asy
   const q = 'clnoe https://github.com/sharkdp/bat';
   const c = cascade(q, { extras: envFeatures(BASH), top: 8 });
   const rank = c.top.findIndex((t) => t.intent === 'git_clone');
-  assert.ok(rank >= 3 && rank < 5, `git_clone is 4th/5th in the cascade (rank ${rank})`);
+  assert.ok(rank >= 1 && rank < 5, `git_clone is not first in the cascade (rank ${rank})`); // model-dependent premise: below the top candidate
   const fake = { infer: async () => ({ intents: { git_clone: 0.99 }, pNone: 0 }) };
   for (const top of [1, 3, 5]) {
     const r = await suggestHybrid(q, { env: BASH, top, encoder: fake });

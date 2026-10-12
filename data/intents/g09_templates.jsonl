@@ -169,3 +169,94 @@
 {"text": "wrzuć statyczną stronę na cloudflare pages", "intent": "wrangler_pages_deploy", "lang": "pl"}
 {"text": "wdroż katalog public na pages", "intent": "wrangler_pages_deploy", "lang": "pl"}
 {"text": "wgraj frontend na cloudflare pages", "intent": "wrangler_pages_deploy", "lang": "pl"}
+{"text": "merge pr 17 that fixes issue #2", "intent": "gh_pr_merge", "lang": "en"}
+{"text": "merge #31 which resolves issue 9", "intent": "gh_pr_merge", "lang": "en"}
+{"text": "squash merge #22, it closes bug #4", "intent": "gh_pr_merge", "lang": "en"}
+{"text": "merge #8 related to ticket 15", "intent": "gh_pr_merge", "lang": "en"}
+{"text": "merge pull request #30 for issue #6", "intent": "gh_pr_merge", "lang": "en"}
+{"text": "merge https://github.com/foo/bar/pull/7", "intent": "gh_pr_merge", "lang": "en"}
+{"text": "merge pull request https://github.com/octo/site/pull/41", "intent": "gh_pr_merge", "lang": "en"}
+{"text": "land https://github.com/team/api/pull/3", "intent": "gh_pr_merge", "lang": "en"}
+{"text": "squash merge https://github.com/acme/web/pull/88", "intent": "gh_pr_merge", "lang": "en"}
+{"text": "zmerguj https://github.com/firma/app/pull/5", "intent": "gh_pr_merge", "lang": "pl"}
+{"text": "merge the pr without waiting for checks", "intent": "gh_pr_merge", "lang": "en"}
+{"text": "merge pr skipping the checks", "intent": "gh_pr_merge", "lang": "en"}
+{"text": "merge this pr even if checks are pending", "intent": "gh_pr_merge", "lang": "en"}
+{"text": "close pr 12", "intent": "gh_pr_merge", "lang": "en"}
+{"text": "close this pull request", "intent": "gh_pr_merge", "lang": "en"}
+{"text": "zamknij ten pull request", "intent": "gh_pr_merge", "lang": "pl"}
+{"text": "merge the pull request now please", "intent": "gh_pr_merge", "lang": "en"}
+{"text": "scal pr #14 dla zgłoszenia #2", "intent": "gh_pr_merge", "lang": "pl"}
+{"text": "view the pull request in the browser", "intent": "gh_pr_view", "lang": "en"}
+{"text": "show this pr on github", "intent": "gh_pr_view", "lang": "en"}
+{"text": "open the pull request on github.com", "intent": "gh_pr_view", "lang": "en"}
+{"text": "view pr in the web ui", "intent": "gh_pr_view", "lang": "en"}
+{"text": "pokaż pull request na githubie", "intent": "gh_pr_view", "lang": "pl"}
+{"text": "view the pr description", "intent": "gh_pr_view", "lang": "en"}
+{"text": "show pull request details on github", "intent": "gh_pr_view", "lang": "en"}
+{"text": "show issue 51 in the browser", "intent": "gh_issue_view", "lang": "en"}
+{"text": "read the description of issue #8", "intent": "gh_issue_view", "lang": "en"}
+{"text": "open github issue 77", "intent": "gh_issue_view", "lang": "en"}
+{"text": "pokaż zgłoszenie numer 9", "intent": "gh_issue_view", "lang": "pl"}
+{"text": "przekieruj port 3000 na zdalny port 5432 przez serwer db.local", "intent": "ssh_port_forward", "lang": "pl"}
+{"text": "przekieruj lokalny port 9000 na port 3306 na hoście sql.internal", "intent": "ssh_port_forward", "lang": "pl"}
+{"text": "zrób tunel ssh z portu 8081 do portu 6379 na serwerze cache.example.org", "intent": "ssh_port_forward", "lang": "pl"}
+{"text": "forward local port 7000 to remote port 5432 on host pg.example.net", "intent": "ssh_port_forward", "lang": "en"}
+{"text": "tunnel local 8443 to port 443 on server web.internal over ssh", "intent": "ssh_port_forward", "lang": "en"}
+{"text": "przekieruj port lokalny 5000 na zdalny 8000 na maszynie app.lan", "intent": "ssh_port_forward", "lang": "pl"}
+{"text": "is port 5432 open on db.example.com", "intent": "port_check", "lang": "en"}
+{"text": "sprawdź czy port 22 jest otwarty na serwerze host.lan", "intent": "port_check", "lang": "pl"}
+{"text": "check if port 443 is reachable on example.org", "intent": "port_check", "lang": "en"}
+{"text": "delete txt files", "intent": "delete_by_ext", "lang": "en"}
+{"text": "delete the png files here", "intent": "delete_by_ext", "lang": "en"}
+{"text": "remove all .csv files", "intent": "delete_by_ext", "lang": "en"}
+{"text": "usuń pliki txt", "intent": "delete_by_ext", "lang": "pl"}
+{"text": "usuń wszystkie pliki log w /tmp", "intent": "delete_by_ext", "lang": "pl"}
+{"text": "delete every .tmp file in the build dir", "intent": "delete_by_ext", "lang": "en"}
+{"text": "remove json files from ./out", "intent": "delete_by_ext", "lang": "en"}
+{"text": "wywal wszystkie pliki .bak", "intent": "delete_by_ext", "lang": "pl"}
+{"text": "show notes.txt", "intent": "cat_file", "lang": "en"}
+{"text": "show the file report.pdf", "intent": "cat_file", "lang": "en"}
+{"text": "show My Notes.txt", "intent": "cat_file", "lang": "en"}
+{"text": "pokaż plik config.yaml", "intent": "cat_file", "lang": "pl"}
+{"text": "show me readme.md", "intent": "cat_file", "lang": "en"}
+{"text": "show todo.md", "intent": "cat_file", "lang": "en"}
+{"text": "run npm build --workspace \"web app\"", "intent": "npm_run_script", "lang": "en"}
+{"text": "npm run test --workspace 'admin panel'", "intent": "npm_run_script", "lang": "en"}
+{"text": "run npm lint in workspace \"docs site\"", "intent": "npm_run_script", "lang": "en"}
+{"text": "npm run start --workspace \"my api\"", "intent": "npm_run_script", "lang": "en"}
+{"text": "show the commit abc1234 in git", "intent": "git_show", "lang": "en"}
+{"text": "git: show the latest commit", "intent": "git_show", "lang": "en"}
+{"text": "show me what the last git commit changed", "intent": "git_show", "lang": "en"}
+{"text": "kill it, keep 4321 alive", "intent": "kill_by_pid", "lang": "en"}
+{"text": "kill that one but leave 999 running", "intent": "kill_by_pid", "lang": "en"}
+{"text": "kill it and leave 2222 alone", "intent": "kill_by_pid", "lang": "en"}
+{"text": "zabij to, zostaw 4321 w spokoju", "intent": "kill_by_pid", "lang": "pl"}
+{"text": "list them", "intent": "list_files", "lang": "en"}
+{"text": "show them", "intent": "list_files", "lang": "en"}
+{"text": "list those files", "intent": "list_files", "lang": "en"}
+{"text": "pokaż je", "intent": "list_files", "lang": "pl"}
+{"text": "list all of them", "intent": "list_files", "lang": "en"}
+{"text": "put secret TOKEN on the production environment", "intent": "wrangler_secret_put", "lang": "en"}
+{"text": "set secret DB_URL in the staging env", "intent": "wrangler_secret_put", "lang": "en"}
+{"text": "add secret STRIPE_KEY to the staging environment", "intent": "wrangler_secret_put", "lang": "en"}
+{"text": "put the secret SENTRY_DSN on production", "intent": "wrangler_secret_put", "lang": "en"}
+{"text": "delete everything in it", "intent": "delete_dir", "lang": "en"}
+{"text": "usuń całą zawartość", "intent": "delete_dir", "lang": "pl"}
+{"text": "remove everything inside it", "intent": "delete_dir", "lang": "en"}
+{"text": "usuń zawartość tego folderu", "intent": "delete_dir", "lang": "pl"}
+{"text": "move it there", "intent": "move_rename", "lang": "en"}
+{"text": "move that over there", "intent": "move_rename", "lang": "en"}
+{"text": "przenieś to tam", "intent": "move_rename", "lang": "pl"}
+{"text": "move it into that folder", "intent": "move_rename", "lang": "en"}
+{"text": "delete the old log on my disk", "intent": "delete_file", "lang": "en"}
+{"text": "remove old logs from my drive", "intent": "delete_file", "lang": "en"}
+{"text": "delete that old log file on the disk", "intent": "delete_file", "lang": "en"}
+{"text": "is there a file named foo", "intent": "find_by_name", "lang": "en"}
+{"text": "is there a file called report", "intent": "find_by_name", "lang": "en"}
+{"text": "is there any file named config here", "intent": "find_by_name", "lang": "en"}
+{"text": "czy jest plik o nazwie foo", "intent": "find_by_name", "lang": "pl"}
+{"text": "delete all log files in the directory I listed", "intent": "delete_by_ext", "lang": "en"}
+{"text": "remove the txt files in the folder I listed", "intent": "delete_by_ext", "lang": "en"}
+{"text": "delete the tmp files in the directory I just listed", "intent": "delete_by_ext", "lang": "en"}
+{"text": "usuń pliki log w katalogu który wylistowałem", "intent": "delete_by_ext", "lang": "pl"}

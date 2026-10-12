@@ -706,13 +706,23 @@ function suggestOnce(query, opts = {}) {
     // `<PR>` even then (left out, `gh pr merge` would act on the current branch's)
     refWordsOnly();
     for (const k of refDst ? [] : ref.blank || []) if (slots[k] == null && usesSlot(BY_ID[intent], k)) { blank.add(k); if (!ref.blanket || k === 'pr') keep.add(k); }
+    // "show it" after an unreadable command: the pronoun is not the default `.` either
+    if (hasPronoun(query)) for (const k of PATH_SLOT_NAMES) if (slots[k] == null && usesSlot(BY_ID[intent], k)) blank.add(k);
     finalizeSlots(BY_ID[intent], slots);
     method = 'history-rule';
   }
   // "remove the logs there", "delete notes.txt there": a place reference never names the object of a changing
   // command (`rm -r DIR`, `mv DIR …`); only the location a search-and-change runs in (`find DIR … -delete`). Any path
   // the request names is relative to the wrong directory, so every path slot is withheld (with or without history).
-  if (locative && !refDst && !bothRefs && BY_ID[intent].risk !== 'safe' && FAMILY_OF[intent] !== 'find' && [...PATH_SLOT_NAMES].some((k) => usesSlot(BY_ID[intent], k))) {
+  // "move it there" with history: an object and a place reference at once is refused for any changing intent, at any confidence
+  if (ctx && ref?.rule !== 'refused' && hasPronoun(query) && locative && BY_ID[intent].risk !== 'safe' && !(bothRefs && refDst)) {
+    for (const k of Object.keys(slots)) if (PATH_SLOT_NAMES.has(k) || r.sources[k] === 'history') { delete slots[k]; delete r.sources[k]; }
+    for (const k of Object.keys(BY_ID[intent].slots || {})) if (usesSlot(BY_ID[intent], k)) blank.add(k);
+    finalizeSlots(BY_ID[intent], slots);
+    context.rule = 'refused';
+    context.note = 'the request names both an object ("it") and a place ("there") from the previous command; not guessing which is which';
+    method = 'history-rule';
+  } else if (locative && !refDst && !bothRefs && BY_ID[intent].risk !== 'safe' && FAMILY_OF[intent] !== 'find' && [...PATH_SLOT_NAMES].some((k) => usesSlot(BY_ID[intent], k))) {
     for (const k of Object.keys(slots)) if (PATH_SLOT_NAMES.has(k)) { delete slots[k]; delete r.sources[k]; }
     for (const k of PATH_SLOT_NAMES) if (usesSlot(BY_ID[intent], k)) blank.add(k);
     finalizeSlots(BY_ID[intent], slots);
