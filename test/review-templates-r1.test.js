@@ -199,3 +199,10 @@ test('review r15: vocabulary word after an explicit pattern marker, any trailing
     'pip install requests -t/tmp/lib.', 'list the files tracked by git in ..']) await held(q);
   for (const q of ['pip install requests -t/tmp/pkgs', 'pip install requests -t./lib/..', 'list tracked files']) assert.equal((await run(q)).missing.length, 0, q);
 });
+
+test('review r16: "and for X" patterns, ls-files scope words, punctuated separated/= pip targets, dots inside punctuation', async () => {
+  const held = async (q) => { const r = await run(q); assert.ok(r.command == null || r.missing.length > 0, `${q}: ${r.command} must not run on Enter`); };
+  for (const q of ['search tracked files for "TODO" and for tracked', 'search tracked files for "TODO" and also for files', 'list the files tracked by git in files',
+    'pip install requests --target=lib,', 'pip install requests -t lib,', 'list the files tracked by git in ..,']) await held(q);
+  for (const q of ['pip install requests --target /tmp/pkgs', 'pip install requests -t ../..', 'list the files tracked by git', 'list tracked files in the repo']) assert.equal((await run(q)).missing.length, 0, q);
+});
