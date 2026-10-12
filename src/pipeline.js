@@ -438,7 +438,7 @@ export function suggest(query, opts = {}) {
   if (opts.model) return once(opts);
   const tm = getTemplatesModel();
   if (!tm) return once(opts);
-  // the templates model is probed without the rerank hook; the hook only ever sees the model whose answer is returned
+  // the templates model is probed without the rerank hook; with the hook, the reranked answer of either model may be consulted, and only a 0.3.4 template intent is kept from the templates model
   const probe = once({ ...opts, model: tm, rerank: undefined });
   if (!probe || !NEW_TEMPLATE_INTENTS.has(probe.intent)) return once(opts);
   if (!opts.rerank) return probe;

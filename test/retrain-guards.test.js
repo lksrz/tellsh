@@ -70,3 +70,11 @@ test('r46: "same but ..." after a 0.3.4 template never turns into another operat
     assert.ok(!r.command || (r.missing || []).length, `${shell}: ${h} / ${q} -> ${r.command}`);
   }
 });
+
+test('r47: a pronoun after `wrangler pages deploy <dir>` never changes the deployed directory', () => {
+  for (const shell of ['bash', 'zsh', 'fish', 'sh', 'powershell', 'cmd']) for (const d of ['dist', 'public', './build'])
+    for (const q of ['delete it', 'remove it', 'wipe it', 'delete that folder', 'move it to /tmp', 'copy it to /backup', 'compress it']) {
+      const r = suggest(q, { shell, os: shell === 'powershell' || shell === 'cmd' ? 'win32' : 'linux', history: [`npx wrangler pages deploy ${d}`] });
+      assert.ok(!r.command || (r.missing || []).length, `${shell}: deploy ${d} / ${q} -> ${r.command}`);
+    }
+});
