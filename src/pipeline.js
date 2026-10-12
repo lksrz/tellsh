@@ -423,8 +423,18 @@ function getTemplatesModel() {
   if (templatesModel === undefined) { try { templatesModel = loadModel(TEMPLATES_MODEL); } catch { templatesModel = null; } }
   return templatesModel;
 }
+// applied to every answer (fresh, history replay, composed): a pip target a shell would expand or unescape is never runnable
+function pipTargetGuard(res) {
+  if (!res || !res.command || (res.missing || []).length || !/^pip_/.test(res.intent || '')) return res;
+  const m = String(res.command).match(/--target\s+("([^"]*)"|'([^']*)'|(\S+))/);
+  const pt = res.slots?.piptarget ?? (m ? (m[2] ?? m[3] ?? m[4]) : null);
+  if (pt == null) return res;
+  const win = /^(?:powershell|pwsh|cmd)$/.test(res.shell);
+  const ok = win ? /^(?:[A-Za-z]:)?[\w.\-\/\\ ]+$/.test(String(pt)) : /^[\w.\-\/ ]+$/.test(String(pt));
+  return ok ? res : { ...res, missing: ['piptarget (a variable or escape the shell would expand)'] };
+}
 export function suggest(query, opts = {}) {
-  const once = (o) => releaseGuards(query, replayFloor(suggestOnce(query, o)));
+  const once = (o) => pipTargetGuard(releaseGuards(query, replayFloor(suggestOnce(query, o))));
   if (opts.model) return once(opts);
   const tm = getTemplatesModel();
   if (!tm) return once(opts);

@@ -48,12 +48,17 @@ test('r43: the rerank hook only sees the model whose answer is returned', () => 
 test('r44: with a rerank hook that moves the answer off a 0.3.4 intent, the 0.3.3 model answers', async () => {
   const { loadModel } = await import('../src/model.js');
   const base = loadModel(new URL('../model/model.bin', import.meta.url).pathname);
-  // a hook that always prefers the second candidate (like an encoder that does not know the new intents)
-  const hook = (c) => (c.candidates && c.candidates.length > 1 ? { ...c, candidates: [c.candidates[1], c.candidates[0], ...c.candidates.slice(2)] } : c);
-  for (const q of ['clean dist to pages', 'deploy ./dist to cloudflare pages', 'show issue 42']) {
+  // a hook that always moves the cascade to its first candidate that is not a 0.3.4 intent (an encoder that does not know them)
+  const hook = (c) => { const alt = (c.top || []).find((t) => !NEW.has(t.intent ?? t.id ?? t[0])); return alt ? { ...c, intent: alt.intent ?? alt.id ?? alt[0], tool: alt.tool ?? c.tool, confidence: alt.p ?? alt.confidence ?? c.confidence, top: [alt, ...c.top.filter((t) => t !== alt)] } : c; };
+  for (const q of ['deploy ./dist to cloudflare pages', 'show issue 42', 'list d1 databases']) {
     const r = suggest(q, { shell: 'bash', os: 'linux', rerank: hook });
     const b = suggest(q, { shell: 'bash', os: 'linux', rerank: hook, model: base });
-    if (!NEW.has(r.intent)) assert.equal(r.command, b.command, q);
+    assert.ok(!NEW.has(r.intent), `${q}: ${r.intent}`);
+    assert.equal(r.command, b.command, q);
   }
+});
+test('r45: a history replay never makes an expandable pip target runnable', () => {
+  const r = suggest('same for flask', { shell: 'cmd', os: 'win32', history: ['py -m pip install requests --target lib^^cache'] });
+  assert.ok(!r.command || (r.missing || []).length > 0, r.command);
 });
 import { NEW_TEMPLATE_INTENTS as NEW } from '../src/pipeline.js';
