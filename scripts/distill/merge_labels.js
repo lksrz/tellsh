@@ -31,6 +31,9 @@ if (!existsSync(side) || readFileSync(side, 'utf8').trim() !== want) { console.e
   const cur = createHash('sha256').update(existsSync(dp) ? readFileSync(dp) : '').digest('hex');
   const meta = JSON.parse(readFileSync(join(ROOT, 'build/hybrid/meta.json'), 'utf8'));
   if (meta.decisionsSha256 !== cur) { console.error('merge_labels: build/hybrid/train.jsonl predates the current decisions; re-run export_data.js'); process.exit(1); } }
+const pmP = join(D, 'pool.meta.json');
+if (!existsSync(pmP)) { console.error('merge_labels: no pool.meta.json (pool provenance unknown); rebuild the pool'); process.exit(1); }
+const poolMeta = JSON.parse(readFileSync(pmP, 'utf8'));
 const excl = exclusionIndex(ROOT);
 const dev = new Set(JSON.parse(readFileSync(join(ROOT, 'build/hybrid/dev_texts.json'), 'utf8')));
 const decisions = rj(join(ROOT, 'data/teacher/decisions.jsonl')).filter((d) => d.text && d.field !== 'risk');
@@ -54,7 +57,9 @@ for (const l of rj(join(D, 'labels.jsonl'))) {
   if (bad(r.text) || (r.src === 'public-relex' && (!r.parent || bad(r.parent)))) { st.heldOut++; continue; }
   const d = current(r);
   if (d?.action === 'drop') { st.heldOut++; continue; }
-  const gold = (d?.action === 'relabel' && d.intent) || r.gold;
+  // current decision applied to the pre-decision gold (pools without gold0 were built without decisions: gold is gold0)
+  const gold0 = poolMeta.gold0 ? r.gold0 : r.gold;
+  const gold = (d?.action === 'relabel' && d.intent) || gold0;
   if (l.soft[l.top] < MINP) { st.lowConf++; continue; }
   // teacher 'none' = no candidate fits; pool rows are shell requests (real out-of-catalog commands included), never
   // chit-chat, so they must not become NONE (tool-head rejection) rows: skip them

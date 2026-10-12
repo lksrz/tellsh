@@ -146,6 +146,7 @@ if __name__ == '__main__':
     # no symlinks inside an existing output (save_pretrained / labels would write through them)
     for p_ in [a.out] + ([os.path.join(dp, f) for dp, dn, fn in os.walk(a.out) for f in dn + fn] if os.path.isdir(a.out) else []):
         if os.path.islink(p_): sys.exit(f'refusing: symlink in output {p_}')
+        if os.path.isfile(p_) and os.stat(p_).st_nlink > 1: sys.exit(f'refusing: hard-linked file in output {p_}')
     out_real = os.path.realpath(a.out)
     d = out_real
     while True:

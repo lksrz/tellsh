@@ -37,7 +37,7 @@ const dev = new Set(JSON.parse(readFileSync(devP, 'utf8')));
 const rng = mulberry32(7);
 // same teacher decisions as gen_data.js / export_data.js: dropped rows stay out, relabelled rows carry the new gold
 const decide = new Map(rj(join(ROOT, 'data/teacher/decisions.jsonl')).filter((d) => d.text && d.field !== 'risk').map((d) => [normalize(d.text), d]));
-const decided = (r) => { const d = decide.get(normalize(r.text)); if (d?.action === 'drop') return null; return d?.action === 'relabel' && d.intent ? { ...r, intent: d.intent, gold: d.intent } : r; };
+const decided = (r) => { const d = decide.get(normalize(r.text)); if (d?.action === 'drop') return null; return d?.action === 'relabel' && d.intent ? { ...r, intent: d.intent, gold: d.intent, gold0: r.gold ?? null } : { ...r, gold0: r.gold ?? null }; };
 const src = [
   ...readReal(ROOT).filter((r) => r.split === 'train').map((r) => ({ ...r, src: 'real', gold: r.intent || null })),
   ...[...rd(join(ROOT, 'data/intents')), ...rj(join(ROOT, 'data/shell/train.jsonl'))].map((r) => ({ ...r, src: 'public', gold: r.intent })),
@@ -50,7 +50,7 @@ const push = (r0, text, s, parent) => {
   // the decision on the generated text itself wins (drop / relabel), as in the exports
   const r = decided({ ...r0, text }); if (!r) return;
   seen.add(n);
-  pool.push({ text, ...(parent ? { parent } : {}), lang: r.lang || '', shell: r.shell || 'bash', os: r.os || 'linux', src: s, tmpl: !!r.tmpl, gold: r.gold ?? null });
+  pool.push({ text, ...(parent ? { parent } : {}), gold0: r.gold0 ?? null, lang: r.lang || '', shell: r.shell || 'bash', os: r.os || 'linux', src: s, tmpl: !!r.tmpl, gold: r.gold ?? null });
 };
 for (const r0 of src) {
   const r = decided(r0); if (!r) continue;
@@ -78,6 +78,8 @@ mkdirSync(OUT, { recursive: true, mode: 0o700 });
 const body = sel.map((r) => JSON.stringify(r)).join('\n') + '\n';
 const noLink = (f) => { try { if (lstatSync(f).isSymbolicLink()) { console.error(`make_pool: refusing to write through symlink ${f}`); process.exit(1); } } catch {} return f; };
 writePrivate(noLink(join(OUT, 'pool.jsonl')), body, { mode: 0o600 });
+// gold0 = the label before any teacher decision; merge re-applies the CURRENT decisions to it
+writePrivate(noLink(join(OUT, 'pool.meta.json')), JSON.stringify({ gold0: true }) + '\n', { mode: 0o600 });
 // labels.jsonl refers to pool rows by position: merge_labels.js refuses a pool whose hash changed since labelling
 writePrivate(noLink(join(OUT, 'pool.sha256')), createHash('sha256').update(body).digest('hex') + '\n', { mode: 0o600 });
 const by = (f) => sel.reduce((m, r) => ((m[f(r)] = (m[f(r)] || 0) + 1), m), {});
