@@ -149,6 +149,8 @@ function main() {
   // held-out texts and eval-only values, not just the base rows
   const emit = (text, family, intent, extras, w, g, lang, group) => {
     if (leaks(text)) { droppedDerived++; return; }
+    // a generated copy follows the teacher decision on its own text, like the base rows
+    if (intent) { const d = decide.get(normalize(text)); if (d?.action === 'drop') return; if (d?.action === 'relabel' && d.intent) { intent = d.intent; family = FAMILY_OF[d.intent]; } }
     const f = [...vectorize(text, DIM, extras).entries()].sort((a, b) => a[0] - b[0]).map(([k, v]) => [k, +v.toFixed(6)]);
     cls.write(JSON.stringify({ y: family, i: intent || '', f, w, g, lang: lang || '', gid: group }) + '\n');
     counts.cls++;

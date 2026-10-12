@@ -30,6 +30,8 @@ if (!existsSync(side) || readFileSync(side, 'utf8').trim() !== want) { console.e
 { const dp = join(ROOT, 'data/teacher/decisions.jsonl');
   const cur = createHash('sha256').update(existsSync(dp) ? readFileSync(dp) : '').digest('hex');
   const meta = JSON.parse(readFileSync(join(ROOT, 'build/hybrid/meta.json'), 'utf8'));
+  const rr = join(ROOT, 'build/real/rows.jsonl');
+  if (meta.realRowsSha256 !== createHash('sha256').update(existsSync(rr) ? readFileSync(rr) : '').digest('hex')) { console.error('merge_labels: build/hybrid/train.jsonl predates the current real split (build/real/rows.jsonl); re-run export_data.js'); process.exit(1); }
   if (meta.decisionsSha256 !== cur) { console.error('merge_labels: build/hybrid/train.jsonl predates the current decisions; re-run export_data.js'); process.exit(1); } }
 const pmP = join(D, 'pool.meta.json');
 if (!existsSync(pmP)) { console.error('merge_labels: no pool.meta.json (pool provenance unknown); rebuild the pool'); process.exit(1); }

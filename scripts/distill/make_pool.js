@@ -37,7 +37,7 @@ const dev = new Set(JSON.parse(readFileSync(devP, 'utf8')));
 const rng = mulberry32(7);
 // same teacher decisions as gen_data.js / export_data.js: dropped rows stay out, relabelled rows carry the new gold
 const decide = new Map(rj(join(ROOT, 'data/teacher/decisions.jsonl')).filter((d) => d.text && d.field !== 'risk').map((d) => [normalize(d.text), d]));
-const decided = (r) => { const d = decide.get(normalize(r.text)); if (d?.action === 'drop') return null; return d?.action === 'relabel' && d.intent ? { ...r, intent: d.intent, gold: d.intent, gold0: r.gold ?? null } : { ...r, gold0: r.gold ?? null }; };
+const decided = (r) => { const d = decide.get(normalize(r.text)); if (d?.action === 'drop') return null; return d?.action === 'relabel' && d.intent ? { ...r, intent: d.intent, gold: d.intent, gold0: 'gold0' in r ? r.gold0 : (r.gold ?? null) } : { ...r, gold0: 'gold0' in r ? r.gold0 : (r.gold ?? null) }; };
 const src = [
   ...readReal(ROOT).filter((r) => r.split === 'train').map((r) => ({ ...r, src: 'real', gold: r.intent || null })),
   ...[...rd(join(ROOT, 'data/intents')), ...rj(join(ROOT, 'data/shell/train.jsonl'))].map((r) => ({ ...r, src: 'public', gold: r.intent })),

@@ -92,7 +92,16 @@ function main() {
     base.push(r);
   }
   const out = heldOutFilter(heldOut);
-  const { rows, push } = out;
+  const { rows } = out;
+  // generated copies (typo / relex) follow the teacher decision on their OWN text too, as originals do
+  const push = (o) => {
+    if (o.kind !== 'orig' && o.intent) {
+      const d = decide.get(normalize(o.text));
+      if (d?.action === 'drop') return;
+      if (d?.action === 'relabel' && d.intent) o = { ...o, intent: d.intent, tool: FAMILY_OF[d.intent] };
+    }
+    out.push(o);
+  };
   let gid = 0;
   for (const r of base) {
     const g = gid++;
@@ -135,6 +144,7 @@ function main() {
   // excludes it from A_dev's training data
   writePrivate(join(OUT, 'dev_texts.json'), JSON.stringify([...devTexts].sort()));
   const meta = {
+    realRowsSha256: createHash('sha256').update(existsSync(join(ROOT, 'build/real/rows.jsonl')) ? readFileSync(join(ROOT, 'build/real/rows.jsonl')) : '').digest('hex'),
     decisionsSha256: createHash('sha256').update(existsSync(join(ROOT, 'data/teacher/decisions.jsonl')) ? readFileSync(join(ROOT, 'data/teacher/decisions.jsonl')) : '').digest('hex'),
     tools: [...Object.keys(FAMILIES), NONE],
     intents: INTENTS.map((i) => i.id),
