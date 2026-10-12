@@ -442,12 +442,14 @@ export function suggest(query, opts = {}) {
   const tm = getTemplatesModel();
   if (!tm) return once(opts);
   // the templates model is probed without the rerank hook; with the hook, the reranked answer of either model may be consulted, and only a 0.3.4 template intent is kept from the templates model
-  const probe = once({ ...opts, model: tm, rerank: undefined });
-  if (!probe || !NEW_TEMPLATE_INTENTS.has(probe.intent)) return once(opts);
+  const probe = once({ ...opts, model: tm, rerank: undefined, gated: true });
+  // a history refusal of the templates model (the previous line is a 0.3.4 template) is kept, never re-asked of 0.3.3
+  if (probe && opts.history?.length && probe.context?.rule === 'refused' && !probe.command) return probe;
+  if (!probe || !NEW_TEMPLATE_INTENTS.has(probe.intent)) return once({ ...opts, gated: true });
   if (!opts.rerank) return probe;
   // with the hook: the reranked templates answer is kept only if it is still a 0.3.4 template intent, otherwise 0.3.3 answers
-  const alt = once({ ...opts, model: tm });
-  return alt && NEW_TEMPLATE_INTENTS.has(alt.intent) ? alt : once(opts);
+  const alt = once({ ...opts, model: tm, gated: true });
+  return alt && NEW_TEMPLATE_INTENTS.has(alt.intent) ? alt : once({ ...opts, gated: true });
 }
 
 // the trust rule (danger.js): a command resolved from history (a reference, "same but …", a value from an earlier
@@ -476,7 +478,8 @@ function suggestOnce(query, opts = {}) {
     // an earlier `tellsh <query>`: what that request produced on its own (no history, no composer). Slots it left as
     // placeholders (refused, ambiguous, rejected) are ambiguous values here, never the catalog default or a guess.
     const quick = (q, unclearArgs) => {
-      const r = suggest(q, { model, env, threshold: thr, compose: 'off', unclearArgs });
+      // with the two-model gate, an earlier request is classified by the gate too (both models read history the same way)
+      const r = opts.gated ? suggest(q, { env, compose: 'off', unclearArgs }) : suggest(q, { model, env, threshold: thr, compose: 'off', unclearArgs });
       if (!r.understood || !r.intent || r.method !== 'catalog') return null;
       const slots = { ...(r.slots || {}) };
       for (const k of r.missing || []) slots[k] = AMB + `<${k}>`;
@@ -974,7 +977,7 @@ function suggestOnce(query, opts = {}) {
     // a value with a line break is never composed into a command (the catalog rejects it as a path); an extract intent is
     // never replaced by a command that creates or rewrites an archive ("extract archive.tar.gz" is not `tar -c -f archive.tar.gz`)
     // a 0.3.4-template suggestion that was withheld is never replaced by a composed command that drops what was withheld
-    if (comp && /^(?:git_show|git_grep|git_ls_files|wrangler_pages_deploy|gh_run_watch|gh_issue_list|gh_issue_view)$/.test(intent) && (res.missing || []).length) comp = null;
+    if (comp && NEW_TEMPLATE_INTENTS.has(intent) && (res.missing || []).length) comp = null;
     if (comp && !comp.invalid && comp.command !== b.command && !/[\r\n]/.test(comp.command) && !(/^extract_/.test(intent) && createsArchive(comp.command))) {
       if (extra.length >= 1 || composeMode === 'force') {
         return { ...res, method: 'composed', experimental: true, reason: `request asks for ${extra.join(' ')} not in the catalog command`,

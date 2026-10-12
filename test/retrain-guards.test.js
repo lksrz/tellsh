@@ -110,3 +110,14 @@ test('r51: no implicit history fill from a 0.3.4 template line', () => {
     assert.equal(R(a), R(b), `${shell}: ${h} / ${q}`);
   }
 });
+
+test('r52: a `tellsh "<request>"` history line of a 0.3.4 template is refused like the raw command; composition keeps a 0.3.4 withhold', () => {
+  // bash/zsh: there `fetch all branches` is git_fetch (fish/sh/pwsh read it as git branch -a, as on 0.3.3)
+  for (const shell of ['bash', 'zsh']) {
+    const o = { shell, os: 'linux' };
+    const R = (r) => (r.command && !(r.missing || []).length ? r.command : null);
+    assert.equal(R(suggest('same but no discard', { ...o, history: ['tellsh "fetch all branches"'] })), null, shell);
+    assert.equal(R(suggest('same but no discard', { ...o, history: ['git fetch --all'] })), null, shell);
+    assert.equal(R(suggest('fetch new commits from all remotes and show a graph of branch history', o)), null, shell);
+  }
+});
