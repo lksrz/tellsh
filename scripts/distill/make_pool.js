@@ -74,6 +74,7 @@ for (const [i, r] of sel.entries()) {
   r.cands = [...new Set([...(r.gold ? [r.gold] : []), ...c.top.map((t) => t.intent)])].slice(0, K);
   r.pNone = +c.pNone.toFixed(4);
 }
+// the pool files go through writePrivate, which also refuses any other git checkout (sibling worktrees included)
 mkdirSync(OUT, { recursive: true, mode: 0o700 });
 const body = sel.map((r) => JSON.stringify(r)).join('\n') + '\n';
 const noLink = (f) => { try { if (lstatSync(f).isSymbolicLink()) { console.error(`make_pool: refusing to write through symlink ${f}`); process.exit(1); } } catch {} return f; };

@@ -1,7 +1,7 @@
 // Private-data writer: the target must resolve inside <repo>/build/ (or outside the repo) and neither the file nor any
 // directory between the repo root and it may be a symlink, so private text can never land in a tracked path.
-import { writeFileSync, lstatSync, realpathSync, renameSync, unlinkSync } from 'node:fs';
-import { resolve, relative, sep, dirname, isAbsolute } from 'node:path';
+import { writeFileSync, lstatSync, realpathSync, renameSync, unlinkSync, existsSync } from 'node:fs';
+import { resolve, relative, sep, dirname, isAbsolute, join, basename } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
 // lstat without existsSync: a dangling symlink must count as a symlink (only ENOENT means missing)
@@ -38,6 +38,14 @@ function checkPrivate(path) {
       if (isLink(p)) throw new Error(`writePrivate: refusing symlink ${p}`);
     }
   } else if (isLink(abs)) throw new Error(`writePrivate: refusing symlink ${abs}`);
+  // every enclosing git checkout (this one, a sibling worktree, a nested repo) must see the target under its build/
+  for (let d = real; ; d = dirname(d)) {
+    if (existsSync(join(d, '.git'))) {
+      const r = relative(d, join(real, basename(abs)));
+      if (!(r.startsWith('build' + sep))) throw new Error(`writePrivate: ${path} is inside the git checkout ${d} but not under its build/`);
+    }
+    if (dirname(d) === d) break;
+  }
   return abs;
 }
 
