@@ -90,3 +90,16 @@ test('review r4: options with an explicit id, generic nouns, pathspecs, extra re
   assert.equal((await run('list open and closed github issues')).command, 'gh issue list --state all');
   for (const q of ['list tracked files', 'git ls-files', 'deploy dist to cloudflare pages']) assert.equal((await run(q)).missing.length, 0, q);
 });
+
+test('review r5: only rendered slots explain words; gh/ls-files residue; literal refs; dropped ids; normalized broad dirs', async () => {
+  const held = async (q, o = BASH) => { const r = await run(q, o); assert.ok(r.command == null || r.missing.length > 0, `${q}: ${r.command} must not run on Enter`); };
+  for (const q of ['show the commit from yesterday', 'watch run 2 builds', 'watch run 5 workflows', 'watch run 42 every 5s', 'gh run watch 99999999999999',
+    'wrangler pages deploy "/."', 'wrangler pages deploy "./.."', 'list my open issues', 'show issue 42 in the browser', 'show issue 42 with comments',
+    'show issue 42 as json', 'list tracked js files', 'git ls-files src', 'git show HEAD tag', 'git grep "TODO FIXME" -- code', 'please git grep TODO -- code']) await held(q);
+  await held('deploy C:/ to cloudflare pages', PS);
+  assert.equal((await run('git show previous')).command, 'git show previous');
+  assert.equal((await run('git show latest')).command, 'git show latest');
+  for (const q of ['gh issue view 42 --repo acme/app', 'watch the github actions run 123 until it finishes', 'list issues in repo acme/app', 'git ls-files', 'show the last commit']) {
+    assert.equal((await run(q)).missing.length, 0, q);
+  }
+});

@@ -1097,7 +1097,8 @@ export function newTemplateSlots(id, text, v, quoted) {
     const litOk = lit && (/^git\s+show/i.test(lit[0]) || /[\d~^@:\/]/.test(lit[2]) || /^HEAD$/i.test(lit[2]));
     const cand = litOk ? lit[2] : m ? m[1] : null;
     if (cand != null) {
-      if (/^(?:the|a|last|latest|newest|ostatni\w*|previous|prior|poprzedni\w*|that|this|it)$/i.test(cand)) { if (/^(?:previous|prior|poprzedni\w*)$/i.test(cand)) v.rev = 'HEAD~1'; }
+      if (lit && /^git\s+show/i.test(lit[0]) && /^[\w./~^@{}:!-]+$/.test(cand) && !cand.startsWith('-')) v.rev = cand; // literal: as typed
+      else if (/^(?:the|a|last|latest|newest|ostatni\w*|previous|prior|poprzedni\w*|that|this|it)$/i.test(cand)) { if (/^(?:previous|prior|poprzedni\w*)$/i.test(cand)) v.rev = 'HEAD~1'; }
       else if (/^[\w./~^@{}:!-]+$/.test(cand) && !cand.startsWith('-')) v.rev = cand;
     } else if (/\b(?:previous|prior|one before|second[- ]to[- ]last|przedostatni\w*|poprzedni\w*)\b/i.test(t)) v.rev = 'HEAD~1';
   }
@@ -1146,19 +1147,26 @@ export function newTemplateSlots(id, text, v, quoted) {
 }
 
 // Words the 0.3.4 templates explain; anything else in the request is a restriction / option the template cannot express.
-const WH_COMMON = 'the a an my our this that me please now pls to on in of for with from and git npx gh wrangler cloudflare github pokaz pokaż mi na do w z dla prosze proszę teraz';
+const WH_COMMON = 'the a an our this that please now pls to on in of for with from and git npx gh wrangler cloudflare github pokaz pokaż mi na do w z dla prosze proszę teraz';
 const WH_WORDS = {
-  git_show: `${WH_COMMON} show display view see print commit commits revision tag last latest newest most recent previous prior second-to-last its diff changes change patch details what was changed in latest ostatni ostatniego ostatnia ostatnie poprzedni poprzedniego przedostatni commita commit zmiany zmian szczegoly szczegóły rewizje rewizję tagu tag`,
-  git_grep: `${WH_COMMON} grep search find look lookup text string pattern word occurrences tracked files file repo repository codebase code all every across inside szukaj wyszukaj znajdz znajdź poszukaj plikach plikow plików sledzonych śledzonych repozytorium kodzie kod -n --`,
-  wrangler_pages_deploy: `${WH_COMMON} pages page deploy redeploy publish upload ship push static site website strona strone stronę stron statyczna statyczną frontend folder directory dir katalog katalogu wdroz wdroż wdróż zdeployuj deployuj opublikuj wrzuc wrzuć wgraj`,
+  git_show: `${WH_COMMON} my me show display view see print commit commits revision tag last latest newest most recent previous prior second-to-last its diff changes change patch details what was changed in latest ostatni ostatniego ostatnia ostatnie poprzedni poprzedniego przedostatni commita commit zmiany zmian szczegoly szczegóły rewizje rewizję tagu tag`,
+  git_grep: `${WH_COMMON} my me grep search find look lookup text string pattern word occurrences tracked files file repo repository codebase code all every across inside szukaj wyszukaj znajdz znajdź poszukaj plikach plikow plików sledzonych śledzonych repozytorium kodzie kod -n --`,
+  wrangler_pages_deploy: `${WH_COMMON} my me pages page deploy redeploy publish upload ship push static site website strona strone stronę stron statyczna statyczną frontend folder directory dir katalog katalogu wdroz wdroż wdróż zdeployuj deployuj opublikuj wrzuc wrzuć wgraj`,
+  gh_run_watch: `${WH_COMMON} me --repo watch watching follow live progress until it its is finishes finish finished done complete completes wait ends end run github actions action ci workflow job build status obserwuj śledź sledz czekaj poczekaj zaczekaj aż az zakończy zakonczy skończy skonczy żywo zywo postęp postep runa runu`,
+  gh_issue_view: `${WH_COMMON} me --repo show view issue details detail info information description summary read zgłoszenie zgloszenie zgłoszenia zgloszenia ticket bug szczegóły szczegoly opis przeczytaj nr number numer no`,
+  gh_issue_list: `${WH_COMMON} --repo list listing show which what are there any issues issue bugs tickets problems all open opened closed state zgłoszenia zgloszenia zgłoszeń zgloszen lista listę liste wylistuj wszystkie otwarte otwartych zamknięte zamkniete repo repository`,
+  git_ls_files: `${WH_COMMON} me ls-files list listing show which what are is all every files file tracked by git repo repository lista listę pliki plików plikow śledzone sledzone śledzonych sledzonych pokaż wszystkie przez`,
 };
+// only the slots a template renders explain words of the request (an extracted `since: yesterday` that never reaches
+// `git show` does not)
+const WH_RENDERED = { git_show: ['rev'], git_grep: ['pattern'], wrangler_pages_deploy: ['path'], gh_run_watch: ['num', 'repo'], gh_issue_view: ['num', 'repo'], gh_issue_list: ['repo', 'state'], git_ls_files: [] };
 const whTokens = (t, vals = []) => t.replace(/(["'])([^"']*)\1/g, (q, _, inner) => (vals.includes(inner.toLowerCase()) ? ' ' : ` ${q} `)).split(/\s+/).map((w) => w.replace(/^[(]+|[),.;:!?]+$/g, '').toLowerCase()).filter(Boolean);
 const UNIT_AFTER = /^\s*-?(?:comments?|labels?|assignees?|reactions?|commits?|files?|failures?|errors?|checks?|runs?|issues?|prs?|people|users?|minutes?|komentarz\w*|days?|d|weeks?|wks?|w|months?|mos?|years?|yrs?|y|hours?|hrs?|h|minutes?|mins?|m|seconds?|secs?|s|dni|dzie\w*|tygodn\w*|miesi\w*|godz\w*|minut\w*|sekund\w*|times?|razy|old|ago|temu|jobs?|attempts?|steps?|items?|of|out|x|%|th|st|nd|rd)\b|^-\w/i;
 /**
  * Why a suggestion for one of the 0.3.4 templates must not run as is ([] : fine): the request has a restriction, option,
  * scope or value boundary the template cannot express. The pipeline puts these in `missing`.
  */
-export function newTemplateWithhold(id, text, slots = {}) {
+export function newTemplateWithhold(id, text, slots = {}, command = null) {
   const t = String(text);
   const out = [];
   const glued = (val) => {
@@ -1169,21 +1177,32 @@ export function newTemplateWithhold(id, text, slots = {}) {
     return false;
   };
   if (WH_WORDS[id]) {
+    // (the --repo value and the option itself are explained by the rendered repo slot)
     const ok = new Set(WH_WORDS[id].split(/\s+/));
-    const vals = Object.values(slots).filter((x) => x != null).map((x) => String(x).toLowerCase());
-    const rest = whTokens(t, vals).filter((w) => !ok.has(w) && !vals.includes(w));
+    const vals = (WH_RENDERED[id] || []).map((k) => slots[k]).filter((x) => x != null).map((x) => String(x).toLowerCase().replace(/^#/, ''));
+    const rest = whTokens(t, vals).filter((w) => !ok.has(w) && !vals.includes(w.replace(/^#/, '')));
     // the literal form: nothing may follow the pattern (`git grep TODO -- code` is a pathspec, not vocabulary)
-    if (id === 'git_grep') { const g = t.match(/^\s*git\s+grep\s+(?:-n\s+)?(?:--\s+)?(["']?)[^\s"']+\1\s+(\S.*)$/); if (g) rest.push(g[2]); }
+    if (id === 'git_grep') { const g = t.match(/\bgit\s+grep\s+(?:-n\s+)?(?:--\s+)?(?:"[^"]*"|'[^']*'|[^\s"']+)\s+(\S.*)$/); if (g) rest.push(g[1]); }
+    if (id === 'git_show') { const g = t.match(/\bgit\s+show\s+(?:"[^"]*"|'[^']*'|[^\s"']+)\s+(\S.*)$/); if (g) rest.push(g[1]); }
     if (rest.length) out.push(`${id === 'git_grep' ? 'pattern' : id === 'git_show' ? 'rev' : 'args'} (not expressed: ${rest.slice(0, 4).join(' ')})`);
     if (Object.values(slots).some((x) => glued(x)) || /\\["']/.test(t)) out.push('value (unclear where the quoted text ends)');
   }
-  if (id === 'wrangler_pages_deploy' && slots.path != null && /^(?:\/+|~\/?|\.\.(?:\/\.\.)*\/?|[a-z]:\\?|\$home\/?|%userprofile%\\?)$/i.test(String(slots.path).trim())) out.push('path (a root, home or parent directory is never uploaded as is)');
+  if (id === 'wrangler_pages_deploy' && slots.path != null) {
+    let p = String(slots.path).trim().replace(/^(["'])(.*)\1$/, '$2').replace(/\\/g, '/').toLowerCase();
+    const drive = /^[a-z]:(?=\/|$)/.exec(p); if (drive) p = p.slice(2) || '/';
+    p = p.replace(/^(?:\$home|%userprofile%|\$env:userprofile)(?=\/|$)/, '~');
+    const segs = []; let up = 0; const abs = p.startsWith('/'); const home = p.startsWith('~');
+    for (const seg of p.replace(/^~/, '').split('/')) { if (!seg || seg === '.') continue; if (seg === '..') { if (segs.length) segs.pop(); else up++; } else segs.push(seg); }
+    if (up > 0 || ((abs || home || drive) && segs.length === 0)) out.push('path (a root, home or parent directory is never uploaded as is)');
+  }
   if (/^(?:gh_issue_view|gh_run_watch|gh_issue_list|git_ls_files)$/.test(id)) {
     // an option the template cannot express (`--exit-status`, `--json`, `--others`, `-- src`) is withheld
     const opts = whTokens(t).filter((w) => /^-/.test(w) && w !== '--repo' && !/^--repo=/.test(w));
     if (opts.length) out.push(`args (not expressed: ${opts.slice(0, 3).join(' ')})`);
     if (id === 'git_ls_files' && /\b(?:untracked|ignored|deleted|modified|others|staged|nieśledzon\w*|niesledzon\w*|usunięt\w*|zmodyfikowan\w*)\b/i.test(t)) out.push('args (a filter git ls-files is not rendered with)');
   }
+  if ((id === 'gh_issue_view' || id === 'gh_run_watch') && slots.num != null && command != null && !new RegExp(`(?:^|\\s)${slots.num}(?:\\s|$)`).test(command)) out.push('num (the number named is not a valid id)');
+  if ((id === 'gh_issue_view' || id === 'gh_run_watch') && slots.num == null && /(?:\b(?:run|runs|issue|issues|watch|view)\s+#?|#)\d+/i.test(t)) out.push('num (the number named is not a valid id)');
   if (id === 'gh_issue_view' || id === 'gh_run_watch') {
     if (slots.num != null) {
       const at = t.search(new RegExp(String.raw`(?:^|[^\d])${slots.num}(?!\d)`));
