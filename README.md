@@ -438,7 +438,7 @@ retrain; `npm test && npm run eval`.
   default).
 * **History after a 0.3.4 template is replayed only as "same for X".** When the previous command is one of the new
   templates (`git fetch`, `git ls-files`, `gh issue list` / `view`, `gh run watch`, `wrangler d1 list`, `wrangler pages
-  deploy`), a follow-up that refers to it (`it`, `there`, `same but …`, `again`, `them`, …) is refused, and that line adds
+  deploy`, and also `git grep` / `git show`), a follow-up that refers to it (`it`, `there`, `same but …`, `again`, `them`, …) is refused, and that line adds
   no history context to other requests.
 * **The selector rule trades recall for safety.** Its vocabulary is closed and hand-written (English and Polish): a
   harmless paraphrase with a word it does not list (`deploy the api worker to cloudflare`, `run the worker on
@@ -506,7 +506,7 @@ retrain; `npm test && npm run eval`.
 - Fixed in 0.3.4: PowerShell / cmd quote a `--workspace` value with spaces and keep pip `--target`; the attached
   `-t/tmp/pkgs` form and a quoted workspace after "in workspace" are read. A pip target is runnable only when it is plain
   letters, digits, `_ . - /` and spaces (plus a drive and `\` in PowerShell / cmd): `~`, `$HOME`, `%VAR%`, `^` or quotes
-  give a placeholder (use an absolute path). Still: a request with several shell arguments
+  are shown marked incomplete and withheld from execution (use an absolute path). Still: a request with several shell arguments
   where one of them carries its own quotes (`tellsh run npm deploy in workspace '"staging app"'`) may be re-quoted; pass
   the request as one argument. Always read the shown command before confirming.
 

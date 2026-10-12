@@ -9,8 +9,8 @@ Values are explicit only; a request the template cannot render is marked incompl
 
 **Known-limits fixes:** PowerShell `--workspace` quoting, `pip install --target` (an allow-listed target only).
 
-**Safety:** a typed command is never rewritten into another runnable one; a follow-up that refers to a 0.3.4 template in
-history is refused except "same for X"; git grep / git show are not suggested as runnable (kept for a later release).
+**Safety:** a follow-up that refers to a 0.3.4 template (or to a `git
+grep` / `git show` line) in history is refused except "same for X"; git grep / git show are not suggested as runnable (kept for a later release).
 
 ## 0.3.3
 
