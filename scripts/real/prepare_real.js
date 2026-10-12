@@ -27,6 +27,7 @@ import { fileURLToPath } from 'node:url';
 import { join } from 'node:path';
 import { BY_ID } from '../../src/catalog.js';
 import { strip, group } from './group.js';
+import { writePrivate } from '../lib/privwrite.js';
 
 const ROOT = fileURLToPath(new URL('../..', import.meta.url));
 const args = process.argv.slice(2);
@@ -164,6 +165,6 @@ Object.assign(st, {
   perNewIntent: Object.fromEntries(NEW.map(([id]) => [id, { train: cnt((r) => r.intent === id && r.split === 'train'), eval: cnt((r) => r.intent === id && r.split === 'eval') }])),
 });
 mkdirSync(join(ROOT, 'build', 'real'), { recursive: true });
-writeFileSync(join(ROOT, 'build', 'real', 'rows.jsonl'), final.map((r) => JSON.stringify(r)).join('\n') + '\n');
-writeFileSync(join(ROOT, 'build', 'real', 'stats.json'), JSON.stringify(st, null, 1));
+writePrivate(join(ROOT, 'build', 'real', 'rows.jsonl'), final.map((r) => JSON.stringify(r)).join('\n') + '\n');
+writePrivate(join(ROOT, 'build', 'real', 'stats.json'), JSON.stringify(st, null, 1));
 console.log(JSON.stringify({ commands: st.commands, rows: st.rows, train: st.train, eval: st.eval, labels: st.labels, groups: st.groups }));

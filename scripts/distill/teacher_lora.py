@@ -46,7 +46,7 @@ def train(a):
     desc = descs(a.meta)
     rows = [json.loads(l) for l in open(a.train) if l.strip()]
     # 'none' targets only from explicit out-of-domain rows; tldr rows carry a tool label but no intent (not a rejection)
-    rows = [r for r in rows if r.get('split') == 'train' and (r.get('intent') or r.get('src') == 'ood')]
+    rows = [r for r in rows if r.get('split') == 'train' and (r.get('intent') or r.get('src') == 'ood') and float(r.get('w', 1)) > 0]
     random.Random(17).shuffle(rows); rows = rows[:a.max_rows]
     intents = list(desc)
     opt = torch.optim.AdamW([p for p in model.parameters() if p.requires_grad], lr=a.lr)
@@ -59,7 +59,7 @@ def train(a):
         pi = tok(p, add_special_tokens=False).input_ids; ti = tok(t, add_special_tokens=False).input_ids
         ids = torch.tensor([pi + ti], device=model.device)
         lab = torch.tensor([[-100] * len(pi) + ti], device=model.device)
-        loss = model(input_ids=ids, labels=lab).loss / a.accum
+        loss = model(input_ids=ids, labels=lab).loss * float(r.get('w', 1)) / a.accum  # row weight (template multiplier)
         loss.backward()
         if (step + 1) % a.accum == 0: opt.step(); opt.zero_grad()
         if step % 200 == 0: print(f'step {step}/{len(rows)} loss {loss.item() * a.accum:.4f}', flush=True)
