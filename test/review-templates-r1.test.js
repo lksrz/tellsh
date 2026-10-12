@@ -383,3 +383,14 @@ test('r32: saltillo quotes and second actions are withheld', () => {
     for (const q of ['search tracked files for "TODO"', 'show issue 42']) assert.deepEqual(suggest(q, env).missing, [], `${env.shell}: ${q}`);
   }
 });
+
+// review r33: control characters inside quotes; also/too as a second action
+test('r33: control characters and also/too second actions are withheld', () => {
+  for (const env of [{ shell: 'bash', os: 'linux' }, { shell: 'pwsh', os: 'win32' }, { shell: 'cmd', os: 'win32' }]) {
+    for (const q of ['search tracked files for "TO\u0001DO"', 'search tracked files for "TODO\u001b[0m"', 'deploy "./di\u007fst" to pages', 'show github issue 42 also read the repo description', 'show issue 42, read the repo description too']) {
+      const r = suggest(q, env);
+      assert.ok(!r.command || r.missing.length > 0, `${env.shell}: ${JSON.stringify(q)}`);
+    }
+    for (const q of ['search tracked files for "TODO"', 'show issue 42']) assert.deepEqual(suggest(q, env).missing, [], `${env.shell}: ${q}`);
+  }
+});
