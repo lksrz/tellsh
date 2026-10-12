@@ -213,3 +213,10 @@ test('review r17: punctuation after a dot-segment target, marker before a determ
     'list the files tracked by git in repo files', 'list the files tracked by git in the repo files', 'list the files tracked by git with files']) await held(q);
   for (const q of ['pip install requests -t ../..', 'list tracked files in the repo', 'list the files tracked by git']) assert.equal((await run(q)).missing.length, 0, q);
 });
+
+test('review r18: glued punctuation / inner spaces in quoted pip targets, replacement grep patterns, named repo scopes', async () => {
+  const held = async (q) => { const r = await run(q); assert.ok(r.command == null || r.missing.length > 0, `${q}: ${r.command} must not run on Enter`); };
+  for (const q of ['pip install requests -t "lib".', 'pip install requests --target="lib".', 'pip install requests --target " lib "',
+    'search tracked files for "TODO" but for the word files instead', 'search tracked files for "TODO" in repo codebase', 'list the files tracked by git in git repo files']) await held(q);
+  for (const q of ['pip install requests --target "my libs"', 'search tracked files for "TODO"', 'list tracked files in the repo']) assert.equal((await run(q)).missing.length, 0, q);
+});
