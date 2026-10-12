@@ -68,6 +68,22 @@ def train(a):
     model.save_pretrained(a.out)
 
 
+def guard_path(path):
+    # a file we write: never through a symlink (dangling included), and its directory must not resolve into a repo
+    # outside build/
+    if os.path.islink(path): sys.exit(f'refusing symlink {path}')
+    d = os.path.realpath(os.path.dirname(os.path.abspath(path)))
+    up = d
+    while True:
+        if os.path.exists(os.path.join(up, '.git')):
+            rel = os.path.relpath(d, up)
+            if not (rel == 'build' or rel.startswith('build' + os.sep)): sys.exit(f'refusing {path}: inside the repo {up} outside build/')
+            return
+        nxt = os.path.dirname(up)
+        if nxt == up: return
+        up = nxt
+
+
 @torch.no_grad()
 def label(a):
     from peft import PeftModel
@@ -87,6 +103,7 @@ def label(a):
     # labels are bound to the exact pool they were made from (text, shell/OS and candidates): sidecar <out>.pool.sha256
     ph = hashlib.sha256(open(a.pool, 'rb').read()).hexdigest()
     side = a.out + '.pool.sha256'
+    guard_path(a.out); guard_path(side)
     if os.path.exists(side) and open(side).read().strip() != ph: sys.exit(f'label: {a.out} was made for a different pool; use a new --out')
     if done and not os.path.exists(side): sys.exit(f'label: {a.out} has no {side}; use a new --out')
     open(side, 'w').write(ph + '\n')
