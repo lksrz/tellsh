@@ -72,6 +72,7 @@ def guard_path(path):
     # a file we write: never through a symlink (dangling included), and its directory must not resolve into a repo
     # outside build/
     if os.path.islink(path): sys.exit(f'refusing symlink {path}')
+    if os.path.exists(path) and os.stat(path).st_nlink > 1: sys.exit(f'refusing hard-linked file {path}')
     d = os.path.realpath(os.path.dirname(os.path.abspath(path)))
     up = d
     while True:

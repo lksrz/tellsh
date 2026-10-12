@@ -167,7 +167,9 @@ def main():
             hard = yi >= 0
             lii = ((cer(li, yi) * wn)[hard].mean() if hard.any() else 0)
             kd = ((-(sp * torch.log_softmax(li, -1)).sum(-1) * wn * sm).sum() / sm.sum() if sm.sum() > 0 else 0)
-            loss = lti + lii + a.kd * kd + 0.5 * (ce(lg.reshape(-1, lg.shape[-1]), ytag.reshape(-1)) if (ytag >= 0).any() else 0)
+            tm = ytag >= 0  # tag loss per token, weighted by its row's weight
+            ltag = ((cer(lg.reshape(-1, lg.shape[-1]), ytag.reshape(-1)).view_as(ytag) * wn.unsqueeze(1))[tm].mean() if tm.any() else 0)
+            loss = lti + lii + a.kd * kd + 0.5 * ltag
             opt.zero_grad()
             loss.backward()
             torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)

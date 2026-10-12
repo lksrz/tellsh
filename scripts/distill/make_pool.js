@@ -10,6 +10,7 @@ import { createHash } from 'node:crypto';
 import { join, relative, resolve, isAbsolute, sep, basename, dirname } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { exclusionIndex } from '../lib/heldout.js';
+import { writePrivate } from '../lib/privwrite.js';
 import { readReal } from '../real/real_rows.js';
 import { cascade } from '../../src/cascade.js';
 import { getModel } from '../../src/model.js';
@@ -72,8 +73,8 @@ for (const [i, r] of sel.entries()) {
 mkdirSync(OUT, { recursive: true, mode: 0o700 });
 const body = sel.map((r) => JSON.stringify(r)).join('\n') + '\n';
 const noLink = (f) => { try { if (lstatSync(f).isSymbolicLink()) { console.error(`make_pool: refusing to write through symlink ${f}`); process.exit(1); } } catch {} return f; };
-writeFileSync(noLink(join(OUT, 'pool.jsonl')), body, { mode: 0o600 });
+writePrivate(noLink(join(OUT, 'pool.jsonl')), body, { mode: 0o600 });
 // labels.jsonl refers to pool rows by position: merge_labels.js refuses a pool whose hash changed since labelling
-writeFileSync(noLink(join(OUT, 'pool.sha256')), createHash('sha256').update(body).digest('hex') + '\n', { mode: 0o600 });
+writePrivate(noLink(join(OUT, 'pool.sha256')), createHash('sha256').update(body).digest('hex') + '\n', { mode: 0o600 });
 const by = (f) => sel.reduce((m, r) => ((m[f(r)] = (m[f(r)] || 0) + 1), m), {});
 console.log(JSON.stringify({ pool: pool.length, written: sel.length, bySrc: by((r) => r.src), byLang: by((r) => r.lang) }));
