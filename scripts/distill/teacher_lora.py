@@ -79,7 +79,7 @@ def guard_path(path):
         if os.path.exists(os.path.join(up, '.git')):
             rel = os.path.relpath(d, up)
             if not (rel == 'build' or rel.startswith('build' + os.sep)): sys.exit(f'refusing {path}: inside the repo {up} outside build/')
-            return
+            # keep walking: every enclosing repository must also see the path under its own build/
         nxt = os.path.dirname(up)
         if nxt == up: return
         up = nxt
@@ -154,7 +154,7 @@ if __name__ == '__main__':
         if os.path.exists(os.path.join(up, '.git')):
             rel = os.path.relpath(out_real, up)
             if not (rel == 'build' or rel.startswith('build' + os.sep)): sys.exit(f'refusing --out inside the repo {up} (use a path outside it or under build/)')
-            break
+            # no break: enclosing repositories are checked too (a nested .git cannot whitelist its own build/)
         nxt = os.path.dirname(d)
         if nxt == d: break
         d = nxt
