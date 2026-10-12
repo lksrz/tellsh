@@ -81,3 +81,12 @@ test('review r3: anything the template cannot express is withheld (missing), nev
     assert.equal(r.missing.length, 0, `${q}: ${r.command} ${JSON.stringify(r.missing)}`);
   }
 });
+
+test('review r4: options with an explicit id, generic nouns, pathspecs, extra revisions, ls-files filters, composer, broad dirs', async () => {
+  const held = async (q) => { const r = await run(q); assert.ok(r.command == null || r.missing.length > 0, `${q}: ${r.command} must not run on Enter`); };
+  for (const q of ['deploy the site to cloudflare pages', 'deploy docs to pages', 'watch run 123 --exit-status', 'show issue 42 --json title',
+    'search tracked files for TODO case insensitive', 'git grep TODO -- code', 'git show HEAD HEAD~1', 'show the commit one before HEAD',
+    'git ls-files --others', 'git ls-files -- src', 'watch the run 5 failures', 'deploy ~ to cloudflare pages', 'deploy .. to cloudflare pages']) await held(q);
+  assert.equal((await run('list open and closed github issues')).command, 'gh issue list --state all');
+  for (const q of ['list tracked files', 'git ls-files', 'deploy dist to cloudflare pages']) assert.equal((await run(q)).missing.length, 0, q);
+});

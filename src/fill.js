@@ -1128,11 +1128,12 @@ export function newTemplateSlots(id, text, v, quoted) {
   if (id === 'gh_issue_list') {
     if (/\b(?:closed|zamkni\w*)\b/i.test(t)) v.state = 'closed';
     else if (/\b(?:all|every|wszystkie|wszystkich)\b/i.test(t) && !/\b(?:open|opened|otwart\w*)\b/i.test(t)) v.state = 'all';
+    if (/\b(?:closed|zamkni\w*)\b/i.test(t) && /\b(?:open|opened|otwart\w*)\b/i.test(t)) v.state = 'all';
     if (v.state && typeof v.args === 'string' && v.args.startsWith('?')) delete v.args;
   }
   if (id === 'wrangler_pages_deploy') {
     // the upload directory only when it is named right after "deploy" and looks like a directory; otherwise <PATH>
-    const DIR = /^(?:\.{1,2}|~|[.~]?\/\S*|\S+\/\S*|build|dist|public|out|site|_site|www|static|output|docs|html)$/i;
+    const DIR = /^(?:\.|\.\/\S+|\.\.\/\S+|~\/\S+|\/\S+|\S+\/\S*|build|dist|public|out|_site|output)$/i;
     const m = t.match(/\bpages\s+deploy\s+(["']?)([^\s"']+)\1(?=\s|$)/i) || (t.match(/\b(?:deploy|publish|upload|wdr[oó]ż|opublikuj|wrzuć|wrzuc)\s+(?:the\s+)?(?:(?:folder|dir|directory|katalog)\s+)?(["']?)([^\s"']+)\1(?:\s+(?:folder|dir|directory|katalog))?\s+(?:to|on|onto|na|do)\b/i));
     const qm = t.match(/\b(?:pages\s+deploy|deploy|publish|upload)\s+(?:the\s+)?(["'])([^"']+)\1/i);
     delete v.path;
@@ -1147,12 +1148,12 @@ export function newTemplateSlots(id, text, v, quoted) {
 // Words the 0.3.4 templates explain; anything else in the request is a restriction / option the template cannot express.
 const WH_COMMON = 'the a an my our this that me please now pls to on in of for with from and git npx gh wrangler cloudflare github pokaz pokaż mi na do w z dla prosze proszę teraz';
 const WH_WORDS = {
-  git_show: `${WH_COMMON} show display view see print commit commits revision tag last latest newest most recent previous prior one before second-to-last its diff changes change patch details what was changed in latest ostatni ostatniego ostatnia ostatnie poprzedni poprzedniego przedostatni commita commit zmiany zmian szczegoly szczegóły rewizje rewizję tagu tag`,
+  git_show: `${WH_COMMON} show display view see print commit commits revision tag last latest newest most recent previous prior second-to-last its diff changes change patch details what was changed in latest ostatni ostatniego ostatnia ostatnie poprzedni poprzedniego przedostatni commita commit zmiany zmian szczegoly szczegóły rewizje rewizję tagu tag`,
   git_grep: `${WH_COMMON} grep search find look lookup text string pattern word occurrences tracked files file repo repository codebase code all every across inside szukaj wyszukaj znajdz znajdź poszukaj plikach plikow plików sledzonych śledzonych repozytorium kodzie kod -n --`,
   wrangler_pages_deploy: `${WH_COMMON} pages page deploy redeploy publish upload ship push static site website strona strone stronę stron statyczna statyczną frontend folder directory dir katalog katalogu wdroz wdroż wdróż zdeployuj deployuj opublikuj wrzuc wrzuć wgraj`,
 };
 const whTokens = (t, vals = []) => t.replace(/(["'])([^"']*)\1/g, (q, _, inner) => (vals.includes(inner.toLowerCase()) ? ' ' : ` ${q} `)).split(/\s+/).map((w) => w.replace(/^[(]+|[),.;:!?]+$/g, '').toLowerCase()).filter(Boolean);
-const UNIT_AFTER = /^\s*-?(?:comments?|komentarz\w*|days?|d|weeks?|wks?|w|months?|mos?|years?|yrs?|y|hours?|hrs?|h|minutes?|mins?|m|seconds?|secs?|s|dni|dzie\w*|tygodn\w*|miesi\w*|godz\w*|minut\w*|sekund\w*|times?|razy|old|ago|temu|jobs?|attempts?|steps?|items?|of|out|x|%|th|st|nd|rd)\b|^-\w/i;
+const UNIT_AFTER = /^\s*-?(?:comments?|labels?|assignees?|reactions?|commits?|files?|failures?|errors?|checks?|runs?|issues?|prs?|people|users?|minutes?|komentarz\w*|days?|d|weeks?|wks?|w|months?|mos?|years?|yrs?|y|hours?|hrs?|h|minutes?|mins?|m|seconds?|secs?|s|dni|dzie\w*|tygodn\w*|miesi\w*|godz\w*|minut\w*|sekund\w*|times?|razy|old|ago|temu|jobs?|attempts?|steps?|items?|of|out|x|%|th|st|nd|rd)\b|^-\w/i;
 /**
  * Why a suggestion for one of the 0.3.4 templates must not run as is ([] : fine): the request has a restriction, option,
  * scope or value boundary the template cannot express. The pipeline puts these in `missing`.
@@ -1170,9 +1171,18 @@ export function newTemplateWithhold(id, text, slots = {}) {
   if (WH_WORDS[id]) {
     const ok = new Set(WH_WORDS[id].split(/\s+/));
     const vals = Object.values(slots).filter((x) => x != null).map((x) => String(x).toLowerCase());
-    const rest = whTokens(t, vals).filter((w) => !ok.has(w) && !vals.includes(w) && !(id === 'git_show' && /^(?:head|@)[~^\d]*$/i.test(w)));
+    const rest = whTokens(t, vals).filter((w) => !ok.has(w) && !vals.includes(w));
+    // the literal form: nothing may follow the pattern (`git grep TODO -- code` is a pathspec, not vocabulary)
+    if (id === 'git_grep') { const g = t.match(/^\s*git\s+grep\s+(?:-n\s+)?(?:--\s+)?(["']?)[^\s"']+\1\s+(\S.*)$/); if (g) rest.push(g[2]); }
     if (rest.length) out.push(`${id === 'git_grep' ? 'pattern' : id === 'git_show' ? 'rev' : 'args'} (not expressed: ${rest.slice(0, 4).join(' ')})`);
     if (Object.values(slots).some((x) => glued(x)) || /\\["']/.test(t)) out.push('value (unclear where the quoted text ends)');
+  }
+  if (id === 'wrangler_pages_deploy' && slots.path != null && /^(?:\/+|~\/?|\.\.(?:\/\.\.)*\/?|[a-z]:\\?|\$home\/?|%userprofile%\\?)$/i.test(String(slots.path).trim())) out.push('path (a root, home or parent directory is never uploaded as is)');
+  if (/^(?:gh_issue_view|gh_run_watch|gh_issue_list|git_ls_files)$/.test(id)) {
+    // an option the template cannot express (`--exit-status`, `--json`, `--others`, `-- src`) is withheld
+    const opts = whTokens(t).filter((w) => /^-/.test(w) && w !== '--repo' && !/^--repo=/.test(w));
+    if (opts.length) out.push(`args (not expressed: ${opts.slice(0, 3).join(' ')})`);
+    if (id === 'git_ls_files' && /\b(?:untracked|ignored|deleted|modified|others|staged|nieśledzon\w*|niesledzon\w*|usunięt\w*|zmodyfikowan\w*)\b/i.test(t)) out.push('args (a filter git ls-files is not rendered with)');
   }
   if (id === 'gh_issue_view' || id === 'gh_run_watch') {
     if (slots.num != null) {

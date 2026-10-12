@@ -853,6 +853,8 @@ function suggestOnce(query, opts = {}) {
     }
     // a value with a line break is never composed into a command (the catalog rejects it as a path); an extract intent is
     // never replaced by a command that creates or rewrites an archive ("extract archive.tar.gz" is not `tar -c -f archive.tar.gz`)
+    // a 0.3.4-template suggestion that was withheld is never replaced by a composed command that drops what was withheld
+    if (comp && /^(?:git_show|git_grep|git_ls_files|wrangler_pages_deploy|gh_run_watch|gh_issue_list|gh_issue_view)$/.test(intent) && (res.missing || []).length) comp = null;
     if (comp && !comp.invalid && comp.command !== b.command && !/[\r\n]/.test(comp.command) && !(/^extract_/.test(intent) && createsArchive(comp.command))) {
       if (extra.length >= 1 || composeMode === 'force') {
         return { ...res, method: 'composed', experimental: true, reason: `request asks for ${extra.join(' ')} not in the catalog command`,

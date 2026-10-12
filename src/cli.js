@@ -350,7 +350,8 @@ export async function main(argv = process.argv.slice(2)) {
       const d = command === s.command ? { risk: s.risk, warnings: s.warnings, critical: s.critical } : checkDanger(command, s.baseRisk);
       risk = maxRisk(s.baseRisk, d.risk);
       critical = d.critical;
-      incomplete = /<[A-Z_]+>/.test(command);
+      // an unchanged withheld suggestion (missing, but no <PLACEHOLDER> in the text) stays incomplete
+      incomplete = /<[A-Z_]+>/.test(command) || (command === s.command && s.missing.length > 0);
       process.stdout.write(C.dim('  risk: ') + riskColor(risk)(risk) + '\n');
       for (const w of d.warnings) process.stdout.write(riskColor(risk)(`  ! ${w}`) + '\n');
       continue;
