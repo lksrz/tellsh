@@ -430,7 +430,11 @@ export function suggest(query, opts = {}) {
   if (!tm) return once(opts);
   // the templates model is probed without the rerank hook; the hook only ever sees the model whose answer is returned
   const probe = once({ ...opts, model: tm, rerank: undefined });
-  return probe && NEW_TEMPLATE_INTENTS.has(probe.intent) ? (opts.rerank ? once({ ...opts, model: tm }) : probe) : once(opts);
+  if (!probe || !NEW_TEMPLATE_INTENTS.has(probe.intent)) return once(opts);
+  if (!opts.rerank) return probe;
+  // with the hook: the reranked templates answer is kept only if it is still a 0.3.4 template intent, otherwise 0.3.3 answers
+  const alt = once({ ...opts, model: tm });
+  return alt && NEW_TEMPLATE_INTENTS.has(alt.intent) ? alt : once(opts);
 }
 
 // the trust rule (danger.js): a command resolved from history (a reference, "same but …", a value from an earlier
