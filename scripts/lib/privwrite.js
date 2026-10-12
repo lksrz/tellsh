@@ -1,6 +1,6 @@
 // Private-data writer: the target must resolve inside <repo>/build/ (or outside the repo) and neither the file nor any
 // directory between the repo root and it may be a symlink, so private text can never land in a tracked path.
-import { writeFileSync, lstatSync, realpathSync, renameSync } from 'node:fs';
+import { writeFileSync, lstatSync, realpathSync, renameSync, unlinkSync } from 'node:fs';
 import { resolve, relative, sep, dirname, isAbsolute } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -16,7 +16,15 @@ function realTarget(p) {
   return resolve(realpathSync(q), ...tail);
 }
 
-export function writePrivate(path, data, opts) {
+/** Check a private output path (same rules as writePrivate) and remove an existing file, so a stream opened with
+ * flags 'wx' afterwards creates a fresh inode (never writes through a symlink or hard link). Returns the path. */
+export function preparePrivate(path) {
+  checkPrivate(path);
+  try { unlinkSync(resolve(path)); } catch (e) { if (e.code !== 'ENOENT') throw e; }
+  return resolve(path);
+}
+
+function checkPrivate(path) {
   const abs = resolve(path);
   if (isLink(abs)) throw new Error(`writePrivate: refusing symlink ${abs}`);
   const real = realTarget(dirname(abs));
@@ -30,6 +38,11 @@ export function writePrivate(path, data, opts) {
       if (isLink(p)) throw new Error(`writePrivate: refusing symlink ${p}`);
     }
   } else if (isLink(abs)) throw new Error(`writePrivate: refusing symlink ${abs}`);
+  return abs;
+}
+
+export function writePrivate(path, data, opts) {
+  const abs = checkPrivate(path);
   // atomic replace: a new inode, so an existing hard link to the old file never receives the data
   const tmp = `${abs}.tmp-${process.pid}`;
   writeFileSync(tmp, data, { ...(typeof opts === 'object' ? opts : {}), flag: 'wx' });

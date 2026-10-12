@@ -13,7 +13,7 @@ import { exclusionIndex } from '../lib/heldout.js';
 import { writePrivate } from '../lib/privwrite.js';
 import { readReal } from '../real/real_rows.js';
 import { cascade } from '../../src/cascade.js';
-import { getModel } from '../../src/model.js';
+import { getModel, loadModel } from '../../src/model.js';
 import { envFeatures } from '../../src/env.js';
 import { normalize, fnv1a } from '../../src/features.js';
 import { relex, silverSpans, mulberry32 } from '../lib/silver.js';
@@ -62,7 +62,11 @@ for (const r0 of src) {
 // deterministic subsample: non-template rows (public and real) first, then template-generated real rows, each by hash
 pool.sort((a, b) => (a.tmpl - b.tmpl) || fnv1a(a.text) - fnv1a(b.text));
 const sel = pool.slice(0, MAX);
-const model = getModel();
+// candidates must come from an A trained with the current eval/dev exclusions (e.g. build/adev/model/model.bin after
+// train_a_dev.sh, or a retrain on this split); the shipped model predates the split, so it needs an explicit opt-in
+const mp = arg('--model', null);
+if (!mp && !args.includes('--allow-shipped-model')) { console.error('make_pool: pass --model <A trained on the current split> (or --allow-shipped-model)'); process.exit(1); }
+const model = mp ? loadModel(mp) : getModel();
 for (const [i, r] of sel.entries()) {
   const env = { shell: r.shell, os: r.os, coreutils: r.os === 'darwin' ? 'bsd' : 'gnu' };
   const c = cascade(r.text, { model, extras: envFeatures(env), k: 4, top: K });

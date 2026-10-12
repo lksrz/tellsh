@@ -14,6 +14,7 @@ import { ctxFeatures } from '../src/history.js';
 import { silverSpans, relex, bioLabels, mulberry32 } from './lib/silver.js';
 import { exclusionIndex } from './lib/heldout.js';
 import { readReal, realTrain } from './real/real_rows.js';
+import { writePrivate, preparePrivate } from './lib/privwrite.js';
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
 export const DIM = 1 << 18;
@@ -139,8 +140,9 @@ function main() {
     base.push(r);
   }
 
-  const cls = createWriteStream(join(outDir, 'cls.jsonl'));
-  const tag = createWriteStream(join(outDir, 'tag.jsonl'));
+  // private-derived rows: guarded fresh files (no symlink / hard link / tracked path), see scripts/lib/privwrite.js
+  const cls = createWriteStream(preparePrivate(join(outDir, 'cls.jsonl')), { flags: 'wx' });
+  const tag = createWriteStream(preparePrivate(join(outDir, 'tag.jsonl')), { flags: 'wx' });
   const counts = { cls: 0, tag: 0, bySrc: {} };
   let gid = 0;
   // every emitted example (incl. typo / relexicalised copies and anaphora phrases) is checked against the
@@ -190,7 +192,7 @@ function main() {
   }
 
   // filtered training corpus for scripts/build_triggers.js (same exclusions and teacher decisions)
-  writeFileSync(join(outDir, 'train_rows.jsonl'), base.filter((r) => r.src !== 'real').map((r) => JSON.stringify({ text: r.text, intent: r.intent, lang: r.lang, shell: r.shell || '' })).join('\n') + '\n');
+  writePrivate(join(outDir, 'train_rows.jsonl'), base.filter((r) => r.src !== 'real').map((r) => JSON.stringify({ text: r.text, intent: r.intent, lang: r.lang, shell: r.shell || '' })).join('\n') + '\n');
 
   // 2. history anaphora: pronoun requests whose intent depends on ctx_ features
   let nAna = 0;

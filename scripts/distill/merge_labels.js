@@ -26,6 +26,11 @@ const want = existsSync(join(D, 'pool.sha256')) ? readFileSync(join(D, 'pool.sha
 if (!want || createHash('sha256').update(poolBody).digest('hex') !== want) { console.error('merge_labels: pool.jsonl changed since labelling (or no pool.sha256); relabel'); process.exit(1); }
 const side = join(D, 'labels.jsonl.pool.sha256');
 if (!existsSync(side) || readFileSync(side, 'utf8').trim() !== want) { console.error('merge_labels: labels.jsonl was not made from this pool (labels.jsonl.pool.sha256); relabel'); process.exit(1); }
+// the base export must reflect the current teacher decisions (its drops / relabels are baked into train.jsonl)
+{ const dp = join(ROOT, 'data/teacher/decisions.jsonl');
+  const cur = createHash('sha256').update(existsSync(dp) ? readFileSync(dp) : '').digest('hex');
+  const meta = JSON.parse(readFileSync(join(ROOT, 'build/hybrid/meta.json'), 'utf8'));
+  if (meta.decisionsSha256 !== cur) { console.error('merge_labels: build/hybrid/train.jsonl predates the current decisions; re-run export_data.js'); process.exit(1); } }
 const excl = exclusionIndex(ROOT);
 const dev = new Set(JSON.parse(readFileSync(join(ROOT, 'build/hybrid/dev_texts.json'), 'utf8')));
 const decisions = rj(join(ROOT, 'data/teacher/decisions.jsonl')).filter((d) => d.text && d.field !== 'risk');

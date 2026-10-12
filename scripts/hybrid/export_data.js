@@ -10,6 +10,7 @@
 //   build/hybrid/dev_texts.json  every normalized dev text (train rows with one of these texts are dropped)
 import { readFileSync, readdirSync, existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { createHash } from 'node:crypto';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { INTENTS } from '../../src/catalog.js';
 import { FAMILIES, FAMILY_OF, NONE, TAG_TYPES } from '../../src/tools.js';
@@ -134,6 +135,7 @@ function main() {
   // excludes it from A_dev's training data
   writePrivate(join(OUT, 'dev_texts.json'), JSON.stringify([...devTexts].sort()));
   const meta = {
+    decisionsSha256: createHash('sha256').update(existsSync(join(ROOT, 'data/teacher/decisions.jsonl')) ? readFileSync(join(ROOT, 'data/teacher/decisions.jsonl')) : '').digest('hex'),
     tools: [...Object.keys(FAMILIES), NONE],
     intents: INTENTS.map((i) => i.id),
     intentTool: Object.fromEntries(INTENTS.map((i) => [i.id, FAMILY_OF[i.id]])),
