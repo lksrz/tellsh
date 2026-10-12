@@ -6,7 +6,8 @@
 //   slots: BIO tagger (tool-conditioned) ─► validated values; regex extraction fills/overrides failures
 //   render for shell/os ─► danger check
 //   low confidence (or unexplained modifiers) ─► second pass: experimental flag composer
-import { getModel } from './model.js';
+import { getModel, loadModel } from './model.js';
+import { fileURLToPath } from 'node:url';
 import { cascade } from './cascade.js';
 import { tag, exFromSpans } from './tagger.js';
 import { extractSlots, pickArg, isOptionWord, foldKeepLength, isStopWord } from './slots.js';
@@ -412,9 +413,24 @@ const LIT_FAMILY = { cargo: /^cargo_/, python: /^python_|^pip_|^run_python/, pyt
   ps: /^process_|^list_process/, top: /^process_|^top/, ping: /^ping_/, grep: /^grep_|^search_/, head: /^head_|^show_file/, tail: /^tail_|^follow_/, wc: /^count_/, sort: /^sort_/, systemctl: /^service_/, service: /^service_/, history: /^history/, crontab: /^cron/ };
 function literalIntentOk(first, intent) { const f = LIT_FAMILY[String(first).toLowerCase()]; return f ? f.test(String(intent)) : false; }
 
+// 0.3.4 two-model gate: the 0.3.3 model (model/model.bin) answers everything it already knew; the retrained model
+// (model/model_templates.bin) is used only when it picks one of the new 0.3.4 template intents, so a retrain can never
+// change the pre-existing intents (their classification and slots stay exactly as on 0.3.3).
+export const NEW_TEMPLATE_INTENTS = new Set(['git_fetch', 'git_ls_files', 'gh_run_watch', 'gh_issue_list', 'gh_issue_view', 'wrangler_d1_list', 'wrangler_pages_deploy', 'git_grep', 'git_show']);
+const TEMPLATES_MODEL = fileURLToPath(new URL('../model/model_templates.bin', import.meta.url));
+let templatesModel;
+function getTemplatesModel() {
+  if (templatesModel === undefined) { try { templatesModel = loadModel(TEMPLATES_MODEL); } catch { templatesModel = null; } }
+  return templatesModel;
+}
 export function suggest(query, opts = {}) {
-  // a command that contradicts the request (ignores "except" / "don't", installs for "uninstall") is refused (guards.js)
-  return releaseGuards(query, replayFloor(suggestOnce(query, opts)));
+  const once = (o) => releaseGuards(query, replayFloor(suggestOnce(query, o)));
+  if (opts.model) return once(opts);
+  const base = once(opts);
+  const tm = getTemplatesModel();
+  if (!tm) return base;
+  const alt = once({ ...opts, model: tm });
+  return alt && NEW_TEMPLATE_INTENTS.has(alt.intent) ? alt : base;
 }
 
 // the trust rule (danger.js): a command resolved from history (a reference, "same but …", a value from an earlier
@@ -832,11 +848,12 @@ function suggestOnce(query, opts = {}) {
     const first = q.split(/\s+/)[0] || '';
     const PROG = /^(?:cargo|python|python3|py|node|deno|bun|go|make|cmake|ruby|java|javac|rustc|gcc|clang|perl|php|dotnet|mvn|gradle|terraform|helm|ansible|brew|apt|apt-get|dnf|yum|pacman|choco|winget|scoop)$/i;
     const looksLiteral = /(?:^|\s)(?:-{1,2}[A-Za-z]|[~.]{0,2}\/|~(?=\s|$))|[|;&<>`*]|\$\(/.test(q);
+    const shortSame = LIT.test(first) && /^[a-z][\w.-]*(?:\s+[a-z0-9][\w.:@/-]*){1,2}$/.test(q) && (String(res.command).toLowerCase().replace(/^sudo\s+/, '').split(/\s+/)[0] || '') === first.toLowerCase();
     // a wrapper (time, env, nohup, watch, exec, nice, timeout, xargs) in front of a typed command is never rewritten
     if (/^(?:time|env|nohup|watch|exec|nice|ionice|timeout|xargs|command|builtin|stdbuf|strace|caffeinate|nsenter|systemd-run|pkexec|faketime|doas|su|chroot|unshare|firejail|flatpak-spawn|runuser|setsid|script|echo|printf|tee|tellsh|:)$/i.test(first) && looksLiteral) res.missing = ['request (a wrapped shell command is not rewritten)'];
-    else if ((LIT.test(first) || PROG.test(first)) && q.split(/\s+/).length > 1 && (looksLiteral || PROG.test(first))) {
+    else if ((LIT.test(first) || PROG.test(first)) && q.split(/\s+/).length > 1 && (looksLiteral || PROG.test(first) || shortSame)) {
       if (/[|;&<>`]|\$\(/.test(q.replace(/(["'])(?:(?!\1).)*\1/g, ' '))) res.missing = ['request (a compound shell command is not rewritten)'];
-      else if (!literalIntentOk(first, res.intent)) res.missing = [`request (the typed ${first} command is not rewritten as ${res.intent})`];
+      else if (!literalIntentOk(first, res.intent) && (String(res.command).toLowerCase().replace(/^sudo\s+/, '').split(/\s+/)[0] || '') !== first.toLowerCase()) res.missing = [`request (the typed ${first} command is not rewritten as ${res.intent})`];
       else {
         const cmd = String(res.command).toLowerCase().replace(/\$home/g, '~');
         const same = (cmd.replace(/^sudo\s+/, '').split(/\s+/)[0] || '') === first.toLowerCase();

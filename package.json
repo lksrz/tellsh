@@ -28,6 +28,7 @@
     "src/*.js",
     "src/rerank/*.js",
     "model/model.bin",
+    "model/model_templates.bin",
     "model/tldr_triggers.json",
     "model/compose_explained.json",
     "README.md",
