@@ -869,6 +869,15 @@ function suggestOnce(query, opts = {}) {
     if (!(res.missing || []).length && /^\S+:\/\/\S+$/.test(q) && res.risk !== 'safe') res.missing = ['action (a bare URL names no action)'];
     if (!(res.missing || []).length && /^(?:move_rename|copy_file|copy_dir|move_file)$/.test(res.intent) && /(?:^|[\s'"])(?:\/dev\/null|nul|\$null)(?=$|[\s'"])/i.test(String(res.command))) res.missing = ['destination (a null device)'];
   }
+  // 0.3.4 known-limits guard: a pip target that a shell would expand or unescape ($VAR, $env:X, %X%, a backtick, or a backslash in
+  // a POSIX shell) is never rendered as a literal folder name; a git fetch request with an option or a fetch modifier is withheld
+  if (!(res.missing || []).length && /^pip_/.test(res.intent || '') && slots.piptarget != null) {
+    const pt = String(slots.piptarget);
+    if (/[$%`]/.test(pt) || (/\\/.test(pt) && !/^(?:powershell|pwsh|cmd)$/.test(res.shell))) res.missing = ['piptarget (a variable or escape the shell would expand)'];
+  }
+  if (!(res.missing || []).length && res.intent === 'git_fetch') {
+    if (/(?:^|\s)-{1,2}[A-Za-z]|\b(?:dry|prune|pruning|tags?|depth|shallow|unshallow|remote|origin|upstream|force|refspec|no|not|without|only|just)\b/i.test(String(query).replace(/^\s*git\s+fetch\s+--all\s*$/i, ''))) res.missing = ['options (git fetch is always git fetch --all)'];
+  }
   // 0.3.4 retrain guard (model-independent): a slot value carrying shell substitution (`...`, $(...), ${...}) in a command
   // that is not read-only, or one value read into two slots from a single occurrence, is withheld, never run
   if (!(res.missing || []).length && res.intent) {

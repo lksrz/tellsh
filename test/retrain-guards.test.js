@@ -27,3 +27,9 @@ test('r41: a pip target next to a non-ASCII space or control character is a plac
   for (const env of ENVS) for (const q of ['pip install requests -tlib\u00a0requests', 'pip install requests -t lib\u2003x', 'pip install requests --target=lib\u00a0x', 'pip install requests --target lib\u200bx']) held(q, env);
   for (const env of ENVS) assert.deepEqual(suggest('pip install requests -t lib', env).missing, []);
 });
+test('r42: expandable pip targets and git fetch modifiers are withheld', () => {
+  for (const env of ENVS) for (const q of ['pip install requests -t $env:TMP', 'pip install requests -t $HOME/lib', 'pip install requests -t %TEMP%', 'fetch branches --dry-run', 'git fetch --prune', 'fetch only origin']) held(q, env);
+  for (const env of ENVS.slice(0, 2)) held('pip install requests -tlib\\cache', env);
+  assert.deepEqual(suggest('fetch all branches', ENVS[0]).missing, []);
+  for (const env of ENVS.slice(2)) assert.deepEqual(suggest('pip install requests --target C:\\libs', env).missing, [], env.shell);
+});
