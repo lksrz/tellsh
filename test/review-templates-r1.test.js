@@ -317,3 +317,14 @@ test('r26: grep pathspecs/options and tabbed pip targets are withheld', () => {
     for (const q of ['search tracked files for "TODO"']) assert.deepEqual(suggest(q, env).missing, [], `${env.shell}: ${q}`);
   }
 });
+
+// review r27: punctuation between a git show selector word and its value
+test('r27: punctuated extra git show selectors are withheld', () => {
+  for (const env of [{ shell: 'bash', os: 'linux' }, { shell: 'pwsh', os: 'win32' }, { shell: 'cmd', os: 'win32' }]) {
+    for (const q of ['show commit HEAD tag: diff', 'show commit HEAD revision: changes', 'show commit HEAD tag:diff', 'show commit HEAD branch - changes', 'show commit HEAD ref=diff']) {
+      const r = suggest(q, env);
+      assert.ok(!r.command || r.missing.length > 0, `${env.shell}: ${q}`);
+    }
+    assert.deepEqual(suggest('show commit HEAD', env).missing, []);
+  }
+});
