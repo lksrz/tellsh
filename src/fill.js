@@ -507,7 +507,7 @@ const sedEscapeNew = (s) => s.replace(/[\\/&]/g, '\\$&').replace(/\n/g, '\\n');
 // a place word ("there", "tam", "inside") is a reference to a directory, never a container / service / process / branch name
 const PLACE_WORD = /^(?:there|here|inside|over\s+there|tam|tu|tutaj|stamt[aą]d|tamże|wewn[aą]trz)$/i;
 export function finalizeSlots(intent, v) {
-  for (const k of ['container', 'service', 'name', 'branch', 'user', 'pkg', 'script']) if (typeof v[k] === 'string' && PLACE_WORD.test(v[k].trim())) v[k] = '?';
+  for (const k of ['container', 'service', 'name', 'branch', 'user', 'pkg', 'script']) if (typeof v[k] === 'string' && PLACE_WORD.test(v[k].trim())) delete v[k]; // left empty: a placeholder (required) or omitted, never a literal '?'
   if (v.ext != null && v.glob == null) v.glob = `*.${v.ext}`;
   if (intent.id === 'find_by_name' && v.name) v.namepat = /[*?]/.test(v.name) || /\.\w+$/.test(v.name) ? v.name : `*${v.name}*`;
   if (intent.id === 'replace_text' && v.old != null && v.new != null) v.sedexpr = `s/${sedEscapeOld(v.old)}/${sedEscapeNew(v.new)}/g`;
@@ -702,9 +702,11 @@ export function resolveSlots(intent, ex) {
   // the request quotes
   if (intent.id === 'npm_run_script' && (v.script == null || String(v.script).startsWith('?'))) {
     const t = String(ex.text);
-    const m = t.match(/\bnpm\s+run(?:-script)?\s+([A-Za-z0-9][\w:.-]*)(?=\s|$)/) || t.match(/^\s*run\s+npm\s+(?!run\b|install\b|i\b|ci\b|scripts?\b|the\b|a\b|my\b)([A-Za-z0-9][\w:.-]*)(?=\s|$)/i);
+    const m = t.match(/\bnpm\s+run(?:-script)?\s+([A-Za-z0-9][\w:.-]*)(?=\s|$)/) || t.match(/^\s*run\s+npm\s+(?!(?:run|install|i|ci|scripts?|the|a|my|publish|unpublish|audit|update|upgrade|uninstall|remove|rm|outdated|login|logout|link|pack|version|init|exec|config|cache|deprecate|dist-tag|owner|access|token|adduser)\b)([A-Za-z0-9][\w:.-]*)(?=\s|$)/i);
     if (m) v.script = m[1];
   }
+  // the new git / gh / wrangler templates: a value the request does not name explicitly is never guessed
+  newTemplateSlots(intent.id, String(ex.text), v, ex.quoted || []);
   if (intent.id === 'base64_encode' || intent.id === 'base64_decode') {
     const t = pickArg('text', ex);
     const fileWord = /\b(plik\w*|files?)\s+\S+\.\w+/i.test(ex.text);
@@ -786,7 +788,9 @@ export function scopeMentions(intentId, text) {
   }
   if (/^pip_/.test(intentId)) {
     for (const m of t.matchAll(SCOPE_ATTACHED_T)) {
-      const value = m[1].replace(/^(["'])([\s\S]*)\1$/, '$2').replace(/[.,!?;:]+$/, '').trim();
+      // quoted contents are literal; only an unquoted value loses trailing punctuation
+      const q = /^(["'])([\s\S]*)\1$/.exec(m[1]);
+      const value = q ? q[2] : m[1].replace(/[.,!?;:]+$/, '').trim();
       out.push({ kind: 'target', value: value || null, at: m.index });
     }
   }
@@ -796,7 +800,8 @@ export function scopeMentions(intentId, text) {
     const rawv = t.slice(at, at + m[2].length);
     const quotedv = /^(["'])[\s\S]*\1$/.test(rawv) && rawv.length >= 2;
     const value = quotedv ? rawv.slice(1, -1).trim() : rawv.replace(/[.,!?;:]+$/, '').replace(/^["'`]|["'`]$/g, '');
-    if (quotedv) { if (value) out.push({ kind: SCOPE_PHRASE_KIND(m[1]), value, at }); continue; }
+    // an empty quoted value (`in workspace ""`) is a placeholder, never a dropped scope
+    if (quotedv) { out.push({ kind: SCOPE_PHRASE_KIND(m[1]), value: value || null, at }); continue; }
     // "w projekcie na macu", "in the project with npm": a function word is no scope value
     if (SCOPE_NOT_VALUE.test(value) || isStopWord(value) || /^(?:on|onto|under|over|via|using|w|we|z|ze|na|do|od|po|przez|pod|nad)$/i.test(value)) continue;
     out.push({ kind: SCOPE_PHRASE_KIND(m[1]), value: value || null, at });
@@ -1066,4 +1071,50 @@ export function buildCommand(intentId, text, { platform = process.platform, env,
     critical: danger.critical,
     missing,
   };
+}
+
+const NPM_BUILTIN = /^(?:publish|unpublish|audit|update|upgrade|uninstall|remove|rm|outdated|login|logout|link|pack|version|init|exec|config|cache|deprecate|dist-tag|owner|access|token|adduser)$/i;
+const REF_TOKEN = /(?:^|\s)((?:HEAD|@)(?:[~^]\d*)*|(?=[0-9a-f]*\d)[0-9a-f]{7,40}|v\d+(?:\.\d+)*)(?=[\s,.;:!?]|$)/;
+/** Explicit values only for the 0.3.4 templates (git show/fetch/grep, gh issue/run, wrangler pages deploy). */
+export function newTemplateSlots(id, text, v, quoted) {
+  const t = text.trim();
+  if (id === 'git_show') {
+    const m = t.match(REF_TOKEN);
+    delete v.branch;
+    if (m) v.rev = m[1];
+    else if (/\b(?:previous|prior|one before|second[- ]to[- ]last|przedostatni\w*|poprzedni\w*)\b/i.test(t)) v.rev = 'HEAD~1';
+  }
+  // git_fetch is always `git fetch --all` (a superset of one remote; --prune is not offered): a known limit
+  if (id === 'grep_text' && typeof v.pattern === 'string' && v.pattern.startsWith('-') && !quoted.includes(v.pattern)) delete v.pattern;
+  if (id === 'npm_run_script' && typeof v.script === 'string' && NPM_BUILTIN.test(v.script) && !new RegExp(`\\bnpm\\s+run(?:-script)?\\s+${v.script}\\b|\\bscript\\s+${v.script}\\b`, 'i').test(t)) delete v.script;
+  if (id === 'git_grep') {
+    const m = t.match(/\bgit\s+grep\s+(?:-\S+\s+)*(?:--\s+)?(["']?)([^\s"']+)\1/);
+    if (quoted.length) v.pattern = quoted[0];
+    else if (m && !m[2].startsWith('-')) v.pattern = m[2];
+    else {
+      const f = t.match(/\b(?:for|na|fraz\w*|słowo|slowo)\s+(["']?)([^\s"']+)\1\s*$/i);
+      if (f && !f[2].startsWith('-')) v.pattern = f[2];
+    }
+    if (typeof v.pattern === 'string' && (v.pattern.startsWith('-') || /^(?:tracked|repo|repository|files?|the|git)$/i.test(v.pattern))) delete v.pattern;
+  }
+  if (id === 'gh_issue_view' || id === 'gh_run_watch') {
+    const re = id === 'gh_issue_view'
+      ? /(?:#|\b(?:issues?|tickets?|bugs?|zgloszeni\w*|nr|numer|number|view)\s+#?)(\d+)\b/i
+      : /(?:\bruns?\s+(?:id\s+)?#?|\bwatch\s+#?|\bactions?\s+#?|\bnr\s+|\bnumer\s+)(\d+)\b(?!\s*(?:days?|hours?|minutes?|dni|godzin\w*|minut\w*))/i;
+    const m = t.match(re);
+    if (m) v.num = m[1]; else delete v.num;
+  }
+  if (id === 'gh_issue_list') {
+    if (/\b(?:closed|zamkni\w*)\b/i.test(t)) v.state = 'closed';
+    else if (/\b(?:all|every|wszystkie|wszystkich)\b/i.test(t)) v.state = 'all';
+    if (v.state && typeof v.args === 'string' && v.args.startsWith('?')) delete v.args;
+  }
+  if (id === 'wrangler_pages_deploy') {
+    const q = quoted[0];
+    const m = t.match(/\bpages\s+deploy\s+(?!-)(\S+)/i) || t.match(/\b(?:deploy|publish|upload|wdr[oó]ż|opublikuj|wrzuć|wrzuc)\s+(?:the\s+)?([.~\/\w-]*[\w.\/~-])(?:\s+(?:folder|dir|directory|katalog))?\s+(?:to|on|onto|na|do)\b/i);
+    if (q) v.path = q;
+    else if (m && !/^(?:it|this|that|site|website|my|our|the|static|strone|stronę|to)$/i.test(m[1])) v.path = m[1].replace(/[,;!?]+$/, '');
+    else delete v.path;
+  }
+  return v;
 }

@@ -78,7 +78,7 @@ const PER_INTENT = {
   list_archive: { file: 'arch/sample.tar.gz' }, compress_zip: { archive: 'backup.zip' },
   find_larger_than: { size: '10k' }, find_smaller_than: { size: '1k' }, sort_uniq: { file: 'my docs/log lines.txt' },
   base64_decode: { file: 'my docs/encoded.b64' }, git_blame: { file: 'README.md' }, git_diff: { file: 'src.txt' },
-  git_show: { branch: 'HEAD' }, git_grep: { pattern: 'alpha' }, wrangler_pages_deploy: { path: 'my docs' },
+  git_show: { rev: 'HEAD' }, git_grep: { pattern: 'alpha' }, wrangler_pages_deploy: { path: 'my docs' },
   git_discard_changes: { file: 'src.txt' }, git_switch_branch: { branch: 'dev' }, git_delete_branch: { branch: 'dev' },
   delete_dir: { path: 'my docs/empty dir' }, activate_venv: { path: '.venv' }, find_by_name: { name: 'notes' },
   diff_files: { src: 'my docs/notes.txt', dst: 'my docs/notes copy.txt' }, create_symlink: { src: 'my docs/notes.txt', dst: 'link to notes' },

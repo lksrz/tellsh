@@ -240,7 +240,7 @@ export const INTENTS = [
   T('git_blame', 'Show who changed each line of a file', 'git blame {file}', { file: null }),
   T('git_init', 'Initialize a git repository', 'git init', {}),
   // templates-catalog: frequent git commands from real usage that the catalog lacked
-  T('git_show', 'Show a commit (the last one by default) with its diff', 'git show«{branch}»', {}),
+  T('git_show', 'Show a commit (the last one by default) with its diff', 'git show«{rev!raw}»', {}),
   T('git_fetch', 'Fetch new commits and branches from all remotes (no merge)', 'git fetch --all', {}),
   T('git_ls_files', 'List the files tracked by git', 'git ls-files', {}),
   T('git_grep', 'Search for text in the files tracked by git', 'git grep -n -- {pattern}', { pattern: null }),
@@ -286,7 +286,7 @@ export const INTENTS = [
   T('wrangler_whoami', 'Show which Cloudflare account wrangler is logged in as', 'npx wrangler whoami«{args!raw}»', {}, 'medium'),
   // templates-catalog
   T('wrangler_d1_list', 'List the Cloudflare D1 databases of the account', 'npx wrangler d1 list«{args!raw}»', {}, 'medium'),
-  T('wrangler_pages_deploy', 'Deploy a static site directory to Cloudflare Pages', 'npx wrangler pages deploy {path}«{args!raw}»', { path: 'dist' }, 'medium'),
+  T('wrangler_pages_deploy', 'Deploy a static site directory to Cloudflare Pages', 'npx wrangler pages deploy {path}«{args!raw}»', { path: null }, 'medium'),
 
   // ---------- GitHub CLI ----------
   T('gh_auth_status', 'Show GitHub CLI login status', 'gh auth status«{args!raw}»', {}),
@@ -300,7 +300,7 @@ export const INTENTS = [
   T('gh_run_view', 'Show a GitHub Actions run (and its failed logs)', 'gh run view«{num!raw}»«--repo {repo!raw}»«{scope!raw}»', {}),
   // templates-catalog
   T('gh_run_watch', 'Watch a GitHub Actions run live until it finishes', 'gh run watch«{num!raw}»«--repo {repo!raw}»«{scope!raw}»', {}),
-  T('gh_issue_list', 'List issues of the repository', 'gh issue list«--repo {repo!raw}»«{args!raw}»', {}),
+  T('gh_issue_list', 'List issues of the repository', 'gh issue list«--repo {repo!raw}»«--state {state!raw}»«{args!raw}»', {}),
   T('gh_issue_view', 'Show one GitHub issue', 'gh issue view {num!raw}«--repo {repo!raw}»«{scope!raw}»', { num: null }),
 ];
 

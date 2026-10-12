@@ -603,7 +603,7 @@ export const VARIANTS = {
   git_remote: { pwsh: 'git remote -v', cmd: 'git remote -v' },
   git_blame: { pwsh: 'git blame {file}', cmd: 'git blame {file}' },
   git_init: { pwsh: 'git init', cmd: 'git init' },
-  git_show: { pwsh: 'git show«{branch}»', cmd: 'git show«{branch}»' },
+  git_show: { pwsh: 'git show«{rev!raw}»', cmd: 'git show«{rev!raw}»' },
   git_fetch: { pwsh: 'git fetch --all', cmd: 'git fetch --all' },
   git_ls_files: { pwsh: 'git ls-files', cmd: 'git ls-files' },
   // a bare `--` can be swallowed by PowerShell before reaching native commands; quote it
@@ -646,7 +646,7 @@ export const VARIANTS = {
   wrangler_d1_list: { pwsh: 'npx wrangler d1 list«{args!raw}»', cmd: 'npx wrangler d1 list«{args!raw}»' },
   wrangler_pages_deploy: { pwsh: 'npx wrangler pages deploy {path}«{args!raw}»', cmd: 'npx wrangler pages deploy {path}«{args!raw}»' },
   gh_run_watch: { pwsh: 'gh run watch«{num!raw}»«--repo {repo!raw}»«{scope!raw}»', cmd: 'gh run watch«{num!raw}»«--repo {repo!raw}»«{scope!raw}»' },
-  gh_issue_list: { pwsh: 'gh issue list«--repo {repo!raw}»«{args!raw}»', cmd: 'gh issue list«--repo {repo!raw}»«{args!raw}»' },
+  gh_issue_list: { pwsh: 'gh issue list«--repo {repo!raw}»«--state {state!raw}»«{args!raw}»', cmd: 'gh issue list«--repo {repo!raw}»«--state {state!raw}»«{args!raw}»' },
   gh_issue_view: { pwsh: 'gh issue view {num!raw}«--repo {repo!raw}»«{scope!raw}»', cmd: 'gh issue view {num!raw}«--repo {repo!raw}»«{scope!raw}»' },
   gh_auth_status: { pwsh: 'gh auth status«{args!raw}»', cmd: 'gh auth status«{args!raw}»' },
   gh_auth_login: { pwsh: 'gh auth login«{args!raw}»', cmd: 'gh auth login«{args!raw}»' },

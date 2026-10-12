@@ -715,7 +715,7 @@ function suggestOnce(query, opts = {}) {
   // command (`rm -r DIR`, `mv DIR …`); only the location a search-and-change runs in (`find DIR … -delete`). Any path
   // the request names is relative to the wrong directory, so every path slot is withheld (with or without history).
   // "move it there" with history: an object and a place reference at once is refused for any changing intent, at any confidence
-  if (ctx && ref?.rule !== 'refused' && hasPronoun(query) && locative && BY_ID[intent].risk !== 'safe' && !(bothRefs && refDst)) {
+  if (ctx && ref?.rule !== 'refused' && hasPronoun(query) && locative && BY_ID[intent].risk !== 'safe') {
     for (const k of Object.keys(slots)) if (PATH_SLOT_NAMES.has(k) || r.sources[k] === 'history') { delete slots[k]; delete r.sources[k]; }
     for (const k of Object.keys(BY_ID[intent].slots || {})) if (usesSlot(BY_ID[intent], k)) blank.add(k);
     finalizeSlots(BY_ID[intent], slots);
@@ -810,6 +810,8 @@ function suggestOnce(query, opts = {}) {
   }
   if (Object.values(r.sources).includes('history')) method = 'history-rule';
   const res = { ...out, understood: true, method, ...b, slotSources: r.sources, spans: r.spans.map((s) => ({ type: s.type, text: s.text })) };
+  // a refused history reference is never runnable as is, even when the intent has no slot left to blank (`git push`)
+  if (context.rule === 'refused' && !(res.missing || []).length) res.missing = ['reference (refused: edit the command)'];
   if (ambiguousText.length) res.warnings = [...(res.warnings || []), `value left as a placeholder: unclear where the quoted text ends (\\" may be an escaped quote) (${ambiguousText.join(', ')})`];
   if (splitPaths.length) res.warnings = [...(res.warnings || []), `path left as a placeholder: unclear which words name the ${splitPaths.map((x) => x.split('=')[0] === 'src' ? 'source' : 'destination').join(' and ')} (${splitPaths.join(', ')}); quote each path`];
   if (cutPaths.length) res.warnings = [...(res.warnings || []), `path left as a placeholder: unclear where the unquoted name ends (${cutPaths.join(', ')}); quote the path`];

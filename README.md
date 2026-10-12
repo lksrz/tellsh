@@ -429,6 +429,10 @@ retrain; `npm test && npm run eval`.
   Known Windows limits from it: `create_symlink` in Windows PowerShell 5.1 and `temperature` / `last_logins` need an
   elevated prompt; `disk_free` has no non-admin cmd.exe command (use PowerShell); cmd's `history_search` only sees the
   current session.
+* **New 0.3.4 templates take only explicit values.** `git fetch` is always `git fetch --all` (a named remote or
+  `--prune` is not rendered); `git show` reads a hash, `HEAD~N` or "previous commit", otherwise shows HEAD; `gh issue view`
+  / `gh run watch` need an explicit number (`issue 42`, `#42`, `run 123`); `wrangler pages deploy` needs the directory
+  named (no `dist` default); a `git grep` pattern that starts with `-` is a placeholder.
 * **The selector rule trades recall for safety.** Its vocabulary is closed and hand-written (English and Polish): a
   harmless paraphrase with a word it does not list (`deploy the api worker to cloudflare`, `run the worker on
   localhost:8787`) gets a placeholder (`<ARGS>`, `<WENV>`) you have to fill or delete. On the 1097 gh / wrangler
