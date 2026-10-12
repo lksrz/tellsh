@@ -99,3 +99,14 @@ test('r50: a 0.3.4 template history line adds no history features: requests read
     assert.equal(a.command && !(a.missing || []).length ? a.command : null, b.command && !(b.missing || []).length ? b.command : null, `${shell}: ${h} / ${q}`);
   }
 });
+
+test('r51: no implicit history fill from a 0.3.4 template line', () => {
+  const H = ['npx wrangler pages deploy site.v2', 'npx wrangler pages deploy dist', 'git ls-files', 'gh issue view 42', 'git fetch --all', 'npx wrangler d1 list', 'gh run watch', 'gh issue list --state closed'];
+  const Q = ['show contents', 'count lines', 'list files', 'show file', 'show size', 'print the file'];
+  for (const shell of ['bash', 'zsh', 'fish', 'sh', 'powershell', 'cmd']) for (const h of H) for (const q of Q) {
+    const o = { shell, os: shell === 'powershell' || shell === 'cmd' ? 'win32' : 'linux' };
+    const a = suggest(q, { ...o, history: [h] }), b = suggest(q, o);
+    const R = (r) => (r.command && !(r.missing || []).length ? r.command : null);
+    assert.equal(R(a), R(b), `${shell}: ${h} / ${q}`);
+  }
+});

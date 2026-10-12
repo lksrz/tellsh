@@ -851,7 +851,8 @@ function suggestOnce(query, opts = {}) {
   // implicit reference: a required slot is still missing and the history has a value of that type.
   // Only for safe intents: a destructive command ("delete the folder") is never aimed at a history
   // value without an explicit reference word ("delete it"), which goes through resolveReference.
-  if (ctx && b.missing.length && ref?.rule !== 'refused' && BY_ID[intent].risk === 'safe' && b.risk === 'safe') {
+  // 0.3.4: never from a 0.3.4 template history line (`deploy site.v2` + "show contents" is not `cat site.v2`)
+  if (ctx && !newLast && b.missing.length && ref?.rule !== 'refused' && BY_ID[intent].risk === 'safe' && b.risk === 'safe') {
     const filled = [];
     for (const m of b.missing) {
       if (r.withheld?.includes(m)) continue; // "list files in the": not a reference to history either
