@@ -20,9 +20,10 @@ const sets = {
   real: sub(real), real_human: sub(real.filter((r) => !r.tmpl)), real_tmpl: sub(real.filter((r) => r.tmpl)),
   data_eval: rd(join(ROOT, 'data/eval')), eval_v04: rd(join(ROOT, 'data/eval_v04')), shell_eval: rj(join(ROOT, 'data/shell/eval.jsonl')),
 };
+if (!dir || !existsSync(join(dir, 'encoder.int8.onnx')) || !existsSync(join(dir, 'vocab.json'))) { console.error('eval_student: no encoder bundle in', dir); process.exit(1); }
 const enc = await Encoder.load({ dir, threads: 2 });
 // Encoder.load falls back to other bundles (env / cache / package): insist on the requested one
-if (!dir || !existsSync(join(dir, 'encoder.int8.onnx')) || !enc || realpathSync(enc.dir) !== realpathSync(dir)) { console.error('eval_student: cannot load encoder from', dir); process.exit(1); }
+if (!enc || realpathSync(enc.dir) !== realpathSync(dir)) { console.error('eval_student: cannot load encoder from', dir); process.exit(1); }
 const out = { dir: dir.replace(ROOT, ''), sets: {} };
 for (const [name, rows] of Object.entries(sets)) {
   let ok = 0; const per = {};

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Offline evaluation of an A + student combination (no runtime change): A answers by default; the student's intent is
 // used when A's confidence < t, or (optionally) when the two disagree and the student's top-intent p >= s.
-// Sweeps t (and s), prints per-set top-1 accuracy, and picks the t that maximises real_human accuracy while losing at
+// Sweeps t (and s), prints per-set top-1 accuracy, and picks the t that maximises real_human (tuning half) accuracy while losing at
 // most --max-loss pp (default 0.3) against A alone on data_eval, eval_v04 and shell_eval. To avoid scoring the choice on
 // the rows it was tuned on, the real eval split is halved by a hash of the command group: t/s are picked on real_human_tune
 // and the untouched half is reported as real_human_test. Aggregates only.
@@ -12,7 +12,7 @@ import { fileURLToPath } from 'node:url';
 import { loadModel } from '../../src/model.js';
 import { cascade } from '../../src/cascade.js';
 import { envFeatures } from '../../src/env.js';
-import { fnv1a } from '../../src/features.js';
+import { createHash } from 'node:crypto';
 import { Encoder } from '../../src/rerank/encoder.js';
 import { writePrivate } from '../lib/privwrite.js';
 
@@ -54,9 +54,11 @@ for (const [name, rows] of Object.entries(sets)) {
 }
 preds.real_human = preds.real.filter((_, i) => !real[i].tmpl);
 preds.real_tmpl = preds.real.filter((_, i) => real[i].tmpl);
-const half = (r) => fnv1a('combo:' + (r.group ?? r.text)) % 2;
+// sha256, not fnv1a: fnv1a's low bit is only the parity of the input characters
+const half = (r) => createHash('sha256').update('combo:' + (r.group ?? r.text)).digest()[0] & 1;
 preds.real_human_tune = preds.real.filter((_, i) => !real[i].tmpl && half(real[i]) === 0);
 preds.real_human_test = preds.real.filter((_, i) => !real[i].tmpl && half(real[i]) === 1);
+if (!preds.real_human_tune.length || !preds.real_human_test.length) { console.error('eval_combo: real_human tuning or test half is empty'); process.exit(1); }
 
 const acc = (P, t, s) => {
   let ok = 0;

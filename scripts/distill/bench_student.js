@@ -20,8 +20,8 @@ if (!enc || realpathSync(enc.dir) !== realpathSync(dir)) { console.error('bench_
 if (enc.runtime !== 'onnxruntime-node') { console.error('bench_student: onnxruntime-node not available (got', enc.runtime + ')'); process.exit(1); }
 const ed = join(ROOT, 'data/eval');
 const texts = [...new Set(readdirSync(ed).filter((f) => f.endsWith('.jsonl')).flatMap((f) => readFileSync(join(ed, f), 'utf8').split('\n').filter((l) => l.trim()).map((l) => JSON.parse(l).text)))].slice(0, N + 20);
-for (const t of texts.slice(0, 20)) await enc.infer(t, { shell: 'bash', os: 'linux' }); // warm-up
 if (texts.length <= 20) { console.error('bench_student: not enough eval texts'); process.exit(1); }
+for (const t of texts.slice(0, 20)) await enc.infer(t, { shell: 'bash', os: 'linux' }); // warm-up
 const ms = [];
 for (const t of texts.slice(20)) { const t0 = performance.now(); await enc.infer(t, { shell: 'bash', os: 'linux' }); ms.push(performance.now() - t0); }
 ms.sort((a, b) => a - b);
