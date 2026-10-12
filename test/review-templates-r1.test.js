@@ -418,3 +418,14 @@ test('r35: gh extra-output relations are withheld', () => {
     for (const q of ['show issue 42', 'watch run 42 in repo foo/bar']) assert.deepEqual(suggest(q, env).missing, [], `${env.shell}: ${q}`);
   }
 });
+
+// review r36: a second repo mention beside the read repo value
+test('r36: repo-output requests are withheld even with a read repo', () => {
+  for (const env of [{ shell: 'bash', os: 'linux' }, { shell: 'pwsh', os: 'win32' }, { shell: 'cmd', os: 'win32' }]) {
+    for (const q of ['show issue 42 in repo foo/bar description of the repo', 'show issue 42 details in repo foo/bar summary of the repository', 'show issue 42 in foo/bar repo description', 'show issue 42 in repo foo/bar me the repo details', 'watch run 42 in repo foo/bar status of the repo', 'show the repo description for issue 42 in repo foo/bar']) {
+      const r = suggest(q, env);
+      assert.ok(!r.command || r.missing.length > 0, `${env.shell}: ${q}`);
+    }
+    for (const q of ['show issue 42', 'watch run 42 in repo foo/bar', 'show issue 42 --repo foo/bar']) assert.deepEqual(suggest(q, env).missing, [], `${env.shell}: ${q}`);
+  }
+});
