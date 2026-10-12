@@ -777,7 +777,7 @@ const SCOPE_OPT = /(?:^|\s)(--workspaces?|--ws|--filter|--repo|--env|--config|--
 const SCOPE_PHRASE = /(?:^|\s)(?:in|for|of|on|from|within|inside|under|at|w|we|dla|z)\s+(?:the\s+|a\s+)?(workspace|project|projek\w*|repo|repository|repozytori\w*|env|environment|srodowisk\w*|config|configuration|konfiguracj\w*)\s+(?!-)("[^"\n]*"|'[^'\n]*'|[^\s,;!?]+)/g;
 // pip's attached short form: `-t/tmp/pkgs`, `-t~/pkgs` (the separated `-t DIR` is read by SCOPE_OPT)
 // trailing sentence punctuation is dropped, but never a `.` / `..` path segment (`-t lib/..`, `..\..`)
-const stripScopePunct = (x) => (/(?:^|[\/\\])\.{1,2}$/.test(x) ? x : x.replace(/[.,!?;:]+$/, ''));
+const stripScopePunct = (x) => (/(?:^|[\/\\:])\.{1,2}$/.test(x) ? x : x.replace(/[.,!?;:]+$/, ''));
 const SCOPE_ATTACHED_T = /(?:^|\s)-t((?:"[^"\n]*"|'[^'\n]*'|[/~.\w][^\s,;!?]*))/g;
 const SCOPE_PHRASE_KIND = (w) => /^(?:workspace)$/.test(w) ? 'workspace' : /^(?:repo|repository|repozytori)/.test(w) ? 'repo'
   : /^(?:env|environment|srodowisk)/.test(w) ? 'env' : /^(?:config|configuration|konfiguracj)/.test(w) ? 'config' : 'project';
@@ -791,7 +791,11 @@ export function scopeMentions(intentId, text) {
     if (SCOPE_SHORT[opt] && !SCOPE_SHORT[opt].test(intentId)) continue;
     const quoted = m[2] ?? m[3] ?? m[5] ?? m[6];
     const raw = quoted ?? m[4] ?? m[7] ?? null;
-    out.push({ kind: SCOPE_KIND[opt], value: quoted != null ? quoted.trim() || null : raw ? stripScopePunct(raw).replace(/^["'`]|["'`]$/g, '') || null : null, at: m.index });
+    // a quoted value glued to more text (`--target "lib"cache`, `-t "lib",cache`) or an operand cut at punctuation is a placeholder
+    const after = t.slice(m.index + m[0].length);
+    const gluedQ = quoted != null && /^\S/.test(after) && !/^[.!?;:)]+(?:\s|$)/.test(after);
+    const cutRaw = quoted == null && raw != null && /^[,;!?]\S/.test(after);
+    out.push({ kind: SCOPE_KIND[opt], value: gluedQ || cutRaw ? null : quoted != null ? quoted.trim() || null : raw ? stripScopePunct(raw).replace(/^["'`]|["'`]$/g, '') || null : null, at: m.index });
   }
   if (/^pip_/.test(intentId)) {
     // `-t@foo`: an attached target the parser does not read is still a target (placeholder), never dropped
@@ -1208,11 +1212,16 @@ export function newTemplateWithhold(id, text, slots = {}, command = null) {
     if (id === 'git_show') {
       const rel = t.match(/\b(?:previous|prior|second[- ]to[- ]last|before|poprzedni\w*|przedostatni\w*|parent|rodzic\w*)\b/gi) || [];
       if (rel.length > 1) rest.push('(nested relative revision)');
-      for (const m of t.matchAll(/\b(?:tag|branch|ref|of|from|on|z|na)\s+(?:the\s+)?(?=(["']?)([^\s"']+)\1)/gi)) if (String(slots.rev ?? '').toLowerCase() !== m[2].toLowerCase() && !/^(?:commit|commits|repo|repository|branch|tag|head)$/i.test(m[2])) rest.push(m[2]);
+      // several commit selectors ("the latest commit and the previous commit") name more than one object
+      const sel = t.match(/\b(?:latest|last|newest|most recent|previous|prior|second[- ]to[- ]last|ostatni\w*|najnowsz\w*|poprzedni\w*|przedostatni\w*)\b/gi) || [];
+      if (sel.length > 1) rest.push('(more than one commit selected)');
+      // a tag / revision / branch named without a value read into rev is not HEAD
+      if (slots.rev == null && /\b(?:tags?|tagu|tagi|revision|rewizj\w*|branch\w*|gał[eę]zi\w*|galezi\w*)\b/i.test(t)) rest.push('(a tag, revision or branch without a value)');
+      for (const m of t.matchAll(/\b(?:tag|branch|ref|revision|of|from|on|at|with|for|in|to|across|z|na|w|dla)\s+(?:the\s+)?(?=(["']?)([^\s"']+)\1)/gi)) if (String(slots.rev ?? '').toLowerCase() !== m[2].toLowerCase() && !/^(?:commit|commits|repo|repository|head|its|it|diff|changes|me|my|this|that)$/i.test(m[2])) rest.push(m[2]);
     }
-    if (id === 'wrangler_pages_deploy') for (const m of t.matchAll(/\b(?:to|for|into|onto|na|do|dla)\s+(?:the\s+)?(["']?)([^\s"']+)\1/gi)) if (!/^(?:cloudflare|pages|page)$/i.test(m[2]) && String(slots.path ?? '').toLowerCase() !== m[2].toLowerCase()) rest.push(m[2]);
+    if (id === 'wrangler_pages_deploy') for (const m of t.matchAll(/\b(?:to|for|into|onto|on|as|named|called|in|at|under|across|pages|na|do|dla|w|jako)\s+(?:the\s+|my\s+)?(?=(["']?)([^\s"']+)\1)/gi)) if (!/^(?:cloudflare|pages|page)$/i.test(m[2]) && String(slots.path ?? '').toLowerCase() !== m[2].toLowerCase()) rest.push(m[2]);
     // a place for git grep ("in files", "under src") is a pathspec unless it names the repository itself
-    if (id === 'git_grep') for (const m of t.matchAll(/\b(?:in|inside|within|under|on|of|at|w|we|na)\s+(?:the\s+|all\s+|my\s+|a\s+)?(["']?)([^\s"']+)\1/gi)) if (!/^(?:repo|repository|repozytorium|tracked|git|codebase|plikach|sledzonych|śledzonych)$/i.test(m[2])) rest.push(m[2]);
+    if (id === 'git_grep') for (const m of t.matchAll(/\b(?:in|inside|within|under|on|of|at|across|except|excluding|from|w|we|na|poza|oprócz|oprocz)\s+(?:the\s+|all\s+|my\s+|a\s+)?(?=(["']?)([^\s"']+)\1)/gi)) if (!/^(?:repo|repository|repozytorium|tracked|git|codebase|plikach|sledzonych|śledzonych)$/i.test(m[2])) rest.push(m[2]);
     if (rest.length) out.push(`${id === 'git_grep' ? 'pattern' : id === 'git_show' ? 'rev' : 'args'} (not expressed: ${[...new Set(rest)].slice(0, 4).join(' ')})`);
     if (Object.values(slots).some((x) => glued(x)) || /\\["']/.test(t)) out.push('value (unclear where the quoted text ends)');
   }

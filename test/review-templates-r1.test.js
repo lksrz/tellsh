@@ -159,3 +159,13 @@ test('review r10: path segments kept in every -t form, nested relative revisions
   await held('wrangler pages deploy "C:../.."', { shell: 'cmd', os: 'win32' });
   for (const q of ['show the previous commit', 'show the last commit', 'deploy dist to cloudflare pages', 'find TODO in tracked files']) assert.equal((await run(q)).missing.length, 0, q);
 });
+
+test('review r11: drive-relative pip targets, glued quoted separated targets, several commit selectors, tags without a value, more selector positions', async () => {
+  const held = async (q, o = BASH) => { const r = await run(q, o); assert.ok(r.command == null || r.missing.length > 0, `${q}: ${r.command} must not run on Enter`); };
+  assert.match((await run('pip install requests -tC:..', PS)).command, /--target 'C:\.\.'/);
+  assert.match((await run('pip install requests --target=C:..', PS)).command, /--target 'C:\.\.'/);
+  for (const q of ['pip install requests --target "lib"cache', 'pip install requests -t "lib",cache', 'show the latest commit and the previous commit',
+    'show the latest commit for the last tag', 'show tag commit', 'pokaż ostatni commit tagu', 'show the commit with revision latest',
+    'deploy dist to cloudflare pages on static', 'deploy dist to cloudflare pages static', 'search tracked files for "TODO" across the file']) await held(q);
+  for (const q of ['pip install requests --target "/tmp/a b"', 'show me the latest commit with its diff', 'wdróż katalog dist na cloudflare pages', 'deploy ./build to pages']) assert.equal((await run(q)).missing.length, 0, q);
+});
