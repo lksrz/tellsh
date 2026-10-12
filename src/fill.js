@@ -808,6 +808,9 @@ export function scopeMentions(intentId, text) {
       // the operand pip reads is everything up to the next space (`-t/tmp/lib,cache`): anything else is a placeholder
       const whole = (t.slice(m.index).match(/^\s*-t(\S+)/) || [])[1] ?? '';
       const cut = !q && (stripScopePunct(whole) !== stripScopePunct(m[1]) || /["'`]/.test(whole) || /\\\s|\\$/.test(t.slice(m.index, m.index + m[0].length + 1)));
+      // `-tlib,`: a trailing comma / semicolon / colon is part of what pip reads: placeholder
+      const whole0 = (t.slice(m.index).match(/^\s*-t(\S+)/) || [])[1] ?? '';
+      if (!q && /[,;:]$/.test(whole0) && !/^[a-z]:$/i.test(whole0)) { out.push({ kind: 'target', value: null, at: m.index }); continue; }
       const bare = stripScopePunct(m[1]).trim(); // `-t./lib/..` keeps its `..`
       const value = escaped || cut ? null : q ? q[2] : bare;
       out.push({ kind: 'target', value: value || null, at: m.index });
@@ -1215,14 +1218,14 @@ export function newTemplateWithhold(id, text, slots = {}, command = null) {
       if (rel.length > 1) rest.push('(nested relative revision)');
       // several commit selectors ("the latest commit and the previous commit") name more than one object
       const sel = t.match(/\b(?:latest|last|newest|most recent|previous|prior|second[- ]to[- ]last|ostatni\w*|najnowsz\w*|poprzedni\w*|przedostatni\w*)\b/gi) || [];
-      if (sel.length > 1) rest.push('(more than one commit selected)');
+      if (sel.length > 1 || (sel.length && slots.rev != null && t.toLowerCase().includes(String(slots.rev).toLowerCase()))) rest.push('(more than one commit selected)');
       // a tag / revision / branch named without a value read into rev is not HEAD
       if ((slots.rev == null || !t.toLowerCase().includes(String(slots.rev).toLowerCase())) && /\b(?:tags?|tagu|tagi|revision|rewizj\w*|branch\w*|gał[eę]zi\w*|galezi\w*)\b/i.test(t)) rest.push('(a tag, revision or branch without a value)');
       for (const m of t.matchAll(/\b(?:tag|branch|ref|revision|of|from|on|at|with|for|in|to|across|z|na|w|dla)\s+(?:the\s+)?(?=(["']?)([^\s"']+)\1)/gi)) if (String(slots.rev ?? '').toLowerCase() !== m[2].toLowerCase() && !/^(?:commit|commits|repo|repository|head|its|it|diff|changes|me|my|this|that)$/i.test(m[2])) rest.push(m[2]);
     }
     if (id === 'wrangler_pages_deploy') for (const m of t.matchAll(/\b(?:to|for|into|onto|on|as|named|called|in|at|under|across|pages|na|do|dla|w|jako)\s+(?:the\s+|my\s+)?(?=(["']?)([^\s"']+)\1)/gi)) if (!/^(?:cloudflare|pages|page)$/i.test(m[2]) && String(slots.path ?? '').toLowerCase() !== m[2].toLowerCase()) rest.push(m[2]);
     // a second pattern ("for "word" and TEXT", "foo or bar") is never searched
-    if (id === 'git_grep') for (const m of t.matchAll(/\b(?:and|or|oraz|lub|albo|i)\s+(?:also\s+)?(?=(["']?)([^\s"']+)\1)/gi)) if (!/^(?:tracked|files?|the|repo|repository|show|list|print|line|lines|numbers?)$/i.test(m[2])) rest.push(m[2]);
+    if (id === 'git_grep') for (const m of t.matchAll(/\b(?:and|or|oraz|lub|albo|i)\s+(?:also\s+)?(?:(?:the|a|an|for|word|words|text|string|pattern|phrase|słowo|slowo|fraz\w*)\s+)*(?=(["']?)([^\s"']+)\1)/gi)) if (!/^(?:tracked|files?|the|repo|repository|show|list|print|line|lines|numbers?)$/i.test(m[2])) rest.push(m[2]);
     // a place for git grep ("in files", "under src") is a pathspec unless it names the repository itself
     if (id === 'git_grep') for (const m of t.matchAll(/\b(?:in|inside|within|under|on|of|at|across|except|excluding|from|w|we|na|poza|oprócz|oprocz)\s+(?:the\s+|all\s+|my\s+|a\s+)?(?=(["']?)([^\s"']+)\1)/gi)) if (!/^(?:repo|repository|repozytorium|tracked|git|codebase|plikach|sledzonych|śledzonych)$/i.test(m[2])) rest.push(m[2]);
     if (rest.length) out.push(`${id === 'git_grep' ? 'pattern' : id === 'git_show' ? 'rev' : 'args'} (not expressed: ${[...new Set(rest)].slice(0, 4).join(' ')})`);

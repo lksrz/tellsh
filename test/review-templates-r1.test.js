@@ -186,3 +186,9 @@ test('review r13: escaped spaces in pip targets, a second grep pattern, issue-st
     'list all issues but closed', 'list all open issues but closed']) await held(q);
   assert.equal((await run('list closed issues')).command, 'gh issue list --state closed');
 });
+
+test('review r14: second pattern after a determiner, trailing comma in -t, implicit + explicit commit', async () => {
+  const held = async (q) => { const r = await run(q); assert.ok(r.command == null || r.missing.length > 0, `${q}: ${r.command} must not run on Enter`); };
+  for (const q of ['search tracked files for "TODO" and the word TEXT', 'pip install requests -tlib,', 'show the latest commit and commit abc1234']) await held(q);
+  for (const q of ['show commit abc1234', 'show the latest commit', 'pip install requests -t/tmp/pkgs']) assert.equal((await run(q)).missing.length, 0, q);
+});
