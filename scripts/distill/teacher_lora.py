@@ -84,6 +84,12 @@ def label(a):
             x = json.loads(l)
             if pool_h.get(x['id']) != x.get('h') or set(x.get('soft', {})) != pool_c.get(x['id']): sys.exit(f'label: {a.out} was made for a different pool (id {x["id"]}); use a new --out')
             done.add(x['id'])
+    # labels are bound to the exact pool they were made from (text, shell/OS and candidates): sidecar <out>.pool.sha256
+    ph = hashlib.sha256(open(a.pool, 'rb').read()).hexdigest()
+    side = a.out + '.pool.sha256'
+    if os.path.exists(side) and open(side).read().strip() != ph: sys.exit(f'label: {a.out} was made for a different pool; use a new --out')
+    if done and not os.path.exists(side): sys.exit(f'label: {a.out} has no {side}; use a new --out')
+    open(side, 'w').write(ph + '\n')
     out = open(a.out, 'a')
     for l in open(a.pool):
         r = json.loads(l)

@@ -24,6 +24,8 @@ const rj = (p) => (existsSync(p) ? readFileSync(p, 'utf8').split('\n').filter((l
 const poolBody = readFileSync(join(D, 'pool.jsonl'), 'utf8');
 const want = existsSync(join(D, 'pool.sha256')) ? readFileSync(join(D, 'pool.sha256'), 'utf8').trim() : null;
 if (!want || createHash('sha256').update(poolBody).digest('hex') !== want) { console.error('merge_labels: pool.jsonl changed since labelling (or no pool.sha256); relabel'); process.exit(1); }
+const side = join(D, 'labels.jsonl.pool.sha256');
+if (!existsSync(side) || readFileSync(side, 'utf8').trim() !== want) { console.error('merge_labels: labels.jsonl was not made from this pool (labels.jsonl.pool.sha256); relabel'); process.exit(1); }
 const excl = exclusionIndex(ROOT);
 const dev = new Set(JSON.parse(readFileSync(join(ROOT, 'build/hybrid/dev_texts.json'), 'utf8')));
 const decisions = rj(join(ROOT, 'data/teacher/decisions.jsonl')).filter((d) => d.text && d.field !== 'risk');

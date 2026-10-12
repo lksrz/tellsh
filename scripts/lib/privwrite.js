@@ -9,8 +9,19 @@ export const isLink = (p) => { try { return lstatSync(p).isSymbolicLink(); } cat
 
 const ROOT = realpathSync(fileURLToPath(new URL('../..', import.meta.url)));
 
+// resolve through the deepest existing ancestor, so a symlinked directory outside the repo cannot point back into it
+function realTarget(p) {
+  let q = p; const tail = [];
+  for (;;) { try { lstatSync(q); break; } catch (e) { if (e.code !== 'ENOENT') throw e; tail.unshift(q.slice(dirname(q).length + 1)); q = dirname(q); } }
+  return resolve(realpathSync(q), ...tail);
+}
+
 export function writePrivate(path, data, opts) {
   const abs = resolve(path);
+  if (isLink(abs)) throw new Error(`writePrivate: refusing symlink ${abs}`);
+  const real = realTarget(dirname(abs));
+  const relReal = relative(ROOT, real);
+  if (!(relReal === '..' || relReal.startsWith('..' + sep) || isAbsolute(relReal)) && !(relReal === 'build' || relReal.startsWith('build' + sep))) throw new Error(`writePrivate: ${path} resolves into the repo outside build/`);
   const rel = relative(ROOT, abs);
   const outside = rel === '..' || rel.startsWith('..' + sep) || isAbsolute(rel);
   if (!outside) {
