@@ -432,8 +432,9 @@ retrain; `npm test && npm run eval`.
 * **`git grep` / `git show` are not suggested as runnable in 0.3.4.** Their free-text forms are withheld (shown with a
   placeholder, never run on Enter or `--yes`) until a later release.
 * **New 0.3.4 templates take only explicit values.** `git fetch` is always `git fetch --all` (a named remote or
-  `--prune` is not rendered, and a request that also asks for another action is withheld); `gh issue view` / `gh run watch`
-  need an explicit number (`issue 42`, `#42`, `run 123`); `wrangler pages deploy` needs the directory named (no `dist`
+  `--prune` is not rendered, and a request that also asks for another action is withheld); `gh issue view` needs an
+  explicit number (`issue 42`, `#42`); `gh run watch` takes one (`run 123`) or none (gh then asks which run), and a
+  number-like word it cannot read is withheld; `wrangler pages deploy` needs the directory named (no `dist`
   default).
 * **History after a 0.3.4 template is replayed only as "same for X".** When the previous command is one of the new
   templates (`git fetch`, `git ls-files`, `gh issue list` / `view`, `gh run watch`, `wrangler d1 list`, `wrangler pages

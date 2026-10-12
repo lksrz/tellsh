@@ -46,7 +46,7 @@
     "teacher": "node scripts/teacher.js",
     "eval": "node scripts/eval.js",
     "bench": "taskset -c 0 node scripts/bench.js",
-    "prepack": "node -e \"for (const f of ['model/model.bin','model/tldr_triggers.json','model/compose_explained.json']) require('fs').statSync(f)\""
+    "prepack": "node -e \"for (const f of ['model/model.bin','model/model_templates.bin','model/tldr_triggers.json','model/compose_explained.json']) require('fs').statSync(f)\""
   },
   "keywords": [
     "cli",
