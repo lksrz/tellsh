@@ -615,3 +615,19 @@ node scripts/hybrid/report_hybrid.js                       # tables above
 ```
 Runtime: `tellsh --hybrid …` (or `TELLSH_HYBRID=1`) uses A+B with the encoder loaded lazily only when the cascade defers;
 without `onnxruntime-node` / the bundle it silently falls back to A. Re-ranked answers are never auto-run with `--yes`.
+
+## Distilled student fallback (A+S, feat/hybrid-student)
+
+A 3-layer encoder (`tellsh-model-student`, bundle `stu-v1`, ~14 MB int4/int8 ONNX) was distilled from a LoRA-tuned
+Qwen 7B teacher that labelled 60k PL/EN sentences (workstream 3, `ml/distill`). Its policy (`POLICY['A+S']`) works like this:
+
+- If A's confidence is >= 0.6, A answers and the student is not loaded.
+- If A rejected the request (below the threshold, or refused by a pipeline guard), the request stays rejected and the
+  student is not run.
+- Otherwise the student's argmax over the catalog intents replaces A's answer, but only if p >= 0.5 and pNone < 0.5.
+  If not, A's answer stands.
+
+It is on by default when the bundle and onnxruntime-node are installed (`TELLSH_HYBRID=0` turns it off).
+`TELLSH_HYBRID=student-full` adds the disagreement rule (a student with p >= 0.9 overrules a confident A), which needs
+the student on every query and measured no better end to end. Numbers come from `scripts/hybrid/eval_student_runtime.js`.
+Rescuing A's rejections was measured and rejected: it turned 99% of the out-of-catalog real requests into wrong answers.

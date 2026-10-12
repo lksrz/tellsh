@@ -43,7 +43,7 @@ const LOG = (p) => Math.log(Math.max(p, 1e-6));
 export function rerank(c, pX, P, { thr, pNone = 0 } = {}) {
   if (c.confidence >= P.tau) {
     // disagreement rule: a confident cascade answer is replaced only by a confident, different, in-catalog model answer
-    if (!P.disagree || pNone >= (P.none ?? 1)) return c;
+    if (!P.disagree || pNone >= (P.none ?? 1) || c.confidence < thr) return c;
     let bi = null; let bp = -1;
     for (const [i, p] of Object.entries(pX)) if (FAMILY_OF[i] && p > bp) { bp = p; bi = i; }
     if (!bi || bi === c.intent || bp < P.disagree) return c;
@@ -94,7 +94,8 @@ export async function suggestHybrid(query, opts = {}) {
   const first = suggest(query, { ...base, rerank: (c, { thr }) => { seen = c; seenThr = thr; return c; } });
   if (!seen || (seen.confidence >= P.tau && !P.disagree)) return { ...first, hybrid: { system, deferred: false } };
   // the policy keeps every cascade rejection (rescue: false): the model could not change anything, so do not load or run it
-  if (P.rescue === false && seen.confidence < seenThr) return { ...first, hybrid: { system, deferred: false } };
+  // (and the completed pipeline's own refusals, e.g. the gh_pr_* guards, which can fire above the threshold)
+  if (P.rescue === false && (seen.confidence < seenThr || !first.understood)) return { ...first, hybrid: { system, deferred: false } };
   const t0 = performance.now();
   let pX; let pNone = 0; let tagger;
   if (/B|S/.test(system)) {
@@ -109,7 +110,11 @@ export async function suggestHybrid(query, opts = {}) {
     if (!pX) return { ...first, hybrid: { system, deferred: true, unavailable: 'lm' } };
   }
   const ms = performance.now() - t0;
-  const res = suggest(query, { ...base, tagger, rerank: (c, { thr }) => rerank(c, pX, P, { thr, pNone }) });
+  let changed = false;
+  const res = suggest(query, { ...base, tagger, rerank: (c, { thr }) => { const r = rerank(c, pX, P, { thr, pNone }); changed = r !== c; return r; } });
+  // fallback policies (A+S): deferred = the model actually changed A's decision (the CLI's --yes and its "re-ranked"
+  // note key on it); consulted = the model was run
+  if (P.fallback) return changed ? { ...res, hybrid: { system, deferred: true, consulted: true, ms, pNone } } : { ...first, hybrid: { system, deferred: false, consulted: true, ms, pNone } };
   return { ...res, hybrid: { system, deferred: true, ms, pNone } };
 }
 
@@ -127,8 +132,9 @@ export async function suggestLazy(query, opts = {}) {
   const student = /S/.test(system);
   const key = student ? 'S' : 'B';
   const encoder = { infer: async (t, env) => {
-    if (!LOADED.has(key)) LOADED.set(key, (await (opts.load || loader(student))()) || false);
-    const m = LOADED.get(key);
+    // the promise is cached, so concurrent first calls share one load; a throwing loader counts as unavailable
+    if (!LOADED.has(key)) LOADED.set(key, Promise.resolve().then(opts.load || loader(student)).then((m) => m || false, () => false));
+    const m = await LOADED.get(key);
     if (!m) throw Object.assign(new Error('unavailable'), { unavailable: true });
     try { return await m.infer(t, env); } catch { throw Object.assign(new Error('unavailable'), { unavailable: true }); }
   } };

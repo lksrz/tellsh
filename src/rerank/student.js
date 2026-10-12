@@ -20,15 +20,16 @@ export function findStudentDir(explicit) {
   return cands.find(ok) || null;
 }
 
-/** Load the student; null when the bundle or onnxruntime is unavailable or the model cannot be opened. */
+/** Load the student; null when the bundle or onnxruntime-node is unavailable or the model cannot be opened. */
 export async function loadStudent({ dir, threads = 1 } = {}) {
   const d = findStudentDir(dir);
   if (!d) return null;
   try {
     const { Encoder } = await import('./encoder.js');
-    const enc = await Encoder.load({ dir: d, threads });
-    // Encoder.load falls back to the B bundle when a directory is incomplete: accept only the student bundle itself
-    if (!enc || realpathSync(enc.dir) !== realpathSync(d)) return null;
+    const enc = await Encoder.load({ dir: d, ort: 'node', threads });
+    // Encoder.load falls back to the B bundle when a directory is incomplete, and to onnxruntime-web (WASM, slower)
+    // when the native runtime is missing: accept only the student bundle itself on onnxruntime-node
+    if (!enc || realpathSync(enc.dir) !== realpathSync(d) || enc.runtime !== 'onnxruntime-node') return null;
     return enc;
   } catch {
     return null;
