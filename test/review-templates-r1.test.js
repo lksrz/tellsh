@@ -407,3 +407,14 @@ test('r34: absolute/device/UNC pages paths and but-clauses are withheld', () => 
     for (const q of ['deploy ./dist to cloudflare pages', 'show issue 42']) assert.deepEqual(suggest(q, env).missing, [], `${env.shell}: ${q}`);
   }
 });
+
+// review r35: extra output relations on gh issue view / run watch
+test('r35: gh extra-output relations are withheld', () => {
+  for (const env of [{ shell: 'bash', os: 'linux' }, { shell: 'pwsh', os: 'win32' }, { shell: 'cmd', os: 'win32' }]) {
+    for (const q of ['show github issue 42 with the description of the repo', 'show issue 42 including the repo description', 'show issue 42 of the repo description', 'watch run 5 with logs']) {
+      const r = suggest(q, env);
+      assert.ok(!r.command || r.missing.length > 0, `${env.shell}: ${q}`);
+    }
+    for (const q of ['show issue 42', 'watch run 42 in repo foo/bar']) assert.deepEqual(suggest(q, env).missing, [], `${env.shell}: ${q}`);
+  }
+});
