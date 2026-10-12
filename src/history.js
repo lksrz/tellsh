@@ -1250,8 +1250,8 @@ function locativeRef(fq, ctx) {
 export function changeGuard(type, value, fq, ctx) {
   const v = String(value);
   if (type === 'dir' && CONTENTS.test(fq)) return `the request is about the entries inside ${v}, not ${v} itself; not guessing`;
-  // `npx wrangler pages deploy dist`: "delete it" may mean the deployment, not the uploaded build directory
-  if (type === 'dir' && ctx.last?.intent === 'wrangler_pages_deploy') return `${v} is the directory the previous command deployed; "it" may mean the deployment; not guessing`;
+  // `npx wrangler pages deploy dist` (or `site.v2`, read as a file): "delete it" may mean the deployment, not the uploaded directory
+  if (ctx.last?.intent === 'wrangler_pages_deploy') return `${v} is what the previous command deployed; "it" may mean the deployment; not guessing`;
   if (type === 'dir' && ctx.searchRoots?.has(v)) return `the directory of the previous command (${v}) is where a search ran, not what it found; not guessing`;
   if (type === 'dir' && ctx.listedDirs?.has(v)) {
     const pl = PLURAL.exec(fq);
