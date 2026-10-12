@@ -62,3 +62,11 @@ test('r45: a history replay never makes an expandable pip target runnable', () =
   assert.ok(!r.command || (r.missing || []).length > 0, r.command);
 });
 import { NEW_TEMPLATE_INTENTS as NEW } from '../src/pipeline.js';
+
+test('r46: "same but ..." after a 0.3.4 template never turns into another operation', () => {
+  const cases = [['git fetch --all', 'same but no push'], ['git fetch --all', 'same but no merge'], ['gh issue list --state closed', 'same but open']];
+  for (const shell of ['bash', 'zsh', 'fish', 'sh', 'powershell', 'cmd']) for (const [h, q] of cases) {
+    const r = suggest(q, { shell, os: shell === 'powershell' || shell === 'cmd' ? 'win32' : 'linux', history: [h] });
+    assert.ok(!r.command || (r.missing || []).length, `${shell}: ${h} / ${q} -> ${r.command}`);
+  }
+});

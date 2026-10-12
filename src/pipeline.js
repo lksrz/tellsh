@@ -549,6 +549,13 @@ function suggestOnce(query, opts = {}) {
     context.note = `the newest command that tellsh can modify (${sb.lastIntent}) is not the previous command; not guessing`;
     return { ...base, understood: false, method: 'history-rule', confidence: 0, candidates, tools, command: null, missing: [], hint: context.note };
   }
+  // "same but no push" after `git fetch --all`: a 0.3.4 template replayed as "same but ..." keeps its operation; a modification
+  // that lands on another intent (git push, git pull, gh pr list) is refused, never a runnable different command
+  if (sb && intent !== sb.lastIntent && (NEW_TEMPLATE_INTENTS.has(sb.lastIntent) || NEW_TEMPLATE_INTENTS.has(intent))) {
+    context.rule = 'refused';
+    context.note = `"same but ..." would change the previous command (${sb.lastIntent}) into another operation (${intent}); not guessing`;
+    return { ...base, understood: false, method: 'history-rule', confidence: 0, candidates, tools, command: null, missing: [], hint: context.note };
+  }
   // "same for api" after `docker --context prod logs web`: repeated here it would run against the default daemon
   if (sb?.scoped) {
     context.rule = 'refused';
