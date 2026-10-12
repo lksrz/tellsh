@@ -603,7 +603,7 @@ export const VARIANTS = {
   git_remote: { pwsh: 'git remote -v', cmd: 'git remote -v' },
   git_blame: { pwsh: 'git blame {file}', cmd: 'git blame {file}' },
   git_init: { pwsh: 'git init', cmd: 'git init' },
-  git_show: { pwsh: 'git show«{rev!raw}»', cmd: 'git show«{rev!raw}»' },
+  git_show: { pwsh: 'git show«{rev}»', cmd: 'git show«{rev}»' },
   git_fetch: { pwsh: 'git fetch --all', cmd: 'git fetch --all' },
   git_ls_files: { pwsh: 'git ls-files', cmd: 'git ls-files' },
   // a bare `--` can be swallowed by PowerShell before reaching native commands; quote it

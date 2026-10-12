@@ -26,8 +26,8 @@ test('review r1 blocker: a refused history reference is never runnable as is', a
 test('review r1 majors: new templates take only explicit values', async () => {
   const cmd = async (q, o) => (await run(q, o)).command;
   assert.equal(await cmd('git show abc1234'), 'git show abc1234');
-  assert.equal(await cmd('git show HEAD~1'), 'git show HEAD~1');
-  assert.equal(await cmd('show the previous commit'), 'git show HEAD~1');
+  assert.equal(await cmd('git show HEAD~1'), "git show 'HEAD~1'");
+  assert.equal(await cmd('show the previous commit'), "git show 'HEAD~1'");
   assert.match(await cmd('wrangler pages deploy build'), /deploy build$/);
   assert.match(await cmd('deploy the build folder to pages in production'), /deploy (?:build|<PATH>)/);
   assert.doesNotMatch(await cmd('deploy the build folder to pages in production'), /deploy (?:dist|production)/);
@@ -39,4 +39,28 @@ test('review r1 majors: new templates take only explicit values', async () => {
   assert.doesNotMatch(await cmd('run npm publish'), /npm run publish/);
   assert.match(await cmd('run npm deploy in workspace ""'), /<WORKSPACE>/);
   assert.match(await cmd("pip install requests -t'/tmp/pkgs;'"), /--target '\/tmp\/pkgs;'/);
+});
+
+test('review r2: explicit values only, unsupported parts withheld, per-shell quoting', async () => {
+  const sug = (q, o = BASH) => run(q, o);
+  const cmd = async (q, o) => (await sug(q, o)).command;
+  for (const [q, exp] of [['git show deadbeef', 'git show deadbeef'], ['git show abc123', 'git show abc123'], ['git show "abc1234"', 'git show abc1234'], ['git show v1.2.3-beta', 'git show v1.2.3-beta']]) assert.equal(await cmd(q), exp, q);
+  assert.equal(await cmd('git show HEAD^1', { shell: 'cmd', os: 'win32' }), 'git show "HEAD^1"');
+  assert.equal(await cmd('git show @', PS), "git show '@'");
+  for (const q of ['deploy the folder to cloudflare pages', 'deploy the static site to "cloudflare pages"']) assert.match(await cmd(q), /deploy <PATH>/, q);
+  for (const q of ['deploy public to cloudflare pages in preview', 'deploy build to cloudflare pages --dry-run', 'deploy build to cloudflare pages without actually deploying']) {
+    const r = await sug(q);
+    assert.ok(r.missing.length > 0, `${q}: ${r.command} must not run on Enter`);
+  }
+  assert.equal(await cmd('wrangler pages deploy "my out"'), "npx wrangler pages deploy 'my out'");
+  assert.match(await cmd('show the issue mentioning #12'), /<NUM>/);
+  assert.match(await cmd('watch run 2 weeks old'), /<NUM>/);
+  assert.equal(await cmd('show issue #7'), 'gh issue view 7');
+  assert.equal(await cmd('git grep for parseConfig'), 'git grep -n -- parseConfig');
+  assert.match(await cmd('git grep -i TODO'), /<PATTERN>/);
+  assert.match(await cmd('pip install requests -t"/tmp/a\\"b"'), /<PIPTARGET>/);
+  for (const q of ['npm install there', 'install npm package there']) assert.ok((await sug(q)).missing.length > 0, q);
+  assert.equal(await cmd('list closed github issues'), 'gh issue list --state closed');
+  assert.match(await cmd('run npm rebuild'), /<SCRIPT>/);
+  assert.equal(await cmd('npm run build'), 'npm run build');
 });

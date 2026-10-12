@@ -240,7 +240,7 @@ export const INTENTS = [
   T('git_blame', 'Show who changed each line of a file', 'git blame {file}', { file: null }),
   T('git_init', 'Initialize a git repository', 'git init', {}),
   // templates-catalog: frequent git commands from real usage that the catalog lacked
-  T('git_show', 'Show a commit (the last one by default) with its diff', 'git show«{rev!raw}»', {}),
+  T('git_show', 'Show a commit (the last one by default) with its diff', 'git show«{rev}»', {}),
   T('git_fetch', 'Fetch new commits and branches from all remotes (no merge)', 'git fetch --all', {}),
   T('git_ls_files', 'List the files tracked by git', 'git ls-files', {}),
   T('git_grep', 'Search for text in the files tracked by git', 'git grep -n -- {pattern}', { pattern: null }),

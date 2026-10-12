@@ -812,6 +812,8 @@ function suggestOnce(query, opts = {}) {
   const res = { ...out, understood: true, method, ...b, slotSources: r.sources, spans: r.spans.map((s) => ({ type: s.type, text: s.text })) };
   // a refused history reference is never runnable as is, even when the intent has no slot left to blank (`git push`)
   if (context.rule === 'refused' && !(res.missing || []).length) res.missing = ['reference (refused: edit the command)'];
+  // "npm install there": a place word rejected as a package / name is still missing, also where that slot is optional
+  if (slots._placeRejected?.length && !(res.missing || []).length) res.missing = slots._placeRejected.map((k) => `${k} (a place word is not a ${k} name)`);
   if (ambiguousText.length) res.warnings = [...(res.warnings || []), `value left as a placeholder: unclear where the quoted text ends (\\" may be an escaped quote) (${ambiguousText.join(', ')})`];
   if (splitPaths.length) res.warnings = [...(res.warnings || []), `path left as a placeholder: unclear which words name the ${splitPaths.map((x) => x.split('=')[0] === 'src' ? 'source' : 'destination').join(' and ')} (${splitPaths.join(', ')}); quote each path`];
   if (cutPaths.length) res.warnings = [...(res.warnings || []), `path left as a placeholder: unclear where the unquoted name ends (${cutPaths.join(', ')}); quote the path`];
