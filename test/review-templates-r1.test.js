@@ -361,3 +361,14 @@ test('r30: typographic quotes and ls-files single-file restrictions are withheld
     for (const q of ['search tracked files for "TODO"', 'list tracked files in the repo']) assert.deepEqual(suggest(q, env).missing, [], `${env.shell}: ${q}`);
   }
 });
+
+// review r31: every non-ASCII quote-like / punctuation; a pages source directory
+test('r31: non-ASCII punctuation and pages source directories are withheld', () => {
+  for (const env of [{ shell: 'bash', os: 'linux' }, { shell: 'pwsh', os: 'win32' }, { shell: 'cmd', os: 'win32' }]) {
+    for (const q of ['search tracked files for ″TODO″', 'search tracked files for ＂TODO＂', 'search tracked files for ❝TODO❞', 'search tracked files for ⹂TODO⹂', 'search tracked files for TODO\u00a0files', 'deploy "dist" from directory static to cloudflare pages', 'deploy dist from folder site to pages']) {
+      const r = suggest(q, env);
+      assert.ok(!r.command || r.missing.length > 0, `${env.shell}: ${q}`);
+    }
+    for (const q of ['search tracked files for "TODO"', 'pokaż zgłoszenie 42']) { const r = suggest(q, env); if (r.intent && /git_grep|gh_issue_view/.test(r.intent)) assert.deepEqual(r.missing, [], `${env.shell}: ${q}`); }
+  }
+});
