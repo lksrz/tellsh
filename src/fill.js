@@ -1194,8 +1194,12 @@ const UNIT_AFTER = /^\s*-?(?:comments?|labels?|assignees?|reactions?|commits?|fi
  * Why a suggestion for one of the 0.3.4 templates must not run as is ([] : fine): the request has a restriction, option,
  * scope or value boundary the template cannot express. The pipeline puts these in `missing`.
  */
+// 0.3.4: the free-text git grep / git show templates are disabled (never runnable). Their parsing is kept for a later
+// release (branch feat/templates-grep-show); set TELLSH_ENABLE_GREP_SHOW=1 only in development to exercise it.
+export const DISABLED_TEMPLATES = new Set(process.env.TELLSH_ENABLE_GREP_SHOW === '1' ? [] : ['git_grep', 'git_show']);
 export function newTemplateWithhold(id, text, slots = {}, command = null) {
   const t = String(text);
+  if (DISABLED_TEMPLATES.has(id)) return [`${id === 'git_grep' ? 'pattern' : 'rev'} (template disabled in this release)`];
   const out = [];
   const glued = (val) => {
     if (val == null) return false;

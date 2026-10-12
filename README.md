@@ -143,8 +143,8 @@ The intent and slots are shared; only the rendering differs (`src/render.js`, va
 
 ### Developer tools (v0.4)
 
-**New templates (feat/templates-catalog)** (ranked by frequency in real command usage): `git show [ref]`, `git fetch --all`, `git ls-files`,
-`git grep -n -- <pattern>`, `gh run watch [id]`, `gh issue list`, `gh issue view <n>`, `npx wrangler d1 list`,
+**New templates (0.3.4)** (ranked by frequency in real command usage): `git fetch --all`, `git ls-files`,
+`gh run watch [id]`, `gh issue list`, `gh issue view <n>`, `npx wrangler d1 list`,
 `npx wrangler pages deploy <dir>`. pip's install directory is kept in PowerShell and cmd too, also in the attached form
 (`-t/tmp/pkgs`), and a quoted workspace after "in workspace" stays one value (`in workspace "staging app"` ->
 `--workspace 'staging app'`, quoted in PowerShell / cmd as well).
@@ -429,6 +429,8 @@ retrain; `npm test && npm run eval`.
   Known Windows limits from it: `create_symlink` in Windows PowerShell 5.1 and `temperature` / `last_logins` need an
   elevated prompt; `disk_free` has no non-admin cmd.exe command (use PowerShell); cmd's `history_search` only sees the
   current session.
+* **`git grep` / `git show` are not suggested as runnable in 0.3.4.** Their free-text forms are withheld (shown with a
+  placeholder, never run on Enter or `--yes`) until a later release.
 * **New 0.3.4 templates take only explicit values.** `git fetch` is always `git fetch --all` (a named remote or
   `--prune` is not rendered); `git show` reads a hash, `HEAD~N` or "previous commit", otherwise shows HEAD; `gh issue view`
   / `gh run watch` need an explicit number (`issue 42`, `#42`, `run 123`); `wrangler pages deploy` needs the directory
