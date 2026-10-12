@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Student encoder (ONNX) top-1 intent accuracy on the same sets as scripts/real/eval_a.js (aggregates only).
 //   node scripts/distill/eval_student.js <onnx dir> [--json out.json] [--max N]
-import { readFileSync, readdirSync, existsSync, writeFileSync } from 'node:fs';
+import { readFileSync, readdirSync, existsSync, writeFileSync, realpathSync } from 'node:fs';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { Encoder } from '../../src/rerank/encoder.js';
@@ -21,7 +21,8 @@ const sets = {
   data_eval: rd(join(ROOT, 'data/eval')), eval_v04: rd(join(ROOT, 'data/eval_v04')), shell_eval: rj(join(ROOT, 'data/shell/eval.jsonl')),
 };
 const enc = await Encoder.load({ dir, threads: 2 });
-if (!enc) { console.error('eval_student: cannot load encoder from', dir); process.exit(1); }
+// Encoder.load falls back to other bundles (env / cache / package): insist on the requested one
+if (!dir || !existsSync(join(dir, 'encoder.int8.onnx')) || !enc || realpathSync(enc.dir) !== realpathSync(dir)) { console.error('eval_student: cannot load encoder from', dir); process.exit(1); }
 const out = { dir: dir.replace(ROOT, ''), sets: {} };
 for (const [name, rows] of Object.entries(sets)) {
   let ok = 0; const per = {};
