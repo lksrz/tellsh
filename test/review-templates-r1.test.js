@@ -249,3 +249,15 @@ test('r20: postfix and vocabulary second grep patterns and unterminated pip targ
     for (const q of ['search tracked files for "TODO"', 'pip install requests -t "lib"']) assert.deepEqual(suggest(q, env).missing, [], `${env.shell}: ${q}`);
   }
 });
+
+// review r21: multi-line requests; an extra git show selector after and/or
+test('r21: multi-line requests and extra git show selectors are withheld', () => {
+  for (const env of [{ shell: 'bash', os: 'linux' }, { shell: 'pwsh', os: 'win32' }, { shell: 'cmd', os: 'win32' }]) {
+    for (const q of ['pip install requests -t"my\nlibs"', 'pip install requests --target lib\nplease', 'git grep "TODO" files\nplease', 'git ls-files files\nplease',
+      'show commit HEAD and tag diff', 'show commit HEAD or v1.0', 'search tracked files for "TODO"\tfiles']) {
+      const r = suggest(q, env);
+      assert.ok(!r.command || r.missing.length > 0, `${env.shell}: ${JSON.stringify(q)}`);
+    }
+    for (const q of ['show commit HEAD', 'git ls-files', 'pip install requests -t lib']) assert.deepEqual(suggest(q, env).missing, [], `${env.shell}: ${q}`);
+  }
+});

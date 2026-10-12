@@ -801,6 +801,8 @@ export function scopeMentions(intentId, text) {
   if (/^pip_/.test(intentId)) {
     // `-t@foo`: an attached target the parser does not read is still a target (placeholder), never dropped
     for (const m of t.matchAll(/(?:^|\s)-t([^\s/~.\w"'][^\s]*)/g)) out.push({ kind: 'target', value: null, at: m.index });
+    // a pip target in a multi-line request: the shell reading of the operand is unclear: a placeholder
+    if (/[\r\n\v\f\u0085\u2028\u2029]/.test(t) && /(?:^|\s)(?:-t|--target)/.test(t)) out.push({ kind: 'target', value: null, at: t.search(/(?:-t|--target)/) });
     // `-t"lib` / `--target "lib`: an unterminated quote is unreadable: a placeholder, never dropped
     for (const m of t.matchAll(/(?:^|\s)(?:-t|--target)(?:=|\s*)(["'])/g)) { const rest = t.slice(m.index + m[0].length); if (!rest.includes(m[1])) out.push({ kind: 'target', value: null, at: m.index }); }
     for (const m of t.matchAll(SCOPE_ATTACHED_T)) {
@@ -1198,6 +1200,8 @@ export function newTemplateWithhold(id, text, slots = {}, command = null) {
     }
     return false;
   };
+  // r21: a multi-line (or control-character) request is never read as one of these templates: the line-based checks cannot vouch for it
+  if (WH_WORDS[id] && /[\r\n\t\v\f\u0085\u2028\u2029]/.test(t)) return ['request (spans several lines)'];
   if (WH_WORDS[id]) {
     // (the --repo value and the option itself are explained by the rendered repo slot)
     const ok = new Set(WH_WORDS[id].split(/\s+/));
@@ -1229,6 +1233,8 @@ export function newTemplateWithhold(id, text, slots = {}, command = null) {
     if (id === 'wrangler_pages_deploy') for (const m of t.matchAll(/\b(?:to|for|into|onto|on|as|named|called|in|at|under|across|pages|na|do|dla|w|jako)\s+(?:the\s+|my\s+)?(?=(["']?)([^\s"']+)\1)/gi)) if (!/^(?:cloudflare|pages|page)$/i.test(m[2]) && String(slots.path ?? '').toLowerCase() !== m[2].toLowerCase()) rest.push(m[2]);
     // a second pattern ("for "word" and TEXT", "foo or bar") is never searched
     if (id === 'git_grep') for (const m of t.matchAll(/(?:\b(?:and|or|but|instead|rather|oraz|lub|albo|i|ale|zamiast)|[,;])\s+(?:also\s+|than\s+|of\s+)?((?:(?:the|a|an|for|word|words|text|string|pattern|phrase|słowo|slowo|fraz\w*)\s+)*)(?=(["']?)([^\s"']+)\2)/gi)) if (/^[,;]/.test(m[0]) || /^(?:but|instead|rather|ale|zamiast)\b/i.test(m[0]) || /\balso\s/i.test(m[0]) || /\b(?:the|a|an)\s+$/i.test(m[1]) || /\b(?:word|words|text|string|pattern|phrase|for|słowo|slowo|fraz\w*)\b/i.test(m[1]) || !/^(?:tracked|files?|the|repo|repository|show|list|print|line|lines|numbers?)$/i.test(m[3])) rest.push(m[3]);
+    // r21: for git show, and/or/plus/then always adds another selector (withheld)
+    if (id === 'git_show') for (const m of t.matchAll(/\b(?:and|or|plus|then|oraz|lub|albo|i|potem)\s+(\S+)/gi)) rest.push(m[1]);
     // r20: or always starts another pattern; and only continues into show/print/list/display (line numbers); too/also/as well add a pattern
     if (id === 'git_grep') { for (const m of t.matchAll(/\b(?:or|lub|albo)\s+(\S+)/gi)) rest.push(m[1]); for (const m of t.matchAll(/\b(?:and|oraz|i)\s+(?!(?:show|print|list|display|pokaż|pokaz|wypisz)\b)(\S+)/gi)) rest.push(m[1]); if (/\b(?:too|also|as\s+well|też|tez|również|rowniez)\b/i.test(t)) rest.push('too'); }
     if (id === 'git_ls_files' || id === 'git_grep') for (const m of t.matchAll(/\b(?:repo|repository|repozytorium)\s+(?:named\s+|called\s+)?(?=(["']?)([^\s"']+)\1)/gi)) if (!/^(?:and|or|but|for|with|only|too|instead|please|i|oraz)$/i.test(m[2])) rest.push(m[2]);
