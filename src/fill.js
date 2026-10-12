@@ -793,7 +793,7 @@ export function scopeMentions(intentId, text) {
     const raw = quoted ?? m[4] ?? m[7] ?? null;
     // a quoted value glued to more text (`--target "lib"cache`, `-t "lib",cache`) or an operand cut at punctuation is a placeholder
     const after = t.slice(m.index + m[0].length);
-    const gluedQ = quoted != null && (SCOPE_KIND[opt] === 'target' ? /^\S/.test(after) || quoted !== quoted.trim() : /^\S/.test(after) && !/^[.!?;:)]+(?:\s|$)/.test(after));
+    const gluedQ = quoted != null && (SCOPE_KIND[opt] === 'target' ? /^\S/.test(after) || quoted !== quoted.trim() : (/^\S/.test(after) && !/^[.!?;:)]+(?:\s|$)/.test(after)) || quoted !== quoted.trim());
     const punctTarget = SCOPE_KIND[opt] === 'target' && quoted == null && raw != null && (/^[,;!?]/.test(after) || (/[,;:.!?]$/.test(raw) && !/^[a-z]:$/i.test(raw) && !/(?:^|[\/\\:])\.{1,2}$/.test(raw)));
     const cutRaw = quoted == null && raw != null && (punctTarget || /\\$/.test(raw) || /^[,;!?]\S/.test(after) || /["'`]/.test(raw) || /^["'`]/.test(after));
     out.push({ kind: SCOPE_KIND[opt], value: gluedQ || cutRaw ? null : quoted != null ? quoted.trim() || null : raw ? stripScopePunct(raw).replace(/^["'`]|["'`]$/g, '') || null : null, at: m.index });
@@ -822,7 +822,7 @@ export function scopeMentions(intentId, text) {
     const at = m.index + m[0].length - m[2].length;
     const rawv = t.slice(at, at + m[2].length);
     const quotedv = /^(["'])[\s\S]*\1$/.test(rawv) && rawv.length >= 2;
-    const value = quotedv ? rawv.slice(1, -1).trim() : rawv.replace(/[.,!?;:]+$/, '').replace(/^["'`]|["'`]$/g, '');
+    const value = quotedv ? (rawv.slice(1, -1).trim() === rawv.slice(1, -1) ? rawv.slice(1, -1) : '') : rawv.replace(/[.,!?;:]+$/, '').replace(/^["'`]|["'`]$/g, '');
     // an empty quoted value (`in workspace ""`) is a placeholder, never a dropped scope
     if (quotedv) { const aft = t.slice(at + m[2].length); const glued = (/^\S/.test(aft) && !/^[,.;:!?)]+(?:\s|$)/.test(aft)) || /\\$/.test(rawv.slice(1, -1)); out.push({ kind: SCOPE_PHRASE_KIND(m[1]), value: glued ? null : value || null, at }); continue; }
     // "w projekcie na macu", "in the project with npm": a function word is no scope value
@@ -1226,7 +1226,7 @@ export function newTemplateWithhold(id, text, slots = {}, command = null) {
     }
     if (id === 'wrangler_pages_deploy') for (const m of t.matchAll(/\b(?:to|for|into|onto|on|as|named|called|in|at|under|across|pages|na|do|dla|w|jako)\s+(?:the\s+|my\s+)?(?=(["']?)([^\s"']+)\1)/gi)) if (!/^(?:cloudflare|pages|page)$/i.test(m[2]) && String(slots.path ?? '').toLowerCase() !== m[2].toLowerCase()) rest.push(m[2]);
     // a second pattern ("for "word" and TEXT", "foo or bar") is never searched
-    if (id === 'git_grep') for (const m of t.matchAll(/(?:\b(?:and|or|but|instead|rather|oraz|lub|albo|i|ale|zamiast)|,)\s+(?:also\s+|than\s+|of\s+)?((?:(?:the|a|an|for|word|words|text|string|pattern|phrase|słowo|slowo|fraz\w*)\s+)*)(?=(["']?)([^\s"']+)\2)/gi)) if (m[0].startsWith(',') || /\b(?:word|words|text|string|pattern|phrase|for|słowo|slowo|fraz\w*)\b/i.test(m[1]) || !/^(?:tracked|files?|the|repo|repository|show|list|print|line|lines|numbers?)$/i.test(m[3])) rest.push(m[3]);
+    if (id === 'git_grep') for (const m of t.matchAll(/(?:\b(?:and|or|but|instead|rather|oraz|lub|albo|i|ale|zamiast)|[,;])\s+(?:also\s+|than\s+|of\s+)?((?:(?:the|a|an|for|word|words|text|string|pattern|phrase|słowo|slowo|fraz\w*)\s+)*)(?=(["']?)([^\s"']+)\2)/gi)) if (/^[,;]/.test(m[0]) || /^(?:but|instead|rather|ale|zamiast)\b/i.test(m[0]) || /\balso\s/i.test(m[0]) || /\b(?:the|a|an)\s+$/i.test(m[1]) || /\b(?:word|words|text|string|pattern|phrase|for|słowo|slowo|fraz\w*)\b/i.test(m[1]) || !/^(?:tracked|files?|the|repo|repository|show|list|print|line|lines|numbers?)$/i.test(m[3])) rest.push(m[3]);
     if (id === 'git_ls_files' || id === 'git_grep') for (const m of t.matchAll(/\b(?:repo|repository|repozytorium)\s+(?:named\s+|called\s+)?(?=(["']?)([^\s"']+)\1)/gi)) if (!/^(?:and|or|but|for|with|only|too|instead|please|i|oraz)$/i.test(m[2])) rest.push(m[2]);
     if (id === 'git_ls_files') for (const m of t.matchAll(/\b(?:in|inside|within|under|of|at|from|below|for|on|with|w|we|z)\s+(?:(?:the|all|my|a|this|git|repo|repository|repozytorium)\s+)*(?=(["']?)([^\s"']+)\1)/gi)) if (!/^(?:repo|repository|repozytorium|git|this)$/i.test(m[2])) rest.push(m[2]);
     // a place for git grep ("in files", "under src") is a pathspec unless it names the repository itself

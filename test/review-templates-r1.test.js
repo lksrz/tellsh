@@ -220,3 +220,18 @@ test('review r18: glued punctuation / inner spaces in quoted pip targets, replac
     'search tracked files for "TODO" but for the word files instead', 'search tracked files for "TODO" in repo codebase', 'list the files tracked by git in git repo files']) await held(q);
   for (const q of ['pip install requests --target "my libs"', 'search tracked files for "TODO"', 'list tracked files in the repo']) assert.equal((await run(q)).missing.length, 0, q);
 });
+
+// review r19: a second git grep pattern after ; / but / instead / also / the; a quoted workspace with edge spaces
+test('r19: hidden second grep patterns and padded quoted workspaces are withheld', () => {
+  for (const env of [{ shell: 'bash', os: 'linux' }, { shell: 'pwsh', os: 'win32' }, { shell: 'cmd', os: 'win32' }]) {
+    for (const q of ['search tracked files for "TODO"; search for the word files', 'git grep "TODO"; git grep files',
+      'search tracked files for "TODO" but tracked instead', 'search tracked files for "TODO" and also files',
+      'search tracked files for "TODO"; tracked', 'run npm deploy in workspace " packages/api "', 'run npm deploy --workspace " packages/api "']) {
+      const r = suggest(q, env);
+      assert.ok(!r.command || r.missing.length > 0, `${env.shell}: ${q}`);
+    }
+    for (const q of ['search tracked files for "TODO"', 'list tracked files in the repo', 'run npm deploy in workspace "staging app"']) {
+      assert.deepEqual(suggest(q, env).missing, [], `${env.shell}: ${q}`);
+    }
+  }
+});
