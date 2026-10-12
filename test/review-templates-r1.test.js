@@ -273,3 +273,14 @@ test('r22: extra grep pattern markers and extra git show selectors are withheld'
     for (const q of ['search tracked files for "TODO"', 'search tracked files for the word "TODO"', 'show commit HEAD']) assert.deepEqual(suggest(q, env).missing, [], `${env.shell}: ${q}`);
   }
 });
+
+// review r23: a named tracked file in git grep; pages words no longer explain worker deploy targets
+test('r23: named grep file and worker deploy to a pages word are withheld', () => {
+  for (const env of [{ shell: 'bash', os: 'linux' }, { shell: 'pwsh', os: 'win32' }, { shell: 'cmd', os: 'win32' }]) {
+    for (const q of ['find "TODO" in the tracked file codebase', 'deploy worker to public', 'deploy worker to dist']) {
+      const r = suggest(q, env);
+      assert.ok(!r.command || r.missing.length > 0, `${env.shell}: ${q}`);
+    }
+    for (const q of ['search tracked files for "TODO"', 'deploy worker to staging']) assert.deepEqual(suggest(q, env).missing, [], `${env.shell}: ${q}`);
+  }
+});

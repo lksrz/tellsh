@@ -270,6 +270,8 @@ const SEL_PICKERS = new Set(('latest last recent recently newest new old older o
   'ostatni ostatnie ostatniego najnowszy najnowsze nowy nowa nowe stary inny inne poprzedni kolejny otwarte otwartych').split(' '));
 const selFamilyAll = {};
 for (const [id, v] of Object.entries(SEL_INTENT)) {
+  // the 0.3.4 template words (pages folders, d1, issues, runs) explain nothing for the older intents of the family
+  if (/^(?:wrangler_pages_deploy|wrangler_d1_list|gh_run_watch|gh_issue_list|gh_issue_view)$/.test(id)) continue;
   const f = id.split('_')[0];
   const all = (selFamilyAll[f] ??= { words: new Set(), stems: [] });
   // a negation ("not logged in" for a login) is explained only for the intent that lists it, never family-wide
@@ -1236,6 +1238,8 @@ export function newTemplateWithhold(id, text, slots = {}, command = null) {
     // r22: structural — git grep with more than one pattern-marker group; git show with a , ; clause or a selector word naming anything but the read revision
     if (id === 'git_grep') { const M = '(?:for|with|to|word|words|text|string|pattern|phrase|słowo|slowo|fraz\\w*)'; const groups = t.match(new RegExp(`\\b${M}(?:\\s+(?:the|a|an|${M}))*\\b`, 'gi')) || []; if (groups.length > 1) rest.push(groups[1]); }
     if (id === 'git_show') { if (/[,;]/.test(t)) rest.push(';'); for (const m of t.matchAll(/\b(?:tag|branch|ref|revision|rewizj\w*|gałęź|galez)\s+(?:named\s+|called\s+)?(["']?)([^\s"']+)\1/gi)) if (String(slots.rev ?? slots.revision ?? '').toLowerCase() !== m[2].toLowerCase()) rest.push(m[2]); }
+    // r23: "in the tracked file X" names a file restriction git grep -n does not render
+    if (id === 'git_grep') for (const m of t.matchAll(/\b(?:file|files|plik|pliku|plikach)\s+(?:named\s+|called\s+)?(["']?)([^\s"']+)\1/gi)) if (!/^(?:for|with|to|and|or|containing|that|which|in|matching|word|text|pattern|za|na|z|w|zawierając\w*|zawierajac\w*)$/i.test(m[2]) && String(slots.pattern ?? '').toLowerCase() !== m[2].toLowerCase()) rest.push(m[2]);
     // r21: for git show, and/or/plus/then always adds another selector (withheld)
     if (id === 'git_show') for (const m of t.matchAll(/\b(?:and|or|plus|then|oraz|lub|albo|i|potem)\s+(\S+)/gi)) rest.push(m[1]);
     // r20: or always starts another pattern; and only continues into show/print/list/display (line numbers); too/also/as well add a pattern
