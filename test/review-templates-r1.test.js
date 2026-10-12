@@ -192,3 +192,10 @@ test('review r14: second pattern after a determiner, trailing comma in -t, impli
   for (const q of ['search tracked files for "TODO" and the word TEXT', 'pip install requests -tlib,', 'show the latest commit and commit abc1234']) await held(q);
   for (const q of ['show commit abc1234', 'show the latest commit', 'pip install requests -t/tmp/pkgs']) assert.equal((await run(q)).missing.length, 0, q);
 });
+
+test('review r15: vocabulary word after an explicit pattern marker, any trailing punctuation on attached -t, dot segments are residue', async () => {
+  const held = async (q) => { const r = await run(q); assert.ok(r.command == null || r.missing.length > 0, `${q}: ${r.command} must not run on Enter`); };
+  for (const q of ['search tracked files for "TODO" and the word tracked', 'search tracked files for "TODO" and the word files', 'pip install requests -tlib!',
+    'pip install requests -t/tmp/lib.', 'list the files tracked by git in ..']) await held(q);
+  for (const q of ['pip install requests -t/tmp/pkgs', 'pip install requests -t./lib/..', 'list tracked files']) assert.equal((await run(q)).missing.length, 0, q);
+});
