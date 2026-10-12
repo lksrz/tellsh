@@ -58,7 +58,7 @@ const riskColor = (r) => (r === 'high' ? C.red : r === 'medium' ? C.yellow : C.g
 
 export function parseArgs(argv) {
   const o = { dryRun: false, yes: false, explain: false, json: false, top: 3, words: [], threshold: undefined, shell: undefined, os: undefined,
-    history: process.env.TELLSH_HISTORY === '1', historyFile: undefined, compose: 'auto', hybrid: ['1', 'safe'].includes(process.env.TELLSH_HYBRID) ? true : ['0', 'off', 'false', 'no'].includes(String(process.env.TELLSH_HYBRID).toLowerCase()) ? false : 'auto' };
+    history: process.env.TELLSH_HISTORY === '1', historyFile: undefined, compose: 'auto', hybrid: ['1', 'safe'].includes(String(process.env.TELLSH_HYBRID).toLowerCase()) ? true : ['0', 'off', 'false', 'no'].includes(String(process.env.TELLSH_HYBRID).toLowerCase()) ? false : 'auto' };
   for (let i = 0; i < argv.length; i++) {
     const a = argv[i];
     if (a === '--') { o.words.push(...argv.slice(i + 1)); break; }
@@ -290,7 +290,7 @@ export async function main(argv = process.argv.slice(2)) {
     // default ('auto'): A answers; the distilled student is consulted only below A's confidence 0.6, and only when its
     // optional bundle is installed (otherwise plain A, no runtime import). --hybrid / TELLSH_HYBRID=1|safe: the B encoder.
     // TELLSH_HYBRID=student-full adds the disagreement rule (student on every query).
-    const H = process.env.TELLSH_HYBRID;
+    const H = String(process.env.TELLSH_HYBRID || '').toLowerCase();
     const system = opts.hybrid === true ? (H === 'safe' ? 'A+B-safe' : 'A+B') : H === 'student-full' ? 'A+S-full' : 'A+S';
     s = opts.hybrid && (opts.hybrid === true || findStudentDir()) ? await suggestLazy(query, { ...so, system }) : pipelineSuggest(query, so);
   } catch (e) {

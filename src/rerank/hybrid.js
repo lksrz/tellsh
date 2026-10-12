@@ -64,6 +64,8 @@ export function rerank(c, pX, P, { thr, pNone = 0 } = {}) {
     if (s > bestS) { bestS = s; best = i; }
   }
   if (!best) return c;
+  // fallback (A+S): a student that agrees with A leaves A's result as it is (same confidence, same --yes behaviour)
+  if (P.fallback && best === c.intent) return c;
   const px = pX[best] ?? 0;
   const ok = px >= P.accept && pNone < (P.none ?? 1);
   // fallback (A+S): an unconvinced model leaves A's own decision (answer or rejection) untouched
@@ -111,7 +113,7 @@ export async function suggestHybrid(query, opts = {}) {
   }
   const ms = performance.now() - t0;
   let changed = false;
-  const res = suggest(query, { ...base, tagger, rerank: (c, { thr }) => { const r = rerank(c, pX, P, { thr, pNone }); changed = r !== c; return r; } });
+  const res = suggest(query, { ...base, tagger, rerank: (c, { thr }) => { const r = rerank(c, pX, P, { thr, pNone }); changed = r !== c && (r.intent !== c.intent || r.topTool !== c.topTool || !!r.rejected); return r; } });
   // fallback policies (A+S): deferred = the model actually changed A's decision (the CLI's --yes and its "re-ranked"
   // note key on it); consulted = the model was run
   if (P.fallback) return changed ? { ...res, hybrid: { system, deferred: true, consulted: true, ms, pNone } } : { ...first, hybrid: { system, deferred: false, consulted: true, ms, pNone } };

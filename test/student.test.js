@@ -140,7 +140,7 @@ test('A+S: a low-confidence answered query is deferred to the student, and the p
 test('A+S: pipeline refusals above the threshold (gh_pr_* guards) are never handed to the student', async () => {
   for (const q of ['revert pr 45', 'approve pr']) {
     const a = suggest(q, { env });
-    if (a.understood) continue; // only refusals matter here
+    assert.equal(a.understood, false, `A refuses ${q}`);
     for (const system of ['A+S', 'A+S-full']) {
       const s = { n: 0, infer: async () => { s.n++; return { intents: { git_revert: 0.99, delete_dir: 0.99 }, pNone: 0 }; } };
       const r = await suggestHybrid(q, { env, system, encoder: s });
@@ -186,4 +186,30 @@ test('CLI: TELLSH_HYBRID off values disable the student', () => {
     const r = spawnSync(process.execPath, ['bin/tellsh.js', '--json', 'show git status'], { encoding: 'utf8', env: { ...process.env, TELLSH_HYBRID: v } });
     assert.equal(JSON.parse(r.stdout).hybrid, undefined, v);
   }
+});
+
+test('A+S: a low-confidence answer the student agrees with is returned unchanged (not deferred)', async () => {
+  const { readFileSync, readdirSync } = await import('node:fs');
+  const rows = readdirSync('data/eval').flatMap((f) => readFileSync(join('data/eval', f), 'utf8').split('\n').filter(Boolean).map((l) => JSON.parse(l)));
+  let q = null; let seen;
+  for (const r of rows) {
+    let thr;
+    suggest(r.text, { env, rerankTop: 0, rerank: (c, o) => { seen = c; thr = o.thr; return c; } });
+    if (seen.confidence >= thr && seen.confidence < 0.6) { q = r.text; break; }
+  }
+  assert.ok(q);
+  const a = suggest(q, { env });
+  const s = { n: 0, infer: async () => { s.n++; return { intents: { [seen.intent]: 0.95 }, pNone: 0 }; } };
+  const r = await suggestHybrid(q, { env, system: 'A+S', encoder: s });
+  assert.equal(s.n, 1);
+  assert.equal(r.hybrid.deferred, false);
+  assert.equal(r.hybrid.consulted, true);
+  assert.equal(r.command, a.command);
+  assert.equal(r.confidence, a.confidence);
+});
+
+test('CLI: --yes still runs a low-confidence safe answer the real student agrees with', { skip: !real }, () => {
+  const r = spawnSync(process.execPath, ['bin/tellsh.js', '--json', 'which files take up the most space under ~/Downloads'], { encoding: 'utf8' });
+  const j = JSON.parse(r.stdout);
+  if (j.hybrid?.consulted) assert.equal(j.hybrid.deferred, false);
 });

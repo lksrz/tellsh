@@ -28,15 +28,15 @@ for (const [name, rows] of Object.entries(sets)) {
   if (!rows.length) continue;
   const res = {};
   for (const [sys, system] of Object.entries(systems)) {
-    let ok = 0, acc = 0, deferred = 0;
+    let ok = 0, acc = 0, deferred = 0, consulted = 0;
     for (const r of rows) {
       const env = { shell: r.shell || 'bash', os: r.os || 'linux' };
       const o = { env, top: 3, cwd: '/tmp', compose: 'off' };
       const s = system ? await suggestHybrid(r.text, { ...o, system, encoder: enc }) : suggest(r.text, o);
-      acc += !!s.understood; deferred += !!s.hybrid?.deferred;
+      acc += !!s.understood; deferred += !!s.hybrid?.deferred; consulted += !!(s.hybrid?.consulted || s.hybrid?.deferred);
       ok += r.intent ? (s.understood && s.intent === r.intent) : !s.understood;
     }
-    res[sys] = { [rows.every((r) => !r.intent) ? 'rejected' : 'correct']: +(100 * ok / rows.length).toFixed(2), answered: +(100 * acc / rows.length).toFixed(2), studentCalls: +(100 * deferred / rows.length).toFixed(1) };
+    res[sys] = { [rows.every((r) => !r.intent) ? 'rejected' : 'correct']: +(100 * ok / rows.length).toFixed(2), answered: +(100 * acc / rows.length).toFixed(2), studentCalls: +(100 * consulted / rows.length).toFixed(1), changed: +(100 * deferred / rows.length).toFixed(1) };
   }
   out.sets[name] = { n: rows.length, ...res };
   console.error(name, JSON.stringify(out.sets[name]));

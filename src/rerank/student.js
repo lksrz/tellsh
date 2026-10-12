@@ -25,6 +25,8 @@ export async function loadStudent({ dir, threads = 1 } = {}) {
   const d = findStudentDir(dir);
   if (!d) return null;
   try {
+    // native runtime only: check it before Encoder.load, which would otherwise build a (slow) onnxruntime-web session
+    await import('onnxruntime-node');
     const { Encoder } = await import('./encoder.js');
     const enc = await Encoder.load({ dir: d, ort: 'node', threads });
     // Encoder.load falls back to the B bundle when a directory is incomplete, and to onnxruntime-web (WASM, slower)
