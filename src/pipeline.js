@@ -433,6 +433,9 @@ function pipTargetGuard(res) {
   const ok = win ? /^(?:[A-Za-z]:)?[\w.\-\/\\ ]+$/.test(String(pt)) : /^[\w.\-\/ ]+$/.test(String(pt));
   return ok ? res : { ...res, missing: ['piptarget (a variable or escape the shell would expand)'] };
 }
+// a request that refers back to the previous command: a pronoun, a place word, or same/again/them/its/that/those/this
+const REFERS_BACK = /\b(?:it|its|it's|them|their|they|that|those|this|these|there|here|same|again|previous|above|tam|tu|tego|tej|ten|je|ich|go|jego|samo|znowu|ponownie|jeszcze)\b/i;
+function refersBack(q) { return hasPronoun(q) || hasLocative(q) || REFERS_BACK.test(String(q)); }
 export function suggest(query, opts = {}) {
   const once = (o) => pipTargetGuard(releaseGuards(query, replayFloor(suggestOnce(query, o))));
   if (opts.model) return once(opts);
@@ -482,12 +485,22 @@ function suggestOnce(query, opts = {}) {
     const kind = opts.historyKind || opts.history.kind || (env.shell === 'powershell' ? 'pwsh' : 'posix');
     ctx = buildContext(opts.history, { classify: quick, cwd: opts.cwd, kind, query });
   }
-  const ctxFeats = ctx ? ctx.features : (opts.cwd ? cwdFlags(opts.cwd).map((c) => 'ctx_cwd=' + c) : []);
+  // 0.3.4: the previous history line is one of the new templates (git fetch, gh issue view, wrangler pages deploy, ...).
+  // The 0.3.3 model never saw these lines as history, so they add no history features (the request is read as on 0.3.3),
+  // and every follow-up that refers to that command is refused, except a "same for X" replay of the identical operation.
+  const newLast = !!ctx && NEW_TEMPLATE_INTENTS.has(ctx.last?.intent);
+  const cwdFeats = opts.cwd ? cwdFlags(opts.cwd).map((c) => 'ctx_cwd=' + c) : [];
+  const ctxFeats = ctx && !newLast ? ctx.features : cwdFeats;
   const extras = [...envFeatures(env), ...ctxFeats];
   const ref = ctx ? resolveReference(query, ctx) : null;
   const context = ctx ? { used: true, commands: ctx.n, rule: ref?.rule || null, note: ref?.note || null } : { used: false };
 
   const base = { query, shell: env.shell, os: env.os, coreutils: env.coreutils, threshold: thr, context };
+  if (newLast && ref?.rule !== 'same-for' && (ref || sameBut(query, ctx) || refersBack(query))) {
+    context.rule = 'refused';
+    context.note = `the previous command (${ctx.last.intent}) is new in this release; a follow-up that refers to it is only supported as "same for X"; not guessing`;
+    return { ...base, understood: false, method: 'history-rule', confidence: 0, candidates: [], tools: [], command: null, missing: [], hint: context.note };
+  }
 
   // ---- rule: "same for X" reuses the previous intent with one slot replaced ----
   if (ref?.rule === 'same-for') {
@@ -528,13 +541,6 @@ function suggestOnce(query, opts = {}) {
   }
 
   const sb = ctx && !ref ? sameBut(query, ctx) : null;
-  // "watch it", "delete it", "open it" after `npx wrangler pages deploy dist`: "it" may mean the deployment; a reference
-  // to a deploy line is never resolved to a local file or directory, nor dropped for a default operand (/var/log/syslog)
-  if (ctx?.last?.intent === 'wrangler_pages_deploy' && !sb && (ref || hasPronoun(query) || hasLocative(query))) {
-    context.rule = 'refused';
-    context.note = 'the previous command deployed to Cloudflare Pages: "it" may mean the deployment, not a local file; not guessing';
-    return { ...base, understood: false, method: 'history-rule', confidence: 0, candidates: [], tools: [], command: null, missing: [], hint: context.note };
-  }
   // a request about the entries of the referenced directory does not use the history at all: its intent is read
   // without the history features (they favour `delete_dir` for "delete log files in this folder")
   // rerankTop: the re-ranker's own candidate count (A+B uses 5); independent of how many candidates are displayed

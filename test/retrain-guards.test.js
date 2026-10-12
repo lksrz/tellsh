@@ -78,3 +78,24 @@ test('r47: a pronoun after `wrangler pages deploy <dir>` never changes the deplo
       assert.ok(!r.command || (r.missing || []).length, `${shell}: deploy ${d} / ${q} -> ${r.command}`);
     }
 });
+
+test('r50: after a 0.3.4 template, a follow-up referring to it is refused; "same for X" replays the identical operation', () => {
+  const H = ['git fetch --all', 'git ls-files', 'gh run watch', 'gh issue list --state closed', 'gh issue view 42', 'npx wrangler d1 list', 'npx wrangler pages deploy dist', 'npx wrangler pages deploy site.v2'];
+  const Q = ['delete it', 'watch it', 'open it', 'move it to /tmp', 'delete them', 'same but no push', 'same but open', 'do it again', 'delete that', 'list files there', 'zrób to samo ale bez push', 'usuń to', 'delete its contents'];
+  for (const shell of ['bash', 'zsh', 'fish', 'sh', 'powershell', 'cmd']) for (const h of H) for (const q of Q) {
+    const r = suggest(q, { shell, os: shell === 'powershell' || shell === 'cmd' ? 'win32' : 'linux', history: [h] });
+    assert.ok(!r.command || (r.missing || []).length, `${shell}: ${h} / ${q} -> ${r.command}`);
+  }
+  const r = suggest('same for build', { shell: 'bash', os: 'linux', history: ['npx wrangler pages deploy dist'] });
+  assert.equal(r.command, 'npx wrangler pages deploy build');
+});
+
+test('r50: a 0.3.4 template history line adds no history features: requests read as on 0.3.3', () => {
+  const cases = [['git ls-files', 'delete tracked files'], ['git fetch --all', 'delete all branches'], ['git fetch --all', 'delete all remotes'],
+    ['npx wrangler pages deploy dist', 'drop all changes'], ['npx wrangler d1 list', 'stop the run'], ['git ls-files', 'release all issues in repo a/b']];
+  for (const shell of ['bash', 'powershell', 'cmd']) for (const [h, q] of cases) {
+    const o = { shell, os: shell === 'bash' ? 'linux' : 'win32' };
+    const a = suggest(q, { ...o, history: [h] }), b = suggest(q, o);
+    assert.equal(a.command && !(a.missing || []).length ? a.command : null, b.command && !(b.missing || []).length ? b.command : null, `${shell}: ${h} / ${q}`);
+  }
+});
