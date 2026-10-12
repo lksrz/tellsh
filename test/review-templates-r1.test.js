@@ -295,3 +295,14 @@ test('r24: punctuated or pattern-named grep file restrictions are withheld', () 
     assert.deepEqual(suggest('search tracked files for "TODO"', env).missing, []);
   }
 });
+
+// review r25: any single-file restriction in git grep
+test('r25: single-file grep restrictions are withheld whatever the punctuation or word', () => {
+  for (const env of [{ shell: 'bash', os: 'linux' }, { shell: 'pwsh', os: 'win32' }, { shell: 'cmd', os: 'win32' }]) {
+    for (const q of ['search tracked file: word for "TODO"', 'search tracked file: text for "TODO"', 'find "TODO" in tracked file. codebase', 'find "TODO" in tracked file; codebase', 'find "TODO" in tracked files: codebase', 'find "TODO" in tracked file (codebase)']) {
+      const r = suggest(q, env);
+      assert.ok(!r.command || r.missing.length > 0, `${env.shell}: ${q}`);
+    }
+    assert.deepEqual(suggest('search tracked files for "TODO"', env).missing, []);
+  }
+});

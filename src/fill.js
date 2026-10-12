@@ -1240,6 +1240,8 @@ export function newTemplateWithhold(id, text, slots = {}, command = null) {
     if (id === 'git_show') { if (/[,;]/.test(t)) rest.push(';'); for (const m of t.matchAll(/\b(?:tag|branch|ref|revision|rewizj\w*|gałęź|galez)\s+(?:named\s+|called\s+)?(["']?)([^\s"']+)\1/gi)) if (String(slots.rev ?? slots.revision ?? '').toLowerCase() !== m[2].toLowerCase()) rest.push(m[2]); }
     // r23: "in the tracked file X" names a file restriction git grep -n does not render
     if (id === 'git_grep') for (const m of t.matchAll(/\b(?:file|files|plik|pliku|plikach)\s*[:=,\-–—]*\s+(?:named\s+|called\s+)?(["']?)([^\s"']+)\1/gi)) if (!/^(?:for|with|to|and|or|containing|that|which|in|matching|word|text|pattern|za|na|z|w|zawierając\w*|zawierajac\w*)$/i.test(m[2])) rest.push(m[2]);
+    // r25: structural — git grep -n renders no file restriction: a singular file word, or files followed by punctuation, is always withheld
+    if (id === 'git_grep' && (/\b(?:file|plik|pliku)\b/i.test(t) || /\b(?:files|plikach|plikow|plików)\s*[^\w\s"']/i.test(t))) rest.push('(a file restriction)');
     // r21: for git show, and/or/plus/then always adds another selector (withheld)
     if (id === 'git_show') for (const m of t.matchAll(/\b(?:and|or|plus|then|oraz|lub|albo|i|potem)\s+(\S+)/gi)) rest.push(m[1]);
     // r20: or always starts another pattern; and only continues into show/print/list/display (line numbers); too/also/as well add a pattern
