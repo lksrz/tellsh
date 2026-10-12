@@ -8,6 +8,7 @@
 import { readFileSync, writeFileSync, existsSync, lstatSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { exclusionIndex } from '../lib/heldout.js';
+import { writePrivate } from '../lib/privwrite.js';
 import { normalize } from '../../src/features.js';
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -59,7 +60,5 @@ for (const l of rj(join(D, 'labels.jsonl'))) {
   st.kept++;
 }
 const outP = join(ROOT, 'build/hybrid/train_distill.jsonl');
-try { if (lstatSync(outP).isSymbolicLink()) { console.error(`merge_labels: refusing to write through symlink ${outP}`); process.exit(1); } } catch {}
-if (existsSync(join(ROOT, 'build')) && lstatSync(join(ROOT, 'build')).isSymbolicLink() || existsSync(join(ROOT, 'build/hybrid')) && lstatSync(join(ROOT, 'build/hybrid')).isSymbolicLink()) { console.error('merge_labels: build/ or build/hybrid is a symlink; refusing'); process.exit(1); }
-writeFileSync(outP, base.replace(/\n*$/, '\n') + extra.map((r) => JSON.stringify(r) + '\n').join(''));
+writePrivate(outP, base.replace(/\n*$/, '\n') + extra.map((r) => JSON.stringify(r) + '\n').join(''));
 console.log(JSON.stringify(st));
