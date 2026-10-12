@@ -10,7 +10,7 @@ import { getModel } from './model.js';
 import { cascade } from './cascade.js';
 import { tag, exFromSpans } from './tagger.js';
 import { extractSlots, pickArg, isOptionWord, foldKeepLength, isStopWord } from './slots.js';
-import { resolveSlots, buildCommand, finalizeSlots, RAW_OK } from './fill.js';
+import { resolveSlots, buildCommand, finalizeSlots, RAW_OK, newTemplateWithhold } from './fill.js';
 import { BY_ID } from './catalog.js';
 import { FAMILY_OF, NONE } from './tools.js';
 import { detectEnv, envFeatures } from './env.js';
@@ -812,6 +812,8 @@ function suggestOnce(query, opts = {}) {
   const res = { ...out, understood: true, method, ...b, slotSources: r.sources, spans: r.spans.map((s) => ({ type: s.type, text: s.text })) };
   // a refused history reference is never runnable as is, even when the intent has no slot left to blank (`git push`)
   if (context.rule === 'refused' && !(res.missing || []).length) res.missing = ['reference (refused: edit the command)'];
+  // 0.3.4 templates: a restriction / option / value boundary the template cannot express is withheld, never dropped
+  if (!(res.missing || []).length && res.intent) { const w = newTemplateWithhold(res.intent, query, slots); if (w.length) res.missing = w; }
   // "npm install there": a place word rejected as a package / name is still missing, also where that slot is optional
   if (slots._placeRejected?.length && !(res.missing || []).length) res.missing = slots._placeRejected.map((k) => `${k} (a place word is not a ${k} name)`);
   if (ambiguousText.length) res.warnings = [...(res.warnings || []), `value left as a placeholder: unclear where the quoted text ends (\\" may be an escaped quote) (${ambiguousText.join(', ')})`];

@@ -167,7 +167,7 @@ export const ALLOW = {
   "gh": ["--help","--version"],
   "gh auth login": [],
   "gh auth status": [],
-  "gh issue list": ["--repo"],
+  "gh issue list": ["--repo","--state"],
   "gh issue view": ["--repo"],
   "gh pr checks": ["--repo"],
   "gh pr create": ["--fill","--repo"],

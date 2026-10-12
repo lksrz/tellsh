@@ -64,3 +64,20 @@ test('review r2: explicit values only, unsupported parts withheld, per-shell quo
   assert.match(await cmd('run npm rebuild'), /<SCRIPT>/);
   assert.equal(await cmd('npm run build'), 'npm run build');
 });
+
+test('review r3: anything the template cannot express is withheld (missing), never dropped', async () => {
+  const sug = (q) => run(q);
+  const held = async (q) => { const r = await sug(q); assert.ok(r.command == null || r.missing.length > 0, `${q}: ${r.command} must not run on Enter`); };
+  for (const q of ['watch run 2 hrs old', 'watch run 20 secs old', 'watch the run 5 jobs', 'watch run 3 attempts', 'git grep TODO -- "*.js"',
+    'wdroż build na cloudflare pages bez publikowania', 'deploy build to cloudflare pages to stage', 'wrangler pages deploy "my out"dist',
+    'run npm deploy in workspace "staging app"suffix', 'run npm trust', 'show commit abc']) await held(q);
+  const cmd = async (q) => (await sug(q)).command;
+  assert.equal(await cmd('git show HEAD:README.md'), 'git show HEAD:README.md');
+  assert.equal(await cmd('git show "HEAD^!"'), "git show 'HEAD^!'");
+  assert.equal(await cmd('show me the latest commit with its diff'), 'git show');
+  assert.equal(await cmd('list all open github issues'), 'gh issue list');
+  for (const q of ['watch run 123', 'show issue 42', 'git grep alpha', 'deploy dist to cloudflare pages', 'wdróż katalog dist na cloudflare pages', 'grep the repo for TODO']) {
+    const r = await sug(q);
+    assert.equal(r.missing.length, 0, `${q}: ${r.command} ${JSON.stringify(r.missing)}`);
+  }
+});
