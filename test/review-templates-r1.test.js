@@ -284,3 +284,14 @@ test('r23: named grep file and worker deploy to a pages word are withheld', () =
     for (const q of ['search tracked files for "TODO"', 'deploy worker to staging']) assert.deepEqual(suggest(q, env).missing, [], `${env.shell}: ${q}`);
   }
 });
+
+// review r24: punctuation after "file"; a file name equal to the pattern
+test('r24: punctuated or pattern-named grep file restrictions are withheld', () => {
+  for (const env of [{ shell: 'bash', os: 'linux' }, { shell: 'pwsh', os: 'win32' }, { shell: 'cmd', os: 'win32' }]) {
+    for (const q of ['find "TODO" in tracked file: codebase', 'grep "TODO" in tracked file: kod', 'search for codebase in the tracked file codebase', 'find "TODO" in tracked files - src']) {
+      const r = suggest(q, env);
+      assert.ok(!r.command || r.missing.length > 0, `${env.shell}: ${q}`);
+    }
+    assert.deepEqual(suggest('search tracked files for "TODO"', env).missing, []);
+  }
+});
