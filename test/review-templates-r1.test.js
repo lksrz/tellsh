@@ -429,3 +429,14 @@ test('r36: repo-output requests are withheld even with a read repo', () => {
     for (const q of ['show issue 42', 'watch run 42 in repo foo/bar', 'show issue 42 --repo foo/bar']) assert.deepEqual(suggest(q, env).missing, [], `${env.shell}: ${q}`);
   }
 });
+
+// review r37: escaped quote in a pip target; repo output via "of repo X"
+test('r37: escaped-quote pip targets and repo-description issue views are withheld', () => {
+  for (const env of [{ shell: 'bash', os: 'linux' }, { shell: 'pwsh', os: 'win32' }, { shell: 'cmd', os: 'win32' }]) {
+    for (const q of ['pip install requests --target="lib\\"', 'pip install requests --target "lib\\"', 'pip install requests -t "lib\\"', 'show the description of repo foo/bar for issue 42', 'show issue 42 for repo foo/bar description']) {
+      const r = suggest(q, env);
+      assert.ok(!r.command || r.missing.length > 0, `${env.shell}: ${q}`);
+    }
+    for (const q of ['watch run 42 in repo foo/bar', 'show issue 42 --repo foo/bar', 'pip install requests -t "lib"']) assert.deepEqual(suggest(q, env).missing, [], `${env.shell}: ${q}`);
+  }
+});
