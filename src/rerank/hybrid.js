@@ -22,6 +22,14 @@ export const POLICY = {
   'A+C': { tau: 0.8, k: 5, alpha: 0.75, accept: 0, keepNone: true },
   'A+C-safe': { tau: 0.8, k: 5, alpha: 0.75, accept: 0, rescue: false },
   B: { tau: Infinity, k: 0, alpha: 0, accept: 0, none: 0.3, keepNone: true, tagger: 'B' },
+  // A+S: the distilled student (src/rerank/student.js) replaces A's answer when A's confidence < 0.6 (k = 0, alpha = 0:
+  // the student's own argmax over the catalog intents). Safe by construction: A's rejections stay rejections (rescue:
+  // false; rescuing them turned most out-of-catalog real requests into wrong answers), and a student below p 0.5 or
+  // saying "not a shell request" leaves A's decision untouched (fallback). Measured end to end with
+  // scripts/hybrid/eval_student_runtime.js. A+S-full adds the disagreement rule (a confident A answer is replaced when
+  // the student disagrees with p >= 0.9); it needs the student on every query and is opt-in (TELLSH_HYBRID=student-full).
+  'A+S': { tau: 0.6, k: 0, alpha: 0, accept: 0.5, none: 0.5, keepNone: true, rescue: false, fallback: true, tagger: 'A' },
+  'A+S-full': { tau: 0.6, k: 0, alpha: 0, accept: 0.5, none: 0.5, keepNone: true, rescue: false, fallback: true, tagger: 'A', disagree: 0.9 },
   C: { tau: Infinity, k: 3, alpha: 0, accept: 0, keepNone: true },
 };
 
@@ -33,13 +41,22 @@ const LOG = (p) => Math.log(Math.max(p, 1e-6));
  * the pipeline's accept threshold according to the policy's own accept rule.
  */
 export function rerank(c, pX, P, { thr, pNone = 0 } = {}) {
-  if (c.confidence >= P.tau) return c;
+  if (c.confidence >= P.tau) {
+    // disagreement rule: a confident cascade answer is replaced only by a confident, different, in-catalog model answer
+    if (!P.disagree || pNone >= (P.none ?? 1)) return c;
+    let bi = null; let bp = -1;
+    for (const [i, p] of Object.entries(pX)) if (FAMILY_OF[i] && p > bp) { bp = p; bi = i; }
+    if (!bi || bi === c.intent || bp < P.disagree) return c;
+    const top = [{ intent: bi, tool: FAMILY_OF[bi], p: Math.max(thr, bp), pTool: 0, pIntent: bp }, ...c.top.filter((t) => t.intent !== bi)];
+    return { ...c, intent: bi, tool: FAMILY_OF[bi], confidence: Math.max(thr, bp), top, reranked: true, topTool: FAMILY_OF[bi] };
+  }
   // keepNone: the cascade's stage 1 says "not a shell request" -> keep its rejection (OOD safety)
   if (P.keepNone && c.topTool === NONE && c.confidence < thr) return c;
   // safe (rescue: false): only re-rank requests A answers anyway; A's rejections stay rejections
   if (P.rescue === false && c.confidence < thr) return c;
   const pa = Object.fromEntries(c.top.map((t) => [t.intent, t.p]));
-  const cands = P.k > 0 ? c.top.slice(0, P.k).map((t) => t.intent) : Object.keys(pX);
+  // k = 0: every intent the model knows that this catalog also has (a model bundle may be older/newer than the catalog)
+  const cands = P.k > 0 ? c.top.slice(0, P.k).map((t) => t.intent) : Object.keys(pX).filter((i) => FAMILY_OF[i]);
   let best = null;
   let bestS = -Infinity;
   for (const i of cands) {
@@ -49,6 +66,8 @@ export function rerank(c, pX, P, { thr, pNone = 0 } = {}) {
   if (!best) return c;
   const px = pX[best] ?? 0;
   const ok = px >= P.accept && pNone < (P.none ?? 1);
+  // fallback (A+S): an unconvinced model leaves A's own decision (answer or rejection) untouched
+  if (!ok && P.fallback) return c;
   const conf = ok ? Math.max(thr, px) : Math.min(thr - 1e-6, px);
   const tool = FAMILY_OF[best];
   const top = [{ intent: best, tool, p: conf, pTool: pa[best] ?? 0, pIntent: px }, ...c.top.filter((t) => t.intent !== best)];
@@ -71,12 +90,14 @@ export async function suggestHybrid(query, opts = {}) {
   const P = { ...POLICY[system], ...(opts.policy || {}) };
   // the policy's k candidates are re-ranked whatever --top displays (k = 0: B alone, no cascade candidates needed)
   base.rerankTop = P.k;
-  let seen = null;
-  const first = suggest(query, { ...base, rerank: (c) => { seen = c; return c; } });
-  if (!seen || seen.confidence >= P.tau) return { ...first, hybrid: { system, deferred: false } };
+  let seen = null; let seenThr = 0;
+  const first = suggest(query, { ...base, rerank: (c, { thr }) => { seen = c; seenThr = thr; return c; } });
+  if (!seen || (seen.confidence >= P.tau && !P.disagree)) return { ...first, hybrid: { system, deferred: false } };
+  // the policy keeps every cascade rejection (rescue: false): the model could not change anything, so do not load or run it
+  if (P.rescue === false && seen.confidence < seenThr) return { ...first, hybrid: { system, deferred: false } };
   const t0 = performance.now();
   let pX; let pNone = 0; let tagger;
-  if (/B/.test(system)) {
+  if (/B|S/.test(system)) {
     if (!opts.encoder) return { ...first, hybrid: { system, deferred: false, unavailable: 'encoder' } };
     const b = await opts.encoder.infer(query, env);
     pX = b.intents;
@@ -92,21 +113,34 @@ export async function suggestHybrid(query, opts = {}) {
   return { ...res, hybrid: { system, deferred: true, ms, pNone } };
 }
 
-/** CLI entry: A+B with the encoder loaded lazily (only when the cascade defers); falls back to A when the optional
- *  runtime or model bundle is missing (result.hybrid.unavailable says why). */
-let ENC = null;
+/** CLI entry: A+B (enc-v2 bundle) or A+S / A+S-full (student bundle), the model loaded lazily (only when the cascade
+ *  defers, or on every query for A+S-full) and once per process; falls back to A when the optional runtime or model
+ *  bundle is missing or cannot be opened (result.hybrid.unavailable says why). */
+const LOADED = new Map();
+const loader = (student) => async () => {
+  if (student) { const { loadStudent } = await import('./student.js'); return loadStudent({ threads: 1 }); }
+  const { Encoder } = await import('./encoder.js');
+  try { return await Encoder.load({ threads: 1 }); } catch { return null; }
+};
 export async function suggestLazy(query, opts = {}) {
+  const system = opts.system || 'A+B';
+  const student = /S/.test(system);
+  const key = student ? 'S' : 'B';
   const encoder = { infer: async (t, env) => {
-    if (ENC === null) { const { Encoder } = await import('./encoder.js'); ENC = (await Encoder.load({ threads: 1 })) || false; }
-    if (!ENC) throw Object.assign(new Error('unavailable'), { unavailable: true });
-    return ENC.infer(t, env);
+    if (!LOADED.has(key)) LOADED.set(key, (await (opts.load || loader(student))()) || false);
+    const m = LOADED.get(key);
+    if (!m) throw Object.assign(new Error('unavailable'), { unavailable: true });
+    try { return await m.infer(t, env); } catch { throw Object.assign(new Error('unavailable'), { unavailable: true }); }
   } };
   try {
-    return await suggestHybrid(query, { ...opts, system: opts.system || 'A+B', encoder });
+    return await suggestHybrid(query, { ...opts, system, encoder });
   } catch (e) {
     if (!e.unavailable) throw e;
-    return { ...suggest(query, opts), hybrid: { system: 'A', deferred: false, unavailable: 'encoder (install onnxruntime-node + tellsh-model-enc)' } };
+    const why = student ? 'student (install onnxruntime-node + tellsh-model-student)' : 'encoder (install onnxruntime-node + tellsh-model-enc)';
+    return { ...suggest(query, opts), hybrid: { system: 'A', deferred: false, unavailable: why } };
   }
 }
+/** test hook: forget loaded models */
+export const _resetLazy = () => LOADED.clear();
 
 export { NONE };

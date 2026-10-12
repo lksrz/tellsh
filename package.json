@@ -71,13 +71,17 @@
   "dependencies": {},
   "peerDependencies": {
     "onnxruntime-node": ">=1.20.0",
-    "tellsh-model-enc": "0.4.x"
+    "tellsh-model-enc": "0.4.x",
+    "tellsh-model-student": "0.1.x"
   },
   "peerDependenciesMeta": {
     "onnxruntime-node": {
       "optional": true
     },
     "tellsh-model-enc": {
+      "optional": true
+    },
+    "tellsh-model-student": {
       "optional": true
     }
   }

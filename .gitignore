@@ -16,3 +16,6 @@ hybrid/package/tellsh-model-enc/*.onnx
 hybrid/package/tellsh-model-enc/vocab.json
 hybrid/package/tellsh-model-enc/labels.json
 hybrid/package/tellsh-model-enc/manifest.json
+hybrid/package/tellsh-model-student/*.onnx
+hybrid/package/tellsh-model-student/vocab.json
+hybrid/package/tellsh-model-student/labels.json
