@@ -121,3 +121,14 @@ test('r52: a `tellsh "<request>"` history line of a 0.3.4 template is refused li
     assert.equal(R(suggest('fetch new commits from all remotes and show a graph of branch history', o)), null, shell);
   }
 });
+
+test('r53: history classification keeps the user threshold; fetch never drops a second operation', () => {
+  const R = (r) => (r.command && !(r.missing || []).length ? r.command : null);
+  for (const shell of ['bash', 'zsh', 'fish', 'sh', 'powershell', 'cmd']) {
+    const o = { shell, os: shell === 'powershell' || shell === 'cmd' ? 'win32' : 'linux' };
+    assert.equal(R(suggest('delete it', { ...o, threshold: 0.99, history: ['tellsh "show contents of report.txt"'] })), null, shell);
+    assert.equal(R(suggest('delete it', { ...o, threshold: 0.99, history: ['tellsh "remove build"'] })), null, shell);
+    for (const q of ['fetch all branches from all remotes and git pull', 'fetch all and then merge', 'fetch everything, then pull'])
+      assert.notEqual(R(suggest(q, o)), 'git fetch --all', `${shell}: ${q}`);
+  }
+});

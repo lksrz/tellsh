@@ -444,7 +444,7 @@ export function suggest(query, opts = {}) {
   // the templates model is probed without the rerank hook; with the hook, the reranked answer of either model may be consulted, and only a 0.3.4 template intent is kept from the templates model
   const probe = once({ ...opts, model: tm, rerank: undefined, gated: true });
   // a history refusal of the templates model (the previous line is a 0.3.4 template) is kept, never re-asked of 0.3.3
-  if (probe && opts.history?.length && probe.context?.rule === 'refused' && !probe.command) return probe;
+  if (probe && opts.history?.length && probe.context?.rule === 'refused' && !probe.command && probe.context.newTemplateLast) return probe;
   if (!probe || !NEW_TEMPLATE_INTENTS.has(probe.intent)) return once({ ...opts, gated: true });
   if (!opts.rerank) return probe;
   // with the hook: the reranked templates answer is kept only if it is still a 0.3.4 template intent, otherwise 0.3.3 answers
@@ -479,7 +479,7 @@ function suggestOnce(query, opts = {}) {
     // placeholders (refused, ambiguous, rejected) are ambiguous values here, never the catalog default or a guess.
     const quick = (q, unclearArgs) => {
       // with the two-model gate, an earlier request is classified by the gate too (both models read history the same way)
-      const r = opts.gated ? suggest(q, { env, compose: 'off', unclearArgs }) : suggest(q, { model, env, threshold: thr, compose: 'off', unclearArgs });
+      const r = opts.gated ? suggest(q, { env, compose: 'off', unclearArgs, ...(opts.threshold != null ? { threshold: opts.threshold } : {}) }) : suggest(q, { model, env, threshold: thr, compose: 'off', unclearArgs });
       if (!r.understood || !r.intent || r.method !== 'catalog') return null;
       const slots = { ...(r.slots || {}) };
       for (const k of r.missing || []) slots[k] = AMB + `<${k}>`;
@@ -501,6 +501,7 @@ function suggestOnce(query, opts = {}) {
   const base = { query, shell: env.shell, os: env.os, coreutils: env.coreutils, threshold: thr, context };
   if (newLast && ref?.rule !== 'same-for' && (ref || sameBut(query, ctx) || refersBack(query))) {
     context.rule = 'refused';
+    context.newTemplateLast = true;
     context.note = `the previous command (${ctx.last.intent}) is new in this release; a follow-up that refers to it is only supported as "same for X"; not guessing`;
     return { ...base, understood: false, method: 'history-rule', confidence: 0, candidates: [], tools: [], command: null, missing: [], hint: context.note };
   }
@@ -918,9 +919,11 @@ function suggestOnce(query, opts = {}) {
   }
   if (!(res.missing || []).length && res.intent === 'git_fetch') {
     // allow-list: only words that ask for a plain fetch of everything
-    const FETCH_OK = /^(?:git|fetch|fetching|get|download|pull|all|every|everything|the|a|latest|new|newest|recent|remote|remotes|branch|branches|ref|refs|commits?|changes|updates?|from|repo|repository|now|please|pls|just|me|my|for|of|and|pobierz|pobrać|pobrac|ściągnij|sciagnij|wszystkie|wszystko|nowe|najnowsze|gałęzie|galezie|gałęzi|galezi|zmiany|z|ze|repozytorium|teraz|proszę|prosze)$/i;
+    const FETCH_OK = /^(?:git|fetch|fetching|get|download|pull|all|every|everything|the|a|latest|new|newest|recent|remote|remotes|branch|branches|ref|refs|commits?|changes|updates?|from|repo|repository|now|please|pls|just|me|my|for|of|pobierz|pobrać|pobrac|ściągnij|sciagnij|wszystkie|wszystko|nowe|najnowsze|gałęzie|galezie|gałęzi|galezi|zmiany|z|ze|repozytorium|teraz|proszę|prosze)$/i;
     const words = String(query).replace(/^\s*git\s+fetch\s+--all\s*$/i, 'fetch').split(/\s+/).filter(Boolean);
     if (words.some((w) => !FETCH_OK.test(w.replace(/[.!?]+$/, '')))) res.missing = ['options (git fetch is always git fetch --all)'];
+    // a second operation ("fetch ... and git pull", "fetch, then merge"): never a fetch that drops it
+    if (/\b(?:and|then|i|oraz|potem)\b|[,;&|]/i.test(String(query)) || (/\bfetch/i.test(query) && /\bpull/i.test(query))) res.missing = ['args (a second action)'];
     if (/(?:^|\s)-{1,2}[A-Za-z]|\b(?:dry|prune|pruning|tags?|depth|shallow|unshallow|remote|origin|upstream|force|refspec|no|not|without|only|just)\b/i.test(String(query).replace(/^\s*git\s+fetch\s+--all\s*$/i, ''))) res.missing = ['options (git fetch is always git fetch --all)'];
   }
   // 0.3.4 retrain guard (model-independent): a slot value carrying shell substitution (`...`, $(...), ${...}) in a command
