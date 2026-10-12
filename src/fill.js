@@ -801,6 +801,8 @@ export function scopeMentions(intentId, text) {
   if (/^pip_/.test(intentId)) {
     // `-t@foo`: an attached target the parser does not read is still a target (placeholder), never dropped
     for (const m of t.matchAll(/(?:^|\s)-t([^\s/~.\w"'][^\s]*)/g)) out.push({ kind: 'target', value: null, at: m.index });
+    // `-t"lib` / `--target "lib`: an unterminated quote is unreadable: a placeholder, never dropped
+    for (const m of t.matchAll(/(?:^|\s)(?:-t|--target)(?:=|\s*)(["'])/g)) { const rest = t.slice(m.index + m[0].length); if (!rest.includes(m[1])) out.push({ kind: 'target', value: null, at: m.index }); }
     for (const m of t.matchAll(SCOPE_ATTACHED_T)) {
       // quoted contents are literal; only an unquoted value loses trailing punctuation
       const q = /^(["'])([\s\S]*)\1$/.exec(m[1]);
@@ -1227,6 +1229,8 @@ export function newTemplateWithhold(id, text, slots = {}, command = null) {
     if (id === 'wrangler_pages_deploy') for (const m of t.matchAll(/\b(?:to|for|into|onto|on|as|named|called|in|at|under|across|pages|na|do|dla|w|jako)\s+(?:the\s+|my\s+)?(?=(["']?)([^\s"']+)\1)/gi)) if (!/^(?:cloudflare|pages|page)$/i.test(m[2]) && String(slots.path ?? '').toLowerCase() !== m[2].toLowerCase()) rest.push(m[2]);
     // a second pattern ("for "word" and TEXT", "foo or bar") is never searched
     if (id === 'git_grep') for (const m of t.matchAll(/(?:\b(?:and|or|but|instead|rather|oraz|lub|albo|i|ale|zamiast)|[,;])\s+(?:also\s+|than\s+|of\s+)?((?:(?:the|a|an|for|word|words|text|string|pattern|phrase|słowo|slowo|fraz\w*)\s+)*)(?=(["']?)([^\s"']+)\2)/gi)) if (/^[,;]/.test(m[0]) || /^(?:but|instead|rather|ale|zamiast)\b/i.test(m[0]) || /\balso\s/i.test(m[0]) || /\b(?:the|a|an)\s+$/i.test(m[1]) || /\b(?:word|words|text|string|pattern|phrase|for|słowo|slowo|fraz\w*)\b/i.test(m[1]) || !/^(?:tracked|files?|the|repo|repository|show|list|print|line|lines|numbers?)$/i.test(m[3])) rest.push(m[3]);
+    // r20: or always starts another pattern; and only continues into show/print/list/display (line numbers); too/also/as well add a pattern
+    if (id === 'git_grep') { for (const m of t.matchAll(/\b(?:or|lub|albo)\s+(\S+)/gi)) rest.push(m[1]); for (const m of t.matchAll(/\b(?:and|oraz|i)\s+(?!(?:show|print|list|display|pokaż|pokaz|wypisz)\b)(\S+)/gi)) rest.push(m[1]); if (/\b(?:too|also|as\s+well|też|tez|również|rowniez)\b/i.test(t)) rest.push('too'); }
     if (id === 'git_ls_files' || id === 'git_grep') for (const m of t.matchAll(/\b(?:repo|repository|repozytorium)\s+(?:named\s+|called\s+)?(?=(["']?)([^\s"']+)\1)/gi)) if (!/^(?:and|or|but|for|with|only|too|instead|please|i|oraz)$/i.test(m[2])) rest.push(m[2]);
     if (id === 'git_ls_files') for (const m of t.matchAll(/\b(?:in|inside|within|under|of|at|from|below|for|on|with|w|we|z)\s+(?:(?:the|all|my|a|this|git|repo|repository|repozytorium)\s+)*(?=(["']?)([^\s"']+)\1)/gi)) if (!/^(?:repo|repository|repozytorium|git|this)$/i.test(m[2])) rest.push(m[2]);
     // a place for git grep ("in files", "under src") is a pathspec unless it names the repository itself

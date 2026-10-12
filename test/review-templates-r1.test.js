@@ -235,3 +235,17 @@ test('r19: hidden second grep patterns and padded quoted workspaces are withheld
     }
   }
 });
+
+// review r20: or / and + vocabulary / postfix too-also add a second grep pattern; an unterminated quoted pip target
+test('r20: postfix and vocabulary second grep patterns and unterminated pip targets are withheld', () => {
+  for (const env of [{ shell: 'bash', os: 'linux' }, { shell: 'pwsh', os: 'win32' }, { shell: 'cmd', os: 'win32' }]) {
+    for (const q of ['search tracked files for "TODO" and files too', 'search tracked files for "TODO" and files also',
+      'search tracked files for "TODO" or files', 'search tracked files for "TODO" or repo too', 'search tracked files for "TODO" and FILES too',
+      'search tracked files for "TODO" and TRACKED', 'pip install requests -t"lib', 'pip install requests --target "lib', 'pip install requests --target="lib',
+      'run npm deploy --workspace=" packages/api "', 'run npm deploy -w " packages/api "']) {
+      const r = suggest(q, env);
+      assert.ok(!r.command || r.missing.length > 0, `${env.shell}: ${q}`);
+    }
+    for (const q of ['search tracked files for "TODO"', 'pip install requests -t "lib"']) assert.deepEqual(suggest(q, env).missing, [], `${env.shell}: ${q}`);
+  }
+});
