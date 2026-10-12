@@ -924,7 +924,7 @@ function suggestOnce(query, opts = {}) {
     if (words.some((w) => !FETCH_OK.test(w.replace(/[.!?]+$/, '')))) res.missing = ['options (git fetch is always git fetch --all)'];
     // a second operation ("fetch ... and git pull", "fetch, then merge"): never a fetch that drops it
     if (/\b(?:and|then|i|oraz|potem)\b|[,;&|]/i.test(String(query)) || (/\bfetch/i.test(query) && /\bpull/i.test(query))
-      || /[\r\n]|[.!?:](?=\s*\S)/.test(String(query)) || (String(query).match(/\bgit\b/gi) || []).length > 1) res.missing = ['args (a second action)'];
+      || /[^\S ]|[\u0085\u3002]|[.!?:](?=\s*\S)/.test(String(query)) || (String(query).match(/\bgit\b/gi) || []).length > 1) res.missing = ['args (a second action)'];
     if (/(?:^|\s)-{1,2}[A-Za-z]|\b(?:dry|prune|pruning|tags?|depth|shallow|unshallow|remote|origin|upstream|force|refspec|no|not|without|only|just)\b/i.test(String(query).replace(/^\s*git\s+fetch\s+--all\s*$/i, ''))) res.missing = ['options (git fetch is always git fetch --all)'];
   }
   // 0.3.4 retrain guard (model-independent): a slot value carrying shell substitution (`...`, $(...), ${...}) in a command

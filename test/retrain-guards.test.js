@@ -128,7 +128,7 @@ test('r53: history classification keeps the user threshold; fetch never drops a 
     const o = { shell, os: shell === 'powershell' || shell === 'cmd' ? 'win32' : 'linux' };
     assert.equal(R(suggest('delete it', { ...o, threshold: 0.99, history: ['tellsh "show contents of report.txt"'] })), null, shell);
     assert.equal(R(suggest('delete it', { ...o, threshold: 0.99, history: ['tellsh "remove build"'] })), null, shell);
-    for (const q of ['fetch all branches from all remotes and git pull', 'fetch all and then merge', 'fetch everything, then pull', 'fetch all new branches. git commit', 'fetch new commits\ngit branch', 'fetch all! git push', 'git fetch all git push'])
+    for (const q of ['fetch all branches from all remotes and git pull', 'fetch all and then merge', 'fetch everything, then pull', 'fetch all new branches. git commit', 'fetch new commits\ngit branch', 'fetch all! git push', 'git fetch all git push', 'fetch new commits\u2028git branch', 'fetch new commits\u2029git branch', 'fetch new commits\u0085git branch', 'fetch new commits\tgit branch', 'fetch all\u3002git push'])
       assert.notEqual(R(suggest(q, o)), 'git fetch --all', `${shell}: ${q}`);
   }
 });
