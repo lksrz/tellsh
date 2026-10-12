@@ -801,8 +801,10 @@ export function scopeMentions(intentId, text) {
       const escaped = q && (q[2].endsWith('\\') || t.charAt(m.index + m[0].length) === q[1] || /^\S/.test(t.slice(m.index + m[0].length)));
       // the operand pip reads is everything up to the next space (`-t/tmp/lib,cache`): anything else is a placeholder
       const whole = (t.slice(m.index).match(/^\s*-t(\S+)/) || [])[1] ?? '';
-      const cut = !q && whole.replace(/[.,!?;:]+$/, '') !== m[1].replace(/[.,!?;:]+$/, '');
-      const value = escaped || cut ? null : q ? q[2] : m[1].replace(/[.,!?;:]+$/, '').trim();
+      const strip = (x) => (/(?:^|\/)\.{1,2}$/.test(x) ? x : x.replace(/[.,!?;:]+$/, ''));
+      const cut = !q && strip(whole) !== strip(m[1]);
+      const bare = /(?:^|\/)\.{1,2}$/.test(m[1]) ? m[1] : m[1].replace(/[.,!?;:]+$/, '').trim(); // `-t./lib/..` keeps its `..`
+      const value = escaped || cut ? null : q ? q[2] : bare;
       out.push({ kind: 'target', value: value || null, at: m.index });
     }
   }
@@ -1133,7 +1135,7 @@ export function newTemplateSlots(id, text, v, quoted) {
   }
   if (id === 'gh_issue_list') {
     // a repository name (`acme/closed`, quoted or not, or the value read into the repo slot) never sets the state
-    t = t.replace(/--repo[=\s]+\S+|(["']?)[\w.-]+\/[\w.-]+\1/gi, ' ');
+    t = t.replace(/--repo[=\s]+\S+|(["']?)(?:[\w.-]+\/)+[\w.-]+\1/gi, ' ');
     if (typeof v.repo === 'string' && v.repo) t = t.split(v.repo).join(' ');
     if (/\b(?:closed|zamkni\w*)\b/i.test(t)) v.state = 'closed';
     else if (/\b(?:all|every|wszystkie|wszystkich)\b/i.test(t) && !/\b(?:open|opened|otwart\w*)\b/i.test(t)) v.state = 'all';
@@ -1159,15 +1161,16 @@ const WH_COMMON = 'same again instead too also but tak samo zamiast też tez the
 const WH_WORDS = {
   git_show: `${WH_COMMON} my me show display view see print commit commits revision tag last latest newest most recent previous prior second-to-last its diff changes change patch details what was changed in latest ostatni ostatniego ostatnia ostatnie poprzedni poprzedniego przedostatni commita commit zmiany zmian szczegoly szczegóły rewizje rewizję tagu tag`,
   git_grep: `${WH_COMMON} my me grep search find look lookup text string pattern word occurrences tracked files file repo repository codebase all every across szukaj wyszukaj znajdz znajdź poszukaj plikach plikow plików sledzonych śledzonych repozytorium kodzie kod -n --`,
-  wrangler_pages_deploy: `${WH_COMMON} my me pages page deploy redeploy publish upload ship push static site website strona strone stronę stron statyczna statyczną folder directory dir katalog katalogu wdroz wdroż wdróż zdeployuj deployuj opublikuj wrzuc wrzuć wgraj`,
+  wrangler_pages_deploy: `${WH_COMMON} my me pages page deploy redeploy publish upload ship push static strona strone stronę stron statyczna statyczną folder directory dir katalog katalogu wdroz wdroż wdróż zdeployuj deployuj opublikuj wrzuc wrzuć wgraj`,
   gh_run_watch: `${WH_COMMON} me --repo repo repository watch watching follow live progress until it its is finishes finish finished done complete completes wait ends end run github actions action ci workflow job build status obserwuj śledź sledz czekaj poczekaj zaczekaj aż az zakończy zakonczy skończy skonczy żywo zywo postęp postep runa runu`,
   gh_issue_view: `${WH_COMMON} me --repo repo repository show view issue details detail info information description summary read zgłoszenie zgloszenie zgłoszenia zgloszenia ticket bug szczegóły szczegoly opis przeczytaj nr number numer no`,
   gh_issue_list: `${WH_COMMON} --repo list listing show which what are there any issues issue bugs tickets problems all open opened closed state zgłoszenia zgloszenia zgłoszeń zgloszen lista listę liste wylistuj wszystkie otwarte otwartych zamknięte zamkniete repo repository`,
+  wrangler_d1_list: `${WH_COMMON} me d1 database databases db dbs baza bazy baz danych list listing all show which what are there my moje moich wszystkie lista listę liste wylistuj listuj pokaż pokaz account konto konta`,
   git_ls_files: `${WH_COMMON} me ls-files list listing show which what are is all every files file tracked by git repo repository lista listę pliki plików plikow śledzone sledzone śledzonych sledzonych pokaż wszystkie przez`,
 };
 // only the slots a template renders explain words of the request (an extracted `since: yesterday` that never reaches
 // `git show` does not)
-const WH_RENDERED = { git_show: ['rev'], git_grep: ['pattern'], wrangler_pages_deploy: ['path'], gh_run_watch: ['num', 'repo'], gh_issue_view: ['num', 'repo'], gh_issue_list: ['repo', 'state'], git_ls_files: [] };
+const WH_RENDERED = { git_show: ['rev'], git_grep: ['pattern'], wrangler_pages_deploy: ['path'], gh_run_watch: ['num', 'repo'], gh_issue_view: ['num', 'repo'], gh_issue_list: ['repo', 'state'], git_ls_files: [], wrangler_d1_list: [] };
 const whTokens = (t, vals = []) => { const left = [...vals]; return t.replace(/(["'])([^"']*)\1/g, (q, _, inner) => { const i = left.indexOf(inner); if (i >= 0) { left.splice(i, 1); return ' '; } return ` ${q} `; }).split(/\s+/).map((w) => w.replace(/^[(]+|[),.;:!?]+$/g, '').toLowerCase()).filter(Boolean); };
 const UNIT_AFTER = /^\s*-?(?:comments?|labels?|assignees?|reactions?|commits?|files?|failures?|errors?|checks?|runs?|issues?|prs?|people|users?|minutes?|komentarz\w*|days?|d|weeks?|wks?|w|months?|mos?|years?|yrs?|y|hours?|hrs?|h|minutes?|mins?|m|seconds?|secs?|s|dni|dzie\w*|tygodn\w*|miesi\w*|godz\w*|minut\w*|sekund\w*|times?|razy|old|ago|temu|jobs?|attempts?|steps?|items?|of|out|x|%|th|st|nd|rd)\b|^-\w/i;
 /**
@@ -1198,7 +1201,10 @@ export function newTemplateWithhold(id, text, slots = {}, command = null) {
     if (id === 'git_grep') { const g = t.match(/\bgit\s+grep\s+(?:-n\s+)?(?:--\s+)?(?:"[^"]*"|'[^']*'|[^\s"']+)\s+(\S.*)$/i); if (g) { rest.length = 0; rest.push(g[1]); } }
     if (id === 'git_show') { const g = t.match(/\bgit\s+show\s+(?:"[^"]*"|'[^']*'|[^\s"']+)\s+(\S.*)$/i); if (g) { rest.length = 0; rest.push(g[1]); } }
     if (id === 'git_ls_files') { const g = t.match(/\bgit\s+ls-files\s+(\S.*)$/i); if (g) { rest.length = 0; rest.push(g[1]); } }
-    if (id === 'git_show' && slots.rev != null && (REF_TOKEN.test(t) || /\bgit\s+show\s+\S/i.test(t)) && /\b(?:previous|prior|second[- ]to[- ]last|before|poprzedni\w*|przedostatni\w*|parent|rodzic\w*)\b/i.test(t)) rest.push('(relative to the named revision)');
+    // the derived `HEAD~1` ("the previous commit") does not appear in the request; a revision that does is explicit
+    if (id === 'git_show' && slots.rev != null && t.toLowerCase().includes(String(slots.rev).toLowerCase()) && /\b(?:previous|prior|second[- ]to[- ]last|before|poprzedni\w*|przedostatni\w*|parent|rodzic\w*)\b/i.test(t)) rest.push('(relative to the named revision)');
+    // a place for git grep ("in files", "under src") is a pathspec unless it names the repository itself
+    if (id === 'git_grep') for (const m of t.matchAll(/\b(?:in|inside|within|under|w|we)\s+(?:the\s+|all\s+|my\s+)?(["']?)([^\s"']+)\1/gi)) if (!/^(?:repo|repository|repozytorium|tracked|git|codebase|plikach|sledzonych|śledzonych)$/i.test(m[2])) rest.push(m[2]);
     if (rest.length) out.push(`${id === 'git_grep' ? 'pattern' : id === 'git_show' ? 'rev' : 'args'} (not expressed: ${[...new Set(rest)].slice(0, 4).join(' ')})`);
     if (Object.values(slots).some((x) => glued(x)) || /\\["']/.test(t)) out.push('value (unclear where the quoted text ends)');
   }
@@ -1209,7 +1215,8 @@ export function newTemplateWithhold(id, text, slots = {}, command = null) {
     const segs = []; let up = 0; const abs = p.startsWith('/'); const home = p.startsWith('~');
     for (const seg of p.replace(/^~/, '').split('/')) { if (!seg || seg === '.') continue; if (seg === '..') { if (segs.length) segs.pop(); else up++; } else segs.push(seg); }
     const sensitive = segs.some((x) => x.startsWith('.')) || ((abs || drive) && (segs.length === 1 || (segs.length === 2 && /^(?:home|users|mnt|media|volumes)$/.test(segs[0]))));
-    if (up > 0 || ((abs || home || drive) && segs.length === 0) || sensitive) out.push('path (a root, home or parent directory is never uploaded as is)');
+    const unc = /^\/\/[^/]/.test(p) && segs.length <= 2; // \\server\share is a volume root
+    if (up > 0 || ((abs || home || drive) && segs.length === 0) || sensitive || unc) out.push('path (a root, home or parent directory is never uploaded as is)');
   }
   if (/^(?:gh_issue_view|gh_run_watch|gh_issue_list|git_ls_files)$/.test(id)) {
     // an option the template cannot express (`--exit-status`, `--json`, `--others`, `-- src`) is withheld

@@ -137,3 +137,13 @@ test('review r8: one value explains one word across quoted and bare forms; expli
   assert.equal((await run('list issues of acme/closed')).command, 'gh issue list --repo acme/closed');
   assert.equal((await run('show the previous commit')).missing.length, 0);
 });
+
+test('review r9: relative words with any named revision, -t keeps .., hosted repo names, local d1, UNC roots, place words in grep, site as a project', async () => {
+  const held = async (q, o = BASH) => { const r = await run(q, o); assert.ok(r.command == null || r.missing.length > 0, `${q}: ${r.command} must not run on Enter`); };
+  for (const q of ['show commit main^ previous', 'show the commit before feature/x', 'list local d1 databases', 'deploy dist to site on cloudflare pages', 'search tracked files for "TODO" in files']) await held(q);
+  await held('wrangler pages deploy "//server/share"', PS);
+  assert.equal((await run('pip install requests -t./lib/..')).command, 'python3 -m pip install requests --target ./lib/..');
+  assert.equal((await run('list open issues in repo github.example.com/acme/closed')).command, 'gh issue list --repo github.example.com/acme/closed');
+  assert.equal((await run('list all issues in repository "github.example.com/acme/open"')).command, 'gh issue list --repo github.example.com/acme/open --state all');
+  for (const q of ['list d1 databases', 'show the previous commit', 'find TODO in tracked files', 'grep the repo for TODO']) assert.equal((await run(q)).missing.length, 0, q);
+});
