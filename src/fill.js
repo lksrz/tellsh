@@ -804,7 +804,7 @@ export function scopeMentions(intentId, text) {
     // `-t@foo`: an attached target the parser does not read is still a target (placeholder), never dropped
     for (const m of t.matchAll(/(?:^|\s)-t([^\s/~.\w"'][^\s]*)/g)) out.push({ kind: 'target', value: null, at: m.index });
     // a pip target in a multi-line request: the shell reading of the operand is unclear: a placeholder
-    if (/[\r\n\t\v\f\u0085\u2028\u2029]/.test(t) && /(?:^|\s)(?:-t|--target)/.test(t)) out.push({ kind: 'target', value: null, at: t.search(/(?:-t|--target)/) });
+    if (/[^\x20-\x7eąćęłńóśźżĄĆĘŁŃÓŚŹŻ]/.test(t) && /(?:^|\s)(?:-t|--target)/.test(t)) out.push({ kind: 'target', value: null, at: t.search(/(?:-t|--target)/) });
     // r37: a backslash before a quote in a pip request with a target: where the operand ends is unclear: a placeholder
     if (/\\["']/.test(t) && /(?:^|\s)(?:-t|--target)/.test(t)) out.push({ kind: 'target', value: null, at: t.search(/(?:-t|--target)/) });
     // `-t"lib` / `--target "lib`: an unterminated quote is unreadable: a placeholder, never dropped

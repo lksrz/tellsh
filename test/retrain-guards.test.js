@@ -23,3 +23,7 @@ test('plain requests and faithful typed commands still run', () => {
     const r = suggest(q, env); assert.ok(r.command && (r.missing || []).length === 0, `${env.shell}: ${q} -> ${r.command} ${JSON.stringify(r.missing)}`);
   }
 });
+test('r41: a pip target next to a non-ASCII space or control character is a placeholder', () => {
+  for (const env of ENVS) for (const q of ['pip install requests -tlib\u00a0requests', 'pip install requests -t lib\u2003x', 'pip install requests --target=lib\u00a0x', 'pip install requests --target lib\u200bx']) held(q, env);
+  for (const env of ENVS) assert.deepEqual(suggest('pip install requests -t lib', env).missing, []);
+});
