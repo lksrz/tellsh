@@ -181,9 +181,10 @@ function main() {
     // spans are unreliable: long paths, backticks, command fragments)
     // template-generated (aic-studio) rows fill the per-intent cap last (real_rows.js); TELLSH_TMPL_W is an extra weight
     // multiplier for them (default 1: measured, the cap ordering helps and extra down-weighting does not)
-    const w = r.src === 'real' ? 0.5 * (r.tmpl && Number.isFinite(parseFloat(process.env.TELLSH_TMPL_W)) ? parseFloat(process.env.TELLSH_TMPL_W) : 1) : 1;
+    const tm = r.src === 'real' && r.tmpl && Number.isFinite(parseFloat(process.env.TELLSH_TMPL_W)) ? parseFloat(process.env.TELLSH_TMPL_W) : 1;
+    const w = r.src === 'real' ? 0.5 * tm : 1;
     emit(r.text, fam, r.intent, [...env(), ...ctx()], w, r.src, r.lang, g);
-    if (boost.has(normalize(r.text) + '|' + r.intent)) { emit(r.text, fam, r.intent, [...env(), ...ctx()], 1, r.src, r.lang, g); nBoost++; }
+    if (boost.has(normalize(r.text) + '|' + r.intent)) { emit(r.text, fam, r.intent, [...env(), ...ctx()], tm, r.src, r.lang, g); nBoost++; } // boost copy honours TELLSH_TMPL_W too
     emit(typo(r.text), fam, r.intent, [...env(), ...ctx()], w, r.src, r.lang, g);
     if (r.src === 'real') continue;
     const { spans } = silverSpans(r.text, r.intent);
