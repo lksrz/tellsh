@@ -432,9 +432,13 @@ retrain; `npm test && npm run eval`.
 * **`git grep` / `git show` are not suggested as runnable in 0.3.4.** Their free-text forms are withheld (shown with a
   placeholder, never run on Enter or `--yes`) until a later release.
 * **New 0.3.4 templates take only explicit values.** `git fetch` is always `git fetch --all` (a named remote or
-  `--prune` is not rendered); `git show` reads a hash, `HEAD~N` or "previous commit", otherwise shows HEAD; `gh issue view`
-  / `gh run watch` need an explicit number (`issue 42`, `#42`, `run 123`); `wrangler pages deploy` needs the directory
-  named (no `dist` default); a `git grep` pattern that starts with `-` is a placeholder.
+  `--prune` is not rendered, and a request that also asks for another action is withheld); `gh issue view` / `gh run watch`
+  need an explicit number (`issue 42`, `#42`, `run 123`); `wrangler pages deploy` needs the directory named (no `dist`
+  default).
+* **History after a 0.3.4 template is replayed only as "same for X".** When the previous command is one of the new
+  templates (`git fetch`, `git ls-files`, `gh issue list` / `view`, `gh run watch`, `wrangler d1 list`, `wrangler pages
+  deploy`), a follow-up that refers to it (`it`, `there`, `same but …`, `again`, `them`, …) is refused, and that line adds
+  no history context to other requests.
 * **The selector rule trades recall for safety.** Its vocabulary is closed and hand-written (English and Polish): a
   harmless paraphrase with a word it does not list (`deploy the api worker to cloudflare`, `run the worker on
   localhost:8787`) gets a placeholder (`<ARGS>`, `<WENV>`) you have to fill or delete. On the 1097 gh / wrangler
@@ -487,7 +491,6 @@ retrain; `npm test && npm run eval`.
   These give a complete command with no warning:
   - ssh `-L` with a bind address (4-part spec): `-L 127.0.0.1:8080:db.internal:5432` -> `-L 8080:localhost:8080` (only
     `-L PORT:HOST:PORT` is read);
-  - `~` in a pip target is quoted literally: `--target ~/packages` -> `--target '~/packages'` (use an absolute path; `$HOME/…` is quoted too);
   - two bare PIDs for one slot: `kill 1234 5678` -> `kill 5678`;
   - some composer flags are no longer explained for their intents (`pull all branches` -> `git branch -a`; read-only);
   - `kill 1234` is read as `pkill -9 -f <NAME>` (a placeholder; `kill pid 1234` -> `kill 1234`).
@@ -499,8 +502,10 @@ retrain; `npm test && npm run eval`.
   ([HYBRID.md](HYBRID.md#v04-real-usage)).
 * Slot F1 gold set is small (208 requests); relexicalised end-to-end numbers use silver spans for unreplaced values.
 
-- Fixed (feat/templates-catalog): PowerShell / cmd quote a `--workspace` value with spaces and keep pip `--target`; the attached
-  `-t/tmp/pkgs` form and a quoted workspace after "in workspace" are read. Still: a request with several shell arguments
+- Fixed in 0.3.4: PowerShell / cmd quote a `--workspace` value with spaces and keep pip `--target`; the attached
+  `-t/tmp/pkgs` form and a quoted workspace after "in workspace" are read. A pip target is runnable only when it is plain
+  letters, digits, `_ . - /` and spaces (plus a drive and `\` in PowerShell / cmd): `~`, `$HOME`, `%VAR%`, `^` or quotes
+  give a placeholder (use an absolute path). Still: a request with several shell arguments
   where one of them carries its own quotes (`tellsh run npm deploy in workspace '"staging app"'`) may be re-quoted; pass
   the request as one argument. Always read the shown command before confirming.
 
