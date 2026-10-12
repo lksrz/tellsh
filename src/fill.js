@@ -1204,6 +1204,8 @@ export function newTemplateWithhold(id, text, slots = {}, command = null) {
   };
   // r21: a multi-line (or control-character) request is never read as one of these templates: the line-based checks cannot vouch for it
   if (WH_WORDS[id] && /[\r\n\t\v\f\u0085\u2028\u2029]/.test(t)) return ['request (spans several lines)'];
+  // r30: typographic quotes or backticks are not read as quoting: the 0.3.4 templates never render them as runnable
+  if (WH_WORDS[id] && /[\u2018-\u201f\u00ab\u00bb\u2039\u203a\u300c-\u300f`\u02bb\u02bc\uff02\uff07]/.test(t)) return ['value (typographic quotes)'];
   if (WH_WORDS[id]) {
     // (the --repo value and the option itself are explained by the rendered repo slot)
     const ok = new Set(WH_WORDS[id].split(/\s+/));
@@ -1241,7 +1243,7 @@ export function newTemplateWithhold(id, text, slots = {}, command = null) {
     // r23: "in the tracked file X" names a file restriction git grep -n does not render
     if (id === 'git_grep') for (const m of t.matchAll(/\b(?:file|files|plik|pliku|plikach)\s*[:=,\-–—]*\s+(?:named\s+|called\s+)?(["']?)([^\s"']+)\1/gi)) if (!/^(?:for|with|to|and|or|containing|that|which|in|matching|word|text|pattern|za|na|z|w|zawierając\w*|zawierajac\w*)$/i.test(m[2])) rest.push(m[2]);
     // r25: structural — git grep -n renders no file restriction: a singular file word, or files followed by punctuation, is always withheld
-    if (id === 'git_grep' && (/\b(?:file|plik|pliku)\b/i.test(t) || /\b(?:files|plikach|plikow|plików)\s*[^\w\s"']/i.test(t))) rest.push('(a file restriction)');
+    if ((id === 'git_grep' || id === 'git_ls_files') && (/\b(?:file|plik|pliku)\b/i.test(t) || /\b(?:files|plikach|plikow|plików)\s*[^\w\s"']+\s*\S/i.test(t))) rest.push('(a file restriction)');
     // r26: structural — any option-looking token (`--`, `-i`, `--cached`) in a git grep request is withheld: only `-n --` is rendered
     if (id === 'git_grep' && /(?:^|\s)-{1,2}(?=\s|$|[^\s\d])/.test(t.replace(/\bgit\s+grep\s+-n\s+--(?=\s)/i, ' '))) rest.push('(an option or pathspec)');
     // r21: for git show, and/or/plus/then always adds another selector (withheld)

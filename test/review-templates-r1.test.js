@@ -350,3 +350,14 @@ test('r29: mid-sentence punctuation and exclusions are withheld', () => {
     for (const q of ['search tracked files for "TODO"', 'show issue 42', 'show issue no 42', 'list tracked files.']) assert.deepEqual(suggest(q, env).missing, [], `${env.shell}: ${q}`);
   }
 });
+
+// review r30: typographic quotes; a singular file restriction for git ls-files
+test('r30: typographic quotes and ls-files single-file restrictions are withheld', () => {
+  for (const env of [{ shell: 'bash', os: 'linux' }, { shell: 'pwsh', os: 'win32' }, { shell: 'cmd', os: 'win32' }]) {
+    for (const q of ['search tracked files for “TODO”', 'grep the repo for “TODO”', 'search tracked files for „TODO“', 'search tracked files for «TODO»', 'search tracked files for `TODO`', 'search tracked files for ‘TODO’', 'list the tracked file files in the repository', 'list the tracked file repository']) {
+      const r = suggest(q, env);
+      assert.ok(!r.command || r.missing.length > 0, `${env.shell}: ${q}`);
+    }
+    for (const q of ['search tracked files for "TODO"', 'list tracked files in the repo']) assert.deepEqual(suggest(q, env).missing, [], `${env.shell}: ${q}`);
+  }
+});
