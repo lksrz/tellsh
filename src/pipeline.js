@@ -528,6 +528,13 @@ function suggestOnce(query, opts = {}) {
   }
 
   const sb = ctx && !ref ? sameBut(query, ctx) : null;
+  // "watch it", "delete it", "open it" after `npx wrangler pages deploy dist`: "it" may mean the deployment; a reference
+  // to a deploy line is never resolved to a local file or directory, nor dropped for a default operand (/var/log/syslog)
+  if (ctx?.last?.intent === 'wrangler_pages_deploy' && !sb && (ref || hasPronoun(query) || hasLocative(query))) {
+    context.rule = 'refused';
+    context.note = 'the previous command deployed to Cloudflare Pages: "it" may mean the deployment, not a local file; not guessing';
+    return { ...base, understood: false, method: 'history-rule', confidence: 0, candidates: [], tools: [], command: null, missing: [], hint: context.note };
+  }
   // a request about the entries of the referenced directory does not use the history at all: its intent is read
   // without the history features (they favour `delete_dir` for "delete log files in this folder")
   // rerankTop: the re-ranker's own candidate count (A+B uses 5); independent of how many candidates are displayed
