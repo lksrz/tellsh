@@ -479,6 +479,8 @@ function suggestOnce(query, opts = {}) {
     const punct = blank.filter((k) => !invalidHistorySlots(ref.slots).includes(k) && !(cutHistory && k === ref.changed));
     if (cutHistory) res.warnings = [...(res.warnings || []), `path left as a placeholder: unclear where the new name ends (${cutHistory}); quote the path`];
     if (punct.length) res.warnings = [...(res.warnings || []), `path left as a placeholder: unclear whether the trailing punctuation is part of the name (${punct.join(', ')}); quote the path`];
+    // a replayed 0.3.4-template command gets the same withholding as a fresh request ("same for / without publishing")
+    if (!(res.missing || []).length) { const w = newTemplateWithhold(ref.intent, query, slots, res.command); if (w.length) res.missing = w; }
     if (punct.length + (cutHistory ? 1 : 0) < blank.length) res.warnings = [...(res.warnings || []), `value left as a placeholder: it is not a valid value (${blank.filter((k) => !punct.includes(k) && !(cutHistory && k === ref.changed)).join(', ')})`];
     return res;
   }

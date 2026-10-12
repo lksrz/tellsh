@@ -103,3 +103,17 @@ test('review r5: only rendered slots explain words; gh/ls-files residue; literal
     assert.equal((await run(q)).missing.length, 0, q);
   }
 });
+
+test('review r6: history replays, attached pip operands, case, glued suffixes, repo names, positional scope, sensitive dirs', async () => {
+  const H = ['npx wrangler pages deploy dist'];
+  const held = async (q, h) => { const r = await run(q, BASH, h); assert.ok(r.command == null || r.missing.length > 0, `${q}: ${r.command} must not run on Enter`); };
+  for (const q of ['same for /tmp/out without publishing', 'same for /', 'same for ~/', 'same for ../']) await held(q, H);
+  for (const q of ['pip install requests -t@foo', 'pip install requests -t/tmp/lib,cache', 'Git grep TODO -- code', 'Git show HEAD tag',
+    'run npm deploy in workspace "staging app"!prod', 'search tracked files for "TODO" in code', 'git ls-files files',
+    'deploy /home/me to cloudflare pages', 'deploy ~/.ssh to cloudflare pages', 'deploy dist to frontend on cloudflare pages']) await held(q);
+  assert.equal((await run('Git show previous')).command, 'git show previous');
+  assert.equal((await run('list open issues in repo acme/closed')).command, 'gh issue list --repo acme/closed');
+  assert.equal((await run('gh issue list --repo acme/closed')).command, 'gh issue list --repo acme/closed');
+  for (const q of ['watch run 42 in repo foo/bar', 'pip install requests -t/tmp/pkgs', 'deploy /tmp/site/dist to pages']) assert.equal((await run(q)).missing.length, 0, q);
+  assert.equal((await run('same for ./build', BASH, H)).missing.length, 0);
+});
