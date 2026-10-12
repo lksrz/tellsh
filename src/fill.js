@@ -776,6 +776,8 @@ const SCOPE_OPT = /(?:^|\s)(--workspaces?|--ws|--filter|--repo|--env|--config|--
 // "in workspace api", "for the project acme/app", "w projekcie api", "in the staging environment" is read by wranglerEnv
 const SCOPE_PHRASE = /(?:^|\s)(?:in|for|of|on|from|within|inside|under|at|w|we|dla|z)\s+(?:the\s+|a\s+)?(workspace|project|projek\w*|repo|repository|repozytori\w*|env|environment|srodowisk\w*|config|configuration|konfiguracj\w*)\s+(?!-)("[^"\n]*"|'[^'\n]*'|[^\s,;!?]+)/g;
 // pip's attached short form: `-t/tmp/pkgs`, `-t~/pkgs` (the separated `-t DIR` is read by SCOPE_OPT)
+// trailing sentence punctuation is dropped, but never a `.` / `..` path segment (`-t lib/..`, `..\..`)
+const stripScopePunct = (x) => (/(?:^|[\/\\])\.{1,2}$/.test(x) ? x : x.replace(/[.,!?;:]+$/, ''));
 const SCOPE_ATTACHED_T = /(?:^|\s)-t((?:"[^"\n]*"|'[^'\n]*'|[/~.\w][^\s,;!?]*))/g;
 const SCOPE_PHRASE_KIND = (w) => /^(?:workspace)$/.test(w) ? 'workspace' : /^(?:repo|repository|repozytori)/.test(w) ? 'repo'
   : /^(?:env|environment|srodowisk)/.test(w) ? 'env' : /^(?:config|configuration|konfiguracj)/.test(w) ? 'config' : 'project';
@@ -789,7 +791,7 @@ export function scopeMentions(intentId, text) {
     if (SCOPE_SHORT[opt] && !SCOPE_SHORT[opt].test(intentId)) continue;
     const quoted = m[2] ?? m[3] ?? m[5] ?? m[6];
     const raw = quoted ?? m[4] ?? m[7] ?? null;
-    out.push({ kind: SCOPE_KIND[opt], value: quoted != null ? quoted.trim() || null : raw ? raw.replace(/[.,!?;:]+$/, '').replace(/^["'`]|["'`]$/g, '') || null : null, at: m.index });
+    out.push({ kind: SCOPE_KIND[opt], value: quoted != null ? quoted.trim() || null : raw ? stripScopePunct(raw).replace(/^["'`]|["'`]$/g, '') || null : null, at: m.index });
   }
   if (/^pip_/.test(intentId)) {
     // `-t@foo`: an attached target the parser does not read is still a target (placeholder), never dropped
@@ -801,9 +803,8 @@ export function scopeMentions(intentId, text) {
       const escaped = q && (q[2].endsWith('\\') || t.charAt(m.index + m[0].length) === q[1] || /^\S/.test(t.slice(m.index + m[0].length)));
       // the operand pip reads is everything up to the next space (`-t/tmp/lib,cache`): anything else is a placeholder
       const whole = (t.slice(m.index).match(/^\s*-t(\S+)/) || [])[1] ?? '';
-      const strip = (x) => (/(?:^|\/)\.{1,2}$/.test(x) ? x : x.replace(/[.,!?;:]+$/, ''));
-      const cut = !q && strip(whole) !== strip(m[1]);
-      const bare = /(?:^|\/)\.{1,2}$/.test(m[1]) ? m[1] : m[1].replace(/[.,!?;:]+$/, '').trim(); // `-t./lib/..` keeps its `..`
+      const cut = !q && (stripScopePunct(whole) !== stripScopePunct(m[1]) || /["'`]/.test(whole));
+      const bare = stripScopePunct(m[1]).trim(); // `-t./lib/..` keeps its `..`
       const value = escaped || cut ? null : q ? q[2] : bare;
       out.push({ kind: 'target', value: value || null, at: m.index });
     }
@@ -1203,14 +1204,23 @@ export function newTemplateWithhold(id, text, slots = {}, command = null) {
     if (id === 'git_ls_files') { const g = t.match(/\bgit\s+ls-files\s+(\S.*)$/i); if (g) { rest.length = 0; rest.push(g[1]); } }
     // the derived `HEAD~1` ("the previous commit") does not appear in the request; a revision that does is explicit
     if (id === 'git_show' && slots.rev != null && t.toLowerCase().includes(String(slots.rev).toLowerCase()) && /\b(?:previous|prior|second[- ]to[- ]last|before|poprzedni\w*|przedostatni\w*|parent|rodzic\w*)\b/i.test(t)) rest.push('(relative to the named revision)');
+    // two relative selectors ("the previous commit of the previous commit") or a named ref/tag/branch position
+    if (id === 'git_show') {
+      const rel = t.match(/\b(?:previous|prior|second[- ]to[- ]last|before|poprzedni\w*|przedostatni\w*|parent|rodzic\w*)\b/gi) || [];
+      if (rel.length > 1) rest.push('(nested relative revision)');
+      for (const m of t.matchAll(/\b(?:tag|branch|ref|of|from|on|z|na)\s+(?:the\s+)?(?=(["']?)([^\s"']+)\1)/gi)) if (String(slots.rev ?? '').toLowerCase() !== m[2].toLowerCase() && !/^(?:commit|commits|repo|repository|branch|tag|head)$/i.test(m[2])) rest.push(m[2]);
+    }
+    if (id === 'wrangler_pages_deploy') for (const m of t.matchAll(/\b(?:to|for|into|onto|na|do|dla)\s+(?:the\s+)?(["']?)([^\s"']+)\1/gi)) if (!/^(?:cloudflare|pages|page)$/i.test(m[2]) && String(slots.path ?? '').toLowerCase() !== m[2].toLowerCase()) rest.push(m[2]);
     // a place for git grep ("in files", "under src") is a pathspec unless it names the repository itself
-    if (id === 'git_grep') for (const m of t.matchAll(/\b(?:in|inside|within|under|w|we)\s+(?:the\s+|all\s+|my\s+)?(["']?)([^\s"']+)\1/gi)) if (!/^(?:repo|repository|repozytorium|tracked|git|codebase|plikach|sledzonych|śledzonych)$/i.test(m[2])) rest.push(m[2]);
+    if (id === 'git_grep') for (const m of t.matchAll(/\b(?:in|inside|within|under|on|of|at|w|we|na)\s+(?:the\s+|all\s+|my\s+|a\s+)?(["']?)([^\s"']+)\1/gi)) if (!/^(?:repo|repository|repozytorium|tracked|git|codebase|plikach|sledzonych|śledzonych)$/i.test(m[2])) rest.push(m[2]);
     if (rest.length) out.push(`${id === 'git_grep' ? 'pattern' : id === 'git_show' ? 'rev' : 'args'} (not expressed: ${[...new Set(rest)].slice(0, 4).join(' ')})`);
     if (Object.values(slots).some((x) => glued(x)) || /\\["']/.test(t)) out.push('value (unclear where the quoted text ends)');
   }
   if (id === 'wrangler_pages_deploy' && slots.path != null) {
     let p = String(slots.path).trim().replace(/^(["'])(.*)\1$/, '$2').replace(/\\/g, '/').toLowerCase();
-    const drive = /^[a-z]:(?=\/|$)/.exec(p); if (drive) p = p.slice(2) || '/';
+    const drive = /^[a-z]:/.exec(p); const driveRel = drive && !/^[a-z]:\//.test(p);
+    if (drive) p = p.slice(2) || '/';
+    if (driveRel && p !== '/') p = `./${p}`; // `C:..` is relative to the drive's current directory
     p = p.replace(/^(?:\$home|%userprofile%|\$env:userprofile)(?=\/|$)/, '~');
     const segs = []; let up = 0; const abs = p.startsWith('/'); const home = p.startsWith('~');
     for (const seg of p.replace(/^~/, '').split('/')) { if (!seg || seg === '.') continue; if (seg === '..') { if (segs.length) segs.pop(); else up++; } else segs.push(seg); }

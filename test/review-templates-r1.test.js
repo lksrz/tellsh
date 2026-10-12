@@ -147,3 +147,15 @@ test('review r9: relative words with any named revision, -t keeps .., hosted rep
   assert.equal((await run('list all issues in repository "github.example.com/acme/open"')).command, 'gh issue list --repo github.example.com/acme/open --state all');
   for (const q of ['list d1 databases', 'show the previous commit', 'find TODO in tracked files', 'grep the repo for TODO']) assert.equal((await run(q)).missing.length, 0, q);
 });
+
+test('review r10: path segments kept in every -t form, nested relative revisions, drive-relative parents, selector positions', async () => {
+  const held = async (q, o = BASH) => { const r = await run(q, o); assert.ok(r.command == null || r.missing.length > 0, `${q}: ${r.command} must not run on Enter`); };
+  assert.match((await run('pip install requests -t..\\..', PS)).command, /--target '\.\.\\\.\.'/);
+  assert.equal((await run('pip install requests -t ../..')).command, 'python3 -m pip install requests --target ../..');
+  assert.equal((await run('pip install requests --target=lib/..')).command, 'python3 -m pip install requests --target lib/..');
+  for (const q of ['pip install requests -t./"my libs"', 'show the previous commit of the previous commit', 'deploy dist to static on cloudflare pages',
+    'search tracked files for "TODO" on file', 'show the latest commit of tag latest']) await held(q);
+  await held('wrangler pages deploy "C:.."', PS);
+  await held('wrangler pages deploy "C:../.."', { shell: 'cmd', os: 'win32' });
+  for (const q of ['show the previous commit', 'show the last commit', 'deploy dist to cloudflare pages', 'find TODO in tracked files']) assert.equal((await run(q)).missing.length, 0, q);
+});
