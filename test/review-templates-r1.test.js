@@ -169,3 +169,13 @@ test('review r11: drive-relative pip targets, glued quoted separated targets, se
     'deploy dist to cloudflare pages on static', 'deploy dist to cloudflare pages static', 'search tracked files for "TODO" across the file']) await held(q);
   for (const q of ['pip install requests --target "/tmp/a b"', 'show me the latest commit with its diff', 'wdróż katalog dist na cloudflare pages', 'deploy ./build to pages']) assert.equal((await run(q)).missing.length, 0, q);
 });
+
+test('review r12: pages replays, derived revision with a tag, job scope, partial quotes, second case-variant operand, bare drive', async () => {
+  const H = ['npx wrangler pages deploy build'];
+  const held = async (q, o = BASH, h) => { const r = await run(q, o, h); assert.ok(r.command == null || r.missing.length > 0, `${q}: ${r.command} must not run on Enter`); };
+  for (const q of ['same for production', 'same for staging', 'same for preview', 'same for docs']) await held(q, BASH, H);
+  for (const q of ['show the previous tag commit', 'watch the build job in run 123', "pip install requests --target ./'my libs'", 'search tracked files for "word" and WORD']) await held(q);
+  assert.match((await run('pip install requests -t C:', PS)).command, /--target 'C:'/);
+  assert.equal((await run('same for ./out', BASH, H)).missing.length, 0);
+  assert.equal((await run('watch the github actions run 123 until it finishes')).missing.length, 0);
+});
