@@ -179,3 +179,10 @@ test('review r12: pages replays, derived revision with a tag, job scope, partial
   assert.equal((await run('same for ./out', BASH, H)).missing.length, 0);
   assert.equal((await run('watch the github actions run 123 until it finishes')).missing.length, 0);
 });
+
+test('review r13: escaped spaces in pip targets, a second grep pattern, issue-state exclusions', async () => {
+  const held = async (q) => { const r = await run(q); assert.ok(r.command == null || r.missing.length > 0, `${q}: ${r.command} must not run on Enter`); };
+  for (const q of ['pip install requests -t/tmp/my\\ libs', 'pip install requests --target /tmp/my\\ libs', 'search tracked files for "word" and TEXT',
+    'list all issues but closed', 'list all open issues but closed']) await held(q);
+  assert.equal((await run('list closed issues')).command, 'gh issue list --state closed');
+});

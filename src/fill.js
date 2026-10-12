@@ -794,7 +794,7 @@ export function scopeMentions(intentId, text) {
     // a quoted value glued to more text (`--target "lib"cache`, `-t "lib",cache`) or an operand cut at punctuation is a placeholder
     const after = t.slice(m.index + m[0].length);
     const gluedQ = quoted != null && /^\S/.test(after) && !/^[.!?;:)]+(?:\s|$)/.test(after);
-    const cutRaw = quoted == null && raw != null && (/^[,;!?]\S/.test(after) || /["'`]/.test(raw) || /^["'`]/.test(after));
+    const cutRaw = quoted == null && raw != null && (/\\$/.test(raw) || /^[,;!?]\S/.test(after) || /["'`]/.test(raw) || /^["'`]/.test(after));
     out.push({ kind: SCOPE_KIND[opt], value: gluedQ || cutRaw ? null : quoted != null ? quoted.trim() || null : raw ? stripScopePunct(raw).replace(/^["'`]|["'`]$/g, '') || null : null, at: m.index });
   }
   if (/^pip_/.test(intentId)) {
@@ -807,7 +807,7 @@ export function scopeMentions(intentId, text) {
       const escaped = q && (q[2].endsWith('\\') || t.charAt(m.index + m[0].length) === q[1] || /^\S/.test(t.slice(m.index + m[0].length)));
       // the operand pip reads is everything up to the next space (`-t/tmp/lib,cache`): anything else is a placeholder
       const whole = (t.slice(m.index).match(/^\s*-t(\S+)/) || [])[1] ?? '';
-      const cut = !q && (stripScopePunct(whole) !== stripScopePunct(m[1]) || /["'`]/.test(whole));
+      const cut = !q && (stripScopePunct(whole) !== stripScopePunct(m[1]) || /["'`]/.test(whole) || /\\\s|\\$/.test(t.slice(m.index, m.index + m[0].length + 1)));
       const bare = stripScopePunct(m[1]).trim(); // `-t./lib/..` keeps its `..`
       const value = escaped || cut ? null : q ? q[2] : bare;
       out.push({ kind: 'target', value: value || null, at: m.index });
@@ -1221,6 +1221,8 @@ export function newTemplateWithhold(id, text, slots = {}, command = null) {
       for (const m of t.matchAll(/\b(?:tag|branch|ref|revision|of|from|on|at|with|for|in|to|across|z|na|w|dla)\s+(?:the\s+)?(?=(["']?)([^\s"']+)\1)/gi)) if (String(slots.rev ?? '').toLowerCase() !== m[2].toLowerCase() && !/^(?:commit|commits|repo|repository|head|its|it|diff|changes|me|my|this|that)$/i.test(m[2])) rest.push(m[2]);
     }
     if (id === 'wrangler_pages_deploy') for (const m of t.matchAll(/\b(?:to|for|into|onto|on|as|named|called|in|at|under|across|pages|na|do|dla|w|jako)\s+(?:the\s+|my\s+)?(?=(["']?)([^\s"']+)\1)/gi)) if (!/^(?:cloudflare|pages|page)$/i.test(m[2]) && String(slots.path ?? '').toLowerCase() !== m[2].toLowerCase()) rest.push(m[2]);
+    // a second pattern ("for "word" and TEXT", "foo or bar") is never searched
+    if (id === 'git_grep') for (const m of t.matchAll(/\b(?:and|or|oraz|lub|albo|i)\s+(?:also\s+)?(?=(["']?)([^\s"']+)\1)/gi)) if (!/^(?:tracked|files?|the|repo|repository|show|list|print|line|lines|numbers?)$/i.test(m[2])) rest.push(m[2]);
     // a place for git grep ("in files", "under src") is a pathspec unless it names the repository itself
     if (id === 'git_grep') for (const m of t.matchAll(/\b(?:in|inside|within|under|on|of|at|across|except|excluding|from|w|we|na|poza|oprócz|oprocz)\s+(?:the\s+|all\s+|my\s+|a\s+)?(?=(["']?)([^\s"']+)\1)/gi)) if (!/^(?:repo|repository|repozytorium|tracked|git|codebase|plikach|sledzonych|śledzonych)$/i.test(m[2])) rest.push(m[2]);
     if (rest.length) out.push(`${id === 'git_grep' ? 'pattern' : id === 'git_show' ? 'rev' : 'args'} (not expressed: ${[...new Set(rest)].slice(0, 4).join(' ')})`);
@@ -1244,6 +1246,7 @@ export function newTemplateWithhold(id, text, slots = {}, command = null) {
     const unc = /^\/\/[^/]/.test(p) && segs.length <= 2; // \\server\share is a volume root
     if (up > 0 || ((abs || home || drive) && segs.length === 0) || sensitive || unc) out.push('path (a root, home or parent directory is never uploaded as is)');
   }
+  if (id === 'gh_issue_list' && /\b(?:but|except|excluding|without|not|no|nie|bez|opr[oó]cz|poza)\b/i.test(t.replace(/(["']?)(?:[\w.-]+\/)+[\w.-]+\1/g, ' '))) out.push('state (an exclusion is not expressed)');
   if (/^(?:gh_issue_view|gh_run_watch|gh_issue_list|git_ls_files)$/.test(id)) {
     // an option the template cannot express (`--exit-status`, `--json`, `--others`, `-- src`) is withheld
     const opts = whTokens(t).filter((w) => /^-/.test(w) && w !== '--repo' && !/^--repo=/.test(w));
