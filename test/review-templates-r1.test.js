@@ -261,3 +261,15 @@ test('r21: multi-line requests and extra git show selectors are withheld', () =>
     for (const q of ['show commit HEAD', 'git ls-files', 'pip install requests -t lib']) assert.deepEqual(suggest(q, env).missing, [], `${env.shell}: ${q}`);
   }
 });
+
+// review r22: several pattern-marker groups in git grep; extra git show selectors after , ; or a selector word
+test('r22: extra grep pattern markers and extra git show selectors are withheld', () => {
+  for (const env of [{ shell: 'bash', os: 'linux' }, { shell: 'pwsh', os: 'win32' }, { shell: 'cmd', os: 'win32' }]) {
+    for (const q of ['search tracked files for "TODO" with the word files', 'search tracked files for word "TODO" word files', 'search tracked files for "TODO" to files',
+      'show commit HEAD; show tag diff', 'show commit HEAD, show revision changes', 'show commit HEAD tag diff']) {
+      const r = suggest(q, env);
+      assert.ok(!r.command || r.missing.length > 0, `${env.shell}: ${q}`);
+    }
+    for (const q of ['search tracked files for "TODO"', 'search tracked files for the word "TODO"', 'show commit HEAD']) assert.deepEqual(suggest(q, env).missing, [], `${env.shell}: ${q}`);
+  }
+});
