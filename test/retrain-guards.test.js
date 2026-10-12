@@ -33,3 +33,15 @@ test('r42: expandable pip targets and git fetch modifiers are withheld', () => {
   assert.deepEqual(suggest('fetch all branches', ENVS[0]).missing, []);
   for (const env of ENVS.slice(2)) assert.deepEqual(suggest('pip install requests --target C:\\libs', env).missing, [], env.shell);
 });
+test('r43: tilde/caret pip targets on Windows, dry-run fetch phrasings, quoted fetch options', () => {
+  for (const env of ENVS.slice(2)) for (const q of ['pip install requests -t ~/lib', 'pip install requests -tlib^^cache', 'pip install requests -t lib!x']) held(q, env);
+  for (const env of ENVS) for (const q of ['pobierz nowe gałęzie na sucho', 'fetch branches "-n"', 'fetch branches as a test run']) { const r = suggest(q, env); if (r.intent === 'git_fetch') held(q, env); }
+  for (const env of ENVS) held('pip install requests -t ~/lib', env);
+  assert.deepEqual(suggest('fetch all branches', ENVS[0]).missing, []);
+});
+test('r43: the rerank hook only sees the model whose answer is returned', () => {
+  const seen = [];
+  const hook = (c, o) => { seen.push(c); return c; };
+  suggest('rm notatki.bak', { shell: 'bash', os: 'linux', rerank: hook });
+  assert.equal(seen.length, 1);
+});

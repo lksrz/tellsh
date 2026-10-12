@@ -426,11 +426,11 @@ function getTemplatesModel() {
 export function suggest(query, opts = {}) {
   const once = (o) => releaseGuards(query, replayFloor(suggestOnce(query, o)));
   if (opts.model) return once(opts);
-  const base = once(opts);
   const tm = getTemplatesModel();
-  if (!tm) return base;
-  const alt = once({ ...opts, model: tm });
-  return alt && NEW_TEMPLATE_INTENTS.has(alt.intent) ? alt : base;
+  if (!tm) return once(opts);
+  // the templates model is probed without the rerank hook; the hook only ever sees the model whose answer is returned
+  const probe = once({ ...opts, model: tm, rerank: undefined });
+  return probe && NEW_TEMPLATE_INTENTS.has(probe.intent) ? (opts.rerank ? once({ ...opts, model: tm }) : probe) : once(opts);
 }
 
 // the trust rule (danger.js): a command resolved from history (a reference, "same but …", a value from an earlier
@@ -873,9 +873,16 @@ function suggestOnce(query, opts = {}) {
   // a POSIX shell) is never rendered as a literal folder name; a git fetch request with an option or a fetch modifier is withheld
   if (!(res.missing || []).length && /^pip_/.test(res.intent || '') && slots.piptarget != null) {
     const pt = String(slots.piptarget);
-    if (/[$%`]/.test(pt) || (/\\/.test(pt) && !/^(?:powershell|pwsh|cmd)$/.test(res.shell))) res.missing = ['piptarget (a variable or escape the shell would expand)'];
+    const win = /^(?:powershell|pwsh|cmd)$/.test(res.shell);
+    // allow-list: letters, digits, _ . - / and spaces; a drive (C:) and backslashes only in PowerShell / cmd; never a ~ (it would be quoted as a literal folder)
+    const ok = win ? /^(?:[A-Za-z]:)?[\w.\-\/\\ ]+$/.test(pt) : /^[\w.\-\/ ]+$/.test(pt);
+    if (!ok) res.missing = ['piptarget (a variable or escape the shell would expand)'];
   }
   if (!(res.missing || []).length && res.intent === 'git_fetch') {
+    // allow-list: only words that ask for a plain fetch of everything
+    const FETCH_OK = /^(?:git|fetch|fetching|get|download|pull|all|every|everything|the|a|latest|new|newest|recent|remote|remotes|branch|branches|ref|refs|commits?|changes|updates?|from|repo|repository|now|please|pls|just|me|my|for|of|and|pobierz|pobrać|pobrac|ściągnij|sciagnij|wszystkie|wszystko|nowe|najnowsze|gałęzie|galezie|gałęzi|galezi|zmiany|z|ze|repozytorium|teraz|proszę|prosze)$/i;
+    const words = String(query).replace(/^\s*git\s+fetch\s+--all\s*$/i, 'fetch').split(/\s+/).filter(Boolean);
+    if (words.some((w) => !FETCH_OK.test(w.replace(/[.!?]+$/, '')))) res.missing = ['options (git fetch is always git fetch --all)'];
     if (/(?:^|\s)-{1,2}[A-Za-z]|\b(?:dry|prune|pruning|tags?|depth|shallow|unshallow|remote|origin|upstream|force|refspec|no|not|without|only|just)\b/i.test(String(query).replace(/^\s*git\s+fetch\s+--all\s*$/i, ''))) res.missing = ['options (git fetch is always git fetch --all)'];
   }
   // 0.3.4 retrain guard (model-independent): a slot value carrying shell substitution (`...`, $(...), ${...}) in a command
