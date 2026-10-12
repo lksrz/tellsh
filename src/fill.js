@@ -1252,6 +1252,8 @@ export function newTemplateWithhold(id, text, slots = {}, command = null) {
     if (id === 'git_ls_files') for (const m of t.matchAll(/\b(?:in|inside|within|under|of|at|from|below|for|on|with|w|we|z)\s+(?:(?:the|all|my|a|this|git|repo|repository|repozytorium)\s+)*(?=(["']?)([^\s"']+)\1)/gi)) if (!/^(?:repo|repository|repozytorium|git|this)$/i.test(m[2])) rest.push(m[2]);
     // a place for git grep ("in files", "under src") is a pathspec unless it names the repository itself
     if (id === 'git_grep') for (const m of t.matchAll(/\b(?:in|inside|within|under|on|of|at|across|except|excluding|from|w|we|na|poza|oprócz|oprocz)\s+(?:the\s+|all\s+|my\s+|a\s+)?(?=(["']?)([^\s"']+)\1)/gi)) if (!/^(?:repo|repository|repozytorium|tracked|git|codebase|plikach|sledzonych|śledzonych)$/i.test(m[2])) rest.push(m[2]);
+    // r28: structural — clause punctuation outside quotes and the rendered values (`in: files`, `repo: x`) is never explained
+    { let u = t.replace(/(["'])[^"']*\1/g, ' '); for (const x of Object.values(slots)) if (x != null && String(x).length) u = u.split(String(x)).join(' '); if (/[:;,=()\[\]{}|&<>]/.test(u)) rest.push('(punctuation)'); }
     if (rest.length) out.push(`${id === 'git_grep' ? 'pattern' : id === 'git_show' ? 'rev' : 'args'} (not expressed: ${[...new Set(rest)].slice(0, 4).join(' ')})`);
     if (Object.values(slots).some((x) => glued(x)) || /\\["']/.test(t)) out.push('value (unclear where the quoted text ends)');
   }

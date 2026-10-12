@@ -328,3 +328,14 @@ test('r27: punctuated extra git show selectors are withheld', () => {
     assert.deepEqual(suggest('show commit HEAD', env).missing, []);
   }
 });
+
+// review r28: clause punctuation after a scope word in the 0.3.4 templates
+test('r28: punctuated scope restrictions are withheld', () => {
+  for (const env of [{ shell: 'bash', os: 'linux' }, { shell: 'pwsh', os: 'win32' }, { shell: 'cmd', os: 'win32' }]) {
+    for (const q of ['search tracked files for "TODO" in: files', 'show files tracked by git in: files', 'grep the repo: codebase for "TODO"']) {
+      const r = suggest(q, env);
+      assert.ok(!r.command || r.missing.length > 0, `${env.shell}: ${q}`);
+    }
+    for (const q of ['search tracked files for "TODO"', 'list tracked files in the repo', 'show commit HEAD']) assert.deepEqual(suggest(q, env).missing, [], `${env.shell}: ${q}`);
+  }
+});
