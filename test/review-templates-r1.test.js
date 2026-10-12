@@ -372,3 +372,14 @@ test('r31: non-ASCII punctuation and pages source directories are withheld', () 
     for (const q of ['search tracked files for "TODO"', 'pokaż zgłoszenie 42']) { const r = suggest(q, env); if (r.intent && /git_grep|gh_issue_view/.test(r.intent)) assert.deepEqual(r.missing, [], `${env.shell}: ${q}`); }
   }
 });
+
+// review r32: allow-listed characters only; a second action
+test('r32: saltillo quotes and second actions are withheld', () => {
+  for (const env of [{ shell: 'bash', os: 'linux' }, { shell: 'pwsh', os: 'win32' }, { shell: 'cmd', os: 'win32' }]) {
+    for (const q of ['search tracked files for ꞌTODOꞌ', 'deploy ꞌ./distꞌ to pages', 'search tracked files for ꞋTODOꞋ', 'show github issue 42 and read the repo description', 'watch run 5 then rerun it']) {
+      const r = suggest(q, env);
+      assert.ok(!r.command || r.missing.length > 0, `${env.shell}: ${q}`);
+    }
+    for (const q of ['search tracked files for "TODO"', 'show issue 42']) assert.deepEqual(suggest(q, env).missing, [], `${env.shell}: ${q}`);
+  }
+});

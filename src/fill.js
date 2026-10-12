@@ -1206,7 +1206,8 @@ export function newTemplateWithhold(id, text, slots = {}, command = null) {
   if (WH_WORDS[id] && /[\r\n\t\v\f\u0085\u2028\u2029]/.test(t)) return ['request (spans several lines)'];
   // r30: typographic quotes or backticks are not read as quoting: the 0.3.4 templates never render them as runnable
   // r31: structural — any non-ASCII punctuation, symbol, space or control character (quote-likes of every script) and any backtick
-  if (WH_WORDS[id] && (/(?![\x00-\x7f])[\p{P}\p{S}\p{Z}\p{C}\p{Lm}\p{Sk}]/u.test(t) || /`/.test(t))) return ['value (non-ASCII punctuation or quotes)'];
+  // r32: allow-list instead — only ASCII and Polish letters; anything else (saltillo ꞌ, other scripts' quote-likes) withholds
+  if (WH_WORDS[id] && (/[^\x00-\x7fąćęłńóśźżĄĆĘŁŃÓŚŹŻ]/u.test(t) || /`/.test(t))) return ['value (characters outside ASCII / Polish letters)'];
   if (WH_WORDS[id]) {
     // (the --repo value and the option itself are explained by the rendered repo slot)
     const ok = new Set(WH_WORDS[id].split(/\s+/));
@@ -1261,6 +1262,8 @@ export function newTemplateWithhold(id, text, slots = {}, command = null) {
     { let u = t.replace(/(["'])[^"']*\1/g, ' '); for (const x of Object.values(slots)) if (x != null && String(x).length) u = u.split(String(x)).join(' '); if (/[:;,=()\[\]{}|&<>]/.test(u) || /[.!?]+\s+\S/.test(u)) rest.push('(punctuation)');
       // r29: a negation or exclusion ("with no description") is never rendered; `no 42` / `no. 42` is a number marker
       if (/\b(?:no|not|without|except|excluding|minus|never|don'?t|bez|nie|oprócz|oprocz|poza)\b(?!\.?\s*#?\d)/i.test(t.replace(/(["'])[^"']*\1/g, ' '))) rest.push('(an exclusion)'); }
+    // r32: structural — a second action (and / then / plus / oraz / potem) is never rendered; only "open and closed" issues are one list
+    { const u2 = id === 'gh_issue_list' ? t.replace(/\b(?:open|opened|otwarte)\s+(?:and|i|oraz)\s+(?:closed|zamkni\w*)\b/gi, ' ') : t; if (/\b(?:and|then|plus|afterwards|oraz|potem|następnie|nastepnie)\b|(?:^|\s)i(?=\s)/i.test(u2.replace(/(["'])[^"']*\1/g, ' '))) rest.push('(a second action)'); }
     if (rest.length) out.push(`${id === 'git_grep' ? 'pattern' : id === 'git_show' ? 'rev' : 'args'} (not expressed: ${[...new Set(rest)].slice(0, 4).join(' ')})`);
     if (Object.values(slots).some((x) => glued(x)) || /\\["']/.test(t)) out.push('value (unclear where the quoted text ends)');
   }
