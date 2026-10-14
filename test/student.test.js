@@ -207,6 +207,22 @@ test('A+S: a templates-model answer the student replaces is deferred (the rerank
   assert.equal(r.hybrid.deferred, true);
 });
 
+test('A+S: a templates-gate rerun landing on an intent neither A nor the student chose keeps A', async () => {
+  const q = 'Could you inspect the last commit';
+  const e = { shell: 'powershell', os: 'win32' };
+  let seen; let thr;
+  suggest(q, { env: e, rerankTop: 0, rerank: (c, o) => { seen ??= c; thr = o.thr; return c; } });
+  assert.equal(seen.intent, 'git_show');
+  assert.ok(seen.confidence >= thr && seen.confidence < 0.6);
+  const a = suggest(q, { env: e });
+  const s = { infer: async () => ({ intents: { git_log: 0.86 }, pNone: 0 }) };
+  const r = await suggestHybrid(q, { env: e, system: 'A+S', encoder: s });
+  assert.equal(r.intent, a.intent);
+  assert.equal(r.command, a.command);
+  assert.equal(r.hybrid.deferred, false);
+  assert.equal(r.hybrid.consulted, true);
+});
+
 test('A+S: a low-confidence answer the student agrees with is returned unchanged (not deferred)', async () => {
   const { readFileSync, readdirSync } = await import('node:fs');
   const rows = readdirSync('data/eval').flatMap((f) => readFileSync(join('data/eval', f), 'utf8').split('\n').filter(Boolean).map((l) => JSON.parse(l)));

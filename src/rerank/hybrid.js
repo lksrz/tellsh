@@ -115,9 +115,12 @@ export async function suggestHybrid(query, opts = {}) {
   const res = suggest(query, { ...base, tagger, rerank: (c, { thr }) => rerank(c, pX, P, { thr, pNone }) });
   // fallback policies (A+S): deferred = the model actually changed A's decision (the CLI's --yes and its "re-ranked"
   // note key on it), judged on the final result vs A's (suggest() may call the hook more than once, e.g. the templates
-  // gate); consulted = the model was run
+  // gate); consulted = the model was run. A change is kept only when it is the student's own argmax (a templates-gate
+  // rerun of the 0.3.3 model can land on an intent neither A nor the student chose -> A's answer)
   const changed = res.understood !== first.understood || res.intent !== first.intent || res.command !== first.command;
-  if (P.fallback) return changed ? { ...res, hybrid: { system, deferred: true, consulted: true, ms, pNone } } : { ...first, hybrid: { system, deferred: false, consulted: true, ms, pNone } };
+  let bi = null; let bp = -1;
+  for (const [i, p] of Object.entries(pX)) if (FAMILY_OF[i] && p > bp) { bp = p; bi = i; }
+  if (P.fallback) return changed && res.understood && res.intent === bi ? { ...res, hybrid: { system, deferred: true, consulted: true, ms, pNone } } : { ...first, hybrid: { system, deferred: false, consulted: true, ms, pNone } };
   return { ...res, hybrid: { system, deferred: true, ms, pNone } };
 }
 
