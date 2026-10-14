@@ -656,7 +656,7 @@ student ran. `changed` is the share on which it changed A's decision. Real-usage
 Rejected rows never become answers: on every out-of-scope set A+S's answered share equals A's, including the 22.5k
 real out-of-catalog requests (`real_ooc`). A answers 65% of these, which is the known stage-1 debt; the student is consulted on 24.5% of them and
 changes 10.4% from one wrong intent to another; `--yes` never auto-runs an answer the student changed. On `real_human`
-the answered share drops by one row (97.04 → 97.01); that row is not counted as a correct answer either way. On `ood` the student
+the answered share drops by one row (97.04 → 97.01). On `ood` the student
 changes 2.2% of rows, which A had already wrongly answered, from one wrong intent to another. The one regression is `blind3`
 (-0.12 pt, one row of 844), which is within noise and under the 1-pt reporting bar. A+S-full is better on `real_tmpl` but worse on
 `real_human` and `shell`, and it runs the student on every query, so it stays opt-in. The cascade alone (no optional
