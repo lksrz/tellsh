@@ -128,7 +128,7 @@ test('env detection and overrides', () => {
   assert.equal(normShell('pwsh.exe'), 'powershell');
   assert.equal(normShell('dash'), 'sh');
   assert.equal(normOs('macos'), 'darwin');
-  assert.deepEqual(detectEnv({ shell: 'fish', os: 'darwin' }), { shell: 'fish', os: 'darwin', coreutils: 'bsd' });
+  assert.deepEqual(detectEnv({ shell: 'fish', os: 'darwin' }, { PATH: '' }), { shell: 'fish', os: 'darwin', coreutils: 'bsd' }); // no GNU coreutils on PATH
   assert.equal(detectEnv({ shell: 'cmd' }).os, 'win32');
   assert.equal(detectEnv({ os: 'win32' }).shell, process.platform === 'win32' ? detectEnv({ os: 'win32' }).shell : 'powershell');
 });
