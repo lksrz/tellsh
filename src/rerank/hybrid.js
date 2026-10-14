@@ -112,10 +112,11 @@ export async function suggestHybrid(query, opts = {}) {
     if (!pX) return { ...first, hybrid: { system, deferred: true, unavailable: 'lm' } };
   }
   const ms = performance.now() - t0;
-  let changed = false;
-  const res = suggest(query, { ...base, tagger, rerank: (c, { thr }) => { const r = rerank(c, pX, P, { thr, pNone }); changed = r !== c && (r.intent !== c.intent || r.topTool !== c.topTool || !!r.rejected); return r; } });
+  const res = suggest(query, { ...base, tagger, rerank: (c, { thr }) => rerank(c, pX, P, { thr, pNone }) });
   // fallback policies (A+S): deferred = the model actually changed A's decision (the CLI's --yes and its "re-ranked"
-  // note key on it); consulted = the model was run
+  // note key on it), judged on the final result vs A's (suggest() may call the hook more than once, e.g. the templates
+  // gate); consulted = the model was run
+  const changed = res.understood !== first.understood || res.intent !== first.intent || res.command !== first.command;
   if (P.fallback) return changed ? { ...res, hybrid: { system, deferred: true, consulted: true, ms, pNone } } : { ...first, hybrid: { system, deferred: false, consulted: true, ms, pNone } };
   return { ...res, hybrid: { system, deferred: true, ms, pNone } };
 }

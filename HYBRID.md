@@ -613,7 +613,7 @@ node scripts/hybrid/eval_hybrid.js --calibrate --lm=adev:qwenft --tag=_ft && nod
 taskset -c 0 node scripts/hybrid/bench_hybrid.js           # LLAMA_BIN=… LLAMA_MODELS=…gguf for C
 node scripts/hybrid/report_hybrid.js                       # tables above
 ```
-Runtime: `tellsh --hybrid …` (or `TELLSH_HYBRID=1`) uses A+B with the encoder loaded lazily only when the cascade defers;
+Runtime: `tellsh --hybrid …` (or `TELLSH_HYBRID=1`/`true`/`yes`/`on`) uses A+B with the encoder loaded lazily only when the cascade defers;
 without `onnxruntime-node` / the bundle it silently falls back to A. Re-ranked answers are never auto-run with `--yes`.
 
 ## Distilled student fallback (A+S, feat/hybrid-student)
@@ -665,4 +665,4 @@ every public set above.
 
 Latency on one core (Xeon box, `taskset -c 7`): loading the student takes 150–180 ms once per call, and inference takes ~3.5 ms
 p50 / 5–7 ms p95. On an Apple M-series laptop the numbers are 70 ms / 3.6 ms. The student loads only when A's confidence
-is below 0.6 (2–7% of in-catalog queries above, 24.5% of out-of-catalog ones).
+is below 0.6 (student calls on 1.5–7.4% of in-catalog queries in the sets above, 24.5% of out-of-catalog ones).

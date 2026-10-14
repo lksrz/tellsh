@@ -207,7 +207,7 @@ kept (`pip install requests --target /tmp/packages`, also `-t`) (v0.3 close5).
 
 ### Optional neural fallback (`--hybrid`)
 
-`tellsh --hybrid …` (or `TELLSH_HYBRID=1`) keeps the cascade's answer when it is confident (≥ 0.9, most requests) and
+`tellsh --hybrid …` (or `TELLSH_HYBRID=1`/`true`/`yes`/`on`) keeps the cascade's answer when it is confident (≥ 0.9, most requests) and
 otherwise re-ranks its top-5 with a small int8 encoder (pruned multilingual-e5-small, 6 layers, 27 MB, ~4 ms on one
 core). It needs `onnxruntime-node` and the `tellsh-model-enc` 0.4 bundle (`enc-v2`, not in this repo); without them
 tellsh silently uses the cascade. `TELLSH_HYBRID=safe` never turns a rejection into an answer. Re-ranked answers are

@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { mkdtempSync, writeFileSync, mkdirSync } from 'node:fs';
+import { mkdtempSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { spawnSync } from 'node:child_process';
@@ -86,7 +86,9 @@ test('suggestLazy loads the model once and only when needed', async () => {
 test('student bundle lookup: incomplete directories are skipped, and loading never falls back to another bundle', async () => {
   const d = mkdtempSync(join(tmpdir(), 'tellsh-stu-'));
   writeFileSync(join(d, 'vocab.json'), '{}'); // no encoder.int8.onnx, no labels.json
-  assert.notEqual(findStudentDir(d), d);
+  const found = findStudentDir(d);
+  assert.notEqual(found, d);
+  if (found !== null) for (const f of ['encoder.int8.onnx', 'vocab.json', 'labels.json']) assert.ok(existsSync(join(found, f)), f);
   const bad = join(d, 'bad'); mkdirSync(bad);
   for (const f of ['encoder.int8.onnx', 'vocab.json', 'labels.json']) writeFileSync(join(bad, f), 'garbage');
   const old = { S: process.env.TELLSH_STUDENT_DIR };
@@ -186,6 +188,23 @@ test('CLI: TELLSH_HYBRID off values disable the student', () => {
     const r = spawnSync(process.execPath, ['bin/tellsh.js', '--json', 'show git status'], { encoding: 'utf8', env: { ...process.env, TELLSH_HYBRID: v } });
     assert.equal(JSON.parse(r.stdout).hybrid, undefined, v);
   }
+  // on values select A+B (a confident query: the cascade answers, the encoder is never loaded)
+  for (const v of ['1', 'true', 'Yes', 'on']) {
+    const r = spawnSync(process.execPath, ['bin/tellsh.js', '--json', 'show git status'], { encoding: 'utf8', env: { ...process.env, TELLSH_HYBRID: v } });
+    assert.equal(JSON.parse(r.stdout).hybrid.system, 'A+B', v);
+  }
+});
+
+test('A+S: a templates-model answer the student replaces is deferred (the rerank hook may run twice)', async () => {
+  const q = "I'd like to update remote branches";
+  let seen; let thr;
+  suggest(q, { env, rerankTop: 0, rerank: (c, o) => { seen = c; thr = o.thr; return c; } });
+  assert.equal(seen.intent, 'git_fetch');
+  assert.ok(seen.confidence >= thr && seen.confidence < 0.6);
+  const s = { infer: async () => ({ intents: { git_branches: 0.95 }, pNone: 0 }) };
+  const r = await suggestHybrid(q, { env, system: 'A+S', encoder: s });
+  assert.equal(r.intent, 'git_branches');
+  assert.equal(r.hybrid.deferred, true);
 });
 
 test('A+S: a low-confidence answer the student agrees with is returned unchanged (not deferred)', async () => {
@@ -208,8 +227,29 @@ test('A+S: a low-confidence answer the student agrees with is returned unchanged
   assert.equal(r.confidence, a.confidence);
 });
 
+// fixed real-student queries (read-only commands); each test first checks its premise through the CLI's own --json,
+// so a bundle change that breaks it fails loudly
+const cli = (args, cwd) => spawnSync(process.execPath, [join(process.cwd(), 'bin/tellsh.js'), '--shell', 'bash', '--os', 'linux', ...args], { encoding: 'utf8', cwd, env: { ...process.env, TELLSH_HYBRID: '' } });
+
 test('CLI: --yes still runs a low-confidence safe answer the real student agrees with', { skip: !real }, () => {
-  const r = spawnSync(process.execPath, ['bin/tellsh.js', '--json', 'which files take up the most space under ~/Downloads'], { encoding: 'utf8' });
-  const j = JSON.parse(r.stdout);
-  if (j.hybrid?.consulted) assert.equal(j.hybrid.deferred, false);
+  const q = 'display my current location in the filesystem'; // current_dir, A < 0.6, the student agrees
+  const cwd = mkdtempSync(join(tmpdir(), 'tellsh-yes-'));
+  const j = JSON.parse(cli(['--json', q], cwd).stdout);
+  assert.equal(j.hybrid.consulted, true);
+  assert.equal(j.hybrid.deferred, false);
+  assert.ok(j.confidence < 0.6 && j.risk === 'safe' && j.method === 'catalog');
+  const r = cli(['--yes', q], cwd);
+  assert.equal(r.status, 0);
+  assert.ok(!r.stdout.includes('Not running'));
+});
+
+test('CLI: --yes refuses a safe answer the real student changed', { skip: !real }, () => {
+  const q = 'gdzie są obrazki .jpg w /home/anna/Obrazy?'; // the student changes A's find_by_ext to list_files
+  const cwd = mkdtempSync(join(tmpdir(), 'tellsh-yes-'));
+  const j = JSON.parse(cli(['--json', q], cwd).stdout);
+  assert.equal(j.hybrid.deferred, true);
+  assert.ok(j.risk === 'safe' && j.method === 'catalog');
+  const r = cli(['--yes', q], cwd);
+  assert.equal(r.status, 4);
+  assert.match(r.stdout, /re-ranked by the neural fallback/);
 });
