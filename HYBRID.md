@@ -634,7 +634,7 @@ Rescuing A's rejections was measured and rejected: it turned 99% of the out-of-c
 
 ### 0.3.5 release numbers (A vs A+S vs A+S-full)
 
-`node scripts/hybrid/eval_student_runtime.js` on the 0.3.5 candidate (`a885d2c`, bundle `stu-v1`, onnxruntime-node);
+`node scripts/hybrid/eval_student_runtime.js` on the 0.3.5 candidate (`342b2ee`, bundle `stu-v1`, onnxruntime-node);
 raw output in `hybrid/results/student_runtime_0.3.5.json`.
 The run reports % correct (in-catalog sets) or % rejected (out-of-scope sets). `calls` is the share of rows on which the
 student ran. `changed` is the share on which it changed A's decision. Real-usage sets are held-out private rows (aggregates only).
@@ -651,12 +651,11 @@ student ran. `changed` is the share on which it changed A's decision. Real-usage
 | ood (rejected) | 92 | 92.39 | 92.39 | 4.3 / 2.2 | 92.39 | 7.6 / 2.2 |
 | blind_ood (rejected) | 40 | 100 | 100 | 0 / 0 | 100 | 0 / 0 |
 | blind3_ood (rejected) | 64 | 98.44 | 98.44 | 1.6 / 0 | 98.44 | 1.6 / 0 |
-| real_ooc (rejected) | 22534 | 35.04 | 35.10 | 24.5 / 10.5 | 35.10 | 65.0 / 15.4 |
+| real_ooc (rejected) | 22534 | 35.04 | 35.04 | 24.5 / 10.4 | 35.04 | 65.0 / 15.3 |
 
-Rejected rows never become answers: on every out-of-scope set A+S's answered share is at most A's, including the 22.5k
+Rejected rows never become answers and answers never become rejections: on every set (in-catalog and out-of-scope) A+S's answered share equals A's, including the 22.5k
 real out-of-catalog requests (`real_ooc`). A answers 65% of these, which is the known stage-1 debt; the student is consulted on 24.5% of them and
-changes 10.5% of them (to another wrong intent, or 0.06% to a rejection); `--yes` never auto-runs an answer the student changed. On `real_human`
-the answered share drops by one row (97.04 → 97.01). On `ood` the student
+changes 10.4% of them from one wrong intent to another; `--yes` never auto-runs an answer the student changed. On `ood` the student
 changes 2.2% of rows, which A had already wrongly answered, from one wrong intent to another. The one regression is `blind3`
 (-0.12 pt, one row of 844), which is within noise and under the 1-pt reporting bar. A+S-full is better on `real_tmpl` but worse on
 `real_human` and `shell`, and it runs the student on every query, so it stays opt-in. The cascade alone (no optional
