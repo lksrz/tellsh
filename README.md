@@ -236,8 +236,10 @@ deterministically:
 * **the tool is never run.** Only its documentation is read, with `man -P cat <page>` (`git-<sub>` for git), where `man`
   comes from a fixed absolute path (`/usr/bin/man`, `/bin/man`), never PATH; no shell, stdin closed, a minimal
   environment (`LC_ALL=C`, pagers set to `cat`, nothing inherited), 250 ms timeout, 256 KB output cap. The tool is only
-  located (absolute PATH entries only) to know it is installed. Only allowlisted tools are checked (ls, grep, find, du,
-  df, sort, tar, sed, head, tail, ps, xargs, cp, mv, …, `git <sub>`); no man page means no check;
+  located (absolute PATH entries only) to know it is installed. Only allowlisted **system** tools are checked (ls,
+  grep, find, du, df, sort, tar, sed, head, tail, ps, xargs, cp, mv, …, `git <sub>`) whose real path is in `/bin`,
+  `/usr/bin`, `/sbin` or `/usr/sbin`, against the system man pages. Homebrew / GNU coreutils on macOS (gnubin,
+  `/usr/local`, `/opt`, home directories) are not checked; no man page means no check;
 * one call spends at most 270 ms on man probes; the parsed option table is cached per binary (real path + size +
   mtime) in `$XDG_CACHE_HOME/tellsh/help` (default `~/.cache/tellsh/help`), failures for a day: the first use of a
   tool costs one `man` (~70–90 ms), later calls a small JSON read;

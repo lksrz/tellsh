@@ -271,6 +271,14 @@ function readKey(rule) {
   });
 }
 
+/** Why --yes must not auto-run suggestion `s` (a short phrase), or null when it may. */
+export function yesRefusal(s) {
+  const fromHistory = Object.values(s.slotSources || {}).includes('history');
+  const badFlags = s.helpcheck?.unknown?.length > 0;
+  if (!(s.risk !== 'safe' || s.missing.length || s.method !== 'catalog' || fromHistory || s.hybrid?.deferred || badFlags)) return null;
+  return s.method === 'composed' ? 'composed (experimental)' : s.method !== 'catalog' || fromHistory ? 'resolved from history' : s.missing.length ? 'incomplete' : s.hybrid?.deferred ? 're-ranked by the neural fallback' : badFlags ? 'using flags your installed tools do not list' : s.risk;
+}
+
 export async function main(argv = process.argv.slice(2)) {
   const opts = parseArgs(argv);
   if (opts.version) { console.log(pkg.version); return 0; }
@@ -344,10 +352,8 @@ export async function main(argv = process.argv.slice(2)) {
   const interactive = process.stdin.isTTY && process.stdout.isTTY;
   const shellName = s.shell;
   if (opts.yes) {
-    const fromHistory = Object.values(s.slotSources || {}).includes('history');
-    const badFlags = s.helpcheck?.unknown?.length > 0;
-    if (s.risk !== 'safe' || s.missing.length || s.method !== 'catalog' || fromHistory || s.hybrid?.deferred || badFlags) {
-      const why = s.method === 'composed' ? 'composed (experimental)' : s.method !== 'catalog' || fromHistory ? 'resolved from history' : s.missing.length ? 'incomplete' : s.hybrid?.deferred ? 're-ranked by the neural fallback' : badFlags ? 'using flags your installed tools do not list' : s.risk;
+    const why = yesRefusal(s);
+    if (why) {
       console.log(C.yellow(`  --yes only auto-runs safe catalog commands; this one is ${why}. Not running.`));
       return 4;
     }

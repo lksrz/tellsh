@@ -2,10 +2,11 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { readFileSync, mkdtempSync, writeFileSync, chmodSync, readdirSync } from 'node:fs';
+import { readFileSync, mkdtempSync, writeFileSync, chmodSync, readdirSync, realpathSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { parseOptions, extractFlags, unknownFlags, toolOptions, checkCommand, which, findMan, TIMEOUT_MS } from '../src/helpcheck.js';
+import { parseOptions, extractFlags, unknownFlags, toolOptions, checkCommand, which, findMan, isSystemBinary, TIMEOUT_MS } from '../src/helpcheck.js';
+import { yesRefusal } from '../src/cli.js';
 
 const FIX = (f) => readFileSync(new URL(`./fixtures/help/${f}`, import.meta.url), 'utf8');
 const OPTS = (f) => parseOptions(FIX(f)).options;
@@ -19,6 +20,7 @@ function fakeBin(names, body = '#!/bin/sh\necho RAN > "$0.ran"\n') {
   for (const n of names) { writeFileSync(join(d, n), body); chmodSync(join(d, n), 0o755); }
   return d;
 }
+const SYS = () => true; // fake tools in a temp dir count as system binaries in the unit tests
 const manSpawn = (text, calls = []) => (f, a, o) => { calls.push({ f, a, o }); return { stdout: text }; };
 
 test('parseOptions: names and arity from GNU, BSD, git fixtures', () => {
@@ -78,7 +80,7 @@ test('only the absolute man is spawned, never the tool; relative PATH entries ar
   const dir = fakeBin(['ls', 'git', 'shutdown']);
   const calls = [];
   const spawn = manSpawn(FIX('gnu_ls.txt'), calls);
-  const o = { env: { PATH: dir, SECRET: 'x' }, spawn, man: MAN };
+  const o = { env: { PATH: dir, SECRET: 'x' }, spawn, man: MAN, isSystem: SYS };
   assert.equal(toolOptions('shutdown', { ...o, dir: tmp() }).reason, 'tool not checked');
   assert.equal(toolOptions('ls', { ...o, dir: tmp() }).ok, true);
   assert.equal(toolOptions('git', { ...o, sub: 'log', dir: tmp() }).ok, true);
@@ -86,6 +88,7 @@ test('only the absolute man is spawned, never the tool; relative PATH entries ar
   assert.deepEqual(calls.map((c) => [c.f, c.a]), [[MAN, ['-P', 'cat', 'ls']], [MAN, ['-P', 'cat', 'git-log']]]);
   assert.equal(calls[0].o.env.SECRET, undefined);
   assert.equal(calls[0].o.env.MANPAGER, 'cat');
+  assert.deepEqual(Object.keys(calls[0].o.env).sort(), ['LC_ALL', 'MANPAGER', 'MANWIDTH', 'PAGER', 'PATH', 'TERM']); // never MANPATH
   assert.equal(readdirSync(dir).filter((f) => f.endsWith('.ran')).length, 0);
   // a relative man is refused, and a tool only reachable through a relative PATH entry is "not installed"
   assert.equal(toolOptions('ls', { ...o, man: 'man', dir: tmp() }).reason, 'no man');
@@ -100,7 +103,7 @@ test('budget: no probe starts after the deadline', () => {
   const now = () => t;
   const calls = [];
   const spawn = (f, a, o) => { calls.push(o.timeout); t += 200; return { stdout: FIX('gnu_ls.txt') }; };
-  const r = checkCommand('ls -l | sort | head', { shell: 'bash', os: 'linux', platform: 'linux', env: { PATH: dir }, spawn, man: MAN, dir: tmp(), budget: 250, now });
+  const r = checkCommand('ls -l | sort | head', { shell: 'bash', os: 'linux', platform: 'linux', env: { PATH: dir }, spawn, man: MAN, dir: tmp(), budget: 250, now, isSystem: SYS });
   assert.deepEqual(calls, [250, 50]);
   assert.equal(r.checked, true);
   assert.equal(r.tool, 'ls, sort');
@@ -113,7 +116,7 @@ test('failures are cached for a day; a timeout cut short by the budget is not', 
   const now = () => t;
   let n = 0;
   const spawn = () => { n++; return { error: 'timeout' }; };
-  const o = { env: { PATH: dir }, spawn, man: MAN, dir: cache, now };
+  const o = { env: { PATH: dir }, spawn, man: MAN, dir: cache, now, isSystem: SYS };
   assert.equal(toolOptions('ls', { ...o, deadline: t + 100 }).reason, 'timeout');
   assert.equal(toolOptions('ls', { ...o, deadline: t + 100 }).reason, 'timeout');
   assert.equal(n, 2); // budget-shortened: retried
@@ -135,7 +138,7 @@ test('failures are cached for a day; a timeout cut short by the budget is not', 
 test('real spawner: a hanging man is killed by the timeout', () => {
   const man = join(fakeBin(['man'], '#!/bin/sh\nsleep 5\n'), 'man');
   const t = Date.now();
-  const r = toolOptions('ls', { env: { PATH: '/bin:/usr/bin' }, man, dir: tmp() });
+  const r = toolOptions('ls', { env: { PATH: '/bin:/usr/bin' }, man, dir: tmp() }); // the real system ls
   assert.equal(r.reason, 'timeout');
   assert.ok(Date.now() - t < 2000);
 });
@@ -144,7 +147,7 @@ test('cache: miss then hit, corrupt file ignored', () => {
   const dir = fakeBin(['ls']);
   const cache = tmp();
   const calls = [];
-  const o = { env: { PATH: dir }, spawn: manSpawn(FIX('gnu_ls.txt'), calls), man: MAN, dir: cache };
+  const o = { env: { PATH: dir }, spawn: manSpawn(FIX('gnu_ls.txt'), calls), man: MAN, dir: cache, isSystem: SYS };
   assert.equal(toolOptions('ls', o).cached, false);
   assert.equal(toolOptions('ls', o).cached, true);
   assert.equal(calls.length, 1);
@@ -156,7 +159,7 @@ test('cache: miss then hit, corrupt file ignored', () => {
 
 test('checkCommand: unknown flags, not installed, disabled, other OS / shell', () => {
   const dir = fakeBin(['ls']);
-  const base = { shell: 'bash', os: 'linux', spawn: manSpawn(FIX('bsd_ls_man.txt')), man: MAN, platform: 'linux', dir: tmp() };
+  const base = { shell: 'bash', os: 'linux', spawn: manSpawn(FIX('bsd_ls_man.txt')), man: MAN, platform: 'linux', dir: tmp(), isSystem: SYS };
   const r = checkCommand('ls --all -la', { ...base, env: { PATH: dir } });
   assert.deepEqual(r.unknown.map((u) => u.flag), ['--all']);
   assert.deepEqual(checkCommand('ls -la', { ...base, env: { PATH: tmp() } }), { checked: false, reason: 'not installed', tool: 'ls', notInstalled: ['ls'] });
@@ -166,36 +169,45 @@ test('checkCommand: unknown flags, not installed, disabled, other OS / shell', (
   assert.equal(checkCommand('ls --all', { ...base, platform: 'win32', env: { PATH: dir } }).checked, false);
 });
 
-// CLI end to end, with a real man page for a fake `ls` placed outside the system dirs: <tmp>/bin/ls is documented by
-// <tmp>/share/man/man1/ls.1 (searched first through MANPATH), whose options lack -a and -h
-function cliRun(args, extraEnv) {
+test('non-system binaries (Homebrew, gnubin, /opt, home) are never probed', () => {
+  // gnubin-style layout: <prefix>/libexec/gnubin/ls next to a share/man that must not be consulted
   const root = tmp();
-  const bin = join(root, 'bin');
-  spawnSync('mkdir', ['-p', bin, join(root, 'share/man/man1')]);
-  writeFileSync(join(bin, 'ls'), '#!/bin/sh\necho RAN > "$0.ran"\n');
-  chmodSync(join(bin, 'ls'), 0o755);
-  writeFileSync(join(root, 'share/man/man1/ls.1'), '.TH LS 1\n.SH OPTIONS\n.TP\n.B \\-l\nlong\n.TP\n.B \\-1\none per line\n');
-  const xdg = tmp();
-  // warm the cache with a generous timeout so a loaded test machine cannot turn the CLI's 300 ms probe into a skip
-  toolOptions('ls', { env: { PATH: bin }, dir: join(xdg, 'tellsh', 'help'), maxTimeout: 10000 });
-  const env = { ...process.env, NO_COLOR: '1', PATH: `${bin}:${process.env.PATH}`, XDG_CACHE_HOME: xdg, TELLSH_SHELL: 'bash', TELLSH_HYBRID: '0', ...extraEnv };
-  const r = spawnSync(process.execPath, [BIN, ...args], { encoding: 'utf8', env, input: '' });
-  assert.equal(readdirSync(bin).filter((f) => f.endsWith('.ran')).length, 0, 'the tool was executed');
-  return r;
-}
+  spawnSync('mkdir', ['-p', join(root, 'libexec/gnubin'), join(root, 'share/man/man1')]);
+  writeFileSync(join(root, 'libexec/gnubin/ls'), '#!/bin/sh\necho RAN > "$0.ran"\n');
+  chmodSync(join(root, 'libexec/gnubin/ls'), 0o755);
+  const calls = [];
+  const env = { PATH: join(root, 'libexec/gnubin') };
+  assert.equal(toolOptions('ls', { env, spawn: manSpawn(FIX('gnu_ls.txt'), calls), man: MAN, dir: tmp() }).reason, 'non-system binary');
+  assert.equal(checkCommand('ls --all', { shell: 'bash', os: 'linux', platform: 'linux', env, spawn: manSpawn('', calls), man: MAN, dir: tmp() }).reason, 'non-system binary');
+  assert.equal(calls.length, 0);
+  assert.equal(isSystemBinary('/usr/bin/ls'), true);
+  assert.equal(isSystemBinary('/bin/ls'), true);
+  for (const p of ['/opt/homebrew/bin/gls', '/usr/local/bin/ls', '/usr/bin/x/ls', '/tmp/$(touch PWNED)/bin/ls', '/home/u/bin/ls']) assert.equal(isSystemBinary(p), false, p);
+});
 
-const canMan = process.platform !== 'win32' && !!which('ls') && toolOptions('ls', { dir: tmp(), maxTimeout: 10000 }).ok;
+test('man page names are validated before spawning', () => {
+  const dir = fakeBin(['git']);
+  const calls = [];
+  const o = { env: { PATH: dir }, spawn: manSpawn(FIX('git_status_h.txt'), calls), man: MAN, isSystem: SYS, dir: tmp() };
+  for (const sub of ['$(id)', 'Status', '-h', 'a/b', 'x;y', '']) assert.equal(toolOptions('git', { ...o, sub }).ok, false, sub);
+  assert.equal(calls.length, 0);
+  assert.equal(toolOptions('git', { ...o, sub: 'cherry-pick' }).ok, true);
+});
 
-test('CLI: unknown flags warn and --yes refuses; TELLSH_HELPCHECK=0 turns it off', { skip: !canMan && 'no working man here' }, () => {
-  const r = cliRun(['--yes', 'list', 'all', 'files', 'including', 'hidden']);
-  assert.match(r.stdout, /ls -lah/);
-  assert.match(r.stdout, /flag -a not found in your installed ls man page/);
-  assert.match(r.stdout, /Not running/);
-  assert.equal(r.status, 4);
-  const j = JSON.parse(cliRun(['--json', 'list', 'all', 'files', 'including', 'hidden']).stdout);
-  assert.deepEqual(j.helpcheck.unknown.map((u) => u.flag), ['-a']); // the cluster stops at the first unknown letter
-  const off = cliRun(['-n', 'list', 'all', 'files', 'including', 'hidden'], { TELLSH_HELPCHECK: '0' });
-  assert.doesNotMatch(off.stdout, /not found in your installed/);
+test('--yes refuses a suggestion with undocumented flags', () => {
+  const s = { risk: 'safe', missing: [], method: 'catalog', slotSources: {}, helpcheck: { checked: true, unknown: [{ tool: 'ls', flag: '-Q' }] } };
+  assert.equal(yesRefusal(s), 'using flags your installed tools do not list');
+  assert.equal(yesRefusal({ ...s, helpcheck: { checked: true, unknown: [] } }), null);
+  assert.equal(yesRefusal({ ...s, helpcheck: { checked: false, reason: 'not installed' } }), null);
+});
+
+const canMan = process.platform !== 'win32' && !!which('ls') && isSystemBinary(realpathSync(which('ls'))) && toolOptions('ls', { dir: tmp(), maxTimeout: 10000 }).ok;
+
+test('CLI: --json carries helpcheck; TELLSH_HELPCHECK=0 turns it off', { skip: !canMan && 'no system ls man page here' }, () => {
+  const run = (extra) => JSON.parse(spawnSync(process.execPath, [BIN, '--json', 'list', 'all', 'files', 'including', 'hidden'],
+    { encoding: 'utf8', env: { ...process.env, XDG_CACHE_HOME: tmp(), TELLSH_HYBRID: '0', PATH: '/usr/bin:/bin', ...extra } }).stdout);
+  assert.ok('helpcheck' in run({}));
+  assert.equal(run({ TELLSH_HELPCHECK: '0' }).helpcheck.reason, 'disabled');
 });
 
 test('smoke: the real ls man page on this system knows -l', { skip: !canMan && 'no ls man page here' }, () => {

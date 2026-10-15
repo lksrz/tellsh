@@ -3,7 +3,8 @@
 ## 0.3.7 (unreleased) — installed-tool flag check
 
 **Help-verifier.** Before a command is shown, its flags are checked against the man page of the tool actually
-installed (new `src/helpcheck.js`). The tool is never executed: only `man -P cat <page>` (`git-<sub>` for git) from a
+installed (new `src/helpcheck.js`). Only system tools (real path in /bin, /usr/bin, /sbin, /usr/sbin) are checked;
+Homebrew / GNU coreutils on macOS are not. The tool is never executed: only `man -P cat <page>` (`git-<sub>` for git) from a
 fixed absolute path, no shell, closed stdin, minimal environment, 250 ms timeout, 256 KB cap, at most 270 ms of probes
 per call. Option arguments are parsed from the page so operands are not mistaken for flags; unknown arity is never
 flagged; long options accept only a unique prefix. Option tables (and failures, for a day) are cached per binary

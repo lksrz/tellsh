@@ -4,7 +4,9 @@
 // Safety: the probed tool is NEVER executed. Only its man page is read, by `man` from a fixed list of absolute paths
 // (not PATH), argv `-P cat <page>`, no shell, stdin closed, a minimal environment (no inherited variables), a timeout
 // and an output cap. The tool itself is only located (absolute PATH entries, realpath) to tell whether it is installed
-// and to key the cache. `git <sub>` reads the page `git-<sub>`. Windows / PowerShell / cmd / fish: never checked.
+// and to key the cache. Only tools whose realpath is in /bin, /usr/bin, /sbin or /usr/sbin are checked (documented by
+// the system man pages; Homebrew / GNU coreutils on macOS are not). `git <sub>` reads the page `git-<sub>`.
+// Windows / PowerShell / cmd / fish: never checked.
 //
 // The check is conservative: an option whose argument count is unknown swallows the next word and ends a combined
 // cluster, so a missed warning is preferred to a false one. Commands nested in `find -exec … ;` or run by `xargs` are
@@ -16,7 +18,7 @@
 import { spawnSync } from 'node:child_process';
 import { statSync, existsSync, accessSync, realpathSync, readFileSync, writeFileSync, mkdirSync, constants as fsConstants } from 'node:fs';
 import { homedir, tmpdir } from 'node:os';
-import { join, dirname, delimiter, isAbsolute } from 'node:path';
+import { join, delimiter, isAbsolute } from 'node:path';
 import { createHash } from 'node:crypto';
 import { splitCommand, isAmbiguous } from './shellwords.js';
 
@@ -31,11 +33,11 @@ const MAN_ENV_PATH = '/usr/bin:/bin:/usr/sbin:/sbin';
 // tools whose man page is read (the tool is never run)
 const TOOLS = ['ls', 'grep', 'egrep', 'fgrep', 'find', 'du', 'df', 'sort', 'tar', 'sed', 'head', 'tail', 'wc', 'cut', 'uniq',
   'cat', 'ln', 'cp', 'mv', 'rm', 'mkdir', 'chmod', 'touch', 'uname', 'shasum', 'stat', 'date', 'xargs', 'ps', 'tr', 'diff', 'zip',
-  'unzip', 'base64', 'file', 'free', 'uptime', 'lsof',
-  'gls', 'ggrep', 'gfind', 'gdu', 'gdf', 'gsort', 'gtar', 'gsed', 'ghead', 'gtail', 'gwc', 'gcut', 'gstat', 'gdate', 'gxargs'];
+  'unzip', 'base64', 'file', 'free', 'uptime', 'lsof'];
 export const ALLOWLIST = new Set([...TOOLS, 'git']);
-const WHOLE_WORD = new Set(['find', 'gfind']); // `-xtype` is one primary, never `-x -t -y …`
-const SYSTEM_DIRS = /^\/(?:usr\/)?s?bin\//;
+const WHOLE_WORD = new Set(['find']); // `-xtype` is one primary, never `-x -t -y …`
+const SYSTEM_DIRS = /^\/(?:usr\/)?s?bin\/[^/]+$/;
+const PAGE_NAME = /^[a-z0-9][a-z0-9._+-]*$/;
 
 export const helpcheckEnabled = (env = process.env) => !['0', 'off', 'false', 'no'].includes(String(env.TELLSH_HELPCHECK ?? '').toLowerCase());
 
@@ -119,7 +121,9 @@ export function defaultSpawn(file, args, { env, cwd, timeout = TIMEOUT_MS } = {}
  * Option table of an installed tool (git: `{ sub }`), from the cache or one man probe.
  * -> { ok: true, options, cached } | { ok: false, reason }
  */
-export function toolOptions(tool, { sub, env = process.env, spawn = defaultSpawn, dir = cacheDir(env), man = findMan(), deadline = Infinity, now = Date.now, maxTimeout = TIMEOUT_MS } = {}) {
+export const isSystemBinary = (real) => SYSTEM_DIRS.test(real);
+
+export function toolOptions(tool, { sub, isSystem = isSystemBinary, env = process.env, spawn = defaultSpawn, dir = cacheDir(env), man = findMan(), deadline = Infinity, now = Date.now, maxTimeout = TIMEOUT_MS } = {}) {
   if (!ALLOWLIST.has(tool)) return { ok: false, reason: 'tool not checked' };
   if (tool === 'git' && !/^[a-z][a-z-]*$/.test(sub || '')) return { ok: false, reason: 'subcommand not checked' };
   const path = which(tool, env);
@@ -127,8 +131,11 @@ export function toolOptions(tool, { sub, env = process.env, spawn = defaultSpawn
   let real;
   let st;
   try { real = realpathSync(path); st = statSync(real); } catch { return { ok: false, reason: 'not installed' }; }
+  // only system tools, documented by the system man pages: Homebrew / gnubin / /opt / home binaries are not checked
+  if (!isSystem(real)) return { ok: false, reason: 'non-system binary' };
   if (!man || !isAbsolute(man)) return { ok: false, reason: 'no man' };
   const page = tool === 'git' ? `git-${sub}` : tool;
+  if (!PAGE_NAME.test(page)) return { ok: false, reason: 'bad page name' };
   const key = `${CACHE_VERSION}\0${real}\0${st.size}\0${st.mtimeMs}\0${man}\0${page}`;
   const cfile = join(dir, `${page.replace(/[^\w.-]/g, '_')}-${createHash('sha1').update(key).digest('hex').slice(0, 16)}.json`);
   try {
@@ -140,8 +147,6 @@ export function toolOptions(tool, { sub, env = process.env, spawn = defaultSpawn
   if (left <= 0) return { ok: false, reason: 'budget' };
   const timeout = Math.min(maxTimeout, left);
   const menv = { PATH: MAN_ENV_PATH, MANPAGER: 'cat', PAGER: 'cat', LC_ALL: 'C', TERM: 'dumb', MANWIDTH: '200' };
-  // a tool outside the system dirs (Homebrew, /opt) is documented next to its bin/: that man dir is searched first
-  if (!SYSTEM_DIRS.test(real)) menv.MANPATH = `${join(dirname(dirname(real)), 'share', 'man')}:`;
   const r = spawn(man, ['-P', 'cat', page], { env: menv, cwd: tmpdir(), timeout });
   const save = (data) => { try { mkdirSync(dir, { recursive: true }); writeFileSync(cfile, JSON.stringify({ key, page, ...data })); } catch { /* read-only cache: fine */ } };
   if (!r || r.error) {
@@ -196,7 +201,7 @@ export function unknownFlags(words, options, { tool } = {}) {
     if (a == null) continue;
     if (a === '--') break;
     if (a.length < 2 || a[0] !== '-') {
-      if (tool === 'xargs' || tool === 'gxargs') break; // the command xargs runs is not checked
+      if (tool === 'xargs') break; // the command xargs runs is not checked
       continue;
     }
     // the command run by find -exec / -ok is not checked: skip to its `;` / `+`
@@ -232,7 +237,7 @@ export function unknownFlags(words, options, { tool } = {}) {
  * Check a final suggestion against the installed tools' man pages. POSIX shells on the OS tellsh runs on only.
  * -> { checked: true, tool, unknown: [{ tool, flag, source }], notInstalled? } | { checked: false, reason, tool?, notInstalled? }
  */
-export function checkCommand(command, { shell, os, env = process.env, platform = process.platform, spawn = defaultSpawn, dir, man = findMan(), budget = BUDGET_MS, now = Date.now } = {}) {
+export function checkCommand(command, { shell, os, env = process.env, platform = process.platform, spawn = defaultSpawn, dir, man = findMan(), budget = BUDGET_MS, now = Date.now, isSystem } = {}) {
   if (!helpcheckEnabled(env)) return { checked: false, reason: 'disabled' };
   if (platform === 'win32' || !['bash', 'zsh', 'sh'].includes(shell)) return { checked: false, reason: 'shell not checked' };
   const realOs = platform === 'darwin' ? 'darwin' : 'linux';
@@ -244,7 +249,7 @@ export function checkCommand(command, { shell, os, env = process.env, platform =
   const notInstalled = [];
   for (const p of extractFlags(command)) {
     const label = p.sub ? `git ${p.sub}` : p.tool;
-    const r = toolOptions(p.tool, { sub: p.sub, env, spawn, dir: dir || cacheDir(env), man, deadline, now });
+    const r = toolOptions(p.tool, { sub: p.sub, env, spawn, dir: dir || cacheDir(env), man, deadline, now, isSystem });
     if (!r.ok) {
       if (r.reason === 'not installed' && !notInstalled.includes(p.tool)) notInstalled.push(p.tool);
       first ??= { checked: false, reason: r.reason, tool: label };
