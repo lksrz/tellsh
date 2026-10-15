@@ -9,8 +9,8 @@ import { FAMILY_OF } from '../src/tools.js';
 import { NEW_TEMPLATE_INTENTS, suggest } from '../src/pipeline.js';
 import { CATALOG_038, DISABLED_038 } from '../src/templates038.js';
 
-const SHIPPED = ['git_diff_stat', 'git_diff_names', 'git_worktree_list'];
-const CUT = ['open_file', 'http_server', 'json_pretty', 'git_worktree_add', 'venv_create', 'git_show_files', 'pip_list', 'npm_outdated'];
+const SHIPPED = ['git_diff_stat', 'git_worktree_list'];
+const CUT = ['open_file', 'http_server', 'json_pretty', 'git_worktree_add', 'venv_create', 'git_show_files', 'pip_list', 'npm_outdated', 'git_diff_names'];
 import { loadModel } from '../src/model.js';
 
 const BASH = { shell: 'bash', os: 'linux', coreutils: 'gnu' };

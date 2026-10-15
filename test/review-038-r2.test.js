@@ -30,3 +30,10 @@ test('catalog-038 review r2: template vocabulary never answers a different reque
     assert.ok(!(runnable(r) && ['pip_list', 'npm_outdated'].includes(r.intent)), `${q} -> ${r.intent}`);
   }
 });
+
+test('catalog-038 confirmation review: git diff --name-only is cut (a plain file listing is never a git diff)', () => {
+  for (const top of [1, 3, 5]) for (const q of ['pokaż nazwy plików', 'list file names', 'which files changed']) {
+    const r = suggest(q, { shell: 'bash', os: 'linux', top });
+    assert.ok(!(runnable(r) && r.command === 'git diff --name-only'), `${top}: ${q} -> ${r.command}`);
+  }
+});
