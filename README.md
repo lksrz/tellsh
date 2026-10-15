@@ -307,8 +307,10 @@ withheld too, with or without history, and without a usable directory the place 
 Wrapped commands (`sudo -u root ls`, `env ls`, `command ls`, `nice -n 5 ps aux`) are read as the command they run.
 "Same for X" / "same but …" repeat the previous command only; they are refused when it cannot be repeated, when a
 later segment of its line ran after the repeatable command, when X names nothing it takes, or when "same but …" would
-turn the previous command into a different, riskier one (`same but no discard` after `git status`; other repeat
-phrasings such as "again but without deleting it" are not recognised: read a high-risk suggestion before pressing Enter). A slot of the previous
+turn the previous command into a different, riskier one (`same but no discard` after `git status`). The same guard
+covers repeat phrasings at the start of a request followed by "but"/"ale" (`again but …`, `do it again, but …`,
+`repeat that but …`, `like before but …`, `jeszcze raz, ale …`, `powtórz to ale …`); they are only guarded, not applied
+as modifiers. Other wordings ("delete it again, but …") are not recognised: read a high-risk suggestion before pressing Enter. A slot of the previous
 command that depends on the shell state (`find "$DIR" …`) or fails validation (a 300-character path) stays a
 placeholder, and a slot the new request withheld (`same but … in /tmp/new!`) is never refilled. A single named path
 after "to"/"into"/"do" ("move them to /tmp/old", with or without history) is the destination and the source stays

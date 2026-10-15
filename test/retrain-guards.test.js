@@ -2,6 +2,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
 import { suggest } from '../src/pipeline.js';
+import { sameButLast } from '../src/samebut-guard.js';
 
 const ENVS = [{ shell: 'bash', os: 'linux' }, { shell: 'zsh', os: 'darwin' }, { shell: 'pwsh', os: 'win32' }, { shell: 'cmd', os: 'win32' }];
 const held = (q, env) => { const r = suggest(q, env); assert.ok(!r.command || (r.missing || []).length > 0, `${env.shell}: ${JSON.stringify(q)} -> ${r.command}`); };
@@ -149,4 +150,18 @@ test('0.3.8: "same but" never turns the previous command into a riskier intent (
   // a fresh request with a negation is never refused because of the history
   assert.equal(suggest('remove build dir without asking', { ...ENVS[0], history: ['cat config.txt'] }).context.rule === 'refused', false);
   assert.match(suggest('commit with message "no changes"', { ...ENVS[0], history: ['git status'] }).command || '', /commit/);
+});
+test('0.3.9: repeat phrasings ("again but …", "jeszcze raz, ale …") get the same-but risk guard', () => {
+  for (const [env, h] of [[ENVS[0], 'cat config.txt'], [ENVS[1], 'cat config.txt'], [ENVS[2], 'Get-Content config.txt'], [ENVS[3], 'type config.txt']]) {
+    for (const q of ['again but without deleting it', 'do it again, but without deleting it', 'repeat that but no deletion', 'jeszcze raz, ale bez usuwania', 'powtórz to ale bez kasowania', 'like before but without\ndeleting it']) {
+      const r = suggest(q, { ...env, history: [h] });
+      assert.ok(!r.command || (r.missing || []).length || /<FILE>/.test(r.command), `${env.shell}: ${JSON.stringify(q)} -> ${r.command}`);
+    }
+  }
+  for (const q of ['again but no discard', 'repeat it, but discard changes']) assert.ok(!suggest(q, { ...ENVS[0], history: ['git status'] }).command, q);
+  for (const q of ['again but without deleting it', 'repeat but no discard']) assert.equal(sameButLast(q, { n: 0 }), '__unknown__', q);
+  // only at the start and only with "but"/"ale": these are not repeat phrasings
+  for (const q of ['delete it again', 'run the tests again', 'show it again but bigger', 'delete old logs but keep config', 'znowu usuń logi'])
+    assert.equal(sameButLast(q, { n: 1, last: { intent: 'cat_file', slots: {} } }), undefined, q);
+  assert.match(suggest('delete it', { ...ENVS[0], history: ['cat config.txt'] }).command, /config\.txt/);
 });
