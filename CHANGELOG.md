@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.3.7 (unreleased) — installed-tool flag check
+## 0.3.7 — installed-tool flag check
 
 **Help-verifier.** Before a command is shown, its flags are checked against the man page of the tool actually
 installed (new `src/helpcheck.js`). Only system tools (real path in /bin, /usr/bin, /sbin, /usr/sbin) are checked;
