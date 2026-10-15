@@ -10,6 +10,10 @@ import { decodeSpans } from './encoder.js';
 import { wasmLinear } from './wasm-linear.js';
 
 const SIZE = { i8: 1, f16: 2, f32: 4 };
+const ARENA_MAX = 256 * 1024 * 1024; // bytes
+/** floats in StudentModel's arena: per layer 4 HxH + IxH + HxI weights and their biases, activations for nMax tokens,
+ *  and the int8 staging area used by the WebAssembly dequantization */
+export const arenaFloats = ({ layers, hidden: H, inter: I }, nMax) => layers * (4 * (H * H + H) + 2 * H * I + I + H) + nMax * (6 * H + I) + nMax + (H * I) / 4 + I + 8;
 const int = (v, lo, hi) => Number.isInteger(v) && v >= lo && v <= hi;
 
 /** student.bin buffer -> {config, get(name) -> typed array view}. The header is untrusted: the config must be in
@@ -31,6 +35,9 @@ export function parseBundle(buf) {
     const len = t.shape.reduce((x, y) => x * y, 1);
     if (!int(t.offset, 0, bytes) || t.offset % SIZE[t.dtype] || t.offset + len * SIZE[t.dtype] > bytes) bad(`tensor ${k} (outside the file)`);
   }
+  // no two tensors share bytes: the total tensor size is bounded by the file
+  const spans = Object.values(tensors).map((t) => [t.offset, t.offset + t.shape.reduce((x, y) => x * y, 1) * SIZE[t.dtype]]).sort((x, y) => x[0] - y[0]);
+  for (let j = 1; j < spans.length; j++) if (spans[j][0] < spans[j - 1][1]) bad('tensors (overlapping)');
   // expected tensors: name -> [shape, allowed dtypes]
   const { hidden: H, inter: I, vocab: V } = c;
   const want = (name, shape, dtypes = ['f32']) => {
@@ -55,6 +62,9 @@ export function parseBundle(buf) {
     ln(`${p}.attention.output.LayerNorm`); ln(`${p}.output.LayerNorm`);
   }
   for (const h of ['tool', 'intent', 'tag']) { const [O] = want(`${h}.weight`, [undefined, H]); want(`${h}.bias`, [O]); }
+  // the arena StudentModel allocates (f32 transformer weights + activations + staging), capped before any allocation
+  const nMax = P - c.posOffset;
+  if (4 * arenaFloats(c, nMax) > ARENA_MAX) bad('dimensions (arena too large)');
   // copy into an 8-aligned ArrayBuffer once (a Buffer from readFileSync may be unaligned)
   const ab = new ArrayBuffer(bytes);
   new Uint8Array(ab).set(buf.subarray(start));
@@ -169,10 +179,8 @@ export class StudentModel {
     this.c = c;
     const { hidden: H, inter: I } = c;
     // one arena (the WebAssembly memory when the SIMD kernel is used) holds the transformer weights and activations
-    const names = [];
-    for (let l = 0; l < c.layers; l++) for (const p of ['attention.self.query', 'attention.self.key', 'attention.self.value', 'attention.output.dense', 'intermediate.dense', 'output.dense']) names.push(`encoder.layer.${l}.${p}`);
     this.nMax = get('embeddings.position_embeddings.weight').length / H - c.posOffset;
-    const floats = names.reduce((a, p) => a + get(`${p}.weight`).length + get(`${p}.bias`).length, 0) + this.nMax * (6 * H + I) + this.nMax + (H * I) / 4 + I + 8; // + int8 staging for deq
+    const floats = arenaFloats(c, this.nMax);
     const kern = wasm && H % 4 === 0 && I % 4 === 0 && H % 2 === 0 ? wasmLinear(floats * 4) : null;
     const buffer = kern ? kern.buffer : new ArrayBuffer(floats * 4);
     this.runtime = kern ? 'wasm-simd' : 'js';

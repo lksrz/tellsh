@@ -4,7 +4,7 @@ import { existsSync, mkdtempSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { buildBundle, quantRows, readSafetensors, toF16 } from '../scripts/hybrid/export_student_js.js';
-import { parseBundle, StudentModel, linear, attend, fromF16 } from '../src/rerank/student-js.js';
+import { parseBundle, StudentModel, linear, attend, fromF16, arenaFloats } from '../src/rerank/student-js.js';
 import { wasmLinear } from '../src/rerank/wasm-linear.js';
 
 const SIMD = !!wasmLinear(1); // false under --jitless or without WebAssembly SIMD: the JS fallback is used
@@ -157,6 +157,13 @@ test('student-js: a hostile or inconsistent header is rejected before any large 
     missing: (h) => { delete h.tensors['intent.bias']; },
     big_dim: (h) => { h.tensors['tool.weight'].shape = [1e12, H]; },
   };
+  // large-but-capped dims, every tensor on the same few bytes (the overlap check runs before shapes and the arena)
+  const overlap = (h) => {
+    h.config = { layers: 24, hidden: 2048, heads: 16, inter: 8192, vocab: 1, eps: 1e-12, posOffset: 0, quant: 'int8-row' };
+    for (const t of Object.values(h.tensors)) { t.offset = 0; t.shape = [4]; t.dtype = 'f32'; }
+  };
+  cases.overlap = overlap;
+  cases.overlap_small = (h) => { h.tensors['tool.bias'].offset = h.tensors['tool.weight'].offset; };
   const d = mkdtempSync(join(tmpdir(), 'tellsh-stujs-'));
   writeFileSync(join(d, 'vocab.json'), JSON.stringify({ pieces: ['<s>', '<pad>', '</s>', '<unk>', '▁a'], scores: [0, 0, 0, 0, -1], unk: 3 }));
   writeFileSync(join(d, 'labels.json'), JSON.stringify({ tools: ['a', 'b', 'c'], intents: ['a', 'b', 'c', 'd', 'e'], tagLabels: ['O', 'B-X', 'I-X'], context: '{shell} {os}', maxLen: 16 }));
@@ -166,6 +173,10 @@ test('student-js: a hostile or inconsistent header is rejected before any large 
     writeFileSync(join(d, 'student.bin'), bin);
     assert.equal(await loadStudent({ dir: d }), null, name);
   }
+  assert.throws(() => parseBundle(patch(overlap)), /overlapping/);
+  // the arena cap: the largest config the bounds allow needs > 256 MB, the real model ~30 MB
+  assert.ok(4 * arenaFloats({ layers: 24, hidden: 2048, inter: 8192 }, 512) > 256 * 1024 * 1024);
+  assert.ok(4 * arenaFloats({ layers: 3, hidden: 384, inter: 1536 }, 512) < 64 * 1024 * 1024);
   assert.throws(() => parseBundle(good.subarray(0, 6)), /student\.bin/);
   const trunc = Buffer.from(good); trunc.writeUInt32LE(1e9, 4);
   assert.throws(() => parseBundle(trunc), /truncated/);
