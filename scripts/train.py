@@ -16,6 +16,7 @@ Thresholds are calibrated on a group-wise holdout (all copies of a sentence stay
 Usage: python3 scripts/train.py [--keep-tool 20000] [--C 30] [--tagC 2]
 """
 import argparse
+import gc
 import json
 import os
 import struct
@@ -265,6 +266,9 @@ def main():
         f'OOD rejected={(score[oodm] < best_t).mean() if oodm.any() else float("nan"):.3f}); compose tool threshold={compose_t:.2f}')
 
     # ---------------- final models on all data ----------------
+    # free the calibration models first (peak memory: the final fit runs on the full matrix)
+    del tool_s, int_s, Xho, p_tool, res
+    gc.collect()
     all_idx = np.arange(len(rows))
     tool, intents = train_all(rows, X, meta, all_idx, args.C, args.keep_tool, keep_int, '[final] ')
 
