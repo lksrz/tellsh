@@ -146,13 +146,12 @@ The intent and slots are shared; only the rendering differs (`src/render.js`, va
 
 ### Developer tools (v0.4)
 
-**New templates (0.3.8, unreleased)**: `git diff --stat [ref]` (`--cached` for staged changes), `git diff --name-only
-[ref]`, `git show --stat <ref>` (`HEAD` by default: "which files changed in the last commit"), `git worktree list`,
+**New templates (0.3.8, unreleased)**: `git diff --stat [ref]`, `git diff --name-only [ref]`, `git worktree list`,
 `pip list` (`python3 -m pip list`) and `npm outdated`.
 They are answered by the retrained templates model (`model/model_templates.bin`, trained with
 `data/intents/g10_catalog038.jsonl`) through the same two-model gate as the 0.3.4 templates. Opening a file / URL
-(`open`), a local HTTP server (`http.server`), pretty-printing JSON (`jq`), `git worktree add` and creating a virtualenv are **not in this
-release**: those requests are answered exactly as in 0.3.7.
+(`open`), a local HTTP server (`http.server`), pretty-printing JSON (`jq`), `git worktree add`, creating a virtualenv and `git show --stat` are **not in this
+release**: they are recognised but always withheld (shown, never run), like `git grep` / `git show`.
 
 **New templates (0.3.4)** (ranked by frequency in real command usage): `git fetch --all`, `git ls-files`,
 `gh run watch [id]`, `gh issue list`, `gh issue view <n>`, `npx wrangler d1 list`,
@@ -486,11 +485,9 @@ retrain; `npm test && npm run eval`.
   explicit number (`issue 42`, `#42`); `gh run watch` takes one (`run 123`) or none (gh then asks which run), and some
   phrasings (`watch the latest workflow run`) are withheld with `<NUM>`; `wrangler pages deploy` needs the directory named (no `dist`
   default).
-* **New 0.3.8 templates take only explicit values.** A revision is used only when the request names it literally
-  (otherwise `HEAD`, or `HEAD~1` for "the previous commit"); a value starting with `-` or not found in the request text
-  (e.g. a revision from an earlier `git show abc123`) is withheld. An explicit revision plus "previous" / "parent" is
-  withheld. A
-  request with a word, option, exclusion or second action the template cannot express (`only for src`, `and update
+* **New 0.3.8 templates take only explicit values.** A revision is used only when the request names it literally; a
+  value starting with `-` or not found in the request text (e.g. a revision from an earlier `git show abc123`) is
+  withheld, and so are staged changes (`--cached` is not rendered). A request with a word, option, exclusion or second action the template cannot express (`only for src`, `and update
   them`, `-w`) is withheld (shown, never run on Enter or `--yes`). `pip list` and `npm outdated` are rated
   medium, so `--yes` never runs them. History after one of them is handled like after a 0.3.4 template (below): after a
   0.3.8 template, "same for X" is withheld (not run).

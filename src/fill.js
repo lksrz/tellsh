@@ -4,7 +4,7 @@ import { extractSlots, pickArg, pickDest, pickDir, foldKeepLength, isStopWord } 
 import { checkDanger, maxRisk, plainSlotValue } from './danger.js';
 import { protectedNumbers } from './guards.js';
 import { shQuote, psQuote, chooseTemplate, quoteForKind, UnquotableError, pwshNativeSlots, unsafeNativePwshArg } from './render.js';
-import { IS_038, slots038, withhold038 } from './templates038.js';
+import { IS_038, DISABLED_038, slots038, withhold038 } from './templates038.js';
 
 export { shQuote };
 
@@ -1201,6 +1201,7 @@ const UNIT_AFTER = /^\s*-?(?:comments?|labels?|assignees?|reactions?|commits?|fi
 // release (branch feat/templates-grep-show); set TELLSH_ENABLE_GREP_SHOW=1 only in development to exercise it.
 export const DISABLED_TEMPLATES = new Set(process.env.TELLSH_ENABLE_GREP_SHOW === '1' ? [] : ['git_grep', 'git_show']);
 export function newTemplateWithhold(id, text, slots = {}, command = null) {
+  if (DISABLED_038.has(id)) return ['args (template disabled in this release)'];
   if (IS_038.has(id)) return withhold038(id, text, slots);
   const t = String(text);
   if (DISABLED_TEMPLATES.has(id)) return [`${id === 'git_grep' ? 'pattern' : 'rev'} (template disabled in this release)`];

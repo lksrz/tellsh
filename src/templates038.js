@@ -8,6 +8,9 @@
 export const CATALOG_038 = ['git_diff_stat', 'git_diff_names', 'git_show_files', 'git_worktree_list', 'git_worktree_add',
   'json_pretty', 'http_server', 'venv_create', 'open_file', 'pip_list', 'npm_outdated'];
 export const IS_038 = new Set(CATALOG_038);
+// not in this release (review): recognised by the templates model but always withheld, like the 0.3.4 git grep / git show,
+// so their requests never fall through to a different 0.3.3 answer
+export const DISABLED_038 = new Set(['open_file', 'http_server', 'json_pretty', 'git_worktree_add', 'venv_create', 'git_show_files']);
 
 const REF_TOKEN = /(?:^|\s)((?:HEAD|@)(?:[~^]\d*)*|(?=[0-9a-f]*\d)[0-9a-f]{7,40}|v\d+(?:\.\d+)*)(?=[\s,.;:!?]|$)/;
 const REF_SHAPE = /^[\w./~^@-]+$/;
@@ -24,7 +27,7 @@ export function slots038(id, text, v, quoted = []) {
   const t = String(text).trim();
   const keep = {};
   if (id === 'git_diff_stat' || id === 'git_diff_names') {
-    if (/(?:^|\s)--(?:cached|staged)\b|\b(?:staged|cached|index|poczekalni\w*|zastage\w*|stage'?owane\w*|dodane\w*)\b/i.test(t)) keep.cached = '--cached';
+    // 0.3.8: staged changes (--cached) are not rendered: a request about the index is withheld (staged words are not vocabulary)
     const lit = t.match(/\bgit\s+diff\s+(?:--(?:cached|staged)\s+)?(?:--stat|--name-only)\s+([^\s"']+)\s*$/i) || t.match(/\bgit\s+diff\s+(?:--(?:cached|staged)\s+)?([^\s"'-][^\s"']*)\s+(?:--stat|--name-only)\s*$/i);
     const prep = t.match(/\b(?:against|vs\.?|versus|compared\s+(?:to|with)|relative\s+to|since|from|between|względem|wzgledem|w\s+por[oó]wnaniu\s+z|od|do)\s+(?:the\s+)?(?:branch\s+|commit\s+|gałęzi\s+|galezi\s+)?(["']?)([^\s"']+)\1(?=[\s,.;!?]*$|\s)/i);
     const m = t.match(REF_TOKEN);
@@ -81,14 +84,14 @@ const COMMON = `the a an me my our this that these please pls now just can could
   chcę chce lista moje mam się sie przez`;
 const WORDS = {
   git_diff_stat: `diff diffs stat stats statistic statistics summary summarise summarize overview changes changed change lines line count counts
-    per file files how many much was were insertions deletions added removed --stat --cached --staged staged cached index uncommitted unstaged working tree
+    per file files how many much was were insertions deletions added removed --stat uncommitted unstaged working tree
     against vs vs. versus compared compare relative since between branch commit last
     each every per podsumowanie statystyki statystyk zmian plikach każdym kazdym zmieniono zmieniło zmienilo gicie diffa zmiany zmienione zmienionych linii linie ile plików plikow pliku plik dodanych usuniętych usunietych
-    względem wzgledem porównaniu porownaniu porównaj porownaj od gałęzi galezi gałąź galaz commita ostatniego poczekalni zastageowanych zatwierdzonych niezatwierdzonych`,
-  git_diff_names: `diff only just names name filenames file files paths changed modified touched changes differ different --name-only --cached --staged staged cached index
+    względem wzgledem porównaniu porownaniu porównaj porownaj od gałęzi galezi gałąź galaz commita ostatniego zatwierdzonych niezatwierdzonych`,
+  git_diff_names: `diff only just names name filenames file files paths changed modified touched changes differ different --name-only
     uncommitted unstaged working tree against vs vs. versus compared compare relative since between branch commit last which have has been
     nazwy nazw plików plikow pliki zmienione zmienionych zmodyfikowane zmodyfikowanych zmieniły zmienily tylko się sie różnią roznia względem wzgledem
-    porównaniu porownaniu od gałęzi galezi gałąź galaz commita ostatniego poczekalni zastageowanych niezatwierdzone touch touched did were
+    porównaniu porownaniu od gałęzi galezi gałąź galaz commita ostatniego niezatwierdzone touch touched did were
     zmieniłem zmienilem zmieniłam zmienilam diffa gicie zmodyfikowanych`,
   git_show_files: `show --stat files file changed modified touched changes stat stats summary last latest newest recent most previous prior commit
     went into were was in by included part made has had one before second-to-last revision tag what which

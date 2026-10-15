@@ -6,11 +6,11 @@ import { readFileSync } from 'node:fs';
 import { buildCommand, newTemplateWithhold } from '../src/fill.js';
 import { BY_ID } from '../src/catalog.js';
 import { FAMILY_OF } from '../src/tools.js';
-import { NEW_TEMPLATE_INTENTS, NOT_GATED, suggest } from '../src/pipeline.js';
-import { CATALOG_038 } from '../src/templates038.js';
+import { NEW_TEMPLATE_INTENTS, suggest } from '../src/pipeline.js';
+import { CATALOG_038, DISABLED_038 } from '../src/templates038.js';
 
-const SHIPPED = ['git_diff_stat', 'git_diff_names', 'git_show_files', 'git_worktree_list', 'pip_list', 'npm_outdated'];
-const CUT = ['open_file', 'http_server', 'json_pretty', 'git_worktree_add', 'venv_create'];
+const SHIPPED = ['git_diff_stat', 'git_diff_names', 'git_worktree_list', 'pip_list', 'npm_outdated'];
+const CUT = ['open_file', 'http_server', 'json_pretty', 'git_worktree_add', 'venv_create', 'git_show_files'];
 import { loadModel } from '../src/model.js';
 
 const BASH = { shell: 'bash', os: 'linux', coreutils: 'gnu' };
@@ -22,10 +22,9 @@ const cmd = (id, text, env = BASH) => build(id, text, env).command;
 const withheld = (id, text, env = BASH) => { const r = build(id, text, env); return newTemplateWithhold(id, text, r.slots, r.command); };
 
 test('catalog-038 intents: catalog, tool family, template gate, risk', () => {
-  assert.equal(CATALOG_038.length, 11); // catalog entries kept; only SHIPPED are answered from the templates model
-  for (const id of CATALOG_038) { assert.ok(BY_ID[id], id); assert.ok(FAMILY_OF[id], id); assert.equal(NEW_TEMPLATE_INTENTS.has(id), SHIPPED.includes(id), id); }
-  for (const id of CUT) assert.ok(NOT_GATED.has(id), id);
-  for (const id of ['git_show', 'git_grep']) assert.ok(NEW_TEMPLATE_INTENTS.has(id) && !NOT_GATED.has(id), id); // withheld as in 0.3.7
+  assert.equal(CATALOG_038.length, 11); // all gated; the CUT ones are always withheld (DISABLED_038)
+  for (const id of CATALOG_038) { assert.ok(BY_ID[id], id); assert.ok(FAMILY_OF[id], id); assert.ok(NEW_TEMPLATE_INTENTS.has(id), id); assert.equal(DISABLED_038.has(id), CUT.includes(id), id); }
+  for (const id of ['git_show', 'git_grep']) assert.ok(NEW_TEMPLATE_INTENTS.has(id), id); // withheld as in 0.3.7
   for (const id of ['git_diff_stat', 'git_diff_names', 'git_show_files', 'git_worktree_list', 'json_pretty']) assert.equal(BY_ID[id].risk, 'safe', id);
   // not read-only (a server, opening an app, writing a worktree / venv) or running project code: never auto-run with --yes
   for (const id of ['http_server', 'open_file', 'git_worktree_add', 'venv_create', 'pip_list', 'npm_outdated']) assert.equal(BY_ID[id].risk, 'medium', id);
@@ -35,7 +34,6 @@ test('catalog-038 intents: catalog, tool family, template gate, risk', () => {
 test('catalog-038 renders per shell', () => {
   for (const [id, text, bash, mac, ps, cm] of [
     ['git_diff_stat', 'show a diff stat', 'git diff --stat', 'git diff --stat', 'git diff --stat', 'git diff --stat'],
-    ['git_diff_stat', 'diff stat of staged changes against main', 'git diff --cached --stat main', null, "git diff --cached --stat 'main'", 'git diff --cached --stat main'],
     ['git_diff_names', 'which files changed compared to develop', 'git diff --name-only develop', null, null, null],
     ['git_show_files', 'which files changed in the last commit', 'git show --stat HEAD', null, "git show --stat 'HEAD'", 'git show --stat HEAD'],
     ['git_show_files', 'files changed in commit abc1234', 'git show --stat abc1234', null, null, null],
@@ -101,8 +99,8 @@ test('g10 training rows: every intent has EN and PL rows; hard negatives are exi
   for (const r of ROWS) { assert.ok(BY_ID[r.intent], r.intent); assert.ok(['en', 'pl'].includes(r.lang)); n[`${r.intent}/${r.lang}`] = (n[`${r.intent}/${r.lang}`] || 0) + 1; }
   for (const id of CATALOG_038) for (const lang of ['en', 'pl']) assert.ok((n[`${id}/${lang}`] || 0) >= 20, `${id}/${lang}: ${n[`${id}/${lang}`]}`);
   assert.ok(ROWS.filter((r) => !CATALOG_038.includes(r.intent)).length >= 30, 'near-miss hard negatives');
-  // venv_create renders only .venv in 0.3.8: rows naming another venv are withheld
-  const namesVenv = (r) => r.intent === 'venv_create' && /\b(?:named|called|nazwie)\b|venv venv$|\.\/venv|\.env$/.test(r.text);
+  // staged changes (--cached) are not rendered in 0.3.8: rows about the index are withheld
+  const namesVenv = (r) => /\b(?:staged|cached|index)\b|--cached|--staged|poczekalni|zastage|stage'?owan/i.test(r.text);
   for (const r of ROWS.filter((x) => SHIPPED.includes(x.intent))) {
     if (namesVenv(r)) { assert.ok(withheld(r.intent, r.text).length > 0, r.text); continue; }
     assert.deepEqual(withheld(r.intent, r.text), [], `${r.intent}: ${r.text}`);
@@ -141,8 +139,7 @@ test('catalog-038: values come from the request (rules 2a / 2b, venv .venv only,
     ['venv_create', 'python3 -m venv --system-site-packages'],
     ['git_show_files', 'which files changed in the previous commit of HEAD~3'],
   ]) assert.ok(withheld(id, text).length > 0, `${id}: ${text} -> ${cmd(id, text)}`);
-  assert.deepEqual(withheld('venv_create', 'python3 -m venv .venv'), []);
-  assert.equal(cmd('venv_create', 'python3 -m venv .venv'), 'python3 -m venv .venv');
+  assert.deepEqual(withheld('venv_create', 'python3 -m venv .venv'), ['args (template disabled in this release)']); // cut in 0.3.8
   // an option-like or a not-named value is withheld whatever the slot extraction produced
   const w = (id, text, slots) => newTemplateWithhold(id, text, slots, 'x');
   assert.ok(w('git_diff_stat', 'show the diff stat', { rev: 'abc123' }).some((m) => /not named/.test(m)));
@@ -157,21 +154,21 @@ test('catalog-038: values come from the request (rules 2a / 2b, venv .venv only,
   }
 });
 
-test('catalog-038: open / http.server / jq / worktree add / venv are answered by the 0.3.3 model alone (never the templates model)', () => {
-  const base = loadModel(new URL('../model/model.bin', import.meta.url).pathname);
-  for (const q of ['open report.pdf', 'serve this folder over http', 'pretty print data.json', 'add a worktree at ../x for branch y', 'create a python virtual environment']) {
-    for (const env of [BASH, MAC, PS, CMD]) {
-      const a = suggest(q, { env }); const b = suggest(q, { env, model: base, gated: true });
-      assert.equal(a?.intent, b?.intent, `${env.shell}: ${q}`); assert.equal(a?.command, b?.command, `${env.shell}: ${q}`);
-      assert.ok(!CUT.includes(a?.intent), `${env.shell}: ${q} -> ${a?.intent}`);
-    }
+test('catalog-038: cut intents (open, http.server, jq, worktree add, venv, git show --stat) are never runnable', () => {
+  const qs = ['open report.pdf', 'open setup', 'serve this folder over http', 'pretty print data.json', 'add a worktree at ../x for branch y',
+    'create a python virtual environment', 'which files changed in the last commit', 'show files changed in the commit before the previous commit'];
+  for (const q of qs) for (const env of [BASH, MAC, PS, CMD]) {
+    const a = suggest(q, { env });
+    assert.ok(!a.command || (a.missing || []).length > 0, `${env.shell}: ${q} -> ${a.command}`);
+    if (CUT.includes(a.intent)) assert.deepEqual(a.missing, ['args (template disabled in this release)'], `${env.shell}: ${q}`);
   }
 });
 
 test('catalog-038 r2: an unexpressed action or scope is withheld; the composer never replaces a template intent', () => {
   const run = (q) => { const r = suggest(q, { env: BASH }); return r.command && !(r.missing || []).length ? r.command : null; };
   assert.equal(run('update outdated npm dependencies'), null);
-  assert.equal(run('show files changed in all commits'), null);
-  assert.equal(suggest('names of changed files staged vs HEAD', { env: BASH }).command, 'git diff --cached --name-only HEAD');
-  assert.equal(suggest('changed file names staged vs HEAD~2', { env: BASH }).command, "git diff --cached --name-only 'HEAD~2'");
+  assert.equal(suggest('names of changed files vs HEAD~2', { env: BASH }).command, "git diff --name-only 'HEAD~2'");
+  // staged changes and a branch literally named `staged` are withheld (0.3.8 renders no --cached)
+  for (const q of ['diff stat of staged changes against main', 'names of changed files staged vs HEAD']) assert.equal(run(q), null, q);
+  assert.equal(run('git diff --stat staged'), 'git diff --stat staged'); // a revision named `staged` stays a revision
 });
