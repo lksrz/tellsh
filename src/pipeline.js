@@ -414,9 +414,8 @@ const LIT_FAMILY = { cargo: /^cargo_/, python: /^python_|^pip_|^run_python/, pyt
   ps: /^process_|^list_process/, top: /^process_|^top/, ping: /^ping_/, grep: /^grep_|^search_/, head: /^head_|^show_file/, tail: /^tail_|^follow_/, wc: /^count_/, sort: /^sort_/, systemctl: /^service_/, service: /^service_/, history: /^history/, crontab: /^cron/ };
 function literalIntentOk(first, intent) { const f = LIT_FAMILY[String(first).toLowerCase()]; return f ? f.test(String(intent)) : false; }
 
-// 0.3.4 two-model gate: the 0.3.3 model (model/model.bin) answers everything it already knew; the retrained model
-// (model/model_templates.bin) is used only when it picks one of the new 0.3.4 template intents, so a retrain can never
-// change the pre-existing intents (their classification and slots stay exactly as on 0.3.3).
+// two-model gate: the 0.3.3 model (model/model.bin) answers everything it already knew; model/model_templates.bin only when it
+// picks a template intent (0.3.4, 0.3.8), so a retrain never changes the pre-existing intents (classification and slots).
 // catalog-038: the shipped 0.3.8 templates are gated the same way; NOT_GATED (cut 0.3.8 ones, disabled 0.3.4 git_grep / git_show) never are: 0.3.3 answers as in 0.3.7
 export const NOT_GATED = new Set(['open_file', 'http_server', 'json_pretty', 'git_worktree_add', 'git_grep', 'git_show']);
 export const NEW_TEMPLATE_INTENTS = new Set(['git_fetch', 'git_ls_files', 'gh_run_watch', 'gh_issue_list', 'gh_issue_view', 'wrangler_d1_list', 'wrangler_pages_deploy', ...CATALOG_038.filter((id) => !NOT_GATED.has(id))]);
