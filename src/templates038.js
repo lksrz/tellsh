@@ -179,3 +179,13 @@ export function withhold038(id, text, slots = {}) {
   if (id === 'http_server' && slots.port != null && !(/^\d{1,5}$/.test(String(slots.port)) && +slots.port > 0 && +slots.port < 65536)) out.push('port (not a valid port)');
   return [...new Set(out)];
 }
+
+// a fall-through of the two-model gate: the templates model ranked a template intent (`isNew`) among its candidates at
+// p >= FALLTHROUGH_P but not first, so the 0.3.3 model answers. A retrain shifts these probabilities, so such an answer is
+// never runnable at medium risk or above (it could be a different, riskier operation than the template the request names).
+export const FALLTHROUGH_P = 0.2;
+export function fallthroughGuard(probe, res, isNew) {
+  if (!res?.command || (res.missing || []).length || isNew(res.intent) || !['medium', 'high'].includes(res.risk)) return res;
+  const hit = (probe?.candidates || []).find((c) => isNew(c.intent) && c.p >= FALLTHROUGH_P);
+  return hit ? { ...res, missing: [`args (a ${hit.intent} template request, not answered by the fallback model)`] } : res;
+}

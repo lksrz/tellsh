@@ -152,6 +152,9 @@ They are answered by the retrained templates model (`model/model_templates.bin`,
 `data/intents/g10_catalog038.jsonl`) through the same two-model gate as the 0.3.4 templates. Opening a file / URL
 (`open`), a local HTTP server (`http.server`), pretty-printing JSON (`jq`), `git worktree add`, creating a virtualenv and `git show --stat` are **not in this
 release**: they are recognised but always withheld (shown, never run), like `git grep` / `git show`.
+When the templates model ranks a template intent among its candidates (p >= 0.2) but not first, the 0.3.3 model
+answers; such a fall-through answer is shown but never runnable when its risk is medium or higher (e.g. `git pull` for
+a fetch-like request).
 
 **New templates (0.3.4)** (ranked by frequency in real command usage): `git fetch --all`, `git ls-files`,
 `gh run watch [id]`, `gh issue list`, `gh issue view <n>`, `npx wrangler d1 list`,

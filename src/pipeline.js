@@ -12,7 +12,7 @@ import { cascade } from './cascade.js';
 import { tag, exFromSpans } from './tagger.js';
 import { extractSlots, pickArg, isOptionWord, foldKeepLength, isStopWord } from './slots.js';
 import { resolveSlots, buildCommand, finalizeSlots, RAW_OK, newTemplateWithhold } from './fill.js';
-import { CATALOG_038 } from './templates038.js';
+import { CATALOG_038, fallthroughGuard } from './templates038.js';
 import { BY_ID } from './catalog.js';
 import { FAMILY_OF, NONE } from './tools.js';
 import { detectEnv, envFeatures } from './env.js';
@@ -447,11 +447,12 @@ export function suggest(query, opts = {}) {
   const probe = once({ ...opts, model: tm, rerank: undefined, gated: true });
   // a history refusal of the templates model (the previous line is a 0.3.4 template) is kept, never re-asked of 0.3.3
   if (probe && opts.history?.length && probe.context?.rule === 'refused' && !probe.command && probe.context.newTemplateLast) return probe;
-  if (!probe || !NEW_TEMPLATE_INTENTS.has(probe.intent)) return once({ ...opts, gated: true });
+  const fall = () => fallthroughGuard(probe, once({ ...opts, gated: true }), (i) => NEW_TEMPLATE_INTENTS.has(i));
+  if (!probe || !NEW_TEMPLATE_INTENTS.has(probe.intent)) return fall();
   if (!opts.rerank) return probe;
   // with the hook: the reranked templates answer is kept only if it is still a 0.3.4 template intent, otherwise 0.3.3 answers
   const alt = once({ ...opts, model: tm, gated: true });
-  return alt && NEW_TEMPLATE_INTENTS.has(alt.intent) ? alt : once({ ...opts, gated: true });
+  return alt && NEW_TEMPLATE_INTENTS.has(alt.intent) ? alt : fall();
 }
 
 // the trust rule (danger.js): a command resolved from history (a reference, "same but …", a value from an earlier

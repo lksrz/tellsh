@@ -13,6 +13,11 @@ template answer is never replaced by a composed command.
 (`jq`), `git worktree add`, creating a virtualenv and `git show --stat` are recognised by the templates model but always
 withheld (shown, never run: `DISABLED_038` in `src/templates038.js`), like the 0.3.4 `git grep` / `git show`, so their
 requests never fall through to a different 0.3.3 answer.
+**Gate fall-through guard:** when the templates model ranks a template intent among its candidates at p >= 0.2 but
+not first, the request falls through to the 0.3.3 model; that answer is withheld if its risk is medium or higher
+(`missing: args (a <template> template request, not answered by the fallback model)`, `fallthroughGuard` in
+`src/templates038.js`), so a retrain's probability shift cannot turn a fetch-like request into a runnable `git pull` /
+`git checkout -b`. Safe fall-through answers are unchanged.
 `model/model_templates.bin` is retrained (catalog + the structural real-usage train split); `model/model.bin` (0.3.3) is
 unchanged. On the private real-usage eval split (36,858 labelled rows, rebuilt with the 0.3.4 + 0.3.8 labels) the gate
 scores 93.66% (93.59% with the 0.3.4 templates model); human-written requests 89.23% (88.60%); template intents 87.2%
