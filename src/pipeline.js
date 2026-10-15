@@ -13,7 +13,7 @@ import { tag, exFromSpans } from './tagger.js';
 import { extractSlots, pickArg, isOptionWord, foldKeepLength, isStopWord } from './slots.js';
 import { resolveSlots, buildCommand, finalizeSlots, RAW_OK, newTemplateWithhold } from './fill.js';
 import { BY_ID } from './catalog.js';
-import { FAMILY_OF, NONE } from './tools.js';
+import { FAMILY_OF, NONE, OOC } from './tools.js';
 import { detectEnv, envFeatures } from './env.js';
 import { buildContext, resolveReference, hasPronoun, hasLocative, cwdFlags, sameBut, entityForSlot, isAmbiguous } from './history.js';
 import { AMB } from './shellwords.js';
@@ -445,11 +445,24 @@ export function suggest(query, opts = {}) {
   const probe = once({ ...opts, model: tm, rerank: undefined, gated: true });
   // a history refusal of the templates model (the previous line is a 0.3.4 template) is kept, never re-asked of 0.3.3
   if (probe && opts.history?.length && probe.context?.rule === 'refused' && !probe.command && probe.context.newTemplateLast) return probe;
-  if (!probe || !NEW_TEMPLATE_INTENTS.has(probe.intent)) return once({ ...opts, gated: true });
+  if (!probe || !NEW_TEMPLATE_INTENTS.has(probe.intent)) return oocVeto(probe, once({ ...opts, gated: true }));
   if (!opts.rerank) return probe;
   // with the hook: the reranked templates answer is kept only if it is still a 0.3.4 template intent, otherwise 0.3.3 answers
   const alt = once({ ...opts, model: tm, gated: true });
   return alt && NEW_TEMPLATE_INTENTS.has(alt.intent) ? alt : once({ ...opts, gated: true });
+}
+
+// out-of-catalog veto: the templates model is trained with an explicit stage-1 class for real shell tasks the catalog does
+// not cover (__ooc__); when it puts that class first, a fresh catalog / composed answer of the 0.3.3 model is withheld
+// (it would be the nearest catalog intent, not the task). History answers are never vetoed. EXPERIMENT knob:
+// TELLSH_OOC_VETO=off|ooc|reject (reject: any low-confidence rejection of the templates model vetoes)
+const OOC_HINT = 'this looks like a shell task tellsh does not know yet';
+function oocVeto(probe, res) {
+  const mode = process.env.TELLSH_OOC_VETO || 'ooc';
+  if (mode === 'off' || !probe || probe.understood || probe.method !== 'none' || !res?.understood) return res;
+  if (mode === 'ooc' && !probe.ooc) return res;
+  if (res.method !== 'catalog' && res.method !== 'composed') return res;
+  return { ...res, understood: false, method: 'none', command: null, intent: null, missing: [], hint: OOC_HINT, ooc: true, vetoed: res.intent || res.method };
 }
 
 // the trust rule (danger.js): a command resolved from history (a reference, "same but …", a value from an earlier
@@ -588,7 +601,7 @@ function suggestOnce(query, opts = {}) {
     // composer vocabulary and quoting are POSIX-only (fish treats \\ and \' as escapes inside single quotes)
     if (env.shell === 'powershell' || env.shell === 'cmd' || env.shell === 'fish') return null;
     const capable = c.tools.filter((t) => t.tool !== NONE);
-    if (c.topTool === NONE && composeMode !== 'force') return null;
+    if ((c.topTool === NONE || c.topTool === OOC) && composeMode !== 'force') return null;
     const ci = composeInput(query, model, capable[0]?.tool, opts.unclearArgs);
     const r = compose(query, capable, ci.ex, { patternOf: ci.pattern, nameOf: ci.nameOf });
     if (!r || r.invalid) return r?.invalid ? { invalid: r.invalid, command: r.command } : null;
@@ -613,7 +626,9 @@ function suggestOnce(query, opts = {}) {
       context.note = 'the request names both an object ("it") and a place ("there") from the previous command; not guessing which is which';
       return { ...out, understood: false, method: 'history-rule', hint: context.note, composeError: comp?.invalid || null };
     }
-    return { ...out, understood: false, method: 'none', hint, composeError: comp?.invalid || null };
+    // stage 1 says "a shell task outside the catalog" (__ooc__): reported as such (see suggest's out-of-catalog veto)
+    const ooc = c.topTool === OOC;
+    return { ...out, understood: false, method: 'none', hint: hint || (ooc ? OOC_HINT : null), ooc, composeError: comp?.invalid || null };
   }
   // "close that pr", "close pr 45": the catalog has no command that closes a pull request; the opposite one (`gh pr create`)
   // or another one (`gh pr view 45`) is never suggested in its place
