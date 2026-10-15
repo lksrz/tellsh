@@ -6,6 +6,12 @@
 import { fileURLToPath } from 'node:url';
 import { suggest } from '../../src/pipeline.js';
 import { evalSets } from '../hybrid/sets.js';
+import { loadModel } from '../../src/model.js';
+
+// --sweep: veto off, plus the out-of-catalog veto at every stage-1 p(__ooc__) threshold T (templates model probe)
+const SWEEP = process.argv.includes('--sweep') ? [0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9] : null;
+if (SWEEP) process.env.TELLSH_OOC_VETO = 'off';
+const TM = SWEEP && loadModel(fileURLToPath(new URL('../../model/model_templates.bin', import.meta.url)));
 
 const ROOT = fileURLToPath(new URL('../..', import.meta.url));
 const S = evalSets(ROOT);
@@ -17,12 +23,22 @@ const out = {};
 for (const [name, rows] of Object.entries(sets)) {
   if (!rows.length) continue;
   let ok = 0, vetoed = 0;
+  const okT = SWEEP ? SWEEP.map(() => 0) : [];
   for (const r of rows) {
-    const s = suggest(r.text, { env: { shell: r.shell || 'bash', os: r.os || 'linux' }, top: 3, cwd: '/tmp', compose: 'off' });
-    ok += r.intent ? (s.understood && s.intent === r.intent) : !s.understood;
+    const o = { env: { shell: r.shell || 'bash', os: r.os || 'linux' }, top: 3, cwd: '/tmp', compose: 'off' };
+    const s = suggest(r.text, o);
+    const good = r.intent ? (s.understood && s.intent === r.intent) : !s.understood;
+    ok += good;
     vetoed += !!s.vetoed;
+    if (SWEEP) {
+      const p = suggest(r.text, { ...o, model: TM }).pOoc || 0;
+      const vetoable = s.understood && (s.method === 'catalog' || s.method === 'composed');
+      SWEEP.forEach((t, k) => { okT[k] += vetoable && p >= t ? !r.intent : good; });
+    }
   }
-  out[name] = { n: rows.length, [rows.every((r) => !r.intent) ? 'rejected' : 'correct']: +(100 * ok / rows.length).toFixed(2), vetoed: +(100 * vetoed / rows.length).toFixed(2) };
+  const key = rows.every((r) => !r.intent) ? 'rejected' : 'correct';
+  out[name] = { n: rows.length, [key]: +(100 * ok / rows.length).toFixed(2), vetoed: +(100 * vetoed / rows.length).toFixed(2),
+    ...(SWEEP ? { sweep: Object.fromEntries(SWEEP.map((t, k) => [t, +(100 * okT[k] / rows.length).toFixed(2)])) } : {}) };
   console.error(name, JSON.stringify(out[name]));
 }
 console.log(JSON.stringify(out));

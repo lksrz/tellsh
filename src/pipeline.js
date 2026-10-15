@@ -459,8 +459,9 @@ export function suggest(query, opts = {}) {
 const OOC_HINT = 'this looks like a shell task tellsh does not know yet';
 function oocVeto(probe, res) {
   const mode = process.env.TELLSH_OOC_VETO || 'ooc';
-  if (mode === 'off' || !probe || probe.understood || probe.method !== 'none' || !res?.understood) return res;
-  if (mode === 'ooc' && !probe.ooc) return res;
+  if (mode === 'off' || !probe || !res?.understood) return res;
+  if (mode === 'p') { if (!((probe.pOoc || 0) >= +(process.env.TELLSH_OOC_T || 0.5))) return res; }
+  else if (probe.understood || probe.method !== 'none' || (mode === 'ooc' && !probe.ooc)) return res;
   if (res.method !== 'catalog' && res.method !== 'composed') return res;
   return { ...res, understood: false, method: 'none', command: null, intent: null, missing: [], hint: OOC_HINT, ooc: true, vetoed: res.intent || res.method };
 }
@@ -592,7 +593,7 @@ function suggestOnce(query, opts = {}) {
     context.note = `the previous command (${sb.lastIntent}) ran against another repository, directory or daemon (-C, --context, -H, ...); not guessing`;
     return { ...base, understood: false, method: 'history-rule', confidence: 0, candidates, tools, command: null, missing: [], hint: context.note };
   }
-  const out = { ...base, confidence: +confidence.toFixed(4), tool: FAMILY_OF[intent] || c.tool, tools, candidates };
+  const out = { ...base, confidence: +confidence.toFixed(4), tool: FAMILY_OF[intent] || c.tool, tools, candidates, ...(c.pOoc ? { pOoc: +c.pOoc.toFixed(4) } : {}) };
 
   const tryCompose = (reason) => {
     if (composeMode === 'off') return null;
