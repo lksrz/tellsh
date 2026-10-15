@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.3.9 — repeat phrasings guarded
 
 **Safety:** the 0.3.8 same-but risk guard also covers repeat phrasings at the start of a request followed by
 "but"/"ale" (`again but without deleting it` after `cat config.txt` is no longer `rm config.txt`; `repeat it, but discard
