@@ -1,7 +1,7 @@
 // WebAssembly SIMD (f32x4) kernels for the student, over one shared memory: linear (out[n,O] = x[n,K] W[O,K]^T + b, f32,
 // K a multiple of 4, O even) deq (int8 rows x per-row scale -> f32, cols a multiple of 4) and attend
 // (multi-head self-attention, head size a multiple of 4). The module is assembled
-// here from opcodes (well under 1 KB, no toolchain); null when WebAssembly SIMD is unavailable.
+// here from opcodes (~1.4 KB, no toolchain); null when WebAssembly SIMD is unavailable.
 
 const leb = (v) => { const o = []; do { let b = v & 0x7f; v >>>= 7; if (v) b |= 0x80; o.push(b); } while (v); return o; };
 const sleb = (v) => { const o = []; for (;;) { const b = v & 0x7f; v >>= 7; if ((v === 0 && !(b & 0x40)) || (v === -1 && (b & 0x40))) { o.push(b); return o; } o.push(b | 0x80); } };

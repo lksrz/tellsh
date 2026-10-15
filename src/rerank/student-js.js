@@ -9,22 +9,62 @@ import { UnigramTokenizer } from './tokenizer.js';
 import { decodeSpans } from './encoder.js';
 import { wasmLinear } from './wasm-linear.js';
 
-/** student.bin buffer -> {config, get(name) -> typed array view} */
+const SIZE = { i8: 1, f16: 2, f32: 4 };
+const int = (v, lo, hi) => Number.isInteger(v) && v >= lo && v <= hi;
+
+/** student.bin buffer -> {config, get(name) -> typed array view}. The header is untrusted: the config must be in
+ *  sane bounds and every tensor the model reads must have its expected dtype and shape and lie inside the file;
+ *  anything else throws (loadStudent -> null) before any allocation that depends on it. */
 export function parseBundle(buf) {
-  if (buf.toString('latin1', 0, 4) !== 'TSJ1') throw new Error('not a student.bin bundle');
+  if (buf.length < 8 || buf.toString('latin1', 0, 4) !== 'TSJ1') throw new Error('not a student.bin bundle');
   const n = buf.readUInt32LE(4);
-  const { config, tensors } = JSON.parse(buf.toString('utf8', 8, 8 + n));
+  if (8 + n > buf.length) throw new Error('student.bin: truncated header');
+  const { config: c, tensors } = JSON.parse(buf.toString('utf8', 8, 8 + n));
+  const bad = (what) => { throw new Error(`student.bin: bad ${what}`); };
+  if (!c || !tensors || typeof tensors !== 'object') bad('header');
+  if (!int(c.layers, 1, 24) || !int(c.hidden, 1, 2048) || !int(c.heads, 1, 64) || c.hidden % c.heads || !int(c.inter, 1, 8192)
+    || !int(c.vocab, 1, 500000) || !int(c.posOffset, 0, 8) || !(c.eps > 0 && c.eps < 1)) bad('config');
   const start = Math.ceil((8 + n) / 8) * 8;
+  const bytes = Math.max(0, buf.length - start);
+  for (const [k, t] of Object.entries(tensors)) {
+    if (!t || !SIZE[t.dtype] || !Array.isArray(t.shape) || !t.shape.length || t.shape.length > 2 || !t.shape.every((d) => int(d, 1, 1 << 24))) bad(`tensor ${k}`);
+    const len = t.shape.reduce((x, y) => x * y, 1);
+    if (!int(t.offset, 0, bytes) || t.offset % SIZE[t.dtype] || t.offset + len * SIZE[t.dtype] > bytes) bad(`tensor ${k} (outside the file)`);
+  }
+  // expected tensors: name -> [shape, allowed dtypes]
+  const { hidden: H, inter: I, vocab: V } = c;
+  const want = (name, shape, dtypes = ['f32']) => {
+    const t = tensors[name];
+    if (!t || !dtypes.includes(t.dtype) || t.shape.length !== shape.length || t.shape.some((d, j) => shape[j] !== undefined && d !== shape[j])) bad(`tensor ${name}`);
+    return t.shape;
+  };
+  const weight = (name, rows, cols, dtypes = ['i8', 'f16']) => {
+    if (want(`${name}.weight`, [rows, cols], dtypes) && tensors[`${name}.weight`].dtype === 'i8') want(`${name}.weight.scale`, [rows]);
+    want(`${name}.bias`, [rows]);
+  };
+  const ln = (name) => { want(`${name}.weight`, [H]); want(`${name}.bias`, [H]); };
+  want('embeddings.word_embeddings.weight', [V, H], ['i8']); want('embeddings.word_embeddings.weight.scale', [V]);
+  const [P] = want('embeddings.position_embeddings.weight', [undefined, H]);
+  if (P <= c.posOffset || P > 4096) bad('position embeddings');
+  want('embeddings.token_type_embeddings.weight', [undefined, H]);
+  ln('embeddings.LayerNorm');
+  for (let l = 0; l < c.layers; l++) {
+    const p = `encoder.layer.${l}`;
+    for (const k of ['attention.self.query', 'attention.self.key', 'attention.self.value', 'attention.output.dense']) weight(`${p}.${k}`, H, H);
+    weight(`${p}.intermediate.dense`, I, H); weight(`${p}.output.dense`, H, I);
+    ln(`${p}.attention.output.LayerNorm`); ln(`${p}.output.LayerNorm`);
+  }
+  for (const h of ['tool', 'intent', 'tag']) { const [O] = want(`${h}.weight`, [undefined, H]); want(`${h}.bias`, [O]); }
   // copy into an 8-aligned ArrayBuffer once (a Buffer from readFileSync may be unaligned)
-  const ab = new ArrayBuffer(buf.length - start);
+  const ab = new ArrayBuffer(bytes);
   new Uint8Array(ab).set(buf.subarray(start));
   const get = (name) => {
     const t = tensors[name];
     if (!t) throw new Error(`student.bin: missing ${name}`);
-    const len = t.shape.reduce((a, b) => a * b, 1);
+    const len = t.shape.reduce((x, y) => x * y, 1);
     return t.dtype === 'i8' ? new Int8Array(ab, t.offset, len) : t.dtype === 'f16' ? new Uint16Array(ab, t.offset, len) : new Float32Array(ab, t.offset, len);
   };
-  return { config, tensors, get };
+  return { config: c, tensors, get };
 }
 
 /** IEEE half (Uint16Array) -> Float32Array */

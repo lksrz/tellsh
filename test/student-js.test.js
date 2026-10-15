@@ -6,6 +6,8 @@ import { tmpdir } from 'node:os';
 import { buildBundle, quantRows, readSafetensors, toF16 } from '../scripts/hybrid/export_student_js.js';
 import { parseBundle, StudentModel, linear, attend, fromF16 } from '../src/rerank/student-js.js';
 import { wasmLinear } from '../src/rerank/wasm-linear.js';
+
+const SIMD = !!wasmLinear(1); // false under --jitless or without WebAssembly SIMD: the JS fallback is used
 import { findStudentDir, loadStudent } from '../src/rerank/student.js';
 
 // tiny random model (1 layer, hidden 8, 2 heads), built in-test
@@ -61,7 +63,7 @@ test('student-js: forward pass of a tiny random model matches the reference impl
   // both kernels: WebAssembly SIMD (default) and the plain-JS fallback
   for (const wasm of [true, false]) {
     const m = new StudentModel(parseBundle(bin), { wasm });
-    assert.equal(m.runtime, wasm ? 'wasm-simd' : 'js');
+    assert.equal(m.runtime, wasm && SIMD ? 'wasm-simd' : 'js');
     for (const ids of [[0, 5, 2], [1, 19, 7, 7, 3, 2, 2, 11, 2], [4]]) {
       const out = m.forward(ids); const ref = reference(t, ids);
       close(out.tool, ref.tool, 1e-4, 'tool');
@@ -82,9 +84,8 @@ test('student-js: blocked linear equals a naive matmul for odd shapes', () => {
   }
 });
 
-test('student-js: WebAssembly kernels (linear, deq, attend) equal the JS reference on realistic shapes', () => {
+test('student-js: WebAssembly kernels (linear, deq, attend) equal the JS reference on realistic shapes', { skip: !SIMD && 'no WebAssembly SIMD' }, () => {
   const k = wasmLinear(4 << 20);
-  assert.ok(k, 'WebAssembly SIMD available (Node >= 18)');
   let off = 0;
   const f32 = (len) => { const v = new Float32Array(k.buffer, off, len); off += len * 4; for (let j = 0; j < len; j++) v[j] = rnd(); return v; };
   for (const [n, K, O] of [[1, 384, 384], [7, 384, 1536], [6, 1536, 384]]) {
@@ -129,6 +130,47 @@ test('student-js: bundle format round trip (safetensors -> student.bin -> typed 
   assert.throws(() => parseBundle(Buffer.from('garbage-garbage')), /student\.bin/);
 });
 
+test('student-js: a hostile or inconsistent header is rejected before any large allocation', async () => {
+  const good = buildBundle(tiny(), { heads: NH });
+  const n = good.readUInt32LE(4);
+  const head = JSON.parse(good.toString('utf8', 8, 8 + n));
+  const start = Math.ceil((8 + n) / 8) * 8;
+  // same data blobs under a rewritten header ('LAYERS_INF' becomes the JSON number 1e309, i.e. Infinity)
+  const patch = (fn) => {
+    const h = JSON.parse(JSON.stringify(head)); fn(h);
+    const j = Buffer.from(JSON.stringify(h).replace('"LAYERS_INF"', '1e309'));
+    const s2 = Math.ceil((8 + j.length) / 8) * 8;
+    const b = Buffer.alloc(s2 + good.length - start);
+    b.write('TSJ1', 0, 'latin1'); b.writeUInt32LE(j.length, 4); j.copy(b, 8); good.copy(b, s2, start);
+    return b;
+  };
+  assert.ok(parseBundle(patch(() => {})).get('tool.weight').length > 0);
+  const cases = {
+    infinite: (h) => { h.config.layers = 'LAYERS_INF'; },
+    huge: (h) => { h.config.hidden = 1e9; },
+    heads: (h) => { h.config.heads = 3; },
+    negative: (h) => { h.config.vocab = -1; },
+    past_eof: (h) => { h.tensors['tool.weight'].offset = 1e8; },
+    unaligned: (h) => { h.tensors['tool.weight'].offset += 1; },
+    wrong_shape: (h) => { h.tensors['encoder.layer.0.intermediate.dense.weight'].shape = [I, H + 1]; },
+    wrong_dtype: (h) => { h.tensors['embeddings.LayerNorm.weight'].dtype = 'i8'; },
+    missing: (h) => { delete h.tensors['intent.bias']; },
+    big_dim: (h) => { h.tensors['tool.weight'].shape = [1e12, H]; },
+  };
+  const d = mkdtempSync(join(tmpdir(), 'tellsh-stujs-'));
+  writeFileSync(join(d, 'vocab.json'), JSON.stringify({ pieces: ['<s>', '<pad>', '</s>', '<unk>', '▁a'], scores: [0, 0, 0, 0, -1], unk: 3 }));
+  writeFileSync(join(d, 'labels.json'), JSON.stringify({ tools: ['a', 'b', 'c'], intents: ['a', 'b', 'c', 'd', 'e'], tagLabels: ['O', 'B-X', 'I-X'], context: '{shell} {os}', maxLen: 16 }));
+  for (const [name, fn] of Object.entries(cases)) {
+    const bin = patch(fn);
+    assert.throws(() => parseBundle(bin), /student\.bin/, name);
+    writeFileSync(join(d, 'student.bin'), bin);
+    assert.equal(await loadStudent({ dir: d }), null, name);
+  }
+  assert.throws(() => parseBundle(good.subarray(0, 6)), /student\.bin/);
+  const trunc = Buffer.from(good); trunc.writeUInt32LE(1e9, 4);
+  assert.throws(() => parseBundle(trunc), /truncated/);
+});
+
 test('student-js: a corrupt student.bin loads as null (A alone), never a throw', async () => {
   const d = mkdtempSync(join(tmpdir(), 'tellsh-stujs-'));
   for (const f of ['student.bin', 'vocab.json', 'labels.json']) writeFileSync(join(d, f), 'garbage');
@@ -147,7 +189,7 @@ test('student-js: real bundle answers and caches per process (skipped without st
   const f = await real.infer('gdzie jest plik docker-compose.yml?', env);
   assert.equal(f.topIntent, 'find_by_name');
   assert.ok(Array.isArray(f.tagger('gdzie jest plik docker-compose.yml?', 'find').spans));
-  assert.equal(real.kernel, 'wasm-simd');
+  assert.equal(real.kernel, SIMD ? 'wasm-simd' : 'js');
   // the lazy tagger reads a copy of the token states: later queries must not change it
   const spans = JSON.stringify(f.tagger('gdzie jest plik docker-compose.yml?', 'find').spans);
   const g = await real.infer('find files named notes.txt in /tmp', env);

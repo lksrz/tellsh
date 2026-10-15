@@ -39,8 +39,10 @@ npm i -g tellsh        # then: tellsh <request...>
 npx tellsh df          # one-off, no install
 ```
 
-Node ≥ 18, no dependencies, no network after install (except for intents that use the network themselves).
-Offline install: `npm pack` → copy `tellsh-0.2.0.tgz` (~1.1 MB) → `npm i -g ./tellsh-0.2.0.tgz`.
+Node ≥ 18, no network after install (except for intents that use the network themselves). One dependency,
+`tellsh-model-student` (data only, ~17 MB: the distilled fallback model, no native code).
+Offline install: `npm pack tellsh tellsh-model-student` → copy both tarballs → `npm i -g ./tellsh-model-student-<v>.tgz
+./tellsh-<v>.tgz`. If the model package is missing, tellsh still runs, with the cascade alone.
 
 ## Usage
 
