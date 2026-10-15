@@ -1,6 +1,6 @@
 # Changelog
 
-## 0.3.8 (unreleased)
+## Unreleased — catalog-038
 
 **New catalog templates (catalog-038):** `git diff --stat [ref]` / `git diff --name-only [ref]`,
 `git worktree list`, `pip list`, `npm outdated`. Training rows in `data/intents/g10_catalog038.jsonl` (EN + PL, with near-miss negatives); labelling
@@ -23,17 +23,29 @@ unchanged. On the private real-usage eval split (36,858 labelled rows, rebuilt w
 scores 93.66% (93.59% with the 0.3.4 templates model); human-written requests 89.23% (88.60%); template intents 87.2%
 (50.0%, n=78); every other intent 93.68% (93.68%).
 
-**Safety:** a "same but …" follow-up never turns the previous command into a different, riskier intent, whichever way
-the history reference is resolved (`src/samebut-guard.js`): `same but no discard` after `git status` used to suggest
-`git restore .`, and `same but without deleting it` after `cat config.txt` suggested `rm config.txt`; both are now refused
-with a hint to ask directly.
-
 **cmd:** a URL in a path slot keeps its slashes (`start "" "https://…"`).
 
-**Build:** training scripts synced with the pipeline that built the 0.3.5/0.3.6 models (`scripts/real/prepare_real.js
---labels 036` reproduces that split exactly); `npm run train` writes `build/model.bin` and `scripts/train.py` refuses to
-overwrite a shipped `model/` file without `--replace-shipped`; `scripts/real/eval_gate.js` (two-model gate on the private
-eval split, aggregates only).
+## 0.3.9 — repeat phrasings guarded
+
+**Safety:** the 0.3.8 same-but risk guard also covers repeat phrasings at the start of a request followed by
+"but"/"ale" (`again but without deleting it` after `cat config.txt` is no longer `rm config.txt`; `repeat it, but discard
+changes` after `git status` is refused; Polish `jeszcze raz, ale …`, `powtórz to ale …`, `jak poprzednio, ale …`). Guard
+only: these phrasings are not applied as modifiers of the previous command. Models are unchanged.
+
+## 0.3.8 — "same but" safety fix
+
+**Safety:** a "same but …" follow-up never turns the previous command into a different, riskier intent, whichever way
+the history reference is resolved (`src/samebut-guard.js`; whitespace and line breaks are folded first; a previous
+command tellsh cannot classify counts as safe). Before, `same but no discard` after any git command suggested
+`git restore .`, and `same but without deleting it` after `cat config.txt` suggested `rm config.txt` (both high risk,
+never auto-run, but one Enter away); both are now refused with a hint to ask directly. Other repeat phrasings ("again but
+without deleting it") are not recognised yet (known limit); a plain `delete it` still works. Models are unchanged.
+
+**Build (no runtime change):** training scripts synced with the pipeline that built the 0.3.5/0.3.6 models
+(`scripts/real/prepare_real.js --labels 036` reproduces that split exactly; structural split, template-generated row
+flag, private-data writer); `npm run train` writes `build/model.bin` and no longer rewrites `model/*.json`;
+`scripts/train.py` refuses to overwrite a shipped `model/` file (by inode) without `--replace-shipped`;
+`scripts/real/eval_gate.js` scores the two-model gate on the private eval split (aggregates only).
 
 ## 0.3.7 — installed-tool flag check
 

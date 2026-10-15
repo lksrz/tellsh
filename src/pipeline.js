@@ -16,7 +16,7 @@ import { CATALOG_038, fallthroughGuard } from './templates038.js';
 import { BY_ID } from './catalog.js';
 import { FAMILY_OF, NONE } from './tools.js';
 import { detectEnv, envFeatures } from './env.js';
-import { sameButRiskGuard } from './samebut-guard.js';
+import { sameButRiskGuard, sameButLast } from './samebut-guard.js';
 import { buildContext, resolveReference, hasPronoun, hasLocative, cwdFlags, sameBut, entityForSlot, isAmbiguous } from './history.js';
 import { AMB } from './shellwords.js';
 import { compose } from './compose.js';
@@ -499,7 +499,7 @@ function suggestOnce(query, opts = {}) {
   const ctxFeats = ctx && !newLast ? ctx.features : cwdFeats;
   const extras = [...envFeatures(env), ...ctxFeats];
   const ref = ctx ? resolveReference(query, ctx) : null;
-  const context = ctx ? { used: true, commands: ctx.n, rule: ref?.rule || null, note: ref?.note || null, sameButLast: sameBut(query, ctx)?.lastIntent } : { used: false };
+  const context = ctx ? { used: true, commands: ctx.n, rule: ref?.rule || null, note: ref?.note || null, sameButLast: sameButLast(query, ctx) } : { used: false };
 
   const base = { query, shell: env.shell, os: env.os, coreutils: env.coreutils, threshold: thr, context };
   if (newLast && ref?.rule !== 'same-for' && (ref || sameBut(query, ctx) || refersBack(query))) {
