@@ -2,13 +2,15 @@
 
 ## 0.3.7 (unreleased) — installed-tool flag check
 
-**Help-verifier.** Before a command is shown, its flags are checked against the help text of the tool actually
-installed (new `src/helpcheck.js`): allowlisted tools only, each with a fixed help argument (`--help`, `git <sub> -h`;
-on macOS system tools are read from their man page and never run), no shell, closed stdin, 300 ms timeout, 256 KB cap.
-The parsed options are cached per binary (realpath + size + mtime) in `$XDG_CACHE_HOME/tellsh/help`
-(`~/.cache/tellsh/help`). An unlisted flag prints a warning (`flag -x not found in your installed <tool> help`) and
-`--yes` refuses to run the command; a missing tool is noted. `--json` carries the result as `helpcheck`. Commands are
-never rewritten. `suggest()` is unchanged (the check runs in the CLI only). `TELLSH_HELPCHECK=0` turns it off.
+**Help-verifier.** Before a command is shown, its flags are checked against the man page of the tool actually
+installed (new `src/helpcheck.js`). The tool is never executed: only `man -P cat <page>` (`git-<sub>` for git) from a
+fixed absolute path, no shell, closed stdin, minimal environment, 250 ms timeout, 256 KB cap, at most 270 ms of probes
+per call. Option arguments are parsed from the page so operands are not mistaken for flags; unknown arity is never
+flagged; long options accept only a unique prefix. Option tables (and failures, for a day) are cached per binary
+(realpath + size + mtime) in `$XDG_CACHE_HOME/tellsh/help` (`~/.cache/tellsh/help`). An undocumented flag prints a
+warning (`flag -x not found in your installed <tool> man page`) and `--yes` refuses to run the command; a missing tool
+is noted. `--json` carries the result as `helpcheck`. Commands are never rewritten; commands nested in `find -exec` /
+`xargs` are not checked. `suggest()` is unchanged (the check runs in the CLI only). `TELLSH_HELPCHECK=0` turns it off.
 
 ## 0.3.6
 

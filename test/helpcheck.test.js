@@ -2,135 +2,162 @@ import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
-import { readFileSync, mkdtempSync, writeFileSync, chmodSync, readdirSync, unlinkSync } from 'node:fs';
+import { readFileSync, mkdtempSync, writeFileSync, chmodSync, readdirSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
-import { parseOptions, extractFlags, unknownFlags, toolOptions, checkCommand, which } from '../src/helpcheck.js';
+import { parseOptions, extractFlags, unknownFlags, toolOptions, checkCommand, which, findMan, TIMEOUT_MS } from '../src/helpcheck.js';
 
 const FIX = (f) => readFileSync(new URL(`./fixtures/help/${f}`, import.meta.url), 'utf8');
+const OPTS = (f) => parseOptions(FIX(f)).options;
 const BIN = fileURLToPath(new URL('../bin/tellsh.js', import.meta.url));
-const rmCache = (d) => { for (const f of readdirSync(d)) unlinkSync(join(d, f)); };
 const tmp = () => mkdtempSync(join(tmpdir(), 'tellsh-hc-'));
+const MAN = '/usr/bin/man'; // injected spawners never run it
 
-// a directory with fake executables (never run by the tests that inject a spawner)
-function fakeBin(names, body = '#!/bin/sh\necho "  -a, --all   x"\necho "  -l          y"\n') {
+// a directory with fake executables (never run: only located)
+function fakeBin(names, body = '#!/bin/sh\necho RAN > "$0.ran"\n') {
   const d = tmp();
   for (const n of names) { writeFileSync(join(d, n), body); chmodSync(join(d, n), 0o755); }
   return d;
 }
+const manSpawn = (text, calls = []) => (f, a, o) => { calls.push({ f, a, o }); return { stdout: text }; };
 
-test('parseOptions: GNU --help, BSD man, git -h, sed, tar fixtures', () => {
-  const ls = parseOptions(FIX('gnu_ls.txt'));
-  for (const o of ['-a', '--all', '-A', '--almost-all', '--color', '-h', '--human-readable', '-l', '-1']) assert.ok(ls.includes(o), o);
-  const bls = parseOptions(FIX('bsd_ls_man.txt'));
-  for (const o of ['-@', '-A', '-H', '-L', '-a', '-d', '-h', '-l', '-t', '-1', '-%', '-D', '--color']) assert.ok(bls.includes(o), o);
-  assert.ok(!bls.includes('--all'));
-  const git = parseOptions(FIX('git_status_h.txt'));
-  for (const o of ['-s', '--short', '--no-short', '--porcelain', '--branch', '--untracked-files', '-u']) assert.ok(git.includes(o), o);
-  const gsed = parseOptions(FIX('gnu_sed.txt'));
-  for (const o of ['-n', '--quiet', '--silent', '-e', '--expression', '-i', '--in-place', '-E', '-r']) assert.ok(gsed.includes(o), o);
-  const bsed = parseOptions(FIX('bsd_sed_man.txt'));
-  for (const o of ['-E', '-a', '-l', '-n', '-u', '-e', '-i']) assert.ok(bsed.includes(o), o);
-  assert.ok(!bsed.includes('-r') && !bsed.includes('--in-place'));
-  const tar = parseOptions(FIX('gnu_tar.txt'));
-  for (const o of ['-c', '-z', '-f', '-C', '--exclude', '--gzip', '--file', '--directory']) assert.ok(tar.includes(o), o);
+test('parseOptions: names and arity from GNU, BSD, git fixtures', () => {
+  const ls = OPTS('gnu_ls.txt');
+  assert.equal(ls['-a'], 'none'); assert.equal(ls['--all'], 'none'); assert.equal(ls['--color'], 'opt'); assert.equal(ls['-1'], 'none');
+  const bls = OPTS('bsd_ls_man.txt');
+  for (const o of ['-@', '-A', '-H', '-a', '-d', '-h', '-l', '-t', '-1', '-%']) assert.equal(bls[o], 'none', o);
+  assert.equal(bls['-D'], 'req'); assert.equal(bls['--color'], 'req'); assert.ok(!('--all' in bls));
+  const git = OPTS('git_status_h.txt');
+  assert.equal(git['--short'], 'none'); assert.equal(git['--no-short'], 'none'); assert.equal(git['--porcelain'], 'opt'); assert.equal(git['-u'], 'opt');
+  const gsed = OPTS('gnu_sed.txt');
+  assert.equal(gsed['-e'], 'req'); assert.equal(gsed['--expression'], 'req'); assert.equal(gsed['-i'], 'opt'); assert.equal(gsed['-n'], 'none');
+  const bsed = OPTS('bsd_sed_man.txt');
+  assert.equal(bsed['-i'], 'req'); assert.equal(bsed['-e'], 'req'); assert.equal(bsed['-E'], 'none'); assert.ok(!('-r' in bsed));
+  const tar = OPTS('gnu_tar.txt');
+  assert.equal(tar['-f'], 'req'); assert.equal(tar['-C'], 'req'); assert.equal(tar['--exclude'], 'req'); assert.equal(tar['-z'], 'none');
+  assert.deepEqual(parseOptions('     -\b-a\ba      all\n     -\b-l\bl      long').options, { '-a': 'none', '-l': 'none' });
 });
 
-test('parseOptions strips man overstrike', () => {
-  assert.deepEqual(parseOptions('     -\b-a\ba      all\n     -\b-l\bl   long'), ['-a', '-l']);
+test('extractFlags: words per allowlisted command, git subcommand, globs as null', () => {
+  assert.deepEqual(extractFlags('du -sh ./* | sort -rh | head -n 10'), [
+    { tool: 'du', words: ['-sh', null] }, { tool: 'sort', words: ['-rh'] }, { tool: 'head', words: ['-n', '10'] }]);
+  assert.deepEqual(extractFlags('git -C repo status --short -b'), [{ tool: 'git', sub: 'status', words: ['--short', '-b'] }]);
+  assert.deepEqual(extractFlags('shutdown -h now; echo -n hi'), []);
 });
 
-test('extractFlags: pipelines, combined shorts, --, git subcommands, globs', () => {
-  assert.deepEqual(extractFlags("du -sh ./* | sort -rh | head -n 10"), [
-    { tool: 'du', flags: ['-sh'] }, { tool: 'sort', flags: ['-rh'] }, { tool: 'head', flags: ['-n'] }]);
-  assert.deepEqual(extractFlags('grep -rn -- -x .'), [{ tool: 'grep', flags: ['-rn'] }]);
-  assert.deepEqual(extractFlags('git -C repo status --short -b'), [{ tool: 'git', sub: 'status', flags: ['--short', '-b'] }]);
-  assert.deepEqual(extractFlags('find . -mtime -7 -name x'), [{ tool: 'find', flags: ['-mtime', '-7', '-name'] }]);
-  assert.deepEqual(extractFlags('find . -exec du -k {} + -print | xargs -0 rm -f'), [
-    { tool: 'find', flags: ['-exec', '-print'] }, { tool: 'xargs', flags: ['-0'] }]); // rm is xargs' command
-  assert.deepEqual(extractFlags('shutdown -h now; echo -n hi'), []); // not allowlisted
-  assert.deepEqual(extractFlags('ls $OPTS --all'), [{ tool: 'ls', flags: ['--all'] }]);
+test('unknownFlags: operands, attached values, clusters, --, find -exec, xargs', () => {
+  const ls = OPTS('gnu_ls.txt');
+  assert.deepEqual(unknownFlags(['-lah', '--color=auto', '--almost'], ls), []);
+  assert.deepEqual(unknownFlags(['-lZ', '--foo=1', '-Q'], ls), ['-Z', '--foo', '-Q']);
+  assert.deepEqual(unknownFlags(['-l', '--', '-Q'], ls), []);
+  const tar = OPTS('gnu_tar.txt');
+  assert.deepEqual(unknownFlags(['-czf', '-weird.tgz', '-C', '-dir'], tar), []); // -f / -C consume their operand
+  const sort = { '-t': 'req', '-k': 'req', '-r': 'none', '-n': 'none' };
+  assert.deepEqual(unknownFlags(['-tX', '-k2,2', '-rn'], sort), []); // sort -tX: X is -t's value
+  assert.deepEqual(unknownFlags(['-t', '-Q'], sort), []);
+  assert.deepEqual(unknownFlags(['-iBAK', 's/a/b/'], OPTS('gnu_sed.txt')), []); // sed -iBAK
+  assert.deepEqual(unknownFlags(['-iBAK'], OPTS('bsd_sed_man.txt')), []);
+  const commit = { '-m': 'req', '--message': 'req', '-a': 'none' };
+  assert.deepEqual(unknownFlags(['-m', '--release'], commit), []); // git commit -m '--release'
+  assert.deepEqual(unknownFlags(['-am', '--release'], commit), []);
+  // unknown arity: the next word is not flagged, the rest of the cluster is not split
+  assert.deepEqual(unknownFlags(['-x', '--bogus', '-xQ'], { '-x': null }), []);
+  assert.deepEqual(unknownFlags(['-n', '1', '--bogus', 'echo', '--zz'], { '-n': 'req', '-0': 'none' }, { tool: 'xargs' }), ['--bogus']);
+  assert.deepEqual(unknownFlags(['.', '-xtype', 'l', '-name', 'x', '-exec', 'rm', '-Q', '{}', '+', '-print'],
+    { '-name': 'req', '-type': 'req', '-x': 'none', '-exec': 'req', '-print': 'none' }, { tool: 'find' }), ['-xtype']);
+  assert.deepEqual(unknownFlags(['-n10', '-5'], { '-n': 'req' }), []);
 });
 
-test('unknownFlags: combined, attached values, --x=v, long prefixes', () => {
-  const o = parseOptions(FIX('gnu_ls.txt'));
-  assert.deepEqual(unknownFlags(['-lah', '--color=auto', '--almost'], o), []);
-  assert.deepEqual(unknownFlags(['-lZ', '--foo=1', '-Q'], o), ['-Z', '--foo', '-Q']);
-  const t = parseOptions(FIX('gnu_tar.txt'));
-  assert.deepEqual(unknownFlags(['-czf', '-C'], t), []);
-  assert.deepEqual(unknownFlags(['-n10', '-5'], ['-n']), []);
-  assert.deepEqual(unknownFlags(['-xtype', '-name', '-x'], ['-x', '-name', '-type'], { whole: true }), ['-xtype']);
-  assert.deepEqual(unknownFlags(['-r'], parseOptions(FIX('bsd_sed_man.txt'))), ['-r']);
+test('long options: a unique prefix is accepted, an ambiguous one is flagged', () => {
+  const o = OPTS('gnu_ls_ambig.txt');
+  assert.deepEqual(unknownFlags(['--colo', '--cont'], o), []);
+  assert.deepEqual(unknownFlags(['--co'], o), ['--co']);
 });
 
-test('allowlist enforcement: a non-allowlisted tool or git subcommand is never spawned', () => {
-  const dir = fakeBin(['shutdown', 'ls', 'git']);
+test('only the absolute man is spawned, never the tool; relative PATH entries are ignored', () => {
+  const dir = fakeBin(['ls', 'git', 'shutdown']);
   const calls = [];
-  const spawn = (f, a) => { calls.push([f, a]); return { stdout: '-a --all -l' }; };
-  const env = { PATH: dir };
-  assert.equal(toolOptions('shutdown', { env, spawn, dir: tmp(), platform: 'linux' }).ok, false);
-  assert.equal(toolOptions('git', { sub: 'log', env, spawn, dir: tmp(), platform: 'linux' }).ok, false);
-  assert.equal(toolOptions('git', { sub: 'frobnicate', env, spawn, dir: tmp(), platform: 'linux' }).ok, false);
-  assert.equal(checkCommand('shutdown -h now', { shell: 'bash', os: 'linux', env, spawn, platform: 'linux', dir: tmp() }).checked, false);
-  assert.equal(calls.length, 0);
-  toolOptions('ls', { env, spawn, dir: tmp(), platform: 'linux' });
-  toolOptions('git', { sub: 'status', env, spawn, dir: tmp(), platform: 'linux' });
-  assert.deepEqual(calls.map((c) => c[1]), [['--help'], ['status', '-h']]);
+  const spawn = manSpawn(FIX('gnu_ls.txt'), calls);
+  const o = { env: { PATH: dir, SECRET: 'x' }, spawn, man: MAN };
+  assert.equal(toolOptions('shutdown', { ...o, dir: tmp() }).reason, 'tool not checked');
+  assert.equal(toolOptions('ls', { ...o, dir: tmp() }).ok, true);
+  assert.equal(toolOptions('git', { ...o, sub: 'log', dir: tmp() }).ok, true);
+  assert.equal(checkCommand('shutdown -h now', { shell: 'bash', os: 'linux', platform: 'linux', ...o, dir: tmp() }).checked, false);
+  assert.deepEqual(calls.map((c) => [c.f, c.a]), [[MAN, ['-P', 'cat', 'ls']], [MAN, ['-P', 'cat', 'git-log']]]);
+  assert.equal(calls[0].o.env.SECRET, undefined);
+  assert.equal(calls[0].o.env.MANPAGER, 'cat');
+  assert.equal(readdirSync(dir).filter((f) => f.endsWith('.ran')).length, 0);
+  // a relative man is refused, and a tool only reachable through a relative PATH entry is "not installed"
+  assert.equal(toolOptions('ls', { ...o, man: 'man', dir: tmp() }).reason, 'no man');
+  assert.equal(findMan(['man', 'bin/man']), null);
+  assert.equal(which('ls', { PATH: `.${':'}bin` }), null);
+  assert.equal(toolOptions('ls', { ...o, env: { PATH: 'relative/bin' }, dir: tmp() }).reason, 'not installed');
 });
 
-test('timeout / oversized output / probe error -> unchecked, not cached', () => {
+test('budget: no probe starts after the deadline', () => {
+  const dir = fakeBin(['ls', 'sort', 'head']);
+  let t = 0;
+  const now = () => t;
+  const calls = [];
+  const spawn = (f, a, o) => { calls.push(o.timeout); t += 200; return { stdout: FIX('gnu_ls.txt') }; };
+  const r = checkCommand('ls -l | sort | head', { shell: 'bash', os: 'linux', platform: 'linux', env: { PATH: dir }, spawn, man: MAN, dir: tmp(), budget: 250, now });
+  assert.deepEqual(calls, [250, 50]);
+  assert.equal(r.checked, true);
+  assert.equal(r.tool, 'ls, sort');
+});
+
+test('failures are cached for a day; a timeout cut short by the budget is not', () => {
   const dir = fakeBin(['ls']);
   const cache = tmp();
-  for (const error of ['timeout']) {
-    const r = toolOptions('ls', { env: { PATH: dir }, spawn: () => ({ error }), dir: cache, platform: 'linux' });
-    assert.deepEqual(r, { ok: false, reason: error });
-  }
-  assert.deepEqual(readdirSync(cache), []);
-  let big = 0;
-  const huge = () => { big++; return { error: 'output too large' }; };
-  assert.equal(toolOptions('ls', { env: { PATH: dir }, spawn: huge, dir: cache, platform: 'linux' }).reason, 'output too large');
-  assert.equal(toolOptions('ls', { env: { PATH: dir }, spawn: huge, dir: cache, platform: 'linux' }).reason, 'output too large');
-  assert.equal(big, 1);
-  rmCache(cache);
-  // a deterministic failure (no options in the text) is cached, so it does not cost a spawn on every call
+  let t = 1e12;
+  const now = () => t;
   let n = 0;
-  const empty = () => { n++; return { stdout: 'nothing here' }; };
-  assert.equal(toolOptions('ls', { env: { PATH: dir }, spawn: empty, dir: cache, platform: 'linux' }).reason, 'no options found in help');
-  assert.equal(toolOptions('ls', { env: { PATH: dir }, spawn: empty, dir: cache, platform: 'linux' }).reason, 'no options found in help');
-  assert.equal(n, 1);
+  const spawn = () => { n++; return { error: 'timeout' }; };
+  const o = { env: { PATH: dir }, spawn, man: MAN, dir: cache, now };
+  assert.equal(toolOptions('ls', { ...o, deadline: t + 100 }).reason, 'timeout');
+  assert.equal(toolOptions('ls', { ...o, deadline: t + 100 }).reason, 'timeout');
+  assert.equal(n, 2); // budget-shortened: retried
+  assert.equal(toolOptions('ls', o).reason, 'timeout'); // full TIMEOUT_MS: remembered
+  assert.equal(toolOptions('ls', o).cached, true);
+  assert.equal(n, 3);
+  t += 25 * 3600 * 1000;
+  toolOptions('ls', o);
+  assert.equal(n, 4); // expired
+  assert.ok(TIMEOUT_MS > 100);
+  let m = 0;
+  const empty = () => { m++; return { stdout: 'nothing here' }; };
+  const c2 = tmp();
+  assert.equal(toolOptions('ls', { ...o, spawn: empty, dir: c2 }).reason, 'no man page');
+  assert.equal(toolOptions('ls', { ...o, spawn: empty, dir: c2 }).reason, 'no man page');
+  assert.equal(m, 1);
 });
 
-test('real spawner: a hanging tool is killed by the timeout', () => {
-  const dir = fakeBin(['ls'], '#!/bin/sh\nsleep 5\n');
+test('real spawner: a hanging man is killed by the timeout', () => {
+  const man = join(fakeBin(['man'], '#!/bin/sh\nsleep 5\n'), 'man');
   const t = Date.now();
-  const r = toolOptions('ls', { env: { PATH: dir + ':/bin:/usr/bin' }, dir: tmp(), platform: 'linux' });
-  assert.equal(r.ok, false);
+  const r = toolOptions('ls', { env: { PATH: '/bin:/usr/bin' }, man, dir: tmp() });
+  assert.equal(r.reason, 'timeout');
   assert.ok(Date.now() - t < 2000);
 });
 
 test('cache: miss then hit, corrupt file ignored', () => {
   const dir = fakeBin(['ls']);
   const cache = tmp();
-  let n = 0;
-  const spawn = () => { n++; return { stdout: FIX('gnu_ls.txt') }; };
-  const o = { env: { PATH: dir }, spawn, dir: cache, platform: 'linux' };
+  const calls = [];
+  const o = { env: { PATH: dir }, spawn: manSpawn(FIX('gnu_ls.txt'), calls), man: MAN, dir: cache };
   assert.equal(toolOptions('ls', o).cached, false);
   assert.equal(toolOptions('ls', o).cached, true);
-  assert.equal(n, 1);
+  assert.equal(calls.length, 1);
   const [f] = readdirSync(cache);
   writeFileSync(join(cache, f), '{not json');
-  const r = toolOptions('ls', o);
-  assert.equal(r.ok, true);
-  assert.equal(r.cached, false);
-  assert.equal(n, 2);
+  assert.equal(toolOptions('ls', o).cached, false);
+  assert.equal(calls.length, 2);
 });
 
 test('checkCommand: unknown flags, not installed, disabled, other OS / shell', () => {
   const dir = fakeBin(['ls']);
-  const spawn = () => ({ stdout: FIX('bsd_ls_man.txt') });
-  const base = { shell: 'bash', os: 'linux', spawn, platform: 'linux', dir: tmp() };
+  const base = { shell: 'bash', os: 'linux', spawn: manSpawn(FIX('bsd_ls_man.txt')), man: MAN, platform: 'linux', dir: tmp() };
   const r = checkCommand('ls --all -la', { ...base, env: { PATH: dir } });
-  assert.equal(r.checked, true);
   assert.deepEqual(r.unknown.map((u) => u.flag), ['--all']);
   assert.deepEqual(checkCommand('ls -la', { ...base, env: { PATH: tmp() } }), { checked: false, reason: 'not installed', tool: 'ls', notInstalled: ['ls'] });
   assert.equal(checkCommand('ls --all', { ...base, env: { PATH: dir, TELLSH_HELPCHECK: '0' } }).reason, 'disabled');
@@ -139,30 +166,43 @@ test('checkCommand: unknown flags, not installed, disabled, other OS / shell', (
   assert.equal(checkCommand('ls --all', { ...base, platform: 'win32', env: { PATH: dir } }).checked, false);
 });
 
-// CLI: a fake `ls` (outside the system dirs, so asked for --help) whose help lacks -a / -h
+// CLI end to end, with a real man page for a fake `ls` placed outside the system dirs: <tmp>/bin/ls is documented by
+// <tmp>/share/man/man1/ls.1 (searched first through MANPATH), whose options lack -a and -h
 function cliRun(args, extraEnv) {
-  const dir = fakeBin(['ls'], '#!/bin/sh\necho "  -l   long"\necho "  -1   one per line"\n');
-  const env = { ...process.env, NO_COLOR: '1', PATH: `${dir}:${process.env.PATH}`, XDG_CACHE_HOME: tmp(), TELLSH_SHELL: 'bash', TELLSH_HYBRID: '0', ...extraEnv };
-  return spawnSync(process.execPath, [BIN, ...args], { encoding: 'utf8', env, input: '' });
+  const root = tmp();
+  const bin = join(root, 'bin');
+  spawnSync('mkdir', ['-p', bin, join(root, 'share/man/man1')]);
+  writeFileSync(join(bin, 'ls'), '#!/bin/sh\necho RAN > "$0.ran"\n');
+  chmodSync(join(bin, 'ls'), 0o755);
+  writeFileSync(join(root, 'share/man/man1/ls.1'), '.TH LS 1\n.SH OPTIONS\n.TP\n.B \\-l\nlong\n.TP\n.B \\-1\none per line\n');
+  const xdg = tmp();
+  // warm the cache with a generous timeout so a loaded test machine cannot turn the CLI's 300 ms probe into a skip
+  toolOptions('ls', { env: { PATH: bin }, dir: join(xdg, 'tellsh', 'help'), maxTimeout: 10000 });
+  const env = { ...process.env, NO_COLOR: '1', PATH: `${bin}:${process.env.PATH}`, XDG_CACHE_HOME: xdg, TELLSH_SHELL: 'bash', TELLSH_HYBRID: '0', ...extraEnv };
+  const r = spawnSync(process.execPath, [BIN, ...args], { encoding: 'utf8', env, input: '' });
+  assert.equal(readdirSync(bin).filter((f) => f.endsWith('.ran')).length, 0, 'the tool was executed');
+  return r;
 }
 
-test('CLI: unknown flags warn and --yes refuses; TELLSH_HELPCHECK=0 restores the old behaviour', () => {
+const canMan = process.platform !== 'win32' && !!which('ls') && toolOptions('ls', { dir: tmp(), maxTimeout: 10000 }).ok;
+
+test('CLI: unknown flags warn and --yes refuses; TELLSH_HELPCHECK=0 turns it off', { skip: !canMan && 'no working man here' }, () => {
   const r = cliRun(['--yes', 'list', 'all', 'files', 'including', 'hidden']);
   assert.match(r.stdout, /ls -lah/);
-  assert.match(r.stdout, /flag -a not found in your installed ls help/);
+  assert.match(r.stdout, /flag -a not found in your installed ls man page/);
   assert.match(r.stdout, /Not running/);
   assert.equal(r.status, 4);
   const j = JSON.parse(cliRun(['--json', 'list', 'all', 'files', 'including', 'hidden']).stdout);
-  assert.equal(j.helpcheck.checked, true);
-  assert.deepEqual(j.helpcheck.unknown.map((u) => u.flag), ['-a', '-h']);
+  assert.deepEqual(j.helpcheck.unknown.map((u) => u.flag), ['-a']); // the cluster stops at the first unknown letter
   const off = cliRun(['-n', 'list', 'all', 'files', 'including', 'hidden'], { TELLSH_HELPCHECK: '0' });
   assert.doesNotMatch(off.stdout, /not found in your installed/);
 });
 
-test('smoke: the real ls on this system knows -l', { skip: process.platform === 'win32' || !which('ls') }, () => {
-  const r = checkCommand('ls -l', { shell: 'bash', os: process.platform === 'darwin' ? 'darwin' : 'linux', dir: tmp() });
-  if (!r.checked) return; // man/help unavailable here (minimal container): nothing to assert
-  assert.deepEqual(r.unknown, []);
-  const bad = checkCommand('ls --tellsh-no-such-flag', { shell: 'bash', os: process.platform === 'darwin' ? 'darwin' : 'linux', dir: tmp() });
+test('smoke: the real ls man page on this system knows -l', { skip: !canMan && 'no ls man page here' }, () => {
+  const os = process.platform === 'darwin' ? 'darwin' : 'linux';
+  const dir = tmp();
+  toolOptions('ls', { dir, maxTimeout: 10000 });
+  assert.deepEqual(checkCommand('ls -l', { shell: 'bash', os, dir }).unknown, []);
+  const bad = checkCommand('ls --tellsh-no-such-flag', { shell: 'bash', os, dir });
   assert.deepEqual(bad.unknown.map((u) => u.flag), ['--tellsh-no-such-flag']);
 });

@@ -1,0 +1,6 @@
+Usage: ls [OPTION]... [FILE]...
+Synthetic sample: two long options sharing a prefix.
+
+      --color[=WHEN]         colorize
+      --context              show context
+  -l                         long listing

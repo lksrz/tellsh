@@ -1,40 +1,40 @@
-// Help-verifier (0.3.7): check the flags of a rendered command against the help text of the tool actually installed
-// (GNU vs BSD, old vs new versions). Deterministic, local, no LLM.
+// Help-verifier (0.3.7): check the flags of a rendered command against the documentation of the tool actually
+// installed (GNU vs BSD, old vs new versions). Deterministic, local, no LLM.
 //
-// Safety: a tool is only ever executed when it is on ALLOWLIST below, with the fixed help argv listed there (`-h` is
-// not help everywhere: `shutdown -h`, `ls -h`, `df -h`). No shell, stdin closed, LC_ALL=C, pagers set to cat, a short
-// timeout and an output cap; non-zero exit codes are accepted (BSD tools print usage and exit 1, `git <sub> -h` 129).
-// On macOS a tool from the system directories is read through its man page (`man -P cat <tool>`), never run; a tool
-// elsewhere on PATH (Homebrew GNU) and every tool on Linux is asked for `--help`. Windows / PowerShell / cmd / fish:
-// never checked.
+// Safety: the probed tool is NEVER executed. Only its man page is read, by `man` from a fixed list of absolute paths
+// (not PATH), argv `-P cat <page>`, no shell, stdin closed, a minimal environment (no inherited variables), a timeout
+// and an output cap. The tool itself is only located (absolute PATH entries, realpath) to tell whether it is installed
+// and to key the cache. `git <sub>` reads the page `git-<sub>`. Windows / PowerShell / cmd / fish: never checked.
 //
-// Parsed option sets are cached per binary identity (realpath + size + mtime) in $XDG_CACHE_HOME/tellsh/help or
-// ~/.cache/tellsh/help; a later call costs one stat and a small JSON read. TELLSH_HELPCHECK=0 turns it all off.
+// The check is conservative: an option whose argument count is unknown swallows the next word and ends a combined
+// cluster, so a missed warning is preferred to a false one. Commands nested in `find -exec … ;` or run by `xargs` are
+// NOT checked (their words are skipped).
+//
+// Parsed option tables (and failures, for a day) are cached per binary identity (realpath + size + mtime) in
+// $XDG_CACHE_HOME/tellsh/help or ~/.cache/tellsh/help. One CLI call spends at most BUDGET_MS on man probes in total.
+// TELLSH_HELPCHECK=0 turns it all off.
 import { spawnSync } from 'node:child_process';
-import { statSync, accessSync, realpathSync, readFileSync, writeFileSync, mkdirSync, constants as fsConstants } from 'node:fs';
+import { statSync, existsSync, accessSync, realpathSync, readFileSync, writeFileSync, mkdirSync, constants as fsConstants } from 'node:fs';
 import { homedir, tmpdir } from 'node:os';
-import { join, delimiter } from 'node:path';
+import { join, dirname, delimiter, isAbsolute } from 'node:path';
 import { createHash } from 'node:crypto';
 import { splitCommand, isAmbiguous } from './shellwords.js';
 
-export const TIMEOUT_MS = 300;
+export const TIMEOUT_MS = 250;
+export const BUDGET_MS = 270; // > TIMEOUT_MS: the first probe of a call gets a full timeout (a real one is remembered)
 export const MAX_OUTPUT = 256 * 1024;
-const CACHE_VERSION = 1;
+export const FAIL_TTL_MS = 24 * 3600 * 1000;
+export const MAN_PATHS = ['/usr/bin/man', '/bin/man'];
+const CACHE_VERSION = 2;
+const MAN_ENV_PATH = '/usr/bin:/bin:/usr/sbin:/sbin';
 
-// tools whose help is read. `--help` is used on Linux and for non-system binaries on macOS: every tool here either
-// prints help for it (GNU, busybox) or rejects the unknown option before doing anything (BSD getopt). Linux procps
-// `ps --help` is only a summary: `--help all` is the full list.
-const HELP_TOOLS = ['ls', 'grep', 'egrep', 'fgrep', 'find', 'du', 'df', 'sort', 'tar', 'sed', 'head', 'tail', 'wc', 'cut', 'uniq',
-  'cat', 'ln', 'cp', 'mv', 'rm', 'mkdir', 'chmod', 'touch', 'uname', 'shasum', 'stat', 'date', 'xargs', 'ps', 'tr', 'diff', 'zip', 'unzip', 'base64', 'file', 'free', 'uptime', 'lsof',
+// tools whose man page is read (the tool is never run)
+const TOOLS = ['ls', 'grep', 'egrep', 'fgrep', 'find', 'du', 'df', 'sort', 'tar', 'sed', 'head', 'tail', 'wc', 'cut', 'uniq',
+  'cat', 'ln', 'cp', 'mv', 'rm', 'mkdir', 'chmod', 'touch', 'uname', 'shasum', 'stat', 'date', 'xargs', 'ps', 'tr', 'diff', 'zip',
+  'unzip', 'base64', 'file', 'free', 'uptime', 'lsof',
   'gls', 'ggrep', 'gfind', 'gdu', 'gdf', 'gsort', 'gtar', 'gsed', 'ghead', 'gtail', 'gwc', 'gcut', 'gstat', 'gdate', 'gxargs'];
-export const ALLOWLIST = Object.fromEntries(HELP_TOOLS.map((t) => [t, { help: t === 'ps' ? ['--help', 'all'] : ['--help'] }]));
-// git: `git <sub> -h` prints the parse-options usage and exits 129 before touching anything (builtins win over
-// aliases). Never `git --help` (opens man / a pager). Subcommands whose -h omits the inherited diff/rev-list options
-// (log, show, diff: its -h covers only --no-index) would report false positives and are not checked.
-export const GIT_SUBS = new Set(['status', 'add', 'commit', 'branch', 'checkout', 'switch', 'restore', 'reset', 'stash',
-  'fetch', 'pull', 'push', 'clone', 'remote', 'tag', 'grep', 'ls-files', 'merge', 'rebase', 'rm', 'mv', 'clean', 'blame', 'config',
-  'init', 'describe', 'cherry-pick', 'revert']);
-const GIT_INCOMPLETE = new Set(['log', 'show', 'diff', 'whatchanged', 'shortlog', 'reflog', 'rev-list']);
+export const ALLOWLIST = new Set([...TOOLS, 'git']);
+const WHOLE_WORD = new Set(['find', 'gfind']); // `-xtype` is one primary, never `-x -t -y …`
 const SYSTEM_DIRS = /^\/(?:usr\/)?s?bin\//;
 
 export const helpcheckEnabled = (env = process.env) => !['0', 'off', 'false', 'no'].includes(String(env.TELLSH_HELPCHECK ?? '').toLowerCase());
@@ -43,97 +43,122 @@ export function cacheDir(env = process.env) {
   return join(env.XDG_CACHE_HOME || join(homedir(), '.cache'), 'tellsh', 'help');
 }
 
-/** First executable `name` on PATH -> absolute path, or null. */
+/** First executable `name` in an ABSOLUTE PATH entry -> path, or null (relative entries like `.` or `bin` are ignored). */
 export function which(name, env = process.env) {
   if (name.includes('/')) return null;
   for (const dir of (env.PATH || '').split(delimiter)) {
-    if (!dir) continue;
+    if (!dir || !isAbsolute(dir)) continue;
     const p = join(dir, name);
     try { if (statSync(p).isFile()) { accessSync(p, fsConstants.X_OK); return p; } } catch { /* next */ }
   }
   return null;
 }
 
+export const findMan = (paths = MAN_PATHS) => paths.find((p) => isAbsolute(p) && existsSync(p)) || null;
+
 const strip = (s) => String(s).replace(/[^\n]\x08/g, '').replace(/\r/g, '');
 
-/** Help / usage / man text -> sorted list of option strings ('-a', '--all', '-name'). */
-export function parseOptions(text) {
-  const t = strip(text);
-  const opts = new Set();
-  const add = (o) => { if (/^--?[A-Za-z0-9@%#?]/.test(o)) opts.add(o); };
-  // option-looking tokens anywhere (description text mentions options too: over-collecting only makes the check more
-  // lenient). A token starts after whitespace or [ ( | , and ends at = [ < or a closing bracket / punctuation.
-  for (const m of t.matchAll(/(^|[\s[(|,'"`])(--?(?:\[no-\])?[A-Za-z0-9@%#?][\w@%#?.+-]*(?:\[[^\]\s]*\])?)/gm)) {
-    let tok = m[2];
-    const inBracket = m[1] === '[';
-    tok = tok.replace(/\[=[^\]]*\]$/, '').replace(/[.,;:]+$/, '');
-    if (tok.startsWith('--[no-]')) { const n = tok.slice(7).replace(/\[.*$/, ''); add('--' + n); add('--no-' + n); continue; }
-    tok = tok.replace(/\[.*$/, '');
-    if (!tok.startsWith('--') && tok.length > 2) {
-      // a synopsis cluster `[-ABCabc1%]` lists single-letter options: add each one (the whole word as well)
-      if (inBracket) for (const c of tok.slice(1)) add('-' + c);
-      add(tok);
-    } else add(tok);
-  }
-  // a BSD synopsis cluster may include characters the token pattern stops at (`[-@ABC...%,]`)
-  for (const m of t.matchAll(/\[-([^\s\]-][^\s\]]*)\]/g)) for (const c of m[1]) if (c !== '\\' && c !== '&') opts.add('-' + c);
-  return [...opts].sort();
+// an option's argument as written in a definition (`char`, `<msg>`, `NUM`, `field1[,field2]`)
+const ARG_WORD = /^(?:<[^>]+>|[A-Za-z][\w.-]*(?:\[[^\]]*\])?|\[[^\]]+\]|#)$/;
+function noteArity(map, name, arity) {
+  if (!(name in map)) map[name] = arity;
+  else if (map[name] !== arity) map[name] = null; // contradicting definitions: unknown
 }
-
-/** Default spawner: no shell, stdin ignored, timeout and output cap. -> { stdout, error } */
-export function defaultSpawn(file, args, { env, cwd } = {}) {
-  const r = spawnSync(file, args, { stdio: ['ignore', 'pipe', 'pipe'], env, cwd, timeout: TIMEOUT_MS, maxBuffer: MAX_OUTPUT,
-    encoding: 'utf8', killSignal: 'SIGKILL' });
-  if (r.error) return { error: r.error.code === 'ETIMEDOUT' ? 'timeout' : r.error.code === 'ENOBUFS' ? 'output too large' : r.error.message };
-  return { stdout: `${r.stdout || ''}\n${r.stderr || ''}` };
-}
-
-const probeEnv = (env) => ({ PATH: env.PATH || '', HOME: env.HOME || homedir(), LC_ALL: 'C', LANG: 'C', PAGER: 'cat', MANPAGER: 'cat',
-  GIT_PAGER: 'cat', TERM: 'dumb', MANWIDTH: '120', NO_COLOR: '1' });
 
 /**
- * Option set of an installed tool (git: `{ tool: 'git', sub }`), via the cache or one allowlisted probe.
- * -> { ok: true, options, source, path } | { ok: false, reason }
+ * Man / help text -> { options: { '-a': 'none', '-t': 'req', '--color': 'opt', '-x': null, ... } }.
+ * null = the option is mentioned but its argument count is not known.
  */
-export function toolOptions(tool, { sub, env = process.env, platform = process.platform, spawn = defaultSpawn, dir = cacheDir(env) } = {}) {
-  let argv;
-  let file;
-  let source;
-  if (tool === 'git') {
-    if (!GIT_SUBS.has(sub)) return { ok: false, reason: GIT_INCOMPLETE.has(sub) ? `git ${sub} -h does not list all its options` : 'subcommand not checked' };
-  } else if (!ALLOWLIST[tool]) return { ok: false, reason: 'tool not checked' };
+export function parseOptions(text) {
+  const t = strip(text);
+  const map = {};
+  const defs = {};
+  // 1) definition lines: an option list at the start of a line (`-a, --all   …`, `-t char, --field-separator=char`,
+  //    `-m <msg>, --message=<msg>`, `--color[=WHEN]`). An argument follows after ONE space or `=`; two or more spaces
+  //    start the description. Aliases on one line share the argument (GNU writes it on the long form only).
+  for (const line of t.split('\n')) {
+    const m = line.match(/^\s{0,12}(-\S.*)$/);
+    if (!m) continue;
+    const head = m[1].split(/\s{2,}|\t/)[0];
+    const group = [];
+    let arity = 'none';
+    for (let item of head.split(/,\s+/)) {
+      if (item.startsWith('--[no-]')) { item = '--' + item.slice(7); (defs['--no-' + item.slice(2).split(/[[=\s]/)[0]] ||= new Set()).add('none'); }
+      const im = item.match(/^(--?[A-Za-z0-9@%#?][\w@%#?.+-]*?)(?:(\[=[^\]]*\]|\[[^\]]*\])|=(\S+)|\s(\S+))?(?:\s.*)?$/);
+      if (!im) break;
+      const [, name, optArg, eqArg, spArg] = im;
+      group.push(name);
+      if (optArg) arity = arity === 'req' ? 'req' : 'opt';
+      else if (eqArg || (spArg && ARG_WORD.test(spArg))) arity = 'req';
+    }
+    for (const g of group) (defs[g] ||= new Set()).add(arity);
+  }
+  for (const [k, s] of Object.entries(defs)) map[k] = s.size === 1 ? [...s][0] : null;
+  // git `--[no-]name`
+  for (const m of t.matchAll(/--\[no-\]([\w-]+)/g)) if (!defs['--' + m[1]]) { noteArity(map, '--' + m[1], 'none'); noteArity(map, '--no-' + m[1], 'none'); }
+  // 2) BSD synopsis: `[-ABCabc1%]` clusters take no argument, `[-t char]` takes one
+  for (const m of t.matchAll(/\[-([^\s\]-][^\s\]]*)\]/g)) for (const c of m[1]) if (c !== '\\' && c !== '&' && !defs['-' + c]) noteArity(map, '-' + c, 'none');
+  for (const m of t.matchAll(/\[(-[A-Za-z0-9])\s+([a-z_<][\w<>-]*)\]?/g)) if (!defs[m[1]]) noteArity(map, m[1], 'req');
+  // 3) any other option-looking token (prose): known name, unknown arity
+  for (const m of t.matchAll(/(^|[\s[(|,'"`])(--?[A-Za-z0-9@%#?][\w@%#?.+-]*)/gm)) {
+    const o = m[2].replace(/[.,;:]+$/, '');
+    if (/^--?[A-Za-z0-9@%#?]/.test(o) && !(o in map)) map[o] = null;
+  }
+  return { options: map };
+}
+
+/** Default spawner (only ever called with an absolute `man`): no shell, stdin ignored, timeout, output cap. */
+export function defaultSpawn(file, args, { env, cwd, timeout = TIMEOUT_MS } = {}) {
+  const r = spawnSync(file, args, { stdio: ['ignore', 'pipe', 'ignore'], env, cwd, timeout, maxBuffer: MAX_OUTPUT,
+    encoding: 'utf8', killSignal: 'SIGKILL' });
+  if (r.error) return { error: r.error.code === 'ETIMEDOUT' ? 'timeout' : r.error.code === 'ENOBUFS' ? 'output too large' : r.error.message };
+  return { stdout: r.stdout || '' };
+}
+
+/**
+ * Option table of an installed tool (git: `{ sub }`), from the cache or one man probe.
+ * -> { ok: true, options, cached } | { ok: false, reason }
+ */
+export function toolOptions(tool, { sub, env = process.env, spawn = defaultSpawn, dir = cacheDir(env), man = findMan(), deadline = Infinity, now = Date.now, maxTimeout = TIMEOUT_MS } = {}) {
+  if (!ALLOWLIST.has(tool)) return { ok: false, reason: 'tool not checked' };
+  if (tool === 'git' && !/^[a-z][a-z-]*$/.test(sub || '')) return { ok: false, reason: 'subcommand not checked' };
   const path = which(tool, env);
   if (!path) return { ok: false, reason: 'not installed' };
   let real;
   let st;
   try { real = realpathSync(path); st = statSync(real); } catch { return { ok: false, reason: 'not installed' }; }
-  if (tool === 'git') { file = path; argv = [sub, '-h']; source = 'help'; }
-  else if (platform === 'darwin' && SYSTEM_DIRS.test(real)) {
-    const man = which('man', env);
-    if (!man) return { ok: false, reason: 'no man' };
-    file = man; argv = ['-P', 'cat', tool]; source = 'man page';
-  } else { file = path; argv = ALLOWLIST[tool].help; source = 'help'; }
-  const label = tool === 'git' ? `git-${sub}` : tool;
-  const key = `${CACHE_VERSION}\0${real}\0${st.size}\0${st.mtimeMs}\0${file}\0${argv.join('\0')}`;
-  const cfile = join(dir, `${label.replace(/[^\w.-]/g, '_')}-${createHash('sha1').update(key).digest('hex').slice(0, 16)}.json`);
+  if (!man || !isAbsolute(man)) return { ok: false, reason: 'no man' };
+  const page = tool === 'git' ? `git-${sub}` : tool;
+  const key = `${CACHE_VERSION}\0${real}\0${st.size}\0${st.mtimeMs}\0${man}\0${page}`;
+  const cfile = join(dir, `${page.replace(/[^\w.-]/g, '_')}-${createHash('sha1').update(key).digest('hex').slice(0, 16)}.json`);
   try {
     const c = JSON.parse(readFileSync(cfile, 'utf8'));
-    if (c && c.key === key && typeof c.fail === 'string') return { ok: false, reason: c.fail };
-    if (c && c.key === key && Array.isArray(c.options) && c.options.every((o) => typeof o === 'string')) return { ok: true, options: c.options, source: c.source, path, cached: true };
+    if (c && c.key === key && typeof c.fail === 'string' && now() - c.at < FAIL_TTL_MS) return { ok: false, reason: c.fail, cached: true };
+    if (c && c.key === key && c.options && typeof c.options === 'object' && !Array.isArray(c.options)) return { ok: true, options: c.options, cached: true };
   } catch { /* missing or corrupt: probe again */ }
-  const r = spawn(file, argv, { env: probeEnv(env), cwd: tmpdir() });
-  const save = (data) => { try { mkdirSync(dir, { recursive: true }); writeFileSync(cfile, JSON.stringify({ key, tool: label, source, ...data })); } catch { /* read-only cache: fine */ } };
-  // a timeout may be a cold disk: tried again next time; an oversized or option-less text is remembered for this binary
-  if (!r || r.error) { if (r?.error === 'output too large') save({ fail: r.error }); return { ok: false, reason: r?.error || 'probe failed' }; }
-  const options = parseOptions(r.stdout);
-  if (options.length < 2) { save({ fail: 'no options found in help' }); return { ok: false, reason: 'no options found in help' }; }
+  const left = deadline - now();
+  if (left <= 0) return { ok: false, reason: 'budget' };
+  const timeout = Math.min(maxTimeout, left);
+  const menv = { PATH: MAN_ENV_PATH, MANPAGER: 'cat', PAGER: 'cat', LC_ALL: 'C', TERM: 'dumb', MANWIDTH: '200' };
+  // a tool outside the system dirs (Homebrew, /opt) is documented next to its bin/: that man dir is searched first
+  if (!SYSTEM_DIRS.test(real)) menv.MANPATH = `${join(dirname(dirname(real)), 'share', 'man')}:`;
+  const r = spawn(man, ['-P', 'cat', page], { env: menv, cwd: tmpdir(), timeout });
+  const save = (data) => { try { mkdirSync(dir, { recursive: true }); writeFileSync(cfile, JSON.stringify({ key, page, ...data })); } catch { /* read-only cache: fine */ } };
+  if (!r || r.error) {
+    const reason = r?.error || 'probe failed';
+    // a timeout cut short by this call's budget says nothing about the page: not remembered
+    if (reason !== 'timeout' || timeout >= maxTimeout) save({ fail: reason, at: now() });
+    return { ok: false, reason };
+  }
+  const { options } = parseOptions(r.stdout);
+  if (Object.keys(options).length < 2) { save({ fail: 'no man page', at: now() }); return { ok: false, reason: 'no man page' }; }
   save({ options });
-  return { ok: true, options, source, path, cached: false };
+  return { ok: true, options, cached: false };
 }
 
 /**
- * Flags used by each allowlisted simple command of `command` (POSIX shells).
- * -> [{ tool, sub?, flags: [...] }]. Words after `--` and words with expansions/globs are skipped.
+ * Words of each allowlisted simple command of `command` (POSIX shells): [{ tool, sub?, words }]. A word with an
+ * expansion or glob is null (an operand, never flagged).
  */
 export function extractFlags(command) {
   const r = splitCommand(command, 'posix');
@@ -141,86 +166,92 @@ export function extractFlags(command) {
   const out = [];
   for (const seg of r.segments) {
     const w = seg.words;
-    if (!w.length || isAmbiguous(w[0])) continue;
+    if (!w.length || isAmbiguous(w[0]) || !ALLOWLIST.has(w[0])) continue;
     let i = 1;
     let sub;
-    const tool = w[0];
-    if (tool === 'git') {
+    if (w[0] === 'git') {
       while (i < w.length && typeof w[i] === 'string' && w[i].startsWith('-')) i += w[i] === '-C' || w[i] === '-c' ? 2 : 1;
       sub = w[i++];
       if (!sub || isAmbiguous(sub)) continue;
-    } else if (!ALLOWLIST[tool]) continue;
-    const flags = [];
-    for (; i < w.length; i++) {
-      const a = w[i];
-      if (isAmbiguous(a)) continue;
-      if (a === '--') break;
-      // the words of a command run by find -exec / xargs belong to that command
-      if (tool === 'find' && /^-(?:exec|execdir|ok|okdir)$/.test(a)) {
-        flags.push(a);
-        while (i + 1 < w.length && w[i + 1] !== ';' && w[i + 1] !== '+') i++;
-        continue;
-      }
-      if (tool === 'xargs' && a[0] !== '-') break;
-      if (a.length < 2 || a[0] !== '-') continue;
-      flags.push(a);
     }
-    out.push(sub ? { tool, sub, flags } : { tool, flags });
+    const words = w.slice(i).map((a) => (isAmbiguous(a) ? null : a));
+    out.push(sub ? { tool: w[0], sub, words } : { tool: w[0], words });
   }
   return out;
 }
 
-/** Flags of `flags` the option list does not know (combined shorts `-lah`, attached values `-n10`, `--x=v`). */
-export function unknownFlags(flags, options, { whole = false } = {}) {
-  const set = new Set(options);
-  const longs = options.filter((o) => o.startsWith('--'));
+// a long option: exact name or a UNIQUE prefix (getopt_long); ambiguous or unknown -> null
+function resolveLong(name, options) {
+  if (name in options) return name;
+  const hits = Object.keys(options).filter((o) => o.startsWith('--') && o.startsWith(name));
+  return hits.length === 1 ? hits[0] : null;
+}
+
+/** Unknown flags among `words` (one simple command's arguments), given its option table. */
+export function unknownFlags(words, options, { tool } = {}) {
   const bad = [];
-  for (const f of flags) {
-    const name = f.split('=')[0];
-    if (set.has(name)) continue;
-    if (/^-\d/.test(f)) continue; // a negative number / relative value (`-n -5`, `-mtime -7`), not a known option
-    if (name.startsWith('--')) {
-      // getopt_long accepts an unambiguous prefix
-      if (name.length > 3 && longs.some((o) => o.startsWith(name))) continue;
-      bad.push(name);
+  const whole = WHOLE_WORD.has(tool);
+  for (let i = 0; i < words.length; i++) {
+    const a = words[i];
+    if (a == null) continue;
+    if (a === '--') break;
+    if (a.length < 2 || a[0] !== '-') {
+      if (tool === 'xargs' || tool === 'gxargs') break; // the command xargs runs is not checked
       continue;
     }
-    if (whole) { bad.push(name); continue; } // find: `-xtype` is one primary, never `-x -t -y ...`
-    const cs = f.slice(1);
-    if (!set.has('-' + cs[0])) { bad.push(name); continue; } // `-x`, or a find-style `-primary`
-    for (let j = 1; j < cs.length; j++) {
-      if (set.has('-' + cs[j])) continue;
-      if (!/[A-Za-z]/.test(cs[j])) break; // an attached value (`-n10`, `-t,`, `-k2,2`)
-      bad.push('-' + cs[j]);
+    // the command run by find -exec / -ok is not checked: skip to its `;` / `+`
+    if (whole && /^-(?:exec|execdir|ok|okdir)$/.test(a)) { while (i + 1 < words.length && words[i + 1] !== ';' && words[i + 1] !== '+') i++; i++; continue; }
+    if (a.startsWith('--')) {
+      const name = a.split('=')[0];
+      const r = resolveLong(name, options);
+      if (!r) { bad.push(name); continue; }
+      if (!a.includes('=') && (options[r] === 'req' || options[r] == null)) i++; // its operand (or possibly one: arity unknown)
+      continue;
+    }
+    if (a in options) { if (options[a] === 'req' || options[a] == null) i++; continue; }
+    if (/^-\d/.test(a)) continue; // a negative number / relative value (`-n -5`, `-mtime -7`)
+    if (whole) { bad.push(a); continue; }
+    const cs = a.slice(1);
+    for (let j = 0; j < cs.length; j++) {
+      const o = '-' + cs[j];
+      if (!(o in options)) {
+        if (j === 0 || /[A-Za-z]/.test(cs[j])) bad.push(o);
+        break; // what follows an unknown option cannot be read
+      }
+      const ar = options[o];
+      if (ar === 'none') continue;
+      // takes a value (the attached remainder, or the next word), or its arity is unknown: the cluster ends here
+      if (j === cs.length - 1 && ar !== 'opt') i++;
+      break;
     }
   }
   return [...new Set(bad)];
 }
 
 /**
- * Check a final suggestion against the installed tools. Runs only for POSIX shells on the OS tellsh runs on.
- * -> { checked: true, tool, unknown, source, notInstalled? } | { checked: false, reason, tool?, notInstalled? }
+ * Check a final suggestion against the installed tools' man pages. POSIX shells on the OS tellsh runs on only.
+ * -> { checked: true, tool, unknown: [{ tool, flag, source }], notInstalled? } | { checked: false, reason, tool?, notInstalled? }
  */
-export function checkCommand(command, { shell, os, env = process.env, platform = process.platform, spawn = defaultSpawn, dir } = {}) {
+export function checkCommand(command, { shell, os, env = process.env, platform = process.platform, spawn = defaultSpawn, dir, man = findMan(), budget = BUDGET_MS, now = Date.now } = {}) {
   if (!helpcheckEnabled(env)) return { checked: false, reason: 'disabled' };
   if (platform === 'win32' || !['bash', 'zsh', 'sh'].includes(shell)) return { checked: false, reason: 'shell not checked' };
   const realOs = platform === 'darwin' ? 'darwin' : 'linux';
   if (os && os !== realOs) return { checked: false, reason: 'rendered for another OS' };
-  const parts = extractFlags(command);
+  const deadline = now() + budget;
   let first = null;
   const unknown = [];
   const tools = [];
   const notInstalled = [];
-  for (const p of parts) {
+  for (const p of extractFlags(command)) {
     const label = p.sub ? `git ${p.sub}` : p.tool;
-    const r = toolOptions(p.tool, { sub: p.sub, env, platform, spawn, dir: dir || cacheDir(env) });
+    const r = toolOptions(p.tool, { sub: p.sub, env, spawn, dir: dir || cacheDir(env), man, deadline, now });
     if (!r.ok) {
       if (r.reason === 'not installed' && !notInstalled.includes(p.tool)) notInstalled.push(p.tool);
       first ??= { checked: false, reason: r.reason, tool: label };
       continue;
     }
     tools.push(label);
-    for (const f of unknownFlags(p.flags, r.options, { whole: p.tool === 'find' || p.tool === 'gfind' })) unknown.push({ tool: label, flag: f, source: r.source });
+    for (const f of unknownFlags(p.words, r.options, { tool: p.tool })) unknown.push({ tool: label, flag: f, source: 'man page' });
   }
   const extra = notInstalled.length ? { notInstalled } : {};
   if (!tools.length) return { ...(first || { checked: false, reason: 'no checked tool' }), ...extra };
