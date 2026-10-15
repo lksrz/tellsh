@@ -3,26 +3,32 @@
 ## 0.3.8 (unreleased)
 
 **New catalog templates (catalog-038):** `git diff --stat [ref]` / `git diff --name-only [ref]` (`--cached` for staged
-changes), `git show --stat <ref>` (default `HEAD`; `HEAD~1` for "the previous commit"), `git worktree list`, create a
-virtualenv (always `python3 -m venv .venv`), `pip list`, `npm outdated`. Training rows in
-`data/intents/g10_catalog038.jsonl` (EN + PL, with near-miss negatives); labelling patterns for the real-usage split in
-`scripts/real/prepare_real.js`. Values come only from the request text (a value starting with `-`, or one the request does
-not literally contain, e.g. a revision from history, is withheld; a venv name or path other than `.venv` is withheld; an
-explicit revision plus "previous" / "parent" is withheld), and a request the template cannot fully express is withheld
-(`src/templates038.js`). These 7 go through the same two-model gate as the 0.3.4 templates (`NEW_TEMPLATE_INTENTS`).
-**Not in this release:** opening a file / URL (`open`), a local HTTP server (`http.server`), pretty-printing JSON (`jq`)
-and `git worktree add` keep catalog entries and training rows but are never answered from the templates model
-(`NOT_GATED` in `src/pipeline.js`); those requests, and the disabled 0.3.4 `git grep` / `git show`, get the same answer
-as in 0.3.7 (the 0.3.3 model). `model/model_templates.bin` is retrained (catalog + the structural real-usage
-train split); `model/model.bin` (0.3.3) is unchanged. On the private real-usage eval split (36,858 labelled rows, rebuilt
-with the 0.3.4 + 0.3.8 labels), the gate scores 93.66% (93.59% with the 0.3.4 templates model); human-written
-requests 89.20% (88.60%); template intents 87.2% (50.0%, n=78); every other intent 93.67% (93.68%; 8 of 36,780 rows
-answered with a template intent instead of 3).
+changes), `git show --stat <ref>` (default `HEAD`; `HEAD~1` for "the previous commit"), `git worktree list`, `pip list`,
+`npm outdated`. Training rows in `data/intents/g10_catalog038.jsonl` (EN + PL, with near-miss negatives); labelling
+patterns for the real-usage split in `scripts/real/prepare_real.js`. Values come only from the request text (a value
+starting with `-`, or one the request does not literally contain, e.g. a revision from history, is withheld; an explicit
+revision plus "previous" / "parent" is withheld), and a request the template cannot fully express is withheld
+(`src/templates038.js`). They go through the same two-model gate as the 0.3.4 templates (`NEW_TEMPLATE_INTENTS`); a
+template answer is never replaced by a composed command.
+**Not in this release:** opening a file / URL (`open`), a local HTTP server (`http.server`), pretty-printing JSON
+(`jq`), `git worktree add` and creating a virtualenv keep catalog entries and training rows but are never answered from
+the templates model (`NOT_GATED` in `src/pipeline.js`): those requests get the same answer as in 0.3.7.
+`model/model_templates.bin` is retrained (catalog + the structural real-usage train split); `model/model.bin` (0.3.3) is
+unchanged. On the private real-usage eval split (36,858 labelled rows, rebuilt with the 0.3.4 + 0.3.8 labels) the gate
+scores 93.66% (93.59% with the 0.3.4 templates model); human-written requests 89.23% (88.60%); template intents 87.2%
+(50.0%, n=78); every other intent 93.68% (93.68%).
 
-**Safety:** a "same but …" follow-up never turns the previous command into a different, riskier intent: `same but no
-discard` after `git status` used to suggest `git restore .` (high risk); it is now refused with a hint to ask directly.
+**Safety:** a "same but …" follow-up never turns the previous command into a different, riskier intent, whichever way
+the history reference is resolved (`src/samebut-guard.js`): `same but no discard` after `git status` used to suggest
+`git restore .`, and `same but without deleting it` after `cat config.txt` suggested `rm config.txt`; both are now refused
+with a hint to ask directly.
 
 **cmd:** a URL in a path slot keeps its slashes (`start "" "https://…"`).
+
+**Build:** training scripts synced with the pipeline that built the 0.3.5/0.3.6 models (`scripts/real/prepare_real.js
+--labels 036` reproduces that split exactly); `npm run train` writes `build/model.bin` and `scripts/train.py` refuses to
+overwrite a shipped `model/` file without `--replace-shipped`; `scripts/real/eval_gate.js` (two-model gate on the private
+eval split, aggregates only).
 
 ## 0.3.7 — installed-tool flag check
 
