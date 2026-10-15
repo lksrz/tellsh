@@ -4,6 +4,7 @@ import { extractSlots, pickArg, pickDest, pickDir, foldKeepLength, isStopWord } 
 import { checkDanger, maxRisk, plainSlotValue } from './danger.js';
 import { protectedNumbers } from './guards.js';
 import { shQuote, psQuote, chooseTemplate, quoteForKind, UnquotableError, pwshNativeSlots, unsafeNativePwshArg } from './render.js';
+import { IS_038, slots038, withhold038 } from './templates038.js';
 
 export { shQuote };
 
@@ -14,6 +15,7 @@ export const RAW_OK = {
   days: (v) => /^\d{1,5}$/.test(String(v)),
   pid: (v) => /^\d{1,7}$/.test(String(v)),
   port: (v) => /^\d{1,5}$/.test(String(v)) && +v > 0 && +v < 65536,
+  cached: (v) => v === '--cached',
   // ssh -L LOCAL:RHOST:RPORT: the remote end of a tunnel (a host name, an IPv4 address or a bracketed IPv6 address)
   rport: (v) => /^\d{1,5}$/.test(String(v)) && +v > 0 && +v < 65536,
   rhost: (v) => /^(?!-)[A-Za-z0-9](?:[\w.-]{0,252})$|^\[[0-9A-Fa-f:.]{2,45}\]$/.test(String(v)),
@@ -1112,6 +1114,7 @@ const NPM_BUILTIN = /^(?:publish|unpublish|audit|update|upgrade|uninstall|remove
 const REF_TOKEN = /(?:^|\s)((?:HEAD|@)(?:[~^]\d*)*|(?=[0-9a-f]*\d)[0-9a-f]{7,40}|v\d+(?:\.\d+)*)(?=[\s,.;:!?]|$)/;
 /** Explicit values only for the 0.3.4 templates (git show/fetch/grep, gh issue/run, wrangler pages deploy). */
 export function newTemplateSlots(id, text, v, quoted) {
+  if (IS_038.has(id)) return slots038(id, text, v, quoted);
   let t = text.trim();
   if (id === 'git_show') {
     delete v.branch; delete v.rev;
@@ -1198,6 +1201,7 @@ const UNIT_AFTER = /^\s*-?(?:comments?|labels?|assignees?|reactions?|commits?|fi
 // release (branch feat/templates-grep-show); set TELLSH_ENABLE_GREP_SHOW=1 only in development to exercise it.
 export const DISABLED_TEMPLATES = new Set(process.env.TELLSH_ENABLE_GREP_SHOW === '1' ? [] : ['git_grep', 'git_show']);
 export function newTemplateWithhold(id, text, slots = {}, command = null) {
+  if (IS_038.has(id)) return withhold038(id, text, slots);
   const t = String(text);
   if (DISABLED_TEMPLATES.has(id)) return [`${id === 'git_grep' ? 'pattern' : 'rev'} (template disabled in this release)`];
   const out = [];

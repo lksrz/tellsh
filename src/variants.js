@@ -608,6 +608,12 @@ export const VARIANTS = {
   git_ls_files: { pwsh: 'git ls-files', cmd: 'git ls-files' },
   // a bare `--` can be swallowed by PowerShell before reaching native commands; quote it
   git_grep: { pwsh: "git grep -n '--' {pattern}", cmd: 'git grep -n -- {pattern}' },
+  // catalog-038
+  git_diff_stat: { pwsh: 'git diff«{cached!raw}» --stat«{rev}»', cmd: 'git diff«{cached!raw}» --stat«{rev}»' },
+  git_diff_names: { pwsh: 'git diff«{cached!raw}» --name-only«{rev}»', cmd: 'git diff«{cached!raw}» --name-only«{rev}»' },
+  git_show_files: { pwsh: 'git show --stat {rev}', cmd: 'git show --stat {rev}' },
+  git_worktree_list: { pwsh: 'git worktree list', cmd: 'git worktree list' },
+  git_worktree_add: { pwsh: 'git worktree add {path} {branch}', cmd: 'git worktree add {path} {branch}' },
 
   // ---------- docker ----------
   docker_ps: { pwsh: 'docker ps', cmd: 'docker ps' },
@@ -657,6 +663,15 @@ export const VARIANTS = {
   gh_pr_merge: { pwsh: 'gh pr merge«{pr!raw}»«--repo {repo!raw}»«{delbranch!raw}»«{scope!raw}»', cmd: 'gh pr merge«{pr!raw}»«--repo {repo!raw}»«{delbranch!raw}»«{scope!raw}»' },
   gh_run_list: { pwsh: 'gh run list«--repo {repo!raw}»«{args!raw}»', cmd: 'gh run list«--repo {repo!raw}»«{args!raw}»' },
   gh_run_view: { pwsh: 'gh run view«{num!raw}»«--repo {repo!raw}»«{scope!raw}»', cmd: 'gh run view«{num!raw}»«--repo {repo!raw}»«{scope!raw}»' },
+  // catalog-038: `py` on Windows, as pip_install
+  venv_create: { pwsh: { win: 'py -m venv {path}', unix: 'python3 -m venv {path}' }, cmd: 'py -m venv {path}' },
+  pip_list: { pwsh: { win: 'py -m pip list', unix: 'python3 -m pip list' }, cmd: 'py -m pip list' },
+  npm_outdated: { pwsh: 'npm outdated', cmd: 'npm outdated' },
+  http_server: { pwsh: { win: 'py -m http.server {port!raw} --bind 127.0.0.1', unix: 'python3 -m http.server {port!raw} --bind 127.0.0.1' }, cmd: 'py -m http.server {port!raw} --bind 127.0.0.1' },
+  json_pretty: { pwsh: 'Get-Content -LiteralPath {file} -Raw | ConvertFrom-Json | ConvertTo-Json -Depth 100', cmd: 'py -m json.tool {file}' },
+  // `start` takes a first quoted argument as the window title: the empty title keeps a quoted file name the file
+  // Invoke-Item opens a file with its default app but cannot open a URL; Start-Process can (the checker rates it high: a wrapper)
+  open_file: { pwsh: (s, q) => `${/^https?:\/\//i.test(String(s.file)) ? 'Start-Process' : 'Invoke-Item -LiteralPath'} ${q(s.file, { name: 'file' })}`, cmd: 'start "" {file}' },
   activate_venv: {
     fish: 'source {path}/bin/activate.fish',
     pwsh: { win: "& (Join-Path {path} 'Scripts/Activate.ps1')", unix: "& (Join-Path {path} 'bin/Activate.ps1')" },

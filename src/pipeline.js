@@ -12,6 +12,7 @@ import { cascade } from './cascade.js';
 import { tag, exFromSpans } from './tagger.js';
 import { extractSlots, pickArg, isOptionWord, foldKeepLength, isStopWord } from './slots.js';
 import { resolveSlots, buildCommand, finalizeSlots, RAW_OK, newTemplateWithhold } from './fill.js';
+import { CATALOG_038 } from './templates038.js';
 import { BY_ID } from './catalog.js';
 import { FAMILY_OF, NONE } from './tools.js';
 import { detectEnv, envFeatures } from './env.js';
@@ -416,7 +417,8 @@ function literalIntentOk(first, intent) { const f = LIT_FAMILY[String(first).toL
 // 0.3.4 two-model gate: the 0.3.3 model (model/model.bin) answers everything it already knew; the retrained model
 // (model/model_templates.bin) is used only when it picks one of the new 0.3.4 template intents, so a retrain can never
 // change the pre-existing intents (their classification and slots stay exactly as on 0.3.3).
-export const NEW_TEMPLATE_INTENTS = new Set(['git_fetch', 'git_ls_files', 'gh_run_watch', 'gh_issue_list', 'gh_issue_view', 'wrangler_d1_list', 'wrangler_pages_deploy', 'git_grep', 'git_show']);
+// catalog-038: the 0.3.8 templates (src/templates038.js) are gated the same way; they are answered once the templates model knows them
+export const NEW_TEMPLATE_INTENTS = new Set(['git_fetch', 'git_ls_files', 'gh_run_watch', 'gh_issue_list', 'gh_issue_view', 'wrangler_d1_list', 'wrangler_pages_deploy', 'git_grep', 'git_show', ...CATALOG_038]);
 const TEMPLATES_MODEL = fileURLToPath(new URL('../model/model_templates.bin', import.meta.url));
 let templatesModel;
 function getTemplatesModel() {

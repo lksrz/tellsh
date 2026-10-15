@@ -133,7 +133,7 @@ The intent and slots are shared; only the rendering differs (`src/render.js`, va
 
 | shell | status | notes |
 |---|---|---|
-| bash, zsh | **v1** | all 173 intents; every render passes `bash -n` in tests (zsh has no checker here) |
+| bash, zsh | **v1** | all 193 intents; every render passes `bash -n` in tests (zsh has no checker here) |
 | sh (dash / busybox) | **v1** | POSIX-only templates; tests run `sh -n` (dash) and `busybox sh -n`; busybox variants for 24 intents (no `ps --sort`, `find -printf`, …) |
 | PowerShell (7, mostly 5.1) | **v1** | real cmdlets (`Get-ChildItem`, `Get-Process`, `Stop-Process`, `Get-NetTCPConnection`, …) for 170/173 on Windows; on Linux/macOS native tools or `bash -c '…'`; gaps: chmod, chmod +x, cal on Windows |
 | fish | best effort | POSIX template with fish quoting + fish overrides (`string join \n $PATH`, history, …); not syntax-checked (fish not installed in CI) |
@@ -145,6 +145,15 @@ The intent and slots are shared; only the rendering differs (`src/render.js`, va
   `$SHELL`, `TELLSH_SHELL`; `--shell` / `--os` override. `--shell cmd` implies Windows.
 
 ### Developer tools (v0.4)
+
+**New templates (0.3.8, unreleased)**: `git diff --stat [ref]` (`--cached` for staged changes), `git diff --name-only
+[ref]`, `git show --stat <ref>` (`HEAD` by default: "which files changed in the last commit"), `git worktree list`,
+`git worktree add <path> <branch>`, pretty-printing a JSON file (`jq . <file>`; PowerShell `ConvertFrom-Json |
+ConvertTo-Json -Depth 100`; cmd `py -m json.tool`), a local HTTP server (`python3 -m http.server 8000 --bind 127.0.0.1`,
+`py` on Windows), creating a virtualenv (`python3 -m venv .venv`), opening a file or URL with its default app (`open` on
+macOS, `xdg-open` on Linux, `Invoke-Item` / `Start-Process` in PowerShell, `start ""` in cmd), `pip list` (`python3 -m pip
+list`) and `npm outdated`. They are answered by the templates model once it is retrained with
+`data/intents/g10_catalog038.jsonl`; until then the shipped models never pick them.
 
 **New templates (0.3.4)** (ranked by frequency in real command usage): `git fetch --all`, `git ls-files`,
 `gh run watch [id]`, `gh issue list`, `gh issue view <n>`, `npx wrangler d1 list`,
@@ -413,7 +422,7 @@ the public sets for a large gain on real usage (before/after tables for A, A+B a
 | stage 1 tool family top-1 / top-3 (`data/eval`, 2384 EN+PL) | **96.9% / 99.8%** |
 | stage 2 intent top-1 (EN / PL) | **95.4%** (95.2% / 95.6%); v0.3: 95.6% |
 | per shell, intent top-1 (bash · zsh · sh · PowerShell · fish · cmd) | 95.4 · 95.6 · 95.6 · 95.4 · 95.1 · 95.1% |
-| renders passing `bash -n` / `sh -n` | all 173 intents × 5 POSIX envs in `npm test` |
+| renders passing `bash -n` / `sh -n` | all 193 intents × 5 POSIX envs in `npm test` |
 | slot F1, hand-annotated gold (tagger + regex fallback / tagger / regex) | **96.3%** / 94.6% / 95.4% |
 | end-to-end exact command, relexicalised held-out values (full pipeline / gold intent) | **83.4%** / 92.6% (v0.3: 85.3%) |
 | blind sets (v0.3, separate author): intent top-1 · end-to-end exact command | 98.8% (clean subset 98.5%) · 95.7% |
@@ -478,6 +487,14 @@ retrain; `npm test && npm run eval`.
   explicit number (`issue 42`, `#42`); `gh run watch` takes one (`run 123`) or none (gh then asks which run), and some
   phrasings (`watch the latest workflow run`) are withheld with `<NUM>`; `wrangler pages deploy` needs the directory named (no `dist`
   default).
+* **New 0.3.8 templates take only explicit values.** A revision, worktree path / branch, JSON file, port or venv name
+  is used only when the request names it (otherwise the default: `HEAD`, port 8000, `.venv`, or a `<PATH>` / `<BRANCH>` /
+  `<FILE>` placeholder). A request with a word, option, exclusion or second action the template cannot express
+  (`only for src`, `on the network`, `and update them`, `-w`) is withheld (shown, never run on Enter or `--yes`). The HTTP
+  server always binds to 127.0.0.1; `open` of a program or script (`.exe`, `.sh`, `.app`, …) is withheld because it would
+  run it. `open_file`, `http_server`, `git worktree add`, `venv_create`, `pip list` and `npm outdated` are rated medium,
+  so `--yes` never runs them; opening a URL in PowerShell (`Start-Process`) is rated high. History after one of them is
+  handled like after a 0.3.4 template (below).
 * **History after a 0.3.4 template is replayed only as "same for X".** When the previous command is one of the new
   templates (`git fetch`, `git ls-files`, `gh issue list` / `view`, `gh run watch`, `wrangler d1 list`, `wrangler pages
   deploy`, and also `git grep` / `git show`), a follow-up that refers to it (`it`, `there`, `same but …`, `again`, `them`, …) is refused, and that line adds

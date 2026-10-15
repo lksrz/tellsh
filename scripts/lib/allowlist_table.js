@@ -9,7 +9,7 @@ const V = { path: 'zqdir', file: 'zqf.txt', src: 'zqa.txt', dst: 'zqb.txt', dest
   age: '-mtime -3', days: 3, since: '3 days ago', port: 8080, pid: 1234, mode: '755', var: 'ZQVAR', name: 'zqname', service: 'zqsvc',
   container: 'zqctr', pkg: 'zqpkg', cmd: 'zqcmd', branch: 'zqbranch', user: 'zquser', pattern: 'zqpat', host: 'zqhost.example',
   target: 'zqhost.example', message: 'zqmsg', url: 'https://zq.example/r.git', text: 'zqtext', ext: 'log', old: 'zqold', new: 'zqnew',
-  start: 1, end: 5, num: 7, state: 'all', pr: '12', repo: 'zqo/zqr', wenv: 'zqenv', dryrun: '--dry-run', delbranch: '--delete-branch', script: 'zqscript', workspace: 'zqws', piptarget: 'zqpipdir', rhost: 'zqrhost.example', rport: 9090,
+  start: 1, end: 5, num: 7, state: 'all', cached: '--cached', rev: 'zqrev', pr: '12', repo: 'zqo/zqr', wenv: 'zqenv', dryrun: '--dry-run', delbranch: '--delete-branch', script: 'zqscript', workspace: 'zqws', piptarget: 'zqpipdir', rhost: 'zqrhost.example', rport: 9090,
   glob: '*.log', minutes: 5, sizeBytes: 1000 };
 const ENVS = [
   { shell: 'bash', os: 'linux', coreutils: 'gnu' }, { shell: 'zsh', os: 'darwin', coreutils: 'bsd' }, { shell: 'bash', os: 'darwin', coreutils: 'bsd' },

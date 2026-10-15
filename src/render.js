@@ -75,7 +75,8 @@ export function cmdQuote(value, { tilde: expand = true, attached = false } = {})
   if (/^\//.test(s) && !attached) throw new SwitchValueError(`value ${JSON.stringify(String(value))} starts with / and would be read as a cmd.exe switch`);
   // Windows paths: / -> \ (an unquoted foo/q could be read as foo /q by built-ins); other values that
   // contain / are double-quoted
-  if (expand || /^[A-Za-z]:|%USERPROFILE%/.test(s)) s = s.replace(/\//g, '\\');
+  // (a URL in a path slot, `start "" https://…`, keeps its slashes)
+  if ((expand && !/^[a-z][a-z0-9+.-]*:\/\//i.test(s)) || /^[A-Za-z]:|%USERPROFILE%/.test(s)) s = s.replace(/\//g, '\\');
   // an expanded %VAR% may contain spaces (C:\Users\John Smith): always double-quote it
   if (!s.includes('%') && /^[A-Za-z0-9_\\.:@+=-]+$/.test(s)) return s;
   // a closing quote after a backslash ("x\\") is an escaped quote for MSVC-parsed programs (where, tar, git) and

@@ -32,6 +32,8 @@ const STATIC_ONLY = {
   kill_by_name: 'kill', kill_force: 'kill', kill_by_pid: 'kill', kill_by_port: 'kill',
   tail_follow: 'runs forever (follow)', cron_edit: 'interactive editor', docker_exec: 'docker', docker_logs: 'docker',
   npm_run_script: 'runs project code',
+  // catalog-038
+  npm_outdated: NETWORK, http_server: 'runs forever (server)', open_file: 'opens a GUI app',
 };
 for (const id of ['docker_ps', 'docker_ps_all', 'docker_images', 'docker_stop', 'docker_stop_all', 'docker_prune', 'docker_stats',
   'docker_compose_up', 'docker_compose_down']) STATIC_ONLY[id] = 'docker';
@@ -50,7 +52,7 @@ const cellStatic = (id, env, command) => {
 // on a test machine makes the cell static-only, not a failure)
 const OPTIONAL_TOOLS = new Set(['docker', 'gh', 'npm', 'npx', 'node', 'brew', 'python3', 'pip', 'pip3', 'git', 'sudo', 'systemctl', 'journalctl',
   'timedatectl', 'crontab', 'upower', 'sensors', 'lspci', 'lsusb', 'ping', 'dig', 'traceroute', 'nc', 'file', 'dpkg', 'curl', 'ssh', 'wrangler',
-  'curl.exe', 'ssh.exe']);
+  'curl.exe', 'ssh.exe', 'jq', 'py']);
 
 // intents whose success prints nothing (writes inside the fixture, or a lookup that may legitimately be empty)
 const NO_OUTPUT = new Set(['routes', 'git_fetch', 'mkdir', 'touch_file', 'chmod', 'make_executable', 'copy', 'move_rename', 'delete_file', 'delete_dir',
@@ -58,7 +60,8 @@ const NO_OUTPUT = new Set(['routes', 'git_fetch', 'mkdir', 'touch_file', 'chmod'
   'git_undo_commit', 'git_discard_changes', 'git_stash', 'git_stash_pop', 'git_diff', 'git_diff_staged', 'git_remote', 'cron_list',
   'users_logged_in', 'last_logins', 'activate_venv', 'compress_zip', 'compress_targz', 'extract_zip', 'extract_targz',
   'battery', 'temperature', 'gpu_info', 'usb_devices', 'listening_ports', 'established_connections', 'process_on_port',
-  'find_process', 'package_installed', 'timezone', 'git_init', 'git_commit', 'disk_mounts', 'block_devices']);
+  'find_process', 'package_installed', 'timezone', 'git_init', 'git_commit', 'disk_mounts', 'block_devices',
+  'git_worktree_add', 'venv_create']);
 // exit codes that are not a failure: grep/diff "no match"/"differ", crontab without a table, cal/who quirks
 const OK_CODES = { diff_files: [0, 1], cron_list: [0, 1], find_process: [0, 1], package_installed: [0, 1], process_on_port: [0, 1],
   history_search: [0, 1], established_connections: [0, 1], users_logged_in: [0, 1], battery: [0, 1], temperature: [0, 1], gpu_info: [0, 1], usb_devices: [0, 1], last_logins: [0, 1] };
@@ -79,6 +82,8 @@ const PER_INTENT = {
   find_larger_than: { size: '10k' }, find_smaller_than: { size: '1k' }, sort_uniq: { file: 'my docs/log lines.txt' },
   base64_decode: { file: 'my docs/encoded.b64' }, git_blame: { file: 'README.md' }, git_diff: { file: 'src.txt' },
   git_show: { rev: 'HEAD' }, git_grep: { pattern: 'alpha' }, wrangler_pages_deploy: { path: 'my docs' },
+  git_diff_stat: { rev: 'HEAD' }, git_diff_names: { rev: 'HEAD' }, git_show_files: { rev: 'HEAD' }, git_worktree_add: { path: '../wt one', branch: 'dev' },
+  json_pretty: { file: 'my docs/sub/data.json' }, venv_create: { path: 'new env' },
   git_discard_changes: { file: 'src.txt' }, git_switch_branch: { branch: 'dev' }, git_delete_branch: { branch: 'dev' },
   delete_dir: { path: 'my docs/empty dir' }, activate_venv: { path: '.venv' }, find_by_name: { name: 'notes' },
   diff_files: { src: 'my docs/notes.txt', dst: 'my docs/notes copy.txt' }, create_symlink: { src: 'my docs/notes.txt', dst: 'link to notes' },

@@ -1,5 +1,20 @@
 # Changelog
 
+## 0.3.8 (unreleased)
+
+**New catalog templates (catalog-038):** `git diff --stat [ref]` / `git diff --name-only [ref]` (`--cached` for staged
+changes), `git show --stat <ref>` (default `HEAD`), `git worktree list`, `git worktree add <path> <branch>`, pretty-print a
+JSON file (`jq .`, PowerShell `ConvertFrom-Json | ConvertTo-Json -Depth 100`, cmd `py -m json.tool`), a local HTTP server
+(`python3 -m http.server <port> --bind 127.0.0.1`, default 8000), create a virtualenv (`python3 -m venv .venv`), open a file
+or URL with its default app (`open` / `xdg-open` / `Invoke-Item` or `Start-Process` / `start ""`), `pip list`, `npm
+outdated`. Training rows in `data/intents/g10_catalog038.jsonl` (EN + PL, with near-miss negatives); labelling patterns
+for the real-usage split in `scripts/real/prepare_real.js`. Values are explicit only, and a request the template cannot
+fully express is withheld (`src/templates038.js`). They go through the same two-model gate as the 0.3.4 templates
+(`NEW_TEMPLATE_INTENTS` now includes them): **the shipped `model/model_templates.bin` is not retrained yet**, so they are
+not predicted until it is (the end-to-end tests skip until then).
+
+**cmd:** a URL in a path slot keeps its slashes (`start "" "https://…"`).
+
 ## 0.3.7 — installed-tool flag check
 
 **Help-verifier.** Before a command is shown, its flags are checked against the man page of the tool actually

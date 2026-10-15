@@ -244,6 +244,12 @@ export const INTENTS = [
   T('git_fetch', 'Fetch new commits and branches from all remotes (no merge)', 'git fetch --all', {}),
   T('git_ls_files', 'List the files tracked by git', 'git ls-files', {}),
   T('git_grep', 'Search for text in the files tracked by git', 'git grep -n -- {pattern}', { pattern: null }),
+  // catalog-038
+  T('git_diff_stat', 'Summarise the changes per file (lines added / removed)', 'git diff«{cached!raw}» --stat«{rev}»', {}),
+  T('git_diff_names', 'List the names of the changed files', 'git diff«{cached!raw}» --name-only«{rev}»', {}),
+  T('git_show_files', 'Show which files a commit (the last one by default) changed', 'git show --stat {rev}', { rev: 'HEAD' }),
+  T('git_worktree_list', 'List the git worktrees of the repository', 'git worktree list', {}),
+  T('git_worktree_add', 'Check out a branch into a new worktree directory', 'git worktree add {path} {branch}', { path: null, branch: null }, 'medium'),
 
   // ---------- docker ----------
   T('docker_ps', 'List running containers', 'docker ps', {}),
@@ -269,6 +275,14 @@ export const INTENTS = [
   T('pip_install', 'Install a Python package with pip', 'python3 -m pip install {pkg}«--target {piptarget}»«{scope!raw}»', { pkg: null }, 'medium'),
   T('activate_venv', 'Activate a Python virtual environment', '. {path}/bin/activate', { path: '.venv' }, 'medium',
     { notes: 'run it in your own shell: activating from tellsh only affects a subshell that exits right away' }),
+  // catalog-038
+  T('venv_create', 'Create a Python virtual environment', 'python3 -m venv {path}', { path: '.venv' }, 'medium'),
+  T('pip_list', 'List the installed Python packages', 'python3 -m pip list', {}, 'medium'),
+  T('npm_outdated', 'Show the npm dependencies that have newer versions', 'npm outdated', {}, 'medium'),
+  T('http_server', 'Serve the current directory over HTTP (local only)', 'python3 -m http.server {port!raw} --bind 127.0.0.1', { port: 8000 }, 'medium',
+    { notes: 'runs until Ctrl+C; bound to 127.0.0.1 so the directory is not shared with the network' }),
+  T('json_pretty', 'Pretty-print a JSON file', 'jq . {file}', { file: null }),
+  T('open_file', 'Open a file or URL with its default app', 'xdg-open {file}', { file: null }, 'medium', { darwin: 'open {file}' }),
   T('tool_version', 'Show the installed version of a command-line tool', '{cmd} --version', { cmd: null }),
   T('cli_help', 'Show the built-in help (--help) of a command', '{cmd} --help', { cmd: null }),
 
