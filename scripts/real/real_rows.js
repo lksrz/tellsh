@@ -6,7 +6,7 @@ import { join } from 'node:path';
 import { fnv1a } from '../../src/features.js';
 
 // at most CAP rows per intent and language (sed -n line ranges alone are ~2500 rows), chosen by a text hash
-export const CAP = 120;
+export const CAP = +(process.env.TELLSH_REAL_CAP || 120);
 
 export function readReal(root) {
   const p = join(root, 'build', 'real', 'rows.jsonl');
@@ -19,7 +19,8 @@ export const realEvalTexts = (rows) => rows.filter((r) => r.split === 'eval').ma
 export function realTrain(rows, ids, cap = CAP) {
   const n = {};
   return rows.filter((r) => r.split === 'train' && r.intent && ids.has(r.intent))
-    .map((r) => ({ r, k: fnv1a('real:' + r.text) })).sort((a, b) => a.k - b.k).map(({ r }) => r)
+        // non-template rows first: aic-studio descriptions are template-generated, so they only fill what is left of the cap
+    .map((r) => ({ r, k: fnv1a('real:' + r.text) })).sort((a, b) => (process.env.TELLSH_TMPL_LAST === '0' ? 0 : (a.r.tmpl ? 1 : 0) - (b.r.tmpl ? 1 : 0)) || a.k - b.k).map(({ r }) => r)
     .filter((r) => (n[r.intent + r.lang] = (n[r.intent + r.lang] || 0) + 1) <= cap)
-    .map((r) => ({ text: r.text, intent: r.intent, lang: r.lang, shell: r.shell, os: r.os, src: 'real' }));
+    .map((r) => ({ text: r.text, intent: r.intent, lang: r.lang, shell: r.shell, os: r.os, src: 'real', tmpl: !!r.tmpl }));
 }

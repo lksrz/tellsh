@@ -444,7 +444,8 @@ The optional **TypeSafe Jev** teacher is build-time only (300 calls, < $0.01).
 
 ```bash
 npm test                         # node:test — parity, cascade, tagger, history, composer, per-shell syntax, CLI
-npm run train                    # node scripts/gen_data.js && python3 scripts/train.py && node scripts/build_triggers.js
+npm run train                    # gen_data + train.py --out build/model.bin + build_triggers (never overwrites model/*.bin;
+                                 #   train.py refuses an existing model/ file without --replace-shipped)
 npm run eval                     # all metrics -> EVAL.md
 npm run bench                    # latency (taskset -c 0) -> EVAL.md
 python3 -I scripts/tldr_ingest.py    # rebuild data/tldr from a clone in data/external/tldr

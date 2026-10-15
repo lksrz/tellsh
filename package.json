@@ -41,7 +41,7 @@
   "scripts": {
     "test": "node --test test/",
     "gen-data": "node scripts/gen_data.js",
-    "train": "node scripts/gen_data.js && python3 scripts/train.py && node scripts/build_triggers.js",
+    "train": "node scripts/gen_data.js && python3 scripts/train.py --out build/model.bin && node scripts/build_triggers.js",
     "tldr": "python3 -I scripts/tldr_ingest.py",
     "teacher": "node scripts/teacher.js",
     "eval": "node scripts/eval.js",

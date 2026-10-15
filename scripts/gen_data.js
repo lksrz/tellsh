@@ -14,6 +14,7 @@ import { ctxFeatures } from '../src/history.js';
 import { silverSpans, relex, bioLabels, mulberry32 } from './lib/silver.js';
 import { exclusionIndex } from './lib/heldout.js';
 import { readReal, realTrain } from './real/real_rows.js';
+import { writePrivate, preparePrivate } from './lib/privwrite.js';
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
 export const DIM = 1 << 18;
@@ -139,14 +140,17 @@ function main() {
     base.push(r);
   }
 
-  const cls = createWriteStream(join(outDir, 'cls.jsonl'));
-  const tag = createWriteStream(join(outDir, 'tag.jsonl'));
+  // private-derived rows: guarded fresh files (no symlink / hard link / tracked path), see scripts/lib/privwrite.js
+  const cls = createWriteStream(preparePrivate(join(outDir, 'cls.jsonl')), { flags: 'wx' });
+  const tag = createWriteStream(preparePrivate(join(outDir, 'tag.jsonl')), { flags: 'wx' });
   const counts = { cls: 0, tag: 0, bySrc: {} };
   let gid = 0;
   // every emitted example (incl. typo / relexicalised copies and anaphora phrases) is checked against the
   // held-out texts and eval-only values, not just the base rows
   const emit = (text, family, intent, extras, w, g, lang, group) => {
     if (leaks(text)) { droppedDerived++; return; }
+    // a generated copy follows the teacher decision on its own text, like the base rows
+    if (intent) { const d = decide.get(normalize(text)); if (d?.action === 'drop') return; if (d?.action === 'relabel' && d.intent) { intent = d.intent; family = FAMILY_OF[d.intent]; } }
     const f = [...vectorize(text, DIM, extras).entries()].sort((a, b) => a[0] - b[0]).map(([k, v]) => [k, +v.toFixed(6)]);
     cls.write(JSON.stringify({ y: family, i: intent || '', f, w, g, lang: lang || '', gid: group }) + '\n');
     counts.cls++;
@@ -154,6 +158,8 @@ function main() {
   };
   const emitTag = (text, spans, tool, group) => {
     if (leaks(text)) { droppedDerived++; return; }
+    // decided texts: a drop drops the tagger row too; a relabel invalidates the silver spans (other intent) -> no tag row
+    { const d = decide.get(normalize(text)); if (d?.action === 'drop' || (d?.action === 'relabel' && d.intent)) return; }
     const toks = tagTokens(text);
     if (!toks.length) return;
     const y = bioLabels(toks, spans);
@@ -173,9 +179,12 @@ function main() {
     const ctx = () => (rng() < 0.25 ? randomCtx() : []);
     // real-usage rows: LLM-written requests with noisy labels -> half weight, and no tagger rows (their regex silver
     // spans are unreliable: long paths, backticks, command fragments)
-    const w = r.src === 'real' ? 0.5 : 1;
+    // template-generated (aic-studio) rows fill the per-intent cap last (real_rows.js); TELLSH_TMPL_W is an extra weight
+    // multiplier for them (default 1: measured, the cap ordering helps and extra down-weighting does not)
+    const tm = r.src === 'real' && r.tmpl && Number.isFinite(parseFloat(process.env.TELLSH_TMPL_W)) ? parseFloat(process.env.TELLSH_TMPL_W) : 1;
+    const w = r.src === 'real' ? 0.5 * tm : 1;
     emit(r.text, fam, r.intent, [...env(), ...ctx()], w, r.src, r.lang, g);
-    if (boost.has(normalize(r.text) + '|' + r.intent)) { emit(r.text, fam, r.intent, [...env(), ...ctx()], 1, r.src, r.lang, g); nBoost++; }
+    if (boost.has(normalize(r.text) + '|' + r.intent)) { emit(r.text, fam, r.intent, [...env(), ...ctx()], tm, r.src, r.lang, g); nBoost++; } // boost copy honours TELLSH_TMPL_W too
     emit(typo(r.text), fam, r.intent, [...env(), ...ctx()], w, r.src, r.lang, g);
     if (r.src === 'real') continue;
     const { spans } = silverSpans(r.text, r.intent);
@@ -188,7 +197,7 @@ function main() {
   }
 
   // filtered training corpus for scripts/build_triggers.js (same exclusions and teacher decisions)
-  writeFileSync(join(outDir, 'train_rows.jsonl'), base.filter((r) => r.src !== 'real').map((r) => JSON.stringify({ text: r.text, intent: r.intent, lang: r.lang, shell: r.shell || '' })).join('\n') + '\n');
+  writePrivate(join(outDir, 'train_rows.jsonl'), base.filter((r) => r.src !== 'real').map((r) => JSON.stringify({ text: r.text, intent: r.intent, lang: r.lang, shell: r.shell || '' })).join('\n') + '\n');
 
   // 2. history anaphora: pronoun requests whose intent depends on ctx_ features
   let nAna = 0;

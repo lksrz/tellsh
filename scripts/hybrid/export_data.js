@@ -10,12 +10,14 @@
 //   build/hybrid/dev_texts.json  every normalized dev text (train rows with one of these texts are dropped)
 import { readFileSync, readdirSync, existsSync, mkdirSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
+import { createHash } from 'node:crypto';
 import { fileURLToPath, pathToFileURL } from 'node:url';
 import { INTENTS } from '../../src/catalog.js';
 import { FAMILIES, FAMILY_OF, NONE, TAG_TYPES } from '../../src/tools.js';
 import { normalize, fnv1a } from '../../src/features.js';
 import { silverSpans, relex, mulberry32 } from '../lib/silver.js';
 import { exclusionIndex } from '../lib/heldout.js';
+import { writePrivate } from '../lib/privwrite.js';
 import { readReal, realTrain } from '../real/real_rows.js';
 
 const ROOT = fileURLToPath(new URL('../..', import.meta.url));
@@ -69,6 +71,9 @@ function main() {
   const heldOut = { has: (n) => excl.has(n) };
   const intentRows = [...readDir(join(ROOT, 'data', 'intents')), ...readJsonl(join(ROOT, 'data', 'train.jsonl'))].map((r) => ({ ...r, src: 'intents' }));
   const shellRows = readJsonl(join(ROOT, 'data', 'shell', 'train.jsonl')).map((r) => ({ ...r, src: 'shell' }));
+  // template-generated real rows: TELLSH_TMPL_W multiplier (same meaning as gen_data.js; default 1 = no extra down-weighting)
+  const TW = Number.isFinite(parseFloat(process.env.TELLSH_TMPL_W)) ? parseFloat(process.env.TELLSH_TMPL_W) : 1;
+  const tw = (r) => (r.tmpl && TW !== 1 ? { w: TW } : {});
   const decisions = readJsonl(join(ROOT, 'data', 'teacher', 'decisions.jsonl')).filter((d) => d.text && d.field !== 'risk');
   const decide = new Map(decisions.map((d) => [normalize(d.text), d]));
   const seen = new Set();
@@ -87,7 +92,16 @@ function main() {
     base.push(r);
   }
   const out = heldOutFilter(heldOut);
-  const { rows, push } = out;
+  const { rows } = out;
+  // generated copies (typo / relex) follow the teacher decision on their OWN text too, as originals do
+  const push = (o) => {
+    if (o.kind !== 'orig' && o.intent) {
+      const d = decide.get(normalize(o.text));
+      if (d?.action === 'drop') return;
+      if (d?.action === 'relabel' && d.intent) o = { ...o, intent: d.intent, tool: FAMILY_OF[d.intent], spans: null }; // spans belonged to the old intent
+    }
+    out.push(o);
+  };
   let gid = 0;
   for (const r of base) {
     const g = gid++;
@@ -96,11 +110,11 @@ function main() {
     const env = () => (r.shell ? { shell: r.shell, os: r.os || 'linux' } : sampleEnv());
     const { spans } = silverSpans(r.text, r.intent);
     const sp = (s) => s.map((x) => [x.type, x.start, x.end]);
-    push({ text: r.text, tool, intent: r.intent, lang: r.lang, ...env(), spans: sp(spans), gid: g, src: r.src, split, kind: 'orig' });
-    push({ text: typo(r.text), tool, intent: r.intent, lang: r.lang, ...env(), spans: null, gid: g, src: r.src, split, kind: 'typo' });
+    push({ text: r.text, tool, intent: r.intent, lang: r.lang, ...env(), spans: sp(spans), gid: g, src: r.src, split, kind: 'orig', ...tw(r) });
+    push({ text: typo(r.text), tool, intent: r.intent, lang: r.lang, ...env(), spans: null, gid: g, src: r.src, split, kind: 'typo', ...tw(r) });
     for (let k = 0; k < 2; k++) {
       const rx = relex(r.text, spans, { lang: r.lang, rng, split: 'train' });
-      if (rx.text !== r.text) push({ text: rx.text, tool, intent: r.intent, lang: r.lang, ...env(), spans: sp(rx.spans), gid: g, src: r.src, split, kind: 'relex' });
+      if (rx.text !== r.text) push({ text: rx.text, tool, intent: r.intent, lang: r.lang, ...env(), spans: sp(rx.spans), gid: g, src: r.src, split, kind: 'relex', ...tw(r) });
     }
   }
   // tldr descriptions: tool label only (intent ''), capped per family/lang as in gen_data
@@ -125,18 +139,20 @@ function main() {
   const devTexts = new Set(rows.filter((r) => r.split === 'dev').map((r) => normalize(r.text)));
   const before = rows.length;
   rows.splice(0, rows.length, ...rows.filter((r) => r.split === 'dev' || !devTexts.has(normalize(r.text))));
-  writeFileSync(join(OUT, 'train.jsonl'), rows.map((r) => JSON.stringify(r)).join('\n') + '\n');
+  writePrivate(join(OUT, 'train.jsonl'), rows.map((r) => JSON.stringify(r)).join('\n') + '\n');
   // the complete dev-text index (every emitted dev row, not only texts whose own hash is dev): train_a_dev.sh
   // excludes it from A_dev's training data
-  writeFileSync(join(OUT, 'dev_texts.json'), JSON.stringify([...devTexts].sort()));
+  writePrivate(join(OUT, 'dev_texts.json'), JSON.stringify([...devTexts].sort()));
   const meta = {
+    realRowsSha256: createHash('sha256').update(existsSync(join(ROOT, 'build/real/rows.jsonl')) ? readFileSync(join(ROOT, 'build/real/rows.jsonl')) : '').digest('hex'),
+    decisionsSha256: createHash('sha256').update(existsSync(join(ROOT, 'data/teacher/decisions.jsonl')) ? readFileSync(join(ROOT, 'data/teacher/decisions.jsonl')) : '').digest('hex'),
     tools: [...Object.keys(FAMILIES), NONE],
     intents: INTENTS.map((i) => i.id),
     intentTool: Object.fromEntries(INTENTS.map((i) => [i.id, FAMILY_OF[i.id]])),
     descriptions: Object.fromEntries(INTENTS.map((i) => [i.id, i.description])),
     tagLabels: ['O', ...TAG_TYPES.flatMap((t) => [`B-${t}`, `I-${t}`])],
   };
-  writeFileSync(join(OUT, 'meta.json'), JSON.stringify(meta, null, 1));
+  writePrivate(join(OUT, 'meta.json'), JSON.stringify(meta, null, 1));
   const c = (f) => rows.filter(f).length;
   console.log(`export_data: ${out.dropped} augmented rows dropped (held-out texts), ${before - rows.length} train rows dropped (dev texts)`);
   console.log(`export_data: ${base.length} base (${base.filter((r) => r.src === 'real').length} real), ${rows.length} rows (train ${c((r) => r.split === 'train')}, dev ${c((r) => r.split === 'dev')}), tldr ${c((r) => r.src === 'tldr')}, ood ${c((r) => r.src === 'ood')}`);

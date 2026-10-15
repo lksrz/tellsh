@@ -180,7 +180,12 @@ def main():
     ap.add_argument('--ood-holdout', type=float, default=0.35)
     ap.add_argument('--seed', type=int, default=13)
     ap.add_argument('--out', default=DEFAULT_OUT)
+    ap.add_argument('--replace-shipped', action='store_true',
+                    help='allow overwriting an existing model under model/ (the shipped models are fixed: 0.3.4+ gates assume them)')
     args = ap.parse_args()
+    out_abs = os.path.abspath(args.out)
+    if os.path.exists(out_abs) and os.path.dirname(out_abs) == os.path.dirname(DEFAULT_OUT) and not args.replace_shipped:
+        sys.exit(f'refusing to overwrite the shipped {os.path.relpath(out_abs, ROOT)}: pass --out build/<name>.bin, or --replace-shipped')
     t0 = time.time()
     meta = json.load(open(os.path.join(BUILD, 'meta.json')))
     dim, tag_dim = meta['dim'], meta['tagDim']
