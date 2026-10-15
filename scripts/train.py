@@ -182,11 +182,19 @@ def main():
     ap.add_argument('--out', default=DEFAULT_OUT)
     ap.add_argument('--replace-shipped', action='store_true',
                     help='allow overwriting an existing model under model/ (the shipped models are fixed: 0.3.4+ gates assume them)')
+    ap.add_argument('--check-out', action='store_true', help='only run the --out guard, then exit (used by the tests)')
     args = ap.parse_args()
-    # resolved paths: a symlink (or symlinked directory) pointing at a shipped model is the shipped model
-    out_abs = os.path.realpath(args.out)
-    if os.path.exists(out_abs) and os.path.dirname(out_abs) == os.path.realpath(os.path.dirname(DEFAULT_OUT)) and not args.replace_shipped:
-        sys.exit(f'refusing to overwrite the shipped {os.path.relpath(out_abs, ROOT)}: pass --out build/<name>.bin, or --replace-shipped')
+    # the output is the shipped model when it IS one of the files in model/ (same inode: covers symlinks, hard links and
+    # case-insensitive paths)
+    if os.path.exists(args.out) and not args.replace_shipped:
+        st = os.stat(args.out)
+        mdir = os.path.dirname(DEFAULT_OUT)
+        for name in os.listdir(mdir):
+            m = os.stat(os.path.join(mdir, name))
+            if (m.st_ino, m.st_dev) == (st.st_ino, st.st_dev):
+                sys.exit(f'refusing to overwrite the shipped model/{name}: pass --out build/<name>.bin, or --replace-shipped')
+    if args.check_out:
+        return
     t0 = time.time()
     meta = json.load(open(os.path.join(BUILD, 'meta.json')))
     dim, tag_dim = meta['dim'], meta['tagDim']

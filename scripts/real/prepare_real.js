@@ -20,9 +20,10 @@
 // after the head, so operands leak into it (`npm install express` / `npm install react` are two groups; 552 of its 2957
 // labelled eval rows share a structural skeleton with a train row, scripts/real/group_leak.js, HYBRID.md#v04-real-usage).
 // The templates-catalog patterns (0.3.4 intents) postdate the 0.3.5/0.3.6 build/real: a rebuild labels those commands
-// instead of leaving them out-of-catalog, so scores on a rebuilt split are not comparable with the published ones.
+// instead of leaving them out-of-catalog (other groups can change sides too); `--labels 036` leaves them out and
+// reproduces the 0.3.5/0.3.6 build/real.
 //
-// Usage: node scripts/real/prepare_real.js [--data <dataset.jsonl>] [--eval-frac 0.25] [--group v04|structural]
+// Usage: node scripts/real/prepare_real.js [--data <dataset.jsonl>] [--eval-frac 0.25] [--group v04|structural] [--labels current|036]
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
@@ -37,6 +38,7 @@ const arg = (k, d) => { const i = args.indexOf(k); return i >= 0 ? args[i + 1] :
 const SRC = arg('--data', process.env.TELLSH_REAL_DATA || '/workspace/tellsh-data/dataset.jsonl');
 const EVAL_FRAC = +arg('--eval-frac', 0.25);
 const GROUP = arg('--group', 'structural');
+const LABELS = arg('--labels', 'current');
 if (!existsSync(SRC)) { console.error(`prepare_real: no dataset at ${SRC}`); process.exit(1); }
 
 // v0.4 intents: label = the command itself (sudo / npx / env prefixes stripped)
@@ -61,16 +63,18 @@ const NEW = [
   ['npm_run_script', /^npm(?: --prefix \S+)? (?:run(?:-script)? [\w:.-]+|test|start|t)(?:\s|$)/],
   ['pip_install', /^(?:pip3?|python3?(?:\.\d+)? -m pip) install\b(?!.*\s-(?:r|e)\b)/],
   ['activate_venv', /^(?:source|\.) \S*\/bin\/activate(?:\.fish)?\s*$|\\Scripts\\activate(?:\.bat|\.ps1)?\s*$/i],
-  // templates-catalog
-  ['wrangler_d1_list', /^wrangler d1 list\b/],
-  ['wrangler_pages_deploy', /^wrangler pages deploy\b/],
-  ['gh_run_watch', /^gh run watch\b/],
-  ['gh_issue_list', /^gh issue list\b/],
-  ['gh_issue_view', /^gh issue view\b/],
-  ['git_show', /^git show(?: [\w~^.\/-]+)?$/],
-  ['git_fetch', /^git fetch(?: (?:--all|--prune|-p|origin))*$/],
-  ['git_ls_files', /^git ls-files$/],
-  ['git_grep', /^git grep(?: -n)? (?:-- )?(?:'[^']*'|"[^"]*"|\S+)$/],
+  // templates-catalog (0.3.4): left out with --labels 036, which reproduces the 0.3.5/0.3.6 build/real exactly
+  ...(LABELS === '036' ? [] : [
+    ['wrangler_d1_list', /^wrangler d1 list\b/],
+    ['wrangler_pages_deploy', /^wrangler pages deploy\b/],
+    ['gh_run_watch', /^gh run watch\b/],
+    ['gh_issue_list', /^gh issue list\b/],
+    ['gh_issue_view', /^gh issue view\b/],
+    ['git_show', /^git show(?: [\w~^.\/-]+)?$/],
+    ['git_fetch', /^git fetch(?: (?:--all|--prune|-p|origin))*$/],
+    ['git_ls_files', /^git ls-files$/],
+    ['git_grep', /^git grep(?: -n)? (?:-- )?(?:'[^']*'|"[^"]*"|\S+)$/],
+  ]),
   ['ssh_port_forward', /^ssh\b.*\s-\w*L\s?\d+:/],
   ['print_line_range', /^(?:nl -ba \S+ \| )?sed -n ['"]?\d+,\d+p['"]?(?: \S+)?$/],
   ['tool_version', /^[\w.-]+ (?:--version|-v|-V|version)$/],
