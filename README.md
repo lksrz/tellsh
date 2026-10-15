@@ -207,12 +207,20 @@ kept (`pip install requests --target /tmp/packages`, also `-t`) (v0.3 close5).
 
 ### Optional neural fallback (`--hybrid`)
 
-`tellsh --hybrid …` (or `TELLSH_HYBRID=1`) keeps the cascade's answer when it is confident (≥ 0.9, most requests) and
+`tellsh --hybrid …` (or `TELLSH_HYBRID=1`/`true`/`yes`/`on`) keeps the cascade's answer when it is confident (≥ 0.9, most requests) and
 otherwise re-ranks its top-5 with a small int8 encoder (pruned multilingual-e5-small, 6 layers, 27 MB, ~4 ms on one
 core). It needs `onnxruntime-node` and the `tellsh-model-enc` 0.4 bundle (`enc-v2`, not in this repo); without them
 tellsh silently uses the cascade. `TELLSH_HYBRID=safe` never turns a rejection into an answer. Re-ranked answers are
 never auto-run with `--yes`. Details, numbers and the trade-off (fewer rejections of requests outside the catalog):
 [HYBRID.md](HYBRID.md).
+
+**Distilled student (default when installed).** With `onnxruntime-node` and the optional `tellsh-model-student`
+bundle installed (`npm i -g onnxruntime-node tellsh-model-student`; 14 MB model, onnxruntime-node is ~290 MB), tellsh
+asks a 3-layer distilled encoder only when the cascade's answer has confidence < 0.6. It never turns a rejection into an
+answer, and it changes the answer only when the student is confident. The model is loaded on first use, which costs
+~170 ms once per call. Without the bundle or the runtime, tellsh is unchanged. `--no-hybrid` / `TELLSH_HYBRID=0` turns
+it off; `TELLSH_HYBRID=student-full` also lets a confident student overrule a confident cascade (the student then runs
+on every query). Answers the student changed are never auto-run with `--yes`.
 
 ### History context
 

@@ -1,5 +1,17 @@
 # Changelog
 
+## 0.3.5
+
+**Optional distilled student (A+S).** If `onnxruntime-node` and the new optional `tellsh-model-student` package (a 14 MB
+3-layer encoder) are both installed, tellsh consults the student when the cascade's confidence is below 0.6:
+`npm i -g tellsh onnxruntime-node tellsh-model-student`. A rejection is never turned into an answer, and the student
+replaces the cascade's answer only when it is confident (p >= 0.5, pNone < 0.5). Answers the student changed are never
+auto-run with `--yes`. On real held-out usage it raises correct answers from 89.4% to 91.1% (human-phrased) and from 94.1% to
+95.7% (template-phrased), with no new false accepts on out-of-scope sets (numbers in [HYBRID.md](HYBRID.md)). Without
+either optional package tellsh behaves exactly as 0.3.4. `--no-hybrid` / `TELLSH_HYBRID=0` turns the student off.
+`TELLSH_HYBRID=student-full` also lets a very confident student (p >= 0.9) overrule a confident cascade. `--hybrid` (A+B)
+is unchanged.
+
 ## 0.3.4
 
 **New catalog templates** (from a separate retrained model, `model/model_templates.bin`, consulted only when it picks one

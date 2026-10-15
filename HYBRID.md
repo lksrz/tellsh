@@ -613,5 +613,55 @@ node scripts/hybrid/eval_hybrid.js --calibrate --lm=adev:qwenft --tag=_ft && nod
 taskset -c 0 node scripts/hybrid/bench_hybrid.js           # LLAMA_BIN=… LLAMA_MODELS=…gguf for C
 node scripts/hybrid/report_hybrid.js                       # tables above
 ```
-Runtime: `tellsh --hybrid …` (or `TELLSH_HYBRID=1`) uses A+B with the encoder loaded lazily only when the cascade defers;
+Runtime: `tellsh --hybrid …` (or `TELLSH_HYBRID=1`/`true`/`yes`/`on`) uses A+B with the encoder loaded lazily only when the cascade defers;
 without `onnxruntime-node` / the bundle it silently falls back to A. Re-ranked answers are never auto-run with `--yes`.
+
+## Distilled student fallback (A+S, feat/hybrid-student)
+
+A 3-layer encoder (`tellsh-model-student`, bundle `stu-v1`, ~14 MB int4/int8 ONNX) was distilled from a LoRA-tuned
+Qwen 7B teacher that labelled 60k PL/EN sentences (workstream 3, `ml/distill`). Its policy (`POLICY['A+S']`) works like this:
+
+- If A's confidence is >= 0.6, A answers and the student is not loaded.
+- If A rejected the request (below the threshold, or refused by a pipeline guard), the request stays rejected and the
+  student is not run.
+- Otherwise the student's argmax over the catalog intents replaces A's answer, but only if p >= 0.5 and pNone < 0.5.
+  If not, A's answer stands.
+
+It is on by default when the bundle and onnxruntime-node are installed (`TELLSH_HYBRID=0` turns it off).
+`TELLSH_HYBRID=student-full` adds the disagreement rule (a student with p >= 0.9 overrules a confident A), which needs
+the student on every query and measured no better end to end. Numbers come from `scripts/hybrid/eval_student_runtime.js`.
+Rescuing A's rejections was measured and rejected: it turned 99% of the out-of-catalog real requests into wrong answers.
+
+### 0.3.5 release numbers (A vs A+S vs A+S-full)
+
+`node scripts/hybrid/eval_student_runtime.js` on the 0.3.5 candidate (`342b2ee`, bundle `stu-v1`, onnxruntime-node);
+raw output in `hybrid/results/student_runtime_0.3.5.json`.
+The run reports % correct (in-catalog sets) or % rejected (out-of-scope sets). `calls` is the share of rows on which the
+student ran. `changed` is the share on which it changed A's decision. Real-usage sets are held-out private rows (aggregates only).
+
+| set | n | A | A+S | A+S calls / changed | A+S-full | A+S-full calls / changed |
+|---|---:|---:|---:|---:|---:|---:|
+| data/eval | 2384 | 94.38 | 94.71 | 5.4 / 1.7 | 94.76 | 98.0 / 2.1 |
+| devtools (eval_v04) | 424 | 95.75 | 96.46 | 2.1 / 0.9 | 96.46 | 97.9 / 0.9 |
+| shell-phrased | 336 | 95.24 | 96.43 | 3.3 / 1.8 | 96.13 | 97.3 / 2.1 |
+| blind | 641 | 98.44 | 98.60 | 3.3 / 0.9 | 98.60 | 99.8 / 0.9 |
+| blind3 | 844 | 98.34 | 98.22 | 1.5 / 0.4 | 98.34 | 99.2 / 0.5 |
+| real_human | 3006 | 89.42 | **91.12** | 7.4 / 3.1 | 90.69 | 97.0 / 5.7 |
+| real_tmpl | 33774 | 94.07 | **95.71** | 5.8 / 1.9 | 96.51 | 97.3 / 2.8 |
+| ood (rejected) | 92 | 92.39 | 92.39 | 4.3 / 2.2 | 92.39 | 7.6 / 2.2 |
+| blind_ood (rejected) | 40 | 100 | 100 | 0 / 0 | 100 | 0 / 0 |
+| blind3_ood (rejected) | 64 | 98.44 | 98.44 | 1.6 / 0 | 98.44 | 1.6 / 0 |
+| real_ooc (rejected) | 22534 | 35.04 | 35.04 | 24.5 / 10.4 | 35.04 | 65.0 / 15.3 |
+
+Rejected rows never become answers and answers never become rejections: on every set (in-catalog and out-of-scope) A+S's answered share equals A's, including the 22.5k
+real out-of-catalog requests (`real_ooc`). A answers 65% of these, which is the known stage-1 debt; the student is consulted on 24.5% of them and
+changes 10.4% of them from one wrong intent to another; `--yes` never auto-runs an answer the student changed. On `ood` the student
+changes 2.2% of rows, which A had already wrongly answered, from one wrong intent to another. The one regression is `blind3`
+(-0.12 pt, one row of 844), which is within noise and under the 1-pt reporting bar. A+S-full is better on `real_tmpl` but worse on
+`real_human` and `shell`, and it runs the student on every query, so it stays opt-in. The cascade alone (no optional
+packages) is byte-identical to 0.3.4 on `data/eval` across bash/zsh(BSD, GNU)/fish/PowerShell/cmd/busybox and on
+every public set above.
+
+Latency on one core (Xeon box, `taskset -c 7`): loading the student takes 150–180 ms once per call, and inference takes ~3.5 ms
+p50 / 5–7 ms p95. On an Apple M-series laptop the numbers are 70 ms / 3.6 ms. The student loads only when A's confidence
+is below 0.6 (student calls on 1.5–7.4% of in-catalog queries in the sets above, 24.5% of out-of-catalog ones).
