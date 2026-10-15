@@ -436,6 +436,7 @@ function pipTargetGuard(res) {
   return ok ? res : { ...res, missing: ['piptarget (a variable or escape the shell would expand)'] };
 }
 // a request that refers back to the previous command: a pronoun, a place word, or same/again/them/its/that/those/this
+const RISK_RANK = { safe: 0, medium: 1, high: 2 };
 const REFERS_BACK = /\b(?:it|its|it's|them|their|they|that|those|this|these|there|here|same|again|previous|above|tam|tu|tego|tej|ten|je|ich|go|jego|samo|znowu|ponownie|jeszcze)\b/i;
 function refersBack(q) { return hasPronoun(q) || hasLocative(q) || REFERS_BACK.test(String(q)); }
 export function suggest(query, opts = {}) {
@@ -560,6 +561,8 @@ function suggestOnce(query, opts = {}) {
   let method = 'catalog';
   if ((ref?.rule === 'pronoun' || ref?.rule === 'refused') && ref.intent) { intent = ref.intent; method = 'history-rule'; confidence = Math.max(confidence, thr); }
   if (sb) { method = 'history-rule'; confidence = Math.max(confidence, thr); context.rule = 'same-but'; context.note = `modifies previous ${sb.lastIntent}`; }
+  // "same but no discard" after `git status`: a same-but request never becomes a different, riskier intent (refused)
+  if (sb && intent !== sb.lastIntent && (RISK_RANK[BY_ID[intent]?.risk] ?? 2) > (RISK_RANK[BY_ID[sb.lastIntent]?.risk] ?? 2)) return { ...base, understood: false, method: 'history-rule', confidence: 0, candidates: [], tools: [], command: null, missing: [], hint: `"same but" would turn ${sb.lastIntent} into the riskier ${intent}: ask for it directly` };
   // "merge https://github.com/o/r/pull/3": a merge of a pull request URL is never `git clone` of it
   if (intent === 'git_clone' && !sb && !ref && PR_URL.test(query) && mergeAsked(query)) intent = 'gh_pr_merge';
   // "same but force" after `rm -r old; ls newdir`: the command it would modify is not the previous one

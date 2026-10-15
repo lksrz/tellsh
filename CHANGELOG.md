@@ -10,8 +10,14 @@ or URL with its default app (`open` / `xdg-open` / `Invoke-Item` or `Start-Proce
 outdated`. Training rows in `data/intents/g10_catalog038.jsonl` (EN + PL, with near-miss negatives); labelling patterns
 for the real-usage split in `scripts/real/prepare_real.js`. Values are explicit only, and a request the template cannot
 fully express is withheld (`src/templates038.js`). They go through the same two-model gate as the 0.3.4 templates
-(`NEW_TEMPLATE_INTENTS` now includes them): **the shipped `model/model_templates.bin` is not retrained yet**, so they are
-not predicted until it is (the end-to-end tests skip until then).
+(`NEW_TEMPLATE_INTENTS` now includes them). `model/model_templates.bin` is retrained (catalog + the structural real-usage
+train split); `model/model.bin` (0.3.3) is unchanged. On the private real-usage eval split (36,858 labelled rows, rebuilt
+with the 0.3.4 + 0.3.8 labels), the gate scores 93.66% (93.59% with the 0.3.4 templates model); human-written
+requests 89.20% (88.60%); template intents 87.2% (50.0%, n=78); every other intent 93.67% (93.68%; 8 of 36,780 rows
+answered with a template intent instead of 3).
+
+**Safety:** a "same but …" follow-up never turns the previous command into a different, riskier intent: `same but no
+discard` after `git status` used to suggest `git restore .` (high risk); it is now refused with a hint to ask directly.
 
 **cmd:** a URL in a path slot keeps its slashes (`start "" "https://…"`).
 

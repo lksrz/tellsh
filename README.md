@@ -152,8 +152,8 @@ The intent and slots are shared; only the rendering differs (`src/render.js`, va
 ConvertTo-Json -Depth 100`; cmd `py -m json.tool`), a local HTTP server (`python3 -m http.server 8000 --bind 127.0.0.1`,
 `py` on Windows), creating a virtualenv (`python3 -m venv .venv`), opening a file or URL with its default app (`open` on
 macOS, `xdg-open` on Linux, `Invoke-Item` / `Start-Process` in PowerShell, `start ""` in cmd), `pip list` (`python3 -m pip
-list`) and `npm outdated`. They are answered by the templates model once it is retrained with
-`data/intents/g10_catalog038.jsonl`; until then the shipped models never pick them.
+list`) and `npm outdated`. They are answered by the retrained templates model (`model/model_templates.bin`, trained with
+`data/intents/g10_catalog038.jsonl`) through the same two-model gate as the 0.3.4 templates.
 
 **New templates (0.3.4)** (ranked by frequency in real command usage): `git fetch --all`, `git ls-files`,
 `gh run watch [id]`, `gh issue list`, `gh issue view <n>`, `npx wrangler d1 list`,
