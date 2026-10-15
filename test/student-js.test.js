@@ -4,7 +4,8 @@ import { existsSync, mkdtempSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { tmpdir } from 'node:os';
 import { buildBundle, quantRows, readSafetensors, toF16 } from '../scripts/hybrid/export_student_js.js';
-import { parseBundle, StudentModel, linear, fromF16 } from '../src/rerank/student-js.js';
+import { parseBundle, StudentModel, linear, attend, fromF16 } from '../src/rerank/student-js.js';
+import { wasmLinear } from '../src/rerank/wasm-linear.js';
 import { findStudentDir, loadStudent } from '../src/rerank/student.js';
 
 // tiny random model (1 layer, hidden 8, 2 heads), built in-test
@@ -56,12 +57,17 @@ const close = (a, b, eps, what) => { assert.equal(a.length, b.length, what); for
 
 test('student-js: forward pass of a tiny random model matches the reference implementation', () => {
   const t = tiny();
-  const m = new StudentModel(parseBundle(buildBundle(t, { heads: NH })));
-  for (const ids of [[0, 5, 2], [1, 19, 7, 7, 3, 2, 2, 11, 2], [4]]) {
-    const out = m.forward(ids); const ref = reference(t, ids);
-    close(out.tool, ref.tool, 1e-4, 'tool');
-    close(out.intent, ref.intent, 1e-4, 'intent');
-    ids.forEach((_, i) => close(out.tags(i), ref.tags[i], 1e-4, `tag ${i}`));
+  const bin = buildBundle(t, { heads: NH });
+  // both kernels: WebAssembly SIMD (default) and the plain-JS fallback
+  for (const wasm of [true, false]) {
+    const m = new StudentModel(parseBundle(bin), { wasm });
+    assert.equal(m.runtime, wasm ? 'wasm-simd' : 'js');
+    for (const ids of [[0, 5, 2], [1, 19, 7, 7, 3, 2, 2, 11, 2], [4]]) {
+      const out = m.forward(ids); const ref = reference(t, ids);
+      close(out.tool, ref.tool, 1e-4, 'tool');
+      close(out.intent, ref.intent, 1e-4, 'intent');
+      ids.forEach((_, i) => close(out.tags(i), ref.tags[i], 1e-4, `tag ${i}`));
+    }
   }
 });
 
@@ -73,6 +79,32 @@ test('student-js: blocked linear equals a naive matmul for odd shapes', () => {
     const ref = [];
     for (let i = 0; i < n; i++) for (let o = 0; o < O; o++) { let a = b[o]; for (let k = 0; k < K; k++) a += x[i * K + k] * W[o * K + k]; ref.push(a); }
     close(out, ref, 1e-5, `linear ${n}x${K}x${O}`);
+  }
+});
+
+test('student-js: WebAssembly kernels (linear, deq, attend) equal the JS reference on realistic shapes', () => {
+  const k = wasmLinear(4 << 20);
+  assert.ok(k, 'WebAssembly SIMD available (Node >= 18)');
+  let off = 0;
+  const f32 = (len) => { const v = new Float32Array(k.buffer, off, len); off += len * 4; for (let j = 0; j < len; j++) v[j] = rnd(); return v; };
+  for (const [n, K, O] of [[1, 384, 384], [7, 384, 1536], [6, 1536, 384]]) {
+    off = 0;
+    const x = f32(n * K), W = f32(O * K), b = f32(O), out = f32(n * O), ref = new Float32Array(n * O);
+    k.linear(x, n, K, W, b, O, out); linear(x, n, K, W, b, O, ref);
+    close(out, ref, 1e-4, `wasm linear ${n}x${K}x${O}`);
+  }
+  off = 0;
+  const q = new Int8Array(k.buffer, 0, 64); for (let j = 0; j < 64; j++) q[j] = (j * 37) % 255 - 127; off = 64;
+  const s = f32(4), d = f32(64);
+  k.deq(q, s, 4, 16, d);
+  close(d, Array.from(q, (v, j) => Math.fround(v * s[Math.floor(j / 16)])), 1e-6, 'wasm deq');
+  for (const n of [1, 5, 23]) {
+    off = 0;
+    const H = 384, NH = 12;
+    const [qq, kk, vv, c1, p1] = [f32(n * H), f32(n * H), f32(n * H), f32(n * H), f32(n)];
+    const c2 = new Float32Array(n * H);
+    k.attend(qq, kk, vv, c1, p1, n, H, NH); attend(qq, kk, vv, c2, new Float32Array(n), n, H, NH);
+    close(c1, c2, 1e-5, `wasm attend n=${n}`);
   }
 });
 
@@ -115,6 +147,12 @@ test('student-js: real bundle answers and caches per process (skipped without st
   const f = await real.infer('gdzie jest plik docker-compose.yml?', env);
   assert.equal(f.topIntent, 'find_by_name');
   assert.ok(Array.isArray(f.tagger('gdzie jest plik docker-compose.yml?', 'find').spans));
+  assert.equal(real.kernel, 'wasm-simd');
+  // the lazy tagger reads a copy of the token states: later queries must not change it
+  const spans = JSON.stringify(f.tagger('gdzie jest plik docker-compose.yml?', 'find').spans);
+  const g = await real.infer('find files named notes.txt in /tmp', env);
+  assert.equal(JSON.stringify(f.tagger('gdzie jest plik docker-compose.yml?', 'find').spans), spans);
+  assert.ok(g.tagger('find files named notes.txt in /tmp', 'find').spans.length > 0);
 });
 
 test('student-js: f16 storage round trip and an f16 bundle runs close to the int8 one', () => {

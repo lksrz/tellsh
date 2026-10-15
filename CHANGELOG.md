@@ -2,8 +2,8 @@
 
 ## 0.3.6 (unreleased)
 
-**The distilled student runs in pure JS and is on by default.** A new forward pass (`src/rerank/student-js.js`) runs
-the A+S student without onnxruntime, from the `tellsh-model-student` 0.2.0 bundle (`student.bin`: int8 weights with
+**The distilled student runs in pure JS and is on by default.** A new forward pass (`src/rerank/student-js.js`, with a tiny
+WebAssembly SIMD kernel for matmuls and attention and a plain-JS fallback) runs the A+S student without onnxruntime, from the `tellsh-model-student` 0.2.0 bundle (`student.bin`: int8 weights with
 per-row scales, ~17 MB; built by `scripts/hybrid/export_student_js.js`). The package is now a regular dependency, so a
 plain `npm i -g tellsh` gets the A+S hybrid; onnxruntime-node stays an optional peer for `--hybrid` (A+B) only. The
 policy is unchanged; the JS student matches the 0.3.5 ONNX student's final decision on the public eval sets (numbers in

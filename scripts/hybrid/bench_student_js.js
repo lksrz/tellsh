@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Latency of the pure-JS student (src/rerank/student-js.js), 1 thread: cold load, per-query p50/p95 on unique queries
 // (fresh texts, so the per-process result cache never hits), first-query time, and end-to-end CLI wall time
-// (`node bin/tellsh.js --dry-run --json <q>`, median of --runs) for a query that consults the student vs one that does not.
+// (`node bin/tellsh.js --dry-run --json <q>`, median of --runs) for a query that consults the student, the same query with TELLSH_HYBRID=0, and one that never consults it.
 //   node scripts/hybrid/bench_student_js.js [--dir DIR] [--n 300] [--runs 7]   (JSON on stdout)
 import { spawnSync } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
@@ -29,12 +29,12 @@ for (const q of texts) {
   ms.push(performance.now() - t);
   first ??= ms[0];
 }
-const cli = (q) => {
+const cli = (q, hybrid) => {
   const w = [];
   let j;
   for (let i = 0; i < +opt('--runs', 7); i++) {
     t = performance.now();
-    const r = spawnSync(process.execPath, ['bin/tellsh.js', '--dry-run', '--json', q], { cwd: ROOT, encoding: 'utf8', env: { ...process.env, TELLSH_STUDENT_DIR: dir } });
+    const r = spawnSync(process.execPath, ['bin/tellsh.js', '--dry-run', '--json', q], { cwd: ROOT, encoding: 'utf8', env: { ...process.env, TELLSH_STUDENT_DIR: dir, ...(hybrid ? { TELLSH_HYBRID: hybrid } : {}) } });
     w.push(performance.now() - t);
     j = JSON.parse(r.stdout);
   }
@@ -43,6 +43,6 @@ const cli = (q) => {
 const out = {
   dir: dir.replace(ROOT, ''), loadMs: +loadMs.toFixed(1), firstQueryMs: +first.toFixed(1), n: ms.length,
   p50: pct(ms, 0.5), p95: pct(ms, 0.95), max: pct(ms, 1),
-  cliStudent: cli('gdzie jest plik docker-compose.yml?'), cliA: cli('show git status'),
+  cliStudent: cli('gdzie jest plik docker-compose.yml?'), cliSameQueryNoStudent: cli('gdzie jest plik docker-compose.yml?', '0'), cliA: cli('show git status'),
 };
 console.log(JSON.stringify(out, null, 1));

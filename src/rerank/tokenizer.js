@@ -7,16 +7,17 @@ const UNK_PENALTY = 10;
 export class UnigramTokenizer {
   /** vocab: [[piece, score], ...] in id order; unkId; special ids */
   constructor({ vocab, unkId = 3, bos = 0, eos = 2, pad = 1 }) {
-    this.pieces = new Map();
-    this.maxLen = 1;
+    this.pieces = new Map(); // piece -> id (scores in a typed array: no per-piece allocation, cheaper cold load)
+    this.scores = new Float64Array(vocab.length);
+    this.maxLen = 1; // in UTF-16 units: an upper bound of the code-point length, only limits the search window
     let min = Infinity;
-    vocab.forEach(([p, s], i) => {
-      if (i <= 3) return; // specials are never produced by segmentation
-      this.pieces.set(p, [i, s]);
-      const n = [...p].length;
-      if (n > this.maxLen) this.maxLen = n;
+    for (let i = 4; i < vocab.length; i++) { // specials (0-3) are never produced by segmentation
+      const [p, s] = vocab[i];
+      this.pieces.set(p, i);
+      this.scores[i] = s;
+      if (p.length > this.maxLen) this.maxLen = p.length;
       if (s < min) min = s;
-    });
+    }
     this.unkScore = min - UNK_PENALTY;
     Object.assign(this, { unkId, bos, eos, pad, size: vocab.length });
   }
@@ -35,11 +36,11 @@ export class UnigramTokenizer {
       let hit = false;
       for (let j = i; j < Math.min(n, i + this.maxLen); j++) {
         s += chars[j];
-        const e = this.pieces.get(s);
-        if (e) {
+        const id = this.pieces.get(s);
+        if (id !== undefined) {
           if (j === i) hit = true;
-          const v = best[i] + e[1];
-          if (v > best[j + 1]) { best[j + 1] = v; from[j + 1] = i; tokId[j + 1] = e[0]; }
+          const v = best[i] + this.scores[id];
+          if (v > best[j + 1]) { best[j + 1] = v; from[j + 1] = i; tokId[j + 1] = id; }
         }
       }
       if (!hit) { // single unknown character

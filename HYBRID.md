@@ -696,9 +696,16 @@ the f16 one on 99.79% (max |Δp| 0.038). End to end (`eval_student_runtime.js`, 
 94.59 (ONNX 94.71), devtools 96.46 (96.46), shell 96.13 (96.43), blind 98.75 (98.60), blind3 98.22 (98.22); answered shares
 equal A's on every set and the out-of-scope sets are unchanged.
 
-**Latency** (`node scripts/hybrid/bench_student_js.js`, Apple M-series, Node 26, 1 thread): load 23 ms (student.bin +
-vocab + tokenizer), first query 56 ms, then p50 40 ms / p95 57 ms per unique query (n = 300). Whole CLI call
-(`node bin/tellsh.js --dry-run --json`, median of 7): 291 ms for a query that consults the student
-(`gdzie jest plik docker-compose.yml?`), 160 ms for one that does not (`show git status`). Inference is ~10x slower
-than onnxruntime's int8 kernels (3.6 ms) but the cold load is ~3x faster, and the student runs only below A's
-confidence 0.6.
+**Kernels.** The matmuls, the int8 -> f32 dequantization at load and the attention run in a small WebAssembly SIMD
+module (`src/rerank/wasm-linear.js`, f32x4, assembled in code from opcodes, ~1.4 KB, no toolchain; `exp` imported from
+JS); the rest (embedding lookup, LayerNorm, GELU, heads) is plain JS, and without WebAssembly SIMD everything falls
+back to the plain-JS kernels (same results within float rounding, covered by tests). The tag head runs lazily, only
+when the tagger is asked for (A+S never is).
+
+**Latency** (`node scripts/hybrid/bench_student_js.js`, Apple M-series, Node 26, 1 thread), plain-JS kernels -> WebAssembly
+SIMD: load 24 -> 18 ms (student.bin + vocab + tokenizer), first query 61 -> 17 ms, then p50 40 -> 9 ms / p95 56 ->
+13 ms per unique query (n = 300). Whole CLI call (`node bin/tellsh.js --dry-run --json`, median of 7) for
+`gdzie jest plik docker-compose.yml?`: 296 -> 242 ms with the student, 180 ms with `TELLSH_HYBRID=0`; a query that
+never consults it (`show git status`) takes 160 ms. The student's share of a CLI call fell from ~119 to ~63 ms. On a
+1-core Xeon VM (Node 22) the plain-JS version measured load 70 ms, first query 166 ms, p50 65 / p95 115 ms and 538 ms
+for the whole consulted call. The student runs only below A's confidence 0.6.

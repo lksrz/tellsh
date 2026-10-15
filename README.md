@@ -218,7 +218,8 @@ never auto-run with `--yes`. Details, numbers and the trade-off (fewer rejection
 confidence < 0.6. It never turns a rejection into an answer, and it changes the answer only when the student is
 confident. Since 0.3.6 the student runs in pure JS (no onnxruntime, no native code) from the `tellsh-model-student`
 0.2 bundle (`student.bin`, int8, ~17 MB), which `npm i -g tellsh` installs as a regular dependency. It is loaded on
-first use: a CLI call that consults it takes ~0.3 s end to end on an Apple M-series laptop (~0.16 s without it).
+first use (a small WebAssembly SIMD kernel, plain-JS fallback): it adds ~60 ms to a CLI call that consults it on an
+Apple M-series laptop (~0.24 s end to end; a call that does not consult it takes ~0.16 s).
 Without the bundle tellsh runs the cascade alone. `--no-hybrid` / `TELLSH_HYBRID=0` turns it off;
 `TELLSH_HYBRID=student-full` also lets a confident student overrule a confident cascade (the student then runs on every
 query). Answers the student changed are never auto-run with `--yes`.
