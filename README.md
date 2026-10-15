@@ -146,13 +146,15 @@ The intent and slots are shared; only the rendering differs (`src/render.js`, va
 
 ### Developer tools (v0.4)
 
-**New templates (0.3.8, unreleased)**: `git diff --stat [ref]`, `git diff --name-only [ref]`, `git worktree list`,
-`pip list` (`python3 -m pip list`) and `npm outdated`.
+**New templates (0.3.8, unreleased)**: `git diff --stat`, `git diff --name-only`, `git worktree list`,
+`pip list` (`python3 -m pip list`) and `npm outdated`. The two diff templates are value-free: a request that names a
+revision or scope (a commit / hash, branch, staged changes, since / from / vs / per ...) is withheld, not answered with
+the plain diff.
 They are answered by the retrained templates model (`model/model_templates.bin`, trained with
 `data/intents/g10_catalog038.jsonl`) through the same two-model gate as the 0.3.4 templates. Opening a file / URL
 (`open`), a local HTTP server (`http.server`), pretty-printing JSON (`jq`), `git worktree add`, creating a virtualenv and `git show --stat` are **not in this
 release**: they are recognised but always withheld (shown, never run), like `git grep` / `git show`.
-When the templates model ranks a template intent among its candidates (p >= 0.2) but not first, the 0.3.3 model
+When the templates model ranks a template intent among its top 5 candidates (p >= 0.2, independent of `--top`) but not first, the 0.3.3 model
 answers; such a fall-through answer is shown but never runnable when its risk is medium or higher (e.g. `git pull` for
 a fetch-like request).
 

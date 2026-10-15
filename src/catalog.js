@@ -245,8 +245,8 @@ export const INTENTS = [
   T('git_ls_files', 'List the files tracked by git', 'git ls-files', {}),
   T('git_grep', 'Search for text in the files tracked by git', 'git grep -n -- {pattern}', { pattern: null }),
   // catalog-038
-  T('git_diff_stat', 'Summarise the changes per file (lines added / removed)', 'git diff«{cached!raw}» --stat«{rev}»', {}),
-  T('git_diff_names', 'List the names of the changed files', 'git diff«{cached!raw}» --name-only«{rev}»', {}),
+  T('git_diff_stat', 'Summarise the changes per file (lines added / removed)', 'git diff --stat', {}),
+  T('git_diff_names', 'List the names of the changed files', 'git diff --name-only', {}),
   T('git_show_files', 'Show which files a commit (the last one by default) changed', 'git show --stat {rev}', { rev: 'HEAD' }),
   T('git_worktree_list', 'List the git worktrees of the repository', 'git worktree list', {}),
   T('git_worktree_add', 'Check out a branch into a new worktree directory', 'git worktree add {path} {branch}', { path: null, branch: null }, 'medium'),

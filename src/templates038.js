@@ -12,7 +12,7 @@ export const IS_038 = new Set(CATALOG_038);
 // so their requests never fall through to a different 0.3.3 answer
 export const DISABLED_038 = new Set(['open_file', 'http_server', 'json_pretty', 'git_worktree_add', 'venv_create', 'git_show_files']);
 
-const REF_TOKEN = /(?:^|\s)((?:HEAD|@)(?:[~^]\d*)*|(?=[0-9a-f]*\d)[0-9a-f]{7,40}|v\d+(?:\.\d+)*)(?=[\s,.;:!?]|$)/;
+export const REF_TOKEN = /(?:^|\s)((?:HEAD|@)(?:[~^]\d*)*|(?=[0-9a-f]*\d)[0-9a-f]{7,40}|v\d+(?:\.\d+)*)(?=[\s,.;:!?]|$)/;
 const REF_SHAPE = /^[\w./~^@-]+$/;
 // words that are never a revision / branch / file name after a preposition
 const NOT_VALUE = /^(?:the|a|an|my|our|this|that|it|last|latest|previous|current|commit|commits|branch|branche?s?|head|repo|repository|file|files|folder|directory|dir|new|separate|another|other|working|tree|worktree|ostatni\w*|poprzedni\w*|bieżąc\w*|biezac\w*|gałęzi|galezi|gałąź|galaz|commita|nowy\w*|nowej|osobn\w*|katalog\w*|folder\w*|pliku?|default|domyśln\w*|domysln\w*|app|application|aplikacj\w*|browser|przeglądar\w*|przegladar\w*|port)$/i;
@@ -26,14 +26,7 @@ const unq = (s) => String(s).replace(/^(["'])(.*)\1$/, '$2');
 export function slots038(id, text, v, quoted = []) {
   const t = String(text).trim();
   const keep = {};
-  if (id === 'git_diff_stat' || id === 'git_diff_names') {
-    // 0.3.8: staged changes (--cached) are not rendered: a request about the index is withheld (staged words are not vocabulary)
-    const lit = t.match(/\bgit\s+diff\s+(?:--(?:cached|staged)\s+)?(?:--stat|--name-only)\s+([^\s"']+)\s*$/i) || t.match(/\bgit\s+diff\s+(?:--(?:cached|staged)\s+)?([^\s"'-][^\s"']*)\s+(?:--stat|--name-only)\s*$/i);
-    const prep = t.match(/\b(?:against|vs\.?|versus|compared\s+(?:to|with)|relative\s+to|since|from|between|względem|wzgledem|w\s+por[oó]wnaniu\s+z|od|do)\s+(?:the\s+)?(?:branch\s+|commit\s+|gałęzi\s+|galezi\s+)?(["']?)([^\s"']+)\1(?=[\s,.;!?]*$|\s)/i);
-    const m = t.match(REF_TOKEN);
-    const cand = lit ? lit[1] : prep && !NOT_VALUE.test(prep[2]) ? prep[2] : m ? m[1] : null;
-    if (cand != null && REF_SHAPE.test(cand) && !cand.startsWith('-')) keep.rev = cand;
-  }
+  // git_diff_stat / git_diff_names are value-free: always plain `git diff --stat` / `--name-only` (a scoped request is withheld)
   if (id === 'git_show_files') {
     const lit = t.match(/\bgit\s+show\s+--stat\s+([^\s"']+)\s*$/i) || t.match(/\b(?:commit|revision|tag|rewizj\w*|commicie|commita)\s+(["']?)([^\s"']+)\1(?=[\s,.;!?]*$|\s)/i);
     const m = t.match(REF_TOKEN);
@@ -85,13 +78,12 @@ const COMMON = `the a an me my our this that these please pls now just can could
 const WORDS = {
   git_diff_stat: `diff diffs stat stats statistic statistics summary summarise summarize overview changes changed change lines line count counts
     per file files how many much was were insertions deletions added removed --stat uncommitted unstaged working tree
-    against vs vs. versus compared compare relative since between branch commit last
-    each every per podsumowanie statystyki statystyk zmian plikach każdym kazdym zmieniono zmieniło zmienilo gicie diffa zmiany zmienione zmienionych linii linie ile plików plikow pliku plik dodanych usuniętych usunietych
-    względem wzgledem porównaniu porownaniu porównaj porownaj od gałęzi galezi gałąź galaz commita ostatniego zatwierdzonych niezatwierdzonych`,
+    every podsumowanie statystyki statystyk zmian plikach zmieniono zmieniło zmienilo gicie diffa zmiany zmienione zmienionych linii linie ile plików plikow pliku plik usuniętych usunietych
+    zatwierdzonych niezatwierdzonych`,
   git_diff_names: `diff only just names name filenames file files paths changed modified touched changes differ different --name-only
-    uncommitted unstaged working tree against vs vs. versus compared compare relative since between branch commit last which have has been
-    nazwy nazw plików plikow pliki zmienione zmienionych zmodyfikowane zmodyfikowanych zmieniły zmienily tylko się sie różnią roznia względem wzgledem
-    porównaniu porownaniu od gałęzi galezi gałąź galaz commita ostatniego niezatwierdzone touch touched did were
+    uncommitted unstaged working tree which have has been
+    nazwy nazw plików plikow pliki zmienione zmienionych zmodyfikowane zmodyfikowanych zmieniły zmienily tylko się sie różnią roznia
+    niezatwierdzone touch touched did were
     zmieniłem zmienilem zmieniłam zmienilam diffa gicie zmodyfikowanych`,
   git_show_files: `show --stat files file changed modified touched changes stat stats summary last latest newest recent most previous prior commit
     went into were was in by included part made has had one before second-to-last revision tag what which
@@ -122,7 +114,7 @@ const WORDS = {
 };
 const VOCAB = Object.fromEntries(Object.entries(WORDS).map(([k, s]) => [k, new Set(`${COMMON} ${s}`.split(/\s+/).filter(Boolean).map((w) => w.toLowerCase()))]));
 // the slots each template renders (only these explain words of the request)
-const RENDERED = { git_diff_stat: ['rev'], git_diff_names: ['rev'], git_show_files: ['rev'], git_worktree_add: ['path', 'branch'], json_pretty: ['file'],
+const RENDERED = { git_diff_stat: [], git_diff_names: [], git_show_files: ['rev'], git_worktree_add: ['path', 'branch'], json_pretty: ['file'],
   http_server: ['port'], venv_create: [], open_file: ['file'], git_worktree_list: [], pip_list: [], npm_outdated: [] };
 // (Unicode-aware word edges: `\b` would see a word break inside `zależności`)
 const SECOND = /(?<![\p{L}\d_])(?:and|but|then|plus|afterwards|also|too|additionally|after\s+that|oraz|ale|potem|następnie|nastepnie|też|tez|również|rowniez|dodatkowo)(?![\p{L}\d_])/iu;
@@ -134,13 +126,20 @@ const PAIR = /(?<![\p{L}\d_])(insertions|added|lines added|packages|dodanych|dod
 // a file opened with the default app that would run as a program (or script) instead of being viewed
 const EXEC_EXT = /\.(?:exe|com|bat|cmd|ps1|psm1|vbs|vbe|js|jse|wsf|wsh|msi|msp|scr|pif|cpl|hta|jar|app|command|tool|sh|bash|zsh|csh|py|pyw|pl|rb|run|bin|appimage|desktop|lnk|url|scpt|workflow|pkg|dmg|deb|rpm)$/i;
 
+// git_diff_stat / git_diff_names render no revision: any request naming one (or a scope: staged, a commit, a branch, a
+// comparison, per commit) is withheld rather than answered with the plain working-tree diff
+const DIFF = new Set(['git_diff_stat', 'git_diff_names']);
+const SCOPE = /(?<![\p{L}\d_])(?:commit|commita|commitu|commity|commits|last|ostatni\w*|branch\w*|gałąź|gałęzi|galaz|galezi|staged|staging|stage|index|cached|dodan\w*|poczekalni\w*|since|from|vs|versus|against|between|compared|od|do|względem|wzgledem|między|miedzy|per|each|każd\w*|kazd\w*|head|main|master|origin|upstream|remote)(?![\p{L}\d_])/iu;
+
 /**
  * Why a suggestion for one of the 0.3.8 templates must not run as is ([] : fine). The pipeline puts these in `missing`.
  */
 export function withhold038(id, text, slots = {}) {
+  if (DISABLED_038.has(id)) return ['args (template disabled in this release)'];
   // an apostrophe inside a word is not a quote (`worktree'y`, `zastageowanych`, `don't`)
   const t = String(text).trim().replace(/(?<=[A-Za-z])'(?=[a-z]{1,9}(?![\p{L}\d_]))/gu, '').replace(PAIR, '$1 $2');
   if (/[\r\n\t\v\f\u0085\u2028\u2029]/.test(t)) return ['request (spans several lines)'];
+  if (DIFF.has(id) && (SCOPE.test(t) || REF_TOKEN.test(t) || /[~^@]|\.\.|\w\/\w/.test(t))) return ['rev (a revision or scope is not expressed: only plain git diff is rendered)'];
   if (/[^\x20-\x7eąćęłńóśźżĄĆĘŁŃÓŚŹŻ]/u.test(t) || /`/.test(t)) return ['value (characters outside ASCII / Polish letters)'];
   const out = [];
   const vals = (RENDERED[id] || []).map((k) => slots[k]).filter((x) => x != null).map((x) => String(x).toLowerCase());

@@ -609,8 +609,8 @@ export const VARIANTS = {
   // a bare `--` can be swallowed by PowerShell before reaching native commands; quote it
   git_grep: { pwsh: "git grep -n '--' {pattern}", cmd: 'git grep -n -- {pattern}' },
   // catalog-038
-  git_diff_stat: { pwsh: 'git diff«{cached!raw}» --stat«{rev}»', cmd: 'git diff«{cached!raw}» --stat«{rev}»' },
-  git_diff_names: { pwsh: 'git diff«{cached!raw}» --name-only«{rev}»', cmd: 'git diff«{cached!raw}» --name-only«{rev}»' },
+  git_diff_stat: { pwsh: 'git diff --stat', cmd: 'git diff --stat' },
+  git_diff_names: { pwsh: 'git diff --name-only', cmd: 'git diff --name-only' },
   git_show_files: { pwsh: 'git show --stat {rev}', cmd: 'git show --stat {rev}' },
   git_worktree_list: { pwsh: 'git worktree list', cmd: 'git worktree list' },
   git_worktree_add: { pwsh: 'git worktree add {path} {branch}', cmd: 'git worktree add {path} {branch}' },

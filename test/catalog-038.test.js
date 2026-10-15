@@ -34,7 +34,7 @@ test('catalog-038 intents: catalog, tool family, template gate, risk', () => {
 test('catalog-038 renders per shell', () => {
   for (const [id, text, bash, mac, ps, cm] of [
     ['git_diff_stat', 'show a diff stat', 'git diff --stat', 'git diff --stat', 'git diff --stat', 'git diff --stat'],
-    ['git_diff_names', 'which files changed compared to develop', 'git diff --name-only develop', null, null, null],
+    ['git_diff_names', 'which files changed', 'git diff --name-only', 'git diff --name-only', 'git diff --name-only', 'git diff --name-only'],
     ['git_show_files', 'which files changed in the last commit', 'git show --stat HEAD', null, "git show --stat 'HEAD'", 'git show --stat HEAD'],
     ['git_show_files', 'files changed in commit abc1234', 'git show --stat abc1234', null, null, null],
     ['git_show_files', 'files in the previous commit', "git show --stat 'HEAD~1'", null, null, null],
@@ -89,7 +89,7 @@ test('catalog-038: a restriction, option or second action the template cannot ex
     ['npm_outdated', 'nieaktualne pakiety npm oprócz react'],
   ]) assert.ok(withheld(id, text).length > 0, `${id}: ${JSON.stringify(text)} -> ${cmd(id, text)}`);
   // plain requests are not
-  for (const [id, text] of [['npm_outdated', 'sprawdź przestarzałe zależności'], ['git_worktree_list', 'which worktrees do i have'], ['git_diff_stat', 'show insertions and deletions per file'],
+  for (const [id, text] of [['npm_outdated', 'sprawdź przestarzałe zależności'], ['git_worktree_list', 'which worktrees do i have'], ['git_diff_stat', 'show insertions and deletions'],
     ['git_worktree_list', "wylistuj worktree'y"], ['pip_list', 'show installed packages and versions']]) assert.deepEqual(withheld(id, text), [], `${id}: ${text}`);
 });
 
@@ -99,8 +99,9 @@ test('g10 training rows: every intent has EN and PL rows; hard negatives are exi
   for (const r of ROWS) { assert.ok(BY_ID[r.intent], r.intent); assert.ok(['en', 'pl'].includes(r.lang)); n[`${r.intent}/${r.lang}`] = (n[`${r.intent}/${r.lang}`] || 0) + 1; }
   for (const id of CATALOG_038) for (const lang of ['en', 'pl']) assert.ok((n[`${id}/${lang}`] || 0) >= 20, `${id}/${lang}: ${n[`${id}/${lang}`]}`);
   assert.ok(ROWS.filter((r) => !CATALOG_038.includes(r.intent)).length >= 30, 'near-miss hard negatives');
-  // staged changes (--cached) are not rendered in 0.3.8: rows about the index are withheld
-  const namesVenv = (r) => /\b(?:staged|cached|index)\b|--cached|--staged|poczekalni|zastage|stage'?owan/i.test(r.text);
+  // the two diff templates are value-free: rows naming a revision or scope (staged, commit, branch, per, od, ...) are withheld
+  const namesVenv = (r) => /\b(?:staged|cached|index)\b|--cached|--staged|poczekalni|zastage|stage'?owan/i.test(r.text)
+    || (/^git_diff_/.test(r.intent) && /(?<![\p{L}\d_])(?:commit\w*|last|ostatni\w*|branch\w*|gałąź|gałęzi|galaz|galezi|stage|dodan\w*|since|from|vs|versus|against|between|compared|od|do|względem|wzgledem|między|miedzy|per|each|każd\w*|kazd\w*|head|main|master|origin|upstream|remote)(?![\p{L}\d_])|[~^@]|\w\/\w/iu.test(r.text));
   for (const r of ROWS.filter((x) => SHIPPED.includes(x.intent))) {
     if (namesVenv(r)) { assert.ok(withheld(r.intent, r.text).length > 0, r.text); continue; }
     assert.deepEqual(withheld(r.intent, r.text), [], `${r.intent}: ${r.text}`);
@@ -142,8 +143,7 @@ test('catalog-038: values come from the request (rules 2a / 2b, venv .venv only,
   assert.deepEqual(withheld('venv_create', 'python3 -m venv .venv'), ['args (template disabled in this release)']); // cut in 0.3.8
   // an option-like or a not-named value is withheld whatever the slot extraction produced
   const w = (id, text, slots) => newTemplateWithhold(id, text, slots, 'x');
-  assert.ok(w('git_diff_stat', 'show the diff stat', { rev: 'abc123' }).some((m) => /not named/.test(m)));
-  assert.ok(w('git_diff_stat', 'diff stat against -x', { rev: '-x' }).some((m) => /option/.test(m)));
+  assert.ok(w('git_diff_stat', 'diff stat against -x', { rev: '-x' }).some((m) => /^rev /.test(m)));
   for (const env of [BASH, MAC, PS, CMD]) {
     for (const q of ['create a venv named current', 'create a venv named --clear', 'python3 -m venv --system-site-packages', 'which files changed in the previous commit of HEAD~3']) {
       const r = suggest(q, { env });
@@ -167,8 +167,8 @@ test('catalog-038: cut intents (open, http.server, jq, worktree add, venv, git s
 test('catalog-038 r2: an unexpressed action or scope is withheld; the composer never replaces a template intent', () => {
   const run = (q) => { const r = suggest(q, { env: BASH }); return r.command && !(r.missing || []).length ? r.command : null; };
   assert.equal(run('update outdated npm dependencies'), null);
-  assert.equal(suggest('names of changed files vs HEAD~2', { env: BASH }).command, "git diff --name-only 'HEAD~2'");
+  assert.equal(run('names of changed files vs HEAD~2'), null); // the diff templates are value-free: a revision is withheld
   // staged changes and a branch literally named `staged` are withheld (0.3.8 renders no --cached)
   for (const q of ['diff stat of staged changes against main', 'names of changed files staged vs HEAD']) assert.equal(run(q), null, q);
-  assert.equal(run('git diff --stat staged'), 'git diff --stat staged'); // a revision named `staged` stays a revision
+  assert.equal(run('git diff --stat staged'), null);
 });

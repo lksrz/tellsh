@@ -2,11 +2,12 @@
 
 ## Unreleased — catalog-038
 
-**New catalog templates (catalog-038):** `git diff --stat [ref]` / `git diff --name-only [ref]`,
+**New catalog templates (catalog-038):** `git diff --stat` / `git diff --name-only`,
 `git worktree list`, `pip list`, `npm outdated`. Training rows in `data/intents/g10_catalog038.jsonl` (EN + PL, with near-miss negatives); labelling
-patterns for the real-usage split in `scripts/real/prepare_real.js`. Values come only from the request text (a value
-starting with `-`, or one the request does not literally contain, e.g. a revision from history, is withheld; staged
-changes (`--cached`) are not rendered), and a request the template cannot fully express is withheld
+patterns for the real-usage split in `scripts/real/prepare_real.js`. The two diff templates are value-free (always the
+plain working-tree diff): a request naming a revision or scope (a ref / hash, commit, last, branch, staged / index,
+since / from / vs / against / od / do, per / each, HEAD / main / origin, ...) is withheld, never answered with the plain
+diff. Values come only from the request text, and a request the template cannot fully express is withheld
 (`src/templates038.js`). They go through the same two-model gate as the 0.3.4 templates (`NEW_TEMPLATE_INTENTS`); a
 template answer is never replaced by a composed command.
 **Not in this release:** opening a file / URL (`open`), a local HTTP server (`http.server`), pretty-printing JSON
@@ -14,7 +15,7 @@ template answer is never replaced by a composed command.
 withheld (shown, never run: `DISABLED_038` in `src/templates038.js`), like the 0.3.4 `git grep` / `git show`, so their
 requests never fall through to a different 0.3.3 answer.
 **Gate fall-through guard:** when the templates model ranks a template intent among its candidates at p >= 0.2 but
-not first, the request falls through to the 0.3.3 model; that answer is withheld if its risk is medium or higher
+not first (among its top 5, whatever `--top` is), the request falls through to the 0.3.3 model; that answer is withheld if its risk is medium or higher
 (`missing: args (a <template> template request, not answered by the fallback model)`, `fallthroughGuard` in
 `src/templates038.js`), so a retrain's probability shift cannot turn a fetch-like request into a runnable `git pull` /
 `git checkout -b`. Safe fall-through answers are unchanged.

@@ -186,7 +186,7 @@ export const ALLOW = {
   "git checkout": ["-b"],
   "git clone": [],
   "git commit": ["-m"],
-  "git diff": ["--cached","--name-only","--staged","--stat"],
+  "git diff": ["--name-only","--staged","--stat"],
   "git fetch": ["--all"],
   "git grep": ["-n"],
   "git init": [],

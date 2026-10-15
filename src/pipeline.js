@@ -444,12 +444,13 @@ export function suggest(query, opts = {}) {
   const tm = getTemplatesModel();
   if (!tm) return once(opts);
   // the templates model is probed without the rerank hook; with the hook, the reranked answer of either model may be consulted, and only a 0.3.4 template intent is kept from the templates model
-  const probe = once({ ...opts, model: tm, rerank: undefined, gated: true });
-  // a history refusal of the templates model (the previous line is a 0.3.4 template) is kept, never re-asked of 0.3.3
-  if (probe && opts.history?.length && probe.context?.rule === 'refused' && !probe.command && probe.context.newTemplateLast) return probe;
+  // the probe ranks at least 5 candidates whatever `top` is (the fall-through guard reads them); cut only for display
+  const n = Math.max(1, opts.top ?? 3), cut = (r) => (r?.candidates?.length > n ? { ...r, candidates: r.candidates.slice(0, n) } : r);
+  const probe = once({ ...opts, top: Math.max(n, 5), model: tm, rerank: undefined, gated: true });
+  if (probe && opts.history?.length && probe.context?.rule === 'refused' && !probe.command && probe.context.newTemplateLast) return cut(probe);
   const fall = () => fallthroughGuard(probe, once({ ...opts, gated: true }), (i) => NEW_TEMPLATE_INTENTS.has(i));
   if (!probe || !NEW_TEMPLATE_INTENTS.has(probe.intent)) return fall();
-  if (!opts.rerank) return probe;
+  if (!opts.rerank) return cut(probe);
   // with the hook: the reranked templates answer is kept only if it is still a 0.3.4 template intent, otherwise 0.3.3 answers
   const alt = once({ ...opts, model: tm, gated: true });
   return alt && NEW_TEMPLATE_INTENTS.has(alt.intent) ? alt : fall();
