@@ -443,6 +443,18 @@ from `$TELLSH_REAL_DATA` by `scripts/real/prepare_real.js` into `build/real/` (g
 aggregate numbers are committed. Without the file every script trains and evaluates on public data only
 (`gen_data.js --no-real` forces this).
 
+**Safety diff between two checkouts.** `scripts/real/gate_diff.js` lists every request whose answer becomes runnable
+with a higher risk. `dump` runs every public eval set (`data/eval`, `data/eval_v04`, `data/blind`, `data/ood*.jsonl`,
+`data/history`; with `--real` also the private eval split, kept out of the console) through `suggest()` of the checkout
+given by `--root`; `compare` reports per-set changes, ESCALATIONS (new runnable and riskier, incl. withheld → runnable)
+and same-risk intent swaps, and exits 1 on any escalation. Runnable = a command, nothing missing, `understood !== false`.
+
+```bash
+node scripts/real/gate_diff.js dump --root ../tellsh-old --out old.jsonl
+node scripts/real/gate_diff.js dump --out new.jsonl
+node scripts/real/gate_diff.js compare old.jsonl new.jsonl   # --show-text prints private rows too
+```
+
 Own EN/PL data (MIT) + **tldr-pages** (CC-BY-4.0, attribution in [DATA_LICENSES.md](DATA_LICENSES.md); derived
 descriptions only, in git, never in the npm tarball). **NL2Bash is GPL-3.0 and is not used** (not even for eval).
 The optional **TypeSafe Jev** teacher is build-time only (300 calls, < $0.01).
