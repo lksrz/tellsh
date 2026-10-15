@@ -16,15 +16,19 @@ export function sameButLast(query, ctx) {
   return sameBut(q, { ...ctx, last: ctx.last || { slots: {} } }) || isRepeatBut(q) ? ctx.last?.intent || UNKNOWN : undefined;
 }
 
-// guard-only repeat phrasings: start of the request, then "but"/"ale" (diacritics folded)
+// guard-only repeat phrasings: start of the request, then "but"/"ale" after a space or a comma/dash (diacritics folded)
+const SEP = String.raw`(?:\s*[,;:–—-]\s*|\s+)`;
+const EN = String.raw`^(?:(?:and|now|ok|okay|so|please)\s*,?\s+)*`;
+const PL = String.raw`^(?:(?:a|i|ok|dobra|prosze)\s*,?\s+)*`;
 const REPEAT_BUT = [
-  /^(?:and\s+|now\s+)?(?:(?:do|run)\s+(?:it|that|this)\s+)?(?:again|one more time),?\s+but\b/,
-  /^(?:and\s+|now\s+)?(?:repeat|rerun|re-run|redo)(?:\s+(?:it|that|this|the\s+(?:last|previous)(?:\s+(?:one|command))?))?,?\s+but\b/,
-  /^(?:(?:just\s+)?like|as)\s+(?:before|last\s+time),?\s+but\b/,
-  /^(?:a\s+|i\s+)?(?:(?:zrob|uruchom|odpal)\s+(?:to\s+)?)?(?:jeszcze\s+raz|znowu|ponownie)(?:\s+to)?,?\s+ale\b/,
-  /^(?:a\s+|i\s+)?powtorz(?:\s+(?:to|ostatnie(?:\s+polecenie)?))?,?\s+ale\b/,
-  /^(?:a\s+|i\s+)?(?:tak\s+)?jak\s+(?:poprzednio|wczesniej|ostatnio),?\s+ale\b/,
-];
+  String.raw`${EN}(?:(?:do|run)\s+(?:it|that|this|the\s+same)\s+)?(?:again|once\s+more|one\s+more\s+time)${SEP}but\b`,
+  String.raw`${EN}(?:repeat|rerun|re-run|redo)(?:\s+(?:it|that|this|the\s+(?:last|previous)(?:\s+(?:one|command))?))?${SEP}but\b`,
+  String.raw`${EN}(?:(?:just\s+)?like|as)\s+(?:before|last\s+time)${SEP}but\b`,
+  String.raw`${EN}(?:do\s+)?the\s+same\s+again${SEP}but\b`,
+  String.raw`${PL}(?:(?:zrob|uruchom|odpal)\s+(?:to\s+)?)?(?:jeszcze\s+raz|znowu|ponownie)(?:\s+to)?${SEP}ale\b`,
+  String.raw`${PL}(?:powtorz|ponow)(?:\s+(?:to|ostatnie(?:\s+polecenie)?))?${SEP}ale\b`,
+  String.raw`${PL}(?:tak\s+)?jak\s+(?:poprzednio|wczesniej|ostatnio)${SEP}ale\b`,
+].map((src) => new RegExp(src));
 const foldRepeat = (q) => String(q).normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/ł/g, 'l').replace(/Ł/g, 'L').toLowerCase().replace(/\s+/g, ' ').trim();
 export const isRepeatBut = (q) => REPEAT_BUT.some((re) => re.test(foldRepeat(q)));
 

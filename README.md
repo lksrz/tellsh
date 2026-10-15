@@ -309,7 +309,8 @@ Wrapped commands (`sudo -u root ls`, `env ls`, `command ls`, `nice -n 5 ps aux`)
 later segment of its line ran after the repeatable command, when X names nothing it takes, or when "same but …" would
 turn the previous command into a different, riskier one (`same but no discard` after `git status`). The same guard
 covers repeat phrasings at the start of a request followed by "but"/"ale" (`again but …`, `do it again, but …`,
-`repeat that but …`, `like before but …`, `jeszcze raz, ale …`, `powtórz to ale …`); they are only guarded, not applied
+`once more but …`, `repeat that but …`, `like before but …`, `do the same again but …`, `jeszcze raz, ale …`, `powtórz to ale …`,
+`ponów, ale …`; a leading `ok`/`please`/`and` and a comma or dash before "but" are allowed); they are only guarded, not applied
 as modifiers. Other wordings ("delete it again, but …") are not recognised: read a high-risk suggestion before pressing Enter. A slot of the previous
 command that depends on the shell state (`find "$DIR" …`) or fails validation (a 300-character path) stays a
 placeholder, and a slot the new request withheld (`same but … in /tmp/new!`) is never refilled. A single named path

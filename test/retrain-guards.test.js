@@ -151,9 +151,9 @@ test('0.3.8: "same but" never turns the previous command into a riskier intent (
   assert.equal(suggest('remove build dir without asking', { ...ENVS[0], history: ['cat config.txt'] }).context.rule === 'refused', false);
   assert.match(suggest('commit with message "no changes"', { ...ENVS[0], history: ['git status'] }).command || '', /commit/);
 });
-test('0.3.9: repeat phrasings ("again but …", "jeszcze raz, ale …") get the same-but risk guard', () => {
+test('unreleased: repeat phrasings ("again but …", "jeszcze raz, ale …") get the same-but risk guard', () => {
   for (const [env, h] of [[ENVS[0], 'cat config.txt'], [ENVS[1], 'cat config.txt'], [ENVS[2], 'Get-Content config.txt'], [ENVS[3], 'type config.txt']]) {
-    for (const q of ['again but without deleting it', 'do it again, but without deleting it', 'repeat that but no deletion', 'jeszcze raz, ale bez usuwania', 'powtórz to ale bez kasowania', 'like before but without\ndeleting it']) {
+    for (const q of ['again but without deleting it', 'do it again, but without deleting it', 'repeat that but no deletion', 'jeszcze raz, ale bez usuwania', 'powtórz to ale bez kasowania', 'like before but without\ndeleting it', 'again,but without deleting it', 'again , but without deleting it', 'again - but delete it', 'once more but delete it', 'ok, again but delete it', 'please again but delete it', 'do the same again but delete it', 'ponów, ale usuń plik', 'Jeszcze raz,ale usuń go']) {
       const r = suggest(q, { ...env, history: [h] });
       assert.ok(!r.command || (r.missing || []).length || /<FILE>/.test(r.command), `${env.shell}: ${JSON.stringify(q)} -> ${r.command}`);
     }
@@ -164,4 +164,6 @@ test('0.3.9: repeat phrasings ("again but …", "jeszcze raz, ale …") get the 
   for (const q of ['delete it again', 'run the tests again', 'show it again but bigger', 'delete old logs but keep config', 'znowu usuń logi'])
     assert.equal(sameButLast(q, { n: 1, last: { intent: 'cat_file', slots: {} } }), undefined, q);
   assert.match(suggest('delete it', { ...ENVS[0], history: ['cat config.txt'] }).command, /config\.txt/);
+  // a repeat phrasing that stays at the same or a lower risk is not refused
+  assert.notEqual(suggest('as before but show hidden files', { ...ENVS[0], history: ['ls'] }).context.rule, 'refused');
 });
