@@ -132,3 +132,14 @@ test('r53: history classification keeps the user threshold; fetch never drops a 
       assert.notEqual(R(suggest(q, o)), 'git fetch --all', `${shell}: ${q}`);
   }
 });
+test('0.3.8: "same but" never turns the previous command into a riskier intent (any history path)', () => {
+  for (const env of ENVS.slice(0, 2)) for (const h of ['git status', 'git branch -a', 'tellsh "fetch all branches"']) {
+    const r = suggest('same but no discard', { ...env, history: [h] });
+    assert.equal(r.command, null, `${env.shell}: ${h} -> ${r.command}`);
+  }
+  for (const [env, h] of [[ENVS[0], 'cat config.txt'], [ENVS[1], 'cat config.txt'], [ENVS[2], 'Get-Content config.txt'], [ENVS[3], 'type config.txt']]) {
+    assert.equal(suggest('same but without deleting it', { ...env, history: [h] }).command, null, env.shell);
+  }
+  assert.match(suggest('same but for staging', { ...ENVS[0], history: ['git push origin main'] }).command, /staging/);
+  assert.match(suggest('delete it', { ...ENVS[0], history: ['cat config.txt'] }).command, /config\.txt/); // a plain reference still works
+});

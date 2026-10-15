@@ -1,5 +1,18 @@
 # Changelog
 
+## 0.3.8 — "same but" safety fix
+
+**Safety:** a "same but …" follow-up never turns the previous command into a different, riskier intent, whichever way
+the history reference is resolved (`src/samebut-guard.js`). Before, `same but no discard` after any git command
+suggested `git restore .`, and `same but without deleting it` after `cat config.txt` suggested `rm config.txt` (both high
+risk, never auto-run, but one Enter away); both are now refused with a hint to ask directly. Models are unchanged.
+
+**Build (no runtime change):** training scripts synced with the pipeline that built the 0.3.5/0.3.6 models
+(`scripts/real/prepare_real.js --labels 036` reproduces that split exactly; structural split, template-generated row
+flag, private-data writer); `npm run train` writes `build/model.bin` and no longer rewrites `model/*.json`;
+`scripts/train.py` refuses to overwrite a shipped `model/` file (by inode) without `--replace-shipped`;
+`scripts/real/eval_gate.js` scores the two-model gate on the private eval split (aggregates only).
+
 ## 0.3.7 — installed-tool flag check
 
 **Help-verifier.** Before a command is shown, its flags are checked against the man page of the tool actually
