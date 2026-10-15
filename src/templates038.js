@@ -79,7 +79,7 @@ const WORDS = {
   git_diff_stat: `diff diffs stat stats statistic statistics summary summarise summarize overview changes changed change lines line count counts
     per file files how many much was were insertions deletions added removed --stat uncommitted unstaged working tree
     every podsumowanie statystyki statystyk zmian plikach zmieniono zmieniło zmienilo gicie diffa zmiany zmienione zmienionych linii linie ile plików plikow pliku plik usuniętych usunietych
-    zatwierdzonych niezatwierdzonych`,
+    niezatwierdzonych`,
   git_diff_names: `diff only just names name filenames file files paths changed modified touched changes differ different --name-only
     uncommitted unstaged working tree which have has been
     nazwy nazw plików plikow pliki zmienione zmienionych zmodyfikowane zmodyfikowanych zmieniły zmienily tylko się sie różnią roznia
@@ -106,7 +106,7 @@ const WORDS = {
   open_file: `open launch view start file url link page website site document picture image pdf with default app application program its viewer browser
     xdg-open invoke-item ii in
     otwórz otworz plik pliku link stronę strone dokument obrazek zdjęcie zdjecie domyślnej domyslnej domyślnym domyslnym aplikacji programie programem przeglądarce przegladarce`,
-  pip_list: `pip pip3 python python3 -m list listing installed packages package libraries library modules versions version which what are have i we
+  pip_list: `pip pip3 python python3 -m list listing installed packages package libraries library modules versions which what are have i we
     has pythona pythonie pakiety pakietów pakietow zainstalowane zainstalowanych biblioteki bibliotek moduły moduly wersje lista listę liste wylistuj mam`,
   npm_outdated: `npm outdated old stale out of date dependencies dependency deps packages package newer updates available versions version which what are
     have there check any for project if
@@ -139,6 +139,10 @@ export function withhold038(id, text, slots = {}) {
   // an apostrophe inside a word is not a quote (`worktree'y`, `zastageowanych`, `don't`)
   const t = String(text).trim().replace(/(?<=[A-Za-z])'(?=[a-z]{1,9}(?![\p{L}\d_]))/gu, '').replace(PAIR, '$1 $2');
   if (/[\r\n\t\v\f\u0085\u2028\u2029]/.test(t)) return ['request (spans several lines)'];
+  // a literal git diff is answered only when it is exactly the rendered command (`git diff --name-only name` is not)
+  if (DIFF.has(id) && /^git\s+diff(?![\p{L}\d_])/iu.test(t) && !/^git\s+diff\s+--(?:stat|name-only)$/i.test(t)) return ['args (a literal git diff with other arguments)'];
+  // npm outdated answers only a request about outdated packages, not "what are my npm dependencies"
+  if (id === 'npm_outdated' && !/(?<![\p{L}\d_])(?:outdated|old|stale|out\s+of\s+date|newer|updates?|upgrades?|przestarza\p{L}*|nieaktualn\p{L}*|stare|nowsze|aktualizacj\p{L}*)(?![\p{L}\d_])/iu.test(t)) return ['args (outdated packages are not asked for)'];
   if (DIFF.has(id) && (SCOPE.test(t) || REF_TOKEN.test(t) || /[~^@]|\.\.|\w\/\w/.test(t))) return ['rev (a revision or scope is not expressed: only plain git diff is rendered)'];
   if (/[^\x20-\x7eąćęłńóśźżĄĆĘŁŃÓŚŹŻ]/u.test(t) || /`/.test(t)) return ['value (characters outside ASCII / Polish letters)'];
   const out = [];
