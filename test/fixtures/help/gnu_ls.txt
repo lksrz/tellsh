@@ -1,0 +1,11 @@
+Usage: ls [OPTION]... [FILE]...
+List things (synthetic sample in GNU --help format).
+
+  -a, --all                  include hidden entries
+  -A, --almost-all           like -a, minus . and ..
+      --color[=WHEN]         colorize; WHEN is always, auto or never
+  -h, --human-readable       with -l, sizes like 1K 2M
+  -l                         long listing
+  -t                         sort by time
+  -1                         one entry per line
+      --help        show this help and exit

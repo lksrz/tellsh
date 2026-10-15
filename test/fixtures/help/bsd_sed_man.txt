@@ -1,0 +1,7 @@
+SYNOPSIS
+     sed [-Ealnu] command [file ...]
+     sed [-Ealnu] [-e command] [-i extension] [file ...]
+
+     -E      Extended regexps.
+     -i extension
+             Edit in place.

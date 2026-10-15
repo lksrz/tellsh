@@ -1,0 +1,9 @@
+usage: git status [<options>] [--] [<pathspec>...]
+
+    -v, --[no-]verbose    be more talkative
+    -s, --[no-]short      terse output
+    -b, --[no-]branch     show the branch
+    --[no-]porcelain[=<version>]
+                          machine output
+    -u, --[no-]untracked-files[=<mode>]
+                          untracked mode

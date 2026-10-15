@@ -51,7 +51,8 @@ tellsh [options] <request...>
 
   -n, --dry-run        print the command only, never run it
   -y, --yes            run without prompting (only risk=safe commands straight from the catalog; never
-                       history-resolved, composed, incomplete or medium/high-risk ones)
+                       history-resolved, composed, incomplete or medium/high-risk ones, nor ones whose
+                       flags your installed tool does not list: see "Installed-tool flag check")
   -e, --explain        tool/intent scores, slots and where each slot came from (tagger/regex/history)
       --json           machine-readable output (implies --dry-run)
       --shell <s>      bash | zsh | sh | powershell | fish | cmd   (default: detected)
@@ -226,6 +227,26 @@ Without the bundle tellsh runs the cascade alone. `--no-hybrid` / `TELLSH_HYBRID
 `TELLSH_HYBRID=student-full` also lets a confident student overrule a confident cascade (the student then runs on every
 query). Answers the student changed are never auto-run with `--yes`.
 
+### Installed-tool flag check
+
+A template's flags may not exist in the version of the tool you have (GNU vs BSD, old vs new). Before a command is
+shown (also in `--json`, as `helpcheck`), tellsh checks its flags against the help text of the tool actually installed,
+deterministically:
+
+* only tools on a fixed allowlist (ls, grep, find, du, df, sort, tar, sed, head, tail, ps, xargs, … and
+  `git <sub>` for builtin subcommands whose `-h` lists all their options; `git log/show/diff` are skipped) are read,
+  each with a fixed help argument. A tool is never run with a guessed `-h` (`shutdown -h`, `df -h`). On macOS a system
+  tool (`/bin`, `/usr/bin`, …) is not run at all: its man page is read (`man -P cat <tool>`); Homebrew / Linux tools
+  are asked for `--help`, `git <sub> -h`. No shell, stdin closed, `LC_ALL=C`, pagers set to `cat`, 300 ms timeout,
+  256 KB output cap;
+* the parsed option list is cached per binary (real path + size + mtime) in `$XDG_CACHE_HOME/tellsh/help` (default
+  `~/.cache/tellsh/help`): the first use of a tool costs one spawn (~20–100 ms), later calls a small JSON read;
+* a flag that is not listed prints `! flag -x not found in your installed <tool> help`, and `--yes` refuses to run the
+  command. The command itself is not rewritten. A tool that is not installed is noted (`note: not installed here`),
+  without refusing;
+* POSIX shells (bash/zsh/sh) on the OS tellsh runs on only: PowerShell, cmd, fish and `--os` renders for another OS are
+  not checked. `TELLSH_HELPCHECK=0` turns the check off.
+
 ### History context
 
 `--history` (or `TELLSH_HISTORY=1`) reads the **tail** (last 32 KB) of `$HISTFILE` / `~/.bash_history` /
@@ -373,7 +394,8 @@ compression from the archive name, `bash -n` and an allowed-flag check validate 
   (names, hosts, URLs, containers, …) may not start with `-`, and URLs must be `scheme://…` or `user@host:path`.
   Values taken from history pass the same validation.
 * `--yes` only runs `safe` commands, i.e. fresh catalog renders with plain values (the trust rule): never
-  history-resolved, composed, edited, incomplete or medium/high-risk ones. Non-TTY use prints only.
+  history-resolved, composed, edited, incomplete or medium/high-risk ones, nor ones with flags missing from the
+  installed tool's help. Non-TTY use prints only.
 
 ## Accuracy & speed (details: [EVAL.md](EVAL.md))
 

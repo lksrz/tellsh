@@ -1,0 +1,12 @@
+Usage: tar [OPTION...] [FILE]...
+Synthetic sample in GNU argp format.
+
+ Main operation mode:
+  -c, --create               new archive
+  -t, --list                 list contents
+  -x, --extract, --get       extract
+ Compression options:
+  -z, --gzip, --gunzip, --ungzip   gzip filter
+  -f, --file=ARCHIVE         archive file
+  -C, --directory=DIR        change to DIR
+      --exclude=PATTERN      skip PATTERN

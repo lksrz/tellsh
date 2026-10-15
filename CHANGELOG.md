@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.3.7 (unreleased) — installed-tool flag check
+
+**Help-verifier.** Before a command is shown, its flags are checked against the help text of the tool actually
+installed (new `src/helpcheck.js`): allowlisted tools only, each with a fixed help argument (`--help`, `git <sub> -h`;
+on macOS system tools are read from their man page and never run), no shell, closed stdin, 300 ms timeout, 256 KB cap.
+The parsed options are cached per binary (realpath + size + mtime) in `$XDG_CACHE_HOME/tellsh/help`
+(`~/.cache/tellsh/help`). An unlisted flag prints a warning (`flag -x not found in your installed <tool> help`) and
+`--yes` refuses to run the command; a missing tool is noted. `--json` carries the result as `helpcheck`. Commands are
+never rewritten. `suggest()` is unchanged (the check runs in the CLI only). `TELLSH_HELPCHECK=0` turns it off.
+
 ## 0.3.6
 
 **The distilled student runs in pure JS and is on by default.** A new forward pass (`src/rerank/student-js.js`, with a tiny
