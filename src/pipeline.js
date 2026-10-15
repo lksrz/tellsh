@@ -16,6 +16,7 @@ import { CATALOG_038 } from './templates038.js';
 import { BY_ID } from './catalog.js';
 import { FAMILY_OF, NONE } from './tools.js';
 import { detectEnv, envFeatures } from './env.js';
+import { sameButRiskGuard } from './samebut-guard.js';
 import { buildContext, resolveReference, hasPronoun, hasLocative, cwdFlags, sameBut, entityForSlot, isAmbiguous } from './history.js';
 import { AMB } from './shellwords.js';
 import { compose } from './compose.js';
@@ -416,9 +417,9 @@ function literalIntentOk(first, intent) { const f = LIT_FAMILY[String(first).toL
 
 // two-model gate: the 0.3.3 model (model/model.bin) answers everything it already knew; model/model_templates.bin only when it
 // picks a template intent (0.3.4, 0.3.8), so a retrain never changes the pre-existing intents (classification and slots).
-// catalog-038: the shipped 0.3.8 templates are gated the same way; NOT_GATED (cut 0.3.8 ones, disabled 0.3.4 git_grep / git_show) never are: 0.3.3 answers as in 0.3.7
-export const NOT_GATED = new Set(['open_file', 'http_server', 'json_pretty', 'git_worktree_add', 'git_grep', 'git_show']);
-export const NEW_TEMPLATE_INTENTS = new Set(['git_fetch', 'git_ls_files', 'gh_run_watch', 'gh_issue_list', 'gh_issue_view', 'wrangler_d1_list', 'wrangler_pages_deploy', ...CATALOG_038.filter((id) => !NOT_GATED.has(id))]);
+// catalog-038: the shipped 0.3.8 templates are gated the same way; NOT_GATED (the cut 0.3.8 ones) never are: 0.3.3 answers as in 0.3.7
+export const NOT_GATED = new Set(['open_file', 'http_server', 'json_pretty', 'git_worktree_add', 'venv_create']);
+export const NEW_TEMPLATE_INTENTS = new Set(['git_fetch', 'git_ls_files', 'gh_run_watch', 'gh_issue_list', 'gh_issue_view', 'wrangler_d1_list', 'wrangler_pages_deploy', 'git_grep', 'git_show', ...CATALOG_038.filter((id) => !NOT_GATED.has(id))]);
 const TEMPLATES_MODEL = fileURLToPath(new URL('../model/model_templates.bin', import.meta.url));
 let templatesModel;
 function getTemplatesModel() {
@@ -436,11 +437,10 @@ function pipTargetGuard(res) {
   return ok ? res : { ...res, missing: ['piptarget (a variable or escape the shell would expand)'] };
 }
 // a request that refers back to the previous command: a pronoun, a place word, or same/again/them/its/that/those/this
-const RISK_RANK = { safe: 0, medium: 1, high: 2 };
 const REFERS_BACK = /\b(?:it|its|it's|them|their|they|that|those|this|these|there|here|same|again|previous|above|tam|tu|tego|tej|ten|je|ich|go|jego|samo|znowu|ponownie|jeszcze)\b/i;
 function refersBack(q) { return hasPronoun(q) || hasLocative(q) || REFERS_BACK.test(String(q)); }
 export function suggest(query, opts = {}) {
-  const once = (o) => pipTargetGuard(releaseGuards(query, replayFloor(suggestOnce(query, o))));
+  const once = (o) => sameButRiskGuard(pipTargetGuard(releaseGuards(query, replayFloor(suggestOnce(query, o)))));
   if (opts.model) return once(opts);
   const tm = getTemplatesModel();
   if (!tm) return once(opts);
@@ -499,7 +499,7 @@ function suggestOnce(query, opts = {}) {
   const ctxFeats = ctx && !newLast ? ctx.features : cwdFeats;
   const extras = [...envFeatures(env), ...ctxFeats];
   const ref = ctx ? resolveReference(query, ctx) : null;
-  const context = ctx ? { used: true, commands: ctx.n, rule: ref?.rule || null, note: ref?.note || null } : { used: false };
+  const context = ctx ? { used: true, commands: ctx.n, rule: ref?.rule || null, note: ref?.note || null, sameButLast: sameBut(query, ctx)?.lastIntent } : { used: false };
 
   const base = { query, shell: env.shell, os: env.os, coreutils: env.coreutils, threshold: thr, context };
   if (newLast && ref?.rule !== 'same-for' && (ref || sameBut(query, ctx) || refersBack(query))) {
@@ -561,8 +561,6 @@ function suggestOnce(query, opts = {}) {
   let method = 'catalog';
   if ((ref?.rule === 'pronoun' || ref?.rule === 'refused') && ref.intent) { intent = ref.intent; method = 'history-rule'; confidence = Math.max(confidence, thr); }
   if (sb) { method = 'history-rule'; confidence = Math.max(confidence, thr); context.rule = 'same-but'; context.note = `modifies previous ${sb.lastIntent}`; }
-  // "same but no discard" after `git status`: a same-but request never becomes a different, riskier intent (refused)
-  if (sb && intent !== sb.lastIntent && (RISK_RANK[BY_ID[intent]?.risk] ?? 2) > (RISK_RANK[BY_ID[sb.lastIntent]?.risk] ?? 2)) return { ...base, understood: false, method: 'history-rule', confidence: 0, candidates: [], tools: [], command: null, missing: [], hint: `"same but" would turn ${sb.lastIntent} into the riskier ${intent}: ask for it directly` };
   // "merge https://github.com/o/r/pull/3": a merge of a pull request URL is never `git clone` of it
   if (intent === 'git_clone' && !sb && !ref && PR_URL.test(query) && mergeAsked(query)) intent = 'gh_pr_merge';
   // "same but force" after `rm -r old; ls newdir`: the command it would modify is not the previous one
@@ -985,8 +983,8 @@ function suggestOnce(query, opts = {}) {
     }
     // a value with a line break is never composed into a command (the catalog rejects it as a path); an extract intent is
     // never replaced by a command that creates or rewrites an archive ("extract archive.tar.gz" is not `tar -c -f archive.tar.gz`)
-    // a 0.3.4-template suggestion that was withheld is never replaced by a composed command that drops what was withheld
-    if (comp && NEW_TEMPLATE_INTENTS.has(intent) && (res.missing || []).length) comp = null;
+    // a template-intent suggestion (0.3.4, 0.3.8) is never replaced by a composed command
+    if (comp && NEW_TEMPLATE_INTENTS.has(intent)) comp = null;
     if (comp && !comp.invalid && comp.command !== b.command && !/[\r\n]/.test(comp.command) && !(/^extract_/.test(intent) && createsArchive(comp.command))) {
       if (extra.length >= 1 || composeMode === 'force') {
         return { ...res, method: 'composed', experimental: true, reason: `request asks for ${extra.join(' ')} not in the catalog command`,

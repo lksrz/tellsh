@@ -90,7 +90,7 @@ const WORDS = {
     nazwy nazw plików plikow pliki zmienione zmienionych zmodyfikowane zmodyfikowanych zmieniły zmienily tylko się sie różnią roznia względem wzgledem
     porównaniu porownaniu od gałęzi galezi gałąź galaz commita ostatniego poczekalni zastageowanych niezatwierdzone touch touched did were
     zmieniłem zmienilem zmieniłam zmienilam diffa gicie zmodyfikowanych`,
-  git_show_files: `show --stat files file changed modified touched changes stat stats summary last latest newest recent most previous prior commit commits
+  git_show_files: `show --stat files file changed modified touched changes stat stats summary last latest newest recent most previous prior commit
     went into were was in by included part made has had one before second-to-last revision tag what which
     pliki plików plikow plik zmienione zmienionych zmieniono zmienił zmienil ostatni ostatnim ostatniego poprzedni poprzednim poprzedniego przedostatni
     przedostatnim commit commicie commita commitem rewizji tagu tag weszły weszly były byly change modify did zmodyfikowane statystyki podsumowanie weszło weszlo co`,
@@ -113,7 +113,7 @@ const WORDS = {
     otwórz otworz plik pliku link stronę strone dokument obrazek zdjęcie zdjecie domyślnej domyslnej domyślnym domyslnym aplikacji programie programem przeglądarce przegladarce`,
   pip_list: `pip pip3 python python3 -m list listing installed packages package libraries library modules versions version which what are have i we
     has pythona pythonie pakiety pakietów pakietow zainstalowane zainstalowanych biblioteki bibliotek moduły moduly wersje lista listę liste wylistuj mam`,
-  npm_outdated: `npm outdated old stale out of date dependencies dependency deps packages package newer updates update available versions version which what are
+  npm_outdated: `npm outdated old stale out of date dependencies dependency deps packages package newer updates available versions version which what are
     have there check any for project if
     przestarzałe przestarzale nieaktualne stare zależności zaleznosci pakiety pakietów pakietow nowsze aktualizacje aktualizacji dostępne dostepne wersje sprawdź sprawdz czy są projektu projekcie przestarzałych przestarzalych nieaktualnych dostępnymi dostepnymi aktualizacjami mają maja`,
 };

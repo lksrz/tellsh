@@ -139,3 +139,9 @@ test('0.3.8: "same but" never turns the previous command into a riskier intent',
   }
   assert.match(suggest('same but for staging', { ...ENVS[0], history: ['git push origin main'] }).command, /staging/);
 });
+test('0.3.8: a pronoun "same but" follow-up is refused too when it would be riskier', () => {
+  for (const [env, h] of [[ENVS[0], 'cat config.txt'], [ENVS[1], 'cat config.txt'], [ENVS[2], 'Get-Content config.txt'], [ENVS[3], 'type config.txt']]) {
+    assert.equal(suggest('same but without deleting it', { ...env, history: [h] }).command, null, env.shell);
+  }
+  assert.match(suggest('delete it', { ...ENVS[0], history: ['cat config.txt'] }).command, /config\.txt/); // a plain reference still works
+});

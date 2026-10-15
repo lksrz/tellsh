@@ -211,11 +211,11 @@ test('A+S: a templates-model answer the student replaces is deferred (the rerank
 });
 
 test('A+S: a templates-gate rerun landing on an intent neither A nor the student chose keeps A', async () => {
-  const q = 'git diff --cached --stat'; // templates model 0.3.8: git_diff_stat in the [thr, 0.6) band on PowerShell
+  const q = 'please inspect the last commit'; // templates model 0.3.8: git_show in the [thr, 0.6) band on PowerShell
   const e = { shell: 'powershell', os: 'win32' };
   let seen; let thr;
   suggest(q, { env: e, rerankTop: 0, rerank: (c, o) => { seen ??= c; thr = o.thr; return c; } });
-  assert.equal(seen.intent, 'git_diff_stat');
+  assert.equal(seen.intent, 'git_show');
   assert.ok(seen.confidence >= thr && seen.confidence < 0.6);
   const a = suggest(q, { env: e });
   const s = { infer: async () => ({ intents: { git_log: 0.86 }, pNone: 0 }) };

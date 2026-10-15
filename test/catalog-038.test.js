@@ -9,8 +9,8 @@ import { FAMILY_OF } from '../src/tools.js';
 import { NEW_TEMPLATE_INTENTS, NOT_GATED, suggest } from '../src/pipeline.js';
 import { CATALOG_038 } from '../src/templates038.js';
 
-const SHIPPED = ['git_diff_stat', 'git_diff_names', 'git_show_files', 'git_worktree_list', 'venv_create', 'pip_list', 'npm_outdated'];
-const CUT = ['open_file', 'http_server', 'json_pretty', 'git_worktree_add'];
+const SHIPPED = ['git_diff_stat', 'git_diff_names', 'git_show_files', 'git_worktree_list', 'pip_list', 'npm_outdated'];
+const CUT = ['open_file', 'http_server', 'json_pretty', 'git_worktree_add', 'venv_create'];
 import { loadModel } from '../src/model.js';
 
 const BASH = { shell: 'bash', os: 'linux', coreutils: 'gnu' };
@@ -24,7 +24,8 @@ const withheld = (id, text, env = BASH) => { const r = build(id, text, env); ret
 test('catalog-038 intents: catalog, tool family, template gate, risk', () => {
   assert.equal(CATALOG_038.length, 11); // catalog entries kept; only SHIPPED are answered from the templates model
   for (const id of CATALOG_038) { assert.ok(BY_ID[id], id); assert.ok(FAMILY_OF[id], id); assert.equal(NEW_TEMPLATE_INTENTS.has(id), SHIPPED.includes(id), id); }
-  for (const id of [...CUT, 'git_show', 'git_grep']) assert.ok(NOT_GATED.has(id), id);
+  for (const id of CUT) assert.ok(NOT_GATED.has(id), id);
+  for (const id of ['git_show', 'git_grep']) assert.ok(NEW_TEMPLATE_INTENTS.has(id) && !NOT_GATED.has(id), id); // withheld as in 0.3.7
   for (const id of ['git_diff_stat', 'git_diff_names', 'git_show_files', 'git_worktree_list', 'json_pretty']) assert.equal(BY_ID[id].risk, 'safe', id);
   // not read-only (a server, opening an app, writing a worktree / venv) or running project code: never auto-run with --yes
   for (const id of ['http_server', 'open_file', 'git_worktree_add', 'venv_create', 'pip_list', 'npm_outdated']) assert.equal(BY_ID[id].risk, 'medium', id);
@@ -156,13 +157,21 @@ test('catalog-038: values come from the request (rules 2a / 2b, venv .venv only,
   }
 });
 
-test('catalog-038: open / http.server / jq / worktree add are answered by the 0.3.3 model alone (never the templates model)', () => {
+test('catalog-038: open / http.server / jq / worktree add / venv are answered by the 0.3.3 model alone (never the templates model)', () => {
   const base = loadModel(new URL('../model/model.bin', import.meta.url).pathname);
-  for (const q of ['open report.pdf', 'serve this folder over http', 'pretty print data.json', 'add a worktree at ../x for branch y', 'show last commit details']) {
+  for (const q of ['open report.pdf', 'serve this folder over http', 'pretty print data.json', 'add a worktree at ../x for branch y', 'create a python virtual environment']) {
     for (const env of [BASH, MAC, PS, CMD]) {
       const a = suggest(q, { env }); const b = suggest(q, { env, model: base, gated: true });
       assert.equal(a?.intent, b?.intent, `${env.shell}: ${q}`); assert.equal(a?.command, b?.command, `${env.shell}: ${q}`);
-      assert.ok(!CUT.includes(a?.intent) && !['git_show', 'git_grep'].includes(a?.intent), `${env.shell}: ${q} -> ${a?.intent}`);
+      assert.ok(!CUT.includes(a?.intent), `${env.shell}: ${q} -> ${a?.intent}`);
     }
   }
+});
+
+test('catalog-038 r2: an unexpressed action or scope is withheld; the composer never replaces a template intent', () => {
+  const run = (q) => { const r = suggest(q, { env: BASH }); return r.command && !(r.missing || []).length ? r.command : null; };
+  assert.equal(run('update outdated npm dependencies'), null);
+  assert.equal(run('show files changed in all commits'), null);
+  assert.equal(suggest('names of changed files staged vs HEAD', { env: BASH }).command, 'git diff --cached --name-only HEAD');
+  assert.equal(suggest('changed file names staged vs HEAD~2', { env: BASH }).command, "git diff --cached --name-only 'HEAD~2'");
 });
