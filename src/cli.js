@@ -11,6 +11,7 @@ import { loadHistory } from './history.js';
 import { joinArgs } from './shellwords.js';
 import { suggestLazy } from './rerank/hybrid.js';
 import { findStudentDir } from './rerank/student.js';
+import { checkCommand } from './helpcheck.js';
 
 const pkg = JSON.parse(readFileSync(new URL('../package.json', import.meta.url), 'utf8'));
 
@@ -26,7 +27,8 @@ Usage: tellsh [options] <request...>
 Options:
   -n, --dry-run     print the command only, never run it
   -y, --yes         run without prompting (only risk=safe commands straight from the catalog;
-                    never history-resolved, composed, incomplete or medium/high-risk ones)
+                    never history-resolved, composed, incomplete or medium/high-risk ones, nor ones
+                    with flags missing from the installed tool's man page; TELLSH_HELPCHECK=0 skips that check)
   -e, --explain     show tool/intent scores, slots and their source
       --json        machine-readable output (implies --dry-run)
       --shell <s>   target shell: bash|zsh|sh|powershell|fish|cmd (default: detected)
@@ -149,6 +151,9 @@ function printSuggestion(s, opts) {
   if (s.missing.length) out.write(C.yellow(`  ? missing: ${s.missing.join(', ')} — edit the command (e) before running`) + '\n');
   if (s.hint) out.write(C.dim(`  hint: ${s.hint}`) + '\n');
   if (s.notes) out.write(C.dim(`  note: ${s.notes}`) + '\n');
+  const hc = s.helpcheck;
+  for (const u of hc?.unknown || []) out.write(C.yellow(`  ! flag ${u.flag} not found in your installed ${u.tool} man page`) + '\n');
+  if (hc?.notInstalled?.length) out.write(C.dim(`  note: not installed here: ${hc.notInstalled.join(', ')}`) + '\n');
   if (opts.explain) {
     if (s.description) out.write(C.dim(`  ${s.description}`) + '\n');
     if (s.variant) out.write(C.dim(`  rendering: ${s.variant}`) + '\n');
@@ -266,6 +271,14 @@ function readKey(rule) {
   });
 }
 
+/** Why --yes must not auto-run suggestion `s` (a short phrase), or null when it may. */
+export function yesRefusal(s) {
+  const fromHistory = Object.values(s.slotSources || {}).includes('history');
+  const badFlags = s.helpcheck?.unknown?.length > 0;
+  if (!(s.risk !== 'safe' || s.missing.length || s.method !== 'catalog' || fromHistory || s.hybrid?.deferred || badFlags)) return null;
+  return s.method === 'composed' ? 'composed (experimental)' : s.method !== 'catalog' || fromHistory ? 'resolved from history' : s.missing.length ? 'incomplete' : s.hybrid?.deferred ? 're-ranked by the neural fallback' : badFlags ? 'using flags your installed tools do not list' : s.risk;
+}
+
 export async function main(argv = process.argv.slice(2)) {
   const opts = parseArgs(argv);
   if (opts.version) { console.log(pkg.version); return 0; }
@@ -296,6 +309,12 @@ export async function main(argv = process.argv.slice(2)) {
   } catch (e) {
     console.error(`tellsh: ${e.message}`);
     return 1;
+  }
+
+  // help-verifier: the flags of the command actually shown are checked against the installed tool's man page
+  // (allowlisted tools only, the tool is never run; cached per binary; TELLSH_HELPCHECK=0 turns it off). Never fails the call.
+  if (s.understood && s.command && !s.gap) {
+    try { s.helpcheck = checkCommand(s.command, { shell: s.shell, os: s.os }); } catch { s.helpcheck = { checked: false, reason: 'error' }; }
   }
 
   if (opts.json) {
@@ -333,9 +352,8 @@ export async function main(argv = process.argv.slice(2)) {
   const interactive = process.stdin.isTTY && process.stdout.isTTY;
   const shellName = s.shell;
   if (opts.yes) {
-    const fromHistory = Object.values(s.slotSources || {}).includes('history');
-    if (s.risk !== 'safe' || s.missing.length || s.method !== 'catalog' || fromHistory || s.hybrid?.deferred) {
-      const why = s.method === 'composed' ? 'composed (experimental)' : s.method !== 'catalog' || fromHistory ? 'resolved from history' : s.missing.length ? 'incomplete' : s.hybrid?.deferred ? 're-ranked by the neural fallback' : s.risk;
+    const why = yesRefusal(s);
+    if (why) {
       console.log(C.yellow(`  --yes only auto-runs safe catalog commands; this one is ${why}. Not running.`));
       return 4;
     }

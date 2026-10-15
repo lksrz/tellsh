@@ -1,0 +1,12 @@
+SYNOPSIS
+     ls [-@AHLacdhlt1%,] [--color=when] [-D format] [file ...]
+
+DESCRIPTION
+     Synthetic sample in BSD man format.
+
+     -A      Show dot entries.
+     -D format
+             Use format for dates with -l.
+     -l      Long listing.
+     --color=when
+             Colour output.

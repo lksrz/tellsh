@@ -1,0 +1,10 @@
+Usage: sed [OPTION]... {script} [input-file]...
+
+  -n, --quiet, --silent
+                 no automatic printing
+  -e script, --expression=script
+                 add a script
+  -i[SUFFIX], --in-place[=SUFFIX]
+                 edit in place
+  -E, -r, --regexp-extended
+                 extended regexps

@@ -51,7 +51,8 @@ tellsh [options] <request...>
 
   -n, --dry-run        print the command only, never run it
   -y, --yes            run without prompting (only risk=safe commands straight from the catalog; never
-                       history-resolved, composed, incomplete or medium/high-risk ones)
+                       history-resolved, composed, incomplete or medium/high-risk ones, nor ones whose
+                       flags your installed tool's man page does not list: see "Installed-tool flag check")
   -e, --explain        tool/intent scores, slots and where each slot came from (tagger/regex/history)
       --json           machine-readable output (implies --dry-run)
       --shell <s>      bash | zsh | sh | powershell | fish | cmd   (default: detected)
@@ -226,6 +227,32 @@ Without the bundle tellsh runs the cascade alone. `--no-hybrid` / `TELLSH_HYBRID
 `TELLSH_HYBRID=student-full` also lets a confident student overrule a confident cascade (the student then runs on every
 query). Answers the student changed are never auto-run with `--yes`.
 
+### Installed-tool flag check
+
+A template's flags may not exist in the version of the tool you have (GNU vs BSD, old vs new). Before a command is
+shown (also in `--json`, as `helpcheck`), tellsh checks its flags against the man page of the tool actually installed,
+deterministically:
+
+* **the tool is never run.** Only its documentation is read, with `man -P cat <page>` (`git-<sub>` for git), where `man`
+  comes from a fixed absolute path (`/usr/bin/man`, `/bin/man`), never PATH; no shell, stdin closed, a minimal
+  environment (`LC_ALL=C`, pagers set to `cat`, nothing inherited), 250 ms timeout, 256 KB output cap. The tool is only
+  located (absolute PATH entries only) to know it is installed. Only allowlisted **system** tools are checked (ls,
+  grep, find, du, df, sort, tar, sed, head, tail, ps, xargs, cp, mv, …, `git <sub>`) whose real path is in `/bin`,
+  `/usr/bin`, `/sbin` or `/usr/sbin`, against the system man pages. Homebrew / GNU coreutils on macOS (gnubin,
+  `/usr/local`, `/opt`, home directories) are not checked; no man page means no check;
+* one call spends at most 270 ms on man probes; the parsed option table is cached per binary (real path + size +
+  mtime) in `$XDG_CACHE_HOME/tellsh/help` (default `~/.cache/tellsh/help`), failures for a day: the first use of a
+  tool costs one `man` (~70–90 ms), later calls a small JSON read;
+* conservative: option arguments are read from the man page (`-t char`, `--file=ARCHIVE`, `[-D format]`), so
+  `git commit -m --release` or `sort -tX` are fine; when an option's argument count is unknown the next word is not
+  judged. Long options may be abbreviated only to a unique prefix;
+* a flag that is not documented prints `! flag -x not found in your installed <tool> man page`, and `--yes` refuses to
+  run the command. The command itself is not rewritten. A tool that is not installed is noted (`note: not installed
+  here`), without refusing;
+* limits: commands run by `find -exec … ;` or by `xargs` are not checked; POSIX shells (bash/zsh/sh) on the OS tellsh
+  runs on only (PowerShell, cmd, fish and `--os` renders for another OS are not checked). `TELLSH_HELPCHECK=0` turns
+  the check off.
+
 ### History context
 
 `--history` (or `TELLSH_HISTORY=1`) reads the **tail** (last 32 KB) of `$HISTFILE` / `~/.bash_history` /
@@ -373,7 +400,8 @@ compression from the archive name, `bash -n` and an allowed-flag check validate 
   (names, hosts, URLs, containers, …) may not start with `-`, and URLs must be `scheme://…` or `user@host:path`.
   Values taken from history pass the same validation.
 * `--yes` only runs `safe` commands, i.e. fresh catalog renders with plain values (the trust rule): never
-  history-resolved, composed, edited, incomplete or medium/high-risk ones. Non-TTY use prints only.
+  history-resolved, composed, edited, incomplete or medium/high-risk ones, nor ones with flags missing from the
+  installed tool's man page. Non-TTY use prints only.
 
 ## Accuracy & speed (details: [EVAL.md](EVAL.md))
 
