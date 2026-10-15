@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.3.9 — repeat phrasings guarded
+
+**Safety:** the 0.3.8 same-but risk guard also covers repeat phrasings at the start of a request followed by
+"but"/"ale" (`again but without deleting it` after `cat config.txt` is no longer `rm config.txt`; `repeat it, but discard
+changes` after `git status` is refused; Polish `jeszcze raz, ale …`, `powtórz to ale …`, `jak poprzednio, ale …`). Guard
+only: these phrasings are not applied as modifiers of the previous command. Models are unchanged.
+
 ## 0.3.8 — "same but" safety fix
 
 **Safety:** a "same but …" follow-up never turns the previous command into a different, riskier intent, whichever way
