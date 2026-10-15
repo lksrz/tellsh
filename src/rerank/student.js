@@ -1,16 +1,18 @@
-// Distilled student encoder (3-layer, ~14 MB int4/int8 ONNX, trained from a LoRA-tuned teacher's labels): an optional
-// fallback for the linear cascade. Same runtime as the B encoder (src/rerank/encoder.js), but its own bundle, looked up
-// in $TELLSH_STUDENT_DIR, ~/.cache/tellsh/stu-v1, the `tellsh-model-student` package, or hybrid/models/student
+// Distilled student encoder (3-layer, trained from a LoRA-tuned teacher's labels): the fallback for the linear
+// cascade, run by the pure-JS runtime in src/rerank/student-js.js (no onnxruntime). Its bundle (student.bin,
+// vocab.json, labels.json, ~17 MB) is looked up in $TELLSH_STUDENT_DIR, ~/.cache/tellsh/stu-v2, the
+// `tellsh-model-student` package (>= 0.2; the ONNX-only 0.1 package counts as missing), or hybrid/models/student
 // (development). No network; nothing is loaded until the cascade asks for help.
-import { existsSync, realpathSync } from 'node:fs';
+import { existsSync } from 'node:fs';
 import { join } from 'node:path';
 import { homedir } from 'node:os';
 import { fileURLToPath } from 'node:url';
 import { createRequire } from 'node:module';
 
 const require = createRequire(import.meta.url);
-export const STUDENT_BUNDLE = 'stu-v1';
-const ok = (d) => !!d && existsSync(join(d, 'encoder.int8.onnx')) && existsSync(join(d, 'vocab.json')) && existsSync(join(d, 'labels.json'));
+export const STUDENT_BUNDLE = 'stu-v2'; // stu-v1 was the ONNX bundle (tellsh 0.3.5)
+export const STUDENT_FILES = ['student.bin', 'vocab.json', 'labels.json'];
+const ok = (d) => !!d && STUDENT_FILES.every((f) => existsSync(join(d, f)));
 
 /** First complete student bundle, or null. Cheap (stat calls only): used to skip the runtime import when absent. */
 export function findStudentDir(explicit) {
@@ -20,19 +22,13 @@ export function findStudentDir(explicit) {
   return cands.find(ok) || null;
 }
 
-/** Load the student; null when the bundle or onnxruntime-node is unavailable or the model cannot be opened. */
-export async function loadStudent({ dir, threads = 1 } = {}) {
+/** Load the student (pure JS); null when no bundle is found or it cannot be read. `threads` is ignored (1 thread). */
+export async function loadStudent({ dir } = {}) {
   const d = findStudentDir(dir);
   if (!d) return null;
   try {
-    // native runtime only: check it before Encoder.load, which would otherwise build a (slow) onnxruntime-web session
-    await import('onnxruntime-node');
-    const { Encoder } = await import('./encoder.js');
-    const enc = await Encoder.load({ dir: d, ort: 'node', threads });
-    // Encoder.load falls back to the B bundle when a directory is incomplete, and to onnxruntime-web (WASM, slower)
-    // when the native runtime is missing: accept only the student bundle itself on onnxruntime-node
-    if (!enc || realpathSync(enc.dir) !== realpathSync(d) || enc.runtime !== 'onnxruntime-node') return null;
-    return enc;
+    const { StudentJS } = await import('./student-js.js');
+    return StudentJS.load(d);
   } catch {
     return null;
   }

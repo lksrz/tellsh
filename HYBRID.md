@@ -665,3 +665,40 @@ every public set above.
 Latency on one core (Xeon box, `taskset -c 7`): loading the student takes 150–180 ms once per call, and inference takes ~3.5 ms
 p50 / 5–7 ms p95. On an Apple M-series laptop the numbers are 70 ms / 3.6 ms. The student loads only when A's confidence
 is below 0.6 (student calls on 1.5–7.4% of in-catalog queries in the sets above, 24.5% of out-of-catalog ones).
+
+### Pure-JS student runtime (0.3.6)
+
+Since 0.3.6 the student runs without onnxruntime: `src/rerank/student-js.js` is a plain-JS forward pass (3 layers,
+hidden 384, 12 heads, exact-erf GELU, LayerNorm eps 1e-12, position ids from 0, mean pooling -> tool/intent heads, tag
+head per token) over `student.bin`, built from the f32 training checkpoint by `scripts/hybrid/export_student_js.js`
+(magic `TSJ1`, JSON header + 8-byte aligned blobs). The word embedding and all transformer linear weights are int8 with a
+per-output-row symmetric scale; biases, LayerNorms, position/type embeddings and the heads are f32; the pooler is dropped.
+`student.bin` is 16.4 MB (`--quant f16` keeps the transformer weights as half floats: 21.4 MB). At load the transformer
+weights are dequantized to Float32 once; the 27k-row embedding stays int8 and only looked-up rows are dequantized. The
+bundle is `tellsh-model-student` 0.2.0 (`student.bin`, `vocab.json`, `labels.json`; cache dir `~/.cache/tellsh/stu-v2`),
+a regular dependency of tellsh, so the A+S hybrid is on after a plain `npm i -g tellsh`.
+
+**Parity** (`node scripts/hybrid/parity_student_js.js`, raw output in `hybrid/results/student_js_parity_0.3.6.json`): JS
+int8 vs the 0.3.5 ONNX student (onnxruntime-node, `stu-v1`), each row in its own shell/os.
+
+| set | n | intent argmax | tool argmax | A+S decision | max \|Δp\| intent |
+|---|---:|---:|---:|---:|---:|
+| data/eval | 2384 | 98.03 | 98.15 | 99.58 | 0.374 |
+| shell-phrased | 336 | 97.62 | 99.40 | 99.70 | 0.211 |
+| blind | 641 | 99.22 | 99.84 | 99.84 | 0.315 |
+| blind3 | 844 | 99.41 | 99.29 | 100 | 0.273 |
+| all | 4205 | 98.45 | 98.74 | **99.71** | 0.374 |
+
+The remaining intent disagreement comes from the ONNX bundle's own (int4/int8) quantization, not from the JS runtime: an
+f16 JS bundle (near-exact weights) agrees with the ONNX student on 98.48% of intents, and the int8 JS bundle agrees with
+the f16 one on 99.79% (max |Δp| 0.038). End to end (`eval_student_runtime.js`, JS student, raw output in
+`hybrid/results/student_runtime_0.3.6_js.json`) A+S is within one or two rows of the 0.3.5 ONNX table above: data/eval
+94.59 (ONNX 94.71), devtools 96.46 (96.46), shell 96.13 (96.43), blind 98.75 (98.60), blind3 98.22 (98.22); answered shares
+equal A's on every set and the out-of-scope sets are unchanged.
+
+**Latency** (`node scripts/hybrid/bench_student_js.js`, Apple M-series, Node 26, 1 thread): load 23 ms (student.bin +
+vocab + tokenizer), first query 56 ms, then p50 40 ms / p95 57 ms per unique query (n = 300). Whole CLI call
+(`node bin/tellsh.js --dry-run --json`, median of 7): 291 ms for a query that consults the student
+(`gdzie jest plik docker-compose.yml?`), 160 ms for one that does not (`show git status`). Inference is ~10x slower
+than onnxruntime's int8 kernels (3.6 ms) but the cold load is ~3x faster, and the student runs only below A's
+confidence 0.6.

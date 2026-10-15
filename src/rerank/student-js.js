@@ -1,0 +1,218 @@
+// Pure-JS runtime of the distilled student (no onnxruntime): a 3-layer BERT-style encoder (pruned multilingual-e5-small)
+// read from student.bin (scripts/hybrid/export_student_js.js: int8 per-row weights + f32 rest), mean pooling -> tool /
+// intent heads, per-token tag head. Same infer() interface as Encoder (src/rerank/encoder.js). Transformer weights are
+// dequantized to Float32 once at load; the 27k-row word embedding stays int8 and only looked-up rows are dequantized.
+import { readFileSync } from 'node:fs';
+import { join } from 'node:path';
+import { UnigramTokenizer } from './tokenizer.js';
+import { decodeSpans } from './encoder.js';
+
+/** student.bin buffer -> {config, get(name) -> typed array view} */
+export function parseBundle(buf) {
+  if (buf.toString('latin1', 0, 4) !== 'TSJ1') throw new Error('not a student.bin bundle');
+  const n = buf.readUInt32LE(4);
+  const { config, tensors } = JSON.parse(buf.toString('utf8', 8, 8 + n));
+  const start = Math.ceil((8 + n) / 8) * 8;
+  // copy into an 8-aligned ArrayBuffer once (a Buffer from readFileSync may be unaligned)
+  const ab = new ArrayBuffer(buf.length - start);
+  new Uint8Array(ab).set(buf.subarray(start));
+  const get = (name) => {
+    const t = tensors[name];
+    if (!t) throw new Error(`student.bin: missing ${name}`);
+    const len = t.shape.reduce((a, b) => a * b, 1);
+    return t.dtype === 'i8' ? new Int8Array(ab, t.offset, len) : t.dtype === 'f16' ? new Uint16Array(ab, t.offset, len) : new Float32Array(ab, t.offset, len);
+  };
+  return { config, tensors, get };
+}
+
+/** IEEE half (Uint16Array) -> Float32Array */
+export function fromF16(h) {
+  const out = new Float32Array(h.length);
+  for (let i = 0; i < h.length; i++) {
+    const x = h[i]; const s = x & 0x8000 ? -1 : 1; const e = (x >> 10) & 0x1f; const m = x & 0x3ff;
+    out[i] = e === 0 ? s * m * 2 ** -24 : e === 31 ? (m ? NaN : s * Infinity) : s * (1 + m / 1024) * 2 ** (e - 15);
+  }
+  return out;
+}
+const deq = (q, s, cols) => { const w = new Float32Array(q.length); for (let r = 0; r < s.length; r++) { const f = s[r]; for (let c = r * cols, e = c + cols; c < e; c++) w[c] = q[c] * f; } return w; };
+
+/** erf, Abramowitz-Stegun 7.1.26 refined (|err| < 1.2e-7): exact GELU as in HF BERT ('gelu') */
+function erf(x) {
+  const s = x < 0 ? -1 : 1; const a = Math.abs(x);
+  const t = 1 / (1 + 0.5 * a);
+  const y = 1 - t * Math.exp(-a * a - 1.26551223 + t * (1.00002368 + t * (0.37409196 + t * (0.09678418 + t * (-0.18628806 + t * (0.27886807 + t * (-1.13520398 + t * (1.48851587 + t * (-0.82215223 + t * 0.17087277)))))))));
+  return s * y;
+}
+
+/** out[n,O] = x[n,K] W[O,K]^T + b; blocks of 4 outputs x 2 rows share loads (~2.5x a plain dot loop in V8) */
+export function linear(x, n, K, W, b, O, out) {
+  let o = 0;
+  for (; o + 3 < O; o += 4) {
+    const w0 = o * K, w1 = w0 + K, w2 = w1 + K, w3 = w2 + K;
+    const b0 = b[o], b1 = b[o + 1], b2 = b[o + 2], b3 = b[o + 3];
+    let i = 0;
+    for (; i + 1 < n; i += 2) {
+      const xa = i * K, xb = xa + K;
+      let a0 = 0, a1 = 0, a2 = 0, a3 = 0, c0 = 0, c1 = 0, c2 = 0, c3 = 0;
+      for (let k = 0; k < K; k++) {
+        const u = x[xa + k], v = x[xb + k], p0 = W[w0 + k], p1 = W[w1 + k], p2 = W[w2 + k], p3 = W[w3 + k];
+        a0 += u * p0; a1 += u * p1; a2 += u * p2; a3 += u * p3; c0 += v * p0; c1 += v * p1; c2 += v * p2; c3 += v * p3;
+      }
+      let r = i * O + o;
+      out[r] = a0 + b0; out[r + 1] = a1 + b1; out[r + 2] = a2 + b2; out[r + 3] = a3 + b3;
+      r += O;
+      out[r] = c0 + b0; out[r + 1] = c1 + b1; out[r + 2] = c2 + b2; out[r + 3] = c3 + b3;
+    }
+    for (; i < n; i++) {
+      const xa = i * K;
+      let a0 = 0, a1 = 0, a2 = 0, a3 = 0;
+      for (let k = 0; k < K; k++) { const u = x[xa + k]; a0 += u * W[w0 + k]; a1 += u * W[w1 + k]; a2 += u * W[w2 + k]; a3 += u * W[w3 + k]; }
+      const r = i * O + o;
+      out[r] = a0 + b0; out[r + 1] = a1 + b1; out[r + 2] = a2 + b2; out[r + 3] = a3 + b3;
+    }
+  }
+  for (; o < O; o++) {
+    const wo = o * K;
+    for (let i = 0; i < n; i++) { const xa = i * K; let a = 0; for (let k = 0; k < K; k++) a += x[xa + k] * W[wo + k]; out[i * O + o] = a + b[o]; }
+  }
+}
+
+/** in place: x[i] = LN(x[i] + r[i]) * g + b per row (r may be null) */
+export function addNorm(x, r, n, H, g, b, eps) {
+  for (let i = 0; i < n; i++) {
+    const o = i * H;
+    let m = 0;
+    for (let k = 0; k < H; k++) { const v = r ? x[o + k] + r[o + k] : x[o + k]; x[o + k] = v; m += v; }
+    m /= H;
+    let s = 0;
+    for (let k = 0; k < H; k++) { const d = x[o + k] - m; s += d * d; }
+    const inv = 1 / Math.sqrt(s / H + eps);
+    for (let k = 0; k < H; k++) x[o + k] = (x[o + k] - m) * inv * g[k] + b[k];
+  }
+}
+
+const softmax = (z) => { let m = -Infinity; for (const v of z) if (v > m) m = v; let s = 0; const e = Array.from(z, (v) => { const x = Math.exp(v - m); s += x; return x; }); return e.map((v) => v / s); };
+
+export class StudentModel {
+  /** bundle: parseBundle() result */
+  constructor(bundle) {
+    const { config: c, get } = bundle;
+    this.c = c;
+    const W = (n) => { const w = get(n); if (w instanceof Uint16Array) return fromF16(w); const s = get(`${n}.scale`); return deq(w, s, w.length / s.length); };
+    const lin = (p) => ({ W: W(`${p}.weight`), b: get(`${p}.bias`) });
+    const ln = (p) => ({ g: get(`${p}.weight`), b: get(`${p}.bias`) });
+    this.emb = { q: get('embeddings.word_embeddings.weight'), s: get('embeddings.word_embeddings.weight.scale'), pos: get('embeddings.position_embeddings.weight'), type: get('embeddings.token_type_embeddings.weight'), ln: ln('embeddings.LayerNorm') };
+    this.layers = [];
+    for (let l = 0; l < c.layers; l++) {
+      const p = `encoder.layer.${l}`;
+      this.layers.push({ q: lin(`${p}.attention.self.query`), k: lin(`${p}.attention.self.key`), v: lin(`${p}.attention.self.value`), o: lin(`${p}.attention.output.dense`), ln1: ln(`${p}.attention.output.LayerNorm`), i: lin(`${p}.intermediate.dense`), out: lin(`${p}.output.dense`), ln2: ln(`${p}.output.LayerNorm`) });
+    }
+    const head = (p) => ({ W: get(`${p}.weight`), b: get(`${p}.bias`), O: get(`${p}.bias`).length });
+    this.heads = { tool: head('tool'), intent: head('intent'), tag: head('tag') };
+    this.n = 0;
+  }
+
+  alloc(n) {
+    if (n <= this.n) return;
+    const { hidden: H, inter: I } = this.c;
+    this.n = n;
+    this.buf = { x: new Float32Array(n * H), q: new Float32Array(n * H), k: new Float32Array(n * H), v: new Float32Array(n * H), ctx: new Float32Array(n * H), t: new Float32Array(n * H), h: new Float32Array(n * I), p: new Float32Array(n) };
+  }
+
+  /** ids -> {tool, intent: Float32Array logits, tags(i) -> logits of token i} (attention over all ids, no padding) */
+  forward(ids) {
+    const n = ids.length;
+    const { hidden: H, heads: NH, inter: I, eps, posOffset } = this.c;
+    this.alloc(n);
+    const { x, q, k, v, ctx, t, h, p } = this.buf;
+    const E = this.emb;
+    for (let i = 0; i < n; i++) {
+      const r = ids[i] * H; const s = E.s[ids[i]]; const po = (i + posOffset) * H; const o = i * H;
+      for (let j = 0; j < H; j++) x[o + j] = E.q[r + j] * s + E.pos[po + j] + E.type[j];
+    }
+    addNorm(x, null, n, H, E.ln.g, E.ln.b, eps);
+    const dh = H / NH; const sc = 1 / Math.sqrt(dh);
+    for (const L of this.layers) {
+      linear(x, n, H, L.q.W, L.q.b, H, q);
+      linear(x, n, H, L.k.W, L.k.b, H, k);
+      linear(x, n, H, L.v.W, L.v.b, H, v);
+      for (let hd = 0; hd < NH; hd++) {
+        const ho = hd * dh;
+        for (let i = 0; i < n; i++) {
+          const qi = i * H + ho;
+          let m = -Infinity;
+          for (let j = 0; j < n; j++) {
+            const kj = j * H + ho;
+            let a = 0;
+            for (let d = 0; d < dh; d++) a += q[qi + d] * k[kj + d];
+            a *= sc; p[j] = a; if (a > m) m = a;
+          }
+          let s = 0;
+          for (let j = 0; j < n; j++) { p[j] = Math.exp(p[j] - m); s += p[j]; }
+          for (let d = 0; d < dh; d++) ctx[qi + d] = 0;
+          for (let j = 0; j < n; j++) {
+            const w = p[j] / s; const vj = j * H + ho;
+            for (let d = 0; d < dh; d++) ctx[qi + d] += w * v[vj + d];
+          }
+        }
+      }
+      linear(ctx, n, H, L.o.W, L.o.b, H, t);
+      addNorm(x, t, n, H, L.ln1.g, L.ln1.b, eps);
+      linear(x, n, H, L.i.W, L.i.b, I, h);
+      for (let j = 0, e = n * I; j < e; j++) { const z = h[j]; h[j] = 0.5 * z * (1 + erf(z * Math.SQRT1_2)); }
+      linear(h, n, I, L.out.W, L.out.b, H, t);
+      addNorm(x, t, n, H, L.ln2.g, L.ln2.b, eps);
+    }
+    const pooled = new Float32Array(H);
+    for (let i = 0; i < n; i++) for (let j = 0; j < H; j++) pooled[j] += x[i * H + j];
+    for (let j = 0; j < H; j++) pooled[j] /= n;
+    const run = (hd, src, off = 0) => { const o = new Float32Array(hd.O); linear(src.subarray(off, off + H), 1, H, hd.W, hd.b, hd.O, o); return o; };
+    const { tool, intent, tag } = this.heads;
+    return { tool: run(tool, pooled), intent: run(intent, pooled), tags: (i) => run(tag, x, i * H) };
+  }
+}
+
+/** Encoder-compatible wrapper: tokenizer + labels + per-process result cache */
+export class StudentJS {
+  static load(dir) {
+    const t0 = performance.now();
+    const model = new StudentModel(parseBundle(readFileSync(join(dir, 'student.bin'))));
+    const v = JSON.parse(readFileSync(join(dir, 'vocab.json'), 'utf8'));
+    const labels = JSON.parse(readFileSync(join(dir, 'labels.json'), 'utf8'));
+    const tok = new UnigramTokenizer({ vocab: v.pieces.map((p, i) => [p, v.scores[i]]), unkId: v.unk });
+    const s = new StudentJS(model, tok, labels, dir);
+    s.loadMs = performance.now() - t0;
+    return s;
+  }
+
+  constructor(model, tok, labels, dir) {
+    Object.assign(this, { model, tok, labels, dir, runtime: 'js' });
+    this.T = labels.tagLabels;
+    this.cache = new Map();
+  }
+
+  /** -> { tools: {tool: p}, intents: {intent: p}, topIntent, topTool, pNone, tagger(text, tool) -> {spans} } */
+  async infer(text, env = {}) {
+    const key = `${env.shell}|${env.os}|${text}`;
+    if (this.cache.has(key)) return this.cache.get(key);
+    const ctx = this.labels.context.replace('{shell}', env.shell || 'bash').replace('{os}', env.os || 'linux');
+    const enc = this.tok.encodePair(text, ctx, this.labels.maxLen);
+    const out = this.model.forward(enc.ids);
+    const pt = softmax(out.tool);
+    const pi = softmax(out.intent);
+    const tools = Object.fromEntries(this.labels.tools.map((t, i) => [t, pt[i]]));
+    const intents = Object.fromEntries(this.labels.intents.map((t, i) => [t, pi[i]]));
+    const tagLogits = [];
+    for (let j = 0; j < enc.nA; j++) tagLogits.push(Array.from(out.tags(j + 1)));
+    const res = {
+      tools, intents,
+      topTool: this.labels.tools[pt.indexOf(Math.max(...pt))],
+      topIntent: this.labels.intents[pi.indexOf(Math.max(...pi))],
+      pNone: tools.__none__ ?? 0,
+      tagger: (t, tool) => ({ spans: decodeSpans(t, enc.tokens, tagLogits, this.T, tool) }),
+    };
+    if (this.cache.size > 256) this.cache.clear();
+    this.cache.set(key, res);
+    return res;
+  }
+}

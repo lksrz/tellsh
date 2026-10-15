@@ -1,10 +1,22 @@
 {
   "name": "tellsh-model-student",
-  "version": "0.1.0",
-  "description": "Optional distilled student model for tellsh (3-layer encoder, int4/int8 ONNX, ~14 MB): consulted only when the linear cascade's confidence is below 0.6.",
-  "files": ["encoder.int8.onnx", "vocab.json", "labels.json", "README.md"],
+  "version": "0.2.0",
+  "description": "Distilled student model for tellsh (3-layer encoder, int8 weights for tellsh's pure-JS runtime, ~17 MB, no onnxruntime): consulted only when the linear cascade's confidence is below 0.6.",
+  "files": [
+    "student.bin",
+    "vocab.json",
+    "labels.json",
+    "README.md"
+  ],
   "license": "MIT",
   "author": "lksrz <lukasz@wearfits.com>",
-  "repository": { "type": "git", "url": "git+https://github.com/lksrz/tellsh.git" },
-  "keywords": ["tellsh", "onnx", "intent-classification", "polish"]
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lksrz/tellsh.git"
+  },
+  "keywords": [
+    "tellsh",
+    "intent-classification",
+    "polish"
+  ]
 }

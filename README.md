@@ -214,13 +214,14 @@ tellsh silently uses the cascade. `TELLSH_HYBRID=safe` never turns a rejection i
 never auto-run with `--yes`. Details, numbers and the trade-off (fewer rejections of requests outside the catalog):
 [HYBRID.md](HYBRID.md).
 
-**Distilled student (default when installed).** With `onnxruntime-node` and the optional `tellsh-model-student`
-bundle installed (`npm i -g onnxruntime-node tellsh-model-student`; 14 MB model, onnxruntime-node is ~290 MB), tellsh
-asks a 3-layer distilled encoder only when the cascade's answer has confidence < 0.6. It never turns a rejection into an
-answer, and it changes the answer only when the student is confident. The model is loaded on first use, which costs
-~170 ms once per call. Without the bundle or the runtime, tellsh is unchanged. `--no-hybrid` / `TELLSH_HYBRID=0` turns
-it off; `TELLSH_HYBRID=student-full` also lets a confident student overrule a confident cascade (the student then runs
-on every query). Answers the student changed are never auto-run with `--yes`.
+**Distilled student (on by default).** tellsh asks a 3-layer distilled encoder only when the cascade's answer has
+confidence < 0.6. It never turns a rejection into an answer, and it changes the answer only when the student is
+confident. Since 0.3.6 the student runs in pure JS (no onnxruntime, no native code) from the `tellsh-model-student`
+0.2 bundle (`student.bin`, int8, ~17 MB), which `npm i -g tellsh` installs as a regular dependency. It is loaded on
+first use: a CLI call that consults it takes ~0.3 s end to end on an Apple M-series laptop (~0.16 s without it).
+Without the bundle tellsh runs the cascade alone. `--no-hybrid` / `TELLSH_HYBRID=0` turns it off;
+`TELLSH_HYBRID=student-full` also lets a confident student overrule a confident cascade (the student then runs on every
+query). Answers the student changed are never auto-run with `--yes`.
 
 ### History context
 
