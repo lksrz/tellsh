@@ -3,14 +3,17 @@
 ## 0.3.8 (unreleased)
 
 **New catalog templates (catalog-038):** `git diff --stat [ref]` / `git diff --name-only [ref]` (`--cached` for staged
-changes), `git show --stat <ref>` (default `HEAD`), `git worktree list`, `git worktree add <path> <branch>`, pretty-print a
-JSON file (`jq .`, PowerShell `ConvertFrom-Json | ConvertTo-Json -Depth 100`, cmd `py -m json.tool`), a local HTTP server
-(`python3 -m http.server <port> --bind 127.0.0.1`, default 8000), create a virtualenv (`python3 -m venv .venv`), open a file
-or URL with its default app (`open` / `xdg-open` / `Invoke-Item` or `Start-Process` / `start ""`), `pip list`, `npm
-outdated`. Training rows in `data/intents/g10_catalog038.jsonl` (EN + PL, with near-miss negatives); labelling patterns
-for the real-usage split in `scripts/real/prepare_real.js`. Values are explicit only, and a request the template cannot
-fully express is withheld (`src/templates038.js`). They go through the same two-model gate as the 0.3.4 templates
-(`NEW_TEMPLATE_INTENTS` now includes them). `model/model_templates.bin` is retrained (catalog + the structural real-usage
+changes), `git show --stat <ref>` (default `HEAD`; `HEAD~1` for "the previous commit"), `git worktree list`, create a
+virtualenv (always `python3 -m venv .venv`), `pip list`, `npm outdated`. Training rows in
+`data/intents/g10_catalog038.jsonl` (EN + PL, with near-miss negatives); labelling patterns for the real-usage split in
+`scripts/real/prepare_real.js`. Values come only from the request text (a value starting with `-`, or one the request does
+not literally contain, e.g. a revision from history, is withheld; a venv name or path other than `.venv` is withheld; an
+explicit revision plus "previous" / "parent" is withheld), and a request the template cannot fully express is withheld
+(`src/templates038.js`). These 7 go through the same two-model gate as the 0.3.4 templates (`NEW_TEMPLATE_INTENTS`).
+**Not in this release:** opening a file / URL (`open`), a local HTTP server (`http.server`), pretty-printing JSON (`jq`)
+and `git worktree add` keep catalog entries and training rows but are never answered from the templates model
+(`NOT_GATED` in `src/pipeline.js`); those requests, and the disabled 0.3.4 `git grep` / `git show`, get the same answer
+as in 0.3.7 (the 0.3.3 model). `model/model_templates.bin` is retrained (catalog + the structural real-usage
 train split); `model/model.bin` (0.3.3) is unchanged. On the private real-usage eval split (36,858 labelled rows, rebuilt
 with the 0.3.4 + 0.3.8 labels), the gate scores 93.66% (93.59% with the 0.3.4 templates model); human-written
 requests 89.20% (88.60%); template intents 87.2% (50.0%, n=78); every other intent 93.67% (93.68%; 8 of 36,780 rows

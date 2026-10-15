@@ -6,8 +6,11 @@ import { readFileSync } from 'node:fs';
 import { buildCommand, newTemplateWithhold } from '../src/fill.js';
 import { BY_ID } from '../src/catalog.js';
 import { FAMILY_OF } from '../src/tools.js';
-import { NEW_TEMPLATE_INTENTS, suggest } from '../src/pipeline.js';
+import { NEW_TEMPLATE_INTENTS, NOT_GATED, suggest } from '../src/pipeline.js';
 import { CATALOG_038 } from '../src/templates038.js';
+
+const SHIPPED = ['git_diff_stat', 'git_diff_names', 'git_show_files', 'git_worktree_list', 'venv_create', 'pip_list', 'npm_outdated'];
+const CUT = ['open_file', 'http_server', 'json_pretty', 'git_worktree_add'];
 import { loadModel } from '../src/model.js';
 
 const BASH = { shell: 'bash', os: 'linux', coreutils: 'gnu' };
@@ -19,8 +22,9 @@ const cmd = (id, text, env = BASH) => build(id, text, env).command;
 const withheld = (id, text, env = BASH) => { const r = build(id, text, env); return newTemplateWithhold(id, text, r.slots, r.command); };
 
 test('catalog-038 intents: catalog, tool family, template gate, risk', () => {
-  assert.equal(CATALOG_038.length, 11);
-  for (const id of CATALOG_038) { assert.ok(BY_ID[id], id); assert.ok(FAMILY_OF[id], id); assert.ok(NEW_TEMPLATE_INTENTS.has(id), id); }
+  assert.equal(CATALOG_038.length, 11); // catalog entries kept; only SHIPPED are answered from the templates model
+  for (const id of CATALOG_038) { assert.ok(BY_ID[id], id); assert.ok(FAMILY_OF[id], id); assert.equal(NEW_TEMPLATE_INTENTS.has(id), SHIPPED.includes(id), id); }
+  for (const id of [...CUT, 'git_show', 'git_grep']) assert.ok(NOT_GATED.has(id), id);
   for (const id of ['git_diff_stat', 'git_diff_names', 'git_show_files', 'git_worktree_list', 'json_pretty']) assert.equal(BY_ID[id].risk, 'safe', id);
   // not read-only (a server, opening an app, writing a worktree / venv) or running project code: never auto-run with --yes
   for (const id of ['http_server', 'open_file', 'git_worktree_add', 'venv_create', 'pip_list', 'npm_outdated']) assert.equal(BY_ID[id].risk, 'medium', id);
@@ -44,7 +48,6 @@ test('catalog-038 renders per shell', () => {
     ['http_server', 'uruchom serwer na porcie 5000', 'python3 -m http.server 5000 --bind 127.0.0.1', null, null, null],
     ['http_server', 'serve this directory', 'python3 -m http.server 8000 --bind 127.0.0.1', null, null, null],
     ['venv_create', 'create a virtualenv', 'python3 -m venv .venv', null, "py -m venv '.venv'", 'py -m venv .venv'],
-    ['venv_create', 'create a venv named env', 'python3 -m venv env', null, null, null],
     ['open_file', 'open report.pdf', 'xdg-open report.pdf', 'open report.pdf', "Invoke-Item -LiteralPath 'report.pdf'", 'start "" report.pdf'],
     ['open_file', 'open https://example.com', 'xdg-open https://example.com', 'open https://example.com', "Start-Process 'https://example.com'", 'start "" "https://example.com"'],
     ['open_file', 'open a file', 'xdg-open <FILE>', null, null, null],
@@ -97,7 +100,10 @@ test('g10 training rows: every intent has EN and PL rows; hard negatives are exi
   for (const r of ROWS) { assert.ok(BY_ID[r.intent], r.intent); assert.ok(['en', 'pl'].includes(r.lang)); n[`${r.intent}/${r.lang}`] = (n[`${r.intent}/${r.lang}`] || 0) + 1; }
   for (const id of CATALOG_038) for (const lang of ['en', 'pl']) assert.ok((n[`${id}/${lang}`] || 0) >= 20, `${id}/${lang}: ${n[`${id}/${lang}`]}`);
   assert.ok(ROWS.filter((r) => !CATALOG_038.includes(r.intent)).length >= 30, 'near-miss hard negatives');
-  for (const r of ROWS.filter((x) => CATALOG_038.includes(x.intent))) {
+  // venv_create renders only .venv in 0.3.8: rows naming another venv are withheld
+  const namesVenv = (r) => r.intent === 'venv_create' && /\b(?:named|called|nazwie)\b|venv venv$|\.\/venv|\.env$/.test(r.text);
+  for (const r of ROWS.filter((x) => SHIPPED.includes(x.intent))) {
+    if (namesVenv(r)) { assert.ok(withheld(r.intent, r.text).length > 0, r.text); continue; }
     assert.deepEqual(withheld(r.intent, r.text), [], `${r.intent}: ${r.text}`);
     for (const env of [BASH, MAC, PS, CMD]) assert.ok(build(r.intent, r.text, env).command, `${r.intent} (${env.shell}): ${r.text}`);
   }
@@ -119,10 +125,44 @@ const E2E = [
   ['list installed pip packages', 'pip_list', 'python3 -m pip list'],
   ['which npm packages are outdated', 'npm_outdated', 'npm outdated'],
 ];
-for (const [q, id, want] of E2E) {
+for (const [q, id, want] of E2E.filter(([, id]) => SHIPPED.includes(id))) {
   test(`catalog-038 end to end (retrained templates model): ${q}`, { skip: known.has(id) ? false : `model/model_templates.bin does not know ${id} yet (retrain)` }, () => {
     const r = suggest(q, { env: BASH });
     assert.equal(r.intent, id);
     assert.equal(r.command, want);
   });
 }
+
+test('catalog-038: values come from the request (rules 2a / 2b, venv .venv only, explicit + relative revision)', () => {
+  for (const [id, text] of [
+    ['venv_create', 'create a venv named current'],
+    ['venv_create', 'create a venv named --clear'],
+    ['venv_create', 'python3 -m venv --system-site-packages'],
+    ['git_show_files', 'which files changed in the previous commit of HEAD~3'],
+  ]) assert.ok(withheld(id, text).length > 0, `${id}: ${text} -> ${cmd(id, text)}`);
+  assert.deepEqual(withheld('venv_create', 'python3 -m venv .venv'), []);
+  assert.equal(cmd('venv_create', 'python3 -m venv .venv'), 'python3 -m venv .venv');
+  // an option-like or a not-named value is withheld whatever the slot extraction produced
+  const w = (id, text, slots) => newTemplateWithhold(id, text, slots, 'x');
+  assert.ok(w('git_diff_stat', 'show the diff stat', { rev: 'abc123' }).some((m) => /not named/.test(m)));
+  assert.ok(w('git_diff_stat', 'diff stat against -x', { rev: '-x' }).some((m) => /option/.test(m)));
+  for (const env of [BASH, MAC, PS, CMD]) {
+    for (const q of ['create a venv named current', 'create a venv named --clear', 'python3 -m venv --system-site-packages', 'which files changed in the previous commit of HEAD~3']) {
+      const r = suggest(q, { env });
+      assert.ok(!r.command || (r.missing || []).length > 0 || !/--system-site|--clear|current|HEAD~3/.test(r.command), `${env.shell}: ${q} -> ${r.command}`);
+    }
+    const r = suggest('show the diff stat', { env, history: ['git show abc123'] });
+    assert.ok(!r.command || (r.missing || []).length > 0 || !/abc123/.test(r.command), `${env.shell}: ${r.command}`);
+  }
+});
+
+test('catalog-038: open / http.server / jq / worktree add are answered by the 0.3.3 model alone (never the templates model)', () => {
+  const base = loadModel(new URL('../model/model.bin', import.meta.url).pathname);
+  for (const q of ['open report.pdf', 'serve this folder over http', 'pretty print data.json', 'add a worktree at ../x for branch y', 'show last commit details']) {
+    for (const env of [BASH, MAC, PS, CMD]) {
+      const a = suggest(q, { env }); const b = suggest(q, { env, model: base, gated: true });
+      assert.equal(a?.intent, b?.intent, `${env.shell}: ${q}`); assert.equal(a?.command, b?.command, `${env.shell}: ${q}`);
+      assert.ok(!CUT.includes(a?.intent) && !['git_show', 'git_grep'].includes(a?.intent), `${env.shell}: ${q} -> ${a?.intent}`);
+    }
+  }
+});

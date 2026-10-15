@@ -14,6 +14,9 @@ const REF_SHAPE = /^[\w./~^@-]+$/;
 // words that are never a revision / branch / file name after a preposition
 const NOT_VALUE = /^(?:the|a|an|my|our|this|that|it|last|latest|previous|current|commit|commits|branch|branche?s?|head|repo|repository|file|files|folder|directory|dir|new|separate|another|other|working|tree|worktree|ostatni\w*|poprzedni\w*|bieżąc\w*|biezac\w*|gałęzi|galezi|gałąź|galaz|commita|nowy\w*|nowej|osobn\w*|katalog\w*|folder\w*|pliku?|default|domyśln\w*|domysln\w*|app|application|aplikacj\w*|browser|przeglądar\w*|przegladar\w*|port)$/i;
 const PATHISH = /^(?:\.{1,2}(?:[\/\\]\S*)?|~[\/\\]\S*|[\/\\]\S+|[a-z]:[\/\\]\S*|\S+[\/\\]\S*)$/i;
+const RELATIVE = /\b(?:previous|prior|parent|before|one\s+before|second[- ]to[- ]last|przedostatni\w*|poprzedni\w*|wcześniejsz\w*|wczesniejsz\w*|rodzic\w*)\b/i;
+// values the templates render without the request naming them (never taken from history)
+const DEFAULTS = { git_show_files: { rev: ['HEAD', 'HEAD~1'] }, venv_create: { path: ['.venv'] } };
 const unq = (s) => String(s).replace(/^(["'])(.*)\1$/, '$2');
 
 /** Explicit slot values for the 0.3.8 templates (`v` is the extracted slots, edited in place). */
@@ -35,7 +38,7 @@ export function slots038(id, text, v, quoted = []) {
     const litOk = litVal != null && (/^git\s+show/i.test(lit[0]) || /[\d~^@:\/]/.test(litVal) || /^HEAD$/i.test(litVal));
     const cand = litOk ? litVal : m ? m[1] : null;
     if (cand != null && REF_SHAPE.test(cand) && !cand.startsWith('-')) keep.rev = cand;
-    else if (/\b(?:previous|prior|one\s+before|second[- ]to[- ]last|przedostatni\w*|poprzedni\w*)\b/i.test(t)) keep.rev = 'HEAD~1';
+    else if (RELATIVE.test(t)) keep.rev = 'HEAD~1';
   }
   if (id === 'git_worktree_add') {
     const lit = t.match(/\bgit\s+worktree\s+add\s+(["']?)([^\s"']+)\1\s+(["']?)([^\s"']+)\3\s*$/i);
@@ -64,11 +67,7 @@ export function slots038(id, text, v, quoted = []) {
     const m = t.match(/\bhttp\.server\s+(\d+)\b/i) || t.match(/\b(?:port|porcie|portu|portem)\s*[:=]?\s*(\d+)\b/i) || t.match(/(?:\bon|\bna|\bat|(?:^|\s)localhost)?\s*:(\d+)\b/i) || t.match(/\b(?:on|na)\s+(\d+)\s*$/i);
     if (m) keep.port = m[1];
   }
-  if (id === 'venv_create') {
-    const lit = t.match(/-m\s+venv\s+(["']?)([^\s"']+)\1\s*$/i);
-    if (lit) keep.path = lit[2];
-    else for (const m of t.matchAll(/(?<![\p{L}\d_])(?:named|called|nazwie|nazwą|nazwa|in|into|at|w|we|do)\s+(?:the\s+)?(?:(?:folder|directory|dir|katalogu|folderze)\s+)?(["']?)([^\s"']+)\1(?=[\s,.;!?]*$|\s)/giu)) if (!NOT_VALUE.test(m[2])) { keep.path = m[2]; break; }
-  }
+  // venv_create: always .venv (a named venv / path in the request is withheld by withhold038)
   for (const k of ['rev', 'cached', 'path', 'file', 'branch', 'port', 'url', 'name', 'pattern', 'count', 'pkg', 'script', 'args', 'scope']) delete v[k];
   Object.assign(v, keep);
   if (keep.file != null) v.file = unq(keep.file);
@@ -107,7 +106,7 @@ const WORDS = {
   http_server: `start run launch serve serving host hosting spin up local localhost simple quick static http web server webserver files directory folder dir here this
     port on at over locally python python3 -m http.server
     uruchom odpal postaw wystaw serwuj serwer lokalny lokalnie prosty statyczny www pliki katalog folder bieżący biezacy tutaj tu porcie port przez bieżącym biezacym bieżącego biezacego katalogu folderu`,
-  venv_create: `create make new set up setup init initialize python python3 virtual virtualenv venv env environment -m named called in into at folder directory dir
+  venv_create: `.venv create make new set up setup init initialize python python3 virtual virtualenv venv env environment -m named called in into at folder directory dir
     utwórz utworz stwórz stworz załóż zaloz nowe nowy nowego wirtualne wirtualnego środowisko srodowisko pythona o nazwie nazwie katalogu folderze`,
   open_file: `open launch view start file url link page website site document picture image pdf with default app application program its viewer browser
     xdg-open invoke-item ii in
@@ -121,7 +120,7 @@ const WORDS = {
 const VOCAB = Object.fromEntries(Object.entries(WORDS).map(([k, s]) => [k, new Set(`${COMMON} ${s}`.split(/\s+/).filter(Boolean).map((w) => w.toLowerCase()))]));
 // the slots each template renders (only these explain words of the request)
 const RENDERED = { git_diff_stat: ['rev'], git_diff_names: ['rev'], git_show_files: ['rev'], git_worktree_add: ['path', 'branch'], json_pretty: ['file'],
-  http_server: ['port'], venv_create: ['path'], open_file: ['file'], git_worktree_list: [], pip_list: [], npm_outdated: [] };
+  http_server: ['port'], venv_create: [], open_file: ['file'], git_worktree_list: [], pip_list: [], npm_outdated: [] };
 // (Unicode-aware word edges: `\b` would see a word break inside `zależności`)
 const SECOND = /(?<![\p{L}\d_])(?:and|but|then|plus|afterwards|also|too|additionally|after\s+that|oraz|ale|potem|następnie|nastepnie|też|tez|również|rowniez|dodatkowo)(?![\p{L}\d_])/iu;
 // Polish "i" (and); not the English pronoun ("which worktrees do i have", "the files i changed")
@@ -162,6 +161,16 @@ export function withhold038(id, text, slots = {}) {
   const u = t.replace(/(["'])[^"']*\1/g, ' ');
   if (SECOND.test(u) || SECOND_I.test(` ${u} `)) out.push('args (a second action)');
   if (NEGATION.test(u)) out.push('args (an exclusion is not expressed)');
+  // values come from the request only: an option-like value, or one the request does not literally contain, is not rendered
+  for (const k of RENDERED[id] || []) {
+    const x = slots[k];
+    if (x == null || (DEFAULTS[id]?.[k] || []).includes(String(x))) continue;
+    if (String(x).startsWith('-')) out.push(`${k} (looks like an option)`);
+    else if (!t.toLowerCase().includes(String(x).toLowerCase())) out.push(`${k} (not named in the request)`);
+  }
+  if (id === 'venv_create' && (/(?<![\p{L}\d_])(?:named|called|nazwan\w*|nazwie|nazwą|nazwa)(?![\p{L}\d_])/iu.test(t) || /-m\s+venv\s+(?!\.venv\s*$)\S/i.test(t)
+    || t.split(/\s+/).some((w) => w !== '.venv' && PATHISH.test(w)))) out.push('path (only .venv is supported)');
+  if (id === 'git_show_files' && RELATIVE.test(t) && ((slots.rev != null && slots.rev !== 'HEAD~1') || REF_TOKEN.test(t) || /\bgit\s+show\b/i.test(t))) out.push('rev (an explicit revision and a relative one)');
   if (id === 'open_file' && slots.file != null && !/^https?:\/\//i.test(String(slots.file)) && EXEC_EXT.test(String(slots.file).replace(/[\/\\]+$/, ''))) out.push('file (a program or script would run, not open)');
   if (id === 'open_file' && slots.file != null && /^(?:file|javascript|data|vbscript|ms-\w+|search-ms):/i.test(String(slots.file))) out.push('file (not a file name or web address)');
   if (id === 'http_server' && slots.port != null && !(/^\d{1,5}$/.test(String(slots.port)) && +slots.port > 0 && +slots.port < 65536)) out.push('port (not a valid port)');

@@ -148,12 +148,11 @@ The intent and slots are shared; only the rendering differs (`src/render.js`, va
 
 **New templates (0.3.8, unreleased)**: `git diff --stat [ref]` (`--cached` for staged changes), `git diff --name-only
 [ref]`, `git show --stat <ref>` (`HEAD` by default: "which files changed in the last commit"), `git worktree list`,
-`git worktree add <path> <branch>`, pretty-printing a JSON file (`jq . <file>`; PowerShell `ConvertFrom-Json |
-ConvertTo-Json -Depth 100`; cmd `py -m json.tool`), a local HTTP server (`python3 -m http.server 8000 --bind 127.0.0.1`,
-`py` on Windows), creating a virtualenv (`python3 -m venv .venv`), opening a file or URL with its default app (`open` on
-macOS, `xdg-open` on Linux, `Invoke-Item` / `Start-Process` in PowerShell, `start ""` in cmd), `pip list` (`python3 -m pip
-list`) and `npm outdated`. They are answered by the retrained templates model (`model/model_templates.bin`, trained with
-`data/intents/g10_catalog038.jsonl`) through the same two-model gate as the 0.3.4 templates.
+creating a virtualenv (`python3 -m venv .venv`, `py` on Windows), `pip list` (`python3 -m pip list`) and `npm outdated`.
+They are answered by the retrained templates model (`model/model_templates.bin`, trained with
+`data/intents/g10_catalog038.jsonl`) through the same two-model gate as the 0.3.4 templates. Opening a file / URL
+(`open`), a local HTTP server (`http.server`), pretty-printing JSON (`jq`) and `git worktree add` are **not in this
+release**: those requests are answered exactly as in 0.3.7.
 
 **New templates (0.3.4)** (ranked by frequency in real command usage): `git fetch --all`, `git ls-files`,
 `gh run watch [id]`, `gh issue list`, `gh issue view <n>`, `npx wrangler d1 list`,
@@ -480,21 +479,22 @@ retrain; `npm test && npm run eval`.
   Known Windows limits from it: `create_symlink` in Windows PowerShell 5.1 and `temperature` / `last_logins` need an
   elevated prompt; `disk_free` has no non-admin cmd.exe command (use PowerShell); cmd's `history_search` only sees the
   current session.
-* **`git grep` / `git show` are not suggested as runnable in 0.3.4.** Their free-text forms are withheld (shown with a
-  placeholder, never run on Enter or `--yes`) until a later release.
+* **`git grep` / `git show` are not suggested as runnable.** In 0.3.4–0.3.7 their free-text forms were withheld; since
+  0.3.8 the templates model is never consulted for them, so those requests get the 0.3.3 model's answer (e.g. "show the
+  last commit" -> `git log`).
 * **New 0.3.4 templates take only explicit values.** `git fetch` is always `git fetch --all` (a named remote or
   `--prune` is not rendered, and a request that also asks for another action is withheld); `gh issue view` needs an
   explicit number (`issue 42`, `#42`); `gh run watch` takes one (`run 123`) or none (gh then asks which run), and some
   phrasings (`watch the latest workflow run`) are withheld with `<NUM>`; `wrangler pages deploy` needs the directory named (no `dist`
   default).
-* **New 0.3.8 templates take only explicit values.** A revision, worktree path / branch, JSON file, port or venv name
-  is used only when the request names it (otherwise the default: `HEAD`, port 8000, `.venv`, or a `<PATH>` / `<BRANCH>` /
-  `<FILE>` placeholder). A request with a word, option, exclusion or second action the template cannot express
-  (`only for src`, `on the network`, `and update them`, `-w`) is withheld (shown, never run on Enter or `--yes`). The HTTP
-  server always binds to 127.0.0.1; `open` of a program or script (`.exe`, `.sh`, `.app`, …) is withheld because it would
-  run it. `open_file`, `http_server`, `git worktree add`, `venv_create`, `pip list` and `npm outdated` are rated medium,
-  so `--yes` never runs them; opening a URL in PowerShell (`Start-Process`) is rated high. History after one of them is
-  handled like after a 0.3.4 template (below).
+* **New 0.3.8 templates take only explicit values.** A revision is used only when the request names it literally
+  (otherwise `HEAD`, or `HEAD~1` for "the previous commit"); a value starting with `-` or not found in the request text
+  (e.g. a revision from an earlier `git show abc123`) is withheld. The venv is always `.venv`: a request naming another
+  venv (`named X`, `called X`, `o nazwie X`, a path) is withheld, as is an explicit revision plus "previous" / "parent". A
+  request with a word, option, exclusion or second action the template cannot express (`only for src`, `and update
+  them`, `-w`) is withheld (shown, never run on Enter or `--yes`). `venv_create`, `pip list` and `npm outdated` are rated
+  medium, so `--yes` never runs them. History after one of them is handled like after a 0.3.4 template (below): after a
+  0.3.8 template, "same for X" is withheld (not run).
 * **History after a 0.3.4 template is replayed only as "same for X".** When the previous command is one of the new
   templates (`git fetch`, `git ls-files`, `gh issue list` / `view`, `gh run watch`, `wrangler d1 list`, `wrangler pages
   deploy`, and also `git grep` / `git show`), a follow-up that refers to it (`it`, `there`, `same but …`, `again`, `them`, …) is refused, and that line adds

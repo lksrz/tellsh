@@ -54,11 +54,8 @@ test('known limits: pip --target and quoted --workspace in PowerShell / cmd; att
 
 test('new-template intents end to end (retrained model)', () => {
   for (const [q, want] of [
-    ['show the last commit', 'git show'],
-    ['pokaż ostatni commit', 'git show'],
     ['fetch new branches from origin without merging', 'git fetch --all'],
     ['list the files tracked by git', 'git ls-files'],
-    ['git grep TODO', 'git grep -n -- TODO'],
     ['watch the github actions run until it finishes', 'gh run watch'],
     ['list open github issues', 'gh issue list'],
     ['show github issue 42', 'gh issue view 42'],

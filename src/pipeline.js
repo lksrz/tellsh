@@ -417,8 +417,9 @@ function literalIntentOk(first, intent) { const f = LIT_FAMILY[String(first).toL
 // 0.3.4 two-model gate: the 0.3.3 model (model/model.bin) answers everything it already knew; the retrained model
 // (model/model_templates.bin) is used only when it picks one of the new 0.3.4 template intents, so a retrain can never
 // change the pre-existing intents (their classification and slots stay exactly as on 0.3.3).
-// catalog-038: the 0.3.8 templates (src/templates038.js) are gated the same way; they are answered once the templates model knows them
-export const NEW_TEMPLATE_INTENTS = new Set(['git_fetch', 'git_ls_files', 'gh_run_watch', 'gh_issue_list', 'gh_issue_view', 'wrangler_d1_list', 'wrangler_pages_deploy', 'git_grep', 'git_show', ...CATALOG_038]);
+// catalog-038: the shipped 0.3.8 templates are gated the same way; NOT_GATED (cut 0.3.8 ones, disabled 0.3.4 git_grep / git_show) never are: 0.3.3 answers as in 0.3.7
+export const NOT_GATED = new Set(['open_file', 'http_server', 'json_pretty', 'git_worktree_add', 'git_grep', 'git_show']);
+export const NEW_TEMPLATE_INTENTS = new Set(['git_fetch', 'git_ls_files', 'gh_run_watch', 'gh_issue_list', 'gh_issue_view', 'wrangler_d1_list', 'wrangler_pages_deploy', ...CATALOG_038.filter((id) => !NOT_GATED.has(id))]);
 const TEMPLATES_MODEL = fileURLToPath(new URL('../model/model_templates.bin', import.meta.url));
 let templatesModel;
 function getTemplatesModel() {
@@ -494,7 +495,7 @@ function suggestOnce(query, opts = {}) {
   // 0.3.4: the previous history line is one of the new templates (git fetch, gh issue view, wrangler pages deploy, ...).
   // The 0.3.3 model never saw these lines as history, so they add no history features (the request is read as on 0.3.3),
   // and every follow-up that refers to that command is refused, except a "same for X" replay of the identical operation.
-  const newLast = !!ctx && NEW_TEMPLATE_INTENTS.has(ctx.last?.intent);
+  const newLast = !!ctx && (NEW_TEMPLATE_INTENTS.has(ctx.last?.intent) || NOT_GATED.has(ctx.last?.intent));
   const cwdFeats = opts.cwd ? cwdFlags(opts.cwd).map((c) => 'ctx_cwd=' + c) : [];
   const ctxFeats = ctx && !newLast ? ctx.features : cwdFeats;
   const extras = [...envFeatures(env), ...ctxFeats];
@@ -573,7 +574,7 @@ function suggestOnce(query, opts = {}) {
   }
   // "same but no push" after `git fetch --all`: a 0.3.4 template replayed as "same but ..." keeps its operation; a modification
   // that lands on another intent (git push, git pull, gh pr list) is refused, never a runnable different command
-  if (sb && intent !== sb.lastIntent && (NEW_TEMPLATE_INTENTS.has(sb.lastIntent) || NEW_TEMPLATE_INTENTS.has(intent))) {
+  if (sb && intent !== sb.lastIntent && (NEW_TEMPLATE_INTENTS.has(sb.lastIntent) || NOT_GATED.has(sb.lastIntent) || NEW_TEMPLATE_INTENTS.has(intent))) {
     context.rule = 'refused';
     context.note = `"same but ..." would change the previous command (${sb.lastIntent}) into another operation (${intent}); not guessing`;
     return { ...base, understood: false, method: 'history-rule', confidence: 0, candidates, tools, command: null, missing: [], hint: context.note };

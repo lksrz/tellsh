@@ -12,14 +12,14 @@ const QUERIES = [...new Set([...kept.matchAll(/'((?:[^'\\]|\\.){4,200})'/g)].map
   'show the last commit', 'show commit HEAD', 'git show HEAD~1', 'show the previous commit', 'show commit abc123', 'pokaż ostatni commit', 'przeszukaj repo pod kątem TODO',
 ]);
 
-test('git_grep and git_show are never runnable in 0.3.4', () => {
+test('git_grep and git_show are never runnable (0.3.8: never answered from the templates model at all)', () => {
   let seen = 0;
   for (const env of ENVS) for (const q of QUERIES) {
     const r = suggest(q, env);
     if (r && /^(?:git_grep|git_show)$/.test(r.intent ?? '')) { seen++; assert.ok(!r.command || (r.missing || []).length > 0, `${env.shell}: ${JSON.stringify(q)} -> ${r.command}`); }
     if (r && r.command && (r.missing || []).length === 0) assert.ok(!/^\s*git\s+(?:grep|show)\b/i.test(r.command), `${env.shell}: ${JSON.stringify(q)} -> ${r.command}`);
   }
-  assert.ok(seen > 50, `classifier still picks the templates (seen ${seen})`);
+  assert.equal(seen, 0, 'git_grep / git_show are not in the two-model gate (the 0.3.3 model answers as in 0.3.7)');
 });
 test('history replay of a git grep / git show command is not runnable', () => {
   for (const env of ENVS) for (const [h, q] of [['git grep -n -- TODO', 'same for FIXME'], ['git show HEAD', 'same for HEAD~2']]) {
