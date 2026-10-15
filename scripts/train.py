@@ -183,8 +183,9 @@ def main():
     ap.add_argument('--replace-shipped', action='store_true',
                     help='allow overwriting an existing model under model/ (the shipped models are fixed: 0.3.4+ gates assume them)')
     args = ap.parse_args()
-    out_abs = os.path.abspath(args.out)
-    if os.path.exists(out_abs) and os.path.dirname(out_abs) == os.path.dirname(DEFAULT_OUT) and not args.replace_shipped:
+    # resolved paths: a symlink (or symlinked directory) pointing at a shipped model is the shipped model
+    out_abs = os.path.realpath(args.out)
+    if os.path.exists(out_abs) and os.path.dirname(out_abs) == os.path.realpath(os.path.dirname(DEFAULT_OUT)) and not args.replace_shipped:
         sys.exit(f'refusing to overwrite the shipped {os.path.relpath(out_abs, ROOT)}: pass --out build/<name>.bin, or --replace-shipped')
     t0 = time.time()
     meta = json.load(open(os.path.join(BUILD, 'meta.json')))

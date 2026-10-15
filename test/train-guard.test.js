@@ -7,12 +7,21 @@ import { fileURLToPath } from 'node:url';
 const ROOT = fileURLToPath(new URL('..', import.meta.url));
 const hasDeps = spawnSync('python3', ['-c', 'import numpy, scipy, sklearn'], { encoding: 'utf8' }).status === 0;
 
-test('train.py refuses to overwrite model/model.bin', { skip: !hasDeps && 'python3 with numpy/scipy/sklearn not available' }, () => {
+test('train.py refuses to overwrite model/model.bin', { skip: !hasDeps && 'python3 with numpy/scipy/sklearn not available' }, async () => {
   for (const out of [[], ['--out', 'model/model.bin'], ['--out', 'model/model_templates.bin']]) {
     const r = spawnSync('python3', ['scripts/train.py', ...out], { cwd: ROOT, encoding: 'utf8' });
     assert.notEqual(r.status, 0);
     assert.match(r.stderr, /refusing to overwrite the shipped model\//);
   }
+  // a symlink to a shipped model is refused too
+  const { mkdtempSync, symlinkSync, rmSync } = await import('node:fs');
+  const dir = mkdtempSync(`${ROOT}build/guard-`);
+  try {
+    symlinkSync(`${ROOT}model/model.bin`, `${dir}/m.bin`);
+    const r = spawnSync('python3', ['scripts/train.py', '--out', `${dir}/m.bin`], { cwd: ROOT, encoding: 'utf8' });
+    assert.notEqual(r.status, 0);
+    assert.match(r.stderr, /refusing to overwrite the shipped model\//);
+  } finally { rmSync(dir, { recursive: true, force: true }); }
 });
 
 test('npm run train writes to build/, not model/', async () => {
