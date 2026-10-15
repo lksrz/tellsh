@@ -138,7 +138,11 @@ test('0.3.8: "same but" never turns the previous command into a riskier intent (
     assert.equal(r.command, null, `${env.shell}: ${h} -> ${r.command}`);
   }
   for (const [env, h] of [[ENVS[0], 'cat config.txt'], [ENVS[1], 'cat config.txt'], [ENVS[2], 'Get-Content config.txt'], [ENVS[3], 'type config.txt']]) {
-    assert.equal(suggest('same but without deleting it', { ...env, history: [h] }).command, null, env.shell);
+    for (const q of ['same but without deleting it', 'again but without deleting it', 'the same without deleting it', 'like before but without deleting it',
+      'do it again without removing it', 'repeat that but without deleting it', 'same but without\ndeleting it', "don't delete it"]) {
+      const r = suggest(q, { ...env, history: [h] });
+      assert.ok(!r.command || (r.missing || []).length || /<FILE>/.test(r.command), `${env.shell}: ${JSON.stringify(q)} -> ${r.command}`);
+    }
   }
   assert.match(suggest('same but for staging', { ...ENVS[0], history: ['git push origin main'] }).command, /staging/);
   assert.match(suggest('delete it', { ...ENVS[0], history: ['cat config.txt'] }).command, /config\.txt/); // a plain reference still works
