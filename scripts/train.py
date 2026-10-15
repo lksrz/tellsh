@@ -16,6 +16,7 @@ Thresholds are calibrated on a group-wise holdout (all copies of a sentence stay
 Usage: python3 scripts/train.py [--keep-tool 20000] [--C 30] [--tagC 2]
 """
 import argparse
+import gc
 import json
 import os
 import struct
@@ -251,6 +252,10 @@ def main():
     log(f'calibration rows: {int(ind.sum())} in-domain, {int(oodm.sum())} out-of-domain')
     log(f'accept threshold={best_t:.3f} (correct kept={(score[ind & correct] >= best_t).mean():.3f}, '
         f'OOD rejected={(score[oodm] < best_t).mean() if oodm.any() else float("nan"):.3f}); compose tool threshold={compose_t:.2f}')
+
+    # the split models hold full-width coefficient matrices (~1 GB with all intent models): free them before the final fit
+    del tool_s, int_s, p_tool, Xho
+    gc.collect()
 
     # ---------------- final models on all data ----------------
     all_idx = np.arange(len(rows))
