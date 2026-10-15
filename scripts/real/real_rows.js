@@ -6,7 +6,7 @@ import { join } from 'node:path';
 import { fnv1a } from '../../src/features.js';
 
 // at most CAP rows per intent and language (sed -n line ranges alone are ~2500 rows), chosen by a text hash
-export const CAP = 120;
+export const CAP = +(process.env.TELLSH_REAL_CAP || 120);
 
 export function readReal(root) {
   const p = join(root, 'build', 'real', 'rows.jsonl');

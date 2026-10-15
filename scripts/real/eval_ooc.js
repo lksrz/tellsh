@@ -10,7 +10,7 @@ import { loadModel } from '../../src/model.js';
 
 // --sweep: veto off, plus the out-of-catalog veto at every stage-1 p(__ooc__) threshold T (templates model probe)
 // (T = p(__ooc__) floor, C = the vetoed answer's confidence ceiling)
-const SWEEP = process.argv.includes('--sweep') ? [0.3, 0.5, 0.7, 0.9].flatMap((t) => [0.6, 0.8, 0.9, 2].map((c) => [t, c])) : null;
+const SWEEP = process.argv.includes('--sweep') ? [0.5, 0.7, 0.9, 0.95, 0.98, 0.99].flatMap((t) => [0.6, 0.8, 0.9, 2].map((c) => [t, c])) : null;
 if (SWEEP) process.env.TELLSH_OOC_VETO = 'off';
 const TM = SWEEP && loadModel(fileURLToPath(new URL('../../model/model_templates.bin', import.meta.url)));
 
