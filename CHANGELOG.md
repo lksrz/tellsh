@@ -3,17 +3,15 @@
 ## Unreleased — catalog-038
 
 **New catalog templates (catalog-038):** `git diff --stat` / `git diff --name-only`,
-`git worktree list`, `pip list`, `npm outdated`. Training rows in `data/intents/g10_catalog038.jsonl` (EN + PL, with near-miss negatives); labelling
+`git worktree list`. Training rows in `data/intents/g10_catalog038.jsonl` (EN + PL, with near-miss negatives); labelling
 patterns for the real-usage split in `scripts/real/prepare_real.js`. The two diff templates are value-free (always the
 plain working-tree diff): a request naming a revision or scope (a ref / hash, commit, last, branch, staged / index,
 since / from / vs / against / od / do, per / each, HEAD / main / origin, committed / zatwierdzonych, ...) is withheld, never
-answered with the plain diff; a literal `git diff …` is answered only when it is exactly the rendered command. `npm outdated`
-answers only a request about outdated packages (not "what are my npm dependencies"); `pip list` does not answer a
-version question. Values come only from the request text, and a request the template cannot fully express is withheld
+answered with the plain diff; a literal `git diff …` is answered only when it is exactly the rendered command. Values come only from the request text, and a request the template cannot fully express is withheld
 (`src/templates038.js`). They go through the same two-model gate as the 0.3.4 templates (`NEW_TEMPLATE_INTENTS`); a
 template answer is never replaced by a composed command.
 **Not in this release:** opening a file / URL (`open`), a local HTTP server (`http.server`), pretty-printing JSON
-(`jq`), `git worktree add`, creating a virtualenv and `git show --stat` are recognised by the templates model but always
+(`jq`), `git worktree add`, creating a virtualenv, `git show --stat`, `pip list` and `npm outdated` are recognised by the templates model but always
 withheld (shown, never run: `DISABLED_038` in `src/templates038.js`), like the 0.3.4 `git grep` / `git show`, so their
 requests never fall through to a different 0.3.3 answer.
 **Gate fall-through guard:** when the templates model ranks a template intent among its candidates at p >= 0.2 but

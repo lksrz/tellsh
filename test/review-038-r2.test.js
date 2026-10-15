@@ -22,6 +22,11 @@ test('catalog-038 review r2: template vocabulary never answers a different reque
   const o = { shell: 'bash', os: 'linux' };
   assert.equal(suggest('git diff --name-only', o).command, 'git diff --name-only');
   assert.equal(suggest('pokaż statystyki niezatwierdzonych zmian', o).command, 'git diff --stat');
-  assert.equal(suggest('which npm packages are outdated', o).command, 'npm outdated');
-  assert.equal(suggest('list installed pip packages', o).command, 'python3 -m pip list');
+  // pip list / npm outdated cut in review r3 (recognised, always withheld)
+  for (const q of ['which npm packages are outdated', 'list installed pip packages', 'list python versions', 'show installed python versions',
+    'zainstalowane wersje pythona', 'czy są nowsze wersje npm']) {
+    const r = suggest(q, o);
+    assert.ok(!(runnable(r) && /^(?:python3 -m pip list|npm outdated)\b/.test(r.command)), `${q} -> ${r.command}`);
+    assert.ok(!(runnable(r) && ['pip_list', 'npm_outdated'].includes(r.intent)), `${q} -> ${r.intent}`);
+  }
 });

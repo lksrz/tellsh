@@ -10,7 +10,7 @@ export const CATALOG_038 = ['git_diff_stat', 'git_diff_names', 'git_show_files',
 export const IS_038 = new Set(CATALOG_038);
 // not in this release (review): recognised by the templates model but always withheld, like the 0.3.4 git grep / git show,
 // so their requests never fall through to a different 0.3.3 answer
-export const DISABLED_038 = new Set(['open_file', 'http_server', 'json_pretty', 'git_worktree_add', 'venv_create', 'git_show_files']);
+export const DISABLED_038 = new Set(['open_file', 'http_server', 'json_pretty', 'git_worktree_add', 'venv_create', 'git_show_files', 'pip_list', 'npm_outdated']);
 
 export const REF_TOKEN = /(?:^|\s)((?:HEAD|@)(?:[~^]\d*)*|(?=[0-9a-f]*\d)[0-9a-f]{7,40}|v\d+(?:\.\d+)*)(?=[\s,.;:!?]|$)/;
 const REF_SHAPE = /^[\w./~^@-]+$/;

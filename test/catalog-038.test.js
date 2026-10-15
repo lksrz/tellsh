@@ -9,8 +9,8 @@ import { FAMILY_OF } from '../src/tools.js';
 import { NEW_TEMPLATE_INTENTS, suggest } from '../src/pipeline.js';
 import { CATALOG_038, DISABLED_038 } from '../src/templates038.js';
 
-const SHIPPED = ['git_diff_stat', 'git_diff_names', 'git_worktree_list', 'pip_list', 'npm_outdated'];
-const CUT = ['open_file', 'http_server', 'json_pretty', 'git_worktree_add', 'venv_create', 'git_show_files'];
+const SHIPPED = ['git_diff_stat', 'git_diff_names', 'git_worktree_list'];
+const CUT = ['open_file', 'http_server', 'json_pretty', 'git_worktree_add', 'venv_create', 'git_show_files', 'pip_list', 'npm_outdated'];
 import { loadModel } from '../src/model.js';
 
 const BASH = { shell: 'bash', os: 'linux', coreutils: 'gnu' };
@@ -89,8 +89,10 @@ test('catalog-038: a restriction, option or second action the template cannot ex
     ['npm_outdated', 'nieaktualne pakiety npm oprócz react'],
   ]) assert.ok(withheld(id, text).length > 0, `${id}: ${JSON.stringify(text)} -> ${cmd(id, text)}`);
   // plain requests are not
-  for (const [id, text] of [['npm_outdated', 'sprawdź przestarzałe zależności'], ['git_worktree_list', 'which worktrees do i have'], ['git_diff_stat', 'show insertions and deletions'],
-    ['git_worktree_list', "wylistuj worktree'y"], ['pip_list', 'show installed packages and versions']]) assert.deepEqual(withheld(id, text), [], `${id}: ${text}`);
+  for (const [id, text] of [['git_worktree_list', 'which worktrees do i have'], ['git_diff_stat', 'show insertions and deletions'],
+    ['git_worktree_list', "wylistuj worktree'y"]]) assert.deepEqual(withheld(id, text), [], `${id}: ${text}`);
+  for (const [id, text] of [['npm_outdated', 'sprawdź przestarzałe zależności'], ['pip_list', 'show installed packages and versions']]) // cut in review r3
+    assert.deepEqual(withheld(id, text), ['args (template disabled in this release)'], `${id}: ${text}`);
 });
 
 const ROWS = readFileSync(new URL('../data/intents/g10_catalog038.jsonl', import.meta.url), 'utf8').trim().split('\n').map((l) => JSON.parse(l));
