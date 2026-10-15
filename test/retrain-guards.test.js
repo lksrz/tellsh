@@ -144,6 +144,7 @@ test('0.3.8: "same but" never turns the previous command into a riskier intent (
     }
   }
   assert.match(suggest('same but for staging', { ...ENVS[0], history: ['git push origin main'] }).command, /staging/);
+  assert.equal(suggest('same but avoid packing it to out.tar.gz', { ...ENVS[0], history: ['cat config.txt'] }).command, null); // composed: refused
   assert.match(suggest('delete it', { ...ENVS[0], history: ['cat config.txt'] }).command, /config\.txt/); // a plain reference still works
   // a fresh request with a negation is never refused because of the history
   assert.equal(suggest('remove build dir without asking', { ...ENVS[0], history: ['cat config.txt'] }).context.rule === 'refused', false);

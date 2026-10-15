@@ -19,7 +19,9 @@ const rank = (id) => (id === UNKNOWN ? 0 : RANK[BY_ID[id]?.risk] ?? 2);
 
 export function sameButRiskGuard(res) {
   const last = res?.context?.sameButLast;
-  if (!last || !res.intent || res.intent === last || rank(res.intent) <= rank(last)) return res;
+  if (!last || !res.command) return res;
+  // a composed command (no catalog intent) is never the answer to a same-but follow-up
+  if (res.intent && res.method !== 'composed' && (res.intent === last || rank(res.intent) <= rank(last))) return res;
   return { ...res, understood: false, method: 'history-rule', confidence: 0, candidates: [], tools: [], command: null, missing: [],
-    context: { ...res.context, rule: 'refused' }, hint: `this follow-up would turn ${last === UNKNOWN ? 'the previous command' : last} into the riskier ${res.intent}: ask for it directly` };
+    context: { ...res.context, rule: 'refused' }, hint: `this follow-up would turn ${last === UNKNOWN ? 'the previous command' : last} into the riskier ${res.method === 'composed' || !res.intent ? 'composed command' : res.intent}: ask for it directly` };
 }
