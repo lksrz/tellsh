@@ -129,7 +129,7 @@ export async function suggestHybrid(query, opts = {}) {
  *  bundle is missing or cannot be opened (result.hybrid.unavailable says why). */
 const LOADED = new Map();
 const loader = (student) => async () => {
-  if (student) { const { loadStudent } = await import('./student.js'); return loadStudent({ threads: 1 }); }
+  if (student) { const { loadStudent } = await import('./student.js'); return loadStudent(); }
   const { Encoder } = await import('./encoder.js');
   try { return await Encoder.load({ threads: 1 }); } catch { return null; }
 };
@@ -148,7 +148,7 @@ export async function suggestLazy(query, opts = {}) {
     return await suggestHybrid(query, { ...opts, system, encoder });
   } catch (e) {
     if (!e.unavailable) throw e;
-    const why = student ? 'student (install onnxruntime-node + tellsh-model-student)' : 'encoder (install onnxruntime-node + tellsh-model-enc)';
+    const why = student ? 'student (install tellsh-model-student >= 0.2, or put student.bin + vocab.json + labels.json in $TELLSH_STUDENT_DIR)' : 'encoder (install onnxruntime-node + tellsh-model-enc)';
     return { ...suggest(query, opts), hybrid: { system: 'A', deferred: false, unavailable: why } };
   }
 }

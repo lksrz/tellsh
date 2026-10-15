@@ -85,23 +85,23 @@ test('suggestLazy loads the model once and only when needed', async () => {
 
 test('student bundle lookup: incomplete directories are skipped, and loading never falls back to another bundle', async () => {
   const d = mkdtempSync(join(tmpdir(), 'tellsh-stu-'));
-  writeFileSync(join(d, 'vocab.json'), '{}'); // no encoder.int8.onnx, no labels.json
+  writeFileSync(join(d, 'vocab.json'), '{}'); // no student.bin, no labels.json
   const found = findStudentDir(d);
   assert.notEqual(found, d);
-  if (found !== null) for (const f of ['encoder.int8.onnx', 'vocab.json', 'labels.json']) assert.ok(existsSync(join(found, f)), f);
+  if (found !== null) for (const f of ['student.bin', 'vocab.json', 'labels.json']) assert.ok(existsSync(join(found, f)), f);
   const bad = join(d, 'bad'); mkdirSync(bad);
-  for (const f of ['encoder.int8.onnx', 'vocab.json', 'labels.json']) writeFileSync(join(bad, f), 'garbage');
+  for (const f of ['student.bin', 'vocab.json', 'labels.json']) writeFileSync(join(bad, f), 'garbage');
   const old = { S: process.env.TELLSH_STUDENT_DIR };
   process.env.TELLSH_STUDENT_DIR = bad;
   try {
     assert.equal(findStudentDir(), bad);
-    assert.equal(await loadStudent(), null); // corrupt model or no runtime -> null, never a throw
+    assert.equal(await loadStudent(), null); // corrupt model -> null, never a throw
   } finally { if (old.S === undefined) delete process.env.TELLSH_STUDENT_DIR; else process.env.TELLSH_STUDENT_DIR = old.S; }
 });
 
 test('CLI: TELLSH_HYBRID=0 and a broken student bundle both answer with A alone', () => {
   const d = mkdtempSync(join(tmpdir(), 'tellsh-stu-'));
-  for (const f of ['encoder.int8.onnx', 'vocab.json', 'labels.json']) writeFileSync(join(d, f), 'garbage');
+  for (const f of ['student.bin', 'vocab.json', 'labels.json']) writeFileSync(join(d, f), 'garbage');
   const run = (extra) => spawnSync(process.execPath, ['bin/tellsh.js', '--json', 'show git status'], { encoding: 'utf8', env: { ...process.env, ...extra } });
   const off = JSON.parse(run({ TELLSH_HYBRID: '0' }).stdout);
   assert.equal(off.intent, 'git_status');
@@ -114,7 +114,7 @@ test('CLI: TELLSH_HYBRID=0 and a broken student bundle both answer with A alone'
 });
 
 const real = await loadStudent();
-test('A+S with the real student bundle (skipped without onnxruntime-node + bundle)', { skip: !real }, async () => {
+test('A+S with the real student bundle (skipped without student.bin)', { skip: !real }, async () => {
   const p = await real.infer('pokaż status repozytorium git', env);
   assert.ok(p.intents.git_status > 0.5);
   const r = await suggestHybrid('show git status', { env, system: 'A+S', encoder: real });
@@ -178,9 +178,12 @@ test('suggestLazy: concurrent first calls share one load; a throwing loader degr
   _resetLazy();
 });
 
-test('student requires the native runtime: no onnxruntime-web fallback', async () => {
+test('the student runs on the pure-JS runtime; an ONNX-only (0.1.x) bundle counts as missing', async () => {
   const m = await loadStudent();
-  if (m) assert.equal(m.runtime, 'onnxruntime-node');
+  if (m) assert.equal(m.runtime, 'js');
+  const d = mkdtempSync(join(tmpdir(), 'tellsh-stu-'));
+  for (const f of ['encoder.int8.onnx', 'vocab.json', 'labels.json']) writeFileSync(join(d, f), 'x');
+  assert.notEqual(findStudentDir(d), d);
 });
 
 test('CLI: TELLSH_HYBRID off values disable the student', () => {

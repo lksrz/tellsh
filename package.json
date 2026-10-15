@@ -1,7 +1,7 @@
 {
   "name": "tellsh",
-  "version": "0.3.5",
-  "description": "Offline natural-language (Polish & English) to shell command CLI: tool->intent->slot cascade of tiny linear models + templates for bash/zsh/sh/PowerShell (fish/cmd best effort). No LLM at runtime, zero dependencies.",
+  "version": "0.3.6",
+  "description": "Offline natural-language (Polish & English) to shell command CLI: tool->intent->slot cascade of tiny linear models + templates for bash/zsh/sh/PowerShell (fish/cmd best effort). No LLM at runtime, no native dependencies (pure JS).",
   "type": "module",
   "bin": {
     "tellsh": "bin/tellsh.js"
@@ -68,20 +68,18 @@
     "type": "git",
     "url": "git+https://github.com/lksrz/tellsh.git"
   },
-  "dependencies": {},
+  "dependencies": {
+    "tellsh-model-student": "0.2.x"
+  },
   "peerDependencies": {
     "onnxruntime-node": ">=1.20.0",
-    "tellsh-model-enc": "0.4.x",
-    "tellsh-model-student": "0.1.x"
+    "tellsh-model-enc": "0.4.x"
   },
   "peerDependenciesMeta": {
     "onnxruntime-node": {
       "optional": true
     },
     "tellsh-model-enc": {
-      "optional": true
-    },
-    "tellsh-model-student": {
       "optional": true
     }
   }

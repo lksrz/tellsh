@@ -39,7 +39,7 @@ Options:
                     tellsh-model-enc bundle; see HYBRID.md; also TELLSH_HYBRID=1|true|yes|on, or =safe to never
                     turn a rejection into an answer)
       --no-hybrid   A only: never consult the optional distilled student (also TELLSH_HYBRID=0|off|false|no); by default it is
-                    used below confidence 0.6 when onnxruntime-node and tellsh-model-student are installed
+                    used below confidence 0.6 when tellsh-model-student (a regular dependency) is installed
       --top <k>     show k candidate intents (default 3)
       --threshold <p>  override confidence threshold
   -v, --version     print version
@@ -288,7 +288,7 @@ export async function main(argv = process.argv.slice(2)) {
     const history = opts.history ? loadHistory({ shell: env.shell, file: opts.historyFile, n: 2 }) : undefined;
     const so = { top: opts.top, threshold: opts.threshold, env, history, cwd: process.cwd(), compose: opts.compose, unclearArgs: joined.unclear };
     // default ('auto'): A answers; the distilled student is consulted only below A's confidence 0.6, and only when its
-    // optional bundle is installed (otherwise plain A, no runtime import). --hybrid / TELLSH_HYBRID=1|true|yes|on|safe: the B encoder.
+    // bundle (tellsh-model-student, pure JS) is found (otherwise plain A, no runtime import). --hybrid / TELLSH_HYBRID=1|true|yes|on|safe: the B encoder.
     // TELLSH_HYBRID=student-full adds the disagreement rule (student on every query).
     const H = String(process.env.TELLSH_HYBRID || '').toLowerCase();
     const system = opts.hybrid === true ? (H === 'safe' ? 'A+B-safe' : 'A+B') : H === 'student-full' ? 'A+S-full' : 'A+S';
