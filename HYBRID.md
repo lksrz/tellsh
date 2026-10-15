@@ -713,3 +713,50 @@ never consults it (`show git status`) takes 160 ms. The student's share of a CLI
 and 538 ms for the whole consulted call; with the WebAssembly SIMD kernels: load 61–97 ms, first query 46–63 ms, p50
 12–16 / p95 22–24 ms, and 415–426 ms (median of 7) for the whole consulted call, 237–243 ms for the same query with
 `TELLSH_HYBRID=0` and 211 ms for one that never consults the student. The student runs only below A's confidence 0.6.
+
+## Out-of-catalog rejection experiment (0.3.7, feat/ooc-reject; not shipped)
+
+Goal: give stage 1 an explicit "shell task, but not in the catalog" signal so A stops answering out-of-catalog real
+requests (`real_ooc`, 22,534 eval rows, rejected 35.0% by A) with the nearest catalog intent, at ≤ 0.5 pt cost in-catalog.
+
+**Split.** The private rows used for 0.3.4+ (`build/real/rows.jsonl`) were already built with `--group structural` and a
+label-independent skeleton split (every command skeleton on one side): 0 of the 22,534 eval out-of-catalog rows share a
+skeleton with any train row, so the train-split out-of-catalog rows (65,064 rows in 3,016 skeletons) can be trained on
+without leakage. No re-split was needed; a retrain with no out-of-catalog rows (`ctl`) reproduces the shipped templates
+model within 0.1 pt on every set.
+
+**Design.** `model/model.bin` (0.3.3) is not retrained (the 0.3.4 gate guarantees its intents); the candidate is the
+*templates* model (`model/model_templates.bin`, already probed on every request, so no extra latency), retrained with the
+train-split out-of-catalog rows as a new stage-1 class `__ooc__` (`gen_data.js --ooc-weight=W --ooc-cap=N`, N rows per
+skeleton; `--ooc-label=none` puts them into `__none__`). Thresholds stay calibrated on curated rows only. A veto
+(`suggest`, `TELLSH_OOC_VETO`) withholds a fresh catalog answer of the 0.3.3 model when the probe says out-of-catalog,
+with the hint "this looks like a shell task tellsh does not know yet". Model size +~4 KB (one class).
+
+**Results** (A only, end-to-end `suggest`, `scripts/real/eval_ooc.js`; % correct, % rejected for `real_ooc`):
+
+| variant | eval | devtools | shell | blind | blind3 | real_human | real_tmpl | ood | real_ooc |
+|---|---|---|---|---|---|---|---|---|---|
+| shipped A (no veto) | 94.38 | 95.75 | 95.24 | 98.44 | 98.34 | 89.42 | 94.07 | 92.39 | 35.04 |
+| shipped A, veto on any templates-model rejection | 93.88 | 95.52 | 94.94 | 98.28 | 98.22 | 84.26 | 93.72 | 94.57 | 41.11 |
+| retrain, no OOC rows (`ctl`), no veto | 94.42 | 95.75 | 94.94 | 98.44 | 98.34 | 89.42 | 94.08 | 92.39 | 35.09 |
+| `ctl`, veto on any rejection | 93.54 | 95.05 | 94.94 | 98.28 | 97.99 | 84.50 | 93.78 | 93.48 | 40.23 |
+| `__ooc__` w=0.5, cap 2/skeleton (5,979 rows), veto when top tool is `__ooc__` | 94.25 | 94.81 | 94.94 | 98.44 | 98.34 | 74.95 | 59.90 | 92.39 | 86.57 |
+| same model, veto p(ooc) ≥ 0.9 | 94.42 | 95.75 | 94.94 | 98.44 | 98.34 | 85.23 | 77.72 | 92.39 | 73.93 |
+| same model, veto p(ooc) ≥ 0.9 and answer confidence < 0.6 | 94.42 | 95.75 | 94.94 | 98.44 | 98.34 | 89.02 | 93.40 | 92.39 | 51.38 |
+| same model, veto p(ooc) ≥ 0.7 and confidence < 0.6 | 94.38 | 95.75 | 94.94 | 98.44 | 98.34 | 88.72 | 92.82 | 92.39 | 54.70 |
+
+(blind_ood / blind3_ood unchanged at 100 / 98.44 in every row.) Runs with w=1, `__none__` w=0.5, cap 6/skeleton, and
+with more real in-catalog negatives (`TELLSH_REAL_CAP` 300 / 600 / all instead of 120) were killed by the OOM killer on
+the shared training box and are still open.
+
+**Reading.** The `__ooc__` class separates real-usage (LLM-written) phrasing from curated phrasing more than it separates
+out-of-catalog from in-catalog: with the veto alone it costs 4–34 pt on real in-catalog requests while the public sets
+barely move. Gating on the vetoed answer's confidence helps (best: +16.3 pt `real_ooc` for −0.40 pt `real_human` and
+−0.68 pt `real_tmpl`), but nothing measured meets the bar (≤ 0.5 pt on every in-catalog set) with a useful gain, so the
+veto is **off by default** and no model changes ship. Next step when the box has ~6 GB free: retrain with all train-split
+real in-catalog rows as negatives (`TELLSH_REAL_CAP`) so the class decision is made on the same distribution, and sweep
+again:
+
+```sh
+scripts/real/ooc_experiment.sh neg_all 100000 0.5 2   # then: build/exp/neg_all.sweep.json (aggregates only)
+```

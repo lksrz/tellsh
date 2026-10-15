@@ -1,5 +1,15 @@
 # Changelog
 
+## 0.3.7 (unreleased)
+
+**Out-of-catalog rejection experiment (no behaviour change).** Stage 1 can be trained with an explicit `__ooc__` class
+from the out-of-catalog real-usage rows (`scripts/gen_data.js --ooc-weight/--ooc-cap/--ooc-label`); the cascade never
+answers from it, and `suggest` has an experimental veto (`TELLSH_OOC_VETO`, off by default) that withholds a catalog
+answer when the templates model says "shell task outside the catalog". No measured setting met the bar (≤ 0.5 pt
+in-catalog cost), so the shipped models are unchanged; results in [HYBRID.md](HYBRID.md). `scripts/real/eval_ooc.js`
+(A-only end-to-end check, `--sweep`) and `scripts/real/ooc_experiment.sh` reproduce it on the private rows.
+`scripts/train.py` frees the calibration models before the final fit (~1 GB less peak memory).
+
 ## 0.3.6
 
 **The distilled student runs in pure JS and is on by default.** A new forward pass (`src/rerank/student-js.js`, with a tiny

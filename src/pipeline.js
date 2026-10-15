@@ -454,11 +454,13 @@ export function suggest(query, opts = {}) {
 
 // out-of-catalog veto: the templates model is trained with an explicit stage-1 class for real shell tasks the catalog does
 // not cover (__ooc__); when it puts that class first, a fresh catalog / composed answer of the 0.3.3 model is withheld
-// (it would be the nearest catalog intent, not the task). History answers are never vetoed. EXPERIMENT knob:
-// TELLSH_OOC_VETO=off|ooc|reject (reject: any low-confidence rejection of the templates model vetoes)
+// (it would be the nearest catalog intent, not the task). History answers are never vetoed. EXPERIMENT ONLY, off by
+// default: no setting has passed the real-usage bar yet (HYBRID.md, "Out-of-catalog rejection experiment").
+// TELLSH_OOC_VETO=off|ooc|reject|p (ooc: the probe's top tool is __ooc__; reject: any low-confidence rejection of the
+// templates model; p: p(__ooc__) >= TELLSH_OOC_T)
 const OOC_HINT = 'this looks like a shell task tellsh does not know yet';
 function oocVeto(probe, res) {
-  const mode = process.env.TELLSH_OOC_VETO || 'ooc';
+  const mode = process.env.TELLSH_OOC_VETO || 'off';
   if (mode === 'off' || !probe || !res?.understood) return res;
   if (mode === 'p') { if (!((probe.pOoc || 0) >= +(process.env.TELLSH_OOC_T || 0.5))) return res; }
   else if (probe.understood || probe.method !== 'none' || (mode === 'ooc' && !probe.ooc)) return res;
