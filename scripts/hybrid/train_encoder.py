@@ -72,7 +72,10 @@ def encode(tok, rows, meta, max_len=64):
                         break
                 tags[j] = gl[lab]
                 prev_span = cur
-        out.append({'ids': ids, 'tool': tl[r['tool']], 'intent': il.get(r['intent'], -100) if r['intent'] else -100, 'tags': tags})
+        soft = [0.0] * len(il) if r.get('soft') else None
+        for k2, v in (r.get('soft') or {}).items():
+            if k2 in il: soft[il[k2]] = v
+        out.append({'ids': ids, 'tool': tl[r['tool']], 'intent': il.get(r['intent'], -100) if r['intent'] else -100, 'tags': tags, 'soft': soft, 'w': float(r.get('w', 1))})
     return out
 
 
@@ -89,6 +92,14 @@ def collate(batch, pad_id):
     return ids, att, torch.tensor([b['tool'] for b in batch]), torch.tensor([b['intent'] for b in batch]), tags
 
 
+def soft_batch(batch, n_intent):
+    # distillation targets (teacher soft labels) and per-row weights; rows without soft labels get a zero mask
+    m = torch.tensor([1.0 if b.get('soft') and sum(b['soft']) > 0 else 0.0 for b in batch])
+    s = torch.tensor([b['soft'] if b.get('soft') else [0.0] * n_intent for b in batch])
+    s = s / s.sum(-1, keepdim=True).clamp(min=1e-9)
+    return s, m, torch.tensor([b.get('w', 1.0) for b in batch])
+
+
 def main():
     ap = argparse.ArgumentParser()
     ap.add_argument('--base', default=os.path.join(ROOT, 'build/hybrid/e5-pruned'))
@@ -100,13 +111,16 @@ def main():
     ap.add_argument('--ckpt-every', type=int, default=500)
     ap.add_argument('--seed', type=int, default=17)
     ap.add_argument('--layers', type=int, default=6, help='truncate the encoder to its bottom N layers (12 = full)')
+    ap.add_argument('--train-file', default=os.path.join(ROOT, 'build/hybrid/train.jsonl'), help='e.g. build/hybrid/train_distill.jsonl (scripts/distill/merge_labels.js)')
+    ap.add_argument('--kd', type=float, default=1.0, help='weight of the KL loss on teacher soft labels')
     ap.add_argument('--all', action='store_true', help='also train on the dev split (final model; no calibration data left)')
     a = ap.parse_args()
     torch.set_num_threads(a.threads)
     random.seed(a.seed)
     torch.manual_seed(a.seed)
     meta = json.load(open(os.path.join(ROOT, 'build/hybrid/meta.json')))
-    rows = [json.loads(l) for l in open(os.path.join(ROOT, 'build/hybrid/train.jsonl'), encoding='utf-8')]
+    rows = [json.loads(l) for l in open(a.train_file, encoding='utf-8') if l.strip()]
+    rows = [r for r in rows if float(r.get('w', 1)) > 0]  # zero-weight rows (e.g. TELLSH_TMPL_W=0) are not trained on
     rows = [r for r in rows if a.all or r['split'] == 'train']
     tok = AutoTokenizer.from_pretrained(a.base)
     data = encode(tok, rows, meta)
@@ -126,6 +140,7 @@ def main():
         model.load_state_dict(st['model']); opt.load_state_dict(st['opt']); sched.load_state_dict(st['sched']); step = st['step']
         print(f'resumed at step {step}/{total}', flush=True)
     ce = nn.CrossEntropyLoss(ignore_index=-100)
+    cer = nn.CrossEntropyLoss(ignore_index=-100, reduction='none')
     pad = tok.pad_token_id
     t0 = time.time()
     model.train()
@@ -143,9 +158,18 @@ def main():
         for bi in range(step - ep * steps_per_epoch, len(batches)):
             if step >= total:
                 break
-            ids, att, yt, yi, ytag = collate([data[i] for i in batches[bi]], pad)
+            bb = [data[i] for i in batches[bi]]
+            ids, att, yt, yi, ytag = collate(bb, pad)
+            sp, sm, w = soft_batch(bb, len(meta['intents']))
             lt, li, lg = model(ids, att)
-            loss = ce(lt, yt) + (ce(li, yi) if (yi >= 0).any() else 0) + 0.5 * (ce(lg.reshape(-1, lg.shape[-1]), ytag.reshape(-1)) if (ytag >= 0).any() else 0)
+            wn = w / w.mean().clamp(min=1e-9)
+            lti = (cer(lt, yt) * wn).mean()
+            hard = yi >= 0
+            lii = ((cer(li, yi) * wn)[hard].mean() if hard.any() else 0)
+            kd = ((-(sp * torch.log_softmax(li, -1)).sum(-1) * wn * sm).sum() / sm.sum() if sm.sum() > 0 else 0)
+            tm = ytag >= 0  # tag loss per token, weighted by its row's weight
+            ltag = ((cer(lg.reshape(-1, lg.shape[-1]), ytag.reshape(-1)).view_as(ytag) * wn.unsqueeze(1))[tm].mean() if tm.any() else 0)
+            loss = lti + lii + a.kd * kd + 0.5 * ltag
             opt.zero_grad()
             loss.backward()
             torch.nn.utils.clip_grad_norm_(model.parameters(), 1.0)

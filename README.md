@@ -306,7 +306,9 @@ withheld too, with or without history, and without a usable directory the place 
 …" / "there are …" / "still there" are not references.) "Move it there" names both ends by reference and is refused.
 Wrapped commands (`sudo -u root ls`, `env ls`, `command ls`, `nice -n 5 ps aux`) are read as the command they run.
 "Same for X" / "same but …" repeat the previous command only; they are refused when it cannot be repeated, when a
-later segment of its line ran after the repeatable command, or when X names nothing it takes. A slot of the previous
+later segment of its line ran after the repeatable command, when X names nothing it takes, or when "same but …" would
+turn the previous command into a different, riskier one (`same but no discard` after `git status`; other repeat
+phrasings such as "again but without deleting it" are not recognised: read a high-risk suggestion before pressing Enter). A slot of the previous
 command that depends on the shell state (`find "$DIR" …`) or fails validation (a 300-character path) stays a
 placeholder, and a slot the new request withheld (`same but … in /tmp/new!`) is never refilled. A single named path
 after "to"/"into"/"do" ("move them to /tmp/old", with or without history) is the destination and the source stays
@@ -444,7 +446,9 @@ The optional **TypeSafe Jev** teacher is build-time only (300 calls, < $0.01).
 
 ```bash
 npm test                         # node:test — parity, cascade, tagger, history, composer, per-shell syntax, CLI
-npm run train                    # node scripts/gen_data.js && python3 scripts/train.py && node scripts/build_triggers.js
+npm run train                    # gen_data + train.py --out build/model.bin (train.py refuses to overwrite a file in model/
+                                 #   without --replace-shipped)
+node scripts/build_triggers.js   # deliberate: rewrites the shipped model/tldr_triggers.json + compose_explained.json
 npm run eval                     # all metrics -> EVAL.md
 npm run bench                    # latency (taskset -c 0) -> EVAL.md
 python3 -I scripts/tldr_ingest.py    # rebuild data/tldr from a clone in data/external/tldr

@@ -1,7 +1,7 @@
 #!/usr/bin/env node
 // Real-usage data (PRIVATE, never committed): turn the real-command dataset into labelled request rows and a
 // train / eval split held out by COMMAND GROUP. Writes only under build/real/ (gitignored):
-//   build/real/rows.jsonl   {text, intent|null, lang, shell, os, group, split: train|eval, cmd, literal, src}
+//   build/real/rows.jsonl   {text, intent|null, lang, shell, os, group, split: train|eval, cmd, literal, src, tmpl}
 //   build/real/stats.json   aggregate counts only (safe to quote in docs)
 //
 // Input: $TELLSH_REAL_DATA or /workspace/tellsh-data/dataset.jsonl; one row per unique (redacted) command with
@@ -11,29 +11,35 @@
 //   2. else the dataset's `intent_or_null`, when it is a catalog intent
 //   3. else null: a real shell task outside the catalog ("out-of-catalog"; eval only: should be rejected/composed)
 // Command group: head + subcommands + sorted flags + number of operands, with every value masked, so
-// `gh pr view 12 --repo a/b` and `gh pr view 40 --repo c/d` are one group. Per label, whole groups go to eval
-// until >= 25% of that label's commands are held out (labels with one group stay in train).
+// `gh pr view 12 --repo a/b` and `gh pr view 40 --repo c/d` are one group. Every group goes to ONE side: it is owned by
+// its majority label, and per label whole owned groups go to eval until >= 25% of that label's commands are held out.
+// `tmpl` marks rows whose descriptions were template-generated (aic-studio only); real_rows.js fills caps with them last.
 //
-// `--group v04` (default) reproduces the split the shipped model was trained on; its skeleton keeps up to two lower-case
-// words after the head, so operands leak into it (`npm install express` / `npm install react` are two groups). On that
-// split 552 of the 2957 labelled eval rows share a --group structural skeleton (per-tool subcommand depth, operands
-// masked) with a train row; A scores 84.6% on them vs 83.5% on the rest (scripts/real/group_leak.js,
-// HYBRID.md#v04-real-usage). The next retrain should use `--group structural`.
+// `--group structural` (default) is the split the 0.3.5+ models were trained and evaluated on (per-tool subcommand
+// depth, operands masked). `--group v04` reproduces the 0.3.3 split, whose skeleton keeps up to two lower-case words
+// after the head, so operands leak into it (`npm install express` / `npm install react` are two groups; 552 of its 2957
+// labelled eval rows share a structural skeleton with a train row, scripts/real/group_leak.js, HYBRID.md#v04-real-usage).
+// The templates-catalog patterns (0.3.4 intents) postdate the 0.3.5/0.3.6 build/real: a rebuild labels those commands
+// instead of leaving them out-of-catalog (other groups can change sides too); `--labels 036` leaves them out and
+// reproduces the 0.3.5/0.3.6 build/real.
 //
-// Usage: node scripts/real/prepare_real.js [--data <dataset.jsonl>] [--eval-frac 0.25] [--group v04|structural]
+// Usage: node scripts/real/prepare_real.js [--data <dataset.jsonl>] [--eval-frac 0.25] [--group v04|structural] [--labels current|036]
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
 import { createHash } from 'node:crypto';
 import { fileURLToPath } from 'node:url';
 import { join } from 'node:path';
 import { BY_ID } from '../../src/catalog.js';
 import { strip, group } from './group.js';
+import { writePrivate } from '../lib/privwrite.js';
 
 const ROOT = fileURLToPath(new URL('../..', import.meta.url));
 const args = process.argv.slice(2);
 const arg = (k, d) => { const i = args.indexOf(k); return i >= 0 ? args[i + 1] : d; };
 const SRC = arg('--data', process.env.TELLSH_REAL_DATA || '/workspace/tellsh-data/dataset.jsonl');
 const EVAL_FRAC = +arg('--eval-frac', 0.25);
-const GROUP = arg('--group', 'v04');
+const GROUP = arg('--group', 'structural');
+const LABELS = arg('--labels', 'current');
+if (!['current', '036'].includes(LABELS)) { console.error(`prepare_real: --labels must be current or 036, got ${LABELS}`); process.exit(1); }
 if (!existsSync(SRC)) { console.error(`prepare_real: no dataset at ${SRC}`); process.exit(1); }
 
 // v0.4 intents: label = the command itself (sudo / npx / env prefixes stripped)
@@ -58,16 +64,18 @@ const NEW = [
   ['npm_run_script', /^npm(?: --prefix \S+)? (?:run(?:-script)? [\w:.-]+|test|start|t)(?:\s|$)/],
   ['pip_install', /^(?:pip3?|python3?(?:\.\d+)? -m pip) install\b(?!.*\s-(?:r|e)\b)/],
   ['activate_venv', /^(?:source|\.) \S*\/bin\/activate(?:\.fish)?\s*$|\\Scripts\\activate(?:\.bat|\.ps1)?\s*$/i],
-  // templates-catalog
-  ['wrangler_d1_list', /^wrangler d1 list\b/],
-  ['wrangler_pages_deploy', /^wrangler pages deploy\b/],
-  ['gh_run_watch', /^gh run watch\b/],
-  ['gh_issue_list', /^gh issue list\b/],
-  ['gh_issue_view', /^gh issue view\b/],
-  ['git_show', /^git show(?: [\w~^.\/-]+)?$/],
-  ['git_fetch', /^git fetch(?: (?:--all|--prune|-p|origin))*$/],
-  ['git_ls_files', /^git ls-files$/],
-  ['git_grep', /^git grep(?: -n)? (?:-- )?(?:'[^']*'|"[^"]*"|\S+)$/],
+  // templates-catalog (0.3.4): left out with --labels 036, which reproduces the 0.3.5/0.3.6 build/real exactly
+  ...(LABELS === '036' ? [] : [
+    ['wrangler_d1_list', /^wrangler d1 list\b/],
+    ['wrangler_pages_deploy', /^wrangler pages deploy\b/],
+    ['gh_run_watch', /^gh run watch\b/],
+    ['gh_issue_list', /^gh issue list\b/],
+    ['gh_issue_view', /^gh issue view\b/],
+    ['git_show', /^git show(?: [\w~^.\/-]+)?$/],
+    ['git_fetch', /^git fetch(?: (?:--all|--prune|-p|origin))*$/],
+    ['git_ls_files', /^git ls-files$/],
+    ['git_grep', /^git grep(?: -n)? (?:-- )?(?:'[^']*'|"[^"]*"|\S+)$/],
+  ]),
   ['ssh_port_forward', /^ssh\b.*\s-\w*L\s?\d+:/],
   ['print_line_range', /^(?:nl -ba \S+ \| )?sed -n ['"]?\d+,\d+p['"]?(?: \S+)?$/],
   ['tool_version', /^[\w.-]+ (?:--version|-v|-V|version)$/],
@@ -107,29 +115,38 @@ for (const r of rows) {
   else { intent = null; st.byLabelSource.outOfCatalog++; }
   const shell = r.shell === 'powershell' ? 'powershell' : r.shell || 'bash';
   const os = r.os === 'windows' ? 'win32' : r.os || 'linux';
-  cmds.push({ cmd, intent, shell, os, group: group(cmd, GROUP), seed, src: r.source_type,
+  // aic-studio-only rows: descriptions were template-generated there (lower training weight, see real_rows.js)
+  const tmpl = Array.isArray(r.hosts) && r.hosts.length > 0 && r.hosts.every((x) => x === 'aic-studio');
+  cmds.push({ cmd, intent, shell, os, group: group(cmd, GROUP), seed, src: r.source_type, tmpl,
     texts: [...r.descriptions_en.map((t) => [t, 'en']), ...r.descriptions_pl.map((t) => [t, 'pl'])] });
   st.commands++;
 }
 
-// group-wise split, per label (null = out-of-catalog counts as one label)
-const byLabel = new Map();
+// group-wise split: every command skeleton goes to ONE side, whatever the labels of its commands. A group is owned by
+// its majority label; per label, whole owned groups go to eval until >= EVAL_FRAC of that label's commands are held out
+// (never more than half; labels with one group stay in train).
+const gLabels = new Map();
 for (const c of cmds) {
   const k = c.intent || '__ooc__';
-  if (!byLabel.has(k)) byLabel.set(k, new Map());
-  const g = byLabel.get(k);
-  g.set(c.group, (g.get(c.group) || 0) + 1);
+  if (!gLabels.has(c.group)) gLabels.set(c.group, new Map());
+  const m = gLabels.get(c.group); m.set(k, (m.get(k) || 0) + 1);
 }
-const evalGroups = new Set();
+const byLabel = new Map();
+for (const [g, m] of gLabels) {
+  const owner = [...m.entries()].sort((x, y) => y[1] - x[1] || (x[0] < y[0] ? -1 : 1))[0][0];
+  if (!byLabel.has(owner)) byLabel.set(owner, new Map());
+  byLabel.get(owner).set(g, [...m.values()].reduce((x, y) => x + y, 0));
+}
+const evalSkeletons = new Set();
 for (const [label, groups] of byLabel) {
   if (groups.size < 2) continue;
-  const total = [...groups.values()].reduce((a, b) => a + b, 0);
-  const order = [...groups.keys()].sort((a, b) => h(label + a).compare(h(label + b)));
+  const total = [...groups.values()].reduce((x, y) => x + y, 0);
+  const order = [...groups.keys()].sort((x, y) => h(label + x).compare(h(label + y)));
   let n = 0;
   for (const g of order) {
     if (n >= EVAL_FRAC * total) break;
     if (n + groups.get(g) > 0.5 * total) continue; // never hold out more than half of a label
-    evalGroups.add(label + '\u0000' + g);
+    evalSkeletons.add(g);
     n += groups.get(g);
   }
 }
@@ -137,12 +154,12 @@ for (const [label, groups] of byLabel) {
 const out = [];
 const norm = (s) => s.toLowerCase().replace(/\s+/g, ' ').trim();
 for (const c of cmds) {
-  const split = evalGroups.has((c.intent || '__ooc__') + '\u0000' + c.group) ? 'eval' : 'train';
+  const split = evalSkeletons.has(c.group) ? 'eval' : 'train';
   for (const [t, lang] of c.texts) {
     if (!t || t.length > 300) continue;
     const text = fill(t, c.seed);
     out.push({ text, intent: c.intent, lang, shell: c.shell, os: c.os, group: c.group, split, cmd: c.cmd,
-      literal: norm(text) === norm(c.cmd), src: c.src });
+      literal: norm(text) === norm(c.cmd), src: c.src, tmpl: c.tmpl });
   }
 }
 // a text that occurs in both splits (short generic descriptions) is held out: dropped from train
@@ -161,10 +178,10 @@ Object.assign(st, {
     byShell: Object.fromEntries(['bash', 'zsh', 'powershell'].map((s) => [s, cnt((r) => r.split === 'eval' && r.intent && r.shell === s)])) },
   labels: { train: new Set(final.filter((r) => r.split === 'train' && r.intent).map((r) => r.intent)).size,
     eval: new Set(final.filter((r) => r.split === 'eval' && r.intent).map((r) => r.intent)).size },
-  groups: { total: new Set(cmds.map((c) => c.group)).size, eval: evalGroups.size },
+  groups: { total: new Set(cmds.map((c) => c.group)).size, eval: evalSkeletons.size },
   perNewIntent: Object.fromEntries(NEW.map(([id]) => [id, { train: cnt((r) => r.intent === id && r.split === 'train'), eval: cnt((r) => r.intent === id && r.split === 'eval') }])),
 });
 mkdirSync(join(ROOT, 'build', 'real'), { recursive: true });
-writeFileSync(join(ROOT, 'build', 'real', 'rows.jsonl'), final.map((r) => JSON.stringify(r)).join('\n') + '\n');
-writeFileSync(join(ROOT, 'build', 'real', 'stats.json'), JSON.stringify(st, null, 1));
+writePrivate(join(ROOT, 'build', 'real', 'rows.jsonl'), final.map((r) => JSON.stringify(r)).join('\n') + '\n');
+writePrivate(join(ROOT, 'build', 'real', 'stats.json'), JSON.stringify(st, null, 1));
 console.log(JSON.stringify({ commands: st.commands, rows: st.rows, train: st.train, eval: st.eval, labels: st.labels, groups: st.groups }));

@@ -16,6 +16,7 @@ Thresholds are calibrated on a group-wise holdout (all copies of a sentence stay
 Usage: python3 scripts/train.py [--keep-tool 20000] [--C 30] [--tagC 2]
 """
 import argparse
+import gc
 import json
 import os
 import struct
@@ -180,7 +181,21 @@ def main():
     ap.add_argument('--ood-holdout', type=float, default=0.35)
     ap.add_argument('--seed', type=int, default=13)
     ap.add_argument('--out', default=DEFAULT_OUT)
+    ap.add_argument('--replace-shipped', action='store_true',
+                    help='allow overwriting an existing model under model/ (the shipped models are fixed: 0.3.4+ gates assume them)')
+    ap.add_argument('--check-out', action='store_true', help='only run the --out guard, then exit (used by the tests)')
     args = ap.parse_args()
+    # the output is the shipped model when it IS one of the files in model/ (same inode: covers symlinks, hard links and
+    # case-insensitive paths)
+    if os.path.exists(args.out) and not args.replace_shipped:
+        st = os.stat(args.out)
+        mdir = os.path.dirname(DEFAULT_OUT)
+        for name in os.listdir(mdir):
+            m = os.stat(os.path.join(mdir, name))
+            if (m.st_ino, m.st_dev) == (st.st_ino, st.st_dev):
+                sys.exit(f'refusing to overwrite the shipped model/{name}: pass --out build/<name>.bin, or --replace-shipped')
+    if args.check_out:
+        return
     t0 = time.time()
     meta = json.load(open(os.path.join(BUILD, 'meta.json')))
     dim, tag_dim = meta['dim'], meta['tagDim']
@@ -251,6 +266,9 @@ def main():
         f'OOD rejected={(score[oodm] < best_t).mean() if oodm.any() else float("nan"):.3f}); compose tool threshold={compose_t:.2f}')
 
     # ---------------- final models on all data ----------------
+    # free the calibration models first (peak memory: the final fit runs on the full matrix)
+    del tool_s, int_s, Xho, p_tool, res
+    gc.collect()
     all_idx = np.arange(len(rows))
     tool, intents = train_all(rows, X, meta, all_idx, args.C, args.keep_tool, keep_int, '[final] ')
 

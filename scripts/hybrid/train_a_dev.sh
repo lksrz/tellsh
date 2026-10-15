@@ -31,4 +31,4 @@ sed -e "s#if (heldOut.has(r0.text)) { dropped++; continue; }#if (heldOut.has(r0.
 grep -q 'heldOut.has(r0.text) || isDevText' $T/scripts/gen_data.js
 grep -q 'const leaks = (t) => excl.has(t) || isDevText(t);' $T/scripts/gen_data.js
 grep -q '_devIndex.has(normalize(t))' $T/scripts/gen_data.js
-cd $T && node scripts/gen_data.js && python3 scripts/train.py --out $T/model/model.bin
+cd $T && node scripts/gen_data.js && python3 scripts/train.py --out $T/model/model.bin --replace-shipped

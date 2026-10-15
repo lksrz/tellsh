@@ -582,7 +582,7 @@ v0.4 (needs the private dataset for the real-usage parts; everything else runs o
 
 ```sh
 TELLSH_REAL_DATA=/path/to/dataset.jsonl node scripts/real/prepare_real.js   # -> build/real/ (gitignored)
-npm run train                                              # A (+ real train split when build/real exists)
+npm run train                                              # A -> build/model.bin (+ real train split when build/real exists)
 node scripts/hybrid/export_data.js && build/hybrid/run_enc.sh   # B (resumable), then export_encoder.py as below
 scripts/hybrid/train_a_dev.sh && node scripts/hybrid/dump_cascade.js --model=build/adev/model/model.bin --tag=adev --sets=dev
 node scripts/hybrid/eval_hybrid.js --calibrate             # A+B policy
