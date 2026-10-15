@@ -1,20 +1,17 @@
-// A "same but …" follow-up, or any follow-up with a negation ("again but without deleting it", "don't remove it"), never
-// turns the previous command into a different, riskier intent, whichever path resolved it (the same-but rule, a pronoun,
-// a place word): `same but no discard` after `git status` is not `git restore .`, and `again but without deleting it`
-// after `cat config.txt` is not `rm config.txt`. Such a request is refused. A plain "delete it" is not affected.
+// A "same but …" follow-up never turns the previous command into a different, riskier intent, whichever path resolved
+// it (the same-but rule, a pronoun, a place word): `same but no discard` after `git status` is not `git restore .`, and
+// `same but without deleting it` after `cat config.txt` is not `rm config.txt`. Such a request is refused. Other
+// phrasings ("again but without deleting it") are not recognised (README known limits); a plain "delete it" is not affected.
 import { BY_ID } from './catalog.js';
 import { sameBut } from './history.js';
 
-const NEGATION = /(?<![\p{L}\d_])(?:without|not|no|never|don'?t|do not|dont|bez|nie)(?![\p{L}\d_])/iu;
-/** The previous command's intent when the request is a same-but or a negated follow-up (whitespace folded), else
- * undefined. A previous command tellsh could not classify (`Get-Content x`) counts as UNKNOWN (ranked safe) when the
- * request refers to it (`referred`: a pronoun / place reference was resolved). */
+/** The previous command's intent when the request is a same-but follow-up (whitespace folded), else undefined; a previous
+ * command tellsh could not classify counts as UNKNOWN (ranked safe). */
 export const UNKNOWN = '__unknown__';
-export function sameButOrNegated(query, ctx, referred = false) {
+export function sameButLast(query, ctx) {
   if (!ctx) return undefined;
-  const q = String(query).replace(/\s+/g, ' ').trim();
-  if (!(NEGATION.test(q) || (ctx.last && sameBut(q, ctx)))) return undefined;
-  return ctx.last?.intent || (referred ? UNKNOWN : undefined);
+  // the pattern is checked even when the previous command was not classified (no ctx.last)
+  return sameBut(String(query).replace(/\s+/g, ' ').trim(), { ...ctx, last: ctx.last || { slots: {} } }) ? ctx.last?.intent || UNKNOWN : undefined;
 }
 
 const RANK = { safe: 0, medium: 1, high: 2 };

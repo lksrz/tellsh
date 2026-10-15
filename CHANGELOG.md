@@ -2,12 +2,12 @@
 
 ## 0.3.8 — "same but" safety fix
 
-**Safety:** a "same but …" follow-up, or any follow-up with a negation ("again but without deleting it", "don't delete
-it"), never turns the previous command into a different, riskier intent, whichever way the history reference is resolved
-(`src/samebut-guard.js`; a previous command tellsh cannot classify counts as safe when the request refers to it).
-Before, `same but no discard` after any git command suggested `git restore .`, and `again but without deleting it`
-after `cat config.txt` suggested `rm config.txt` (both high risk, never auto-run, but one Enter away); both are now
-refused with a hint to ask directly. A plain `delete it` still works. Models are unchanged.
+**Safety:** a "same but …" follow-up never turns the previous command into a different, riskier intent, whichever way
+the history reference is resolved (`src/samebut-guard.js`; whitespace and line breaks are folded first; a previous
+command tellsh cannot classify counts as safe). Before, `same but no discard` after any git command suggested
+`git restore .`, and `same but without deleting it` after `cat config.txt` suggested `rm config.txt` (both high risk,
+never auto-run, but one Enter away); both are now refused with a hint to ask directly. Other repeat phrasings ("again but
+without deleting it") are not recognised yet (known limit); a plain `delete it` still works. Models are unchanged.
 
 **Build (no runtime change):** training scripts synced with the pipeline that built the 0.3.5/0.3.6 models
 (`scripts/real/prepare_real.js --labels 036` reproduces that split exactly; structural split, template-generated row
