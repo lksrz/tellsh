@@ -693,8 +693,10 @@ The remaining intent disagreement comes from the ONNX bundle's own (int4/int8) q
 f16 JS bundle (near-exact weights) agrees with the ONNX student on 98.48% of intents, and the int8 JS bundle agrees with
 the f16 one on 99.79% (max |Δp| 0.038). End to end (`eval_student_runtime.js`, JS student, raw output in
 `hybrid/results/student_runtime_0.3.6_js.json`) A+S is within one or two rows of the 0.3.5 ONNX table above: data/eval
-94.59 (ONNX 94.71), devtools 96.46 (96.46), shell 96.13 (96.43), blind 98.75 (98.60), blind3 98.22 (98.22); answered shares
-equal A's on every set and the out-of-scope sets are unchanged.
+94.59 (ONNX 94.71), devtools 96.46 (96.46), shell 96.13 (96.43), blind 98.75 (98.60), blind3 98.22 (98.22), and on the
+held-out real-usage sets real_human 90.98 (91.12; A 89.42), real_tmpl 95.71 (95.71; A 94.07), real_ooc rejected 35.04
+(35.04, student consulted on 24.5% and changing 10.5%); answered shares equal A's on every set and the out-of-scope sets
+are unchanged.
 
 **Kernels.** The matmuls, the int8 -> f32 dequantization at load and the attention run in a small WebAssembly SIMD
 module (`src/rerank/wasm-linear.js`, f32x4, assembled in code from opcodes, ~1.4 KB, no toolchain; `exp` imported from
@@ -707,5 +709,7 @@ SIMD: load 24 -> 18 ms (student.bin + vocab + tokenizer), first query 61 -> 17 m
 13 ms per unique query (n = 300). Whole CLI call (`node bin/tellsh.js --dry-run --json`, median of 7) for
 `gdzie jest plik docker-compose.yml?`: 296 -> 242 ms with the student, 180 ms with `TELLSH_HYBRID=0`; a query that
 never consults it (`show git status`) takes 160 ms. The student's share of a CLI call fell from ~119 to ~63 ms. On a
-1-core Xeon VM (Node 22) the plain-JS version measured load 70 ms, first query 166 ms, p50 65 / p95 115 ms and 538 ms
-for the whole consulted call. The student runs only below A's confidence 0.6.
+1-core Xeon VM (Node 20, `taskset`) the plain-JS version measured load 70 ms, first query 166 ms, p50 65 / p95 115 ms
+and 538 ms for the whole consulted call; with the WebAssembly SIMD kernels: load 61–97 ms, first query 46–63 ms, p50
+12–16 / p95 22–24 ms, and 415–426 ms (median of 7) for the whole consulted call, 237–243 ms for the same query with
+`TELLSH_HYBRID=0` and 211 ms for one that never consults the student. The student runs only below A's confidence 0.6.
