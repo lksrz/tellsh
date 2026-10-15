@@ -39,6 +39,7 @@ const SRC = arg('--data', process.env.TELLSH_REAL_DATA || '/workspace/tellsh-dat
 const EVAL_FRAC = +arg('--eval-frac', 0.25);
 const GROUP = arg('--group', 'structural');
 const LABELS = arg('--labels', 'current');
+if (!['current', '036'].includes(LABELS)) { console.error(`prepare_real: --labels must be current or 036, got ${LABELS}`); process.exit(1); }
 if (!existsSync(SRC)) { console.error(`prepare_real: no dataset at ${SRC}`); process.exit(1); }
 
 // v0.4 intents: label = the command itself (sudo / npx / env prefixes stripped)
