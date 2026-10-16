@@ -61,7 +61,11 @@
           "mod": "raw",
           "flag": "-r",
           "form": "bool",
-          "model": "predict"
+          "model": "predict",
+          "implied": {
+            "reason": "jq -r only drops the JSON quotes of string results; values and structure are unchanged",
+            "when": "always"
+          }
         },
         {
           "mod": "compact",

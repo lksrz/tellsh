@@ -10,6 +10,12 @@
 // Metrics per route: label accuracy, exact canonical-IR match and compiled-command match (on gold-ok rows),
 // accepted-wrong (gate accepts but the command differs from gold, or gold is not ok) over all rows and
 // over accepted rows, abstention precision/recall (abstain = no accepted command; positive = gold not ok).
+//
+// Confidence thresholds (rows with p.conf / d.conf from ml/ir/eval.py; older preds only have p.label_prob, d.logp):
+//   --calibrate [--thresholds-out T.json]  (dev) per route and scalar confidence, the threshold with max coverage
+//       whose accepted-wrong rate over kept rows is <= 0.5 / 1 / 2 %; PD sweeps a P-fast-path and a D threshold
+//       jointly; writes T.json (default PRED.thresholds.json) and adds report.calibration + reliability tables.
+//   --thresholds T.json  (test) applies dev-chosen thresholds: report.thresholded = coverage / accepted-wrong per target.
 
 import fs from 'node:fs';
 import { loadSchemas, canon, equals, gate } from '../../ir/lib/index.js';
@@ -69,6 +75,20 @@ for (const pr of preds) {
 const MISSING = { label: null, accepted: false, command: null, canon: null, err: 'missing' };
 
 const routes = { P: [], D: [], PD: [] };
+const confs = new Array(gold.length).fill(null), pFastAt = new Array(gold.length).fill(false);
+// scalar confidences in [0, 1] per definition; undefined when the preds file lacks the field
+function confOf(pr) {
+  const pc = pr.p?.conf, dc = pr.d?.conf, lp = pr.d?.logp;
+  return {
+    P: { p_label: pc?.label ?? pr.p?.label_prob, p_min: pc?.min, p_prod: pc?.prod },
+    D: {
+      d_label: dc?.label, d_min_tok: dc?.min_tok, d_seqprob: lp == null ? undefined : Math.exp(lp),
+      d_min_all: dc ? Math.min(dc.min_tok, dc.ptr_min) : undefined,
+      d_prob_all: dc && lp != null ? Math.exp(lp + dc.ptr_logp) : undefined,
+      d_margin: dc?.min_margin,
+    },
+  };
+}
 gold.forEach((r, i) => {
   const pr = byRow.get(i);
   if (!pr) { for (const k of Object.keys(routes)) routes[k].push([i, k === 'PD' ? { ...MISSING, route: 'D' } : MISSING]); return; }
@@ -80,6 +100,8 @@ gold.forEach((r, i) => {
   const dl = (() => { const a = pr.d?.actions?.find(([x]) => x !== 'BOS')?.[0]; return { OK: 'ok', NOT_SHELL: 'not_shell', OOS: 'out_of_scope', UNDER: 'underspecified', AMBIG: 'ambiguous' }[a] ?? 'ok'; })();
   try { dOut = judge(r, decodeActions(pr.d.actions, schemas), dl); } catch { dOut = judge(r, null, dl); }
   const pFast = pr.p?.label === 'ok' && pr.p?.single !== false && pOut.accepted;
+  confs[i] = confOf(pr);
+  pFastAt[i] = pFast;
   routes.P.push([i, pOut]);
   routes.D.push([i, dOut]);
   routes.PD.push([i, pFast ? { ...pOut, route: 'P' } : { ...dOut, route: 'D' }]);
@@ -127,10 +149,114 @@ if (DUMP) {
   }
   fs.writeFileSync(DUMP, out.join('\n') + '\n');
 }
+// ---------------------------------------------------------------- confidence calibration
+const TARGETS = [0.5, 1, 2]; // max accepted-wrong % over kept rows
+const isWrong = (i, o) => o.accepted && (gold[i].label !== 'ok' || o.command !== goldInfo[i].command);
+// accepted rows of a single-confidence route -> [{c, w}]
+const items = (k, side, def) => routes[k].filter(([, o]) => o.accepted).map(([i, o]) => ({ c: confs[i]?.[side][def], w: isWrong(i, o) }));
+const hasDef = (its) => its.length > 0 && its.every((x) => typeof x.c === 'number' && Number.isFinite(x.c));
+// best threshold: rows kept iff c >= t; base = rows always kept {kept, wrong}; returns {t, kept, wrong} per target
+function sweep(its, base = { kept: 0, wrong: 0 }) {
+  const s = [...its].sort((a, b) => b.c - a.c);
+  const best = Object.fromEntries(TARGETS.map((T) => [T, null]));
+  const ok = (kept, wrong, T) => kept > 0 && 100 * wrong <= T * kept;
+  for (const T of TARGETS) if (ok(base.kept, base.wrong, T)) best[T] = { t: Infinity, kept: base.kept, wrong: base.wrong };
+  let kept = base.kept, wrong = base.wrong;
+  for (let j = 0; j < s.length; j++) {
+    kept++; wrong += s[j].w ? 1 : 0;
+    if (j + 1 < s.length && s[j + 1].c === s[j].c) continue; // ties go together
+    for (const T of TARGETS) if (ok(kept, wrong, T) && (!best[T] || kept > best[T].kept)) best[T] = { t: s[j].c, kept, wrong };
+  }
+  return best;
+}
+const fmt = (n, b, extra) => b && { ...extra, kept: b.kept, coverage: pct(b.kept, n), accepted_wrong: b.wrong, accepted_wrong_rate_accepted: pct(b.wrong, b.kept) };
+function reliability(its, bins = 10) {
+  const s = [...its].sort((a, b) => a.c - b.c), out = [];
+  for (let b = 0; b < bins; b++) {
+    const part = s.slice(Math.floor((b * s.length) / bins), Math.floor(((b + 1) * s.length) / bins));
+    if (!part.length) continue;
+    const w = part.filter((x) => x.w).length;
+    out.push({ c_lo: +part[0].c.toFixed(4), c_hi: +part[part.length - 1].c.toFixed(4), mean_conf: +(part.reduce((a, x) => a + x.c, 0) / part.length).toFixed(4), n: part.length, correct: pct(part.length - w, part.length) });
+  }
+  return out;
+}
+const DEFS = { P: Object.keys(confOf({}).P), D: Object.keys(confOf({}).D) };
+function calibrate() {
+  const n = gold.length, cal = { targets_pct: TARGETS, routes: {} }, thr = { targets_pct: TARGETS, routes: {} };
+  for (const [k, side] of [['P', 'P'], ['D', 'D']]) {
+    const per = {};
+    for (const def of DEFS[side]) {
+      const its = items(k, side, def);
+      if (hasDef(its)) per[def] = sweep(its);
+    }
+    cal.routes[k] = { by_def: Object.fromEntries(Object.entries(per).map(([d, b]) => [d, Object.fromEntries(TARGETS.map((T) => [T, fmt(n, b[T], { t: b[T]?.t })]))])) };
+    thr.routes[k] = {};
+    for (const T of TARGETS) {
+      const cands = Object.entries(per).filter(([, b]) => b[T]).sort((a, b) => b[1][T].kept - a[1][T].kept);
+      if (cands.length) thr.routes[k][T] = { def: cands[0][0], t: cands[0][1][T].t };
+    }
+    const d1 = thr.routes[k][1]?.def ?? Object.keys(per)[0];
+    if (d1) cal.routes[k].reliability = { def: d1, bins: reliability(items(k, side, d1)) };
+  }
+  // PD: P fast path kept iff pFast and p >= tP, else D kept iff D accepted and d >= tD
+  thr.routes.PD = {};
+  const best = {};
+  for (const pd of DEFS.P) for (const dd of DEFS.D) {
+    const pIts = gold.map((_, i) => i).filter((i) => pFastAt[i]).map((i) => ({ i, c: confs[i].P[pd], w: isWrong(i, routes.P[i][1]) }));
+    const dIts = routes.D.filter(([i, o]) => !pFastAt[i] && o.accepted).map(([i, o]) => ({ i, c: confs[i].D[dd], w: isWrong(i, o) }));
+    if (!hasDef(pIts) || !hasDef(dIts)) continue;
+    const qs = [...new Set([0, ...Array.from({ length: 20 }, (_, q) => [...pIts].sort((a, b) => a.c - b.c)[Math.floor((q * pIts.length) / 20)].c), Infinity])];
+    for (const tP of qs) {
+      const keptP = pIts.filter((x) => x.c >= tP);
+      const base = { kept: keptP.length, wrong: keptP.filter((x) => x.w).length };
+      // P-fast rows below tP fall back to D (their D outcome)
+      const fall = pIts.filter((x) => x.c < tP).map((x) => routes.D[x.i][1].accepted ? { c: confs[x.i].D[dd], w: isWrong(x.i, routes.D[x.i][1]) } : null).filter(Boolean);
+      const b = sweep([...dIts, ...fall], base);
+      for (const T of TARGETS) if (b[T] && (!best[T] || b[T].kept > best[T].kept)) best[T] = { ...b[T], p_def: pd, tP, d_def: dd, tD: b[T].t };
+    }
+  }
+  cal.routes.PD = {};
+  for (const T of TARGETS) {
+    if (!best[T]) continue;
+    const { p_def, tP, d_def, tD } = best[T];
+    thr.routes.PD[T] = { p_def, tP, d_def, tD };
+    cal.routes.PD[T] = fmt(n, best[T], thr.routes.PD[T]);
+  }
+  for (const k of ['P', 'D']) for (const T of TARGETS) if (thr.routes[k][T]) cal.routes[k][`chosen_${T}`] = fmt(n, applyOne(k, thr.routes[k][T]), thr.routes[k][T]);
+  return { cal, thr };
+}
+// apply one threshold entry to a route -> {kept, wrong}
+function applyOne(k, e) {
+  let kept = 0, wrong = 0;
+  const keep = (i, o, side, def, t) => { if (o.accepted && confs[i] && confs[i][side][def] >= t) { kept++; if (isWrong(i, o)) wrong++; return true; } return false; };
+  for (let i = 0; i < gold.length; i++) {
+    if (k === 'PD') { if (!(pFastAt[i] && keep(i, routes.P[i][1], 'P', e.p_def, e.tP))) keep(i, routes.D[i][1], 'D', e.d_def, e.tD); }
+    else keep(i, routes[k][i][1], k, e.def, e.t);
+  }
+  return { kept, wrong };
+}
+const reviveInf = (k, v) => (v === 'Infinity' ? Infinity : v);
+const jsonInf = (k, v) => (v === Infinity ? 'Infinity' : v);
+
 const report = { data: DATA, preds: PREDS || 'oracle', labels: LABELS, routes: Object.fromEntries(Object.entries(routes).map(([k, v]) => [k, score(v)])) };
 // Gold-oracle check of the P route on P-expressible rows only (P can express ~45% of ok rows by design).
 report.p_coverage = { single_ok: routes.P.filter(([, o]) => o.label === 'ok' && o.err !== 'not_single').length, accepted: routes.P.filter(([, o]) => o.accepted).length };
 if (ORACLE) report.p_expressible = gold.filter((r) => pTargets(r.ir, schemas)).length;
-const text = JSON.stringify(report, null, 1);
+if (args.includes('--calibrate')) {
+  const { cal, thr } = calibrate();
+  thr.calibrated_on = DATA; thr.preds = PREDS;
+  report.calibration = cal;
+  const tout = opt('thresholds-out') || String(PREDS).replace(/\.jsonl$/, '') + '.thresholds.json';
+  fs.writeFileSync(tout, JSON.stringify(thr, jsonInf, 1));
+  report.thresholds_out = tout;
+}
+if (opt('thresholds')) {
+  const thr = JSON.parse(fs.readFileSync(opt('thresholds'), 'utf8'), reviveInf);
+  report.thresholded = { thresholds: opt('thresholds'), calibrated_on: thr.calibrated_on, routes: {} };
+  for (const [k, per] of Object.entries(thr.routes)) {
+    report.thresholded.routes[k] = Object.fromEntries(Object.entries(per).map(([T, e]) => [T, fmt(gold.length, applyOne(k, e), e)]));
+  }
+}
+const text = JSON.stringify(report, jsonInf, 1);
 if (opt('out')) fs.writeFileSync(opt('out'), text);
 console.log(text);

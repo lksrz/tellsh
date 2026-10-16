@@ -45,7 +45,14 @@
           "flag": "-n",
           "form": "bool",
           "model": "predict",
-          "cue": "SORT"
+          "cue": "SORT",
+          "implied": {
+            "reason": "ranking uniq -c / wc counts needs numeric order",
+            "when": [
+              "after:lines.uniq.count",
+              "after:file.count"
+            ]
+          }
         },
         {
           "mod": "human",

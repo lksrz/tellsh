@@ -87,4 +87,40 @@ P and D, exact action-sequence match `d_exact`, P exact on P-expressible rows), 
 - `abstain_precision` / `abstain_recall` — abstain = no accepted command (model abstention, decode failure or gate
   rejection); positive = gold label not `ok`.
 
+## Confidence + calibration
+
+`eval.py` writes the probabilities of the greedy choices into each prediction row (extra keys; old readers ignore
+them): `p.conf = {label, min, prod}` (label prob; min / product over the P probs the prediction uses: label, single,
+op, pin, stderr, every mod bit, every slot kind, start/end of predicted pointer slots) and
+`d.conf = {label, min_tok, min_margin, ptr_min, ptr_logp}` (status-token prob, min action-token prob, min top1-top2
+margin, min / summed log of pointer start*end probs); `d.logp` stays the summed action-token log-prob. Greedy only
+(no beam). Older preds (no `conf`) still calibrate on `p_label` (= `p.label_prob`) and `d_seqprob` only.
+
+Scalar confidences swept: P `p_label`, `p_min`, `p_prod`; D `d_label`, `d_min_tok`, `d_seqprob` = exp(logp),
+`d_min_all` = min(min_tok, ptr_min), `d_prob_all` = exp(logp + ptr_logp) (combined), `d_margin`. PD sweeps a P-fast-path
+threshold (20 quantiles) jointly with a D threshold.
+
+Re-run predictions on the GPU box with the current `ml/ir/*.py` (copy `eval.py` and `model.py` over first):
+
+```bat
+cd /d D:\tellsh-ir\tellsh
+D:\tellsh-ir\venv\Scripts\python ml\ir\eval.py --ckpt build\ir\runs\h8\best.pt --split dev  --no-node --preds-out build\ir\runs\h8\preds_dev.jsonl
+D:\tellsh-ir\venv\Scripts\python ml\ir\eval.py --ckpt build\ir\runs\h8\best.pt --split test --no-node --preds-out build\ir\runs\h8\preds_test.jsonl
+```
+
+Then on the Mac (thresholds are chosen on dev only and applied unchanged to test):
+
+```sh
+node scripts/ir/eval_pred.mjs --data build/ir/dataset/v1/dev.jsonl --preds build/ir/runs/h8/preds_dev.jsonl \
+  --calibrate --thresholds-out build/ir/runs/h8/thresholds.json --out build/ir/runs/h8/preds_dev.cal.json
+node scripts/ir/eval_pred.mjs --data build/ir/dataset/v1/test.jsonl --preds build/ir/runs/h8/preds_test.jsonl \
+  --thresholds build/ir/runs/h8/thresholds.json --out build/ir/runs/h8/preds_test.thr.json
+```
+
+`report.calibration.routes.{P,D}`: `by_def[def][target]` (best threshold per definition), `chosen_<target>`
+(the definition with max coverage), `reliability` (10 equal-count bins over accepted rows: confidence range, mean,
+% correct); `routes.PD[target]`. Targets = accepted-wrong rate over kept rows <= 0.5 / 1 / 2 %; `t: "Infinity"`
+means nothing can be kept. `report.thresholded.routes[route][target]` = coverage / accepted-wrong on the scored split.
+Small kept counts on dev (tens of rows) make the 0.5 % target statistically weak; check the test numbers.
+
 Prediction ids are `<split>:<line>` of `build/ir/dataset/v1/<split>.jsonl`; scoring needs that file (gold IR).

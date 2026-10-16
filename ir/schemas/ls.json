@@ -84,7 +84,11 @@
           "mod": "one_per_line",
           "flag": "-1",
           "form": "bool",
-          "model": "predict"
+          "model": "predict",
+          "implied": {
+            "reason": "ls already prints one name per line into a pipe",
+            "when": "piped"
+          }
         },
         {
           "mod": "directory",

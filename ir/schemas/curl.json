@@ -55,13 +55,21 @@
           "mod": "silent",
           "flag": "-s",
           "form": "bool",
-          "model": "predict"
+          "model": "predict",
+          "implied": {
+            "reason": "only hides curl's progress meter on stderr; stdout is unchanged",
+            "when": "always"
+          }
         },
         {
           "mod": "show_error",
           "flag": "-S",
           "form": "bool",
-          "model": "predict"
+          "model": "predict",
+          "implied": {
+            "reason": "only re-enables error messages that -s hides",
+            "when": "always"
+          }
         },
         {
           "mod": "location",
@@ -145,13 +153,21 @@
           "mod": "silent",
           "flag": "-s",
           "form": "bool",
-          "model": "predict"
+          "model": "predict",
+          "implied": {
+            "reason": "only hides curl's progress meter on stderr; stdout is unchanged",
+            "when": "always"
+          }
         },
         {
           "mod": "show_error",
           "flag": "-S",
           "form": "bool",
-          "model": "predict"
+          "model": "predict",
+          "implied": {
+            "reason": "only re-enables error messages that -s hides",
+            "when": "always"
+          }
         },
         {
           "mod": "location",
@@ -216,13 +232,21 @@
           "mod": "silent",
           "flag": "-s",
           "form": "bool",
-          "model": "predict"
+          "model": "predict",
+          "implied": {
+            "reason": "only hides curl's progress meter on stderr; stdout is unchanged",
+            "when": "always"
+          }
         },
         {
           "mod": "show_error",
           "flag": "-S",
           "form": "bool",
-          "model": "predict"
+          "model": "predict",
+          "implied": {
+            "reason": "only re-enables error messages that -s hides",
+            "when": "always"
+          }
         },
         {
           "mod": "max_time",
@@ -256,7 +280,11 @@
           "flag": "-O",
           "form": "bool",
           "model": "predict",
-          "note": "target = last URL path segment in cwd; empty segment -> unsupported; exists -> high"
+          "note": "target = last URL path segment in cwd; empty segment -> unsupported; exists -> high",
+          "implied": {
+            "reason": "a download needs a target file; -O names it after the URL (write risk is derived from it)",
+            "when": "always"
+          }
         }
       ],
       "rules": [

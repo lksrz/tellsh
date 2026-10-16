@@ -8,6 +8,12 @@
 
 Predictions are JSONL rows {id, p: {label, single, op, pin, mods, stderr, slots}, d: {actions, logp}} that
 scripts/ir/eval_pred.mjs assembles into IR (P route), decodes from actions (D route) and routes P-then-D.
+Each row also carries confidences of the greedy choices (ignored by older readers):
+  p.conf = {label, min, prod}            label prob; min / product over the P probs the prediction uses
+  d.conf = {label, min_tok, min_margin, ptr_min, ptr_logp}
+           status-token prob, min action-token prob, min top1-top2 token margin, min / summed log of pointer
+           (start*end) probs; d.logp stays the summed action-token log-prob.
+Calibrate thresholds on dev with: node scripts/ir/eval_pred.mjs --calibrate ... (see ml/ir/README.md).
 """
 import argparse
 import json
@@ -19,6 +25,22 @@ from functools import partial
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+
+
+def p_conf(p, i, v, slots):
+    """Probabilities of the greedy P choices that make up the prediction -> {label, min, prod}. Non-ok: label only;
+    ok: + single, op, pin, stderr, every mod bit, every slot kind, start/end of predicted pointer slots."""
+    ps = [float(p["label_prob"][i])]
+    if v.labels[int(p["label"][i])] == "ok":
+        ps += [float(p[k][i]) for k in ("single_prob", "op_prob", "pin_prob", "stderr_prob")]
+        ps += p["mods_prob"][i].tolist() + p["kind_prob"][i].tolist()
+        for k, s in enumerate(v.slots):
+            if s in slots and slots[s]["u"][0] >= 0:
+                ps += [float(p["start_prob"][i, k]), float(p["end_prob"][i, k])]
+    prod = 1.0
+    for x in ps:
+        prod *= x
+    return {"label": round(ps[0], 6), "min": round(min(ps), 6), "prod": round(prod, 6)}
 
 
 def score(preds, split, data_dir, out):
@@ -77,10 +99,13 @@ def main():
     with open(preds_path, "w", encoding="utf-8") as f:
         for b in dl:
             b = {x: y.to(dev) for x, y in b.items()}
-            p, acts, spans, logp = model.predict(b)
+            p, acts, spans, logp, dc = model.predict(b, conf=True)
             batches.append((b, p, acts, spans))
-            for pr, dseq, lp in zip(p_rows(p, vocab), d_sequences(acts, spans, vocab), logp.tolist()):
-                f.write(json.dumps({"id": ds.rows[k]["id"], "p": pr, "d": {"actions": dseq, "logp": round(lp, 4)}}) + "\n")
+            dc = {x: y.tolist() for x, y in dc.items()}
+            for i, (pr, dseq, lp) in enumerate(zip(p_rows(p, vocab), d_sequences(acts, spans, vocab), logp.tolist())):
+                pr["conf"] = p_conf(p, i, vocab, pr["slots"])
+                d = {"actions": dseq, "logp": round(lp, 4), "conf": {x: round(y[i], 6) for x, y in dc.items()}}
+                f.write(json.dumps({"id": ds.rows[k]["id"], "p": pr, "d": d}) + "\n")
                 k += 1
     print(f"{k} predictions -> {preds_path}")
     print("quick " + json.dumps(quick_metrics(batches, vocab)))

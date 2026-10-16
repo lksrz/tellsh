@@ -5,6 +5,7 @@
 import { effectsOf } from './schemas.js';
 import { unitWord } from './units.js';
 import { parseIntPhrase } from './normalizers.js';
+import { strictObligations } from './strict.js';
 import {
   CUE_LEXICON, PER_FILE, DIR_WORDS, KILL_VERBS, NOT_GERUND, CLAUSE_BOUNDARY, TOOL_WORDS, WRITE_VERBS,
   OP_VERBS, langWordAt, langExt, PIN_NAMES, REQUIRE_WORDS, SORT_FORBID, TYPE_F_CONFLICT, FILE_NOUNS, KNOWN_WORDS,
@@ -388,6 +389,30 @@ export function obligations(ir, stages, ctx, used) {
   });
   if (unknown.length > MAX_UNKNOWN) fail('coverage', `unexplained words: ${unknown.join(', ')}`);
   pass('coverage', unknown.length ? `closed-lexicon words explained; unknown: ${unknown.join(', ')}` : 'closed-lexicon words explained');
+
+  // Audit r2 (strict.js): cover words, span integrity, unrequested mods, data-audit patterns.
+  const requireWordsFor = (op, m) => [`${op}.${m.mod}`, ...(m.values || []).filter((v) => v.k === 'const').map((v) => `${op}.${m.mod}=${v.id}`)]
+    .some((k) => REQUIRE_WORDS[k]);
+  const isKnown = (x) => KNOWN_WORDS.has(x) || LEXICON_WORDS.has(x);
+  strictObligations(ir, stages, ctx, used, { words, consumed, fail, hasFree, hasMod, specOf, prevOf, inCue, isKnown,
+    isUnknownWord, flagSpelled, requireWordsFor, isExtWord: (x) => !!langWordAt([x.toLowerCase(), 'files'], 0), nearKnown });
+  pass('strict', 'cover words, span integrity, mods requested, audit patterns');
+}
+
+// A typo of a known word: one edit (insert / delete / substitute / transpose) away, words of 4+ letters.
+function nearKnown(w) {
+  if (w.length < 4) return false;
+  const known = (x) => KNOWN_WORDS.has(x) || LEXICON_WORDS.has(x);
+  const abc = 'abcdefghijklmnopqrstuvwxyz';
+  for (let i = 0; i <= w.length; i++) {
+    if (i < w.length && known(w.slice(0, i) + w.slice(i + 1))) return true;
+    if (i < w.length - 1 && known(w.slice(0, i) + w[i + 1] + w[i] + w.slice(i + 2))) return true;
+    for (const c of abc) {
+      if (known(w.slice(0, i) + c + w.slice(i))) return true;
+      if (i < w.length && known(w.slice(0, i) + c + w.slice(i + 1))) return true;
+    }
+  }
+  return false;
 }
 
 function isUnknownWord(w) {

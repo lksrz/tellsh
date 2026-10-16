@@ -97,7 +97,9 @@ test('bound phrases are explained only by their mod', () => {
   ok('show commit abc1234 without the patch', 'git show -s abc1234 --');
   no('show commit abc1234 without the patch', 'git show abc1234 --', /without the patch/);
   ok('skip 20 commits on develop', 'git log --skip=20 develop --');
-  ok('count occurrences of Cache in app, not just lines', 'rg --count-matches Cache app');
+  ok('count occurrences of Cache in app.ts, not just lines', 'rg --count-matches Cache app.ts');
+  // over a directory --count-matches prints one count per file, not the total asked for
+  no('count occurrences of Cache in app, not just lines', 'rg --count-matches Cache app', /per_file/);
   ok('search the fixtures folder for the literal a+b, not as a regex', "rg -F 'a+b' fixtures");
   ok('first parent history oneline', 'git log --first-parent --oneline');
   no('first parent history oneline', 'git log --oneline', /first parent/);

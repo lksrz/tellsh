@@ -222,7 +222,9 @@ class IRModel(nn.Module):
 
     # -------- inference
     @torch.no_grad()
-    def predict(self, b):
+    def predict(self, b, conf=False):
+        """Greedy P + D decode. conf=True also returns a dict of per-row confidences (probabilities of the greedy
+        choices): P head probs in p[*_prob] and D {label, min_tok, min_margin, ptr_min, ptr_logp} (B,) tensors."""
         x, units, pooled = self.encode(b)
         um = b["unit_mask"]
         P = self.p_heads(units, pooled, um)
@@ -231,6 +233,12 @@ class IRModel(nn.Module):
         p = dict(label=P["label"].argmax(-1), label_prob=P["label"].softmax(-1).max(-1).values, single=P["single"].argmax(-1),
                  op=P["op"].argmax(-1), pin=P["pin"].argmax(-1), stderr=P["stderr"].argmax(-1), mods=P["mods"] > 0,
                  kind=P["kind"].argmax(-1), start=p_start, end=p_end)
+        if conf:
+            mx = lambda t: t.float().softmax(-1).max(-1).values
+            sig = P["mods"].float().sigmoid()
+            p.update(single_prob=mx(P["single"]), op_prob=mx(P["op"]), pin_prob=mx(P["pin"]), stderr_prob=mx(P["stderr"]),
+                     mods_prob=torch.maximum(sig, 1 - sig), kind_prob=mx(P["kind"]), start_prob=mx(P["start"]),
+                     end_prob=mx(self.p_ptr.end_logits(P["slot_h"], units, um, p_start)))
         # greedy D decode (no grammar mask; first action restricted to a status)
         B, dev = x.shape[0], x.device
         v = self.v
@@ -243,6 +251,8 @@ class IRModel(nn.Module):
         d_op = torch.zeros(B, 1, dtype=torch.long, device=dev)
         acts, spans, done = [], [], torch.zeros(B, dtype=torch.bool, device=dev)
         logp = torch.zeros(B, device=dev)
+        ones = torch.ones(B, device=dev)
+        c_label, c_min, c_margin, c_pmin, c_plogp = ones.clone(), ones.clone(), ones.clone(), ones.clone(), torch.zeros(B, device=dev)
         for t in range(self.max_len - 1):
             h = self.d_states(b, x, units, d_in, d_span, d_op)[:, -1:]
             lg = self.h_act(h)[:, 0].float()
@@ -255,9 +265,22 @@ class IRModel(nn.Module):
             lp = lg.log_softmax(-1)
             a = lp.argmax(-1)
             logp = logp + torch.where(done, torch.zeros_like(logp), lp.gather(1, a[:, None])[:, 0])
-            s = self.d_ptr.start_logits(h, units, um).argmax(-1)
-            e = self.d_ptr.end_logits(h, units, um, s).argmax(-1)
+            sl = self.d_ptr.start_logits(h, units, um).float().log_softmax(-1)
+            s = sl.argmax(-1)
+            el = self.d_ptr.end_logits(h, units, um, s).float().log_softmax(-1)
+            e = el.argmax(-1)
             ptr = self.is_ptr[a]
+            if conf:
+                live = ~done
+                top = lp.exp().topk(2, -1).values
+                if t == 0:
+                    c_label = top[:, 0]
+                c_min = torch.where(live, torch.minimum(c_min, top[:, 0]), c_min)
+                c_margin = torch.where(live, torch.minimum(c_margin, top[:, 0] - top[:, 1]), c_margin)
+                pl = sl.max(-1).values[:, 0] + el.max(-1).values[:, 0]
+                lp_on = live & ptr
+                c_pmin = torch.where(lp_on, torch.minimum(c_pmin, pl.exp()), c_pmin)
+                c_plogp = c_plogp + torch.where(lp_on, pl, torch.zeros_like(pl))
             sp = torch.stack([torch.where(ptr, s[:, 0], -1), torch.where(ptr, e[:, 0], -1)], -1)
             a = torch.where(done, torch.full_like(a, v.PAD), a)
             acts.append(a)
@@ -269,7 +292,10 @@ class IRModel(nn.Module):
             d_op = torch.cat([d_op, new_op[:, None]], 1)
             if done.all():
                 break
-        return p, torch.stack(acts, 1), torch.stack(spans, 1), logp
+        out = (p, torch.stack(acts, 1), torch.stack(spans, 1), logp)
+        if conf:
+            out += (dict(label=c_label, min_tok=c_min, min_margin=c_margin, ptr_min=c_pmin, ptr_logp=c_plogp),)
+        return out
 
 
 def param_counts(m: IRModel):

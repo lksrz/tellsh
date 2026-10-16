@@ -113,7 +113,11 @@
           "mod": "oneline",
           "flag": "--oneline",
           "form": "bool",
-          "model": "predict"
+          "model": "predict",
+          "implied": {
+            "reason": "a line consumer (grep / wc -l / head) needs one commit per line",
+            "when": "piped"
+          }
         },
         {
           "mod": "format",

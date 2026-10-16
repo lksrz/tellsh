@@ -69,7 +69,7 @@ const OP_KEYS = ['realization', 'argv_prefix', 'gloss', 'effects', 'stdin', 'std
 const POS_KEYS = ['role', 'type', 'arity', 'leading_dash', 'always_eoo', 'eoo_after', 'multi', 'norms',
   'template', 'quote', 'dialect', 'validator', 'note'];
 const OPT_KEYS = ['mod', 'flag', 'form', 'value', 'model', 'derive', 'cue', 'polarity', 'direction',
-  'alt_flag_when', 'group', 'same_argv_as', 'effects_add', 'stdout', 'platform', 'min_version', 'note'];
+  'alt_flag_when', 'group', 'same_argv_as', 'effects_add', 'stdout', 'platform', 'min_version', 'implied', 'note'];
 const VAL_KEYS = ['type', 'range', 'enum', 'repeat', 'prefix', 'template', 'quote', 'validator',
   'dialect', 'norms', 'enum_cue'];
 
@@ -158,6 +158,14 @@ function checkOption(o, path, add) {
   // cue: one class, or a list (the mod needs any one of them and explains each of them)
   if (o.cue !== undefined) {
     for (const c of [].concat(o.cue)) if (!CUE_CLASSES.includes(c)) add(path, `unknown cue class "${c}"`);
+  }
+  // implied: {reason, when}: an implied default of the op, needing no request word (strict.js);
+  // when: 'always' | 'piped' (the stage feeds another) | 'each' (it feeds an each stage) | 'after:op[.mod]' (the previous stage), or a list
+  if (o.implied !== undefined) {
+    const ws = [].concat(o.implied?.when ?? []);
+    if (!isObj(o.implied) || typeof o.implied.reason !== 'string' || !o.implied.reason || !ws.length
+      || !ws.every((w) => w === 'always' || w === 'piped' || w === 'each' || /^after:[a-z]+\.[a-z_]+(\.[a-z_]+)?$/.test(w)))
+      add(path, 'implied must be {reason, when: always|piped|after:op[.mod] (or a list)}');
   }
   if (o.polarity !== undefined && o.polarity !== 'neg') add(path, 'polarity must be "neg"');
   if (o.direction !== undefined && !['first', 'last'].includes(o.direction)) add(path, 'direction must be first|last');

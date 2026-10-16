@@ -139,7 +139,11 @@
           "flag": "-l",
           "form": "bool",
           "model": "predict",
-          "stdout": "paths"
+          "stdout": "paths",
+          "implied": {
+            "reason": "an each stage (xargs) runs on files: rg -l is what feeds it file names",
+            "when": "each"
+          }
         },
         {
           "mod": "files_without_match",
@@ -161,7 +165,11 @@
           "mod": "only_matching",
           "flag": "-o",
           "form": "bool",
-          "model": "predict"
+          "model": "predict",
+          "implied": {
+            "reason": "a downstream counter (wc -l, sort | uniq -c, head) counts or shows the matches themselves",
+            "when": "piped"
+          }
         },
         {
           "mod": "line_number",
