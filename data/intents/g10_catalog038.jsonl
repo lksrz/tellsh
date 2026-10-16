@@ -1,0 +1,488 @@
+{"text": "git diff --stat", "intent": "git_diff_stat", "lang": "en"}
+{"text": "show a diff stat", "intent": "git_diff_stat", "lang": "en"}
+{"text": "summarize my changes per file", "intent": "git_diff_stat", "lang": "en"}
+{"text": "how many lines changed in each file", "intent": "git_diff_stat", "lang": "en"}
+{"text": "show the diff summary", "intent": "git_diff_stat", "lang": "en"}
+{"text": "diff stat of staged changes", "intent": "git_diff_stat", "lang": "en"}
+{"text": "git diff --stat against main", "intent": "git_diff_stat", "lang": "en"}
+{"text": "show diff statistics", "intent": "git_diff_stat", "lang": "en"}
+{"text": "show insertions and deletions per file", "intent": "git_diff_stat", "lang": "en"}
+{"text": "give me a summary of uncommitted changes", "intent": "git_diff_stat", "lang": "en"}
+{"text": "diff stat compared to develop", "intent": "git_diff_stat", "lang": "en"}
+{"text": "how much changed since HEAD~3", "intent": "git_diff_stat", "lang": "en"}
+{"text": "show a change summary per file", "intent": "git_diff_stat", "lang": "en"}
+{"text": "git diff --cached --stat", "intent": "git_diff_stat", "lang": "en"}
+{"text": "stat of the staged diff", "intent": "git_diff_stat", "lang": "en"}
+{"text": "summary of changes in the working tree", "intent": "git_diff_stat", "lang": "en"}
+{"text": "show added and removed lines per file", "intent": "git_diff_stat", "lang": "en"}
+{"text": "diff stats versus origin/main", "intent": "git_diff_stat", "lang": "en"}
+{"text": "show a summary of what changed", "intent": "git_diff_stat", "lang": "en"}
+{"text": "how many lines were added and removed", "intent": "git_diff_stat", "lang": "en"}
+{"text": "show the stat of my changes", "intent": "git_diff_stat", "lang": "en"}
+{"text": "line counts of the changes per file", "intent": "git_diff_stat", "lang": "en"}
+{"text": "diff summary against the main branch", "intent": "git_diff_stat", "lang": "en"}
+{"text": "overview of my uncommitted changes", "intent": "git_diff_stat", "lang": "en"}
+{"text": "pokaż podsumowanie zmian", "intent": "git_diff_stat", "lang": "pl"}
+{"text": "statystyki zmian w plikach", "intent": "git_diff_stat", "lang": "pl"}
+{"text": "ile linii zmieniono w każdym pliku", "intent": "git_diff_stat", "lang": "pl"}
+{"text": "podsumowanie zmian w gicie", "intent": "git_diff_stat", "lang": "pl"}
+{"text": "pokaż statystyki diffa", "intent": "git_diff_stat", "lang": "pl"}
+{"text": "git diff --stat", "intent": "git_diff_stat", "lang": "pl"}
+{"text": "podsumowanie zmian względem main", "intent": "git_diff_stat", "lang": "pl"}
+{"text": "ile linii dodanych i usuniętych", "intent": "git_diff_stat", "lang": "pl"}
+{"text": "statystyki zmian w poczekalni", "intent": "git_diff_stat", "lang": "pl"}
+{"text": "pokaż podsumowanie niezatwierdzonych zmian", "intent": "git_diff_stat", "lang": "pl"}
+{"text": "statystyki zmian względem develop", "intent": "git_diff_stat", "lang": "pl"}
+{"text": "podsumowanie diffa", "intent": "git_diff_stat", "lang": "pl"}
+{"text": "ile zmian w plikach", "intent": "git_diff_stat", "lang": "pl"}
+{"text": "pokaż ile linii zmienione w plikach", "intent": "git_diff_stat", "lang": "pl"}
+{"text": "statystyki diffa względem gałęzi main", "intent": "git_diff_stat", "lang": "pl"}
+{"text": "podsumowanie zmian od HEAD~2", "intent": "git_diff_stat", "lang": "pl"}
+{"text": "wyświetl statystyki zmian", "intent": "git_diff_stat", "lang": "pl"}
+{"text": "podsumowanie zmian dodanych do commita", "intent": "git_diff_stat", "lang": "pl"}
+{"text": "pokaż statystyki zmian w poczekalni", "intent": "git_diff_stat", "lang": "pl"}
+{"text": "ile linii się zmieniło", "intent": "git_diff_stat", "lang": "pl"}
+{"text": "daj podsumowanie zmian", "intent": "git_diff_stat", "lang": "pl"}
+{"text": "git diff --name-only", "intent": "git_diff_names", "lang": "en"}
+{"text": "list the changed files", "intent": "git_diff_names", "lang": "en"}
+{"text": "which files changed", "intent": "git_diff_names", "lang": "en"}
+{"text": "show only the names of modified files", "intent": "git_diff_names", "lang": "en"}
+{"text": "list modified files", "intent": "git_diff_names", "lang": "en"}
+{"text": "which files have uncommitted changes", "intent": "git_diff_names", "lang": "en"}
+{"text": "names of files that differ from main", "intent": "git_diff_names", "lang": "en"}
+{"text": "list files changed compared to develop", "intent": "git_diff_names", "lang": "en"}
+{"text": "show changed file names", "intent": "git_diff_names", "lang": "en"}
+{"text": "which files did i touch", "intent": "git_diff_names", "lang": "en"}
+{"text": "list staged file names", "intent": "git_diff_names", "lang": "en"}
+{"text": "git diff --name-only HEAD~1", "intent": "git_diff_names", "lang": "en"}
+{"text": "which files are modified", "intent": "git_diff_names", "lang": "en"}
+{"text": "only file names of the diff", "intent": "git_diff_names", "lang": "en"}
+{"text": "show the paths of changed files", "intent": "git_diff_names", "lang": "en"}
+{"text": "list files changed since v1.2.0", "intent": "git_diff_names", "lang": "en"}
+{"text": "which files differ from origin/main", "intent": "git_diff_names", "lang": "en"}
+{"text": "just the names of the changed files", "intent": "git_diff_names", "lang": "en"}
+{"text": "list the files i changed", "intent": "git_diff_names", "lang": "en"}
+{"text": "file names in the staged diff", "intent": "git_diff_names", "lang": "en"}
+{"text": "which files were changed against main", "intent": "git_diff_names", "lang": "en"}
+{"text": "list changed files in the working tree", "intent": "git_diff_names", "lang": "en"}
+{"text": "pokaż zmienione pliki", "intent": "git_diff_names", "lang": "pl"}
+{"text": "lista zmienionych plików", "intent": "git_diff_names", "lang": "pl"}
+{"text": "które pliki się zmieniły", "intent": "git_diff_names", "lang": "pl"}
+{"text": "nazwy zmodyfikowanych plików", "intent": "git_diff_names", "lang": "pl"}
+{"text": "tylko nazwy zmienionych plików", "intent": "git_diff_names", "lang": "pl"}
+{"text": "git diff --name-only", "intent": "git_diff_names", "lang": "pl"}
+{"text": "które pliki różnią się od main", "intent": "git_diff_names", "lang": "pl"}
+{"text": "wypisz zmienione pliki", "intent": "git_diff_names", "lang": "pl"}
+{"text": "jakie pliki zmodyfikowane", "intent": "git_diff_names", "lang": "pl"}
+{"text": "pliki zmienione względem develop", "intent": "git_diff_names", "lang": "pl"}
+{"text": "nazwy plików w poczekalni", "intent": "git_diff_names", "lang": "pl"}
+{"text": "lista zmodyfikowanych plików", "intent": "git_diff_names", "lang": "pl"}
+{"text": "które pliki się zmieniły od v1.2.0", "intent": "git_diff_names", "lang": "pl"}
+{"text": "pokaż nazwy zmienionych plików", "intent": "git_diff_names", "lang": "pl"}
+{"text": "wypisz nazwy plików które się zmieniły", "intent": "git_diff_names", "lang": "pl"}
+{"text": "zmienione pliki względem gałęzi main", "intent": "git_diff_names", "lang": "pl"}
+{"text": "które pliki są zmienione", "intent": "git_diff_names", "lang": "pl"}
+{"text": "pokaż tylko nazwy plików z diffa", "intent": "git_diff_names", "lang": "pl"}
+{"text": "jakie pliki zmieniłem", "intent": "git_diff_names", "lang": "pl"}
+{"text": "niezatwierdzone zmienione pliki", "intent": "git_diff_names", "lang": "pl"}
+{"text": "which files changed in the last commit", "intent": "git_show_files", "lang": "en"}
+{"text": "what files were in the last commit", "intent": "git_show_files", "lang": "en"}
+{"text": "git show --stat", "intent": "git_show_files", "lang": "en"}
+{"text": "show the files of the latest commit", "intent": "git_show_files", "lang": "en"}
+{"text": "list files changed by commit abc1234", "intent": "git_show_files", "lang": "en"}
+{"text": "files touched in the previous commit", "intent": "git_show_files", "lang": "en"}
+{"text": "which files went into the last commit", "intent": "git_show_files", "lang": "en"}
+{"text": "git show --stat HEAD~2", "intent": "git_show_files", "lang": "en"}
+{"text": "show the stat of the last commit", "intent": "git_show_files", "lang": "en"}
+{"text": "files changed in commit 9f8e7d6", "intent": "git_show_files", "lang": "en"}
+{"text": "what did the last commit change", "intent": "git_show_files", "lang": "en"}
+{"text": "which files did the latest commit modify", "intent": "git_show_files", "lang": "en"}
+{"text": "list the files of the most recent commit", "intent": "git_show_files", "lang": "en"}
+{"text": "summary of the last commit", "intent": "git_show_files", "lang": "en"}
+{"text": "files in commit v2.0.1", "intent": "git_show_files", "lang": "en"}
+{"text": "which files were changed in the previous commit", "intent": "git_show_files", "lang": "en"}
+{"text": "show what files commit 1a2b3c4 touched", "intent": "git_show_files", "lang": "en"}
+{"text": "files modified by the last commit", "intent": "git_show_files", "lang": "en"}
+{"text": "stat of commit HEAD~1", "intent": "git_show_files", "lang": "en"}
+{"text": "which files were in the most recent commit", "intent": "git_show_files", "lang": "en"}
+{"text": "show changed files of the latest commit", "intent": "git_show_files", "lang": "en"}
+{"text": "które pliki zmieniono w ostatnim commicie", "intent": "git_show_files", "lang": "pl"}
+{"text": "pliki z ostatniego commita", "intent": "git_show_files", "lang": "pl"}
+{"text": "jakie pliki zmienił ostatni commit", "intent": "git_show_files", "lang": "pl"}
+{"text": "git show --stat", "intent": "git_show_files", "lang": "pl"}
+{"text": "pokaż pliki z ostatniego commita", "intent": "git_show_files", "lang": "pl"}
+{"text": "pliki zmienione w commicie abc1234", "intent": "git_show_files", "lang": "pl"}
+{"text": "co zmienił ostatni commit", "intent": "git_show_files", "lang": "pl"}
+{"text": "pliki z poprzedniego commita", "intent": "git_show_files", "lang": "pl"}
+{"text": "które pliki weszły do ostatniego commita", "intent": "git_show_files", "lang": "pl"}
+{"text": "lista plików ostatniego commita", "intent": "git_show_files", "lang": "pl"}
+{"text": "pokaż statystyki ostatniego commita", "intent": "git_show_files", "lang": "pl"}
+{"text": "pliki w commicie 9f8e7d6", "intent": "git_show_files", "lang": "pl"}
+{"text": "jakie pliki były w ostatnim commicie", "intent": "git_show_files", "lang": "pl"}
+{"text": "zmienione pliki w poprzednim commicie", "intent": "git_show_files", "lang": "pl"}
+{"text": "pokaż pliki zmienione w commicie v2.0.1", "intent": "git_show_files", "lang": "pl"}
+{"text": "które pliki zmienił przedostatni commit", "intent": "git_show_files", "lang": "pl"}
+{"text": "wypisz pliki z ostatniego commita", "intent": "git_show_files", "lang": "pl"}
+{"text": "pliki zmodyfikowane w ostatnim commicie", "intent": "git_show_files", "lang": "pl"}
+{"text": "podsumowanie ostatniego commita", "intent": "git_show_files", "lang": "pl"}
+{"text": "co weszło do ostatniego commita", "intent": "git_show_files", "lang": "pl"}
+{"text": "git worktree list", "intent": "git_worktree_list", "lang": "en"}
+{"text": "list worktrees", "intent": "git_worktree_list", "lang": "en"}
+{"text": "show all git worktrees", "intent": "git_worktree_list", "lang": "en"}
+{"text": "which worktrees do i have", "intent": "git_worktree_list", "lang": "en"}
+{"text": "list the work trees of this repo", "intent": "git_worktree_list", "lang": "en"}
+{"text": "show existing worktrees", "intent": "git_worktree_list", "lang": "en"}
+{"text": "what worktrees are there", "intent": "git_worktree_list", "lang": "en"}
+{"text": "list linked worktrees", "intent": "git_worktree_list", "lang": "en"}
+{"text": "show my git worktrees", "intent": "git_worktree_list", "lang": "en"}
+{"text": "list all working trees", "intent": "git_worktree_list", "lang": "en"}
+{"text": "which branches are checked out in worktrees", "intent": "git_worktree_list", "lang": "en"}
+{"text": "show the worktrees", "intent": "git_worktree_list", "lang": "en"}
+{"text": "list every worktree", "intent": "git_worktree_list", "lang": "en"}
+{"text": "do i have any worktrees", "intent": "git_worktree_list", "lang": "en"}
+{"text": "show linked working trees", "intent": "git_worktree_list", "lang": "en"}
+{"text": "what worktrees exist", "intent": "git_worktree_list", "lang": "en"}
+{"text": "list git working trees", "intent": "git_worktree_list", "lang": "en"}
+{"text": "worktrees list", "intent": "git_worktree_list", "lang": "en"}
+{"text": "display the worktrees", "intent": "git_worktree_list", "lang": "en"}
+{"text": "show all work trees", "intent": "git_worktree_list", "lang": "en"}
+{"text": "lista worktree", "intent": "git_worktree_list", "lang": "pl"}
+{"text": "pokaż worktree", "intent": "git_worktree_list", "lang": "pl"}
+{"text": "wylistuj drzewa robocze", "intent": "git_worktree_list", "lang": "pl"}
+{"text": "jakie mam worktree", "intent": "git_worktree_list", "lang": "pl"}
+{"text": "pokaż wszystkie drzewa robocze", "intent": "git_worktree_list", "lang": "pl"}
+{"text": "git worktree list", "intent": "git_worktree_list", "lang": "pl"}
+{"text": "lista drzew roboczych", "intent": "git_worktree_list", "lang": "pl"}
+{"text": "pokaż istniejące worktree", "intent": "git_worktree_list", "lang": "pl"}
+{"text": "jakie drzewa robocze są w repo", "intent": "git_worktree_list", "lang": "pl"}
+{"text": "wylistuj worktree'y", "intent": "git_worktree_list", "lang": "pl"}
+{"text": "pokaż podpięte drzewa robocze", "intent": "git_worktree_list", "lang": "pl"}
+{"text": "które drzewa robocze istnieją", "intent": "git_worktree_list", "lang": "pl"}
+{"text": "lista wszystkich worktree", "intent": "git_worktree_list", "lang": "pl"}
+{"text": "wyświetl drzewa robocze", "intent": "git_worktree_list", "lang": "pl"}
+{"text": "jakie są worktree", "intent": "git_worktree_list", "lang": "pl"}
+{"text": "pokaż listę worktree", "intent": "git_worktree_list", "lang": "pl"}
+{"text": "wypisz drzewa robocze", "intent": "git_worktree_list", "lang": "pl"}
+{"text": "pokaż moje worktree", "intent": "git_worktree_list", "lang": "pl"}
+{"text": "lista worktree w gicie", "intent": "git_worktree_list", "lang": "pl"}
+{"text": "jakie drzewa robocze mam", "intent": "git_worktree_list", "lang": "pl"}
+{"text": "git worktree add ../hotfix hotfix/login", "intent": "git_worktree_add", "lang": "en"}
+{"text": "create a worktree at ../review for branch feature-x", "intent": "git_worktree_add", "lang": "en"}
+{"text": "add a worktree for branch develop in ../dev", "intent": "git_worktree_add", "lang": "en"}
+{"text": "check out branch release/1.2 into a new worktree at ../release", "intent": "git_worktree_add", "lang": "en"}
+{"text": "create a new worktree", "intent": "git_worktree_add", "lang": "en"}
+{"text": "add a git worktree", "intent": "git_worktree_add", "lang": "en"}
+{"text": "make a separate worktree for branch main at ../main", "intent": "git_worktree_add", "lang": "en"}
+{"text": "set up a worktree in ../wt for feature/api", "intent": "git_worktree_add", "lang": "en"}
+{"text": "create a worktree for develop", "intent": "git_worktree_add", "lang": "en"}
+{"text": "add a worktree at ../experiment", "intent": "git_worktree_add", "lang": "en"}
+{"text": "new worktree for branch bugfix-42 in ../bugfix", "intent": "git_worktree_add", "lang": "en"}
+{"text": "create a work tree in ../docs for branch docs", "intent": "git_worktree_add", "lang": "en"}
+{"text": "git worktree add ../tmp main", "intent": "git_worktree_add", "lang": "en"}
+{"text": "check out feature-y in a separate worktree at ../y", "intent": "git_worktree_add", "lang": "en"}
+{"text": "add another worktree for branch staging at ../staging", "intent": "git_worktree_add", "lang": "en"}
+{"text": "create a worktree under ../trees/review for branch review", "intent": "git_worktree_add", "lang": "en"}
+{"text": "set up a new working tree for branch release", "intent": "git_worktree_add", "lang": "en"}
+{"text": "make a worktree in ../spike for spike/cache", "intent": "git_worktree_add", "lang": "en"}
+{"text": "add a worktree for the branch hotfix at ../hf", "intent": "git_worktree_add", "lang": "en"}
+{"text": "create a second worktree at ../second for develop", "intent": "git_worktree_add", "lang": "en"}
+{"text": "utwórz worktree w ../hotfix dla gałęzi hotfix/login", "intent": "git_worktree_add", "lang": "pl"}
+{"text": "dodaj worktree", "intent": "git_worktree_add", "lang": "pl"}
+{"text": "stwórz nowe drzewo robocze", "intent": "git_worktree_add", "lang": "pl"}
+{"text": "dodaj worktree dla gałęzi develop w ../dev", "intent": "git_worktree_add", "lang": "pl"}
+{"text": "utwórz drzewo robocze w ../review dla gałęzi feature-x", "intent": "git_worktree_add", "lang": "pl"}
+{"text": "git worktree add ../tmp main", "intent": "git_worktree_add", "lang": "pl"}
+{"text": "nowe drzewo robocze dla gałęzi release w ../release", "intent": "git_worktree_add", "lang": "pl"}
+{"text": "dodaj drzewo robocze w katalogu ../wt dla gałęzi feature/api", "intent": "git_worktree_add", "lang": "pl"}
+{"text": "utwórz worktree dla gałęzi main", "intent": "git_worktree_add", "lang": "pl"}
+{"text": "stwórz worktree w ../spike", "intent": "git_worktree_add", "lang": "pl"}
+{"text": "dodaj nowy worktree dla gałęzi bugfix-42 w ../bugfix", "intent": "git_worktree_add", "lang": "pl"}
+{"text": "utwórz osobne drzewo robocze dla gałęzi staging w ../staging", "intent": "git_worktree_add", "lang": "pl"}
+{"text": "dodaj worktree w ../docs dla gałęzi docs", "intent": "git_worktree_add", "lang": "pl"}
+{"text": "nowy worktree w ../exp dla gałęzi experiment", "intent": "git_worktree_add", "lang": "pl"}
+{"text": "stwórz drzewo robocze dla gałęzi hotfix w ../hf", "intent": "git_worktree_add", "lang": "pl"}
+{"text": "utwórz nowe drzewo robocze w ../second dla gałęzi develop", "intent": "git_worktree_add", "lang": "pl"}
+{"text": "dodaj drzewo robocze", "intent": "git_worktree_add", "lang": "pl"}
+{"text": "utwórz worktree'a dla gałęzi review w ../review", "intent": "git_worktree_add", "lang": "pl"}
+{"text": "dodaj worktree pod ../trees/x dla gałęzi x", "intent": "git_worktree_add", "lang": "pl"}
+{"text": "stwórz nowy worktree", "intent": "git_worktree_add", "lang": "pl"}
+{"text": "pretty print data.json", "intent": "json_pretty", "lang": "en"}
+{"text": "jq . config.json", "intent": "json_pretty", "lang": "en"}
+{"text": "format package.json nicely", "intent": "json_pretty", "lang": "en"}
+{"text": "pretty-print the json file response.json", "intent": "json_pretty", "lang": "en"}
+{"text": "show settings.json formatted", "intent": "json_pretty", "lang": "en"}
+{"text": "prettify result.json", "intent": "json_pretty", "lang": "en"}
+{"text": "make output.json readable", "intent": "json_pretty", "lang": "en"}
+{"text": "indent the json in data.json", "intent": "json_pretty", "lang": "en"}
+{"text": "view api.json pretty printed", "intent": "json_pretty", "lang": "en"}
+{"text": "beautify the json file manifest.json", "intent": "json_pretty", "lang": "en"}
+{"text": "pretty print a json file", "intent": "json_pretty", "lang": "en"}
+{"text": "show the json file tsconfig.json formatted", "intent": "json_pretty", "lang": "en"}
+{"text": "python -m json.tool payload.json", "intent": "json_pretty", "lang": "en"}
+{"text": "format the json in ./tmp/out.json", "intent": "json_pretty", "lang": "en"}
+{"text": "pretty print json", "intent": "json_pretty", "lang": "en"}
+{"text": "reformat the contents of report.json", "intent": "json_pretty", "lang": "en"}
+{"text": "show me events.json in human readable form", "intent": "json_pretty", "lang": "en"}
+{"text": "print data/users.json nicely", "intent": "json_pretty", "lang": "en"}
+{"text": "pretty print the json in \"my file.json\"", "intent": "json_pretty", "lang": "en"}
+{"text": "show response.json indented", "intent": "json_pretty", "lang": "en"}
+{"text": "format json file", "intent": "json_pretty", "lang": "en"}
+{"text": "prettify the json file config/app.json", "intent": "json_pretty", "lang": "en"}
+{"text": "ładnie wyświetl data.json", "intent": "json_pretty", "lang": "pl"}
+{"text": "sformatuj plik config.json", "intent": "json_pretty", "lang": "pl"}
+{"text": "pokaż sformatowany package.json", "intent": "json_pretty", "lang": "pl"}
+{"text": "jq . dane.json", "intent": "json_pretty", "lang": "pl"}
+{"text": "pokaż czytelnie response.json", "intent": "json_pretty", "lang": "pl"}
+{"text": "sformatuj json w pliku wynik.json", "intent": "json_pretty", "lang": "pl"}
+{"text": "wyświetl plik json z wcięciami", "intent": "json_pretty", "lang": "pl"}
+{"text": "pokaż zawartość settings.json sformatowany", "intent": "json_pretty", "lang": "pl"}
+{"text": "ładnie pokaż plik manifest.json", "intent": "json_pretty", "lang": "pl"}
+{"text": "sformatuj json", "intent": "json_pretty", "lang": "pl"}
+{"text": "pokaż api.json w czytelnej formie", "intent": "json_pretty", "lang": "pl"}
+{"text": "wyświetl ładnie plik ./tmp/out.json", "intent": "json_pretty", "lang": "pl"}
+{"text": "sformatuj zawartość report.json", "intent": "json_pretty", "lang": "pl"}
+{"text": "pokaż czytelnie plik json", "intent": "json_pretty", "lang": "pl"}
+{"text": "pokaż events.json z wcięciami", "intent": "json_pretty", "lang": "pl"}
+{"text": "ładnie sformatuj plik data/users.json", "intent": "json_pretty", "lang": "pl"}
+{"text": "pokaż sformatowany plik json", "intent": "json_pretty", "lang": "pl"}
+{"text": "wyświetl czytelnie tsconfig.json", "intent": "json_pretty", "lang": "pl"}
+{"text": "sformatuj plik \"moje dane.json\"", "intent": "json_pretty", "lang": "pl"}
+{"text": "pokaż ładnie json z pliku payload.json", "intent": "json_pretty", "lang": "pl"}
+{"text": "start a web server here", "intent": "http_server", "lang": "en"}
+{"text": "serve this folder over http", "intent": "http_server", "lang": "en"}
+{"text": "python3 -m http.server", "intent": "http_server", "lang": "en"}
+{"text": "start a simple http server on port 9000", "intent": "http_server", "lang": "en"}
+{"text": "serve the current directory on port 8080", "intent": "http_server", "lang": "en"}
+{"text": "run a local web server", "intent": "http_server", "lang": "en"}
+{"text": "spin up a quick static server", "intent": "http_server", "lang": "en"}
+{"text": "host these files on localhost", "intent": "http_server", "lang": "en"}
+{"text": "start an http server in this directory", "intent": "http_server", "lang": "en"}
+{"text": "serve static files locally on port 3000", "intent": "http_server", "lang": "en"}
+{"text": "launch a simple web server on 5000", "intent": "http_server", "lang": "en"}
+{"text": "run python http server", "intent": "http_server", "lang": "en"}
+{"text": "serve this directory", "intent": "http_server", "lang": "en"}
+{"text": "start a local http server on port 8001", "intent": "http_server", "lang": "en"}
+{"text": "quick web server for this folder", "intent": "http_server", "lang": "en"}
+{"text": "serve files from here on localhost", "intent": "http_server", "lang": "en"}
+{"text": "python3 -m http.server 9999", "intent": "http_server", "lang": "en"}
+{"text": "start a static web server", "intent": "http_server", "lang": "en"}
+{"text": "host the current folder on port 4000", "intent": "http_server", "lang": "en"}
+{"text": "run a simple local server", "intent": "http_server", "lang": "en"}
+{"text": "serve the files here over http", "intent": "http_server", "lang": "en"}
+{"text": "uruchom serwer http tutaj", "intent": "http_server", "lang": "pl"}
+{"text": "postaw prosty serwer www", "intent": "http_server", "lang": "pl"}
+{"text": "serwuj ten katalog przez http", "intent": "http_server", "lang": "pl"}
+{"text": "uruchom lokalny serwer na porcie 9000", "intent": "http_server", "lang": "pl"}
+{"text": "odpal serwer http w bieżącym katalogu", "intent": "http_server", "lang": "pl"}
+{"text": "python3 -m http.server", "intent": "http_server", "lang": "pl"}
+{"text": "uruchom prosty serwer www na porcie 8080", "intent": "http_server", "lang": "pl"}
+{"text": "wystaw pliki lokalnie", "intent": "http_server", "lang": "pl"}
+{"text": "postaw lokalny serwer na porcie 3000", "intent": "http_server", "lang": "pl"}
+{"text": "serwuj pliki z tego folderu", "intent": "http_server", "lang": "pl"}
+{"text": "uruchom statyczny serwer", "intent": "http_server", "lang": "pl"}
+{"text": "odpal prosty serwer http", "intent": "http_server", "lang": "pl"}
+{"text": "serwer www dla bieżącego katalogu", "intent": "http_server", "lang": "pl"}
+{"text": "uruchom serwer na porcie 5000", "intent": "http_server", "lang": "pl"}
+{"text": "postaw serwer http na localhost", "intent": "http_server", "lang": "pl"}
+{"text": "serwuj ten folder lokalnie", "intent": "http_server", "lang": "pl"}
+{"text": "odpal lokalny serwer www", "intent": "http_server", "lang": "pl"}
+{"text": "uruchom serwer http na porcie 8001", "intent": "http_server", "lang": "pl"}
+{"text": "wystaw ten katalog przez http", "intent": "http_server", "lang": "pl"}
+{"text": "uruchom prosty serwer", "intent": "http_server", "lang": "pl"}
+{"text": "create a virtualenv", "intent": "venv_create", "lang": "en"}
+{"text": "create a python virtual environment", "intent": "venv_create", "lang": "en"}
+{"text": "python3 -m venv .venv", "intent": "venv_create", "lang": "en"}
+{"text": "make a new venv", "intent": "venv_create", "lang": "en"}
+{"text": "set up a virtual environment", "intent": "venv_create", "lang": "en"}
+{"text": "create a venv named env", "intent": "venv_create", "lang": "en"}
+{"text": "create a virtual environment in .env", "intent": "venv_create", "lang": "en"}
+{"text": "init a python venv", "intent": "venv_create", "lang": "en"}
+{"text": "make a virtualenv called venv", "intent": "venv_create", "lang": "en"}
+{"text": "create a new python environment", "intent": "venv_create", "lang": "en"}
+{"text": "python -m venv venv", "intent": "venv_create", "lang": "en"}
+{"text": "set up a venv in the folder .venv", "intent": "venv_create", "lang": "en"}
+{"text": "create a venv", "intent": "venv_create", "lang": "en"}
+{"text": "make a virtual env", "intent": "venv_create", "lang": "en"}
+{"text": "create a virtual environment called myenv", "intent": "venv_create", "lang": "en"}
+{"text": "initialize a new virtualenv", "intent": "venv_create", "lang": "en"}
+{"text": "create a python venv in ./venv", "intent": "venv_create", "lang": "en"}
+{"text": "new virtual environment", "intent": "venv_create", "lang": "en"}
+{"text": "set up a python virtualenv", "intent": "venv_create", "lang": "en"}
+{"text": "create venv", "intent": "venv_create", "lang": "en"}
+{"text": "utwórz wirtualne środowisko", "intent": "venv_create", "lang": "pl"}
+{"text": "stwórz venv", "intent": "venv_create", "lang": "pl"}
+{"text": "utwórz środowisko wirtualne pythona", "intent": "venv_create", "lang": "pl"}
+{"text": "python3 -m venv .venv", "intent": "venv_create", "lang": "pl"}
+{"text": "załóż nowe środowisko wirtualne", "intent": "venv_create", "lang": "pl"}
+{"text": "utwórz venv o nazwie env", "intent": "venv_create", "lang": "pl"}
+{"text": "stwórz virtualenv", "intent": "venv_create", "lang": "pl"}
+{"text": "utwórz nowe wirtualne środowisko w .venv", "intent": "venv_create", "lang": "pl"}
+{"text": "załóż venv", "intent": "venv_create", "lang": "pl"}
+{"text": "stwórz środowisko wirtualne o nazwie myenv", "intent": "venv_create", "lang": "pl"}
+{"text": "utwórz nowy venv", "intent": "venv_create", "lang": "pl"}
+{"text": "stwórz wirtualne środowisko pythona w katalogu venv", "intent": "venv_create", "lang": "pl"}
+{"text": "załóż virtualenv", "intent": "venv_create", "lang": "pl"}
+{"text": "utwórz venv w folderze .env", "intent": "venv_create", "lang": "pl"}
+{"text": "nowe środowisko wirtualne", "intent": "venv_create", "lang": "pl"}
+{"text": "stwórz nowe wirtualne środowisko", "intent": "venv_create", "lang": "pl"}
+{"text": "utwórz środowisko pythona", "intent": "venv_create", "lang": "pl"}
+{"text": "załóż środowisko wirtualne pythona", "intent": "venv_create", "lang": "pl"}
+{"text": "utwórz venv", "intent": "venv_create", "lang": "pl"}
+{"text": "stwórz nowy venv o nazwie env", "intent": "venv_create", "lang": "pl"}
+{"text": "open report.pdf", "intent": "open_file", "lang": "en"}
+{"text": "open https://example.com", "intent": "open_file", "lang": "en"}
+{"text": "open index.html in the browser", "intent": "open_file", "lang": "en"}
+{"text": "open the file notes.txt", "intent": "open_file", "lang": "en"}
+{"text": "xdg-open diagram.png", "intent": "open_file", "lang": "en"}
+{"text": "open photo.jpg with the default app", "intent": "open_file", "lang": "en"}
+{"text": "open docs/manual.pdf", "intent": "open_file", "lang": "en"}
+{"text": "view slides.pptx", "intent": "open_file", "lang": "en"}
+{"text": "open the pdf invoice.pdf", "intent": "open_file", "lang": "en"}
+{"text": "open https://github.com in my browser", "intent": "open_file", "lang": "en"}
+{"text": "launch the image screenshot.png", "intent": "open_file", "lang": "en"}
+{"text": "open \"my report.docx\"", "intent": "open_file", "lang": "en"}
+{"text": "open README.md with its default application", "intent": "open_file", "lang": "en"}
+{"text": "open the website https://tellsh.dev", "intent": "open_file", "lang": "en"}
+{"text": "open file", "intent": "open_file", "lang": "en"}
+{"text": "open the document contract.pdf", "intent": "open_file", "lang": "en"}
+{"text": "open picture.jpeg", "intent": "open_file", "lang": "en"}
+{"text": "open this link https://news.ycombinator.com", "intent": "open_file", "lang": "en"}
+{"text": "open data.csv in the default program", "intent": "open_file", "lang": "en"}
+{"text": "open the file ./out/chart.svg", "intent": "open_file", "lang": "en"}
+{"text": "open a file", "intent": "open_file", "lang": "en"}
+{"text": "otwórz report.pdf", "intent": "open_file", "lang": "pl"}
+{"text": "otwórz https://example.com", "intent": "open_file", "lang": "pl"}
+{"text": "otwórz index.html w przeglądarce", "intent": "open_file", "lang": "pl"}
+{"text": "otwórz plik notes.txt", "intent": "open_file", "lang": "pl"}
+{"text": "otwórz zdjęcie photo.jpg", "intent": "open_file", "lang": "pl"}
+{"text": "otwórz docs/manual.pdf", "intent": "open_file", "lang": "pl"}
+{"text": "otwórz plik pdf invoice.pdf", "intent": "open_file", "lang": "pl"}
+{"text": "otwórz stronę https://github.com", "intent": "open_file", "lang": "pl"}
+{"text": "otwórz obrazek screenshot.png", "intent": "open_file", "lang": "pl"}
+{"text": "otwórz \"mój raport.docx\"", "intent": "open_file", "lang": "pl"}
+{"text": "otwórz README.md w domyślnej aplikacji", "intent": "open_file", "lang": "pl"}
+{"text": "otwórz link https://tellsh.dev", "intent": "open_file", "lang": "pl"}
+{"text": "otwórz plik", "intent": "open_file", "lang": "pl"}
+{"text": "otwórz dokument umowa.pdf", "intent": "open_file", "lang": "pl"}
+{"text": "otwórz data.csv w domyślnym programie", "intent": "open_file", "lang": "pl"}
+{"text": "otwórz plik ./out/chart.svg", "intent": "open_file", "lang": "pl"}
+{"text": "otwórz zdjęcie picture.jpeg", "intent": "open_file", "lang": "pl"}
+{"text": "otwórz stronę w przeglądarce https://news.ycombinator.com", "intent": "open_file", "lang": "pl"}
+{"text": "otwórz slides.pptx", "intent": "open_file", "lang": "pl"}
+{"text": "otwórz plik raport.pdf", "intent": "open_file", "lang": "pl"}
+{"text": "pip list", "intent": "pip_list", "lang": "en"}
+{"text": "list installed python packages", "intent": "pip_list", "lang": "en"}
+{"text": "which pip packages are installed", "intent": "pip_list", "lang": "en"}
+{"text": "show installed python libraries", "intent": "pip_list", "lang": "en"}
+{"text": "python3 -m pip list", "intent": "pip_list", "lang": "en"}
+{"text": "what python packages do i have", "intent": "pip_list", "lang": "en"}
+{"text": "list pip packages", "intent": "pip_list", "lang": "en"}
+{"text": "show all installed pip packages", "intent": "pip_list", "lang": "en"}
+{"text": "pip3 list", "intent": "pip_list", "lang": "en"}
+{"text": "list python modules installed with pip", "intent": "pip_list", "lang": "en"}
+{"text": "which python libraries are installed", "intent": "pip_list", "lang": "en"}
+{"text": "show installed packages and versions", "intent": "pip_list", "lang": "en"}
+{"text": "list the installed pip packages", "intent": "pip_list", "lang": "en"}
+{"text": "what packages are installed in this python", "intent": "pip_list", "lang": "en"}
+{"text": "show pip packages", "intent": "pip_list", "lang": "en"}
+{"text": "list all python packages", "intent": "pip_list", "lang": "en"}
+{"text": "installed python packages", "intent": "pip_list", "lang": "en"}
+{"text": "which packages has pip installed", "intent": "pip_list", "lang": "en"}
+{"text": "list installed libraries", "intent": "pip_list", "lang": "en"}
+{"text": "show python package versions", "intent": "pip_list", "lang": "en"}
+{"text": "pip list", "intent": "pip_list", "lang": "pl"}
+{"text": "lista zainstalowanych pakietów pythona", "intent": "pip_list", "lang": "pl"}
+{"text": "jakie pakiety pip są zainstalowane", "intent": "pip_list", "lang": "pl"}
+{"text": "pokaż zainstalowane biblioteki pythona", "intent": "pip_list", "lang": "pl"}
+{"text": "wylistuj pakiety pip", "intent": "pip_list", "lang": "pl"}
+{"text": "jakie mam pakiety pythona", "intent": "pip_list", "lang": "pl"}
+{"text": "pokaż pakiety pip", "intent": "pip_list", "lang": "pl"}
+{"text": "lista pakietów pip", "intent": "pip_list", "lang": "pl"}
+{"text": "pokaż wszystkie zainstalowane pakiety", "intent": "pip_list", "lang": "pl"}
+{"text": "jakie biblioteki pythona są zainstalowane", "intent": "pip_list", "lang": "pl"}
+{"text": "wypisz zainstalowane pakiety pythona", "intent": "pip_list", "lang": "pl"}
+{"text": "pokaż wersje pakietów pythona", "intent": "pip_list", "lang": "pl"}
+{"text": "zainstalowane pakiety pythona", "intent": "pip_list", "lang": "pl"}
+{"text": "lista bibliotek pythona", "intent": "pip_list", "lang": "pl"}
+{"text": "jakie moduły pythona mam", "intent": "pip_list", "lang": "pl"}
+{"text": "pokaż listę pakietów pip", "intent": "pip_list", "lang": "pl"}
+{"text": "pip3 list", "intent": "pip_list", "lang": "pl"}
+{"text": "wylistuj zainstalowane biblioteki", "intent": "pip_list", "lang": "pl"}
+{"text": "jakie pakiety są zainstalowane w pythonie", "intent": "pip_list", "lang": "pl"}
+{"text": "pokaż zainstalowane pakiety pip", "intent": "pip_list", "lang": "pl"}
+{"text": "npm outdated", "intent": "npm_outdated", "lang": "en"}
+{"text": "which npm packages are outdated", "intent": "npm_outdated", "lang": "en"}
+{"text": "check for outdated dependencies", "intent": "npm_outdated", "lang": "en"}
+{"text": "show outdated npm packages", "intent": "npm_outdated", "lang": "en"}
+{"text": "are there newer versions of my dependencies", "intent": "npm_outdated", "lang": "en"}
+{"text": "list stale dependencies", "intent": "npm_outdated", "lang": "en"}
+{"text": "which dependencies are out of date", "intent": "npm_outdated", "lang": "en"}
+{"text": "check npm for updates", "intent": "npm_outdated", "lang": "en"}
+{"text": "show packages with newer versions available", "intent": "npm_outdated", "lang": "en"}
+{"text": "what npm deps are outdated", "intent": "npm_outdated", "lang": "en"}
+{"text": "check outdated packages in this project", "intent": "npm_outdated", "lang": "en"}
+{"text": "list outdated deps", "intent": "npm_outdated", "lang": "en"}
+{"text": "any outdated dependencies", "intent": "npm_outdated", "lang": "en"}
+{"text": "show dependency updates available", "intent": "npm_outdated", "lang": "en"}
+{"text": "which packages have updates", "intent": "npm_outdated", "lang": "en"}
+{"text": "check if dependencies are out of date", "intent": "npm_outdated", "lang": "en"}
+{"text": "outdated npm dependencies", "intent": "npm_outdated", "lang": "en"}
+{"text": "show old npm packages", "intent": "npm_outdated", "lang": "en"}
+{"text": "check for newer npm package versions", "intent": "npm_outdated", "lang": "en"}
+{"text": "list npm packages that are out of date", "intent": "npm_outdated", "lang": "en"}
+{"text": "npm outdated", "intent": "npm_outdated", "lang": "pl"}
+{"text": "które pakiety npm są nieaktualne", "intent": "npm_outdated", "lang": "pl"}
+{"text": "sprawdź przestarzałe zależności", "intent": "npm_outdated", "lang": "pl"}
+{"text": "pokaż nieaktualne pakiety npm", "intent": "npm_outdated", "lang": "pl"}
+{"text": "czy są nowsze wersje zależności", "intent": "npm_outdated", "lang": "pl"}
+{"text": "lista przestarzałych zależności", "intent": "npm_outdated", "lang": "pl"}
+{"text": "które zależności są nieaktualne", "intent": "npm_outdated", "lang": "pl"}
+{"text": "sprawdź aktualizacje npm", "intent": "npm_outdated", "lang": "pl"}
+{"text": "pokaż pakiety z dostępnymi aktualizacjami", "intent": "npm_outdated", "lang": "pl"}
+{"text": "jakie zależności npm są przestarzałe", "intent": "npm_outdated", "lang": "pl"}
+{"text": "sprawdź nieaktualne pakiety w projekcie", "intent": "npm_outdated", "lang": "pl"}
+{"text": "pokaż stare pakiety npm", "intent": "npm_outdated", "lang": "pl"}
+{"text": "czy są aktualizacje zależności", "intent": "npm_outdated", "lang": "pl"}
+{"text": "pokaż dostępne aktualizacje zależności", "intent": "npm_outdated", "lang": "pl"}
+{"text": "które pakiety mają nowsze wersje", "intent": "npm_outdated", "lang": "pl"}
+{"text": "sprawdź czy zależności są nieaktualne", "intent": "npm_outdated", "lang": "pl"}
+{"text": "przestarzałe zależności npm", "intent": "npm_outdated", "lang": "pl"}
+{"text": "pokaż przestarzałe pakiety", "intent": "npm_outdated", "lang": "pl"}
+{"text": "sprawdź nowsze wersje pakietów npm", "intent": "npm_outdated", "lang": "pl"}
+{"text": "nieaktualne pakiety npm", "intent": "npm_outdated", "lang": "pl"}
+{"text": "show the diff", "intent": "git_diff", "lang": "en"}
+{"text": "show unstaged changes in README.md", "intent": "git_diff", "lang": "en"}
+{"text": "pokaż zmiany w pliku app.js", "intent": "git_diff", "lang": "pl"}
+{"text": "show the staged diff", "intent": "git_diff_staged", "lang": "en"}
+{"text": "pokaż zmiany w poczekalni", "intent": "git_diff_staged", "lang": "pl"}
+{"text": "show the last commit with its diff", "intent": "git_show", "lang": "en"}
+{"text": "pokaż ostatni commit", "intent": "git_show", "lang": "pl"}
+{"text": "show recent commits", "intent": "git_log", "lang": "en"}
+{"text": "pokaż historię commitów", "intent": "git_log", "lang": "pl"}
+{"text": "git status", "intent": "git_status", "lang": "en"}
+{"text": "które pliki są niezatwierdzone", "intent": "git_status", "lang": "pl"}
+{"text": "list the files tracked by git", "intent": "git_ls_files", "lang": "en"}
+{"text": "list branches", "intent": "git_branches", "lang": "en"}
+{"text": "pokaż gałęzie", "intent": "git_branches", "lang": "pl"}
+{"text": "create a new branch feature-x", "intent": "git_new_branch", "lang": "en"}
+{"text": "utwórz nową gałąź feature-x", "intent": "git_new_branch", "lang": "pl"}
+{"text": "switch to branch develop", "intent": "git_switch_branch", "lang": "en"}
+{"text": "show data.json", "intent": "cat_file", "lang": "en"}
+{"text": "pokaż plik config.json", "intent": "cat_file", "lang": "pl"}
+{"text": "print the contents of notes.txt", "intent": "cat_file", "lang": "en"}
+{"text": "activate the virtualenv", "intent": "activate_venv", "lang": "en"}
+{"text": "aktywuj venv", "intent": "activate_venv", "lang": "pl"}
+{"text": "source .venv/bin/activate", "intent": "activate_venv", "lang": "en"}
+{"text": "install requests with pip", "intent": "pip_install", "lang": "en"}
+{"text": "zainstaluj pakiet requests", "intent": "pip_install", "lang": "pl"}
+{"text": "install the npm dependencies", "intent": "npm_install", "lang": "en"}
+{"text": "zainstaluj zależności npm", "intent": "npm_install", "lang": "pl"}
+{"text": "npm run dev", "intent": "npm_run_script", "lang": "en"}
+{"text": "which process is listening on port 8000", "intent": "process_on_port", "lang": "en"}
+{"text": "co nasłuchuje na porcie 8080", "intent": "process_on_port", "lang": "pl"}
+{"text": "check the http status of https://example.com", "intent": "http_status", "lang": "en"}
+{"text": "download https://example.com/file.zip", "intent": "download_file", "lang": "en"}
+{"text": "make a directory venv", "intent": "mkdir", "lang": "en"}
+{"text": "utwórz katalog env", "intent": "mkdir", "lang": "pl"}
+{"text": "python3 --version", "intent": "tool_version", "lang": "en"}
+{"text": "npm --help", "intent": "cli_help", "lang": "en"}

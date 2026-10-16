@@ -12,6 +12,7 @@ import { cascade } from './cascade.js';
 import { tag, exFromSpans } from './tagger.js';
 import { extractSlots, pickArg, isOptionWord, foldKeepLength, isStopWord } from './slots.js';
 import { resolveSlots, buildCommand, finalizeSlots, RAW_OK, newTemplateWithhold } from './fill.js';
+import { CATALOG_038, fallthroughGuard } from './templates038.js';
 import { BY_ID } from './catalog.js';
 import { FAMILY_OF, NONE } from './tools.js';
 import { detectEnv, envFeatures } from './env.js';
@@ -414,10 +415,10 @@ const LIT_FAMILY = { cargo: /^cargo_/, python: /^python_|^pip_|^run_python/, pyt
   ps: /^process_|^list_process/, top: /^process_|^top/, ping: /^ping_/, grep: /^grep_|^search_/, head: /^head_|^show_file/, tail: /^tail_|^follow_/, wc: /^count_/, sort: /^sort_/, systemctl: /^service_/, service: /^service_/, history: /^history/, crontab: /^cron/ };
 function literalIntentOk(first, intent) { const f = LIT_FAMILY[String(first).toLowerCase()]; return f ? f.test(String(intent)) : false; }
 
-// 0.3.4 two-model gate: the 0.3.3 model (model/model.bin) answers everything it already knew; the retrained model
-// (model/model_templates.bin) is used only when it picks one of the new 0.3.4 template intents, so a retrain can never
-// change the pre-existing intents (their classification and slots stay exactly as on 0.3.3).
-export const NEW_TEMPLATE_INTENTS = new Set(['git_fetch', 'git_ls_files', 'gh_run_watch', 'gh_issue_list', 'gh_issue_view', 'wrangler_d1_list', 'wrangler_pages_deploy', 'git_grep', 'git_show']);
+// two-model gate: the 0.3.3 model (model/model.bin) answers everything it already knew; model/model_templates.bin only when it
+// picks a template intent (0.3.4, 0.3.8), so a retrain never changes the pre-existing intents (classification and slots).
+// catalog-038: the 0.3.8 templates are gated the same way (DISABLED_038 ones always withheld, src/templates038.js)
+export const NEW_TEMPLATE_INTENTS = new Set(['git_fetch', 'git_ls_files', 'gh_run_watch', 'gh_issue_list', 'gh_issue_view', 'wrangler_d1_list', 'wrangler_pages_deploy', 'git_grep', 'git_show', ...CATALOG_038]);
 const TEMPLATES_MODEL = fileURLToPath(new URL('../model/model_templates.bin', import.meta.url));
 let templatesModel;
 function getTemplatesModel() {
@@ -443,14 +444,16 @@ export function suggest(query, opts = {}) {
   const tm = getTemplatesModel();
   if (!tm) return once(opts);
   // the templates model is probed without the rerank hook; with the hook, the reranked answer of either model may be consulted, and only a 0.3.4 template intent is kept from the templates model
-  const probe = once({ ...opts, model: tm, rerank: undefined, gated: true });
-  // a history refusal of the templates model (the previous line is a 0.3.4 template) is kept, never re-asked of 0.3.3
-  if (probe && opts.history?.length && probe.context?.rule === 'refused' && !probe.command && probe.context.newTemplateLast) return probe;
-  if (!probe || !NEW_TEMPLATE_INTENTS.has(probe.intent)) return once({ ...opts, gated: true });
-  if (!opts.rerank) return probe;
+  // the probe ranks at least 5 candidates whatever `top` is (the fall-through guard reads them); cut only for display
+  const n = Math.max(1, opts.top ?? 3), cut = (r) => (r?.candidates?.length > n ? { ...r, candidates: r.candidates.slice(0, n) } : r);
+  const probe = once({ ...opts, top: Math.max(n, 5), model: tm, rerank: undefined, gated: true });
+  if (probe && opts.history?.length && probe.context?.rule === 'refused' && !probe.command && probe.context.newTemplateLast) return cut(probe);
+  const fall = () => fallthroughGuard(probe, once({ ...opts, gated: true }), (i) => NEW_TEMPLATE_INTENTS.has(i));
+  if (!probe || !NEW_TEMPLATE_INTENTS.has(probe.intent)) return fall();
+  if (!opts.rerank) return cut(probe);
   // with the hook: the reranked templates answer is kept only if it is still a 0.3.4 template intent, otherwise 0.3.3 answers
   const alt = once({ ...opts, model: tm, gated: true });
-  return alt && NEW_TEMPLATE_INTENTS.has(alt.intent) ? alt : once({ ...opts, gated: true });
+  return alt && NEW_TEMPLATE_INTENTS.has(alt.intent) ? alt : fall();
 }
 
 // the trust rule (danger.js): a command resolved from history (a reference, "same but …", a value from an earlier
@@ -981,8 +984,8 @@ function suggestOnce(query, opts = {}) {
     }
     // a value with a line break is never composed into a command (the catalog rejects it as a path); an extract intent is
     // never replaced by a command that creates or rewrites an archive ("extract archive.tar.gz" is not `tar -c -f archive.tar.gz`)
-    // a 0.3.4-template suggestion that was withheld is never replaced by a composed command that drops what was withheld
-    if (comp && NEW_TEMPLATE_INTENTS.has(intent) && (res.missing || []).length) comp = null;
+    // a template-intent suggestion (0.3.4, 0.3.8) is never replaced by a composed command
+    if (comp && NEW_TEMPLATE_INTENTS.has(intent)) comp = null;
     if (comp && !comp.invalid && comp.command !== b.command && !/[\r\n]/.test(comp.command) && !(/^extract_/.test(intent) && createsArchive(comp.command))) {
       if (extra.length >= 1 || composeMode === 'force') {
         return { ...res, method: 'composed', experimental: true, reason: `request asks for ${extra.join(' ')} not in the catalog command`,

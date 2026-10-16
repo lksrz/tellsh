@@ -20,8 +20,8 @@
 // after the head, so operands leak into it (`npm install express` / `npm install react` are two groups; 552 of its 2957
 // labelled eval rows share a structural skeleton with a train row, scripts/real/group_leak.js, HYBRID.md#v04-real-usage).
 // The templates-catalog patterns (0.3.4 intents) postdate the 0.3.5/0.3.6 build/real: a rebuild labels those commands
-// instead of leaving them out-of-catalog (other groups can change sides too); `--labels 036` leaves them out and
-// reproduces the 0.3.5/0.3.6 build/real.
+// instead of leaving them out-of-catalog (other groups can change sides too); the catalog-038 patterns (0.3.8) likewise.
+// `--labels 036` leaves both out and reproduces the 0.3.5/0.3.6 build/real.
 //
 // Usage: node scripts/real/prepare_real.js [--data <dataset.jsonl>] [--eval-frac 0.25] [--group v04|structural] [--labels current|036]
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs';
@@ -64,8 +64,20 @@ const NEW = [
   ['npm_run_script', /^npm(?: --prefix \S+)? (?:run(?:-script)? [\w:.-]+|test|start|t)(?:\s|$)/],
   ['pip_install', /^(?:pip3?|python3?(?:\.\d+)? -m pip) install\b(?!.*\s-(?:r|e)\b)/],
   ['activate_venv', /^(?:source|\.) \S*\/bin\/activate(?:\.fish)?\s*$|\\Scripts\\activate(?:\.bat|\.ps1)?\s*$/i],
-  // templates-catalog (0.3.4): left out with --labels 036, which reproduces the 0.3.5/0.3.6 build/real exactly
+  // catalog-038 (0.3.8; before templates-catalog: `git show --stat` is git_show_files, not git_show) and templates-catalog
+  // (0.3.4): both left out with --labels 036, which reproduces the 0.3.5/0.3.6 build/real exactly
   ...(LABELS === '036' ? [] : [
+    ['git_diff_stat', /^git diff(?: --(?:cached|staged))? --stat(?: [\w~^.\/@-]+)?$/],
+    ['git_diff_names', /^git diff(?: --(?:cached|staged))? --name-only(?: [\w~^.\/@-]+)?$/],
+    ['git_show_files', /^git show --stat(?: [\w~^.\/@-]+)?$/],
+    ['git_worktree_list', /^git worktree list$/],
+    ['git_worktree_add', /^git worktree add (?!-)\S+ (?!-)\S+$/],
+    ['json_pretty', /^(?:jq (?:\.|'\.'|"\.")|python3? -m json\.tool) (?!-)\S+$|^cat (?!-)\S+ \| jq(?: \.| '\.')?$/],
+    ['http_server', /^python3? -m http\.server(?: \d{1,5})?(?: --bind (?:127\.0\.0\.1|localhost))?$/],
+    ['venv_create', /^python3?(?:\.\d+)? -m venv (?!-)\S+$/],
+    ['open_file', /^(?:open|xdg-open) (?!-)\S+$/],
+    ['pip_list', /^(?:pip3?|python3?(?:\.\d+)? -m pip) list$/],
+    ['npm_outdated', /^npm outdated$/],
     ['wrangler_d1_list', /^wrangler d1 list\b/],
     ['wrangler_pages_deploy', /^wrangler pages deploy\b/],
     ['gh_run_watch', /^gh run watch\b/],

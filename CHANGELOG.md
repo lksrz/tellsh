@@ -1,5 +1,30 @@
 # Changelog
 
+## 0.3.10 — catalog-038: git diff --stat, git worktree list, fall-through guard
+
+**New catalog templates (catalog-038):** `git diff --stat`, `git worktree list`. Training rows in `data/intents/g10_catalog038.jsonl` (EN + PL, with near-miss negatives); labelling
+patterns for the real-usage split in `scripts/real/prepare_real.js`. The diff template is value-free (always the
+plain working-tree diff): a request naming a revision or scope (a ref / hash, commit, last, branch, staged / index,
+since / from / vs / against / od / do, per / each, HEAD / main / origin, committed / zatwierdzonych, ...) is withheld, never
+answered with the plain diff; a literal `git diff …` is answered only when it is exactly the rendered command. Values come only from the request text, and a request the template cannot fully express is withheld
+(`src/templates038.js`). They go through the same two-model gate as the 0.3.4 templates (`NEW_TEMPLATE_INTENTS`); a
+template answer is never replaced by a composed command.
+**Not in this release:** opening a file / URL (`open`), a local HTTP server (`http.server`), pretty-printing JSON
+(`jq`), `git worktree add`, creating a virtualenv, `git show --stat`, `git diff --name-only` (a plain file listing was read as a diff), `pip list` and `npm outdated` are recognised by the templates model but always
+withheld (shown, never run: `DISABLED_038` in `src/templates038.js`), like the 0.3.4 `git grep` / `git show`, so their
+requests never fall through to a different 0.3.3 answer.
+**Gate fall-through guard:** when the templates model ranks a template intent among its candidates at p >= 0.2 but
+not first (among its top 5, whatever `--top` is), the request falls through to the 0.3.3 model; that answer is withheld if its risk is medium or higher
+(`missing: args (a <template> template request, not answered by the fallback model)`, `fallthroughGuard` in
+`src/templates038.js`), so a retrain's probability shift cannot turn a fetch-like request into a runnable `git pull` /
+`git checkout -b`. Safe fall-through answers are unchanged.
+`model/model_templates.bin` is retrained (catalog + the structural real-usage train split); `model/model.bin` (0.3.3) is
+unchanged. On the private real-usage eval split (36,858 labelled rows, rebuilt with the 0.3.4 + 0.3.8 labels) the gate
+scores 93.66% (93.59% with the 0.3.4 templates model); human-written requests 89.23% (88.60%); template intents 87.2%
+(50.0%, n=78); every other intent 93.68% (93.68%).
+
+**cmd:** a URL in a path slot keeps its slashes (`start "" "https://…"`).
+
 ## 0.3.9 — repeat phrasings guarded
 
 **Safety:** the 0.3.8 same-but risk guard also covers repeat phrasings at the start of a request followed by

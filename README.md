@@ -133,7 +133,7 @@ The intent and slots are shared; only the rendering differs (`src/render.js`, va
 
 | shell | status | notes |
 |---|---|---|
-| bash, zsh | **v1** | all 173 intents; every render passes `bash -n` in tests (zsh has no checker here) |
+| bash, zsh | **v1** | all 193 intents; every render passes `bash -n` in tests (zsh has no checker here) |
 | sh (dash / busybox) | **v1** | POSIX-only templates; tests run `sh -n` (dash) and `busybox sh -n`; busybox variants for 24 intents (no `ps --sort`, `find -printf`, …) |
 | PowerShell (7, mostly 5.1) | **v1** | real cmdlets (`Get-ChildItem`, `Get-Process`, `Stop-Process`, `Get-NetTCPConnection`, …) for 170/173 on Windows; on Linux/macOS native tools or `bash -c '…'`; gaps: chmod, chmod +x, cal on Windows |
 | fish | best effort | POSIX template with fish quoting + fish overrides (`string join \n $PATH`, history, …); not syntax-checked (fish not installed in CI) |
@@ -145,6 +145,17 @@ The intent and slots are shared; only the rendering differs (`src/render.js`, va
   `$SHELL`, `TELLSH_SHELL`; `--shell` / `--os` override. `--shell cmd` implies Windows.
 
 ### Developer tools (v0.4)
+
+**New templates (0.3.10)**: `git diff --stat` and `git worktree list`. The diff template is value-free: a request that names a
+revision or scope (a commit / hash, branch, staged changes, since / from / vs / per ...) is withheld, not answered with
+the plain diff.
+They are answered by the retrained templates model (`model/model_templates.bin`, trained with
+`data/intents/g10_catalog038.jsonl`) through the same two-model gate as the 0.3.4 templates. Opening a file / URL
+(`open`), a local HTTP server (`http.server`), pretty-printing JSON (`jq`), `git worktree add`, creating a virtualenv, `git show --stat`, `git diff --name-only`, `pip list` and `npm outdated` are **not in this
+release**: they are recognised but always withheld (shown, never run), like `git grep` / `git show`.
+When the templates model ranks a template intent among its top 5 candidates (p >= 0.2, independent of `--top`) but not first, the 0.3.3 model
+answers; such a fall-through answer is shown but never runnable when its risk is medium or higher (e.g. `git pull` for
+a fetch-like request).
 
 **New templates (0.3.4)** (ranked by frequency in real command usage): `git fetch --all`, `git ls-files`,
 `gh run watch [id]`, `gh issue list`, `gh issue view <n>`, `npx wrangler d1 list`,
@@ -418,7 +429,7 @@ the public sets for a large gain on real usage (before/after tables for A, A+B a
 | stage 1 tool family top-1 / top-3 (`data/eval`, 2384 EN+PL) | **96.9% / 99.8%** |
 | stage 2 intent top-1 (EN / PL) | **95.4%** (95.2% / 95.6%); v0.3: 95.6% |
 | per shell, intent top-1 (bash · zsh · sh · PowerShell · fish · cmd) | 95.4 · 95.6 · 95.6 · 95.4 · 95.1 · 95.1% |
-| renders passing `bash -n` / `sh -n` | all 173 intents × 5 POSIX envs in `npm test` |
+| renders passing `bash -n` / `sh -n` | all 193 intents × 5 POSIX envs in `npm test` |
 | slot F1, hand-annotated gold (tagger + regex fallback / tagger / regex) | **96.3%** / 94.6% / 95.4% |
 | end-to-end exact command, relexicalised held-out values (full pipeline / gold intent) | **83.4%** / 92.6% (v0.3: 85.3%) |
 | blind sets (v0.3, separate author): intent top-1 · end-to-end exact command | 98.8% (clean subset 98.5%) · 95.7% |
@@ -440,6 +451,18 @@ the public sets for a large gain on real usage (before/after tables for A, A+B a
 from `$TELLSH_REAL_DATA` by `scripts/real/prepare_real.js` into `build/real/` (gitignored); only model weights and
 aggregate numbers are committed. Without the file every script trains and evaluates on public data only
 (`gen_data.js --no-real` forces this).
+
+**Safety diff between two checkouts.** `scripts/real/gate_diff.js` lists every request whose answer becomes runnable
+with a higher risk. `dump` runs every public eval set (`data/eval`, `data/eval_v04`, `data/blind`, `data/ood*.jsonl`,
+`data/history`; with `--real` also the private eval split, kept out of the console) through `suggest()` of the checkout
+given by `--root`; `compare` reports per-set changes, ESCALATIONS (new runnable and riskier, incl. withheld → runnable)
+and same-risk intent swaps, and exits 1 on any escalation. Runnable = a command, nothing missing, `understood !== false`.
+
+```bash
+node scripts/real/gate_diff.js dump --root ../tellsh-old --out old.jsonl
+node scripts/real/gate_diff.js dump --out new.jsonl
+node scripts/real/gate_diff.js compare old.jsonl new.jsonl   # --show-text prints private rows too
+```
 
 Own EN/PL data (MIT) + **tldr-pages** (CC-BY-4.0, attribution in [DATA_LICENSES.md](DATA_LICENSES.md); derived
 descriptions only, in git, never in the npm tarball). **NL2Bash is GPL-3.0 and is not used** (not even for eval).
@@ -476,13 +499,18 @@ retrain; `npm test && npm run eval`.
   Known Windows limits from it: `create_symlink` in Windows PowerShell 5.1 and `temperature` / `last_logins` need an
   elevated prompt; `disk_free` has no non-admin cmd.exe command (use PowerShell); cmd's `history_search` only sees the
   current session.
-* **`git grep` / `git show` are not suggested as runnable in 0.3.4.** Their free-text forms are withheld (shown with a
-  placeholder, never run on Enter or `--yes`) until a later release.
+* **`git grep` / `git show` are not suggested as runnable.** Their free-text forms are recognised and withheld (shown,
+  never run).
 * **New 0.3.4 templates take only explicit values.** `git fetch` is always `git fetch --all` (a named remote or
   `--prune` is not rendered, and a request that also asks for another action is withheld); `gh issue view` needs an
   explicit number (`issue 42`, `#42`); `gh run watch` takes one (`run 123`) or none (gh then asks which run), and some
   phrasings (`watch the latest workflow run`) are withheld with `<NUM>`; `wrangler pages deploy` needs the directory named (no `dist`
   default).
+* **The 0.3.10 templates take no values.** `git diff --stat` and `git worktree list` render no revision or path: a
+  request naming one (a ref / hash, a commit, a branch, staged changes, since / from / vs, ...) is withheld, and so is a
+  request with a word, option, exclusion or second action the template cannot express (`only for src`, `and update
+  them`, `-w`) (shown, never run on Enter or `--yes`). History after one of them is handled like after a 0.3.4 template
+  (below): "same for X" is withheld (not run).
 * **History after a 0.3.4 template is replayed only as "same for X".** When the previous command is one of the new
   templates (`git fetch`, `git ls-files`, `gh issue list` / `view`, `gh run watch`, `wrangler d1 list`, `wrangler pages
   deploy`, and also `git grep` / `git show`), a follow-up that refers to it (`it`, `there`, `same but …`, `again`, `them`, …) is refused, and that line adds

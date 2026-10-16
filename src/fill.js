@@ -4,6 +4,7 @@ import { extractSlots, pickArg, pickDest, pickDir, foldKeepLength, isStopWord } 
 import { checkDanger, maxRisk, plainSlotValue } from './danger.js';
 import { protectedNumbers } from './guards.js';
 import { shQuote, psQuote, chooseTemplate, quoteForKind, UnquotableError, pwshNativeSlots, unsafeNativePwshArg } from './render.js';
+import { IS_038, REF_TOKEN, slots038, withhold038 } from './templates038.js';
 
 export { shQuote };
 
@@ -712,8 +713,7 @@ export function resolveSlots(intent, ex) {
     const m = t.match(/\bnpm\s+run(?:-script)?\s+([A-Za-z0-9][\w:.-]*)(?=\s|$)/) || t.match(/^\s*run\s+npm\s+(?!(?:run|install|i|ci|scripts?|the|a|my|publish|unpublish|audit|update|upgrade|uninstall|remove|rm|outdated|login|logout|link|pack|version|init|exec|config|cache|deprecate|dist-tag|owner|access|token|adduser)\b)([A-Za-z0-9][\w:.-]*)(?=\s|$)/i);
     if (m) v.script = m[1];
   }
-  // the new git / gh / wrangler templates: a value the request does not name explicitly is never guessed
-  newTemplateSlots(intent.id, String(ex.text), v, ex.quoted || []);
+  (IS_038.has(intent.id) ? slots038 : newTemplateSlots)(intent.id, String(ex.text), v, ex.quoted || []); // template values: never guessed
   if (intent.id === 'base64_encode' || intent.id === 'base64_decode') {
     const t = pickArg('text', ex);
     const fileWord = /\b(plik\w*|files?)\s+\S+\.\w+/i.test(ex.text);
@@ -1109,7 +1109,6 @@ const markMissing = (v, k) => {
   if (!v._placeRejected.includes(k)) v._placeRejected.push(k);
 };
 const NPM_BUILTIN = /^(?:publish|unpublish|audit|update|upgrade|uninstall|remove|rm|outdated|login|logout|link|pack|version|init|exec|config|cache|deprecate|dist-tag|owner|access|token|adduser|trust|undeprecate|rebuild|prune|dedupe|fund|doctor|ls|list|explain|query|search|view|info|star|stars|unstar|ping|prefix|root|bin|bugs|docs|edit|help|hook|org|profile|repo|shrinkwrap|team|whoami|set|get|pkg|sbom|diff|ci|install-test|it|completion|find-dupes|exec|x)$/i;
-const REF_TOKEN = /(?:^|\s)((?:HEAD|@)(?:[~^]\d*)*|(?=[0-9a-f]*\d)[0-9a-f]{7,40}|v\d+(?:\.\d+)*)(?=[\s,.;:!?]|$)/;
 /** Explicit values only for the 0.3.4 templates (git show/fetch/grep, gh issue/run, wrangler pages deploy). */
 export function newTemplateSlots(id, text, v, quoted) {
   let t = text.trim();
@@ -1198,6 +1197,7 @@ const UNIT_AFTER = /^\s*-?(?:comments?|labels?|assignees?|reactions?|commits?|fi
 // release (branch feat/templates-grep-show); set TELLSH_ENABLE_GREP_SHOW=1 only in development to exercise it.
 export const DISABLED_TEMPLATES = new Set(process.env.TELLSH_ENABLE_GREP_SHOW === '1' ? [] : ['git_grep', 'git_show']);
 export function newTemplateWithhold(id, text, slots = {}, command = null) {
+  if (IS_038.has(id)) return withhold038(id, text, slots);
   const t = String(text);
   if (DISABLED_TEMPLATES.has(id)) return [`${id === 'git_grep' ? 'pattern' : 'rev'} (template disabled in this release)`];
   const out = [];

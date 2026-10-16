@@ -211,7 +211,7 @@ test('A+S: a templates-model answer the student replaces is deferred (the rerank
 });
 
 test('A+S: a templates-gate rerun landing on an intent neither A nor the student chose keeps A', async () => {
-  const q = 'Could you inspect the last commit';
+  const q = 'please inspect the last commit'; // templates model 0.3.8: git_show in the [thr, 0.6) band on PowerShell
   const e = { shell: 'powershell', os: 'win32' };
   let seen; let thr;
   suggest(q, { env: e, rerankTop: 0, rerank: (c, o) => { seen ??= c; thr = o.thr; return c; } });

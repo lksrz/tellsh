@@ -11,11 +11,15 @@ allowlist / risk, binaries present by default, and (when safe to run) executed w
 
 ## Summary (v0.3.1 → feat/templates-catalog; 9 new intents, 182 intents per cell)
 
+0.3.8 (catalog-038, 11 new intents, 193 intents per cell): darwin re-run below (352 pass, 0 fail, 227 static). linux,
+busybox and win32 are not re-run yet (their rows are the 0.3.4 run); `gen` for them renders the new intents with no static
+issue and every risk equal to the catalog risk.
+
 | platform | pass | fail | static | gap |
 |---|---|---|---|---|
 | linux (container, bash/sh/zsh) | 318 → 330 | 0 → 0 | 201 → 216 | 0 → 0 |
 | busybox (container) | 106 → 110 | 0 → 0 | 67 → 72 | 0 → 0 |
-| darwin (zsh/bash BSD, zsh GNU) | 316 → 328 | 0 → 0 | 203 → 218 | 0 → 0 |
+| darwin (zsh/bash BSD, zsh GNU) | 316 → 328 → 352 (0.3.8) | 0 → 0 → 0 | 203 → 218 → 227 | 0 → 0 → 0 |
 | win32 (PowerShell 5.1, cmd) | 174 → 182 | 0 → 0 | 135 → 145 | 37 → 37 |
 
 ## linux (container)
@@ -92,14 +96,14 @@ No failures.
 
 ## darwin
 
-Host `studio.lan`, run 2026-10-11T20:52:54.355Z.
+Host `studio.lan`, run 2026-10-15T13:28:01.748Z.
 
 | cell | pass | fail | static | gap |
 |---|---|---|---|---|
-| zsh/darwin/bsd | 109 | 0 | 73 | 0 |
-| bash/darwin/bsd | 109 | 0 | 73 | 0 |
-| zsh/darwin/gnu | 110 | 0 | 72 | 0 |
-| **total** | 328 | 0 | 218 | 0 |
+| zsh/darwin/bsd | 117 | 0 | 76 | 0 |
+| bash/darwin/bsd | 117 | 0 | 76 | 0 |
+| zsh/darwin/gnu | 118 | 0 | 75 | 0 |
+| **total** | 352 | 0 | 227 | 0 |
 
 No failures.
 
@@ -115,12 +119,14 @@ No failures.
 - service (sudo): service_restart, service_stop, service_start, service_enable
 - sudo: dmesg
 - package install (sudo): install_package, system_update
-- needs network: public_ip, ping_host, dns_lookup, traceroute, port_check, curl_headers, http_status, download_file, ssh_connect, ssh_port_forward, git_pull, git_push, git_clone, wrangler_deploy, wrangler_dev, wrangler_tail, wrangler_secret_put, wrangler_login, wrangler_whoami, wrangler_d1_list, wrangler_pages_deploy, gh_auth_status, gh_auth_login, gh_pr_list, gh_pr_view, gh_pr_create, gh_pr_checks, gh_pr_merge, gh_run_list, gh_run_view, gh_run_watch, gh_issue_list, gh_issue_view
+- needs network: public_ip, ping_host, dns_lookup, traceroute, port_check, curl_headers, http_status, download_file, ssh_connect, ssh_port_forward, git_pull, git_push, git_clone, npm_outdated, wrangler_deploy, wrangler_dev, wrangler_tail, wrangler_secret_put, wrangler_login, wrangler_whoami, wrangler_d1_list, wrangler_pages_deploy, gh_auth_status, gh_auth_login, gh_pr_list, gh_pr_view, gh_pr_create, gh_pr_checks, gh_pr_merge, gh_run_list, gh_run_view, gh_run_watch, gh_issue_list, gh_issue_view
 - needs docker (not installed on this test machine): docker_ps, docker_ps_all, docker_logs, docker_images, docker_stop, docker_stop_all, docker_prune, docker_exec, docker_stats, docker_compose_up, docker_compose_down
 - docker: docker_ps, docker_ps_all, docker_logs, docker_images, docker_stop, docker_stop_all, docker_prune, docker_exec, docker_stats, docker_compose_up, docker_compose_down
-- needs npm (not installed on this test machine): npm_run_script, npm_install, npm_install_global
+- needs npm (not installed on this test machine): npm_run_script, npm_install, npm_install_global, npm_outdated
 - runs project code: npm_run_script
 - package install: npm_install, npm_install_global, pip_install
+- runs forever (server): http_server
+- opens a GUI app: open_file
 - needs npx (not installed on this test machine): wrangler_deploy, wrangler_dev, wrangler_tail, wrangler_secret_put, wrangler_login, wrangler_whoami, wrangler_d1_list, wrangler_pages_deploy
 - needs gh (not installed on this test machine): gh_auth_status, gh_auth_login, gh_pr_list, gh_pr_view, gh_pr_create, gh_pr_checks, gh_pr_merge, gh_run_list, gh_run_view, gh_run_watch, gh_issue_list, gh_issue_view
 
