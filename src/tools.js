@@ -78,6 +78,8 @@ export const FAMILIES = {
 
 /** Label used by stage 1 for requests that are not shell tasks at all (chit-chat). */
 export const NONE = '__none__';
+/** Stage-1 label for real shell tasks the catalog does not cover (trained on out-of-catalog real-usage rows). */
+export const OOC = '__ooc__';
 
 export const FAMILY_OF = {};
 for (const [fam, ids] of Object.entries(FAMILIES)) for (const id of ids) FAMILY_OF[id] = fam;

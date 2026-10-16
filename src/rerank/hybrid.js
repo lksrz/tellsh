@@ -120,6 +120,8 @@ export async function suggestHybrid(query, opts = {}) {
   const changed = res.understood !== first.understood || res.intent !== first.intent || res.command !== first.command;
   let bi = null; let bp = -1;
   for (const [i, p] of Object.entries(pX)) if (FAMILY_OF[i] && p > bp) { bp = p; bi = i; }
+  // an out-of-catalog veto of the re-ranked answer (src/ooc.js) withholds; it never falls back to A's (other) command
+  if (P.fallback && res.vetoed) return { ...res, hybrid: { system, deferred: false, consulted: true, ms, pNone } };
   if (P.fallback) return changed && res.understood && res.intent === bi ? { ...res, hybrid: { system, deferred: true, consulted: true, ms, pNone } } : { ...first, hybrid: { system, deferred: false, consulted: true, ms, pNone } };
   return { ...res, hybrid: { system, deferred: true, ms, pNone } };
 }

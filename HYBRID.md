@@ -713,3 +713,54 @@ never consults it (`show git status`) takes 160 ms. The student's share of a CLI
 and 538 ms for the whole consulted call; with the WebAssembly SIMD kernels: load 61–97 ms, first query 46–63 ms, p50
 12–16 / p95 22–24 ms, and 415–426 ms (median of 7) for the whole consulted call, 237–243 ms for the same query with
 `TELLSH_HYBRID=0` and 211 ms for one that never consults the student. The student runs only below A's confidence 0.6.
+
+## Out-of-catalog rejection (0.3.11)
+
+Goal: stop the 0.3.3 model answering out-of-catalog real requests (`real_ooc`) with the nearest catalog intent, at
+≤ 0.5 pt cost on every in-catalog set. Follows the 0.3.7 experiment (feat/ooc-reject, not shipped), whose `__ooc__`
+class mostly separated real-usage phrasing from curated phrasing; the fix was training with all train-split real
+in-catalog rows as negatives, so the class decision is made on the same distribution.
+
+**Design.** A separate model, `model/model_ooc.bin` (+3.2 MB), is the templates-model recipe with an extra stage-1 class
+`__ooc__`, probed only for p(`__ooc__`) (`src/ooc.js`). The veto withholds a fresh catalog / composed answer of the
+0.3.3 model when p(`__ooc__`) ≥ 0.99 and the answer's confidence < 0.8 (hint "this looks like a shell task tellsh does
+not know yet", exit 3). History answers (`history-rule`, a slot from history, any context rule) and templates-model
+answers are never vetoed; the veto only withholds, never makes anything runnable. The cheap checks run first, so the
+model is loaded and run only for a vetoable answer (+~1 ms mean, +~6 ms p95). `TELLSH_OOC_VETO=off` (or `0` / `false` / `no`) disables it,
+`TELLSH_OOC_T` / `TELLSH_OOC_C` override the thresholds; a missing model file means no veto.
+In the A+S / A+S-full student fallback a vetoed re-ranked answer stays withheld (never replaced by A's first answer).
+Earlier `tellsh` lines in the history are classified without the veto, so the context of a later request is exactly
+the 0.3.10 one. The evaluation (`scripts/real/eval_ooc.js`) runs with the composer off, so the numbers below describe
+catalog answers; with the default composer, composed answers are vetoable too (withheld only, never runnable).
+
+**Training.** Out-of-catalog rows of the real-usage train split (skeleton-disjoint from the eval split), weight 0.5,
+≤ 2 rows per command group; in-catalog real rows uncapped (`gen_data.js` / `train.py` `--ooc-weight` / `--ooc-cap` /
+`--ooc-label`):
+
+```sh
+scripts/real/ooc_experiment.sh NAME 100000 0.5 2   # -> build/exp/NAME.bin (+ sweep, aggregates only)
+cp build/exp/NAME.bin model/model_ooc.bin
+```
+
+**Evaluation.** `scripts/real/eval_ooc.js --sweep --half=tune` picks thresholds on the TUNE half of the eval split
+(group hash even); `--half=test` reports on the other half. Safety: `scripts/real/gate_diff.js` against 0.3.10 on the
+public sets and the real eval split; `scripts/real/eval_gate.js` for the gate top-1.
+
+| set (TEST half) | 0.3.10 | 0.3.11 |
+|---|---|---|
+| `real_ooc` rejected | 34.32 | **47.11** (+12.8) |
+| `real_tmpl` | 77.75 | 77.37 (−0.38) |
+| `real_human` | 88.00 | 88.00 |
+| eval, devtools, shell, blind, blind3, ood, blind_ood, blind3_ood | — | unchanged |
+
+Full eval split: `real_ooc` 34.79 → 46.63 (+11.8), `real_human` −0.20, `real_tmpl` −0.46. `gate_diff`: 0 escalations,
+0 same-risk swaps, public sets byte-identical, real eval 4,488 answers newly withheld, 0 newly runnable. `eval_gate.js`
+top-1 93.67 → 93.24 (a vetoed in-catalog answer counts as a miss).
+
+Threshold choice: on TUNE, 0.9/0.6 (+11.33, max cost 0.50) and 0.99/0.8 (+11.27, max cost 0.46) were tied. 0.99/0.8 was
+chosen for its margin, but honestly the tie-break was made after seeing TEST, where 0.9/0.6 would cost 0.61 on
+`real_tmpl`.
+
+**Failed alternative.** Retraining the shipped `model/model_templates.bin` itself with the `__ooc__` class (no extra file,
+no extra latency) changed template gating: 154 escalations in `gate_diff`, template requests falling through to other
+intents. The templates model therefore stays as in 0.3.10 and the ooc signal lives in its own model.

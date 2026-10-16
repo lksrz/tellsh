@@ -4,11 +4,11 @@
 // The best score over all candidate tools wins, so a stage-1 mistake ranked 2nd/3rd can still be recovered.
 import { getModel, predictProba } from './model.js';
 import { vectorize } from './features.js';
-import { NONE } from './tools.js';
+import { NONE, OOC } from './tools.js';
 
 /**
  * -> { intent, tool, confidence, top: [{intent, tool, p, pTool, pIntent}], tools: [{tool, p}],
- *      topTool, topToolP, pNone }
+ *      topTool, topToolP, pNone, pOoc }
  */
 export function cascade(text, { model = getModel(), extras = [], k = 3, top = 3, restrictTool } = {}) {
   const feats = [...vectorize(text, model.dim, extras)];
@@ -16,9 +16,10 @@ export function cascade(text, { model = getModel(), extras = [], k = 3, top = 3,
   const pt = predictProba(tm, feats);
   const order = Array.from(pt.keys()).sort((a, b) => pt[b] - pt[a]);
   const noneIdx = tm.labels.indexOf(NONE);
+  const oocIdx = tm.labels.indexOf(OOC);
   // restrictTool: stage 2 only inside one family (history "same but ..." refers to the previous tool)
   if (restrictTool) { const i = tm.labels.indexOf(restrictTool); pt[i] = 1; order.splice(order.indexOf(i), 1); order.unshift(i); }
-  const cands = restrictTool ? [tm.labels.indexOf(restrictTool)] : order.filter((i) => i !== noneIdx).slice(0, k);
+  const cands = restrictTool ? [tm.labels.indexOf(restrictTool)] : order.filter((i) => i !== noneIdx && i !== oocIdx).slice(0, k);
   const scored = [];
   for (const i of cands) {
     const fam = tm.labels[i];
@@ -41,5 +42,6 @@ export function cascade(text, { model = getModel(), extras = [], k = 3, top = 3,
     topTool: tm.labels[order[0]],
     topToolP: pt[order[0]],
     pNone: noneIdx >= 0 ? pt[noneIdx] : 0,
+    pOoc: oocIdx >= 0 ? pt[oocIdx] : 0,
   };
 }
