@@ -79,3 +79,24 @@ env = {
   (`gate_reject`, `unsafe_value`, `env_unsupported`, `ambiguous`); `risk`: `safe | medium | high |
   deny`; `reasons: string[]`; `obligations: [{check, ok, detail}]` (§6.3). An accepted result
   should also carry `command` (compiled text) and `gloss`.
+
+## Accountability — `accountability.js` (gate step 3, after `strict.js`)
+
+Every free (unconsumed) content word of the request must be accounted for by the accepted IR, or the gate
+rejects with `uncovered_content: "<word>", ...` (label `gate_reject`). A word is accounted for when it is:
+
+- inside a copied / normalized value span, or a cue phrase of the cue lexicon (`findCues`);
+- echoed by a value (`ids` next to `ids.txt`, `history` next to `~/.zsh_history`), or the one word right
+  after a named value (head noun: "the metro **bundler**", not after regex / non-identifier patterns);
+- a closed-lexicon word, a product name (`PRODUCT_NAMES`), a typo of a known word, or one of `GENERIC`
+  (request wording that asks for nothing by itself; tuned on train gold).
+
+Uncovered: an unknown content word (`zod`, `accounts`), a known word that names a thing (`CONTENT_WORDS`:
+`src`, `lib`, `fuzz`, ...), a file type listed next to globbed ones but used by no value (`png jpg or gif`
+with `*.png`, `*.gif`), a bare path / rev that is request wording (`working tree`), and a cue word whose
+element is absent (`CUE_KEYS`: `porcelain` / `machine-readable` without `--porcelain`, `history` without
+`git log` / `git show`, `whose names` with a content search). This replaces the one-unknown-word tolerance
+of the coverage check (`MAX_UNKNOWN`) for accepted IR.
+
+Gold false-reject rate (gold IR of ok rows, h8b eval, Oct 2026): train 190 / 25360 (0.75%), dev 12 / 1976
+(0.61%), test 8 / 851 (0.94%).

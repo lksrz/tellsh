@@ -5,7 +5,8 @@
 import { effectsOf } from './schemas.js';
 import { unitWord } from './units.js';
 import { parseIntPhrase } from './normalizers.js';
-import { strictObligations } from './strict.js';
+import { strictObligations, STRICT_KNOWN, PRODUCT_NAMES } from './strict.js';
+import { accountability } from './accountability.js';
 import {
   CUE_LEXICON, PER_FILE, DIR_WORDS, KILL_VERBS, NOT_GERUND, CLAUSE_BOUNDARY, TOOL_WORDS, WRITE_VERBS,
   OP_VERBS, langWordAt, langExt, PIN_NAMES, REQUIRE_WORDS, SORT_FORBID, TYPE_F_CONFLICT, FILE_NOUNS, KNOWN_WORDS,
@@ -397,6 +398,9 @@ export function obligations(ir, stages, ctx, used) {
   strictObligations(ir, stages, ctx, used, { words, consumed, fail, hasFree, hasMod, specOf, prevOf, inCue, isKnown,
     isUnknownWord, flagSpelled, requireWordsFor, isExtWord: (x) => !!langWordAt([x.toLowerCase(), 'files'], 0), nearKnown });
   pass('strict', 'cover words, span integrity, mods requested, audit patterns');
+  // Accountability (accountability.js): every content word is a value, a cue of a present element, or filler.
+  accountability(ir, stages, ctx, { used, words, consumed, fail, inCue, isUnknownWord, nearKnown, strictKnown: (w) => STRICT_KNOWN.has(w), productNames: PRODUCT_NAMES,
+    isExtWord: (x) => !!langWordAt([x, 'files'], 0), langExt });
 }
 
 // A typo of a known word: one edit (insert / delete / substitute / transpose) away, words of 4+ letters.

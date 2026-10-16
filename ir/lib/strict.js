@@ -136,7 +136,7 @@ const SCRIPT_NAMES = new Set(['lint', 'build', 'start', 'dev', 'format', 'typech
 const DIRISH = new Set(['checks', 'scripts', 'config', 'configs', 'work', 'docs', 'src', 'lib', 'libs', 'tests', 'test', 'app',
   'apps', 'bin', 'build', 'dist', 'packages', 'modules', 'tools', 'utils', 'data', 'assets', 'public', 'templates', 'content']);
 // Capitalised product names: context, not values.
-const PRODUCT_NAMES = new Set(['django', 'rails', 'react', 'docker', 'kubernetes', 'python', 'node', 'rust', 'java', 'linux',
+export const PRODUCT_NAMES = new Set(['django', 'rails', 'react', 'docker', 'kubernetes', 'python', 'node', 'rust', 'java', 'linux',
   'mac', 'windows', 'jenkins', 'terraform', 'postgres', 'redis', 'vue', 'angular', 'flask', 'laravel', 'webpack', 'vite',
   'jest', 'ruby', 'golang', 'swift', 'kotlin', 'android', 'xcode', 'slack', 'chrome', 'firefox', 'nginx', 'apache']);
 // Filter clauses ("lines with X", "files that mention X"): the next content word is a value.
@@ -147,7 +147,7 @@ const FILTER_SKIP = new Set(['a', 'an', 'the', 'any', 'some', 'contain', 'contai
   'commit', 'tag', 'literal', 'literally', 'phrase', 'both', 'either', 'it', 'their', 'its', 'working', 'pattern', 'regex', 'term', 'stderr', 'stdout']);
 
 // Words this module gives a meaning to: never "unexplained" next to a value.
-const STRICT_KNOWN = new Set([...Object.values(MOD_WORDS).flat(), ...COVER.flatMap((r) => r.words), ...FREQ_STRICT,
+export const STRICT_KNOWN = new Set([...Object.values(MOD_WORDS).flat(), ...COVER.flatMap((r) => r.words), ...FREQ_STRICT,
   ...WHICH_FILES].flatMap((p) => p.split(' ')).concat(['incl', 'excl', 'rank', 'ranked', 'repeated', 'used', 'calls', 'import', 'imports', 'alive', 'set', 'present',
   'defined', 'exist', 'exists', 'configured', 'enabled', 'disabled', 'pinned', 'available', 'installed', 'up', 'mentioned', 'declared', 'occurs', 'occur', 'appears', 'shows', 'lives', 'sits', 'command']));
 
