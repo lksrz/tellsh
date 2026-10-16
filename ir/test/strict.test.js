@@ -126,3 +126,17 @@ test('6. audit r3: dropped operands, misread roles', () => {
   no('Show the first 4 remote branches with verbose details.', 'git branch -a -v | head -n 4', /local branches first/);
   no('skip .git and vendor when listing files under src', 'find src -type d \\( -name .git -o -name vendor \\) -prune -o -print', /-type f/);
 });
+
+test('generic words are not paths; a named ref must be used', () => {
+  no('unstaged changes across the whole repo', 'git diff -- repo', /generic request word/);
+  ok('unstaged changes across the whole repo', 'git diff');
+  no('unstaged changes only', 'git diff -- unstaged', /generic request word/);
+  ok('files under repo, max depth 2', 'find repo -maxdepth 2 -type f');
+  ok('word diff of the folder named changes', 'git diff --word-diff -- changes');
+  no('last 5 commits on develop', 'git log -n 5', /names a ref/);
+  ok('last 5 commits on develop', 'git log -n 5 develop');
+  no('commits from main touching src', 'git log -- src', /names a ref/);
+  ok('commits from main touching src', 'git log main -- src');
+  ok('commits from release/2.3 touching src', 'git log release/2.3 -- src');
+  ok('last 5 commits on the dev server logs', 'git log -n 5');
+});

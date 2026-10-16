@@ -7,7 +7,8 @@
 // PRED row: {id: "<split>:<line>", p: {label, single, op, pin, mods, stderr, slots}, d: {actions: [[name, u0, u1]]}}
 // Every gold row is scored (missing prediction = abstention); ids must be unique and from the --data split.
 // Routes: P (heads only; abstains when single=false), D (decoder), PD (P when it predicts ok + one stage and the gate accepts it, else D).
-// Metrics per route: label accuracy, exact canonical-IR match and compiled-command match (on gold-ok rows),
+// Metrics per route: label accuracy, exact canonical-IR match and compiled-command match (on gold-ok rows; commands are
+// compared with equiv.mjs sameCommand, so equivalent spellings count as a match),
 // accepted-wrong (gate accepts but the command differs from gold, or gold is not ok) over all rows and
 // over accepted rows, abstention precision/recall (abstain = no accepted command; positive = gold not ok).
 //
@@ -19,6 +20,7 @@
 
 import fs from 'node:fs';
 import { loadSchemas, canon, equals, gate } from '../../ir/lib/index.js';
+import { sameCommand } from './equiv.mjs';
 import { encodeActions, decodeActions, pTargets, assembleP, LABELS } from './actions.mjs';
 
 const args = process.argv.slice(2);
@@ -121,11 +123,11 @@ function score(rows) {
     if (g.label === 'ok') {
       okN++;
       if (o.canon && gi.canon && equals(o.canon, gi.canon)) exact++;
-      if (o.accepted && o.command === gi.command) cmd++;
+      if (o.accepted && sameCommand(o.command, gi.command, g.request)) cmd++;
     }
     if (o.accepted) {
       acc++;
-      if (g.label !== 'ok' || o.command !== gi.command) accWrong++;
+      if (g.label !== 'ok' || !sameCommand(o.command, gi.command, g.request)) accWrong++;
     } else {
       abst++;
       if (g.label !== 'ok') abstTrue++;
@@ -145,13 +147,13 @@ if (DUMP) {
   const out = [];
   for (const k of ['D', 'PD']) for (const [i, o] of routes[k]) {
     const g = gold[i], gi = goldInfo[i];
-    if (o.accepted && (g.label !== 'ok' || o.command !== gi.command)) out.push(JSON.stringify({ route: k, i, request: g.request, gold_label: g.label, gold: gi.command, pred: o.command }));
+    if (o.accepted && (g.label !== 'ok' || !sameCommand(o.command, gi.command, g.request))) out.push(JSON.stringify({ route: k, i, request: g.request, gold_label: g.label, gold: gi.command, pred: o.command }));
   }
   fs.writeFileSync(DUMP, out.join('\n') + '\n');
 }
 // ---------------------------------------------------------------- confidence calibration
 const TARGETS = [0.5, 1, 2]; // max accepted-wrong % over kept rows
-const isWrong = (i, o) => o.accepted && (gold[i].label !== 'ok' || o.command !== goldInfo[i].command);
+const isWrong = (i, o) => o.accepted && (gold[i].label !== 'ok' || !sameCommand(o.command, goldInfo[i].command, gold[i].request));
 // accepted rows of a single-confidence route -> [{c, w}]
 const items = (k, side, def) => routes[k].filter(([, o]) => o.accepted).map(([i, o]) => ({ c: confs[i]?.[side][def], w: isWrong(i, o) }));
 const hasDef = (its) => its.length > 0 && its.every((x) => typeof x.c === 'number' && Number.isFinite(x.c));

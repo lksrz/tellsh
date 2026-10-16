@@ -158,6 +158,17 @@ const FILLER = new Set(['please', 'pls', 'plz', 'thanks', 'thx', 'kindly', 'the'
   'that', 'these', 'those', 'here', 'there', 'me', 'my']);
 // git vocabulary is never a bare-word path ("files changed in commit X" is not "-- commit").
 const GIT_NOUNS = new Set(['commit', 'commits', 'branch', 'branches', 'tag', 'tags', 'stash']);
+// generic request words that are not a path unless the request names them as one ("the folder named files"); the
+// scope words ("repo", "project") are a path only outside git (where they mean the whole work tree: "git diff", not "-- repo")
+const PATH_STOPWORDS = new Set(['unstaged', 'staged', 'changes', 'changed', 'files', 'file', 'directory', 'directories', 'folder', 'folders',
+  'dir', 'dirs', 'here', 'everything', 'everywhere', 'whole', 'all']);
+const GIT_SCOPE_WORDS = new Set(['repo', 'repos', 'repository', 'repositories', 'project', 'codebase', 'tree', 'worktree', 'workspace']);
+const DIR_NOUNS = new Set(['folder', 'folders', 'directory', 'directories', 'dir', 'dirs', 'file', 'named', 'called']);
+// a word that names a git ref by itself ("on develop", "from release/2.3")
+const REF_WORD = /^(main|master|develop|development|dev|trunk|staging|production|prod|(release|hotfix|feature|bugfix|origin|upstream)\/[\w./-]+)$/;
+const REF_PREP = new Set(['on', 'in', 'from']);
+// "dev server", "in production mode": the word is not a ref
+const REF_NOT_NEXT = new Set(['server', 'servers', 'environment', 'env', 'box', 'machine', 'host', 'mode', 'build', 'builds', 'dependencies', 'deps', 'dependency', 'folder', 'directory', 'dir', 'config', 'logs', 'log']);
 const KNOWN_IDENT = new Set(['macos', 'ios', 'ipados', 'node_modules', '__pycache__', 'github', 'gitlab', 'javascript', 'typescript']);
 const PATH_PREP = new Set(['in', 'under', 'inside', 'within', 'from', 'of', 'at', 'into', 'through', 'across', 'for']);
 const CUE_LEAD = new Set(['including', 'include', 'incl', 'with', 'plus', 'and', 'no', 'without', 'also', 'even']);
@@ -259,6 +270,9 @@ export function strictObligations(ir, stages, ctx, used, h) {
   for (const v of used) {
     if (v.role === 'paths' && v.kind === 'span' && !/[/.~]/.test(v.value) && !isQuotedUnit(seg.units[v.u[0]])) {
       if (GIT_NOUNS.has(v.value.toLowerCase())) fail('span', `path "${v.value}" is a git noun`);
+      const lw = v.value.toLowerCase();
+      if ((PATH_STOPWORDS.has(lw) || (GIT_SCOPE_WORDS.has(lw) && [...ops].some((o) => o.startsWith('git.')))) && !DIR_NOUNS.has(words[v.u[1]]) && !['named', 'called'].includes(words[v.u[0] - 1]))
+        fail('span', `path "${v.value}" is a generic request word, not a path`);
       if (inCue(v.u[0]) && CUE_LEAD.has(words[v.u[0] - 1])) fail('span', `path "${v.value}" is a cue word`);
       if (FILLER.has(v.value.toLowerCase()) || ['and', 'or', 'of', 'in', 'with', 'for', 'to', 'on'].includes(v.value.toLowerCase()))
         fail('span', `path "${v.value}" is a function word`);
@@ -456,6 +470,19 @@ export function strictObligations(ir, stages, ctx, used, h) {
     for (const info of execInfos) {
       if (!['git.diff', 'git.show', 'git.log'].includes(info.exec.op)) continue;
       if ((info.values.paths || []).length) for (const r of info.values.rev || []) if (/\.[A-Za-z][A-Za-z0-9]+$/.test(r) && !/\.\./.test(r) && !/^v?\d/.test(r)) fail('scope', `"${r}" is a file, not a revision`);
+    }
+    // "on develop" / "from release/2.3": a ref the request names must reach an op that takes a revision
+    const revInfos = execInfos.filter((i) => i.op.positionals.some((p) => p.role === 'rev'));
+    if (revInfos.length) {
+      for (let i = 1; i < words.length; i++) {
+        let k = i;
+        if (words[k] === 'branch' && !consumed.has(k)) k++;
+        if (k >= words.length || !REF_PREP.has(words[i - 1]) || consumed.has(k) || isQuotedUnit(seg.units[k])) continue;
+        const t = seg.units[k].t;
+        if (!REF_WORD.test(t) && !(k > i && /^[\w./-]+$/.test(t))) continue;
+        if (REF_NOT_NEXT.has(words[k + 1])) continue;
+        if (!revInfos.some((r) => (r.values.rev || []).includes(t))) fail('dropped_value', `"${words[i - 1]} ${t}" names a ref the command does not use`);
+      }
     }
     for (const info of stages) {
       if (info.kind === 'macro') continue;

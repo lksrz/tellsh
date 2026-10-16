@@ -92,3 +92,13 @@ builds the relabel overlay, runs dedup (`--cap 80 --near 0.8 --overlay`), export
 `build/ir/targets/<name>` and the 3 k-fold splits. A dir is complete when every planned call has an ok
 usage line; incomplete dirs are skipped, or with `--partial` snapshotted into `<dir>_partial/` and
 converted there (dataset name defaults to `v2pre`, else `v2`). Re-runs only redo stale conversions.
+
+## equiv.mjs: command equivalence key
+
+`equivKey(command, request)` / `sameCommand(a, b, request)` treat equivalent spellings as one answer; used by
+`eval_pred.mjs` (cmd_match, accepted-wrong, `--dump`, calibration) and the verifier pair scripts. Rules (see
+the file header): `find -type f` vs plain find on file requests, `git log --oneline`, `rg -o | wc -l` ==
+`--count-matches`, `curl -S` without `-s`, `tail -F` vs `-f` (no rotation cue), `rg|grep P FILE | wc -l` ==
+`-c P FILE` for one file operand with only line-selecting flags, `sort F | uniq` == `sort -u F`, leading flag
+order, combined boolean short flags (`-iF` == `-i -F` for rg/grep/ls/sort), and single quotes around words
+without shell-special characters.
