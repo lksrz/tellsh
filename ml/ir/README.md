@@ -124,3 +124,60 @@ means nothing can be kept. `report.thresholded.routes[route][target]` = coverage
 Small kept counts on dev (tens of rows) make the 0.5 % target statistically weak; check the test numbers.
 
 Prediction ids are `<split>:<line>` of `build/ir/dataset/v1/<split>.jsonl`; scoring needs that file (gold IR).
+
+## Learned verifier (`ml/ir/verifier.py`)
+
+The gate checks structure and provenance, not meaning, and the generator's own confidence does not separate right
+from wrong (dev-chosen thresholds fail on test). The verifier scores `p(correct | request, os, command)` for every
+gate-accepted candidate; the pipeline is generator → gate → verifier(threshold).
+
+- **Model**: cross-encoder, encoder initialised from the S student exactly like `model.py` (same `Encoder`, same
+  `student.bin`), input `<s> os: request </s></s> command </s>` (student Unigram tokenizer, ≤ 160 tokens, ids made in
+  JS so the GPU box needs no node), mean-pool + linear head. BCE with label smoothing (`--smooth 0.02`), AdamW (encoder
+  5e-5, head 1e-3), warmup + cosine, CUDA AMP (bf16, or fp16 + GradScaler on the 2080 Ti) or CPU. `OUT/last.pt` each
+  epoch (`--resume`), `OUT/best.pt` on the best dev AUC (ties: lower ECE), early stop after `--patience` evals.
+  No IR string input yet (optional extension). CPU scoring ≈ 1.3–2.8 ms/pair (batch 256), fine to run on the Mac.
+- **Data** (`scripts/ir/make_negatives.mjs`, deterministic, split kept → no skeleton leakage): positive = gate-compiled
+  gold command of each ok row (canon has one rendering per meaning, so no extra equivalent renderings); up to `--k 4`
+  hard negatives per row = perturbations of the gold IR that the gate **still accepts** and that compile to another
+  command: `mod_drop`, `mod_add` (unrequested boolean mod), `mod_swap` (sibling boolean mod), `span_shift` (copied span
+  ±1 unit at either end), `span_other` (another span of the request), `role_swap` (e.g. path ↔ pattern), `op_family`
+  (head ↔ tail, …), `stage_drop`; picked round-robin over kinds. `--errors DUMP.jsonl:SPLIT` adds real model errors
+  (`eval_pred.mjs --dump` rows) as negatives of that split. v1: train 24 805 pos / 69 219 neg, dev 1 897 / 4 980,
+  test 816 / 2 442 (≈ 105 s). Negatives are far more frequent than on real candidates (h8 PD dev: 82 % correct), so
+  calibration on real candidates needs `score_combined.mjs` (thresholds chosen on real dev candidates), not the
+  synthetic-dev ECE.
+- **Candidates** (`scripts/ir/make_candidates.mjs`): eval.py preds → the PD route's gate-accepted command per row
+  (same routing as `eval_pred.mjs`) with token ids → `cand_<split>.jsonl`.
+- **Combined scoring** (`scripts/ir/score_combined.mjs`): coverage (correct kept / gold ok), accepted-wrong over kept
+  with a one-sided 95 % Clopper–Pearson upper bound, abstention precision / recall (positive = row without a correct
+  accepted candidate), verifier AUC / ECE on accepted candidates, a threshold sweep; the threshold is chosen on dev
+  (max kept with accepted-wrong ≤ `--target` %, by upper bound and by point estimate) and applied unchanged to test.
+  At 0.5 % the upper bound needs ≥ ~600 kept dev rows with zero errors.
+
+Mac (data, candidates):
+
+```sh
+node scripts/ir/make_negatives.mjs                    # -> build/ir/verifier/v1/{train,dev,test}.jsonl
+node scripts/ir/make_candidates.mjs --data build/ir/dataset/v1/dev.jsonl  --preds build/ir/runs/h8/preds_dev.jsonl  --out build/ir/verifier/v1/cand_dev.jsonl
+node scripts/ir/make_candidates.mjs --data build/ir/dataset/v1/test.jsonl --preds build/ir/runs/h8/preds_test.jsonl --out build/ir/verifier/v1/cand_test.jsonl
+```
+
+GPU box (copy `ml/ir/{model,verifier}.py`, `build/ir/verifier/v1/*.jsonl`, `hybrid/models/student/student.bin`):
+
+```bat
+cd /d D:\tellsh-ir\tellsh
+D:\tellsh-ir\venv\Scripts\python ml\ir\verifier.py train --data build\ir\verifier\v1 --out build\ir\runs\ver1 --epochs 6 --batch 128 --amp fp16
+D:\tellsh-ir\venv\Scripts\python ml\ir\verifier.py train --data build\ir\verifier\v1 --out build\ir\runs\ver1 --epochs 6 --batch 128 --amp fp16 --resume
+D:\tellsh-ir\venv\Scripts\python ml\ir\verifier.py score --ckpt build\ir\runs\ver1\best.pt --pairs build\ir\verifier\v1\cand_dev.jsonl  --out build\ir\runs\ver1\scores_dev.jsonl
+D:\tellsh-ir\venv\Scripts\python ml\ir\verifier.py score --ckpt build\ir\runs\ver1\best.pt --pairs build\ir\verifier\v1\cand_test.jsonl --out build\ir\runs\ver1\scores_test.jsonl
+```
+
+Mac (bring `best.pt` / `scores_*.jsonl` back; or score here on CPU with the same `score` command):
+
+```sh
+node scripts/ir/score_combined.mjs \
+  --dev-data build/ir/dataset/v1/dev.jsonl   --dev-preds build/ir/runs/h8/preds_dev.jsonl   --dev-scores build/ir/runs/ver1/scores_dev.jsonl \
+  --test-data build/ir/dataset/v1/test.jsonl --test-preds build/ir/runs/h8/preds_test.jsonl --test-scores build/ir/runs/ver1/scores_test.jsonl \
+  --target 0.5 --out build/ir/runs/ver1/combined.json
+```

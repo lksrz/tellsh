@@ -13,6 +13,8 @@ Each row also carries confidences of the greedy choices (ignored by older reader
   d.conf = {label, min_tok, min_margin, ptr_min, ptr_logp}
            status-token prob, min action-token prob, min top1-top2 token margin, min / summed log of pointer
            (start*end) probs; d.logp stays the summed action-token log-prob.
+K-fold held-out (ml/ir/kfold.py): --data-file TARGETS.jsonl predicts on any targets file (pred ids = its row ids),
+--gold-file DATASET.jsonl scores against that gold file instead of DATA/SPLIT.jsonl.
 Calibrate thresholds on dev with: node scripts/ir/eval_pred.mjs --calibrate ... (see ml/ir/README.md).
 """
 import argparse
@@ -43,8 +45,8 @@ def p_conf(p, i, v, slots):
     return {"label": round(ps[0], 6), "min": round(min(ps), 6), "prod": round(prod, 6)}
 
 
-def score(preds, split, data_dir, out):
-    data = os.path.join(data_dir, f"{split}.jsonl")
+def score(preds, split, data_dir, out, gold_file=""):
+    data = gold_file or os.path.join(data_dir, f"{split}.jsonl")
     cmd = ["node", os.path.join(ROOT, "scripts/ir/eval_pred.mjs"), "--preds", preds, "--data", data, "--out", out]
     r = subprocess.run(cmd, capture_output=True, text=True)
     if r.returncode:
@@ -64,6 +66,8 @@ def main():
     a.add_argument("--split", default="dev")
     a.add_argument("--targets", default=os.path.join(ROOT, "build/ir/targets/v1"))
     a.add_argument("--data", default=os.path.join(ROOT, "build/ir/dataset/v1"), help="dataset dir (gold IR for scoring)")
+    a.add_argument("--data-file", default="", help="targets jsonl to predict on (overrides TARGETS/SPLIT.jsonl)")
+    a.add_argument("--gold-file", default="", help="dataset jsonl to score against (overrides DATA/SPLIT.jsonl)")
     a.add_argument("--preds-out", default="")
     a.add_argument("--preds", default="", help="with --score-only: saved predictions")
     a.add_argument("--report", default="")
@@ -76,7 +80,7 @@ def main():
 
     if args.score_only:
         preds = args.preds
-        score(preds, args.split, args.data, args.report or preds.replace(".jsonl", "") + ".report.json")
+        score(preds, args.split, args.data, args.report or preds.replace(".jsonl", "") + ".report.json", args.gold_file)
         return
     # model-side imports only here: --score-only needs neither torch nor numpy (plain python3 + node)
     import torch
@@ -92,11 +96,12 @@ def main():
     model = IRModel(vocab, d_model=ta["d_model"], d_layers=ta["d_layers"], d_heads=ta["d_heads"], d_ff=ta["d_ff"], arm=ta["arm"])
     model.load_state_dict(ck["model"])
     model.to(dev).eval()
-    ds = IRDataset(os.path.join(args.targets, f"{args.split}.jsonl"), vocab, limit=args.limit)
+    ds = IRDataset(args.data_file or os.path.join(args.targets, f"{args.split}.jsonl"), vocab, limit=args.limit)
     dl = DataLoader(ds, batch_size=args.batch, shuffle=False, collate_fn=partial(collate, v=vocab))
     preds_path = args.preds_out or os.path.join(os.path.dirname(args.ckpt), f"preds_{args.split}.jsonl")
     batches, k = [], 0
-    with open(preds_path, "w", encoding="utf-8") as f:
+    tmp_path = preds_path + ".tmp"  # written in full, then renamed: an interrupted run leaves no truncated preds file
+    with open(tmp_path, "w", encoding="utf-8") as f:
         for b in dl:
             b = {x: y.to(dev) for x, y in b.items()}
             p, acts, spans, logp, dc = model.predict(b, conf=True)
@@ -107,10 +112,11 @@ def main():
                 d = {"actions": dseq, "logp": round(lp, 4), "conf": {x: round(y[i], 6) for x, y in dc.items()}}
                 f.write(json.dumps({"id": ds.rows[k]["id"], "p": pr, "d": d}) + "\n")
                 k += 1
+    os.replace(tmp_path, preds_path)
     print(f"{k} predictions -> {preds_path}")
     print("quick " + json.dumps(quick_metrics(batches, vocab)))
     if not args.no_node:
-        score(preds_path, args.split, args.data, args.report or preds_path.replace(".jsonl", "") + ".report.json")
+        score(preds_path, args.split, args.data, args.report or preds_path.replace(".jsonl", "") + ".report.json", args.gold_file)
 
 
 if __name__ == "__main__":

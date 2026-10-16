@@ -122,8 +122,9 @@ class Pointer(nn.Module):
 # ---------------------------------------------------------------- model
 
 class IRModel(nn.Module):
-    def __init__(self, vocab, d_model=384, d_layers=5, d_heads=8, d_ff=1536, max_len=34, arm="H8", dropout=0.1):
+    def __init__(self, vocab, d_model=384, d_layers=5, d_heads=8, d_ff=1536, max_len=34, arm="H8", dropout=0.1, label_smoothing=0.0):
         super().__init__()
+        self.ls = label_smoothing  # for the label head and D action CE only (pointers / P heads stay hard)
         if arm != "H8":
             raise NotImplementedError(f"arm {arm}: ternary QAT (HQ/T50) is a later hook; only H8 is implemented")
         self.v = vocab
@@ -196,7 +197,7 @@ class IRModel(nn.Module):
         um = b["unit_mask"]
         P = self.p_heads(units, pooled, um)
         out = {}
-        out["label"] = F.cross_entropy(P["label"], b["label"])
+        out["label"] = F.cross_entropy(P["label"], b["label"], label_smoothing=self.ls)
         okm = b["label"] == 0
         out["single"] = F.cross_entropy(P["single"][okm], b["single"][okm]) if okm.any() else pooled.sum() * 0
         pm = b["p_mask"]
@@ -212,7 +213,7 @@ class IRModel(nn.Module):
                 el = self.p_ptr.end_logits(P["slot_h"], units, um, st)
                 out["p_end"] = F.cross_entropy(el[pm].flatten(0, 1), en[pm].flatten(), ignore_index=-100)
         h = self.d_states(b, x, units, b["d_in"], b["d_in_span"], b["d_ctx_op"])
-        out["act"] = F.cross_entropy(self.h_act(h).flatten(0, 1), b["d_tgt"].flatten(), ignore_index=-100)
+        out["act"] = F.cross_entropy(self.h_act(h).flatten(0, 1), b["d_tgt"].flatten(), ignore_index=-100, label_smoothing=self.ls)
         if (b["d_start"] >= 0).any():
             out["d_start"] = F.cross_entropy(self.d_ptr.start_logits(h, units, um).flatten(0, 1), b["d_start"].flatten(), ignore_index=-100)
             out["d_end"] = F.cross_entropy(self.d_ptr.end_logits(h, units, um, b["d_start"]).flatten(0, 1), b["d_end"].flatten(), ignore_index=-100)

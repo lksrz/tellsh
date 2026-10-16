@@ -1,6 +1,10 @@
 """Train the typed-IR model (P heads + D decoder) on targets exported by scripts/ir/export_targets.mjs.
 
-    python ml/ir/train.py --targets build/ir/targets/v1 --out runs/ir_h8 [--epochs 20 --batch 64 --lr 3e-4]
+    python ml/ir/train.py --targets build/ir/targets/v1 --out runs/ir_h8 [--max-epochs 12 --batch 64 --lr 3e-4]
+    # k-fold (ml/ir/kfold.py): --train-file / --dev-file override TARGETS/{train,dev}.jsonl
+
+Anti-overfitting: label smoothing (--label-smoothing, label head + D actions), --dropout, --wd; early stopping when
+dev d_exact has not improved for --patience evals (0 = off). best.pt is kept by dev d_exact (not loss).
 
 CUDA when available (AMP bf16, or fp16 + GradScaler), else CPU (f32). Checkpoints: OUT/last.pt every epoch (and every
 --ckpt-steps; full state incl. optimizer), OUT/best.pt (weights only) on the best dev exact-action match; --resume
@@ -31,7 +35,11 @@ def args_parser():
     a.add_argument("--student", default=os.path.join(ROOT, "hybrid/models/student/student.bin"))
     a.add_argument("--out", default=os.path.join(ROOT, "build/ir/runs/h8"))
     a.add_argument("--arm", default="H8", choices=["H8", "HQ"], help="HQ = ternary QAT (not implemented yet)")
-    a.add_argument("--epochs", type=int, default=20)
+    a.add_argument("--max-epochs", "--epochs", dest="epochs", type=int, default=12)
+    a.add_argument("--patience", type=int, default=3, help="stop after N evals without a dev d_exact gain (0 = off)")
+    a.add_argument("--label-smoothing", type=float, default=0.1)
+    a.add_argument("--train-file", default="", help="targets jsonl to train on (default TARGETS/train.jsonl)")
+    a.add_argument("--dev-file", default="", help="targets jsonl for dev eval (default TARGETS/dev.jsonl)")
     a.add_argument("--max-steps", type=int, default=0, help="stop after this many optimizer steps (0 = no cap)")
     a.add_argument("--batch", type=int, default=64)
     a.add_argument("--lr", type=float, default=3e-4, help="P heads + decoder")
@@ -58,7 +66,8 @@ def args_parser():
 
 
 def model_kwargs(args):
-    return dict(d_model=args.d_model, d_layers=args.d_layers, d_heads=args.d_heads, d_ff=args.d_ff, arm=args.arm, dropout=args.dropout)
+    return dict(d_model=args.d_model, d_layers=args.d_layers, d_heads=args.d_heads, d_ff=args.d_ff, arm=args.arm, dropout=args.dropout,
+                label_smoothing=args.label_smoothing)
 
 
 def to(b, dev):
@@ -90,14 +99,14 @@ def main():
     dev = torch.device(args.device or ("cuda" if torch.cuda.is_available() else "cpu"))
     amp = args.amp
     if amp == "auto":
-        amp = ("bf16" if torch.cuda.is_bf16_supported() else "fp16") if dev.type == "cuda" else "off"
+        amp = ("bf16" if torch.cuda.get_device_capability(dev)[0] >= 8 else "fp16") if dev.type == "cuda" else "off"  # Turing: fp16
     dtype = {"bf16": torch.bfloat16, "fp16": torch.float16}.get(amp)
     amp_ctx = (lambda: torch.autocast(dev.type, dtype=dtype)) if dtype else (lambda: torch.autocast(dev.type, enabled=False))
     scaler = torch.amp.GradScaler("cuda", enabled=amp == "fp16")
     os.makedirs(args.out, exist_ok=True)
     vocab = Vocab(load_vocab(args.targets))
-    tr = IRDataset(os.path.join(args.targets, "train.jsonl"), vocab, limit=args.limit, seed=args.seed)
-    dv = IRDataset(os.path.join(args.targets, "dev.jsonl"), vocab, limit=args.dev_limit, seed=args.seed)
+    tr = IRDataset(args.train_file or os.path.join(args.targets, "train.jsonl"), vocab, limit=args.limit, seed=args.seed)
+    dv = IRDataset(args.dev_file or os.path.join(args.targets, "dev.jsonl"), vocab, limit=args.dev_limit, seed=args.seed)
     col = partial(collate, v=vocab)
     lkw = dict(collate_fn=col, num_workers=args.workers, persistent_workers=args.workers > 0, pin_memory=dev.type == "cuda")
     tl = DataLoader(tr, batch_size=args.batch, shuffle=True, drop_last=True, **lkw)
@@ -123,7 +132,7 @@ def main():
         total = min(total, args.max_steps)
     sched = torch.optim.lr_scheduler.LambdaLR(
         opt, lambda s: min(1.0, (s + 1) / max(1, args.warmup)) * max(0.05, 0.5 * (1 + math.cos(math.pi * min(1.0, s / max(1, total))))))
-    step, epoch0, skip0, best = 0, 0, 0, -1.0
+    step, epoch0, skip0, best, bad = 0, 0, 0, -1.0, 0
     if resuming:
         ck = torch.load(last, map_location=dev, weights_only=False)
         model.load_state_dict(ck["model"])
@@ -132,13 +141,14 @@ def main():
         if "scaler" in ck:
             scaler.load_state_dict(ck["scaler"])
         step, epoch0, skip0, best = ck["step"], ck["epoch"], ck.get("ebatch", 0), ck.get("best", -1.0)
+        bad = ck.get("bad", 0)
         print(f"resumed from {last}: step {step} epoch {epoch0} batch {skip0}", flush=True)
     log = open(os.path.join(args.out, "log.jsonl"), "a", encoding="utf-8")
 
     def save(path, epoch, ebatch=0):
         # last.pt: full training state; ebatch = batches already done in `epoch` (mid-epoch --ckpt-steps saves)
         torch.save({"model": model.state_dict(), "opt": opt.state_dict(), "sched": sched.state_dict(), "scaler": scaler.state_dict(),
-                    "step": step, "epoch": epoch, "ebatch": ebatch, "best": best, "args": vars(args), "vocab": vocab.raw,
+                    "step": step, "epoch": epoch, "ebatch": ebatch, "best": best, "bad": bad, "args": vars(args), "vocab": vocab.raw,
                     "params": pc}, path)
 
     def save_best(path, epoch):
@@ -147,18 +157,25 @@ def main():
                     "params": pc}, path)
 
     def run_eval(epoch):
-        nonlocal best
+        nonlocal best, bad
         m = evaluate(model, dl, dev, amp_ctx)
         rec = {"type": "eval", "step": step, "epoch": epoch, **m}
         log.write(json.dumps(rec) + "\n")
         log.flush()
         print("eval " + json.dumps(rec), flush=True)
         if m["d_exact"] > best:
-            best = m["d_exact"]
+            best, bad = m["d_exact"], 0
             save_best(os.path.join(args.out, "best.pt"), epoch)
+        else:
+            bad += 1
+
+    stop = lambda: args.patience > 0 and bad >= args.patience  # noqa: E731
 
     model.train()
     t0, run = time.time(), {}
+    if resuming and (stop() or (args.max_steps and step >= args.max_steps)):
+        print(f"already stopped (bad {bad}, step {step}): skipping training", flush=True)
+        epoch0 = args.epochs
     for epoch in range(epoch0, args.epochs):
         skip, skip0 = skip0, 0
         done = skip  # batches of this epoch already trained on
@@ -193,12 +210,18 @@ def main():
                 run = {}
             if args.eval_every and step % args.eval_every == 0:
                 run_eval(epoch)
+                if stop():
+                    break
             if args.ckpt_steps and step % args.ckpt_steps == 0:
                 save(last, epoch, bi + 1)
         full = done >= steps_per_epoch
-        run_eval(epoch + 1 if full else epoch)
+        if not (stop() and args.eval_every and step % args.eval_every == 0):  # skip a repeat eval at the same step
+            run_eval(epoch + 1 if full else epoch)
         save(last, epoch + 1, 0) if full else save(last, epoch, done)
         if args.max_steps and step >= args.max_steps:
+            break
+        if stop():
+            print(f"early stop: no dev d_exact gain in {bad} evals (best {best:.4f})", flush=True)
             break
     print(f"done: step {step}, best dev d_exact {best:.4f}, {time.time() - t0:.0f}s", flush=True)
 
