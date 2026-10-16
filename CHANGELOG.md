@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased — catalog-038
+## 0.3.10 — catalog-038: git diff --stat, git worktree list, fall-through guard
 
 **New catalog templates (catalog-038):** `git diff --stat`, `git worktree list`. Training rows in `data/intents/g10_catalog038.jsonl` (EN + PL, with near-miss negatives); labelling
 patterns for the real-usage split in `scripts/real/prepare_real.js`. The diff template is value-free (always the

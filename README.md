@@ -146,7 +146,7 @@ The intent and slots are shared; only the rendering differs (`src/render.js`, va
 
 ### Developer tools (v0.4)
 
-**New templates (0.3.8, unreleased)**: `git diff --stat` and `git worktree list`. The diff template is value-free: a request that names a
+**New templates (0.3.10)**: `git diff --stat` and `git worktree list`. The diff template is value-free: a request that names a
 revision or scope (a commit / hash, branch, staged changes, since / from / vs / per ...) is withheld, not answered with
 the plain diff.
 They are answered by the retrained templates model (`model/model_templates.bin`, trained with
@@ -506,11 +506,11 @@ retrain; `npm test && npm run eval`.
   explicit number (`issue 42`, `#42`); `gh run watch` takes one (`run 123`) or none (gh then asks which run), and some
   phrasings (`watch the latest workflow run`) are withheld with `<NUM>`; `wrangler pages deploy` needs the directory named (no `dist`
   default).
-* **New 0.3.8 templates take only explicit values.** A revision is used only when the request names it literally; a
-  value starting with `-` or not found in the request text (e.g. a revision from an earlier `git show abc123`) is
-  withheld, and so are staged changes (`--cached` is not rendered). A request with a word, option, exclusion or second action the template cannot express (`only for src`, `and update
-  them`, `-w`) is withheld (shown, never run on Enter or `--yes`). History after one of them is handled like after a 0.3.4 template (below): after a
-  0.3.8 template, "same for X" is withheld (not run).
+* **The 0.3.10 templates take no values.** `git diff --stat` and `git worktree list` render no revision or path: a
+  request naming one (a ref / hash, a commit, a branch, staged changes, since / from / vs, ...) is withheld, and so is a
+  request with a word, option, exclusion or second action the template cannot express (`only for src`, `and update
+  them`, `-w`) (shown, never run on Enter or `--yes`). History after one of them is handled like after a 0.3.4 template
+  (below): "same for X" is withheld (not run).
 * **History after a 0.3.4 template is replayed only as "same for X".** When the previous command is one of the new
   templates (`git fetch`, `git ls-files`, `gh issue list` / `view`, `gh run watch`, `wrangler d1 list`, `wrangler pages
   deploy`, and also `git grep` / `git show`), a follow-up that refers to it (`it`, `there`, `same but …`, `again`, `them`, …) is refused, and that line adds
