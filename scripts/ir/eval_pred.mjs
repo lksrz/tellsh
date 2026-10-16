@@ -117,6 +117,16 @@ function score(rows) {
   };
 }
 
+// --dump FILE: one line per accepted-but-wrong D/PD row (gold vs predicted command), for error analysis
+const DUMP = opt('dump');
+if (DUMP) {
+  const out = [];
+  for (const k of ['D', 'PD']) for (const [i, o] of routes[k]) {
+    const g = gold[i], gi = goldInfo[i];
+    if (o.accepted && (g.label !== 'ok' || o.command !== gi.command)) out.push(JSON.stringify({ route: k, i, request: g.request, gold_label: g.label, gold: gi.command, pred: o.command }));
+  }
+  fs.writeFileSync(DUMP, out.join('\n') + '\n');
+}
 const report = { data: DATA, preds: PREDS || 'oracle', labels: LABELS, routes: Object.fromEntries(Object.entries(routes).map(([k, v]) => [k, score(v)])) };
 // Gold-oracle check of the P route on P-expressible rows only (P can express ~45% of ok rows by design).
 report.p_coverage = { single_ok: routes.P.filter(([, o]) => o.label === 'ok' && o.err !== 'not_single').length, accepted: routes.P.filter(([, o]) => o.accepted).length };
