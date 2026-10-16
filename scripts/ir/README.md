@@ -102,3 +102,26 @@ the file header): `find -type f` vs plain find on file requests, `git log --onel
 `-c P FILE` for one file operand with only line-selecting flags, `sort F | uniq` == `sort -u F`, leading flag
 order, combined boolean short flags (`-iF` == `-i -F` for rg/grep/ls/sort), and single quotes around words
 without shell-special characters.
+
+## adjudicate.mjs: LLM adjudication of gold disagreements
+
+Gold (synthetic, Haiku-generated) has errors, and many `y = 0` candidates are equivalent spellings, so raw
+accepted-wrong is noisy. `adjudicate.mjs` sends every `y = 0` candidate of a `make_candidates.mjs` file (plus an
+optional random `--sample-agree N` of `y = 1` rows, to estimate false agreement) to the Anthropic Messages API
+(default `claude-opus-5-5`, adaptive thinking, `--effort low`, JSON-schema output). Prediction and gold are shown
+as A/B in a deterministic per-id random order and judged independently (`a_correct`, `b_correct`, `equivalent`,
+`reason`); a refusal gold (label != ok) is shown as "decline", so the judge decides whether the request should be
+answered at all. Only synthetic data: never point it at build/real or private data.
+
+    zsh -ic 'node scripts/ir/adjudicate.mjs --cands build/ir/verifier/v1/cand_test.jsonl \
+      --data build/ir/dataset/v1/test.jsonl --out build/ir/adjudicate/v1_test [--sample-agree 100] [--concurrency 16] [--limit N]'
+
+Key from `CLAUDE_API_KEY` (or `ANTHROPIC_API_KEY`), workspace from `CLAUDE_WORKSPACE_ID` (`anthropic-workspace-id`);
+never logged. 429/5xx are retried with backoff. `OUT/cache.jsonl` (keyed by id, command, gold, model) makes runs
+resumable; `OUT/adjudications.jsonl` and `OUT/summary.json` (both_correct / pred_correct_gold_wrong / pred_wrong /
+both_wrong, equivalent, cost) are rewritten each run. Pure helpers live in `adjudicate_lib.mjs`
+(tests: `ir/test/adjudicate.test.js`).
+
+`score_combined.mjs --adjudications DEV_ADJ,TEST_ADJ` counts a `y = 0` candidate as correct when its adjudication
+(same id and command) says the prediction is correct, and reports `adj_wrong`, `adj_accepted_wrong_rate`,
+`adj_accepted_wrong_ub95` next to the raw numbers (thresholds are still chosen on raw labels).

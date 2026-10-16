@@ -14,16 +14,21 @@
 // candidate is wrong); verifier AUC / ECE over accepted candidates.
 // The threshold is chosen on dev only (max kept rows subject to accepted-wrong <= target %), twice: by the upper
 // bound and by the point estimate, and applied unchanged to test. `gate_only` = no verifier (t = 0).
+// --adjudications F[,F...] (adjudicate.mjs output, dev and/or test): a y = 0 candidate whose adjudication (same id and
+// command) says the prediction is correct also counts as correct; each row then adds adj_wrong / adj_accepted_wrong_rate /
+// adj_accepted_wrong_ub95 next to the raw numbers (thresholds are still chosen on the raw labels).
 
 import fs from 'node:fs';
 import { loadSchemas } from '../../ir/lib/index.js';
 import { readJsonl, candidates, goldCommand } from './make_candidates.mjs';
 import { sameCommand } from './equiv.mjs';
+import { loadAdjudications, adjudicatedY } from './adjudicate_lib.mjs';
 
 const args = process.argv.slice(2);
 const opt = (k, d) => { const i = args.indexOf(`--${k}`); return i >= 0 ? args[i + 1] : d; };
 const TARGET = Number(opt('target', 0.5)) / 100;
 const schemas = loadSchemas();
+const ADJ = opt('adjudications') ? loadAdjudications(opt('adjudications').split(',')) : null;
 
 // ---------------------------------------------------------------- stats
 function logBinomPmf(k, n, p) {
@@ -74,9 +79,10 @@ function load(split) {
   const gold = readJsonl(DATA);
   const name = DATA.split(/[\\/]/).pop().replace(/\.jsonl$/, '');
   const scores = new Map(readJsonl(SCORES).map((r) => [String(r.id), r.p_ok]));
-  const items = candidates(schemas, gold, readJsonl(PREDS), name).map((c) => ({
-    p: scores.get(String(c.id)) ?? -1, y: sameCommand(c.command, goldCommand(schemas, gold[c.i]), c.request), route: c.route,
-  }));
+  const items = candidates(schemas, gold, readJsonl(PREDS), name).map((c) => {
+    const y = sameCommand(c.command, goldCommand(schemas, gold[c.i]), c.request);
+    return { p: scores.get(String(c.id)) ?? -1, y, ya: adjudicatedY(y, c.id, c.command, ADJ), route: c.route };
+  });
   const missing = items.filter((x) => x.p < 0).length;
   return { name, n: gold.length, goldOk: gold.filter((r) => r.label === 'ok').length, items, missing };
 }
@@ -93,7 +99,13 @@ function at(S, t) {
     coverage: pct(right, S.goldOk), accepted_wrong_rate: pct(wrong, kept.length), accepted_wrong_ub95: pct(cpUpper(wrong, kept.length), 1),
     abstain_precision: pct(abstTrue, abst), abstain_recall: pct(abstTrue, shouldAbstain),
     correct_lost: S.items.filter((x) => x.y && t !== -Infinity && (x.p < 0 || x.p < t)).length,
+    ...(ADJ ? adjAt(kept) : {}),
   };
+}
+
+function adjAt(kept) {
+  const w = kept.filter((x) => !x.ya).length;
+  return { adj_wrong: w, adj_accepted_wrong_rate: pct(w, kept.length), adj_accepted_wrong_ub95: pct(cpUpper(w, kept.length), 1) };
 }
 
 // lowest threshold (max kept) whose criterion holds on dev; unscored candidates (p = -1) are never kept and never a
