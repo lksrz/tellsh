@@ -1,0 +1,89 @@
+{
+  "schema_version": 1,
+  "tool": "pkill",
+  "binary": "pkill",
+  "versions": {},
+  "platforms": {
+    "linux_gnu": "ok",
+    "darwin_bsd": "ok"
+  },
+  "ops": {
+    "proc.kill": {
+      "realization": "default",
+      "argv_prefix": [],
+      "gloss": "send {signal} to processes named exactly {name}",
+      "effects": [
+        "signal_proc"
+      ],
+      "stdin": {
+        "accepts": [],
+        "when": "never"
+      },
+      "stdout": "none",
+      "no_operands": "error",
+      "positionals": [
+        {
+          "role": "name",
+          "type": "ProcName",
+          "arity": [
+            1,
+            1
+          ],
+          "leading_dash": "reject",
+          "validator": "^[A-Za-z0-9_][A-Za-z0-9_-]{1,63}$",
+          "note": "pkill matches the name as an extended regex even with -x, so regex metacharacters ('.', '+') are rejected (python3.11, c++ -> gate_reject)"
+        }
+      ],
+      "options": [
+        {
+          "mod": "signal",
+          "flag": "-",
+          "form": "attached",
+          "model": "predict",
+          "value": {
+            "type": "Const",
+            "enum": {
+              "TERM": "TERM",
+              "KILL": "KILL",
+              "INT": "INT",
+              "HUP": "HUP"
+            },
+            "norms": [
+              "signal"
+            ],
+            "enum_cue": {
+              "KILL": "FORCE"
+            }
+          },
+          "note": "rendered first (-KILL); value only from norm:signal (has a source span); KILL carries cue FORCE"
+        },
+        {
+          "mod": "exact",
+          "flag": "-x",
+          "form": "bool",
+          "model": "derived",
+          "derive": "always"
+        },
+        {
+          "mod": "ignore_case",
+          "flag": "-i",
+          "form": "bool",
+          "model": "predict",
+          "cue": "CASE"
+        }
+      ],
+      "rules": [],
+      "notes": [
+        "gate: requires a kill/stop/terminate verb cue and an exact name span",
+        "Linux: -x matches the 15-char comm; names longer than 15 chars -> env_unsupported",
+        "procps-ng and macOS pkill share -x, -f, -i and the -SIGNAL form"
+      ],
+      "excluded": [
+        "-u/-U/-P/-g/-t selectors (phase 2)",
+        "--signal (procps only)",
+        "-n/-o",
+        "-f full command line (phase 2: without -x it kills every process whose command line contains the name)"
+      ]
+    }
+  }
+}

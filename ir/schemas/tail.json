@@ -1,0 +1,139 @@
+{
+  "schema_version": 1,
+  "tool": "tail",
+  "binary": "tail",
+  "versions": {},
+  "platforms": {
+    "linux_gnu": "ok",
+    "darwin_bsd": "ok"
+  },
+  "ops": {
+    "file.tail": {
+      "realization": "default",
+      "argv_prefix": [],
+      "gloss": "last {lines} lines of {paths}",
+      "effects": [
+        "read_fs"
+      ],
+      "stdin": {
+        "accepts": [
+          "lines",
+          "paths"
+        ],
+        "when": "no_file_operands"
+      },
+      "stdout": "input",
+      "stdout_when": [
+        {
+          "mods": [
+            "follow"
+          ],
+          "stdout": "endless"
+        },
+        {
+          "mods": [
+            "follow_retry"
+          ],
+          "stdout": "endless"
+        }
+      ],
+      "no_operands": "stdin",
+      "positionals": [
+        {
+          "role": "paths",
+          "type": "Path",
+          "arity": [
+            0,
+            8
+          ],
+          "leading_dash": "eoo"
+        }
+      ],
+      "options": [
+        {
+          "mod": "lines",
+          "flag": "-n",
+          "form": "sep",
+          "model": "predict",
+          "value": {
+            "type": "Int",
+            "range": [
+              1,
+              10000000
+            ]
+          },
+          "cue": "LIMIT",
+          "direction": "last"
+        },
+        {
+          "mod": "from_line",
+          "flag": "-n",
+          "form": "sep",
+          "model": "predict",
+          "value": {
+            "type": "Int",
+            "range": [
+              1,
+              10000000
+            ],
+            "template": "+{v}"
+          },
+          "note": "'from line N to the end'"
+        },
+        {
+          "mod": "bytes",
+          "flag": "-c",
+          "form": "sep",
+          "model": "predict",
+          "value": {
+            "type": "Int",
+            "range": [
+              1,
+              1000000000
+            ]
+          },
+          "direction": "last"
+        },
+        {
+          "mod": "follow",
+          "flag": "-f",
+          "form": "bool",
+          "model": "predict",
+          "cue": "FOLLOW"
+        },
+        {
+          "mod": "follow_retry",
+          "flag": "-F",
+          "form": "bool",
+          "model": "predict",
+          "cue": "FOLLOW",
+          "note": "follow by name, retry on rotation"
+        }
+      ],
+      "rules": [
+        {
+          "excl": [
+            "lines",
+            "from_line",
+            "bytes"
+          ]
+        },
+        {
+          "excl": [
+            "follow",
+            "follow_retry"
+          ]
+        }
+      ],
+      "excluded": [
+        "--pid (GNU)",
+        "-s (GNU)",
+        "-r (BSD only)"
+      ],
+      "each_ok": true,
+      "notes": [
+        "follow/follow_retry are illegal in an each inner (endless output)"
+      ]
+    }
+  }
+}

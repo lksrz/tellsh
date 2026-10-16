@@ -1,0 +1,90 @@
+{
+  "schema_version": 1,
+  "tool": "wc",
+  "binary": "wc",
+  "versions": {},
+  "platforms": {
+    "linux_gnu": "ok",
+    "darwin_bsd": "ok"
+  },
+  "ops": {
+    "file.count": {
+      "realization": "default",
+      "argv_prefix": [],
+      "gloss": "count {what} in {paths}",
+      "effects": [
+        "read_fs"
+      ],
+      "stdin": {
+        "accepts": [
+          "lines",
+          "paths"
+        ],
+        "when": "no_file_operands"
+      },
+      "stdout": "lines",
+      "no_operands": "stdin",
+      "positionals": [
+        {
+          "role": "paths",
+          "type": "Path",
+          "arity": [
+            0,
+            8
+          ],
+          "leading_dash": "eoo"
+        }
+      ],
+      "options": [
+        {
+          "mod": "lines",
+          "flag": "-l",
+          "form": "bool",
+          "model": "predict",
+          "cue": "COUNT"
+        },
+        {
+          "mod": "words",
+          "flag": "-w",
+          "form": "bool",
+          "model": "predict",
+          "cue": "COUNT"
+        },
+        {
+          "mod": "bytes",
+          "flag": "-c",
+          "form": "bool",
+          "model": "predict",
+          "cue": "COUNT"
+        },
+        {
+          "mod": "chars",
+          "flag": "-m",
+          "form": "bool",
+          "model": "predict",
+          "cue": "COUNT"
+        }
+      ],
+      "rules": [
+        {
+          "required": [
+            "lines",
+            "words",
+            "bytes",
+            "chars"
+          ]
+        },
+        {
+          "excl": [
+            "bytes",
+            "chars"
+          ]
+        }
+      ],
+      "notes": [
+        "several files print a 'total' line; under xargs possibly several (gloss)"
+      ],
+      "each_ok": true
+    }
+  }
+}

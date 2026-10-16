@@ -1,0 +1,131 @@
+{
+  "schema_version": 1,
+  "tool": "ls",
+  "binary": "ls",
+  "versions": {},
+  "platforms": {
+    "linux_gnu": "ok",
+    "darwin_bsd": "ok"
+  },
+  "cluster_short": true,
+  "ops": {
+    "dir.list": {
+      "realization": "default",
+      "argv_prefix": [],
+      "gloss": "list {paths}",
+      "effects": [
+        "list_fs"
+      ],
+      "stdin": {
+        "accepts": [],
+        "when": "never"
+      },
+      "stdout": "lines",
+      "no_operands": "cwd",
+      "stderr": [
+        "discard"
+      ],
+      "positionals": [
+        {
+          "role": "paths",
+          "type": "Path",
+          "arity": [
+            0,
+            8
+          ],
+          "leading_dash": "eoo"
+        }
+      ],
+      "options": [
+        {
+          "mod": "long",
+          "flag": "-l",
+          "form": "bool",
+          "model": "predict",
+          "cue": "LONG_FORMAT"
+        },
+        {
+          "mod": "hidden",
+          "flag": "-A",
+          "form": "bool",
+          "model": "predict",
+          "cue": "HIDDEN",
+          "note": "global 'hidden' mod: the one canonical rendering of 'include hidden' on ls"
+        },
+        {
+          "mod": "human",
+          "flag": "-h",
+          "form": "bool",
+          "model": "predict",
+          "cue": "HUMAN_SIZES"
+        },
+        {
+          "mod": "sort_size",
+          "flag": "-S",
+          "form": "bool",
+          "model": "predict",
+          "cue": "SORT"
+        },
+        {
+          "mod": "sort_time",
+          "flag": "-t",
+          "form": "bool",
+          "model": "predict",
+          "cue": "SORT"
+        },
+        {
+          "mod": "reverse",
+          "flag": "-r",
+          "form": "bool",
+          "model": "predict",
+          "cue": "REVERSE"
+        },
+        {
+          "mod": "one_per_line",
+          "flag": "-1",
+          "form": "bool",
+          "model": "predict"
+        },
+        {
+          "mod": "directory",
+          "flag": "-d",
+          "form": "bool",
+          "model": "predict"
+        },
+        {
+          "mod": "recursive",
+          "flag": "-R",
+          "form": "bool",
+          "model": "predict"
+        }
+      ],
+      "rules": [
+        {
+          "excl": [
+            "sort_size",
+            "sort_time"
+          ]
+        },
+        {
+          "excl": [
+            "directory",
+            "recursive"
+          ]
+        }
+      ],
+      "excluded": [
+        "--color",
+        "--group-directories-first (GNU)",
+        "-G (GNU: no group; BSD: color)",
+        "--time-style (GNU)",
+        "-T (differs)",
+        "-a (hidden is rendered -A; '.' and '..' add nothing)"
+      ],
+      "notes": [
+        "stdout is lines, never paths: 'ls | xargs' is inexpressible",
+        "predicted boolean short flags are clustered in schema order: -lAhS"
+      ],
+      "each_ok": true
+    }
+  }
+}

@@ -1,0 +1,598 @@
+{
+  "schema_version": 1,
+  "tool": "rg",
+  "binary": "rg",
+  "versions": {
+    "min": "13.0.0",
+    "notes": [
+      "-g '!x' uses gitignore semantics: a glob without '/' matches the basename at any depth",
+      "binary from the 'ripgrep' package; same flags on linux and darwin"
+    ]
+  },
+  "platforms": {
+    "linux_gnu": "ok",
+    "darwin_bsd": "ok"
+  },
+  "ops": {
+    "text.search": {
+      "realization": "default",
+      "argv_prefix": [],
+      "gloss": "search file contents for {pattern} in {paths} (recursive; skips .gitignore'd, hidden and binary files)",
+      "effects": [
+        "read_fs"
+      ],
+      "stdin": {
+        "accepts": [
+          "lines",
+          "paths",
+          "endless"
+        ],
+        "when": "no_file_operands"
+      },
+      "stdout": "lines",
+      "stdout_when": [
+        {
+          "mods": [
+            "files_with_matches"
+          ],
+          "stdout": "paths"
+        },
+        {
+          "mods": [
+            "files_without_match"
+          ],
+          "stdout": "paths"
+        },
+        {
+          "mods": [
+            "files_with_matches",
+            "null"
+          ],
+          "stdout": "paths0"
+        }
+      ],
+      "nul": {
+        "mod": "null"
+      },
+      "no_operands": "stdin",
+      "first_stage_operands": [
+        "."
+      ],
+      "positionals": [
+        {
+          "role": "pattern",
+          "type": "Pattern",
+          "arity": [
+            1,
+            4
+          ],
+          "leading_dash": "dash_e",
+          "dialect": "rust_regex",
+          "multi": "dash_e"
+        },
+        {
+          "role": "paths",
+          "type": "Path",
+          "arity": [
+            0,
+            8
+          ],
+          "leading_dash": "eoo"
+        }
+      ],
+      "options": [
+        {
+          "mod": "fixed_strings",
+          "flag": "-F",
+          "form": "bool",
+          "model": "derived",
+          "derive": "pattern_literal_with_meta"
+        },
+        {
+          "mod": "ignore_case",
+          "flag": "-i",
+          "form": "bool",
+          "model": "predict",
+          "cue": "CASE"
+        },
+        {
+          "mod": "smart_case",
+          "flag": "-S",
+          "form": "bool",
+          "model": "predict",
+          "cue": "CASE"
+        },
+        {
+          "mod": "case_sensitive",
+          "flag": "-s",
+          "form": "bool",
+          "model": "predict",
+          "cue": "CASE"
+        },
+        {
+          "mod": "word",
+          "flag": "-w",
+          "form": "bool",
+          "model": "predict",
+          "cue": "WORD"
+        },
+        {
+          "mod": "line_regexp",
+          "flag": "-x",
+          "form": "bool",
+          "model": "predict",
+          "cue": "WHOLE_LINE"
+        },
+        {
+          "mod": "invert",
+          "flag": "-v",
+          "form": "bool",
+          "model": "predict",
+          "polarity": "neg"
+        },
+        {
+          "mod": "files_with_matches",
+          "flag": "-l",
+          "form": "bool",
+          "model": "predict",
+          "stdout": "paths"
+        },
+        {
+          "mod": "files_without_match",
+          "flag": "--files-without-match",
+          "form": "bool",
+          "model": "predict",
+          "polarity": "neg",
+          "stdout": "paths"
+        },
+        {
+          "mod": "count",
+          "flag": "-c",
+          "form": "bool",
+          "model": "predict",
+          "cue": "COUNT",
+          "note": "matching LINES per file"
+        },
+        {
+          "mod": "count_matches",
+          "flag": "--count-matches",
+          "form": "bool",
+          "model": "predict",
+          "cue": "COUNT",
+          "note": "matches (occurrences) per file"
+        },
+        {
+          "mod": "only_matching",
+          "flag": "-o",
+          "form": "bool",
+          "model": "predict"
+        },
+        {
+          "mod": "line_number",
+          "flag": "-n",
+          "form": "bool",
+          "model": "predict",
+          "cue": "LINE_NUMBERS",
+          "note": "rg numbers lines only on a tty; rendered when asked"
+        },
+        {
+          "mod": "no_line_number",
+          "flag": "-N",
+          "form": "bool",
+          "model": "predict"
+        },
+        {
+          "mod": "with_filename",
+          "flag": "-H",
+          "form": "bool",
+          "model": "compiler",
+          "derive": "each_inner"
+        },
+        {
+          "mod": "max_count",
+          "flag": "-m",
+          "form": "sep",
+          "model": "predict",
+          "value": {
+            "type": "Int",
+            "range": [
+              1,
+              1000000
+            ]
+          },
+          "cue": "LIMIT",
+          "note": "PER FILE; a global 'first N' is '| head -n N'"
+        },
+        {
+          "mod": "context",
+          "flag": "-C",
+          "form": "sep",
+          "model": "predict",
+          "value": {
+            "type": "Int",
+            "range": [
+              0,
+              1000
+            ]
+          },
+          "cue": "CONTEXT"
+        },
+        {
+          "mod": "before",
+          "flag": "-B",
+          "form": "sep",
+          "model": "predict",
+          "value": {
+            "type": "Int",
+            "range": [
+              0,
+              1000
+            ]
+          },
+          "cue": "CONTEXT"
+        },
+        {
+          "mod": "after",
+          "flag": "-A",
+          "form": "sep",
+          "model": "predict",
+          "value": {
+            "type": "Int",
+            "range": [
+              0,
+              1000
+            ]
+          },
+          "cue": "CONTEXT"
+        },
+        {
+          "mod": "name_glob",
+          "flag": "-g",
+          "form": "sep",
+          "model": "predict",
+          "value": {
+            "type": "Glob",
+            "repeat": [
+              1,
+              8
+            ],
+            "quote": "always",
+            "validator": "^[^!]"
+          },
+          "note": "a Glob value must not start with '!' (it would flip into an exclusion)"
+        },
+        {
+          "mod": "exclude_glob",
+          "flag": "-g",
+          "form": "sep",
+          "model": "predict",
+          "value": {
+            "type": "Glob",
+            "repeat": [
+              1,
+              8
+            ],
+            "prefix": "!",
+            "quote": "always",
+            "validator": "^[^!]"
+          },
+          "polarity": "neg",
+          "note": "a Glob value must not start with '!' (it would flip into an exclusion)"
+        },
+        {
+          "mod": "exclude_dir",
+          "flag": "-g",
+          "form": "sep",
+          "model": "predict",
+          "value": {
+            "type": "Name",
+            "repeat": [
+              1,
+              8
+            ],
+            "prefix": "!",
+            "quote": "always",
+            "validator": "^[^*?\\[\\]{}/\\\\!\\x00-\\x1f]{1,255}$"
+          },
+          "polarity": "neg",
+          "same_argv_as": "exclude_glob",
+          "note": "gitignore-style basename match at any depth; also excludes a FILE with that exact name (gloss); Name: no glob metacharacters, no '/', no leading '!' (a copied span never turns into a glob or a path pattern)"
+        },
+        {
+          "mod": "hidden",
+          "flag": "--hidden",
+          "form": "bool",
+          "model": "predict",
+          "cue": "HIDDEN"
+        },
+        {
+          "mod": "no_ignore",
+          "flag": "--no-ignore",
+          "form": "bool",
+          "model": "predict",
+          "cue": "IGNORED"
+        },
+        {
+          "mod": "follow_links",
+          "flag": "-L",
+          "form": "bool",
+          "model": "predict",
+          "cue": "FOLLOW_LINKS"
+        },
+        {
+          "mod": "max_depth",
+          "flag": "--max-depth",
+          "form": "sep",
+          "model": "predict",
+          "value": {
+            "type": "Int",
+            "range": [
+              0,
+              64
+            ],
+            "norms": [
+              "int",
+              "scope_top"
+            ]
+          },
+          "cue": "SCOPE_TOP",
+          "note": "-d avoided"
+        },
+        {
+          "mod": "line_buffered",
+          "flag": "--line-buffered",
+          "form": "bool",
+          "model": "derived",
+          "derive": "endless_input_and_piped_output",
+          "note": "grep/rg block-buffer a piped stdout; derived when the input stream is endless and stdout is piped"
+        },
+        {
+          "mod": "null",
+          "flag": "-0",
+          "form": "bool",
+          "model": "compiler",
+          "derive": "each_transport",
+          "stdout": "paths0"
+        }
+      ],
+      "rules": [
+        {
+          "excl": [
+            "ignore_case",
+            "smart_case",
+            "case_sensitive"
+          ]
+        },
+        {
+          "excl": [
+            "word",
+            "line_regexp"
+          ]
+        },
+        {
+          "excl": [
+            "files_with_matches",
+            "files_without_match",
+            "count",
+            "count_matches",
+            "only_matching"
+          ]
+        },
+        {
+          "excl": [
+            "invert",
+            "files_with_matches"
+          ]
+        },
+        {
+          "excl": [
+            "invert",
+            "only_matching"
+          ]
+        },
+        {
+          "excl": [
+            "invert",
+            "count_matches"
+          ]
+        },
+        {
+          "excl": [
+            "line_number",
+            "no_line_number"
+          ]
+        },
+        {
+          "excl": [
+            "context",
+            "before"
+          ]
+        },
+        {
+          "excl": [
+            "context",
+            "after"
+          ]
+        },
+        {
+          "excl": [
+            "files_with_matches",
+            "context"
+          ]
+        },
+        {
+          "excl": [
+            "files_with_matches",
+            "before"
+          ]
+        },
+        {
+          "excl": [
+            "files_with_matches",
+            "after"
+          ]
+        },
+        {
+          "requires": "null",
+          "any_of": [
+            "files_with_matches",
+            "files_without_match"
+          ]
+        },
+        {
+          "stdin_excl": [
+            "files_with_matches",
+            "files_without_match",
+            "with_filename"
+          ]
+        }
+      ],
+      "excluded": [
+        "-P/--pcre2 (build-dependent)",
+        "-U/--multiline",
+        "-r/--replace (rewrites output)",
+        "--pre (executes programs)",
+        "--json",
+        "-z/--search-zip",
+        "-t/-T (type sets differ from ext globs; -g with ext_glob is canonical)",
+        "-d (ambiguous across versions; --max-depth used)"
+      ],
+      "each_ok": true
+    },
+    "files.list": {
+      "realization": "default",
+      "argv_prefix": [
+        "--files"
+      ],
+      "gloss": "list the files rg would search under {paths}",
+      "effects": [
+        "list_fs"
+      ],
+      "stdin": {
+        "accepts": [],
+        "when": "never"
+      },
+      "stdout": "paths",
+      "stdout_when": [
+        {
+          "mods": [
+            "null"
+          ],
+          "stdout": "paths0"
+        }
+      ],
+      "nul": {
+        "mod": "null"
+      },
+      "no_operands": "cwd",
+      "positionals": [
+        {
+          "role": "paths",
+          "type": "Path",
+          "arity": [
+            0,
+            8
+          ],
+          "leading_dash": "eoo"
+        }
+      ],
+      "options": [
+        {
+          "mod": "name_glob",
+          "flag": "-g",
+          "form": "sep",
+          "model": "predict",
+          "value": {
+            "type": "Glob",
+            "repeat": [
+              1,
+              8
+            ],
+            "quote": "always",
+            "validator": "^[^!]"
+          },
+          "note": "a Glob value must not start with '!' (it would flip into an exclusion)"
+        },
+        {
+          "mod": "exclude_glob",
+          "flag": "-g",
+          "form": "sep",
+          "model": "predict",
+          "value": {
+            "type": "Glob",
+            "repeat": [
+              1,
+              8
+            ],
+            "prefix": "!",
+            "quote": "always",
+            "validator": "^[^!]"
+          },
+          "polarity": "neg",
+          "note": "a Glob value must not start with '!' (it would flip into an exclusion)"
+        },
+        {
+          "mod": "exclude_dir",
+          "flag": "-g",
+          "form": "sep",
+          "model": "predict",
+          "value": {
+            "type": "Name",
+            "repeat": [
+              1,
+              8
+            ],
+            "prefix": "!",
+            "quote": "always",
+            "validator": "^[^*?\\[\\]{}/\\\\!\\x00-\\x1f]{1,255}$"
+          },
+          "polarity": "neg",
+          "same_argv_as": "exclude_glob",
+          "note": "gitignore-style basename match at any depth; also excludes a FILE with that exact name (gloss); Name: no glob metacharacters, no '/', no leading '!' (a copied span never turns into a glob or a path pattern)"
+        },
+        {
+          "mod": "hidden",
+          "flag": "--hidden",
+          "form": "bool",
+          "model": "predict",
+          "cue": "HIDDEN"
+        },
+        {
+          "mod": "no_ignore",
+          "flag": "--no-ignore",
+          "form": "bool",
+          "model": "predict",
+          "cue": "IGNORED"
+        },
+        {
+          "mod": "max_depth",
+          "flag": "--max-depth",
+          "form": "sep",
+          "model": "predict",
+          "value": {
+            "type": "Int",
+            "range": [
+              0,
+              64
+            ],
+            "norms": [
+              "int",
+              "scope_top"
+            ]
+          },
+          "cue": "SCOPE_TOP",
+          "note": "-d avoided"
+        },
+        {
+          "mod": "null",
+          "flag": "-0",
+          "form": "bool",
+          "model": "compiler",
+          "derive": "each_transport",
+          "stdout": "paths0"
+        }
+      ],
+      "rules": []
+    }
+  }
+}

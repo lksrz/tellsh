@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "tool": "uniq",
+  "binary": "uniq",
+  "versions": {},
+  "platforms": {
+    "linux_gnu": "ok",
+    "darwin_bsd": "ok"
+  },
+  "ops": {
+    "lines.uniq": {
+      "realization": "default",
+      "argv_prefix": [],
+      "gloss": "collapse adjacent duplicate lines",
+      "effects": [
+        "read_fs"
+      ],
+      "stdin": {
+        "accepts": [
+          "lines",
+          "paths"
+        ],
+        "when": "no_file_operands"
+      },
+      "stdout": "lines",
+      "no_operands": "stdin",
+      "positionals": [
+        {
+          "role": "paths",
+          "type": "Path",
+          "arity": [
+            0,
+            1
+          ],
+          "leading_dash": "eoo",
+          "note": "arity 0..1: uniq's SECOND operand is an output file and is never rendered; never an each inner (no each_ok)"
+        }
+      ],
+      "options": [
+        {
+          "mod": "count",
+          "flag": "-c",
+          "form": "bool",
+          "model": "predict",
+          "cue": "COUNT"
+        },
+        {
+          "mod": "repeated",
+          "flag": "-d",
+          "form": "bool",
+          "model": "predict"
+        },
+        {
+          "mod": "unique_only",
+          "flag": "-u",
+          "form": "bool",
+          "model": "predict"
+        },
+        {
+          "mod": "ignore_case",
+          "flag": "-i",
+          "form": "bool",
+          "model": "predict",
+          "cue": "CASE"
+        }
+      ],
+      "rules": [
+        {
+          "excl": [
+            "repeated",
+            "unique_only"
+          ]
+        }
+      ],
+      "excluded": [
+        "OUTPUT operand (writes)",
+        "-f/-s (phase 2)",
+        "-w (GNU only)"
+      ],
+      "notes": [
+        "gate: legal only after lines.sort unless the request has an ADJACENT cue"
+      ]
+    }
+  }
+}

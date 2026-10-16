@@ -1,0 +1,62 @@
+{
+  "schema_version": 1,
+  "tool": "lsof",
+  "binary": "lsof",
+  "versions": {},
+  "platforms": {
+    "linux_gnu": "ok",
+    "darwin_bsd": "ok"
+  },
+  "ops": {
+    "port.who": {
+      "realization": "default",
+      "argv_prefix": [
+        "-nP"
+      ],
+      "gloss": "processes with TCP port {port} open",
+      "effects": [
+        "read_proc"
+      ],
+      "stdin": {
+        "accepts": [],
+        "when": "never"
+      },
+      "stdout": "lines",
+      "no_operands": "nothing",
+      "positionals": [],
+      "options": [
+        {
+          "mod": "port",
+          "flag": "-iTCP:",
+          "form": "attached",
+          "model": "predict",
+          "value": {
+            "type": "Port",
+            "range": [
+              1,
+              65535
+            ]
+          }
+        },
+        {
+          "mod": "listening",
+          "flag": "-sTCP:LISTEN",
+          "form": "bool",
+          "model": "predict",
+          "cue": "LISTEN"
+        }
+      ],
+      "rules": [
+        {
+          "required": [
+            "port"
+          ]
+        }
+      ],
+      "notes": [
+        "TCP only (UDP not covered)",
+        "without root, other users' processes may be invisible (gloss)"
+      ]
+    }
+  }
+}

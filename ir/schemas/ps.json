@@ -1,0 +1,65 @@
+{
+  "schema_version": 1,
+  "tool": "ps",
+  "binary": "ps",
+  "versions": {},
+  "platforms": {
+    "linux_gnu": "ok",
+    "darwin_bsd": "ok"
+  },
+  "ops": {
+    "proc.list": {
+      "realization": "default",
+      "argv_prefix": [
+        "aux"
+      ],
+      "gloss": "all processes of all users",
+      "effects": [
+        "read_proc"
+      ],
+      "stdin": {
+        "accepts": [],
+        "when": "never"
+      },
+      "stdout": "lines",
+      "no_operands": "nothing",
+      "positionals": [],
+      "options": [
+        {
+          "mod": "sort_cpu",
+          "flag": "--sort=-%cpu",
+          "form": "bool",
+          "model": "predict",
+          "cue": "SORT",
+          "platform": {
+            "darwin_bsd": "absent"
+          },
+          "note": "procps only; darwin pending verification of 'ps aux -r'"
+        },
+        {
+          "mod": "sort_mem",
+          "flag": "--sort=-%mem",
+          "form": "bool",
+          "model": "predict",
+          "cue": "SORT",
+          "platform": {
+            "darwin_bsd": "absent"
+          },
+          "note": "procps only; darwin pending verification of 'ps aux -m'"
+        }
+      ],
+      "rules": [
+        {
+          "excl": [
+            "sort_cpu",
+            "sort_mem"
+          ]
+        }
+      ],
+      "notes": [
+        "BSD-style 'aux' works on procps and macOS",
+        "the header line counts as a line for head (hard case)"
+      ]
+    }
+  }
+}

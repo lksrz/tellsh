@@ -1,0 +1,377 @@
+{
+  "schema_version": 1,
+  "tool": "grep",
+  "binary": "grep",
+  "versions": {
+    "notes": [
+      "GNU grep >= 3.x and macOS/FreeBSD grep 2.6+ share every listed flag except null",
+      "--include/--exclude/--exclude-dir apply during -r traversal on both"
+    ]
+  },
+  "platforms": {
+    "linux_gnu": "ok",
+    "darwin_bsd": "ok"
+  },
+  "ops": {
+    "text.search": {
+      "realization": [
+        "pinned",
+        "stdin_filter"
+      ],
+      "argv_prefix": [],
+      "gloss": "search {paths} for lines matching {pattern} (grep: does not skip hidden or .gitignore'd files)",
+      "effects": [
+        "read_fs"
+      ],
+      "stdin": {
+        "accepts": [
+          "lines",
+          "paths",
+          "endless"
+        ],
+        "when": "no_file_operands"
+      },
+      "stdout": "lines",
+      "stdout_when": [
+        {
+          "mods": [
+            "files_with_matches"
+          ],
+          "stdout": "paths"
+        },
+        {
+          "mods": [
+            "files_without_match"
+          ],
+          "stdout": "paths"
+        },
+        {
+          "mods": [
+            "files_with_matches",
+            "null"
+          ],
+          "stdout": "paths0"
+        }
+      ],
+      "nul": {
+        "mod": "null"
+      },
+      "no_operands": "stdin",
+      "first_stage_operands": [
+        "."
+      ],
+      "positionals": [
+        {
+          "role": "pattern",
+          "type": "Pattern",
+          "arity": [
+            1,
+            4
+          ],
+          "leading_dash": "dash_e",
+          "dialect": "posix_ere",
+          "note": "regex kind renders -E, checked by a strict POSIX-ERE checker (no backslash escapes outside the POSIX set, no GNU \\w \\b \\s \\< \\> or back-references); literal with metachars renders -F",
+          "multi": "dash_e"
+        },
+        {
+          "role": "paths",
+          "type": "Path",
+          "arity": [
+            0,
+            8
+          ],
+          "leading_dash": "eoo"
+        }
+      ],
+      "options": [
+        {
+          "mod": "recursive",
+          "flag": "-r",
+          "form": "bool",
+          "model": "derived",
+          "derive": "first_stage",
+          "note": "always rendered for a first-stage grep (grep -r on a plain file just searches it); never for a stdin filter or an each inner"
+        },
+        {
+          "mod": "fixed_strings",
+          "flag": "-F",
+          "form": "bool",
+          "model": "derived",
+          "derive": "pattern_literal_with_meta"
+        },
+        {
+          "mod": "extended_regex",
+          "flag": "-E",
+          "form": "bool",
+          "model": "derived",
+          "derive": "pattern_regex"
+        },
+        {
+          "mod": "ignore_case",
+          "flag": "-i",
+          "form": "bool",
+          "model": "predict",
+          "cue": "CASE"
+        },
+        {
+          "mod": "word",
+          "flag": "-w",
+          "form": "bool",
+          "model": "predict",
+          "cue": "WORD"
+        },
+        {
+          "mod": "line_regexp",
+          "flag": "-x",
+          "form": "bool",
+          "model": "predict",
+          "cue": "WHOLE_LINE"
+        },
+        {
+          "mod": "invert",
+          "flag": "-v",
+          "form": "bool",
+          "model": "predict",
+          "polarity": "neg"
+        },
+        {
+          "mod": "files_with_matches",
+          "flag": "-l",
+          "form": "bool",
+          "model": "predict",
+          "stdout": "paths"
+        },
+        {
+          "mod": "files_without_match",
+          "flag": "-L",
+          "form": "bool",
+          "model": "predict",
+          "polarity": "neg",
+          "stdout": "paths"
+        },
+        {
+          "mod": "count",
+          "flag": "-c",
+          "form": "bool",
+          "model": "predict",
+          "cue": "COUNT",
+          "note": "matching LINES per file"
+        },
+        {
+          "mod": "only_matching",
+          "flag": "-o",
+          "form": "bool",
+          "model": "predict"
+        },
+        {
+          "mod": "line_number",
+          "flag": "-n",
+          "form": "bool",
+          "model": "predict",
+          "cue": "LINE_NUMBERS"
+        },
+        {
+          "mod": "with_filename",
+          "flag": "-H",
+          "form": "bool",
+          "model": "compiler",
+          "derive": "each_inner"
+        },
+        {
+          "mod": "max_count",
+          "flag": "-m",
+          "form": "sep",
+          "model": "predict",
+          "value": {
+            "type": "Int",
+            "range": [
+              1,
+              1000000
+            ]
+          },
+          "cue": "LIMIT",
+          "note": "PER FILE"
+        },
+        {
+          "mod": "context",
+          "flag": "-C",
+          "form": "sep",
+          "model": "predict",
+          "value": {
+            "type": "Int",
+            "range": [
+              0,
+              1000
+            ]
+          },
+          "cue": "CONTEXT"
+        },
+        {
+          "mod": "before",
+          "flag": "-B",
+          "form": "sep",
+          "model": "predict",
+          "value": {
+            "type": "Int",
+            "range": [
+              0,
+              1000
+            ]
+          },
+          "cue": "CONTEXT"
+        },
+        {
+          "mod": "after",
+          "flag": "-A",
+          "form": "sep",
+          "model": "predict",
+          "value": {
+            "type": "Int",
+            "range": [
+              0,
+              1000
+            ]
+          },
+          "cue": "CONTEXT"
+        },
+        {
+          "mod": "name_glob",
+          "flag": "--include",
+          "form": "eq",
+          "model": "predict",
+          "value": {
+            "type": "Glob",
+            "repeat": [
+              1,
+              8
+            ],
+            "quote": "always"
+          }
+        },
+        {
+          "mod": "exclude_glob",
+          "flag": "--exclude",
+          "form": "eq",
+          "model": "predict",
+          "value": {
+            "type": "Glob",
+            "repeat": [
+              1,
+              8
+            ],
+            "quote": "always"
+          },
+          "polarity": "neg"
+        },
+        {
+          "mod": "exclude_dir",
+          "flag": "--exclude-dir",
+          "form": "eq",
+          "model": "predict",
+          "value": {
+            "type": "Name",
+            "repeat": [
+              1,
+              8
+            ],
+            "validator": "^[^*?\\[\\]{}/\\\\!\\x00-\\x1f]{1,255}$"
+          },
+          "polarity": "neg",
+          "note": "Name: no glob metacharacters, no '/', no leading '!' (a copied span never turns into a glob or a path pattern)"
+        },
+        {
+          "mod": "line_buffered",
+          "flag": "--line-buffered",
+          "form": "bool",
+          "model": "derived",
+          "derive": "endless_input_and_piped_output",
+          "note": "grep/rg block-buffer a piped stdout; derived when the input stream is endless and stdout is piped"
+        },
+        {
+          "mod": "null",
+          "flag": "-Z",
+          "form": "bool",
+          "model": "compiler",
+          "derive": "each_transport",
+          "stdout": "paths0",
+          "platform": {
+            "darwin_bsd": {
+              "flag": "--null"
+            }
+          },
+          "note": "GNU -Z/--null; BSD grep -Z means decompress, so darwin uses --null"
+        }
+      ],
+      "rules": [
+        {
+          "excl": [
+            "fixed_strings",
+            "extended_regex"
+          ]
+        },
+        {
+          "excl": [
+            "word",
+            "line_regexp"
+          ]
+        },
+        {
+          "excl": [
+            "files_with_matches",
+            "files_without_match",
+            "count",
+            "only_matching"
+          ]
+        },
+        {
+          "excl": [
+            "invert",
+            "files_with_matches"
+          ]
+        },
+        {
+          "excl": [
+            "invert",
+            "only_matching"
+          ]
+        },
+        {
+          "excl": [
+            "context",
+            "before"
+          ]
+        },
+        {
+          "excl": [
+            "context",
+            "after"
+          ]
+        },
+        {
+          "requires": "null",
+          "any_of": [
+            "files_with_matches",
+            "files_without_match"
+          ]
+        },
+        {
+          "stdin_excl": [
+            "files_with_matches",
+            "files_without_match",
+            "with_filename"
+          ]
+        }
+      ],
+      "excluded": [
+        "-P (GNU only, PCRE)",
+        "-z/--null-data",
+        "-R (follows all symlinks; differs)",
+        "--color",
+        "-f FILE (pattern file)",
+        "-s",
+        "-q (exit status only)"
+      ],
+      "each_ok": true
+    }
+  }
+}

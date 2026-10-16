@@ -1,0 +1,333 @@
+{
+  "schema_version": 1,
+  "tool": "find",
+  "binary": "find",
+  "versions": {
+    "notes": [
+      "GNU findutils >= 4.6 and macOS/FreeBSD find support every listed predicate"
+    ]
+  },
+  "platforms": {
+    "linux_gnu": "ok",
+    "darwin_bsd": "ok"
+  },
+  "ops": {
+    "files.find": {
+      "realization": "default",
+      "argv_prefix": [],
+      "gloss": "find {type} under {roots} matching the predicates",
+      "effects": [
+        "list_fs"
+      ],
+      "stdin": {
+        "accepts": [],
+        "when": "never"
+      },
+      "stdout": "paths",
+      "stdout_when": [
+        {
+          "mods": [
+            "print0"
+          ],
+          "stdout": "paths0"
+        }
+      ],
+      "nul": {
+        "mod": "print0"
+      },
+      "no_operands": "error",
+      "first_stage_operands": [
+        "."
+      ],
+      "stderr": [
+        "discard"
+      ],
+      "positionals": [
+        {
+          "role": "paths",
+          "type": "Path",
+          "arity": [
+            0,
+            8
+          ],
+          "leading_dash": "dot_slash",
+          "note": "the search roots; rendered BEFORE the expression (layout operands_first). find has no usable '--'; a '-'-initial root is rendered ./-x"
+        }
+      ],
+      "options": [
+        {
+          "mod": "max_depth",
+          "flag": "-maxdepth",
+          "form": "sep",
+          "model": "predict",
+          "value": {
+            "type": "Int",
+            "range": [
+              0,
+              64
+            ],
+            "norms": [
+              "int",
+              "scope_top"
+            ]
+          },
+          "cue": "SCOPE_TOP",
+          "note": "global option; rendered before all predicates (GNU warns otherwise)"
+        },
+        {
+          "mod": "min_depth",
+          "flag": "-mindepth",
+          "form": "sep",
+          "model": "predict",
+          "value": {
+            "type": "Int",
+            "range": [
+              0,
+              64
+            ]
+          }
+        },
+        {
+          "mod": "exclude_dir",
+          "flag": "-name",
+          "form": "group",
+          "model": "predict",
+          "group": {
+            "kind": "prune"
+          },
+          "value": {
+            "type": "Name",
+            "repeat": [
+              1,
+              4
+            ],
+            "validator": "^[^*?\\[\\]{}/\\\\!\\x00-\\x1f]{1,255}$"
+          },
+          "polarity": "neg",
+          "note": "renders '-type d -name D -prune -o' or '-type d \\( -name A -o -name B \\) -prune -o'; terminal becomes -print"
+        },
+        {
+          "mod": "type",
+          "flag": "-type",
+          "form": "sep",
+          "model": "predict",
+          "value": {
+            "type": "Const",
+            "enum": {
+              "f": "f",
+              "d": "d",
+              "l": "l"
+            }
+          }
+        },
+        {
+          "mod": "ignore_case",
+          "form": "none",
+          "model": "predict",
+          "cue": "CASE",
+          "note": "switches name_glob/any_name to -iname"
+        },
+        {
+          "mod": "name_glob",
+          "flag": "-name",
+          "form": "sep",
+          "model": "predict",
+          "value": {
+            "type": "Glob",
+            "repeat": [
+              1,
+              1
+            ],
+            "quote": "always"
+          },
+          "alt_flag_when": {
+            "mod": "ignore_case",
+            "flag": "-iname"
+          }
+        },
+        {
+          "mod": "any_name",
+          "flag": "-name",
+          "form": "group",
+          "model": "predict",
+          "group": {
+            "kind": "or"
+          },
+          "value": {
+            "type": "Glob",
+            "repeat": [
+              2,
+              4
+            ],
+            "quote": "always"
+          },
+          "alt_flag_when": {
+            "mod": "ignore_case",
+            "flag": "-iname"
+          },
+          "note": "renders '\\( -name A -o -name B \\)'"
+        },
+        {
+          "mod": "exclude_glob",
+          "flag": [
+            "-not",
+            "-name"
+          ],
+          "form": "sep",
+          "model": "predict",
+          "value": {
+            "type": "Glob",
+            "repeat": [
+              1,
+              4
+            ],
+            "quote": "always"
+          },
+          "polarity": "neg"
+        },
+        {
+          "mod": "size_gt",
+          "flag": "-size",
+          "form": "sep",
+          "model": "predict",
+          "value": {
+            "type": "Size",
+            "template": "+{v}c"
+          },
+          "cue": "SIZE",
+          "note": "rendered in bytes (c suffix), which is exact on GNU and BSD; k/M/G suffixes round the file size UP to the unit (GNU: '-size -1M' matches only empty files) and BSD rounds differently, so they are never rendered"
+        },
+        {
+          "mod": "size_lt",
+          "flag": "-size",
+          "form": "sep",
+          "model": "predict",
+          "value": {
+            "type": "Size",
+            "template": "-{v}c"
+          },
+          "cue": "SIZE",
+          "note": "rendered in bytes (c suffix), which is exact on GNU and BSD; k/M/G suffixes round the file size UP to the unit (GNU: '-size -1M' matches only empty files) and BSD rounds differently, so they are never rendered"
+        },
+        {
+          "mod": "modified_within_days",
+          "flag": "-mtime",
+          "form": "sep",
+          "model": "predict",
+          "value": {
+            "type": "Int",
+            "range": [
+              1,
+              36500
+            ],
+            "template": "-{v}",
+            "norms": [
+              "age_days"
+            ]
+          },
+          "cue": "RECENCY",
+          "note": "-mtime -N: modified less than N*24h ago"
+        },
+        {
+          "mod": "modified_before_days",
+          "flag": "-mtime",
+          "form": "sep",
+          "model": "predict",
+          "value": {
+            "type": "Int",
+            "range": [
+              1,
+              36500
+            ],
+            "template": "+{v}",
+            "norms": [
+              "age_days"
+            ]
+          },
+          "cue": "RECENCY"
+        },
+        {
+          "mod": "modified_within_minutes",
+          "flag": "-mmin",
+          "form": "sep",
+          "model": "predict",
+          "value": {
+            "type": "Int",
+            "range": [
+              1,
+              525600
+            ],
+            "template": "-{v}",
+            "norms": [
+              "age_minutes"
+            ]
+          },
+          "cue": "RECENCY"
+        },
+        {
+          "mod": "empty",
+          "flag": "-empty",
+          "form": "bool",
+          "model": "predict"
+        },
+        {
+          "mod": "newer",
+          "flag": "-newer",
+          "form": "sep",
+          "model": "predict",
+          "value": {
+            "type": "Path"
+          }
+        },
+        {
+          "mod": "print0",
+          "flag": "-print0",
+          "form": "bool",
+          "model": "compiler",
+          "derive": "each_transport",
+          "note": "unused in practice: find + each folds to '-exec CMD [opts] -- {} +'"
+        }
+      ],
+      "rules": [
+        {
+          "excl": [
+            "modified_within_days",
+            "modified_before_days",
+            "modified_within_minutes"
+          ]
+        },
+        {
+          "excl": [
+            "name_glob",
+            "any_name"
+          ]
+        },
+        {
+          "requires": "ignore_case",
+          "any_of": [
+            "name_glob",
+            "any_name"
+          ]
+        }
+      ],
+      "excluded": [
+        "-delete",
+        "-exec/-execdir/-ok with free commands (only the each fold)",
+        "-printf/-fprint (GNU)",
+        "-regex/-iregex (dialect differs)",
+        "-newerXY",
+        "-perm",
+        "-user/-group (phase 2)",
+        "-L/-H (phase 2)",
+        "-path/-not -path (find paths carry the root prefix, so a copied 'src/gen' never matches; phase 2 with a root-independent normalizer)"
+      ],
+      "notes": [
+        "render order: roots, global options (-maxdepth, -mindepth), prune group, predicates, terminal",
+        "compiler terminal: -print when a prune group exists; '-exec CMD [opts] -- {} +' for each",
+        "-not is supported by GNU and BSD find; '!' is avoided for readability",
+        "-size: GNU rounds sizes up to the unit (k/M/G); BSD/macOS rounds differently with scale suffixes; only the exact 'c' (bytes) form is rendered"
+      ],
+      "layout": "operands_first"
+    }
+  }
+}

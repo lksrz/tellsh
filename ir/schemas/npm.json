@@ -1,0 +1,166 @@
+{
+  "schema_version": 1,
+  "tool": "npm",
+  "binary": "npm",
+  "versions": {
+    "min": "7.0",
+    "notes": [
+      "npm >= 7: 'npm ls' shows top-level deps by default; --all shows the tree"
+    ]
+  },
+  "platforms": {
+    "linux_gnu": "ok",
+    "darwin_bsd": "ok",
+    "notes": [
+      "excluded entirely: install, ci, exec, publish, npx"
+    ]
+  },
+  "ops": {
+    "npm.run": {
+      "realization": "default",
+      "argv_prefix": [
+        "run"
+      ],
+      "gloss": "run the package script {script} (executes project code)",
+      "effects": [
+        "exec_project"
+      ],
+      "stdin": {
+        "accepts": [],
+        "when": "never"
+      },
+      "stdout": "lines",
+      "no_operands": "nothing",
+      "stderr": [
+        "merge"
+      ],
+      "positionals": [
+        {
+          "role": "script",
+          "type": "ScriptName",
+          "arity": [
+            1,
+            1
+          ],
+          "leading_dash": "reject",
+          "validator": "^[A-Za-z0-9:._-]{1,64}$"
+        }
+      ],
+      "options": [],
+      "rules": [],
+      "excluded": [
+        "-- args (phase 2)",
+        "--workspace (phase 2)"
+      ]
+    },
+    "npm.scripts": {
+      "realization": "default",
+      "argv_prefix": [
+        "run"
+      ],
+      "gloss": "list the package scripts",
+      "effects": [
+        "read_fs"
+      ],
+      "stdin": {
+        "accepts": [],
+        "when": "never"
+      },
+      "stdout": "lines",
+      "no_operands": "nothing",
+      "positionals": [],
+      "options": [],
+      "rules": []
+    },
+    "npm.test": {
+      "realization": "default",
+      "argv_prefix": [
+        "test"
+      ],
+      "gloss": "run the package tests (executes project code; may enter watch mode in a terminal)",
+      "effects": [
+        "exec_project"
+      ],
+      "stdin": {
+        "accepts": [],
+        "when": "never"
+      },
+      "stdout": "lines",
+      "no_operands": "nothing",
+      "stderr": [
+        "merge"
+      ],
+      "positionals": [],
+      "options": [],
+      "rules": [],
+      "notes": [
+        "vitest/jest may start an interactive watch mode on a tty but run once in a pipe or under an agent; stated in the gloss (§8.6 trap)"
+      ]
+    },
+    "npm.ls": {
+      "realization": "default",
+      "argv_prefix": [
+        "ls"
+      ],
+      "gloss": "list installed dependencies",
+      "effects": [
+        "read_fs"
+      ],
+      "stdin": {
+        "accepts": [],
+        "when": "never"
+      },
+      "stdout": "lines",
+      "no_operands": "nothing",
+      "positionals": [
+        {
+          "role": "packages",
+          "type": "Name",
+          "arity": [
+            0,
+            4
+          ],
+          "leading_dash": "reject",
+          "validator": "^(@[a-z0-9._-]+/)?[a-z0-9._-]+$"
+        }
+      ],
+      "options": [
+        {
+          "mod": "top_level",
+          "flag": "--depth=0",
+          "form": "bool",
+          "model": "predict",
+          "note": "fixed flag word"
+        },
+        {
+          "mod": "depth",
+          "flag": "--depth",
+          "form": "eq",
+          "model": "predict",
+          "value": {
+            "type": "Int",
+            "range": [
+              1,
+              20
+            ]
+          }
+        },
+        {
+          "mod": "all",
+          "flag": "--all",
+          "form": "bool",
+          "model": "predict"
+        }
+      ],
+      "rules": [
+        {
+          "excl": [
+            "top_level",
+            "depth",
+            "all"
+          ]
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,98 @@
+{
+  "schema_version": 1,
+  "tool": "sort",
+  "binary": "sort",
+  "versions": {
+    "notes": [
+      "-h exists in GNU coreutils and in macOS/FreeBSD sort"
+    ]
+  },
+  "platforms": {
+    "linux_gnu": "ok",
+    "darwin_bsd": "ok"
+  },
+  "ops": {
+    "lines.sort": {
+      "realization": "default",
+      "argv_prefix": [],
+      "gloss": "sort lines of {paths}",
+      "effects": [
+        "read_fs"
+      ],
+      "stdin": {
+        "accepts": [
+          "lines",
+          "paths"
+        ],
+        "when": "no_file_operands"
+      },
+      "stdout": "input",
+      "no_operands": "stdin",
+      "positionals": [
+        {
+          "role": "paths",
+          "type": "Path",
+          "arity": [
+            0,
+            8
+          ],
+          "leading_dash": "eoo"
+        }
+      ],
+      "options": [
+        {
+          "mod": "numeric",
+          "flag": "-n",
+          "form": "bool",
+          "model": "predict",
+          "cue": "SORT"
+        },
+        {
+          "mod": "human",
+          "flag": "-h",
+          "form": "bool",
+          "model": "predict",
+          "cue": "SORT"
+        },
+        {
+          "mod": "reverse",
+          "flag": "-r",
+          "form": "bool",
+          "model": "predict",
+          "cue": "REVERSE"
+        },
+        {
+          "mod": "unique",
+          "flag": "-u",
+          "form": "bool",
+          "model": "predict"
+        },
+        {
+          "mod": "ignore_case",
+          "flag": "-f",
+          "form": "bool",
+          "model": "predict",
+          "cue": "CASE"
+        }
+      ],
+      "rules": [
+        {
+          "excl": [
+            "numeric",
+            "human"
+          ]
+        }
+      ],
+      "excluded": [
+        "-o (writes a file)",
+        "-k/-t (phase 2)",
+        "-V",
+        "-R",
+        "-z"
+      ],
+      "notes": [
+        "macro freq = 'sort [FILE] | uniq -c | sort -rn' is defined by the compiler, not here"
+      ]
+    }
+  }
+}

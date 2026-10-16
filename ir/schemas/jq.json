@@ -1,0 +1,86 @@
+{
+  "schema_version": 1,
+  "tool": "jq",
+  "binary": "jq",
+  "versions": {
+    "min": "1.6"
+  },
+  "platforms": {
+    "linux_gnu": "ok",
+    "darwin_bsd": "ok"
+  },
+  "ops": {
+    "json.select": {
+      "realization": "default",
+      "argv_prefix": [],
+      "gloss": "select {filter} from the JSON in {paths}",
+      "effects": [
+        "read_fs"
+      ],
+      "stdin": {
+        "accepts": [
+          "json",
+          "bytes"
+        ],
+        "when": "no_file_operands"
+      },
+      "stdout": "json",
+      "stdout_when": [
+        {
+          "mods": [
+            "raw"
+          ],
+          "stdout": "lines"
+        }
+      ],
+      "no_operands": "stdin",
+      "positionals": [
+        {
+          "role": "filter",
+          "type": "JqPath",
+          "arity": [
+            1,
+            1
+          ],
+          "leading_dash": "reject",
+          "quote": "always",
+          "validator": "^(\\.[A-Za-z_][A-Za-z0-9_]*(\\[\\d+\\])*|\\.\\[\\d+\\])+$"
+        },
+        {
+          "role": "paths",
+          "type": "Path",
+          "arity": [
+            0,
+            1
+          ],
+          "leading_dash": "reject"
+        }
+      ],
+      "options": [
+        {
+          "mod": "raw",
+          "flag": "-r",
+          "form": "bool",
+          "model": "predict"
+        },
+        {
+          "mod": "compact",
+          "flag": "-c",
+          "form": "bool",
+          "model": "predict"
+        }
+      ],
+      "rules": [],
+      "excluded": [
+        "any filter beyond field paths/indexes (select, map, |, arithmetic)",
+        "--arg/--argjson",
+        "-s",
+        "-n",
+        "--rawfile"
+      ],
+      "notes": [
+        "never an each inner (no each_ok)"
+      ]
+    }
+  }
+}

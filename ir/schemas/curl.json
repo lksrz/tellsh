@@ -1,0 +1,266 @@
+{
+  "schema_version": 1,
+  "tool": "curl",
+  "binary": "curl",
+  "versions": {
+    "min": "7.68",
+    "notes": [
+      "--no-clobber (7.83+) not used: overwrite risk is handled by the runtime stat"
+    ]
+  },
+  "platforms": {
+    "linux_gnu": "ok",
+    "darwin_bsd": "ok",
+    "notes": [
+      "excluded: -d/--data*, -X, -u, -H, -K, -b, -T, -k, -x, --config"
+    ]
+  },
+  "ops": {
+    "http.get": {
+      "realization": "default",
+      "argv_prefix": [
+        "-g"
+      ],
+      "gloss": "HTTP GET {url} to stdout",
+      "effects": [
+        "net_read"
+      ],
+      "stdin": {
+        "accepts": [],
+        "when": "never"
+      },
+      "stdout": "bytes",
+      "no_operands": "error",
+      "positionals": [
+        {
+          "role": "url",
+          "type": "Url",
+          "arity": [
+            1,
+            1
+          ],
+          "leading_dash": "reject",
+          "validator": "^https?://[^\\s\\x00-\\x1f\\x7f]{1,2040}$",
+          "note": "every curl op renders -g (--globoff) first: '[]{}' in a copied URL are literal, never URL globs that fan out into many requests or files"
+        }
+      ],
+      "options": [
+        {
+          "mod": "fail",
+          "flag": "-f",
+          "form": "bool",
+          "model": "predict"
+        },
+        {
+          "mod": "silent",
+          "flag": "-s",
+          "form": "bool",
+          "model": "predict"
+        },
+        {
+          "mod": "show_error",
+          "flag": "-S",
+          "form": "bool",
+          "model": "predict"
+        },
+        {
+          "mod": "location",
+          "flag": "-L",
+          "form": "bool",
+          "model": "predict",
+          "cue": "FOLLOW_REDIRECTS"
+        },
+        {
+          "mod": "include_headers",
+          "flag": "-i",
+          "form": "bool",
+          "model": "predict",
+          "cue": "HEADERS"
+        },
+        {
+          "mod": "max_time",
+          "flag": "--max-time",
+          "form": "sep",
+          "model": "predict",
+          "value": {
+            "type": "Int",
+            "range": [
+              1,
+              3600
+            ]
+          }
+        }
+      ],
+      "rules": [],
+      "stdout_when": [
+        {
+          "mods": [
+            "include_headers"
+          ],
+          "stdout": "lines"
+        }
+      ]
+    },
+    "http.head": {
+      "realization": "default",
+      "argv_prefix": [
+        "-g",
+        "-I"
+      ],
+      "gloss": "HTTP HEAD {url}: response headers only",
+      "effects": [
+        "net_read"
+      ],
+      "stdin": {
+        "accepts": [],
+        "when": "never"
+      },
+      "stdout": "lines",
+      "no_operands": "error",
+      "positionals": [
+        {
+          "role": "url",
+          "type": "Url",
+          "arity": [
+            1,
+            1
+          ],
+          "leading_dash": "reject",
+          "validator": "^https?://[^\\s\\x00-\\x1f\\x7f]{1,2040}$",
+          "note": "every curl op renders -g (--globoff) first: '[]{}' in a copied URL are literal, never URL globs that fan out into many requests or files"
+        }
+      ],
+      "options": [
+        {
+          "mod": "fail",
+          "flag": "-f",
+          "form": "bool",
+          "model": "predict"
+        },
+        {
+          "mod": "silent",
+          "flag": "-s",
+          "form": "bool",
+          "model": "predict"
+        },
+        {
+          "mod": "show_error",
+          "flag": "-S",
+          "form": "bool",
+          "model": "predict"
+        },
+        {
+          "mod": "location",
+          "flag": "-L",
+          "form": "bool",
+          "model": "predict",
+          "cue": "FOLLOW_REDIRECTS"
+        },
+        {
+          "mod": "max_time",
+          "flag": "--max-time",
+          "form": "sep",
+          "model": "predict",
+          "value": {
+            "type": "Int",
+            "range": [
+              1,
+              3600
+            ]
+          }
+        }
+      ],
+      "rules": []
+    },
+    "http.download": {
+      "realization": "default",
+      "argv_prefix": [
+        "-g",
+        "-f",
+        "-L"
+      ],
+      "gloss": "download {url} to {target} (fails on HTTP errors, follows redirects)",
+      "effects": [
+        "net_read",
+        "write_fs"
+      ],
+      "stdin": {
+        "accepts": [],
+        "when": "never"
+      },
+      "stdout": "none",
+      "no_operands": "error",
+      "positionals": [
+        {
+          "role": "url",
+          "type": "Url",
+          "arity": [
+            1,
+            1
+          ],
+          "leading_dash": "reject",
+          "validator": "^https?://[^\\s\\x00-\\x1f\\x7f]{1,2040}$",
+          "note": "every curl op renders -g (--globoff) first: '[]{}' in a copied URL are literal, never URL globs that fan out into many requests or files"
+        }
+      ],
+      "options": [
+        {
+          "mod": "silent",
+          "flag": "-s",
+          "form": "bool",
+          "model": "predict"
+        },
+        {
+          "mod": "show_error",
+          "flag": "-S",
+          "form": "bool",
+          "model": "predict"
+        },
+        {
+          "mod": "max_time",
+          "flag": "--max-time",
+          "form": "sep",
+          "model": "predict",
+          "value": {
+            "type": "Int",
+            "range": [
+              1,
+              3600
+            ]
+          }
+        },
+        {
+          "mod": "output",
+          "flag": "-o",
+          "form": "sep",
+          "model": "predict",
+          "value": {
+            "type": "Path"
+          },
+          "note": "target = this path; it need not exist but its parent directory must (env); exists -> high"
+        },
+        {
+          "mod": "remote_name",
+          "flag": "-O",
+          "form": "bool",
+          "model": "predict",
+          "note": "target = last URL path segment in cwd; empty segment -> unsupported; exists -> high"
+        }
+      ],
+      "rules": [
+        {
+          "required": [
+            "output",
+            "remote_name"
+          ]
+        },
+        {
+          "excl": [
+            "output",
+            "remote_name"
+          ]
+        }
+      ]
+    }
+  }
+}

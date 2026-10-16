@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "tool": "sed",
+  "binary": "sed",
+  "versions": {},
+  "platforms": {
+    "linux_gnu": "ok",
+    "darwin_bsd": "ok"
+  },
+  "ops": {
+    "file.lines": {
+      "realization": "default",
+      "argv_prefix": [
+        "-n"
+      ],
+      "gloss": "print lines {range} of {paths}",
+      "effects": [
+        "read_fs"
+      ],
+      "stdin": {
+        "accepts": [
+          "lines",
+          "paths"
+        ],
+        "when": "no_file_operands"
+      },
+      "stdout": "lines",
+      "no_operands": "stdin",
+      "positionals": [
+        {
+          "role": "paths",
+          "type": "Path",
+          "arity": [
+            0,
+            1
+          ],
+          "leading_dash": "eoo"
+        }
+      ],
+      "options": [
+        {
+          "mod": "line_range",
+          "form": "word",
+          "model": "predict",
+          "value": {
+            "type": "LineRange",
+            "template": "{v}p",
+            "quote": "always"
+          },
+          "note": "LineRange renders 'A,B', 'N' or 'A,$' from ints only: sed -n '120,160p'"
+        }
+      ],
+      "rules": [
+        {
+          "required": [
+            "line_range"
+          ]
+        }
+      ],
+      "excluded": [
+        "every other sed script",
+        "-i (writes)",
+        "-E",
+        "-e"
+      ],
+      "notes": [
+        "never an each inner (no each_ok): with several files sed -n prints lines A..B of the concatenated stream"
+      ]
+    }
+  }
+}

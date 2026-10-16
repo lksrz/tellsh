@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "tool": "head",
+  "binary": "head",
+  "versions": {},
+  "platforms": {
+    "linux_gnu": "ok",
+    "darwin_bsd": "ok"
+  },
+  "ops": {
+    "file.head": {
+      "realization": "default",
+      "argv_prefix": [],
+      "gloss": "first {lines} lines of {paths}",
+      "effects": [
+        "read_fs"
+      ],
+      "stdin": {
+        "accepts": [
+          "lines",
+          "paths",
+          "endless"
+        ],
+        "when": "no_file_operands"
+      },
+      "stdout": "input",
+      "no_operands": "stdin",
+      "positionals": [
+        {
+          "role": "paths",
+          "type": "Path",
+          "arity": [
+            0,
+            8
+          ],
+          "leading_dash": "eoo"
+        }
+      ],
+      "options": [
+        {
+          "mod": "lines",
+          "flag": "-n",
+          "form": "sep",
+          "model": "predict",
+          "value": {
+            "type": "Int",
+            "range": [
+              1,
+              10000000
+            ]
+          },
+          "cue": "LIMIT",
+          "direction": "first"
+        },
+        {
+          "mod": "bytes",
+          "flag": "-c",
+          "form": "sep",
+          "model": "predict",
+          "value": {
+            "type": "Int",
+            "range": [
+              1,
+              1000000000
+            ]
+          },
+          "direction": "first"
+        }
+      ],
+      "rules": [
+        {
+          "excl": [
+            "lines",
+            "bytes"
+          ]
+        }
+      ],
+      "excluded": [
+        "-n -N / -c -N (all but last N; GNU only)",
+        "-q/-v"
+      ],
+      "each_ok": true
+    }
+  }
+}

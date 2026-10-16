@@ -1,0 +1,749 @@
+{
+  "schema_version": 1,
+  "tool": "git",
+  "binary": "git",
+  "versions": {
+    "min": "2.20",
+    "notes": [
+      "read-only subcommands only; every op requires a work tree (env check)"
+    ]
+  },
+  "platforms": {
+    "linux_gnu": "ok",
+    "darwin_bsd": "ok"
+  },
+  "ops": {
+    "git.status": {
+      "realization": "default",
+      "argv_prefix": [
+        "status"
+      ],
+      "gloss": "working tree status",
+      "effects": [
+        "read_vcs"
+      ],
+      "stdin": {
+        "accepts": [],
+        "when": "never"
+      },
+      "stdout": "lines",
+      "no_operands": "nothing",
+      "positionals": [
+        {
+          "role": "paths",
+          "type": "Path",
+          "arity": [
+            0,
+            8
+          ],
+          "leading_dash": "eoo",
+          "always_eoo": true
+        }
+      ],
+      "options": [
+        {
+          "mod": "short",
+          "flag": "-s",
+          "form": "bool",
+          "model": "predict"
+        },
+        {
+          "mod": "branch",
+          "flag": "-b",
+          "form": "bool",
+          "model": "predict"
+        },
+        {
+          "mod": "porcelain",
+          "flag": "--porcelain",
+          "form": "bool",
+          "model": "predict"
+        }
+      ],
+      "rules": [
+        {
+          "excl": [
+            "short",
+            "porcelain"
+          ]
+        }
+      ]
+    },
+    "git.log": {
+      "realization": "default",
+      "argv_prefix": [
+        "log"
+      ],
+      "gloss": "commit history of {rev} touching {paths}",
+      "effects": [
+        "read_vcs"
+      ],
+      "stdin": {
+        "accepts": [],
+        "when": "never"
+      },
+      "stdout": "lines",
+      "no_operands": "nothing",
+      "positionals": [
+        {
+          "role": "rev",
+          "type": "Rev",
+          "arity": [
+            0,
+            1
+          ],
+          "leading_dash": "reject",
+          "validator": "^[A-Za-z0-9._/@^~][A-Za-z0-9._/@^~-]*(\\.\\.\\.?[A-Za-z0-9._/@^~][A-Za-z0-9._/@^~-]*)?$",
+          "eoo_after": true,
+          "note": "a present rev is always followed by '--' (git log main --), so git must resolve it as a revision, never as a path"
+        },
+        {
+          "role": "paths",
+          "type": "Path",
+          "arity": [
+            0,
+            8
+          ],
+          "leading_dash": "eoo",
+          "always_eoo": true
+        }
+      ],
+      "options": [
+        {
+          "mod": "oneline",
+          "flag": "--oneline",
+          "form": "bool",
+          "model": "predict"
+        },
+        {
+          "mod": "format",
+          "flag": "--format",
+          "form": "eq",
+          "model": "predict",
+          "value": {
+            "type": "Const",
+            "enum": {
+              "subject": "%s",
+              "hash_subject": "%h %s",
+              "hash_author_date_subject": "%h %an %ad %s",
+              "fuller": "fuller"
+            }
+          }
+        },
+        {
+          "mod": "graph",
+          "flag": "--graph",
+          "form": "bool",
+          "model": "predict"
+        },
+        {
+          "mod": "decorate",
+          "flag": "--decorate",
+          "form": "bool",
+          "model": "predict"
+        },
+        {
+          "mod": "all_refs",
+          "flag": "--all",
+          "form": "bool",
+          "model": "predict"
+        },
+        {
+          "mod": "max_count",
+          "flag": "-n",
+          "form": "sep",
+          "model": "predict",
+          "value": {
+            "type": "Int",
+            "range": [
+              1,
+              100000
+            ]
+          },
+          "cue": "LIMIT",
+          "direction": "first",
+          "note": "newest first; applied before --reverse"
+        },
+        {
+          "mod": "skip",
+          "flag": "--skip",
+          "form": "eq",
+          "model": "predict",
+          "value": {
+            "type": "Int",
+            "range": [
+              1,
+              100000
+            ]
+          }
+        },
+        {
+          "mod": "fixed_strings",
+          "flag": "-F",
+          "form": "bool",
+          "model": "derived",
+          "derive": "git_patterns_literal_with_meta",
+          "note": "--fixed-strings: applies to every --grep and --author value; derived when no pattern is regex kind and some value has a metachar"
+        },
+        {
+          "mod": "extended_regex",
+          "flag": "-E",
+          "form": "bool",
+          "model": "derived",
+          "derive": "git_pattern_regex",
+          "note": "--extended-regexp: derived when a grep_message value is regex kind; literal values are then ERE-escaped"
+        },
+        {
+          "mod": "author",
+          "flag": "--author",
+          "form": "eq",
+          "model": "predict",
+          "value": {
+            "type": "Name",
+            "repeat": [
+              1,
+              2
+            ]
+          },
+          "note": "git matches --author as a pattern: with -F it is literal; with -E the compiler ERE-escapes it; otherwise a value with metachars derives -F"
+        },
+        {
+          "mod": "grep_message",
+          "flag": "--grep",
+          "form": "eq",
+          "model": "predict",
+          "value": {
+            "type": "Pattern",
+            "repeat": [
+              1,
+              3
+            ],
+            "dialect": "posix_ere"
+          },
+          "note": "regex kind -> derived -E (ERE, strict POSIX checker); literal with metachars -> derived -F; BRE is never used"
+        },
+        {
+          "mod": "ignore_case",
+          "flag": "-i",
+          "form": "bool",
+          "model": "predict",
+          "cue": "CASE",
+          "note": "--regexp-ignore-case: applies to --grep/--author"
+        },
+        {
+          "mod": "all_match",
+          "flag": "--all-match",
+          "form": "bool",
+          "model": "predict"
+        },
+        {
+          "mod": "invert_grep",
+          "flag": "--invert-grep",
+          "form": "bool",
+          "model": "predict",
+          "polarity": "neg",
+          "min_version": "2.4"
+        },
+        {
+          "mod": "since",
+          "flag": "--since",
+          "form": "eq",
+          "model": "predict",
+          "value": {
+            "type": "Date"
+          },
+          "cue": "RECENCY"
+        },
+        {
+          "mod": "until",
+          "flag": "--until",
+          "form": "eq",
+          "model": "predict",
+          "value": {
+            "type": "Date"
+          },
+          "cue": "RECENCY"
+        },
+        {
+          "mod": "no_merges",
+          "flag": "--no-merges",
+          "form": "bool",
+          "model": "predict",
+          "polarity": "neg"
+        },
+        {
+          "mod": "merges_only",
+          "flag": "--merges",
+          "form": "bool",
+          "model": "predict"
+        },
+        {
+          "mod": "first_parent",
+          "flag": "--first-parent",
+          "form": "bool",
+          "model": "predict"
+        },
+        {
+          "mod": "stat",
+          "flag": "--stat",
+          "form": "bool",
+          "model": "predict"
+        },
+        {
+          "mod": "name_only",
+          "flag": "--name-only",
+          "form": "bool",
+          "model": "predict"
+        },
+        {
+          "mod": "name_status",
+          "flag": "--name-status",
+          "form": "bool",
+          "model": "predict"
+        },
+        {
+          "mod": "patch",
+          "flag": "-p",
+          "form": "bool",
+          "model": "predict"
+        },
+        {
+          "mod": "reverse",
+          "flag": "--reverse",
+          "form": "bool",
+          "model": "predict",
+          "cue": "REVERSE",
+          "note": "-n applies BEFORE --reverse (gloss)"
+        },
+        {
+          "mod": "follow_renames",
+          "flag": "--follow",
+          "form": "bool",
+          "model": "predict"
+        },
+        {
+          "mod": "date_format",
+          "flag": "--date",
+          "form": "eq",
+          "model": "predict",
+          "value": {
+            "type": "Const",
+            "enum": {
+              "relative": "relative",
+              "short": "short",
+              "iso": "iso"
+            }
+          }
+        }
+      ],
+      "rules": [
+        {
+          "excl": [
+            "oneline",
+            "format"
+          ]
+        },
+        {
+          "excl": [
+            "graph",
+            "reverse"
+          ]
+        },
+        {
+          "excl": [
+            "no_merges",
+            "merges_only"
+          ]
+        },
+        {
+          "excl": [
+            "stat",
+            "name_only",
+            "name_status",
+            "patch"
+          ]
+        },
+        {
+          "requires": "ignore_case",
+          "any_of": [
+            "author",
+            "grep_message"
+          ]
+        },
+        {
+          "requires": "invert_grep",
+          "any_of": [
+            "grep_message"
+          ]
+        },
+        {
+          "min_values": "grep_message",
+          "when": "all_match",
+          "min": 2
+        },
+        {
+          "role_count": "paths",
+          "when": "follow_renames",
+          "arity": [
+            1,
+            1
+          ]
+        },
+        {
+          "excl_role": "all_refs",
+          "role": "rev"
+        },
+        {
+          "excl": [
+            "fixed_strings",
+            "extended_regex"
+          ]
+        }
+      ],
+      "excluded": [
+        "-S/-G pickaxe (phase 2)",
+        "-L line-log",
+        "--pretty=format:<free>",
+        "--output (writes)",
+        "--ext-diff",
+        "-c config overrides"
+      ],
+      "notes": [
+        "pager left to user config; git disables it when stdout is not a tty"
+      ]
+    },
+    "git.show": {
+      "realization": "default",
+      "argv_prefix": [
+        "show"
+      ],
+      "gloss": "show commit {rev}",
+      "effects": [
+        "read_vcs"
+      ],
+      "stdin": {
+        "accepts": [],
+        "when": "never"
+      },
+      "stdout": "lines",
+      "no_operands": "nothing",
+      "positionals": [
+        {
+          "role": "rev",
+          "type": "Rev",
+          "arity": [
+            0,
+            1
+          ],
+          "leading_dash": "reject",
+          "validator": "^[A-Za-z0-9._/@^~][A-Za-z0-9._/@^~-]*(\\.\\.\\.?[A-Za-z0-9._/@^~][A-Za-z0-9._/@^~-]*)?$",
+          "eoo_after": true,
+          "note": "a present rev is always followed by '--' (git log main --), so git must resolve it as a revision, never as a path"
+        },
+        {
+          "role": "paths",
+          "type": "Path",
+          "arity": [
+            0,
+            8
+          ],
+          "leading_dash": "eoo",
+          "always_eoo": true
+        }
+      ],
+      "options": [
+        {
+          "mod": "oneline",
+          "flag": "--oneline",
+          "form": "bool",
+          "model": "predict"
+        },
+        {
+          "mod": "stat",
+          "flag": "--stat",
+          "form": "bool",
+          "model": "predict"
+        },
+        {
+          "mod": "name_only",
+          "flag": "--name-only",
+          "form": "bool",
+          "model": "predict"
+        },
+        {
+          "mod": "name_status",
+          "flag": "--name-status",
+          "form": "bool",
+          "model": "predict"
+        },
+        {
+          "mod": "no_patch",
+          "flag": "-s",
+          "form": "bool",
+          "model": "predict"
+        }
+      ],
+      "rules": [
+        {
+          "excl": [
+            "stat",
+            "name_only",
+            "name_status",
+            "no_patch"
+          ]
+        }
+      ],
+      "excluded": [
+        "--output (writes)",
+        "--ext-diff",
+        "--textconv"
+      ]
+    },
+    "git.diff": {
+      "realization": "default",
+      "argv_prefix": [
+        "diff"
+      ],
+      "gloss": "changes {rev} {paths}",
+      "effects": [
+        "read_vcs"
+      ],
+      "stdin": {
+        "accepts": [],
+        "when": "never"
+      },
+      "stdout": "lines",
+      "stdout_when": [
+        {
+          "mods": [
+            "name_only"
+          ],
+          "stdout": "paths"
+        },
+        {
+          "mods": [
+            "name_only",
+            "null"
+          ],
+          "stdout": "paths0"
+        }
+      ],
+      "nul": {
+        "mod": "null"
+      },
+      "no_operands": "nothing",
+      "positionals": [
+        {
+          "role": "rev",
+          "type": "Rev",
+          "arity": [
+            0,
+            2
+          ],
+          "leading_dash": "reject",
+          "validator": "^[A-Za-z0-9._/@^~][A-Za-z0-9._/@^~-]*(\\.\\.\\.?[A-Za-z0-9._/@^~][A-Za-z0-9._/@^~-]*)?$",
+          "eoo_after": true,
+          "note": "a present rev is always followed by '--' (git log main --), so git must resolve it as a revision, never as a path"
+        },
+        {
+          "role": "paths",
+          "type": "Path",
+          "arity": [
+            0,
+            8
+          ],
+          "leading_dash": "eoo",
+          "always_eoo": true
+        }
+      ],
+      "options": [
+        {
+          "mod": "staged",
+          "flag": "--staged",
+          "form": "bool",
+          "model": "predict"
+        },
+        {
+          "mod": "stat",
+          "flag": "--stat",
+          "form": "bool",
+          "model": "predict"
+        },
+        {
+          "mod": "name_only",
+          "flag": "--name-only",
+          "form": "bool",
+          "model": "predict"
+        },
+        {
+          "mod": "name_status",
+          "flag": "--name-status",
+          "form": "bool",
+          "model": "predict"
+        },
+        {
+          "mod": "word_diff",
+          "flag": "--word-diff",
+          "form": "bool",
+          "model": "predict"
+        },
+        {
+          "mod": "null",
+          "flag": "-z",
+          "form": "bool",
+          "model": "compiler",
+          "derive": "each_transport"
+        }
+      ],
+      "rules": [
+        {
+          "excl": [
+            "stat",
+            "name_only",
+            "name_status"
+          ]
+        },
+        {
+          "requires": "null",
+          "any_of": [
+            "name_only"
+          ]
+        },
+        {
+          "no_range_multi": "rev"
+        }
+      ],
+      "excluded": [
+        "--output (writes)",
+        "--ext-diff",
+        "--no-index (phase 2)"
+      ],
+      "notes": [
+        "--name-only paths are relative to the repo top: each after git.diff requires cwd == toplevel"
+      ]
+    },
+    "git.branch": {
+      "realization": "default",
+      "argv_prefix": [
+        "branch"
+      ],
+      "gloss": "list branches",
+      "effects": [
+        "read_vcs"
+      ],
+      "stdin": {
+        "accepts": [],
+        "when": "never"
+      },
+      "stdout": "lines",
+      "no_operands": "nothing",
+      "positionals": [],
+      "options": [
+        {
+          "mod": "all",
+          "flag": "-a",
+          "form": "bool",
+          "model": "predict"
+        },
+        {
+          "mod": "remotes",
+          "flag": "-r",
+          "form": "bool",
+          "model": "predict"
+        },
+        {
+          "mod": "verbose",
+          "flag": "-v",
+          "form": "bool",
+          "model": "predict"
+        },
+        {
+          "mod": "merged",
+          "flag": "--merged",
+          "form": "eq",
+          "model": "predict",
+          "value": {
+            "type": "Rev",
+            "validator": "^[A-Za-z0-9._/@^~][A-Za-z0-9._/@^~-]*(\\.\\.\\.?[A-Za-z0-9._/@^~][A-Za-z0-9._/@^~-]*)?$"
+          }
+        },
+        {
+          "mod": "no_merged",
+          "flag": "--no-merged",
+          "form": "eq",
+          "model": "predict",
+          "value": {
+            "type": "Rev",
+            "validator": "^[A-Za-z0-9._/@^~][A-Za-z0-9._/@^~-]*(\\.\\.\\.?[A-Za-z0-9._/@^~][A-Za-z0-9._/@^~-]*)?$"
+          }
+        },
+        {
+          "mod": "contains",
+          "flag": "--contains",
+          "form": "eq",
+          "model": "predict",
+          "value": {
+            "type": "Rev",
+            "validator": "^[A-Za-z0-9._/@^~][A-Za-z0-9._/@^~-]*(\\.\\.\\.?[A-Za-z0-9._/@^~][A-Za-z0-9._/@^~-]*)?$"
+          }
+        },
+        {
+          "mod": "sort",
+          "flag": "--sort",
+          "form": "eq",
+          "model": "predict",
+          "value": {
+            "type": "Const",
+            "enum": {
+              "-committerdate": "-committerdate",
+              "committerdate": "committerdate",
+              "refname": "refname",
+              "-creatordate": "-creatordate"
+            }
+          },
+          "cue": "SORT",
+          "min_version": "2.7"
+        },
+        {
+          "mod": "show_current",
+          "flag": "--show-current",
+          "form": "bool",
+          "model": "predict",
+          "min_version": "2.22"
+        }
+      ],
+      "rules": [
+        {
+          "excl": [
+            "all",
+            "remotes"
+          ]
+        },
+        {
+          "excl": [
+            "merged",
+            "no_merged"
+          ]
+        },
+        {
+          "excl": [
+            "show_current",
+            "all",
+            "remotes",
+            "verbose",
+            "merged",
+            "no_merged",
+            "contains",
+            "sort"
+          ]
+        }
+      ],
+      "excluded": [
+        "any branch-name positional (creates a branch)",
+        "-d/-D/-m/-M/-c/-C",
+        "--set-upstream-to",
+        "--list PATTERN (phase 2)"
+      ]
+    }
+  }
+}
