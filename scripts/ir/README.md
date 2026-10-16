@@ -177,5 +177,8 @@ rank order (no accepted hypothesis = abstain), and record:
 `--calibrate`; `report.nbest.chosen_rank` is the rank histogram. `make_candidates.mjs` writes rank / margin / nb_agree
 on D rows. `score_combined.mjs`: fixed knobs `--max-rank`, `--min-margin`, `--min-beam-agree` filter D candidates; when
 dev has n-best candidates, `nbest_settings` is a dev-chosen (max_rank, min_agree, min_margin, t) setting (max kept,
-UB / point accepted-wrong <= target), applied unchanged to test (`<split>.nbest`). Preds without `d.nbest` behave as
+UB / point accepted-wrong <= target) plus `by_coverage_{20,30,40,50}` (lowest dev UB at dev coverage >= floor), over
+max_rank x ensemble min_agree x min_beam_agree x min_margin x t, applied unchanged to test (`<split>.nbest`, with the full
+grid in `<split>.nbest.sweep`). `--select-adj` makes the dev choice count adjudicated wrong / correct; `unadjudicated_wrong`
+counts kept raw-wrong candidates with no adjudication of that exact command. Gate results are memoized per (row, IR). Preds without `d.nbest` behave as
 before. Tests: `node --test ir/test/nbest.test.js`.

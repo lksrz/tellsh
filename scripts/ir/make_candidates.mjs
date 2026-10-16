@@ -34,10 +34,19 @@ export function encodePair(tok, request, os, command, maxLen = MAX_PAIR_TOKENS) 
   return [tok.bos, ...A, tok.eos, tok.eos, ...b, tok.eos];
 }
 
-// gate-accepted command of an IR, or null
+// gate-accepted command of an IR, or null. Memoized per (request, os, IR): the main and agree models' n-best lists
+// repeat many hypotheses on the same rows (bounded: cleared past GATE_CACHE_MAX entries).
+const GATE_CACHE_MAX = 500000;
+const gateCache = new Map();
 export function acceptedCommand(schemas, r, ir) {
   if (!ir || ir.status !== 'ok') return null;
-  try { const g = gate(r.request, ir, envOf(schemas, r)); return g.accept ? g.command : null; } catch { return null; }
+  const key = `${r.os}\u0000${r.request}\u0000${JSON.stringify(ir)}`;
+  if (gateCache.has(key)) return gateCache.get(key);
+  let c = null;
+  try { const g = gate(r.request, ir, envOf(schemas, r)); c = g.accept ? g.command : null; } catch { c = null; }
+  if (gateCache.size >= GATE_CACHE_MAX) gateCache.clear();
+  gateCache.set(key, c);
+  return c;
 }
 
 // gold command per row (gate-compiled when accepted, else the dataset command; null when gold is not ok)

@@ -24,7 +24,11 @@
 // N-best preds (eval.py --nbest K; D candidate = first gate-accepted hypothesis, nbest_lib.mjs): D candidates carry
 // rank / margin / nb_agree. Fixed knobs --max-rank R, --min-margin M, --min-beam-agree A drop D candidates outside them
 // before everything else (P candidates always pass). When dev has n-best candidates, `nbest` adds a dev-chosen
-// (max_rank, min_agree, min_margin, t) setting (max kept subject to UB / point <= target) applied unchanged to test.
+// (max_rank, min_agree (ensemble), min_beam_agree, min_margin, t) setting (max kept subject to UB / point <= target),
+// `by_coverage` settings (lowest dev UB with dev coverage >= 20/30/40/50 %), all applied unchanged to test, and a
+// `sweep` over the whole grid (t in the agreement sweep thresholds). --select-adj makes these dev choices count wrong /
+// correct with the adjudications (dev ones; test is never used for choosing). Test rows add `unadjudicated_wrong`:
+// kept raw-wrong candidates without an adjudication of that exact command (they count as wrong in adj numbers).
 
 import fs from 'node:fs';
 import { loadSchemas } from '../../ir/lib/index.js';
@@ -32,14 +36,15 @@ import { readJsonl, candidates, goldCommand } from './make_candidates.mjs';
 import { sameCommand } from './equiv.mjs';
 import { loadAdjudications, adjudicatedY } from './adjudicate_lib.mjs';
 import { acceptedById, agreeCount, keeps, chooseGrid } from './combined_lib.mjs';
-import { nbestKeeps, chooseNbest } from './nbest_lib.mjs';
+import { nbestKeeps, nbestEval, pickMaxKept, pickByCoverage } from './nbest_lib.mjs';
 
 const args = process.argv.slice(2);
 const opt = (k, d) => { const i = args.indexOf(`--${k}`); return i >= 0 ? args[i + 1] : d; };
 const TARGET = Number(opt('target', 0.5)) / 100;
 const schemas = loadSchemas();
 const num = (k) => (opt(k) != null ? Number(opt(k)) : null);
-const KNOBS = { max_rank: num('max-rank'), min_margin: num('min-margin'), min_agree: num('min-beam-agree') };
+const KNOBS = { max_rank: num('max-rank'), min_margin: num('min-margin'), min_beam_agree: num('min-beam-agree') };
+const SELECT_ADJ = args.includes('--select-adj');
 const ADJ = opt('adjudications') ? loadAdjudications(opt('adjudications').split(',')) : null;
 
 // ---------------------------------------------------------------- stats
@@ -50,7 +55,15 @@ function logBinomPmf(k, n, p) {
   for (let i = 1; i <= k; i++) lc += Math.log(n - k + i) - Math.log(i);
   return lc + k * Math.log(p) + (n - k) * Math.log(1 - p);
 }
-const binomCdf = (k, n, p) => { let s = 0; for (let i = 0; i <= k; i++) s += Math.exp(logBinomPmf(i, n, p)); return Math.min(1, s); };
+// O(k): pmf(i + 1) = pmf(i) * (n - i) / (i + 1) * p / (1 - p), in log space from pmf(0)
+function binomCdf(k, n, p) {
+  if (p <= 0) return 1;
+  if (p >= 1) return k >= n ? 1 : 0;
+  let l = n * Math.log(1 - p), s = Math.exp(l);
+  const r = Math.log(p) - Math.log(1 - p);
+  for (let i = 0; i < k; i++) { l += Math.log(n - i) - Math.log(i + 1) + r; s += Math.exp(l); }
+  return Math.min(1, s);
+}
 // one-sided (1 - alpha) Clopper-Pearson upper bound of a proportion k / n
 export function cpUpper(k, n, alpha = 0.05) {
   if (n === 0) return 1;
@@ -94,7 +107,7 @@ function load(split) {
   const others = (opt(`${split}-agree`) || '').split(',').filter(Boolean).map((f) => acceptedById(schemas, gold, readJsonl(f), name));
   const items = candidates(schemas, gold, readJsonl(PREDS), name).map((c) => {
     const y = sameCommand(c.command, goldCommand(schemas, gold[c.i]), c.request);
-    return { p: scores ? scores.get(String(c.id)) ?? -1 : 1, y, ya: adjudicatedY(y, c.id, c.command, ADJ), route: c.route,
+    return { id: c.id, command: c.command, p: scores ? scores.get(String(c.id)) ?? -1 : 1, y, ya: adjudicatedY(y, c.id, c.command, ADJ), route: c.route,
       agree: agreeCount(c.id, c.command, c.request, others), rank: c.rank, margin: c.margin, nb_agree: c.nb_agree };
   }).filter((x) => nbestKeeps(x, KNOBS));
   const missing = items.filter((x) => x.p < 0).length;
@@ -114,13 +127,14 @@ function at(S, t, a = 0, nk = null) {
     abstain_precision: pct(abstTrue, abst), abstain_recall: pct(abstTrue, shouldAbstain),
     ...(a ? { min_agree: a } : {}), ...(nk ? { nbest: nk } : {}),
     correct_lost: S.items.filter((x) => x.y && !(keeps(x, a, t) && (!nk || nbestKeeps(x, nk)))).length,
-    ...(ADJ ? adjAt(kept) : {}),
+    ...(ADJ ? adjAt(kept, S) : {}),
   };
 }
 
-function adjAt(kept) {
+function adjAt(kept, S) {
   const w = kept.filter((x) => !x.ya).length;
-  return { adj_wrong: w, adj_accepted_wrong_rate: pct(w, kept.length), adj_accepted_wrong_ub95: pct(cpUpper(w, kept.length), 1) };
+  const unadj = kept.filter((x) => !x.ya && ADJ.get(String(x.id))?.command !== x.command).length;
+  return { adj_wrong: w, adj_coverage: pct(kept.length - w, S.goldOk), adj_accepted_wrong_rate: pct(w, kept.length), adj_accepted_wrong_ub95: pct(cpUpper(w, kept.length), 1), unadjudicated_wrong: unadj };
 }
 
 // lowest threshold (max kept) whose criterion holds on dev; unscored candidates (p = -1) are never kept and never a
@@ -152,12 +166,17 @@ const grid = N ? {
 } : null;
 if (grid) report.agreement_settings = Object.fromEntries(Object.entries(grid).map(([k, v]) => [k, v ? { min_agree: v.min_agree, t: v.t === -Infinity ? 0 : r4(v.t) } : 'none']));
 const HAS_NB = dev.items.some((x) => x.rank != null);
+const COV_FLOORS = [0.2, 0.3, 0.4, 0.5];
+const ubFn = (w, k) => cpUpper(w, k);
+const nbRows = HAS_NB ? nbestEval(dev.items, N, SWEEP_T) : null;
 const nbSet = HAS_NB ? {
-  by_upper_bound: chooseNbest(dev.items, (w, k) => cpUpper(w, k) <= TARGET, MIN_KEPT, !AGREE_ONLY),
-  by_point: chooseNbest(dev.items, (w, k) => w / k <= TARGET, MIN_KEPT, !AGREE_ONLY),
+  by_upper_bound: pickMaxKept(nbRows, (w, k) => cpUpper(w, k) <= TARGET, MIN_KEPT, SELECT_ADJ),
+  by_point: pickMaxKept(nbRows, (w, k) => w / k <= TARGET, MIN_KEPT, SELECT_ADJ),
+  ...Object.fromEntries(COV_FLOORS.map((f) => [`by_coverage_${f * 100}`, pickByCoverage(nbRows, f, dev.goldOk, ubFn, SELECT_ADJ)])),
 } : null;
-const knobsOf = (g) => ({ max_rank: g.max_rank, min_agree: g.min_agree, min_margin: g.min_margin });
-if (nbSet) report.nbest_settings = Object.fromEntries(Object.entries(nbSet).map(([k, v]) => [k, v ? { ...knobsOf(v), t: v.t === -Infinity ? 0 : r4(v.t) } : 'none']));
+const knobsOf = (g) => ({ max_rank: g.max_rank, min_margin: g.min_margin, min_beam_agree: g.min_beam_agree });
+const settingOf = (v) => (v ? { ...knobsOf(v), min_agree: v.min_agree, t: v.t === -Infinity ? 0 : r4(v.t) } : 'none');
+if (nbSet) report.nbest_settings = { select_adj: SELECT_ADJ, ...Object.fromEntries(Object.entries(nbSet).map(([k, v]) => [k, settingOf(v)])) };
 if (Object.values(KNOBS).some((v) => v != null)) report.nbest_fixed_knobs = KNOBS;
 for (const S of [dev, test].filter(Boolean)) {
   if (grid) {
@@ -167,10 +186,15 @@ for (const S of [dev, test].filter(Boolean)) {
       sweep: Array.from({ length: N + 1 }, (_, a) => SWEEP_T.map((t) => ({ min_agree: a, ...at(S, t, a) }))).flat() } };
   }
   if (nbSet) {
-    const pick = (g) => (g ? at(S, g.t, 0, knobsOf(g)) : at(S, Infinity));
+    const pick = (g) => (g ? at(S, g.t, g.min_agree, knobsOf(g)) : at(S, Infinity));
     const ranks = {};
     for (const x of S.items) if (x.rank != null) ranks[x.rank] = (ranks[x.rank] || 0) + 1;
-    report[S.name] = { ...report[S.name], nbest: { chosen_rank: ranks, by_upper_bound: pick(nbSet.by_upper_bound), by_point: pick(nbSet.by_point) } };
+    const rows = S === dev ? nbRows : nbestEval(S.items, N, SWEEP_T);
+    const sweep = rows.map((r) => ({ max_rank: r.max_rank, min_agree: r.min_agree, min_margin: r.min_margin, min_beam_agree: r.min_beam_agree,
+      t: r.t === -Infinity ? 0 : r4(r.t), kept: r.kept, coverage: pct(r.correct, S.goldOk), wrong: r.wrong, rate: pct(r.wrong, r.kept),
+      ub95: pct(cpUpper(r.wrong, r.kept), 1), ...(ADJ ? { adj_wrong: r.adj_wrong, adj_coverage: pct(r.adj_correct, S.goldOk),
+        adj_rate: pct(r.adj_wrong, r.kept), adj_ub95: pct(cpUpper(r.adj_wrong, r.kept), 1) } : {}) }));
+    report[S.name] = { ...report[S.name], nbest: { chosen_rank: ranks, ...Object.fromEntries(Object.entries(nbSet).map(([k, v]) => [k, pick(v)])), sweep } };
   }
   if (AGREE_ONLY) { Object.assign(report[S.name], { rows: S.n, gold_ok: S.goldOk, accepted_candidates: S.items.length, gate_only: at(S, -Infinity) }); continue; }
   report[S.name] = { ...report[S.name],
