@@ -14,7 +14,8 @@ import { extractSlots, pickArg, isOptionWord, foldKeepLength, isStopWord } from 
 import { resolveSlots, buildCommand, finalizeSlots, RAW_OK, newTemplateWithhold } from './fill.js';
 import { CATALOG_038, fallthroughGuard } from './templates038.js';
 import { BY_ID } from './catalog.js';
-import { FAMILY_OF, NONE } from './tools.js';
+import { FAMILY_OF, NONE, OOC } from './tools.js';
+import { oocVeto, oocProbe, OOC_HINT } from './ooc.js';
 import { detectEnv, envFeatures } from './env.js';
 import { sameButRiskGuard, sameButLast } from './samebut-guard.js';
 import { buildContext, resolveReference, hasPronoun, hasLocative, cwdFlags, sameBut, entityForSlot, isAmbiguous } from './history.js';
@@ -448,7 +449,7 @@ export function suggest(query, opts = {}) {
   const n = Math.max(1, opts.top ?? 3), cut = (r) => (r?.candidates?.length > n ? { ...r, candidates: r.candidates.slice(0, n) } : r);
   const probe = once({ ...opts, top: Math.max(n, 5), model: tm, rerank: undefined, gated: true });
   if (probe && opts.history?.length && probe.context?.rule === 'refused' && !probe.command && probe.context.newTemplateLast) return cut(probe);
-  const fall = () => fallthroughGuard(probe, once({ ...opts, gated: true }), (i) => NEW_TEMPLATE_INTENTS.has(i));
+  const fall = () => oocVeto(() => oocProbe(once, opts), fallthroughGuard(probe, once({ ...opts, gated: true }), (i) => NEW_TEMPLATE_INTENTS.has(i)));
   if (!probe || !NEW_TEMPLATE_INTENTS.has(probe.intent)) return fall();
   if (!opts.rerank) return cut(probe);
   // with the hook: the reranked templates answer is kept only if it is still a 0.3.4 template intent, otherwise 0.3.3 answers
@@ -583,7 +584,7 @@ function suggestOnce(query, opts = {}) {
     context.note = `the previous command (${sb.lastIntent}) ran against another repository, directory or daemon (-C, --context, -H, ...); not guessing`;
     return { ...base, understood: false, method: 'history-rule', confidence: 0, candidates, tools, command: null, missing: [], hint: context.note };
   }
-  const out = { ...base, confidence: +confidence.toFixed(4), tool: FAMILY_OF[intent] || c.tool, tools, candidates };
+  const out = { ...base, confidence: +confidence.toFixed(4), tool: FAMILY_OF[intent] || c.tool, tools, candidates, ...(c.pOoc ? { pOoc: +c.pOoc.toFixed(4) } : {}) };
 
   const tryCompose = (reason) => {
     if (composeMode === 'off') return null;
@@ -591,8 +592,8 @@ function suggestOnce(query, opts = {}) {
     if (hasLocative(query) && composeMode !== 'force') return null;
     // composer vocabulary and quoting are POSIX-only (fish treats \\ and \' as escapes inside single quotes)
     if (env.shell === 'powershell' || env.shell === 'cmd' || env.shell === 'fish') return null;
-    const capable = c.tools.filter((t) => t.tool !== NONE);
-    if (c.topTool === NONE && composeMode !== 'force') return null;
+    const capable = c.tools.filter((t) => t.tool !== NONE && t.tool !== OOC);
+    if ((c.topTool === NONE || c.topTool === OOC) && composeMode !== 'force') return null;
     const ci = composeInput(query, model, capable[0]?.tool, opts.unclearArgs);
     const r = compose(query, capable, ci.ex, { patternOf: ci.pattern, nameOf: ci.nameOf });
     if (!r || r.invalid) return r?.invalid ? { invalid: r.invalid, command: r.command } : null;
@@ -617,7 +618,7 @@ function suggestOnce(query, opts = {}) {
       context.note = 'the request names both an object ("it") and a place ("there") from the previous command; not guessing which is which';
       return { ...out, understood: false, method: 'history-rule', hint: context.note, composeError: comp?.invalid || null };
     }
-    return { ...out, understood: false, method: 'none', hint, composeError: comp?.invalid || null };
+    return { ...out, understood: false, method: 'none', hint: hint || (c.topTool === OOC ? OOC_HINT : null), ooc: c.topTool === OOC, composeError: comp?.invalid || null };
   }
   // "close that pr", "close pr 45": the catalog has no command that closes a pull request; the opposite one (`gh pr create`)
   // or another one (`gh pr view 45`) is never suggested in its place

@@ -2,24 +2,33 @@
 // A-only (no student) end-to-end check of out-of-catalog rejection vs in-catalog accuracy through suggest():
 // per set, correct = understood && intent == gold (in-catalog sets) or rejected = !understood (out-of-scope sets).
 // Aggregates only (the real_* sets are PRIVATE). HYBRID.md#out-of-catalog-rejection
-//   node scripts/real/eval_ooc.js            (JSON on stdout; TELLSH_OOC_VETO=off|ooc|reject selects the veto)
+//   node scripts/real/eval_ooc.js            (JSON on stdout; the built-in veto of src/ooc.js as configured:
+//                                             TELLSH_OOC_VETO=off disables it, TELLSH_OOC_T / TELLSH_OOC_C override thresholds)
+//   --sweep                                  built-in veto off, every (T, C) pair simulated
+//   --half=tune|test                         real-usage rows (real_human, real_tmpl, real_ooc) with an even / odd group
+//                                             hash only (fnv1a of r.group, else r.text); public sets unaffected
 import { fileURLToPath } from 'node:url';
 import { suggest } from '../../src/pipeline.js';
 import { evalSets } from '../hybrid/sets.js';
-import { loadModel } from '../../src/model.js';
+import { getOocModel, oocVetoable } from '../../src/ooc.js';
+import { fnv1a } from '../../src/features.js';
 
-// --sweep: veto off, plus the out-of-catalog veto at every stage-1 p(__ooc__) threshold T (templates model probe)
+// --sweep: veto off, plus the out-of-catalog veto at every stage-1 p(__ooc__) threshold T (model/model_ooc.bin probe)
 // (T = p(__ooc__) floor, C = the vetoed answer's confidence ceiling)
 const SWEEP = process.argv.includes('--sweep') ? [0.5, 0.7, 0.9, 0.95, 0.98, 0.99].flatMap((t) => [0.6, 0.8, 0.9, 2].map((c) => [t, c])) : null;
 if (SWEEP) process.env.TELLSH_OOC_VETO = 'off';
-const TM = SWEEP && loadModel(fileURLToPath(new URL('../../model/model_templates.bin', import.meta.url)));
+const OM = SWEEP && getOocModel();
+if (SWEEP && !OM) { console.error('--sweep needs model/model_ooc.bin'); process.exit(2); }
 
+const HALF = process.argv.find((a) => a.startsWith('--half='))?.slice(7) ?? null;
+if (HALF && HALF !== 'tune' && HALF !== 'test') { console.error('--half must be tune or test'); process.exit(2); }
+const half = (rows) => (HALF ? rows.filter((r) => fnv1a(String(r.group || r.text)) % 2 === (HALF === 'tune' ? 0 : 1)) : rows);
 const ROOT = fileURLToPath(new URL('../..', import.meta.url));
 const S = evalSets(ROOT);
 const real = S.real();
 const sets = { eval: S.eval(), devtools: S.devtools(), shell: S.shell(), blind: S.blind(), blind3: S.blind3(),
-  real_human: real.filter((r) => !r.tmpl), real_tmpl: real.filter((r) => r.tmpl),
-  ood: S.ood(), blind_ood: S.blind_ood(), blind3_ood: S.blind3_ood(), real_ooc: S.real_ooc() };
+  real_human: half(real.filter((r) => !r.tmpl)), real_tmpl: half(real.filter((r) => r.tmpl)),
+  ood: S.ood(), blind_ood: S.blind_ood(), blind3_ood: S.blind3_ood(), real_ooc: half(S.real_ooc()) };
 const out = {};
 for (const [name, rows] of Object.entries(sets)) {
   if (!rows.length) continue;
@@ -32,9 +41,12 @@ for (const [name, rows] of Object.entries(sets)) {
     ok += good;
     vetoed += !!s.vetoed;
     if (SWEEP) {
-      const p = suggest(r.text, { ...o, model: TM }).pOoc || 0;
-      const vetoable = s.understood && (s.method === 'catalog' || s.method === 'composed');
-      SWEEP.forEach(([t, c], k) => { okT[k] += vetoable && p >= t && s.confidence < c ? !r.intent : good; });
+      // the built-in veto's cheap conditions (src/ooc.js oocVetoable) with C swept; the probe mirrors oocProbe
+      process.env.TELLSH_OOC_VETO = 'on';
+      const vetoableAt = SWEEP.map(([, c]) => { process.env.TELLSH_OOC_C = String(c); return oocVetoable(s); });
+      process.env.TELLSH_OOC_VETO = 'off'; delete process.env.TELLSH_OOC_C;
+      const p = vetoableAt.some(Boolean) ? (suggest(r.text, { ...o, model: OM, rerank: undefined, gated: true }).pOoc || 0) : 0;
+      SWEEP.forEach(([t], k) => { okT[k] += vetoableAt[k] && p >= t ? !r.intent : good; });
     }
   }
   const key = rows.every((r) => !r.intent) ? 'rejected' : 'correct';

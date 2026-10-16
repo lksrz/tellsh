@@ -267,10 +267,6 @@ def main():
     log(f'accept threshold={best_t:.3f} (correct kept={(score[ind & correct] >= best_t).mean():.3f}, '
         f'OOD rejected={(score[oodm] < best_t).mean() if oodm.any() else float("nan"):.3f}); compose tool threshold={compose_t:.2f}')
 
-    # the split models hold full-width coefficient matrices (~1 GB with all intent models): free them before the final fit
-    del tool_s, int_s, p_tool, Xho
-    gc.collect()
-
     # ---------------- final models on all data ----------------
     # free the calibration models first (peak memory: the final fit runs on the full matrix)
     del tool_s, int_s, Xho, p_tool, res

@@ -340,6 +340,16 @@ path is the source. A quoted `'~/x'` from history stays the literal directory `.
 Gap: bash appends to `~/.bash_history` only when the shell exits unless you set `PROMPT_COMMAND='history -a'`
 (zsh with `INC_APPEND_HISTORY`/`SHARE_HISTORY`, fish and PSReadLine write immediately).
 
+### Out-of-catalog veto (0.3.11)
+
+A shell task the catalog does not cover used to get the nearest catalog command. A second small model
+(`model/model_ooc.bin`, 3.2 MB) now withholds such an answer when it is sure the request is out of catalog
+(p ≥ 0.99) and the answer is not confident (< 0.8): tellsh prints "this looks like a shell task tellsh does not know yet"
+and exits 3. It only withholds, never makes anything runnable; history and template answers are never vetoed. On private
+real usage it rejects ~12 pt more out-of-catalog requests for < 0.5 pt in-catalog. `TELLSH_OOC_VETO=off` disables it;
+`TELLSH_OOC_T` / `TELLSH_OOC_C` override the thresholds. Details: [HYBRID.md](HYBRID.md). Package: ~4.0 MB packed,
+10.1 MB unpacked.
+
 ### Second pass: composer (experimental)
 
 `src/compose.js` has a closed vocabulary for 17 tools (ls, find, grep, du, df, ps, tar, sort, head, tail, wc,
