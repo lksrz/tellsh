@@ -5,7 +5,7 @@
 **Out-of-catalog veto (`src/ooc.js`):** a fresh catalog / composed answer of the 0.3.3 model (never a history answer,
 never a templates-model answer) is withheld when a new, separate model says the request is a shell task outside the
 catalog: p(`__ooc__`) >= 0.99 and the answer's confidence < 0.8. The CLI prints "this looks like a shell task tellsh
-does not know yet" and exits 3. The veto only withholds; it never makes anything runnable. `TELLSH_OOC_VETO=off` (or `0` / `false` / `no`)
+does not know yet" and exits 3. The veto only withholds; it never makes anything runnable. Earlier `tellsh` lines in the history are read without it, and the A+S student fallback keeps a vetoed answer withheld. `TELLSH_OOC_VETO=off` (or `0` / `false` / `no`)
 disables it; `TELLSH_OOC_T` / `TELLSH_OOC_C` override the thresholds. The model runs only for answers that pass these
 cheap checks (+~1 ms mean, +~6 ms p95).
 **New model `model/model_ooc.bin` (+3.2 MB):** the 0.3.10 templates model recipe with an extra stage-1 class `__ooc__`

@@ -728,6 +728,7 @@ not know yet", exit 3). History answers (`history-rule`, a slot from history, an
 answers are never vetoed; the veto only withholds, never makes anything runnable. The cheap checks run first, so the
 model is loaded and run only for a vetoable answer (+~1 ms mean, +~6 ms p95). `TELLSH_OOC_VETO=off` (or `0` / `false` / `no`) disables it,
 `TELLSH_OOC_T` / `TELLSH_OOC_C` override the thresholds; a missing model file means no veto.
+In the A+S / A+S-full student fallback a vetoed re-ranked answer stays withheld (never replaced by A's first answer).
 Earlier `tellsh` lines in the history are classified without the veto, so the context of a later request is exactly
 the 0.3.10 one. The evaluation (`scripts/real/eval_ooc.js`) runs with the composer off, so the numbers below describe
 catalog answers; with the default composer, composed answers are vetoable too (withheld only, never runnable).

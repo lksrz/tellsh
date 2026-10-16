@@ -133,3 +133,19 @@ test('a plain not-understood answer carries no ooc field', () => {
   assert.equal(r.understood, false);
   assert.equal('ooc' in r && r.ooc !== true, false);
 });
+
+test('A+S fallback: a vetoed re-ranked answer stays withheld (never A\'s other command)', async () => {
+  clear();
+  const { suggestHybrid } = await import('../src/rerank/hybrid.js');
+  const enc = { infer: async () => ({ intents: { activate_venv: 0.6 }, pNone: 0, tagger: undefined }) };
+  for (const q of ['włącz środowisko wirtualne pythona', 'show git status', 'list files here']) {
+    for (const system of ['A+S', 'A+S-full']) {
+      process.env.TELLSH_OOC_VETO = 'off';
+      const off = await suggestHybrid(q, { env: { shell: 'bash', os: 'linux' }, system, encoder: enc });
+      process.env.TELLSH_OOC_VETO = 'on'; process.env.TELLSH_OOC_T = '0'; process.env.TELLSH_OOC_C = '2';
+      const on = await suggestHybrid(q, { env: { shell: 'bash', os: 'linux' }, system, encoder: enc });
+      clear();
+      if (on.command) assert.equal(on.command, off.command, `${system} ${q}`);
+    }
+  }
+});
