@@ -17,12 +17,17 @@
 // --adjudications F[,F...] (adjudicate.mjs output, dev and/or test): a y = 0 candidate whose adjudication (same id and
 // command) says the prediction is correct also counts as correct; each row then adds adj_wrong / adj_accepted_wrong_rate /
 // adj_accepted_wrong_ub95 next to the raw numbers (thresholds are still chosen on the raw labels).
+// --dev-agree P1,P2,... / --test-agree P1,P2,... (other models' preds for the same split): each candidate gets
+// agree = number of other models whose own gate-accepted command is sameCommand-equal (combined_lib.mjs). Adds
+// `agreement`: a dev-chosen (min_agree, t) setting (max kept subject to UB / point <= target) applied to test, and a
+// sweep over min_agree in 0..N x t. Without --*-scores the run is agreement-only (gate + min_agree, no verifier).
 
 import fs from 'node:fs';
 import { loadSchemas } from '../../ir/lib/index.js';
 import { readJsonl, candidates, goldCommand } from './make_candidates.mjs';
 import { sameCommand } from './equiv.mjs';
 import { loadAdjudications, adjudicatedY } from './adjudicate_lib.mjs';
+import { acceptedById, agreeCount, keeps, chooseGrid } from './combined_lib.mjs';
 
 const args = process.argv.slice(2);
 const opt = (k, d) => { const i = args.indexOf(`--${k}`); return i >= 0 ? args[i + 1] : d; };
@@ -75,20 +80,22 @@ const pct = (a, b) => (b ? +((100 * a) / b).toFixed(3) : null);
 // ---------------------------------------------------------------- per split
 function load(split) {
   const DATA = opt(`${split}-data`), PREDS = opt(`${split}-preds`), SCORES = opt(`${split}-scores`);
-  if (!DATA || !PREDS || !SCORES) return null;
+  if (!DATA || !PREDS || (!SCORES && !AGREE_ONLY)) return null;
   const gold = readJsonl(DATA);
   const name = DATA.split(/[\\/]/).pop().replace(/\.jsonl$/, '');
-  const scores = new Map(readJsonl(SCORES).map((r) => [String(r.id), r.p_ok]));
+  const scores = SCORES ? new Map(readJsonl(SCORES).map((r) => [String(r.id), r.p_ok])) : null;
+  const others = (opt(`${split}-agree`) || '').split(',').filter(Boolean).map((f) => acceptedById(schemas, gold, readJsonl(f), name));
   const items = candidates(schemas, gold, readJsonl(PREDS), name).map((c) => {
     const y = sameCommand(c.command, goldCommand(schemas, gold[c.i]), c.request);
-    return { p: scores.get(String(c.id)) ?? -1, y, ya: adjudicatedY(y, c.id, c.command, ADJ), route: c.route };
+    return { p: scores ? scores.get(String(c.id)) ?? -1 : 1, y, ya: adjudicatedY(y, c.id, c.command, ADJ), route: c.route,
+      agree: agreeCount(c.id, c.command, c.request, others) };
   });
   const missing = items.filter((x) => x.p < 0).length;
-  return { name, n: gold.length, goldOk: gold.filter((r) => r.label === 'ok').length, items, missing };
+  return { name, nOthers: others.length, n: gold.length, goldOk: gold.filter((r) => r.label === 'ok').length, items, missing };
 }
 
-function at(S, t) {
-  const kept = S.items.filter((x) => t === -Infinity || (x.p >= 0 && x.p >= t)); // gate_only keeps unscored too
+function at(S, t, a = 0) {
+  const kept = S.items.filter((x) => keeps(x, a, t)); // t = -Infinity (gate_only) keeps unscored too
   const wrong = kept.filter((x) => !x.y).length, right = kept.length - wrong;
   const abst = S.n - kept.length;
   // positives for abstention: rows without a correct accepted candidate (gold not ok, generator wrong, or none)
@@ -98,7 +105,8 @@ function at(S, t) {
     t: t === -Infinity ? 0 : t === Infinity ? 'none' : r4(t), kept: kept.length, correct: right, wrong,
     coverage: pct(right, S.goldOk), accepted_wrong_rate: pct(wrong, kept.length), accepted_wrong_ub95: pct(cpUpper(wrong, kept.length), 1),
     abstain_precision: pct(abstTrue, abst), abstain_recall: pct(abstTrue, shouldAbstain),
-    correct_lost: S.items.filter((x) => x.y && t !== -Infinity && (x.p < 0 || x.p < t)).length,
+    ...(a ? { min_agree: a } : {}),
+    correct_lost: S.items.filter((x) => x.y && !keeps(x, a, t)).length,
     ...(ADJ ? adjAt(kept) : {}),
   };
 }
@@ -121,15 +129,30 @@ function choose(S, crit) {
   return Infinity;
 }
 
+const AGREE_ONLY = !opt('dev-scores') && !!opt('dev-agree');
 const dev = load('dev'), test = load('test');
-if (!dev) { console.error('usage: score_combined.mjs --dev-data D --dev-preds P --dev-scores S [--test-data ... --test-preds ... --test-scores ...]'); process.exit(2); }
-const thr = {
+if (!dev) { console.error('usage: score_combined.mjs --dev-data D --dev-preds P (--dev-scores S | --dev-agree P1,..) [--test-data ... --test-preds ... --test-scores ... --test-agree ...]'); process.exit(2); }
+const thr = AGREE_ONLY ? {} : {
   by_upper_bound: choose(dev, (w, k) => cpUpper(w, k) <= TARGET),
   by_point: choose(dev, (w, k) => w / k <= TARGET),
 };
 const report = { target_pct: TARGET * 100, thresholds: Object.fromEntries(Object.entries(thr).map(([k, v]) => [k, v === Infinity ? 'none' : r4(v)])) };
+const N = dev.nOthers;
+const SWEEP_T = AGREE_ONLY ? [-Infinity] : [-Infinity, 0.5, 0.7, 0.8, 0.9, 0.95, 0.98, 0.99];
+const grid = N ? {
+  by_upper_bound: chooseGrid(dev.items, N, (w, k) => cpUpper(w, k) <= TARGET, MIN_KEPT, !AGREE_ONLY),
+  by_point: chooseGrid(dev.items, N, (w, k) => w / k <= TARGET, MIN_KEPT, !AGREE_ONLY),
+} : null;
+if (grid) report.agreement_settings = Object.fromEntries(Object.entries(grid).map(([k, v]) => [k, v ? { min_agree: v.min_agree, t: v.t === -Infinity ? 0 : r4(v.t) } : 'none']));
 for (const S of [dev, test].filter(Boolean)) {
-  report[S.name] = {
+  if (grid) {
+    if (S.nOthers !== N) throw new Error(`${S.name}: ${S.nOthers} agreeing models, dev has ${N}`);
+    const pick = (g) => (g ? at(S, g.t, g.min_agree) : at(S, Infinity));
+    report[S.name] = { agreement: { models: N, by_upper_bound: pick(grid.by_upper_bound), by_point: pick(grid.by_point),
+      sweep: Array.from({ length: N + 1 }, (_, a) => SWEEP_T.map((t) => ({ min_agree: a, ...at(S, t, a) }))).flat() } };
+  }
+  if (AGREE_ONLY) { Object.assign(report[S.name], { rows: S.n, gold_ok: S.goldOk, accepted_candidates: S.items.length, gate_only: at(S, -Infinity) }); continue; }
+  report[S.name] = { ...report[S.name],
     rows: S.n, gold_ok: S.goldOk, accepted_candidates: S.items.length, missing_scores: S.missing,
     verifier: { auc: r4(auc(S.items.filter((x) => x.p >= 0))), ece: r4(ece(S.items.filter((x) => x.p >= 0))) },
     gate_only: at(S, -Infinity),

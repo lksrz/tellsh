@@ -125,3 +125,13 @@ both_wrong, equivalent, cost) are rewritten each run. Pure helpers live in `adju
 `score_combined.mjs --adjudications DEV_ADJ,TEST_ADJ` counts a `y = 0` candidate as correct when its adjudication
 (same id and command) says the prediction is correct, and reports `adj_wrong`, `adj_accepted_wrong_rate`,
 `adj_accepted_wrong_ub95` next to the raw numbers (thresholds are still chosen on raw labels).
+
+### Ensemble agreement
+
+`score_combined.mjs --dev-agree P1,P2,... --test-agree P1,P2,...` takes other models' predictions for the same split
+(e.g. `build/ir/runs/kfold_v2/fold{0,1,2}/preds_{dev,test}.jsonl`, produced by `ml/ir/run_ens_v2.bat`). Each accepted
+candidate of the main model gets `agree` = the number of other models whose own gate-accepted command (same PD route
+assembly) is `sameCommand`-equal to it (`combined_lib.mjs`). The report adds `agreement_settings` (chosen on dev: max
+kept rows subject to UB / point accepted-wrong <= `--target`, at least `--min-kept`, over `min_agree in 0..N` x
+verifier threshold) and per split `agreement.{by_upper_bound,by_point,sweep}`. Without `--dev-scores` the run is
+agreement-only (gate + `min_agree`, no verifier). Tests: `ir/test/agreement.test.js`.
