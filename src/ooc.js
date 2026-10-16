@@ -6,7 +6,8 @@
 // ooc model runs only for a vetoable answer. Answers resolved from history (method 'history-rule', a slot sourced from
 // history, any context rule) are never vetoed. A missing model/model_ooc.bin (or a model without the __ooc__ label,
 // pOoc = 0) means no veto.
-// TELLSH_OOC_VETO=off disables it; TELLSH_OOC_T / TELLSH_OOC_C override the thresholds (experiments).
+// TELLSH_OOC_VETO=off (or 0 / false / no) disables it; earlier `tellsh` lines in the history are classified without the veto,
+// so the context of a later request is the same as in 0.3.10; TELLSH_OOC_T / TELLSH_OOC_C override the thresholds (experiments).
 import { fileURLToPath } from 'node:url';
 import { loadModel } from './model.js';
 
@@ -27,7 +28,7 @@ export function getOocModel() {
 
 /** The cheap conditions (no model call): `res` is a fresh low-confidence catalog / composed answer the veto may withhold. */
 export function oocVetoable(res) {
-  if (process.env.TELLSH_OOC_VETO === 'off' || !res?.understood || !res.command) return false;
+  if (/^(?:0|off|false|no)$/i.test(process.env.TELLSH_OOC_VETO || '') || !res?.understood || !res.command) return false;
   if (res.method !== 'catalog' && res.method !== 'composed') return false;
   if (res.context?.rule || Object.values(res.slotSources || {}).includes('history')) return false;
   return (res.confidence ?? 0) < num(process.env.TELLSH_OOC_C, OOC_C);

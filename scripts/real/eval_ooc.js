@@ -8,7 +8,7 @@
 //   --half=tune|test                         real-usage rows (real_human, real_tmpl, real_ooc) with an even / odd group
 //                                             hash only (fnv1a of r.group, else r.text); public sets unaffected
 import { fileURLToPath } from 'node:url';
-import { suggest } from '../../src/pipeline.js';
+import { suggest, NEW_TEMPLATE_INTENTS } from '../../src/pipeline.js';
 import { evalSets } from '../hybrid/sets.js';
 import { getOocModel, oocVetoable } from '../../src/ooc.js';
 import { fnv1a } from '../../src/features.js';
@@ -43,7 +43,7 @@ for (const [name, rows] of Object.entries(sets)) {
     if (SWEEP) {
       // the built-in veto's cheap conditions (src/ooc.js oocVetoable) with C swept; the probe mirrors oocProbe
       process.env.TELLSH_OOC_VETO = 'on';
-      const vetoableAt = SWEEP.map(([, c]) => { process.env.TELLSH_OOC_C = String(c); return oocVetoable(s); });
+      const vetoableAt = SWEEP.map(([, c]) => { process.env.TELLSH_OOC_C = String(c); return !NEW_TEMPLATE_INTENTS.has(s.intent) && oocVetoable(s); });
       process.env.TELLSH_OOC_VETO = 'off'; delete process.env.TELLSH_OOC_C;
       const p = vetoableAt.some(Boolean) ? (suggest(r.text, { ...o, model: OM, rerank: undefined, gated: true }).pOoc || 0) : 0;
       SWEEP.forEach(([t], k) => { okT[k] += vetoableAt[k] && p >= t ? !r.intent : good; });

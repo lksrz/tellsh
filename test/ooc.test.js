@@ -109,3 +109,27 @@ test('suggest never returns a command after a veto', () => {
   }
   assert.ok(vetoed > 0, 'at least one fall-through answer is vetoed');
 });
+
+test('a forced veto never changes how earlier tellsh lines in the history are read (context stays as with the veto off)', () => {
+  clear();
+  const q = 'podglad crontaba';
+  const o = { shell: 'bash', os: 'linux', top: 3, cwd: '/tmp', compose: 'off', history: ['tellsh "npx echo"', 'tellsh "list files"', 'git status'] };
+  process.env.TELLSH_OOC_VETO = 'off';
+  const off = suggest(q, o);
+  process.env.TELLSH_OOC_VETO = 'on'; process.env.TELLSH_OOC_T = '0'; process.env.TELLSH_OOC_C = '2';
+  const on = suggest(q, o);
+  // the veto may withhold the answer itself, never turn it into another runnable command
+  if (on.command) { assert.equal(on.command, off.command); assert.equal(on.intent, off.intent); }
+});
+
+test('TELLSH_OOC_VETO accepts 0 / false / no / OFF', () => {
+  clear();
+  for (const v of ['0', 'false', 'no', 'OFF']) { process.env.TELLSH_OOC_VETO = v; assert.equal(oocVeto(probe, res), res); }
+});
+
+test('a plain not-understood answer carries no ooc field', () => {
+  clear();
+  const r = suggest('hello there how are you', { shell: 'bash', os: 'linux' });
+  assert.equal(r.understood, false);
+  assert.equal('ooc' in r && r.ooc !== true, false);
+});

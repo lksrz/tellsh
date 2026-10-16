@@ -726,8 +726,11 @@ in-catalog rows as negatives, so the class decision is made on the same distribu
 0.3.3 model when p(`__ooc__`) ≥ 0.99 and the answer's confidence < 0.8 (hint "this looks like a shell task tellsh does
 not know yet", exit 3). History answers (`history-rule`, a slot from history, any context rule) and templates-model
 answers are never vetoed; the veto only withholds, never makes anything runnable. The cheap checks run first, so the
-model is loaded and run only for a vetoable answer (+~1 ms mean, +~6 ms p95). `TELLSH_OOC_VETO=off` disables it,
+model is loaded and run only for a vetoable answer (+~1 ms mean, +~6 ms p95). `TELLSH_OOC_VETO=off` (or `0` / `false` / `no`) disables it,
 `TELLSH_OOC_T` / `TELLSH_OOC_C` override the thresholds; a missing model file means no veto.
+Earlier `tellsh` lines in the history are classified without the veto, so the context of a later request is exactly
+the 0.3.10 one. The evaluation (`scripts/real/eval_ooc.js`) runs with the composer off, so the numbers below describe
+catalog answers; with the default composer, composed answers are vetoable too (withheld only, never runnable).
 
 **Training.** Out-of-catalog rows of the real-usage train split (skeleton-disjoint from the eval split), weight 0.5,
 ≤ 2 rows per command group; in-catalog real rows uncapped (`gen_data.js` / `train.py` `--ooc-weight` / `--ooc-cap` /
@@ -753,7 +756,7 @@ Full eval split: `real_ooc` 34.79 → 46.63 (+11.8), `real_human` −0.20, `real
 0 same-risk swaps, public sets byte-identical, real eval 4,488 answers newly withheld, 0 newly runnable. `eval_gate.js`
 top-1 93.67 → 93.24 (a vetoed in-catalog answer counts as a miss).
 
-Threshold choice: on TUNE, 0.9/0.6 (+11.46, max cost 0.50) and 0.99/0.8 (+11.41, max cost 0.46) were tied. 0.99/0.8 was
+Threshold choice: on TUNE, 0.9/0.6 (+11.33, max cost 0.50) and 0.99/0.8 (+11.27, max cost 0.46) were tied. 0.99/0.8 was
 chosen for its margin, but honestly the tie-break was made after seeing TEST, where 0.9/0.6 would cost 0.61 on
 `real_tmpl`.
 
