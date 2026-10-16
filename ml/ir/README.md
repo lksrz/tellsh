@@ -37,8 +37,36 @@ All IR logic lives in JS. Python only sees token ids, unit maps and target ids:
 
 - encoder 16.0M params (10.5M of them the 27k×384 word embedding), P heads 0.9M, decoder 12.6M (5 layers × 384,
   8 heads, FF 1536, cross-attention over token + unit states; `--d-layers/--d-model/--d-ff` configurable), total 29.5M.
-- `--arm H8` (default): f32 weights, bf16/fp16 autocast on CUDA. `--arm HQ` (ternary QAT) is a reserved hook and raises
-  `NotImplementedError`.
+- `--arm H8` (default): f32 weights, bf16/fp16 autocast on CUDA.
+- `--arm HQ` / `--arm T50`: ternary QAT, see below.
+
+## Ternary QAT arms (`ml/ir/bitlinear.py`)
+
+BitNet b1.58-style: `BitLinear` keeps f32 shadow weights and in the forward pass uses absmean ternary weights
+(`round(w / mean|w|)` clamped to {-1,0,1}, one scale per matrix) and per-token absmax int8 activations, both through a
+straight-through estimator. Embeddings, LayerNorms, the pointer / P / D heads, `mem` and `span_proj` stay high precision.
+
+- `--arm HQ`: the H8 (student-initialised 3×384) encoder with its linears ternarized from the start of training.
+- `--arm T50`: a wider encoder from scratch (`--enc-layers 6 --enc-hidden 512 --enc-heads 8 --enc-ff 2048` default;
+  e.g. `--enc-hidden 768 --enc-heads 12 --enc-ff 3072`), student vocab / tokenizer, no student weights.
+- `--tern-enc / --no-tern-enc` (default on for HQ/T50), `--tern-dec` (the D decoder becomes `TernDecoder`, a pre-norm
+  decoder with BitLinear projections; not state-dict compatible with the f32 decoder), `--subln` (LayerNorm before every
+  quantized projection, BitNet SubLN; fresh init, so it perturbs HQ's pretrained layers).
+- `packed_size(model)` (printed at train start as `packed {...}`) counts BitLinear weights packed at 2 bits
+  (`pack2` / `unpack2`, 4 per byte) + an f32 scale, and every other parameter at f16 and int8 (+ per-row scale).
+
+| config | params | ternary | total, rest f16 | total, rest int8 |
+|---|---|---|---|---|
+| H8 | 29.5M | 0 | 56.3 MB | 28.4 MB |
+| HQ (enc) | 29.5M | 5.3M | 47.5 MB | 24.6 MB |
+| HQ + `--tern-dec` | 29.5M | 17.1M | 27.8 MB | 16.1 MB |
+| T50 6×512 | 47.4M | 18.9M | 59.0 MB | 32.0 MB |
+| T50 6×512 + `--tern-dec` | 47.4M | 30.7M | 39.3 MB | 23.4 MB |
+| T50 6×768 + `--tern-dec` | 79.6M | 54.3M | 61.3 MB | 37.2 MB |
+
+The word embedding (27k × H) dominates the high-precision remainder. `eval.py` rebuilds the model from the checkpoint's
+args without the ternary flags, so it only loads HQ checkpoints trained without `--tern-dec`/`--subln`; the in-training
+dev eval covers all arms.
 
 ## Local (Mac)
 

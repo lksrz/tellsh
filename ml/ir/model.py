@@ -15,6 +15,8 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+from bitlinear import TernDecoder, ternarize_
+
 NEG = -1e4
 
 
@@ -91,7 +93,10 @@ class Encoder(nn.Module):
             for ours, theirs in names.items():
                 for p in ("weight", "bias"):
                     sd[f"layers.{i}.{ours}.{p}"] = t[f"encoder.layer.{i}.{theirs}.{p}"]
-        self.load_state_dict({k: torch.from_numpy(np.ascontiguousarray(v)) for k, v in sd.items()}, strict=True)
+        r = self.load_state_dict({k: torch.from_numpy(np.ascontiguousarray(v)) for k, v in sd.items()}, strict=False)
+        bad = [k for k in r.missing_keys if ".sub_ln." not in k] + list(r.unexpected_keys)  # BitLinear SubLN: fresh init
+        if bad:
+            raise RuntimeError(f"student load: mismatched keys {bad[:8]}")
         return cfg
 
 
@@ -122,14 +127,26 @@ class Pointer(nn.Module):
 # ---------------------------------------------------------------- model
 
 class IRModel(nn.Module):
-    def __init__(self, vocab, d_model=384, d_layers=5, d_heads=8, d_ff=1536, max_len=34, arm="H8", dropout=0.1, label_smoothing=0.0):
+    def __init__(self, vocab, d_model=384, d_layers=5, d_heads=8, d_ff=1536, max_len=34, arm="H8", dropout=0.1, label_smoothing=0.0,
+                 tern_enc=None, tern_dec=False, subln=False, enc_layers=6, enc_hidden=512, enc_heads=8, enc_ff=2048):
+        """arm H8: student-shaped f32 encoder. HQ: same shape, ternary QAT (bitlinear.py). T50: wider encoder
+        (enc_layers x enc_hidden, from scratch), ternary. tern_enc defaults to True for HQ/T50; tern_dec ternarizes the D decoder."""
         super().__init__()
         self.ls = label_smoothing  # for the label head and D action CE only (pointers / P heads stay hard)
-        if arm != "H8":
-            raise NotImplementedError(f"arm {arm}: ternary QAT (HQ/T50) is a later hook; only H8 is implemented")
+        if arm not in ("H8", "HQ", "T50"):
+            raise ValueError(f"unknown arm {arm}")
+        if tern_enc is None:
+            tern_enc = arm != "H8"
         self.v = vocab
-        H = 384
-        self.enc = Encoder()
+        if arm == "T50":
+            self.enc = Encoder(H=enc_hidden, layers=enc_layers, heads=enc_heads, inter=enc_ff)
+            H = enc_hidden
+        else:
+            self.enc = Encoder()
+            H = 384
+        if tern_enc:
+            for l in self.enc.layers:
+                ternarize_(l, subln)
         self.drop = nn.Dropout(dropout)
         # P heads (section 4.3)
         self.h_label = nn.Linear(H, len(vocab.labels))
@@ -150,8 +167,11 @@ class IRModel(nn.Module):
         self.op_emb = nn.Embedding(len(vocab.ops), D)  # factorized emb(option) + emb(op)
         self.span_proj = nn.Linear(H, D)
         self.pos_emb = nn.Embedding(max_len, D)
-        layer = nn.TransformerDecoderLayer(D, d_heads, d_ff, dropout, activation="gelu", batch_first=True, norm_first=True)
-        self.dec = nn.TransformerDecoder(layer, d_layers, norm=nn.LayerNorm(D))
+        if tern_dec:
+            self.dec = TernDecoder(D, d_heads, d_ff, dropout, d_layers, subln)
+        else:
+            layer = nn.TransformerDecoderLayer(D, d_heads, d_ff, dropout, activation="gelu", batch_first=True, norm_first=True)
+            self.dec = nn.TransformerDecoder(layer, d_layers, norm=nn.LayerNorm(D))
         self.h_act = nn.Linear(D, len(vocab.actions))
         self.d_ptr = Pointer(D, H)
         self.max_len = max_len

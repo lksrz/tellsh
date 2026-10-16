@@ -3,8 +3,12 @@
 // See scripts/ir/README.md. Node >= 20, no dependencies.
 //
 //   node scripts/ir/dedup.mjs --name v1 [--cap 60] [--near 0.8] [--label-ratio 0.25] [--seed 1] \
-//        build/ir/gen/haiku100k/converted.jsonl build/ir/grok/run10k/converted.jsonl
+//        [--overlay build/ir/relabel/v1_overlay.jsonl] [--source-cap N] \
+//        build/ir/gen/haiku100k/converted.jsonl build/ir/grok/run10k/converted.jsonl=20000
 //
+// FILE=N caps that source at N rows after the status filter (deterministic shuffle); --source-cap N is the
+// default cap for sources without one. --overlay applies apply_relabel.mjs output to non-ok rows (by
+// normalized request): drop, relabel, or replace with the overlay's accepted ok row.
 // Kept: label ok with status accepted (IR present), and non-ok labels (ir null). Dropped: ok items the
 // converter rejected / mismatched / failed to decompile (conservative: never train on them).
 
@@ -16,7 +20,7 @@ import { fileURLToPath } from 'node:url';
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 
 function parseArgs(argv) {
-  const a = { name: '', cap: 60, near: 0.8, labelRatio: 0.25, seed: 1, inputs: [] };
+  const a = { name: '', cap: 60, near: 0.8, labelRatio: 0.25, seed: 1, inputs: [], overlay: '', sourceCap: 0 };
   for (let i = 2; i < argv.length; i++) {
     const k = argv[i], v = argv[i + 1];
     switch (k) {
@@ -25,6 +29,8 @@ function parseArgs(argv) {
       case '--near': a.near = +v; i++; break;
       case '--label-ratio': a.labelRatio = +v; i++; break;
       case '--seed': a.seed = +v; i++; break;
+      case '--overlay': a.overlay = v; i++; break;
+      case '--source-cap': a.sourceCap = +v; i++; break;
       default: if (k.startsWith('--')) { console.error(`unknown arg ${k}`); process.exit(2); } a.inputs.push(k);
     }
   }
@@ -95,19 +101,38 @@ function cmdTools(cmd) {
 
 function main() {
   const a = parseArgs(process.argv);
-  const st = { inputs: a.inputs, params: { cap: a.cap, near: a.near, labelRatio: a.labelRatio, seed: a.seed },
-    read: 0, dropped_status: {}, exact_dups: 0, near_dups: 0, skeleton_capped: 0, label_capped: {} };
+  const st = { inputs: a.inputs, params: { cap: a.cap, near: a.near, labelRatio: a.labelRatio, seed: a.seed, overlay: a.overlay || null, sourceCap: a.sourceCap },
+    read: 0, dropped_status: {}, overlay: { ok: 0, relabel: 0, drop: 0 }, source_capped: 0, exact_dups: 0, near_dups: 0, skeleton_capped: 0, label_capped: {}, per_source: {} };
+  const overlay = new Map();
+  if (a.overlay) for (const l of fs.readFileSync(path.resolve(ROOT, a.overlay), 'utf8').split('\n')) if (l) { const o = JSON.parse(l); overlay.set(o.key, o); }
+  const srcStat = (s) => (st.per_source[s] ??= { read: 0, ok_read: 0, ok_accepted: 0, overlay: 0, source_capped: 0, exact_dups: 0, near_dups: 0, skeleton_capped: 0, label_capped: 0, final: 0, final_label: {} });
 
-  // 1. read + status filter + exact dedup
-  const items = []; const seenExact = new Set();
-  for (const f of a.inputs) {
+  // 1. read + status filter + overlay + per-source cap + exact dedup
+  const items = []; const seenExact = new Set(); const rs = mulberry32(a.seed + 7);
+  for (const spec of a.inputs) {
+    const m = spec.match(/^(.*)=(\d+)$/); const f = m ? m[1] : spec; const cap = m ? +m[2] : a.sourceCap;
+    const src = path.basename(path.dirname(f)); const ss = srcStat(src); const rows = [];
     for (const l of fs.readFileSync(path.resolve(ROOT, f), 'utf8').split('\n')) {
       if (!l) continue; let j; try { j = JSON.parse(l); } catch { bump(st.dropped_status, 'bad_json'); continue; }
-      st.read++;
+      st.read++; ss.read++; if (j.label === 'ok') ss.ok_read++;
       if (j.label === 'ok' ? !(j.status === 'accepted' && j.ir) : j.ir) { bump(st.dropped_status, `${j.label}:${j.status}`); continue; }
       const n = normReq(j.request); if (!n) { bump(st.dropped_status, 'empty_request'); continue; }
-      if (seenExact.has(n)) { st.exact_dups++; continue; }
-      seenExact.add(n); items.push({ j, n });
+      if (j.label === 'ok') ss.ok_accepted++;
+      const o = j.label !== 'ok' && overlay.get(n);
+      if (o) {
+        st.overlay[o.action]++; ss.overlay++;
+        if (o.action === 'drop') continue;
+        j = o.action === 'ok' ? { ...o.row } : { ...j, label: o.row.label };
+      }
+      rows.push({ j, n, src });
+    }
+    if (cap && rows.length > cap) {
+      for (let i = rows.length - 1; i > 0; i--) { const k = Math.floor(rs() * (i + 1)); [rows[i], rows[k]] = [rows[k], rows[i]]; }
+      ss.source_capped = rows.length - cap; st.source_capped += rows.length - cap; rows.length = cap;
+    }
+    for (const it of rows) {
+      if (seenExact.has(it.n)) { st.exact_dups++; ss.exact_dups++; continue; }
+      seenExact.add(it.n); items.push(it);
     }
   }
 
@@ -121,7 +146,7 @@ function main() {
       const xs = buckets.get(key); if (xs) for (const x of xs) cand.add(x);
     }
     for (const c of cand) if (jaccard(sh, kept[c].sh) >= a.near) { dup = true; break; }
-    if (dup) { st.near_dups++; continue; }
+    if (dup) { st.near_dups++; srcStat(it.src).near_dups++; continue; }
     const idx = kept.length; kept.push({ ...it, sh });
     for (const key of keys) { const xs = buckets.get(key); if (xs) xs.push(idx); else buckets.set(key, [idx]); }
   }
@@ -133,7 +158,7 @@ function main() {
   for (const it of kept) {
     if (it.j.label === 'ok') {
       it.skel = skeleton(it.j.ir);
-      if ((perSkel[it.skel] || 0) >= a.cap) { st.skeleton_capped++; continue; }
+      if ((perSkel[it.skel] || 0) >= a.cap) { st.skeleton_capped++; srcStat(it.src).skeleton_capped++; continue; }
       bump(perSkel, it.skel);
     }
     capped.push(it);
@@ -144,7 +169,7 @@ function main() {
   const maxNon = Math.floor(a.labelRatio * nOk); const perLabel = {}; const final = [];
   for (const it of capped) {
     const lb = it.j.label;
-    if (lb !== 'ok' && (perLabel[lb] || 0) >= maxNon) { bump(st.label_capped, lb); continue; }
+    if (lb !== 'ok' && (perLabel[lb] || 0) >= maxNon) { bump(st.label_capped, lb); srcStat(it.src).label_capped++; continue; }
     bump(perLabel, lb); final.push(it);
   }
 
@@ -159,6 +184,7 @@ function main() {
     if (it.j.label !== 'ok') rec.reasons = it.j.reasons;
     out[sp].push(JSON.stringify(rec));
     bump(by.label, `${sp}:${it.j.label}`); bump(by.label, it.j.label);
+    const ss = srcStat(it.src); ss.final++; bump(ss.final_label, it.j.label);
     if (it.j.label === 'ok') {
       for (const op of new Set(ops(it.j.ir))) bump(by.op, op);
       for (const t of cmdTools(it.j.command)) bump(by.tool, t);

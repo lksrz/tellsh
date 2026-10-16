@@ -25,6 +25,7 @@ sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 from data import IRDataset, Vocab, collate, load_vocab  # noqa: E402
 from model import IRModel, param_counts  # noqa: E402
 from metrics import quick_metrics  # noqa: E402
+from bitlinear import packed_size  # noqa: E402
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
 
@@ -34,7 +35,15 @@ def args_parser():
     a.add_argument("--targets", default=os.path.join(ROOT, "build/ir/targets/v1"))
     a.add_argument("--student", default=os.path.join(ROOT, "hybrid/models/student/student.bin"))
     a.add_argument("--out", default=os.path.join(ROOT, "build/ir/runs/h8"))
-    a.add_argument("--arm", default="H8", choices=["H8", "HQ"], help="HQ = ternary QAT (not implemented yet)")
+    a.add_argument("--arm", default="H8", choices=["H8", "HQ", "T50"],
+                   help="HQ = student encoder + ternary QAT; T50 = wider ternary encoder from scratch (bitlinear.py)")
+    a.add_argument("--tern-enc", action=argparse.BooleanOptionalAction, default=None, help="ternary encoder linears (default: on for HQ/T50)")
+    a.add_argument("--tern-dec", action="store_true", help="ternary D decoder linears")
+    a.add_argument("--subln", action="store_true", help="LayerNorm before every quantized projection (BitNet SubLN)")
+    a.add_argument("--enc-layers", type=int, default=6, help="T50 encoder")
+    a.add_argument("--enc-hidden", type=int, default=512, help="T50 encoder")
+    a.add_argument("--enc-heads", type=int, default=8, help="T50 encoder")
+    a.add_argument("--enc-ff", type=int, default=2048, help="T50 encoder")
     a.add_argument("--max-epochs", "--epochs", dest="epochs", type=int, default=12)
     a.add_argument("--patience", type=int, default=3, help="stop after N evals without a dev d_exact gain (0 = off)")
     a.add_argument("--label-smoothing", type=float, default=0.1)
@@ -67,7 +76,8 @@ def args_parser():
 
 def model_kwargs(args):
     return dict(d_model=args.d_model, d_layers=args.d_layers, d_heads=args.d_heads, d_ff=args.d_ff, arm=args.arm, dropout=args.dropout,
-                label_smoothing=args.label_smoothing)
+                label_smoothing=args.label_smoothing, tern_enc=args.tern_enc, tern_dec=args.tern_dec, subln=args.subln,
+                enc_layers=args.enc_layers, enc_hidden=args.enc_hidden, enc_heads=args.enc_heads, enc_ff=args.enc_ff)
 
 
 def to(b, dev):
@@ -116,11 +126,12 @@ def main():
     resuming = args.resume and os.path.exists(last)
     if args.resume and not resuming:
         print(f"--resume: {last} not found, starting a fresh run", flush=True)
-    if not args.no_student and not resuming:
+    if not args.no_student and not resuming and args.arm != "T50":
         cfg = model.enc.load_student(args.student)
         print(f"encoder initialised from {args.student} {cfg}", flush=True)
     model.to(dev)
     pc = param_counts(model)
+    print(f"packed {json.dumps(packed_size(model))}", flush=True)
     print(f"params {json.dumps(pc)}  device {dev}  amp {amp}  train {len(tr)}  dev {len(dv)}", flush=True)
     enc_params = list(model.enc.parameters())
     enc_ids = {id(p) for p in enc_params}

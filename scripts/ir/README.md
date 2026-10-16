@@ -56,8 +56,14 @@ span / norm / const against the request (`ir/lib/lift.js`), and runs the full ga
 
 ```sh
 node scripts/ir/dedup.mjs --name v1 [--cap 60] [--near 0.8] [--label-ratio 0.25] [--seed 1] \
-  build/ir/gen/haiku100k/converted.jsonl build/ir/grok/run10k/converted.jsonl
+  [--overlay build/ir/relabel/v1_overlay.jsonl] [--source-cap N] \
+  build/ir/gen/haiku100k/converted.jsonl build/ir/grok/run10k/converted.jsonl=20000
 ```
+
+`FILE=N` caps one source at N rows (after the status filter, seeded shuffle); `--source-cap N` is the
+default for the others. `--overlay` applies `apply_relabel.mjs` output to non-ok rows matched by
+normalized request (drop / relabel / replace with an accepted ok row). Sources earlier on the command
+line win exact duplicates.
 
 1. keeps `ok` items only when `status: accepted` (rejected / mismatch / decompile_error are
    dropped) and non-ok labels (no IR);
@@ -67,5 +73,22 @@ node scripts/ir/dedup.mjs --name v1 [--cap 60] [--near 0.8] [--label-ratio 0.25]
 5. each non-ok label capped at `--label-ratio` x #ok;
 6. split ~90/5/5: ok items by skeleton hash (dev/test skeletons never in train), non-ok by request hash.
 
-Writes `build/ir/dataset/<name>/{train,dev,test}.jsonl` and `stats.json` (drop counts, exact /
-near dups, capped counts, per label / split, per tool, per op, skeleton counts).
+Writes `build/ir/dataset/<name>/{train,dev,test}.jsonl` and `stats.json` (drop counts, overlay counts,
+exact / near dups, capped counts, per label / split, per tool, per op, skeleton counts, and `per_source`:
+read, ok acceptance, overlay hits, each drop stage, final rows per label).
+
+## apply_relabel.mjs: relabel proposals -> dedup overlay
+
+`node scripts/ir/apply_relabel.mjs [--changes build/ir/relabel/v1_changes.jsonl] [--out build/ir/relabel/v1_overlay.jsonl]`
+combines `relabel_nonok.mjs` proposals per normalized request: any `flag` -> drop the row; `ok` with
+gate `accepted` -> ok row with IR re-derived by decompile + lift + gate (not re-accepted -> drop);
+non-ok -> non-ok only when the consistency pass and the model agree (else ignored); conflicts -> drop.
+
+## build_v2.sh: one-command v2 build
+
+`scripts/ir/build_v2.sh [--partial] [--name NAME]` converts each source generator dir (haiku100k, run10k,
+haiku_v2_smoke, g46_v2_20k, haiku_v2_200k) whose `converted.jsonl` is missing or older than `items.jsonl`,
+builds the relabel overlay, runs dedup (`--cap 80 --near 0.8 --overlay`), exports targets to
+`build/ir/targets/<name>` and the 3 k-fold splits. A dir is complete when every planned call has an ok
+usage line; incomplete dirs are skipped, or with `--partial` snapshotted into `<dir>_partial/` and
+converted there (dataset name defaults to `v2pre`, else `v2`). Re-runs only redo stale conversions.
