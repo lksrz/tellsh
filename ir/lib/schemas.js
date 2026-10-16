@@ -160,12 +160,13 @@ function checkOption(o, path, add) {
     for (const c of [].concat(o.cue)) if (!CUE_CLASSES.includes(c)) add(path, `unknown cue class "${c}"`);
   }
   // implied: {reason, when}: an implied default of the op, needing no request word (strict.js);
-  // when: 'always' | 'piped' (the stage feeds another) | 'each' (it feeds an each stage) | 'after:op[.mod]' (the previous stage), or a list
+  // when: 'always' | 'piped' (the stage feeds another) | 'each' (it feeds an each stage) | 'after:op[.mod]' (the previous stage)
+  // | 'before:op[.mod]' (the next stage), or a list
   if (o.implied !== undefined) {
     const ws = [].concat(o.implied?.when ?? []);
     if (!isObj(o.implied) || typeof o.implied.reason !== 'string' || !o.implied.reason || !ws.length
-      || !ws.every((w) => w === 'always' || w === 'piped' || w === 'each' || /^after:[a-z]+\.[a-z_]+(\.[a-z_]+)?$/.test(w)))
-      add(path, 'implied must be {reason, when: always|piped|after:op[.mod] (or a list)}');
+      || !ws.every((w) => w === 'always' || w === 'piped' || w === 'each' || /^(after|before):[a-z]+\.[a-z_]+(\.[a-z_]+)?$/.test(w)))
+      add(path, 'implied must be {reason, when: always|piped|each|after:op[.mod]|before:op[.mod] (or a list)}');
   }
   if (o.polarity !== undefined && o.polarity !== 'neg') add(path, 'polarity must be "neg"');
   if (o.direction !== undefined && !['first', 'last'].includes(o.direction)) add(path, 'direction must be first|last');

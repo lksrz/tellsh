@@ -319,6 +319,108 @@ class IRModel(nn.Module):
         return out
 
 
+    @torch.no_grad()
+    def beam(self, b, K=8, ptr_k=2, alpha=1.0):
+        """N-best D decode (beam search over actions and pointer spans; same restrictions as greedy: first action is a
+        status, no grammar mask). Per beam and step the candidates are the top-K actions; a pointer action expands over
+        the top-ptr_k start units, each with its argmax end. Search score = summed action + pointer log-probs; the final
+        list is re-ranked by score / len**alpha (alpha=0: raw sum). Returns per row a list of up to K hypotheses
+        {acts: [ids], spans: [[s, e]] (inclusive, -1 for non-pointer), logp, ptr_logp, score, min_tok}, best first."""
+        x, units, _ = self.encode(b)
+        B, dev, v = x.shape[0], x.device, self.v
+        rep = lambda t: t.repeat_interleave(K, 0)
+        x, units = rep(x), rep(units)
+        bk = {"attn": rep(b["attn"]), "unit_mask": rep(b["unit_mask"])}
+        um = bk["unit_mask"]
+        BK, U = B * K, units.shape[1]
+        status_ids = torch.tensor([v.aid[a] for a in ("OK", "NOT_SHELL", "OOS", "UNDER", "AMBIG")], device=dev)
+        op_index = torch.zeros(len(v.actions), dtype=torch.long, device=dev)
+        for k, o in enumerate(v.ops[1:]):
+            op_index[v.aid["op:" + o]] = k + 1
+        d_in = torch.full((BK, 1), v.BOS, dtype=torch.long, device=dev)
+        d_span = torch.full((BK, 1, 2), -1, dtype=torch.long, device=dev)
+        d_op = torch.zeros(BK, 1, dtype=torch.long, device=dev)
+        score = torch.full((B, K), -float("inf"), device=dev)
+        score[:, 0] = 0  # only beam 0 is live at t=0 (no duplicate hypotheses)
+        score = score.view(BK)
+        tok_lp, ptr_lp = torch.zeros(BK, device=dev), torch.zeros(BK, device=dev)
+        min_tok, length = torch.ones(BK, device=dev), torch.zeros(BK, device=dev)
+        done = torch.zeros(BK, dtype=torch.bool, device=dev)
+        A = min(K, len(v.actions) - 2)
+        pk = max(1, min(ptr_k, U))
+        for t in range(self.max_len - 1):
+            h = self.d_states(bk, x, units, d_in, d_span, d_op)[:, -1:]
+            lg = self.h_act(h)[:, 0].float()
+            lg[:, v.PAD] = NEG
+            lg[:, v.BOS] = NEG
+            if t == 0:
+                keep = torch.full_like(lg, NEG)
+                keep[:, status_ids] = 0
+                lg = lg + keep
+            lp = lg.log_softmax(-1)
+            a_lp, a_id = lp.topk(A, -1)  # (BK,A)
+            sl = self.d_ptr.start_logits(h, units, um).float().log_softmax(-1)[:, 0]  # (BK,U)
+            s_lp, s_id = sl.topk(pk, -1)  # (BK,pk)
+            el = self.d_ptr.end_logits(h.expand(-1, pk, -1), units, um, s_id).float().log_softmax(-1)  # (BK,pk,U)
+            e_lp, e_id = el.max(-1)  # (BK,pk)
+            isp = self.is_ptr[a_id]  # (BK,A)
+            span_lp = (s_lp + e_lp)[:, None, :].expand(-1, A, -1)  # (BK,A,pk)
+            c_ptr = torch.where(isp[..., None], span_lp, torch.zeros_like(span_lp))
+            valid = isp[..., None] | (torch.arange(pk, device=dev)[None, None, :] == 0)
+            c_tok = a_lp[..., None].expand(-1, -1, pk)
+            cand = score[:, None, None] + c_tok + c_ptr
+            cand = torch.where(valid, cand, torch.full_like(cand, -float("inf")))
+            # finished beams carry over exactly once (as PAD, score unchanged)
+            fin = torch.full_like(cand, -float("inf"))
+            fin[:, 0, 0] = score
+            cand = torch.where(done[:, None, None], fin, cand).view(B, K * A * pk)
+            top, idx = cand.topk(K, -1)  # (B,K)
+            src = idx // (A * pk)
+            ai, pi = (idx % (A * pk)) // pk, idx % pk
+            beam = (torch.arange(B, device=dev)[:, None] * K + src).view(BK)
+            ai, pi = ai.view(BK), pi.view(BK)
+            was_done = done[beam]
+            a = torch.where(was_done, torch.full_like(ai, v.PAD), a_id[beam, ai])
+            ptr = self.is_ptr[a] & ~was_done
+            sp = torch.stack([torch.where(ptr, s_id[beam, pi], -1), torch.where(ptr, e_id[beam, pi], -1)], -1)
+            live = ~was_done
+            step_tok = a_lp[beam, ai]
+            tok_lp = tok_lp[beam] + torch.where(live, step_tok, torch.zeros_like(step_tok))
+            step_ptr = torch.where(ptr, s_lp[beam, pi] + e_lp[beam, pi], torch.zeros_like(step_tok))
+            ptr_lp = ptr_lp[beam] + step_ptr
+            min_tok = torch.where(live, torch.minimum(min_tok[beam], step_tok.exp()), min_tok[beam])
+            length = length[beam] + live.float()
+            score = top.view(BK)
+            done = was_done | (a == v.EOS)
+            new_op = torch.where(op_index[a] > 0, op_index[a], d_op[beam, -1])
+            d_in = torch.cat([d_in[beam], a[:, None]], 1)
+            d_span = torch.cat([d_span[beam], sp[:, None]], 1)
+            d_op = torch.cat([d_op[beam], new_op[:, None]], 1)
+            if bool((done | torch.isinf(score)).all()):
+                break
+        norm = score / length.clamp(min=1).pow(alpha)
+        out = []
+        acts, spans = d_in[:, 1:].tolist(), d_span[:, 1:].tolist()
+        for i in range(B):
+            hyps = []
+            for j in range(i * K, (i + 1) * K):
+                if not math.isfinite(float(score[j])):
+                    continue
+                aa, ss = [], []
+                for x_, s_ in zip(acts[j], spans[j]):
+                    if x_ == v.PAD:
+                        break
+                    aa.append(x_)
+                    ss.append(s_)
+                    if x_ == v.EOS:
+                        break
+                hyps.append(dict(acts=aa, spans=ss, logp=float(tok_lp[j]), ptr_logp=float(ptr_lp[j]),
+                                 score=float(norm[j]), min_tok=float(min_tok[j])))
+            hyps.sort(key=lambda r: -r["score"])
+            out.append(hyps)
+        return out
+
+
 def param_counts(m: IRModel):
     c = lambda mod: sum(p.numel() for p in mod.parameters())
     enc = c(m.enc)

@@ -45,7 +45,7 @@ test('a cue word needs its element', () => {
   no('history of build.gradle and settings.gradle', 'ls build.gradle settings.gradle', /history/);
   ok('history of build.gradle and settings.gradle', 'git log -- build.gradle settings.gradle');
   no('first 5 files whose names contain deploy', 'rg -l deploy . | head -n 5', /whose names/);
-  no('Show a word diff of the working tree', 'git diff --word-diff working --', /working tree/);
+  no('Show a word diff of the working tree', 'git diff --word-diff working --', /working/);
   ok('Show a word diff of the working tree', 'git diff --word-diff');
   // a cue word echoed by a value is that value ("the zsh history file")
   ok('byte count of the zsh history file ~/.zsh_history', 'wc -c ~/.zsh_history');

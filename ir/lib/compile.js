@@ -369,6 +369,29 @@ function cwdText(s) {
   return `./${s}`;
 }
 
+// F1 (taxonomy v2): a name exclusion (`-not -name`) on a request whose noun is files lists regular files only. A
+// files.find exec with exclude_glob and no type gets type=f when the request says "file(s)" and names no
+// directories / folders / links. Deterministic (depends on the IR and the request only); added before canon, so
+// `canonical` carries the mod and decompile(compile(x)) round-trips to it.
+const FILE_NOUN = /\bfiles?\b/i;
+const NON_FILE_NOUN = /\b(dir(ector(y|ies))?s?|folders?|(sym)?links?|entries|everything)\b/i;
+export function impliedFileType(ir, request) {
+  if (typeof request !== 'string' || !FILE_NOUN.test(request) || NON_FILE_NOUN.test(request)) return ir;
+  const fix = (e) => {
+    if (e?.k !== 'exec' || e.op !== 'files.find') return e;
+    const mods = e.mods || [];
+    if (!mods.some((m) => m.mod === 'exclude_glob') || mods.some((m) => m.mod === 'type')) return e;
+    return { ...e, mods: [...mods, { mod: 'type', values: [{ k: 'const', id: 'f' }] }] };
+  };
+  return {
+    ...ir,
+    body: {
+      ...ir.body,
+      parts: ir.body.parts.map((p) => ({ ...p, stages: p.stages.map((st) => (st.k === 'each' ? { ...st, exec: fix(st.exec) } : fix(st))) })),
+    },
+  };
+}
+
 // compile(ir, env) -> { plan, text, canonical } | { error, label }
 export function compile(ir, env) {
   try {
@@ -378,7 +401,7 @@ export function compile(ir, env) {
     if (!ir || ir.status !== 'ok') return { error: `abstention: ${ir?.status}`, label: ir?.status ?? 'gate_reject' };
     const shape = validateShape(ir);
     if (shape.length) fail(`invalid IR: ${shape.join('; ')}`);
-    const c = canon(ir, { schemas: env.schemas, request: env.request, pathExists: env.pathExists });
+    const c = canon(impliedFileType(ir, env.request), { schemas: env.schemas, request: env.request, pathExists: env.pathExists });
     const counter = { n: 0 };
     const plan = {};
     if (c.cwd) plan.cwd = cwdText(c.cwd.s);

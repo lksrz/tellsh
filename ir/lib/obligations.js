@@ -183,6 +183,8 @@ export function obligations(ir, stages, ctx, used) {
     }
     const viaAlso = (el) => c.phrase in ALSO_EXPLAINS && (ALSO_EXPLAINS[c.phrase] === null || ALSO_EXPLAINS[c.phrase].includes(el.d))
       && el.classes.some((x) => cueHas(c, x));
+    // find lists hidden entries by default: "including hidden" is explained by find itself
+    if (c.cls === 'HIDDEN' && execInfos.some((i) => i.exec.op === 'files.find')) continue;
     if (!elements.some((el) => el.classes.includes(c.cls) || viaAlso(el))) fail('cue', `"${c.phrase}" (${c.cls}) is not explained by any element`);
   }
   pass('cues', [...new Set(elements.flatMap((el) => el.classes))].join(' ') || 'none');

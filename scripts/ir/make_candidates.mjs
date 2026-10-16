@@ -6,6 +6,8 @@
 //   node scripts/ir/make_candidates.mjs --data build/ir/dataset/v1/dev.jsonl --preds build/ir/runs/h8/preds_dev.jsonl \
 //     --out build/ir/verifier/v1/cand_dev.jsonl
 //
+// D route: with d.nbest (eval.py --nbest K) the first gate-accepted hypothesis (nbest_lib.mjs); rows then also carry
+// rank / margin / nb_agree.
 // Row: {id, request, os, command, route, ids, y}  (y = 1 when the command is equivalent (equiv.mjs) to the gate-compiled gold command;
 // informative only: score_combined.mjs recomputes correctness from the gold split).
 
@@ -16,6 +18,7 @@ import { gate } from '../../ir/lib/index.js';
 import { decodeActions, assembleP } from './actions.mjs';
 import { loadTokenizer } from './export_targets.mjs';
 import { sameCommand } from './equiv.mjs';
+import { selectD } from './nbest_lib.mjs';
 
 export const PLATFORM = { linux: 'linux_gnu', darwin: 'darwin_bsd' };
 export const MAX_PAIR_TOKENS = 160;
@@ -43,7 +46,14 @@ export function goldCommand(schemas, r) {
   return acceptedCommand(schemas, r, r.ir) ?? r.command;
 }
 
-// PD route of one prediction row -> {command, route} | null (abstain)
+// D route of one prediction row: first gate-accepted d.nbest hypothesis (nbest_lib.mjs) or the greedy d.actions
+export function dSelect(schemas, r, d) {
+  const compile = (actions) => { let ir; try { ir = decodeActions(actions, schemas); } catch { return null; } return acceptedCommand(schemas, r, ir); };
+  return selectD(d, compile, (a, b) => sameCommand(a, b, r.request));
+}
+
+// PD route of one prediction row -> {command, route[, rank, margin, nb_agree]} | null (abstain); the n-best fields
+// are set for D candidates of preds with d.nbest
 export function pdCandidate(schemas, r, pr) {
   if (!pr) return null;
   if (pr.p?.label === 'ok' && pr.p?.single !== false) {
@@ -52,10 +62,9 @@ export function pdCandidate(schemas, r, pr) {
     const c = acceptedCommand(schemas, r, ir);
     if (c) return { command: c, route: 'P' };
   }
-  let ir = null;
-  try { ir = decodeActions(pr.d.actions, schemas); } catch { return null; }
-  const c = acceptedCommand(schemas, r, ir);
-  return c ? { command: c, route: 'D' } : null;
+  const s = dSelect(schemas, r, pr.d);
+  if (!s.command) return null;
+  return Array.isArray(pr.d?.nbest) ? { command: s.command, route: 'D', rank: s.rank, margin: s.margin, nb_agree: s.agree } : { command: s.command, route: 'D' };
 }
 
 // gold rows + prediction rows -> [{id, i, request, os, command, route}] for every row with an accepted candidate
@@ -88,7 +97,7 @@ if (process.argv[1] && fileURLToPath(import.meta.url) === path.resolve(process.a
   fs.writeFileSync(OUT, cands.map((c) => {
     const y = sameCommand(c.command, goldCommand(schemas, gold[c.i]), c.request) ? 1 : 0;
     right += y;
-    return JSON.stringify({ id: c.id, request: c.request, os: c.os, command: c.command, route: c.route, y, ids: encodePair(tok, c.request, c.os, c.command) });
+    return JSON.stringify({ id: c.id, request: c.request, os: c.os, command: c.command, route: c.route, ...(c.rank != null ? { rank: c.rank, margin: c.margin, nb_agree: c.nb_agree } : {}), y, ids: encodePair(tok, c.request, c.os, c.command) });
   }).join('\n') + '\n');
   console.error(`${split}: ${gold.length} rows, ${cands.length} accepted candidates (${right} correct, ${cands.length - right} wrong) -> ${OUT}`);
 }

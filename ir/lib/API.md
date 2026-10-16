@@ -100,3 +100,60 @@ of the coverage check (`MAX_UNKNOWN`) for accepted IR.
 
 Gold false-reject rate (gold IR of ok rows, h8b eval, Oct 2026): train 190 / 25360 (0.75%), dev 12 / 1976
 (0.61%), test 8 / 851 (0.94%).
+
+## Product semantics and scoring equivalence (taxonomy v2, `docs/ir_error_taxonomy_v2.md`)
+
+- **File listing (F1).** `files.find` (`find … -type f`) is the file lister. `files.list` (`rg --files`) is opt-in:
+  only for a gitignore cue (`IGNORED`) or an explicit rg / ripgrep request (the gate enforces it; the schema keeps
+  `realization: default` only because rg is its sole realizer). `compile` adds `type=f` to a `files.find` exec that has
+  `exclude_glob` and no `type` when the request says "file(s)" and names no directories / folders / links / entries
+  (`impliedFileType(ir, request)`, applied before `canon`, so `canonical` carries it and decompile round-trips).
+- **Count semantics (F4).** IR-level convention, not a compile rewrite (compile stays a pure function of the IR):
+  "count (matching) lines" over a directory, glob, several paths or `-r` is one total, `search | file.count{lines}`
+  (`rg P DIR | wc -l`); the `count` mod (`-c`, per-file counts) is for a single file operand or an each / per / every
+  file cue. The gate and the gold relabel enforce it.
+- **Implied `-o` (F7).** `only_matching` is implied only before `wc -l` (`when: before:file.count.lines`: counting
+  occurrences); under `sort | uniq -c`, `sort -u` or `head` it needs a match / occurrence / extract word. The schema
+  validator accepts `before:op[.mod]` (the next stage); `strict.js` evaluates it.
+- **Scoring equivalence (F3)** — `scripts/ir/equiv.mjs` `equivKey(cmd, request)` / `sameCommand(a, b, request)`; the
+  rule list is in the file header. Request-sensitive: curl `-s` / `-S` (quiet / show-errors cues), `ls -1` ("one per
+  line"), `find -type f` (kept when the request says files and the command excludes names). Not merged on purpose:
+  `find -exec rg -H` vs `rg -g` (one canonical form instead), `jq -r` on non-numeric output, `git log --oneline` when
+  piped (head / wc / grep see a different line shape), `ls -1` on a tty without `-l`.
+
+## Strict cue coverage and value shapes — `strict_cover.js`, `strict_values.js` (gate step 3, agent B)
+
+Called at the end of `strictObligations` (strict.js); tuned on train gold (dataset v2), see
+`docs/ir_error_taxonomy_v2.md` F1/F5/F6/F8/F13.
+
+- `coverObligations(cx)` (strict_cover.js):
+  - **F1** `files_list`: `files.list` (`rg --files`) is rejected unless an IGNORED cue or the words
+    rg / ripgrep / gitignore / ignored / respect(ing) occur — a plain file listing is `find -type f`.
+  - **F5** `COVER_RULES` (exported table; fields `id, words, when, need, forbid, unless`; keys `op`,
+    `op.mod`, `op.mod=const`): a free cue needs one `need` key and no `forbid` key. Covers uniq -d/-u
+    (and "collapse" forbids them), sort -n, wc word/byte/char flags, git log format (hash+subject,
+    subject only, fuller, author/date forbids one-line formats), --date relative/iso, --until, -p,
+    --stat, --name-only, diff --staged, --decorate, --graph, git show vs/against (→ diff), git status
+    -s/-b/--porcelain, git branch --show-current, ls -1/-R/-d (and "contents" forbids -d), find
+    -type l/-empty/-mindepth, curl -s/-S/-f/-i/-I, jq -r. Reason suffix `[rule id]`.
+  - git branch: "remote branches" without an all/local cue forbids `-a`; an all/local cue (and no
+    "nothing local") forbids `-r` alone.
+  - find: directories/folders as the listed noun (not after a preposition, no file noun) need `-type d`.
+  - anchors: a free "ends with" before a pattern span needs `$` and no `^`; "starts with" must not get
+    only `$`; a starts_with/ends_with norm over the opposite cue is rejected.
+- `valueObligations(cx)` (strict_values.js):
+  - **F6** paths: `,`/`;`, scope words (current, cwd, pwd, top-level, across, machine, readable,
+    printing), repo/project after the/this/my/our or before "root" (non-git ops; git ops already reject
+    them), a ref word after on/from/branch on git ops. rev/packages/script/author: filler, git nouns,
+    scope words and generic words (changes, files, all, latest, ...) are rejected; a rev that is a known
+    English word and not ref-shaped (`REF_SHAPE`: feat|fix|chore|refactor/…, sha, HEAD~n, v1…, contains
+    `/~^.@`, main/develop/…) is rejected unless next to branch/tag/ref. `--author` keeping `'s`;
+    trailing `,;!?` on path/rev/author/package/script. A filter-stage search whose pattern is request
+    wording (lines, output, files, commits, …). Function words as name/glob/exclude values.
+  - **F8** an exclude_dir with a file extension; a known directory (node_modules, vendor, .git, …) as
+    find/grep `-not -name`/`--exclude` (rg `-g '!dir'` is fine); a bare extension as a name/exclude
+    glob; a single literal file as grep `--include` over `.` (unless each/every/all/any).
+  - **F13** (conservative): "this file", "that file", "that dir/folder/directory", "the file I", "the
+    one I" with no path value → `scope` reject.
+- strict.js `impliedHolds` also accepts `before:op[.mod]` (the next stage's op/mod), mirroring `after:`.
+- obligations.js: a HIDDEN cue is explained by `files.find` (find lists hidden entries by default).

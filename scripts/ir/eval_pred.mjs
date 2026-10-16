@@ -16,11 +16,16 @@
 //   --calibrate [--thresholds-out T.json]  (dev) per route and scalar confidence, the threshold with max coverage
 //       whose accepted-wrong rate over kept rows is <= 0.5 / 1 / 2 %; PD sweeps a P-fast-path and a D threshold
 //       jointly; writes T.json (default PRED.thresholds.json) and adds report.calibration + reliability tables.
+// N-best (preds with d.nbest from ml/ir/eval.py --nbest K): the D route takes the first gate-accepted hypothesis in
+//   rank order (nbest_lib.mjs; --nbest-max-rank R limits it to ranks <= R, default all); its beam agreement / margin
+//   are extra D confidences (d_nb_agree, d_nb_margin) for --calibrate, and report.nbest counts the rank histogram.
+//   Rows without d.nbest are scored exactly as before.
 //   --thresholds T.json  (test) applies dev-chosen thresholds: report.thresholded = coverage / accepted-wrong per target.
 
 import fs from 'node:fs';
 import { loadSchemas, canon, equals, gate } from '../../ir/lib/index.js';
 import { sameCommand } from './equiv.mjs';
+import { selectD, NO_MARGIN } from './nbest_lib.mjs';
 import { encodeActions, decodeActions, pTargets, assembleP, LABELS } from './actions.mjs';
 
 const args = process.argv.slice(2);
@@ -77,6 +82,9 @@ for (const pr of preds) {
 const MISSING = { label: null, accepted: false, command: null, canon: null, err: 'missing' };
 
 const routes = { P: [], D: [], PD: [] };
+const NB_MAX_RANK = opt('nbest-max-rank') != null ? Number(opt('nbest-max-rank')) : Infinity;
+const nbRanks = {};
+const dlOf = (acts) => { const a = acts?.find(([x]) => x !== 'BOS')?.[0]; return { OK: 'ok', NOT_SHELL: 'not_shell', OOS: 'out_of_scope', UNDER: 'underspecified', AMBIG: 'ambiguous' }[a] ?? 'ok'; };
 const confs = new Array(gold.length).fill(null), pFastAt = new Array(gold.length).fill(false);
 // scalar confidences in [0, 1] per definition; undefined when the preds file lacks the field
 function confOf(pr) {
@@ -88,6 +96,7 @@ function confOf(pr) {
       d_min_all: dc ? Math.min(dc.min_tok, dc.ptr_min) : undefined,
       d_prob_all: dc && lp != null ? Math.exp(lp + dc.ptr_logp) : undefined,
       d_margin: dc?.min_margin,
+      d_nb_agree: pr.nbSel?.agree ?? undefined, d_nb_margin: pr.nbSel?.margin ?? undefined,
     },
   };
 }
@@ -99,8 +108,16 @@ gold.forEach((r, i) => {
   // P can only express 1 part x 1 stage; single=false is the model saying so -> P abstains
   if (pl === 'ok' && pr.p?.single === false) pOut = { label: 'ok', accepted: false, command: null, canon: null, err: 'not_single' };
   else try { pOut = judge(r, assembleP(pr.p, schemas), pl); } catch { pOut = judge(r, null, pl); }
-  const dl = (() => { const a = pr.d?.actions?.find(([x]) => x !== 'BOS')?.[0]; return { OK: 'ok', NOT_SHELL: 'not_shell', OOS: 'out_of_scope', UNDER: 'underspecified', AMBIG: 'ambiguous' }[a] ?? 'ok'; })();
-  try { dOut = judge(r, decodeActions(pr.d.actions, schemas), dl); } catch { dOut = judge(r, null, dl); }
+  let dActs = pr.d?.actions;
+  if (Array.isArray(pr.d?.nbest)) {
+    // n-best: first gate-accepted hypothesis within --nbest-max-rank; none -> the beam's best (scored as rejected/abstain)
+    const d = { ...pr.d, nbest: pr.d.nbest.slice(0, NB_MAX_RANK + 1) };
+    const compile = (a) => { const o = judge(r, decodeActions(a, schemas), 'ok'); return o.accepted ? o.command : null; };
+    pr.nbSel = selectD(d, compile, (a, b) => sameCommand(a, b, r.request));
+    dActs = pr.nbSel.actions;
+    nbRanks[pr.nbSel.rank ?? 'none'] = (nbRanks[pr.nbSel.rank ?? 'none'] || 0) + 1;
+  }
+  try { dOut = judge(r, decodeActions(dActs, schemas), dlOf(dActs)); } catch { dOut = judge(r, null, dlOf(dActs)); }
   const pFast = pr.p?.label === 'ok' && pr.p?.single !== false && pOut.accepted;
   confs[i] = confOf(pr);
   pFastAt[i] = pFast;
@@ -243,6 +260,7 @@ const jsonInf = (k, v) => (v === Infinity ? 'Infinity' : v);
 const report = { data: DATA, preds: PREDS || 'oracle', labels: LABELS, routes: Object.fromEntries(Object.entries(routes).map(([k, v]) => [k, score(v)])) };
 // Gold-oracle check of the P route on P-expressible rows only (P can express ~45% of ok rows by design).
 report.p_coverage = { single_ok: routes.P.filter(([, o]) => o.label === 'ok' && o.err !== 'not_single').length, accepted: routes.P.filter(([, o]) => o.accepted).length };
+if (Object.keys(nbRanks).length) report.nbest = { max_rank: NB_MAX_RANK, no_margin: NO_MARGIN, chosen_rank: nbRanks };
 if (ORACLE) report.p_expressible = gold.filter((r) => pTargets(r.ir, schemas)).length;
 if (args.includes('--calibrate')) {
   const { cal, thr } = calibrate();

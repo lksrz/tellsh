@@ -7,6 +7,8 @@
 //   4. systematic data-audit patterns (git log | tail, rg DIR | uniq -c, git show --oneline, ...).
 
 import { unitWord, isQuotedUnit } from './units.js';
+import { coverObligations } from './strict_cover.js';
+import { valueObligations } from './strict_values.js';
 
 // ---------- 3. request words of cue-less mods (key `op.mod` or `op.mod=const`) ----------
 // Mods with a cue class, a negative polarity or a value copied from the request are supported by
@@ -214,6 +216,11 @@ export function strictObligations(ir, stages, ctx, used, h) {
       const p = prevOf(info);
       return !!p?.exec && p.exec.op === `${o1}.${o2}` && (!mod || p.exec.mods.some((m) => m.mod === mod));
     }
+    if (w.startsWith('before:')) {
+      const [o1, o2, mod] = w.slice(7).split('.');
+      const n = nextOf(info);
+      return !!n?.exec && n.exec.op === `${o1}.${o2}` && (!mod || n.exec.mods.some((m) => m.mod === mod));
+    }
     return false;
   });
   for (const info of execInfos) {
@@ -417,6 +424,9 @@ export function strictObligations(ir, stages, ctx, used, h) {
   }
 
   auditLeaks();
+  coverObligations({ words, fail, hasFree, execInfos, ops, hasMod, ctx, seg, used, consumed, inCue });
+  valueObligations({ words, fail, hasFree, execInfos, ops, hasMod, ctx, seg, used, consumed, inCue, isKnown, isExtWord: h.isExtWord,
+    isFileLike, prevOf, nextOf, PATH_STOPWORDS, GIT_SCOPE_WORDS, GIT_NOUNS, FILLER, REF_WORD, DIR_NOUNS, FILE_NAMES });
 
   // rg -c / --count-matches print one count per file: a total over a directory needs | wc -l
   const perFileCue = ctx.cues.some((c) => c.cls === 'PER_FILE') || whichFiles || hasFree(['each file', 'every file', 'per file', 'by file', 'files', 'counts'])

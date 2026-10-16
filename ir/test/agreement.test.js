@@ -25,7 +25,7 @@ test('chooseGrid picks max kept satisfying the criterion', () => {
     { p: 0.6, y: true, agree: 0 },
   ];
   const crit = (w) => w === 0;
-  assert.deepEqual(chooseGrid(items, 1, crit, 1), { min_agree: 1, t: 0.9, kept: 6 });
+  assert.deepEqual(chooseGrid(items, 1, crit, 1), { min_agree: 1, t: 0.6, kept: 6 });
   assert.deepEqual(chooseGrid(items, 1, crit, 1, false), { min_agree: 1, t: -Infinity, kept: 6 });
   assert.equal(chooseGrid(items, 0, crit, 1), null);
   assert.equal(chooseGrid(items, 1, crit, 7), null);

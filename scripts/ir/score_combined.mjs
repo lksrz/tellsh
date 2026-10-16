@@ -21,6 +21,10 @@
 // agree = number of other models whose own gate-accepted command is sameCommand-equal (combined_lib.mjs). Adds
 // `agreement`: a dev-chosen (min_agree, t) setting (max kept subject to UB / point <= target) applied to test, and a
 // sweep over min_agree in 0..N x t. Without --*-scores the run is agreement-only (gate + min_agree, no verifier).
+// N-best preds (eval.py --nbest K; D candidate = first gate-accepted hypothesis, nbest_lib.mjs): D candidates carry
+// rank / margin / nb_agree. Fixed knobs --max-rank R, --min-margin M, --min-beam-agree A drop D candidates outside them
+// before everything else (P candidates always pass). When dev has n-best candidates, `nbest` adds a dev-chosen
+// (max_rank, min_agree, min_margin, t) setting (max kept subject to UB / point <= target) applied unchanged to test.
 
 import fs from 'node:fs';
 import { loadSchemas } from '../../ir/lib/index.js';
@@ -28,11 +32,14 @@ import { readJsonl, candidates, goldCommand } from './make_candidates.mjs';
 import { sameCommand } from './equiv.mjs';
 import { loadAdjudications, adjudicatedY } from './adjudicate_lib.mjs';
 import { acceptedById, agreeCount, keeps, chooseGrid } from './combined_lib.mjs';
+import { nbestKeeps, chooseNbest } from './nbest_lib.mjs';
 
 const args = process.argv.slice(2);
 const opt = (k, d) => { const i = args.indexOf(`--${k}`); return i >= 0 ? args[i + 1] : d; };
 const TARGET = Number(opt('target', 0.5)) / 100;
 const schemas = loadSchemas();
+const num = (k) => (opt(k) != null ? Number(opt(k)) : null);
+const KNOBS = { max_rank: num('max-rank'), min_margin: num('min-margin'), min_agree: num('min-beam-agree') };
 const ADJ = opt('adjudications') ? loadAdjudications(opt('adjudications').split(',')) : null;
 
 // ---------------------------------------------------------------- stats
@@ -88,14 +95,14 @@ function load(split) {
   const items = candidates(schemas, gold, readJsonl(PREDS), name).map((c) => {
     const y = sameCommand(c.command, goldCommand(schemas, gold[c.i]), c.request);
     return { p: scores ? scores.get(String(c.id)) ?? -1 : 1, y, ya: adjudicatedY(y, c.id, c.command, ADJ), route: c.route,
-      agree: agreeCount(c.id, c.command, c.request, others) };
-  });
+      agree: agreeCount(c.id, c.command, c.request, others), rank: c.rank, margin: c.margin, nb_agree: c.nb_agree };
+  }).filter((x) => nbestKeeps(x, KNOBS));
   const missing = items.filter((x) => x.p < 0).length;
   return { name, nOthers: others.length, n: gold.length, goldOk: gold.filter((r) => r.label === 'ok').length, items, missing };
 }
 
-function at(S, t, a = 0) {
-  const kept = S.items.filter((x) => keeps(x, a, t)); // t = -Infinity (gate_only) keeps unscored too
+function at(S, t, a = 0, nk = null) {
+  const kept = S.items.filter((x) => keeps(x, a, t) && (!nk || nbestKeeps(x, nk))); // t = -Infinity (gate_only) keeps unscored too
   const wrong = kept.filter((x) => !x.y).length, right = kept.length - wrong;
   const abst = S.n - kept.length;
   // positives for abstention: rows without a correct accepted candidate (gold not ok, generator wrong, or none)
@@ -105,8 +112,8 @@ function at(S, t, a = 0) {
     t: t === -Infinity ? 0 : t === Infinity ? 'none' : r4(t), kept: kept.length, correct: right, wrong,
     coverage: pct(right, S.goldOk), accepted_wrong_rate: pct(wrong, kept.length), accepted_wrong_ub95: pct(cpUpper(wrong, kept.length), 1),
     abstain_precision: pct(abstTrue, abst), abstain_recall: pct(abstTrue, shouldAbstain),
-    ...(a ? { min_agree: a } : {}),
-    correct_lost: S.items.filter((x) => x.y && !keeps(x, a, t)).length,
+    ...(a ? { min_agree: a } : {}), ...(nk ? { nbest: nk } : {}),
+    correct_lost: S.items.filter((x) => x.y && !(keeps(x, a, t) && (!nk || nbestKeeps(x, nk)))).length,
     ...(ADJ ? adjAt(kept) : {}),
   };
 }
@@ -144,12 +151,26 @@ const grid = N ? {
   by_point: chooseGrid(dev.items, N, (w, k) => w / k <= TARGET, MIN_KEPT, !AGREE_ONLY),
 } : null;
 if (grid) report.agreement_settings = Object.fromEntries(Object.entries(grid).map(([k, v]) => [k, v ? { min_agree: v.min_agree, t: v.t === -Infinity ? 0 : r4(v.t) } : 'none']));
+const HAS_NB = dev.items.some((x) => x.rank != null);
+const nbSet = HAS_NB ? {
+  by_upper_bound: chooseNbest(dev.items, (w, k) => cpUpper(w, k) <= TARGET, MIN_KEPT, !AGREE_ONLY),
+  by_point: chooseNbest(dev.items, (w, k) => w / k <= TARGET, MIN_KEPT, !AGREE_ONLY),
+} : null;
+const knobsOf = (g) => ({ max_rank: g.max_rank, min_agree: g.min_agree, min_margin: g.min_margin });
+if (nbSet) report.nbest_settings = Object.fromEntries(Object.entries(nbSet).map(([k, v]) => [k, v ? { ...knobsOf(v), t: v.t === -Infinity ? 0 : r4(v.t) } : 'none']));
+if (Object.values(KNOBS).some((v) => v != null)) report.nbest_fixed_knobs = KNOBS;
 for (const S of [dev, test].filter(Boolean)) {
   if (grid) {
     if (S.nOthers !== N) throw new Error(`${S.name}: ${S.nOthers} agreeing models, dev has ${N}`);
     const pick = (g) => (g ? at(S, g.t, g.min_agree) : at(S, Infinity));
     report[S.name] = { agreement: { models: N, by_upper_bound: pick(grid.by_upper_bound), by_point: pick(grid.by_point),
       sweep: Array.from({ length: N + 1 }, (_, a) => SWEEP_T.map((t) => ({ min_agree: a, ...at(S, t, a) }))).flat() } };
+  }
+  if (nbSet) {
+    const pick = (g) => (g ? at(S, g.t, 0, knobsOf(g)) : at(S, Infinity));
+    const ranks = {};
+    for (const x of S.items) if (x.rank != null) ranks[x.rank] = (ranks[x.rank] || 0) + 1;
+    report[S.name] = { ...report[S.name], nbest: { chosen_rank: ranks, by_upper_bound: pick(nbSet.by_upper_bound), by_point: pick(nbSet.by_point) } };
   }
   if (AGREE_ONLY) { Object.assign(report[S.name], { rows: S.n, gold_ok: S.goldOk, accepted_candidates: S.items.length, gate_only: at(S, -Infinity) }); continue; }
   report[S.name] = { ...report[S.name],

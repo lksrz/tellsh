@@ -94,7 +94,7 @@ const PIPES = [
 const CONTRASTS = [
   'literal vs regex (rg -F / grep -F vs a regex pattern, ^anchors from "starts with")',
   'first N matches overall (| head -n N) vs N matches per file (-m N)',
-  'count of files vs lines vs occurrences (-l | wc -l, -c, -o | wc -l)',
+  'count of files vs lines vs occurrences (-l | wc -l, one total | wc -l, -o | wc -l; -c only per file)',
   'staged vs working tree vs against a branch (git diff --staged / git diff / git diff main)',
   'exclude a directory vs invert match (-g \'!dir\' vs -v)',
   'head vs tail direction, lines vs bytes',
@@ -203,6 +203,15 @@ Spread the requests over these opening styles (each used several times): ${opens
 - Rendering: single quotes only when needed (metachars, spaces, globs); a path starting with ~/ ALWAYS keeps ~/ unquoted so it expands (never '~/x') (~/.config/x, or ~/'my dir/x' when the rest needs quotes); '\\'' for embedded quotes; patterns starting with - use -e; find leading-dash roots as ./-x; rg/grep first stage always has a path operand ('.' if none given); grep is recursive with -r and uses --include=/--exclude=/--exclude-dir=; rg uses -g 'GLOB' / -g '!DIR'; find exclude dir via -type d -name D -prune -o ... -print; each-inner argv ends with -- (find ... -exec wc -l -- {} +, xargs -0 -r wc -l --); inner rg/grep get -H and -e P.
 - Forbidden in ok commands: ; || > >> $( backticks, loops, sudo, rm, any write, awk, cut, tee, sed other than sed -n 'A,Bp'. && only as in the npm example.
 - If the request needs anything outside the schemas or §8 lists it, the label is out_of_scope (never approximate).
+
+## Conventions (docs/ir_error_taxonomy_v2.md F10; gold_rewrite.mjs lints these)
+- Decline (ambiguous / underspecified) ONLY when no single supported op answers the request. Clear tail, sed -n, jq, pkill, curl and git log requests are ok, never declined.
+- Listing files: find D -type f [-maxdepth N] [-name G] [-not -name G]. rg --files ONLY when the request names rg/ripgrep, "files rg would search" or gitignore/ignored-file semantics.
+- Never put -o before sort | uniq -c, sort -u or head when the request is about lines; -o only for "matches / occurrences / matched text / extract".
+- git log -n N (with --oneline or a one-line --format), never a multi-line git log piped to head.
+- "Count lines with X" over a directory, glob or several paths: one total (rg X D | wc -l). -c only for a single file or an "each / per / every file" cue.
+- "the repo", "this project", "my repo" without a path → the current directory (no path operand / '.'), never a literal repo or project dir.
+- curl -I only for "headers only / just the headers / HEAD"; -i for headers together with the body.
 
 ## IR invariants (§0)
 ${SEC0}

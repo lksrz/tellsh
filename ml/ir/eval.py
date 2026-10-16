@@ -15,6 +15,10 @@ Each row also carries confidences of the greedy choices (ignored by older reader
            (start*end) probs; d.logp stays the summed action-token log-prob.
 K-fold held-out (ml/ir/kfold.py): --data-file TARGETS.jsonl predicts on any targets file (pred ids = its row ids),
 --gold-file DATASET.jsonl scores against that gold file instead of DATA/SPLIT.jsonl.
+N-best (--nbest K > 1): beam search over D actions + pointer spans (model.IRModel.beam) adds
+  d.nbest = [{actions, logp, ptr_logp, score, conf: {min_tok}}, ...]   best first by score = (logp + ptr_logp) / len**alpha
+(--nbest-alpha, default 1.0; 0 = raw sum). d itself stays the greedy decode, so older readers see no change.
+scripts/ir/eval_pred.mjs routes D through the first gate-accepted hypothesis when d.nbest is present.
 Calibrate thresholds on dev with: node scripts/ir/eval_pred.mjs --calibrate ... (see ml/ir/README.md).
 """
 import argparse
@@ -43,6 +47,13 @@ def p_conf(p, i, v, slots):
     for x in ps:
         prod *= x
     return {"label": round(ps[0], 6), "min": round(min(ps), 6), "prod": round(prod, 6)}
+
+
+def nbest_entry(hy, v):
+    """model.beam hypothesis -> {actions: [[name, u0, u1_exclusive]], logp, ptr_logp, score, conf} (d_sequences format)."""
+    acts = [[v.actions[a], s, e + 1] if v.raw["pointer"][a] else [v.actions[a], -1, -1] for a, (s, e) in zip(hy["acts"], hy["spans"])]
+    return {"actions": acts, "logp": round(hy["logp"], 4), "ptr_logp": round(hy["ptr_logp"], 4),
+            "score": round(hy["score"], 4), "conf": {"min_tok": round(hy["min_tok"], 6)}}
 
 
 def score(preds, split, data_dir, out, gold_file=""):
@@ -74,6 +85,9 @@ def main():
     a.add_argument("--batch", type=int, default=128)
     a.add_argument("--limit", type=int, default=0)
     a.add_argument("--device", default="")
+    a.add_argument("--nbest", type=int, default=1, help="K>1: beam search, adds d.nbest (K hypotheses)")
+    a.add_argument("--nbest-alpha", type=float, default=1.0, help="length normalization exponent for n-best ranking")
+    a.add_argument("--nbest-ptr", type=int, default=2, help="pointer start candidates per pointer action in the beam")
     a.add_argument("--no-node", action="store_true", help="only write predictions")
     a.add_argument("--score-only", action="store_true", help="score --preds with node, no model")
     args = a.parse_args()
@@ -106,11 +120,14 @@ def main():
         for b in dl:
             b = {x: y.to(dev) for x, y in b.items()}
             p, acts, spans, logp, dc = model.predict(b, conf=True)
+            nb = model.beam(b, K=args.nbest, ptr_k=args.nbest_ptr, alpha=args.nbest_alpha) if args.nbest > 1 else None
             batches.append((b, p, acts, spans))
             dc = {x: y.tolist() for x, y in dc.items()}
             for i, (pr, dseq, lp) in enumerate(zip(p_rows(p, vocab), d_sequences(acts, spans, vocab), logp.tolist())):
                 pr["conf"] = p_conf(p, i, vocab, pr["slots"])
                 d = {"actions": dseq, "logp": round(lp, 4), "conf": {x: round(y[i], 6) for x, y in dc.items()}}
+                if nb is not None:
+                    d["nbest"] = [nbest_entry(hy, vocab) for hy in nb[i]]
                 f.write(json.dumps({"id": ds.rows[k]["id"], "p": pr, "d": d}) + "\n")
                 k += 1
     os.replace(tmp_path, preds_path)

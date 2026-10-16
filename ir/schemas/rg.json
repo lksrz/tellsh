@@ -171,8 +171,8 @@
           "form": "bool",
           "model": "predict",
           "implied": {
-            "reason": "a downstream counter (wc -l, sort | uniq -c, head) counts or shows the matches themselves",
-            "when": "piped"
+            "reason": "a downstream wc -l counts the matches (occurrences) themselves; elsewhere (sort | uniq -c, sort -u, head) -o needs a match / occurrence / extract word (taxonomy v2 F7)",
+            "when": "before:file.count.lines"
           }
         },
         {
@@ -469,6 +469,9 @@
     },
     "files.list": {
       "realization": "default",
+      "notes": [
+        "opt-in (taxonomy v2 F1): file listing is files.find (find -type f); files.list only when the request asks for gitignore semantics (IGNORED cue) or names rg / ripgrep; the gate enforces the cue. realization stays 'default' only because rg is the op's sole realizer"
+      ],
       "argv_prefix": [
         "--files"
       ],

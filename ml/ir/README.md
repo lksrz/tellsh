@@ -153,6 +153,20 @@ Small kept counts on dev (tens of rows) make the 0.5 % target statistically weak
 
 Prediction ids are `<split>:<line>` of `build/ir/dataset/v1/<split>.jsonl`; scoring needs that file (gold IR).
 
+## N-best decoding (`eval.py --nbest K`)
+
+`--nbest K` (K > 1) adds a beam search over D actions and pointer spans (`IRModel.beam`: per step the top-K actions;
+a pointer action expands over the top `--nbest-ptr` (2) start units, each with its argmax end). Each preds row then
+carries `d.nbest = [{actions, logp, ptr_logp, score, conf: {min_tok}}]`, best first by
+`score = (logp + ptr_logp) / len**alpha` (`--nbest-alpha`, default 1.0; 0 = raw sum). `d` itself stays the greedy
+decode, so K = 1 (default) output is unchanged. The scorers take the first gate-accepted hypothesis as the D candidate
+(`scripts/ir/nbest_lib.mjs`; see scripts/ir/README.md "N-best D routing"). GPU box: `ml\ir\run_nbest_v2.bat`
+(h8v2 + kfold_v2 fold models, v2 dev/test, K = 8 -> `preds_{dev,test}_nb8.jsonl`).
+
+```sh
+python3.11 ml/ir/eval.py --ckpt build/ir/runs/smoke/best.pt --split dev --limit 50 --nbest 8
+```
+
 ## Learned verifier (`ml/ir/verifier.py`)
 
 The gate checks structure and provenance, not meaning, and the generator's own confidence does not separate right

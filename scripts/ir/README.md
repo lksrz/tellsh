@@ -93,6 +93,31 @@ builds the relabel overlay, runs dedup (`--cap 80 --near 0.8 --overlay`), export
 usage line; incomplete dirs are skipped, or with `--partial` snapshotted into `<dir>_partial/` and
 converted there (dataset name defaults to `v2pre`, else `v2`). Re-runs only redo stale conversions.
 
+`--rewrite` (default for `--name v3*`) writes dedup output to `build/ir/dataset/<name>base` and runs
+`gold_rewrite.mjs` (below) into `build/ir/dataset/<name>` before targets and k-fold: `scripts/ir/build_v2.sh --name v3`.
+
+## gold_rewrite.mjs: gold rules, train adjudication overlay, gold lint (v3)
+
+`node scripts/ir/gold_rewrite.mjs --in build/ir/dataset/v3base --out build/ir/dataset/v3 [--adj ADJ --kfold KFOLD]`
+(docs/ir_error_taxonomy_v2.md F1/F2/F4/F7/F9/F10/M7). Deterministic IR rules on every split; a rewrite is kept only
+when the gate accepts the new IR (strict), otherwise the row is unchanged and counted under `gate_rejected`:
+- `files_find`: cue-less `files.list` (`rg --files`) -> `find D -type f` (`-maxdepth`, `-name` / `\( -name A -o ... \)`,
+  `-not -name`, a wildcard-free extension-less `!dir` -> prune, `-0` -> `-print0`). Kept when the request names
+  rg/ripgrep/search/gitignore/ignored or wants hidden files only;
+- `drop_o`: `-o` before sort/uniq/freq/head removed when the request is about lines with no match/occurrence cue;
+- `count_total`: a single-stage `-c` search over directory operands (or none) with no each/per/every-file cue -> `| wc -l`;
+- `curl_head`: `-i` with a headers-only cue -> `-I`; `-I` with a headers-and-body cue -> `-i`;
+- `scope_path`: a literal repo/project/workspace path after the/this/my/our -> dropped (cwd).
+
+Adjudications (`build/ir/adjudicate/v2_kfold/adjudications.jsonl`, train ids only; dev/test are never touched): a
+train row the judge called gold-wrong is replaced by the judge-approved k-fold pred IR (`build/ir/verifier/v2/kfold.jsonl`,
+re-gated, same command) as an ok row, or dropped when no pred was judged right; rows with conflicting gold verdicts are
+left alone. Rows are matched by normalized request. The lint (F10) counts retired conventions left after the rules
+(cue-less `rg --files`, hidden-only `rg --files`, `-o` in a line pipeline, multi-line `git log | head`, curl `-I`/`-i`
+against the cue, scope-word paths) and lists them in `OUT/lint.jsonl`. Counts per rule / split / label go to
+`OUT/stats.json` (`gold_rewrite`). Tests: `ir/test/gold_rewrite.test.js`. The generator prompt (`grok_gen.mjs`,
+"Conventions") asks for the same conventions in new generations.
+
 ## equiv.mjs: command equivalence key
 
 `equivKey(command, request)` / `sameCommand(a, b, request)` treat equivalent spellings as one answer; used by
@@ -135,3 +160,22 @@ assembly) is `sameCommand`-equal to it (`combined_lib.mjs`). The report adds `ag
 kept rows subject to UB / point accepted-wrong <= `--target`, at least `--min-kept`, over `min_agree in 0..N` x
 verifier threshold) and per split `agreement.{by_upper_bound,by_point,sweep}`. Without `--dev-scores` the run is
 agreement-only (gate + `min_agree`, no verifier). Tests: `ir/test/agreement.test.js`.
+
+## N-best D routing (`nbest_lib.mjs`)
+
+Preds written with `ml/ir/eval.py --nbest K` carry `d.nbest` (hypotheses, best first). `eval_pred.mjs`,
+`make_candidates.mjs` and `score_combined.mjs` then take as the D candidate the **first gate-accepted hypothesis** in
+rank order (no accepted hypothesis = abstain), and record:
+
+- `rank`: its index in the beam (0 = the beam's best);
+- `margin`: its score minus the score of the next lower-ranked hypothesis with a different command (sameCommand;
+  rejected hypotheses count as different); 99 when there is none;
+- `nb_agree` (beam agreement): softmax mass of the beam (over `logp + ptr_logp`) on hypotheses compiling to a
+  sameCommand-equal command.
+
+`eval_pred.mjs`: `--nbest-max-rank R` caps the rank; `d_nb_agree` / `d_nb_margin` join the D confidences for
+`--calibrate`; `report.nbest.chosen_rank` is the rank histogram. `make_candidates.mjs` writes rank / margin / nb_agree
+on D rows. `score_combined.mjs`: fixed knobs `--max-rank`, `--min-margin`, `--min-beam-agree` filter D candidates; when
+dev has n-best candidates, `nbest_settings` is a dev-chosen (max_rank, min_agree, min_margin, t) setting (max kept,
+UB / point accepted-wrong <= target), applied unchanged to test (`<split>.nbest`). Preds without `d.nbest` behave as
+before. Tests: `node --test ir/test/nbest.test.js`.
