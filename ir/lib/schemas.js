@@ -34,7 +34,7 @@ export const TYPE_ACTIONS = {
   Path: { span: true, norms: ['home_path'] },
   Pattern: { span: true, norms: ['starts_with', 'ends_with'] },
   Glob: { span: true, norms: ['ext_glob', 'substr_glob'] },
-  Name: { span: true, norms: [] },
+  Name: { span: true, norms: ['possessive'] },
   ScriptName: { span: true, norms: [] },
   ProcName: { span: true, norms: [] },
   Rev: { span: true, norms: ['rev_rel'] },

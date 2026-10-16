@@ -4,21 +4,17 @@ Status: design for the EN pilot, bash/zsh first. Machine-readable tool schemas l
 `ir/schemas/<tool>.json` and follow the format defined in §2. Nothing in this document changes
 today's runtime (A + S, 0.3.11). The IR path is additive until §9's migration steps say otherwise.
 
-**Basis.** Three drafts and two judge reviews, following the consultations `c2`/`c3`. **Gate and
-compiler** (safety draft): invariants, the ArgvPlan compiler, `each` over NUL paths only, two-way
-request/command obligations, dialect-checked regexes, the PATH-shim harness, effect-derived risk.
-**Model encoding** (learnability draft): word-level pointer units, a one-step biaffine span, the
-heads-only fast path, factorized option embeddings, per-route × risk-tier Clopper-Pearson
-calibration on unmasked "legal mass". **Data and scope** (coverage draft): abstract ops, a global
-modifier vocabulary, the capped `freq` macro, stderr merge, the reverse parser as a coverage meter,
-minimal-pair sampling, rule-growth accounting.
+**Basis.** Three drafts and two judge reviews (consultations `c2`/`c3`): gate and compiler
+(invariants, ArgvPlan, `each` over NUL paths, two-way obligations, dialect-checked regexes, PATH-shim
+harness, effect-derived risk); model encoding (word-level pointer units, biaffine span, heads-only
+fast path, per-route × tier calibration); data and scope (abstract ops, global mods, `freq`, stderr
+merge, reverse parser as coverage meter, minimal pairs, rule-growth accounting). Reference
+implementation: `ir/lib/*.js` (tests `node --test ir/test/`); data pipeline §10.1.
 
 **Explicitly rejected:** parseable placeholder commands (in bash/zsh `rg <PATTERN> app.log`
 truncates `app.log`); inexact canonical folds (`git log | head -n N` → `-n N`); silently swapping
 rg for grep on option-id parity; `xargs -d '\n'`; hard cue masks in the decoder; a second learned
 verifier (gloss entailment) in the pilot; model-emitted `ambiguous` labels.
-
----
 
 ## 0. Invariants (every other rule serves these)
 
@@ -38,8 +34,6 @@ verifier (gloss entailment) in the pilot; model-emitted `ambiguous` labels.
 7. **Generated-path answers never auto-run**, whatever their risk.
 8. **A first stage never reads stdin.** A rendered command behaves the same in a terminal, under
    an agent, or with stdin redirected.
-
----
 
 ## 1. IR data model
 
@@ -105,17 +99,19 @@ Decisions:
   leading dashes and CDPATH lookup, which would also print to stdout). It must exist as a directory
   (env check, every risk tier). It costs one action plus one span.
 - **No `;`, `||`, `&`, `$(…)`, variables, loops or subshells.**
-- **`canon(IR)`** is exact by construction. It does five things:
+- **`canon(IR)`** (`ir/lib/canon.js`) is exact by construction and idempotent. It does five things:
   1. sorts mods into schema order;
-  2. dedupes repeated values;
-  3. replaces provenance with value strings (keeping `pkind`);
+  2. dedupes repeated values and mods, and drops a first-stage `paths` equal to the op's
+     `first_stage_operands` (`rg foo .` == `rg foo`; the compiler adds `.` itself);
+  3. replaces provenance with value strings (keeping `pkind`; a missing `pkind` is `literal`). It
+     fixes spellings the renderer prints identically: a leading `./` of `cwd` is dropped (`cd ./X`
+     is how every cwd renders), and so is a `./` before a find root that needs `dot_slash`
+     (`./-x`, `./(`: the compiler adds it back);
   4. collapses mods declared `same_argv_as` in the realized tool. For example, rg renders
      `exclude_dir` and `exclude_glob` identically as `-g '!X'`;
   5. sets `pkind = literal` on a regex pattern without metacharacters (they match identically).
 
   It contains **no semantic rewrites**: `git log | head -n 20` stays a two-stage pipe.
-
----
 
 ## 2. Tool schema format
 
@@ -355,9 +351,7 @@ The remaining schemas (full detail in `ir/schemas/*.json`):
 | pkill (`proc.kill`) | `signal` attached `-KILL`/`-TERM`/`-INT`/`-HUP` (norm `signal` only; `KILL` carries cue FORCE), rendered **first**; derived `exact -x` always; `ignore_case -i` | `signal_proc` (high); name `^[A-Za-z0-9_][A-Za-z0-9_-]{1,63}$` (pkill reads it as an ERE even with `-x`, so `.`/`+` are rejected); `-f` excluded (phase 2); Linux `-x` matches the 15-char `comm` → longer names `env_unsupported` |
 
 Pilot scale (counted from the schemas at build time, never hardcoded; today): 26 ops, 17 tool
-schemas, 113 modifier ids in 179 option entries, about 40 relations, 14 value types, 18 norm kinds.
-
----
+schemas, 113 modifier ids in 179 option entries, about 40 relations, 14 value types, 19 norm kinds.
 
 ## 3. Stream typing and legal compositions
 
@@ -413,8 +407,6 @@ schemas, 113 modifier ids in 179 option entries, about 40 relations, 14 value ty
 
 **Limits:** 1–3 `&&` parts; 1–4 IR stages per pipe (`freq` counts as one); ≤6 real commands per
 pipe, ≤8 in total; ≤1 `each` per pipe; `cwd` optional.
-
----
 
 ## 4. Model output encoding
 
@@ -556,8 +548,6 @@ would need about 3,000 accepted cases with zero errors. A generated high-tier an
 requires exact P = D canonical agreement, every obligation satisfied with zero unexplained words,
 the required verb cue, and UI confirmation. A's catalog intent remains the primary path for these.
 
----
-
 ## 5. Compiler
 
 `compile(IR, shell, platform, envprofile, schemaVersion) → string | Unsupported` is a pure,
@@ -565,7 +555,8 @@ versioned function. The pipeline is `canon → realize → ArgvPlan → render`.
 
 ### 5.1 Canon
 
-Canon is exactly the five steps of §1. It makes no semantic rewrites (and drops no "default" mods).
+Canon is exactly the five steps of §1. It makes no semantic rewrites and drops no "default" mods;
+the only default it drops is an operand list the compiler would render identically (step 2).
 
 ### 5.2 Realization (abstract op → tool)
 
@@ -662,8 +653,6 @@ assert byte equality with the ArgvPlan, `decompile(render(x)) == canon(x)`, and 
 
 The same decompiler parses real command skeletons (§10) and catalog templates (§9).
 
----
-
 ## 6. Acceptance gate and risk
 
 The checks run in order, and the first failure abstains with a label.
@@ -702,8 +691,9 @@ first-stage-stdin (invariant 8).
 | `jq_path` | span `version`, `scripts.build`, `items[0].name` | `.version`, `.scripts.build`, `.items[0].name`; keys must be copied |
 | `url_scheme` | a bare hostname span (+ optional path) with a **web cue** (`www.`/`api.` prefix, or the request says url/site/website/web/api/endpoint/http/domain) **and** a TLD in an allowlist that excludes extension-like TLDs (`md py sh rs ai io zip mov ts js …`) | `https://` + span. A span that exists as a local path (env probe) is rejected; a path-like span is `ambiguous` |
 | `starts_with` / `ends_with` | span X | `^` + escape(X) / escape(X) + `$` (regex kind; escape per realized dialect, §1) |
-| `signal` | "force", "-9", "hard" → `KILL`; "gracefully" → `TERM` | a const id with a source span (pkill's only signal action) |
-| `scope_top` | a SCOPE_TOP cue span ("only here", "top level only", "not recursive") | `1` (rg/find `max_depth`) |
+| `signal` | "force", "-9", "hard" → `KILL`; "gracefully" → `TERM`; a named `KILL/TERM/INT/HUP` (`SIGHUP`, `-HUP`) | a const id with a source span (pkill's only signal action) |
+| `scope_top` | a closed SCOPE_TOP phrase ("only here", "top level only", "not recursive", "without recursing", …) | `1` (rg/find `max_depth`) |
+| `possessive` | a Name span `X's` ("bob's commits") | `X` (git author/owner names) |
 
 **Never invented:** file names, branch names ("the default branch" is `underspecified`), patterns,
 URLs, script names (`npm test` needs none), process names, regexes built from descriptions ("email
@@ -725,12 +715,15 @@ HIDDEN. The sampler adds double-negation minimal pairs ("skip hidden" vs "don't 
 |---|---|
 | Polarity ⇔ | A NEG cue ("not", "n't", "without", "except", "excluding", "other than", "but not", "skip", "ignore <noun>", "lacking", "apart from") ⇔ ≥1 `polarity: neg` element. Also, if the learned polarity head is confident and the lexicon found no cue, abstain. That catches lexicon misses |
 | **Negation scope** | The NEG cue's window is the next ≤4 units up to a clause boundary. The neg element must bind inside it: an `exclude_*` value span lies in the window, and for `invert`/`invert_grep`/`files_without_match` the *pattern* span lies in it. "TODO not in tests" → `exclude_dir(tests)` passes; `invert(TODO)` fails |
-| Cue classes ⇔ | CASE, HIDDEN, IGNORED, FOLLOW_LINKS, SCOPE_TOP, WORD, WHOLE_LINE, LINE_NUMBERS, CONTEXT, LIMIT, COUNT, RECENCY, SIZE, SORT, REVERSE, LONG_FORMAT, HUMAN_SIZES, FOLLOW, FOLLOW_REDIRECTS, HEADERS, LISTEN, FORCE, REGEX, ADJACENT (closed list): every predicted mod or `enum_cue` value carrying a cue needs its cue in the request, and every cue present needs ≥1 element of its class. Non-mod elements: REGEX ⇔ ≥1 pattern with `pkind` regex not produced by `starts_with`/`ends_with`; ADJACENT ⇔ a lines.uniq stage not directly after lines.sort; FORCE ⇔ pkill signal `KILL`. This blocks an invented `-i`, `--hidden`, `--no-ignore`, `-v` or `-f`. Cosmetic mods (`curl -s`, `jq -r`, `git log --oneline`) carry no cue |
+| Cue classes ⇔ | Schema classes CASE, HIDDEN, IGNORED, FOLLOW_LINKS, SCOPE_TOP, WORD, WHOLE_LINE, LINE_NUMBERS, CONTEXT, LIMIT, COUNT, RECENCY, SIZE, SORT, REVERSE, LONG_FORMAT, HUMAN_SIZES, FOLLOW, FOLLOW_REDIRECTS, HEADERS, LISTEN; gate classes FORCE, REGEX, ADJACENT, FREQ, TIMEOUT, PER_FILE (closed list, `ir/lib/lexicon.js`). Every predicted mod or `enum_cue` value carrying a cue needs one of its classes in the request, and every cue present needs ≥1 element of its class. Non-mod elements: REGEX ⇔ ≥1 copied pattern with `pkind` regex; ADJACENT ⇔ lines.uniq not directly after lines.sort; FORCE ⇔ pkill `KILL`; the `freq` macro needs FREQ/SORT/COUNT or a frequency word ("rank", "repeated", "most", "often") and explains all three; LIMIT after `freq` may come from the FREQ phrase; rg/grep `max_count` also accepts PER_FILE. Explain-only elements never need a cue but explain one that is present (a sort stage: SORT; head/tail without a count: LIMIT; per-file outputs such as `-c`/`-l`/find listings: PER_FILE; `ls -lh`: HUMAN_SIZES). Special classes: BOUND phrases ("not merged", "first parent", …) are claimed before NEG and explained only when the command has the bound mod; NAMES_ONLY ("bare names", "without the path") is explained only by plain `ls`, else rejected; NEUTRAL ("any depth", "how long") needs nothing. This blocks an invented `-i`, `--hidden`, `--no-ignore`, `-v` or `-f`. Cosmetic mods (`curl -s`, `jq -r`, `git log --oneline`) carry no cue |
+| Mod words | A behaviour-changing mod or const with no cue class needs its own request word (`REQUIRE_WORDS`, keyed `op.mod` or `op.mod=const`: e.g. `files.find.type=d` "directories", `git.log.skip`, `git.branch.merged`, `git.diff.staged`, `npm.ls.all`, `lines.uniq.repeated`, `dir.list.sort_time`), or the request spells the flag itself (also inside a short cluster). Sort direction words must agree with the order (`SORT_FORBID`: "smallest" vs `ls -S`); find `-type f` is rejected when the request names directories or links but never files |
 | Numbers | Every numeric token is consumed by a norm or by a copied span (path or pattern). Every int norm has a source |
-| Direction | first/top/head → `direction: first`; last/bottom/end/tail → `last`. On newest-first streams (`git log`) "last/latest/recent N commits" means the first N, i.e. `git log -n N` |
+| Direction | first/top/head → `direction: first`; last/bottom/end/tail → `last`; every free direction word must agree with every direction element. On newest-first streams (`git log`, `ls -t`) "last/latest/recent N" means the first N, i.e. `git log -n N`; downstream of one, "last" is ambiguous and rejected. rg/grep `-m` is per file: "first N" needs `\| head -n N` |
 | Count kind | "how many files" → a count over `paths`. "how many times/occurrences" → `-o … \| wc -l` or `--count-matches`. "how many lines" → `-c` or `wc -l`. A bare "count X" with no kind gives **`ambiguous`** (gate-only) |
 | Named values | Every quoted or backticked string, path-like unit and URL is consumed by a value. A flag-like unit is consumed by a value (`-v` as a pattern, `-9` by `signal`) or by a predicted mod whose realized flag, or cluster member, equals it (`rg --hidden foo`, `ls -lA`); an unmatched flag-like unit gives `gate_reject` |
-| Coverage | A word from a closed lexicon (language/extension table, op verbs, write verbs, tool names, cue words, units) that no element explains: **any** gives `gate_reject` ("count lines in python files" with the glob dropped). Truly unknown content words outside consumed spans: more than 1 gives `gate_reject` ("…and email me the result"); that tolerance is a calibrated feature, not a constant |
+| Coverage | A word from a closed lexicon that no element explains: **any** gives `gate_reject`. Tool names must be what the command runs; write verbs (delete, rename, copy, …) are inexpressible (except save/write with a `write_fs` effect); op verbs (kill, download) need their op; a language/extension word ("python files") needs a value ending in that extension. Plain-English extension names (go, c, text, json, md) count only before "file(s)" or spelled `.go`. Unknown content words (outside consumed spans, cue phrases, the closed lexicons and the known domain vocabulary): more than `MAX_UNKNOWN` (= 1) gives `gate_reject` ("…and email me the result") |
+| Paths | A bare-word path (no `/ . ~`) is one request word, is not a file-kind noun before "files" ("config files"), and does not follow an unexplained modifier word ("app logs") |
+| Review rejects | Known wrong accepts, rejected conservatively: "just the number" with `wc FILE` (prints the name); `uniq -i` after a case-sensitive sort; `npm ls --depth` with a package; `find -maxdepth -type d` without `-mindepth 1`; "dotfiles" with `ls -A`; a count over `git branch --merged` |
 | Kill | pkill requires a kill/stop/terminate verb cue and an exact ProcName span. Its signal always comes from `norm:signal`; `KILL` requires a FORCE cue |
 
 ### 6.4 Environment
@@ -738,7 +731,9 @@ HIDDEN. The sampler adds double-negation minimal pairs ("skip hidden" vs "don't 
 The tool exists (`command -v`, cached) at the minimum version for the mods used; the platform
 render exists; git ops run inside a work tree; `cwd` exists as a directory; **for risk ≥ medium,
 copied read operands must exist** (for safe risk a missing path is only flagged). Write targets
-(`-o PATH`, the `-O` name) need not exist, but their parent directory must.
+(`-o PATH`, the `-O` name) need not exist, but their parent directory must. Paths are resolved
+against `cwd`, and a leading `~` against `env.home`; without `env.home` a tilde path is not probed
+and a tilde write target is assumed to exist (high).
 
 ### 6.5 Round-trip (§5.5) and effects → risk
 
@@ -762,8 +757,6 @@ and high need confirmation.
 
 **Abstention UX.** `underspecified` shows *what is missing* ("need: a search pattern"), together
 with the missing role and an example phrasing. **It never shows a command or a placeholder.**
-
----
 
 ## 7. Worked examples
 
@@ -849,8 +842,6 @@ Rendering details for some of the examples:
 - **#36 actions.** `OK MACRO:freq arg:paths SPAN PIPE op:file.head mod:lines norm:int EOS` is 9
   actions.
 
----
-
 ## 8. Hard cases, and what the pilot IR deliberately does not express
 
 All of these are `out_of_scope` on the new path; A may still answer through a vetted intent.
@@ -886,8 +877,6 @@ All of these are `out_of_scope` on the new path; A may still answer through a ve
    renders exactly `git diff main`; `main...HEAD` only as a rev range the user typed.
 8. **Unicode homoglyphs** in paths are copied byte-exactly and shown in the gloss; bidi and
    zero-width characters give `unsafe_value`.
-
----
 
 ## 9. Sharing the gate with A, and catalog migration
 
@@ -945,8 +934,6 @@ catalog stops growing**: a new hand template is accepted only for a construct th
 (catalog-038: 2 of 11 survived). fish/pwsh/cmd stay on legacy templates until their backends pass
 the shim harness.
 
----
-
 ## 10. Data, evaluation, and staying off the treadmill
 
 **Sources.** Real skeletons (private, processed on aic-grok, aggregates only) are decompiled into
@@ -997,3 +984,17 @@ route on M1 and the Xeon VM.
 
 If new combinations keep needing bespoke obligations, the architectural premise has failed — report
 it, do not patch it.
+
+### 10.1 Synthetic data pipeline (implemented; details in `scripts/ir/README.md`)
+
+1. `scripts/ir/grok_gen.mjs` asks a teacher for labelled requests + commands (`ok`, `ambiguous`,
+   `underspecified`, `out_of_scope`, `not_shell`) with structured output. Backends (`--backend`):
+   `grok` (CLI, default), `codex` (CLI), `claude` (CLI `-p`), `api` (Anthropic Messages API, 429
+   backoff). Each call samples a fresh subset of `value_pools.mjs` (files, dirs, identifiers, revs,
+   URLs, ports, …), so values are copied, not invented by habit.
+2. `scripts/ir/convert.mjs <dir>`: decompile each command, `lift` (`ir/lib/lift.js`) every value
+   back to a span / norm / const against the request, then run the full gate with round-trip.
+   Status `accepted | rejected | mismatch | decompile_error | not_ok`; only `accepted` is kept.
+3. `scripts/ir/dedup.mjs`: exact and MinHash near-dup removal, a cap per IR skeleton (IR with spans
+   and literal strings removed), label balance, and a ~90/5/5 split **by skeleton hash** (dev/test
+   skeletons never appear in train); non-ok items split by request hash.

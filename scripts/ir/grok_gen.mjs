@@ -11,6 +11,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { spawn } from 'node:child_process';
 import { fileURLToPath } from 'node:url';
+import { sampleValues, OPENINGS } from './value_pools.mjs';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 
@@ -154,7 +155,11 @@ const OUT_SCHEMA = {
     }, additionalProperties: false } } }, additionalProperties: false,
 };
 
-function buildPrompt(spec) {
+function buildPrompt(spec, call = 0, seed = 1) {
+  const vr = mulberry32((seed * 1000003 + call * 7919) | 0);
+  const vals = sampleValues(vr);
+  const opens = []; while (opens.length < 4) { const o = pick(vr, OPENINGS); if (!opens.includes(o)) opens.push(o); }
+  const valueBlock = Object.entries(vals).map(([k, xs]) => `- ${k}: ${xs.map(x => JSON.stringify(x)).join(', ')}`).join('\n');
   const tools = spec.kind === 'single' ? [spec.focus] : spec.tools;
   const schemas = tools.map(t => `### ${t}.json\n${SCHEMAS[t]}`).join('\n\n');
   let focus;
@@ -176,13 +181,26 @@ OS: about ${Math.round(spec.os_linux_share * 100)}% "linux", rest "darwin". shel
 - tools: binaries used in command (e.g. ["rg","wc"]); [] for non-ok.
 - reason: "" for ok; short reason for non-ok (e.g. "write_effect: sed -i", "need: a search pattern", "count kind not determinable").
 
+## Values to use (sampled for this batch)
+Draw file names, directories, extensions, patterns, authors, branches, revs, URLs, processes, ports, jq fields, sizes, ages and counts from these lists (mix and vary them; small variations are fine). Do NOT default to src/, docs/, README, app.log, TODO or foo unless they appear here.
+${valueBlock}
+
+## Request openings
+Spread the requests over these opening styles (each used several times): ${opens.map(o => `[${o}]`).join('; ')}. At most 1 in 10 requests may start with "how many", and at most 1 in 10 with "show".
+
 ## Rules for requests
-- Write requests as a developer would say them in words: at most ~1 in 10 requests may name a literal flag or paste command syntax; the rest describe the intent ("with line numbers", "ignore case", "only file names").
+- Never paste a command into the request. At most ~1 in 10 requests may name a single flag; never the whole command line. The rest describe the intent in words ("with line numbers", "ignore case", "only file names").
+- Counting requests always say WHAT is counted (lines / files / matches / occurrences / commits / processes), except in deliberately ambiguous items labelled ambiguous.
+- Literal vs regex: the request uses words like "regex", "pattern", "matching ^...", "starts with", "ends with", or clearly writes regex syntax → regex. Otherwise the search text is a literal string.
+
+## Tool choice rules
+- grep ONLY when the request literally names grep; otherwise text search uses rg.
+- regex (grep -E, or an rg regex pattern) ONLY when the request asks for a regex/pattern as above; otherwise use literal search (rg -F / grep -F when the text has regex metacharacters, plain literal pattern otherwise).
 
 ## Rules for ok commands
 - Use ONLY the tools, ops and option flags present in the given schemas (and xargs only as the compiler's \`xargs -0 -r\` (linux) / \`xargs -0\` (darwin) transport). Nothing excluded by the schema notes.
 - Copy rule: every value in the command (pattern, path, glob stem, name, URL, author, rev) must appear verbatim in the request, or be an allowed normalization: numbers words->digits, sizes->bytes with c (find -size +52428800c), relative days (-mtime -2), git dates (--since='1 week ago'), extension/language -> glob ('*.py'), "starts with X" -> '^X', jq field -> '.field', signals (force -> -KILL).
-- Rendering: single quotes only when needed (metachars, spaces, globs); a path starting with ~/ keeps ~/ unquoted so it expands (~/.config/x, or ~/'my dir/x' when the rest needs quotes); '\\'' for embedded quotes; patterns starting with - use -e; find leading-dash roots as ./-x; rg/grep first stage always has a path operand ('.' if none given); grep is recursive with -r and uses --include=/--exclude=/--exclude-dir=; rg uses -g 'GLOB' / -g '!DIR'; find exclude dir via -type d -name D -prune -o ... -print; each-inner argv ends with -- (find ... -exec wc -l -- {} +, xargs -0 -r wc -l --); inner rg/grep get -H and -e P.
+- Rendering: single quotes only when needed (metachars, spaces, globs); a path starting with ~/ ALWAYS keeps ~/ unquoted so it expands (never '~/x') (~/.config/x, or ~/'my dir/x' when the rest needs quotes); '\\'' for embedded quotes; patterns starting with - use -e; find leading-dash roots as ./-x; rg/grep first stage always has a path operand ('.' if none given); grep is recursive with -r and uses --include=/--exclude=/--exclude-dir=; rg uses -g 'GLOB' / -g '!DIR'; find exclude dir via -type d -name D -prune -o ... -print; each-inner argv ends with -- (find ... -exec wc -l -- {} +, xargs -0 -r wc -l --); inner rg/grep get -H and -e P.
 - Forbidden in ok commands: ; || > >> $( backticks, loops, sudo, rm, any write, awk, cut, tee, sed other than sed -n 'A,Bp'. && only as in the npm example.
 - If the request needs anything outside the schemas or §8 lists it, the label is out_of_scope (never approximate).
 
@@ -345,14 +363,14 @@ async function main() {
 
   const todo = plan.filter(p => !done.has(p.call));
   console.log(`plan: ${plan.length} calls (${done.size} already ok, ${todo.length} to run), out=${out}`);
-  if (a.dryRun) { fs.writeFileSync(path.join(promptDir, 'dry.txt'), buildPrompt(todo[0]?.spec || plan[0].spec)); console.log('dry run: wrote prompts/dry.txt'); return; }
+  if (a.dryRun) { fs.writeFileSync(path.join(promptDir, 'dry.txt'), buildPrompt((todo[0] || plan[0]).spec, (todo[0] || plan[0]).call, a.seed)); console.log('dry run: wrote prompts/dry.txt'); return; }
 
   const t0 = Date.now(); let nOk = 0, nFail = 0, nItems = 0, nRej = 0, tokIn = 0, tokOut = 0, tokR = 0, cost = 0; const labels = {};
   let next = 0;
   async function worker() {
     while (next < todo.length) {
       const p = todo[next++];
-      const pf = path.join(promptDir, `call${p.call}.txt`); fs.writeFileSync(pf, buildPrompt(p.spec));
+      const pf = path.join(promptDir, `call${p.call}.txt`); fs.writeFileSync(pf, buildPrompt(p.spec, p.call, a.seed));
       let res, error = '', ms = 0, usage = {}, c = 0;
       for (let attempt = 0, waits = 0; attempt < 3; attempt++) {
         const s = Date.now(); const r = await runBackend(pf, a, cwd); ms += Date.now() - s;

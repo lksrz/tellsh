@@ -8,7 +8,7 @@ import { parseIntPhrase } from './normalizers.js';
 import {
   CUE_LEXICON, PER_FILE, DIR_WORDS, KILL_VERBS, NOT_GERUND, CLAUSE_BOUNDARY, TOOL_WORDS, WRITE_VERBS,
   OP_VERBS, langWordAt, langExt, PIN_NAMES, REQUIRE_WORDS, SORT_FORBID, TYPE_F_CONFLICT, FILE_NOUNS, KNOWN_WORDS,
-  MAX_UNKNOWN, FREQ_WORDS,
+  MAX_UNKNOWN, FREQ_WORDS, BOUND_MODS, MOD_EXPLAINS, CLAUSE_VERBS, ALSO_EXPLAINS, BARE_NUMBER,
 } from './lexicon.js';
 
 const isNumeric = (u) => /^[-+:]?\d/.test(u.t) || parseIntPhrase(unitWord(u)) !== null;
@@ -21,6 +21,18 @@ const LEXICON_WORDS = new Set([
   ...SORT_FORBID.flatMap((r) => r.words).flatMap((p) => p.split(' ')),
   ...Object.keys(TOOL_WORDS), ...WRITE_VERBS, ...KILL_VERBS, ...Object.keys(OP_VERBS), ...NOT_GERUND,
 ]);
+
+// Words that may precede a bare directory word ("in logs", "under the src").
+const PATH_LEAD = new Set(['in', 'under', 'inside', 'within', 'of', 'from', 'at', 'into', 'through', 'across', 'the',
+  'my', 'our', 'this', 'that', 'to', 'on', 'for', 'and', 'or', 'below', 'beneath', 'throughout', 'all', 'every', 'via',
+  'over', 'with', 'than', 'vs', 'versus', 'between', 'both', 'whole', 'entire', 'touching', 'touched', 'affecting',
+  'changing', 'changed', 'modified', 'named', 'called', 'about', 'against', 'path', 'root', 'dir', 'directory', 'folder', 'files', 'file',
+  'dirs', 'directories', 'folders', 'symlinks', 'search', 'serch']);
+
+// "config files", "log files": a word that names a kind of file, not a directory, before "files".
+const FILE_KIND_WORDS = new Set(['config', 'configs', 'configuration', 'settings', 'log', 'logs', 'test', 'tests',
+  'source', 'backup', 'backups', 'data', 'temp', 'tmp', 'image', 'images', 'media', 'video', 'audio', 'binary', 'text',
+  'script', 'scripts', 'template', 'templates', 'lock', 'cache', 'env', 'secret', 'secrets', 'doc', 'build']);
 
 export function obligations(ir, stages, ctx, used) {
   const { seg, cues, obl, reject } = ctx;
@@ -52,17 +64,32 @@ export function obligations(ir, stages, ctx, used) {
 
   // Polarity and negation scope: every NEG element binds inside a NEG cue's window, and every NEG
   // cue's window binds at least one NEG element ("not in tests, skip vendor" needs both exclusions).
-  const negCues = cues.filter((c) => c.cls === 'NEG' && !isConsumed(c));
+  // "skip 20 commits": git log --skip whose count follows the word is not a negation
+  const skipVals = execInfos.filter((i) => i.exec.op === 'git.log').flatMap((i) => valuesOf(i, 'skip'));
+  const isSkipCount = (c) => ['skip', 'skipping'].includes(c.phrase) && skipVals.some((v) => v.u && v.u[0] >= c.b && v.u[0] <= c.b + 2);
+  const negCues = cues.filter((c) => c.cls === 'NEG' && !isConsumed(c) && !isSkipCount(c));
   const negElems = [];
   for (const info of execInfos) for (const m of info.exec.mods) if (specOf(info, m.mod).polarity === 'neg') negElems.push({ info, mod: m.mod });
   if (negCues.length && !negElems.length) fail('polarity', `NEG cue "${negCues[0].phrase}" but no negated element`);
   if (!negCues.length && negElems.length) fail('polarity', `negated mod "${negElems[0].mod}" without a NEG cue`);
   if (!negCues.length && ctx.env.polarity?.neg && ctx.env.polarity?.confident) fail('polarity', 'polarity head says negated; lexicon found no cue');
+  // A window runs up to 4 words after the cue, to a clause boundary; a coordination ("skip node_modules
+  // and dist", "except the old, tmp or cache folders") continues it unless a new clause verb follows.
+  const COORD = new Set(['and', 'or', 'nor', ',']);
   const windows = negCues.map((c) => {
     let end = c.b;
-    while (end < words.length && end < c.b + 4 && !CLAUSE_BOUNDARY.has(words[end])) end++;
+    let limit = c.b + 4;
+    for (;;) {
+      while (end < words.length && end < limit && !CLAUSE_BOUNDARY.has(words[end])) end++;
+      let k = end;
+      while (k < words.length && COORD.has(words[k])) k++;
+      if (k === end || end >= limit || k >= words.length || CLAUSE_VERBS.has(words[k]) || k - end > 2) break;
+      end = k;
+      limit = k + 3;
+    }
     return [c.b, end];
   });
+  const stemWindows = negCues.map((c, k) => [c.a, windows[k][1]]);
   const windowsOf = (u) => windows.flatMap(([a, b], k) => (u[0] >= a && u[1] <= b ? [k] : []));
   const covered = new Set();
   for (const { info, mod } of negElems) {
@@ -75,7 +102,7 @@ export function obligations(ir, stages, ctx, used) {
       if (per.every((h) => h.length)) hits = per.flat();
     } else {
       const stem = mod.split('_').pop().replace(/s$/, '');
-      hits = windows.flatMap(([a, b], k) => (words.slice(a, b).some((w) => w.includes(stem)) ? [k] : []));
+      hits = stemWindows.flatMap(([a, b], k) => (words.slice(a, b).some((w) => w.includes(stem)) ? [k] : []));
     }
     if (!hits.length) fail('negation_scope', `${mod} does not bind inside a NEG cue's window`);
     hits.forEach((k) => covered.add(k));
@@ -89,6 +116,9 @@ export function obligations(ir, stages, ctx, used) {
   // in the request, and explains each of them.
   const elements = []; // {classes, d}
   const addEl = (classes, d, alt) => elements.push({ classes: [].concat(classes), d, alt });
+  // explain-only: never required, but explains its classes when they are present
+  const addExplains = (classes, d) => elements.push({ classes: [].concat(classes), d, optional: true });
+  const prevOf = (info) => stages.find((s) => s.part === info.part && s.stage === info.stage - 1);
   const hasRegexPattern = (info) => [...(info.exec.args.pattern || []), ...valuesOf(info, 'grep_message')].some((v) => v.k === 'span' && v.pkind === 'regex');
   for (const info of stages) {
     // freq = sort | uniq -c | sort -rn: it sorts, counts, and answers "most common"
@@ -97,22 +127,61 @@ export function obligations(ir, stages, ctx, used) {
       const spec = specOf(info, m.mod);
       // a count after freq ("10 most common lines") takes its LIMIT from the FREQ phrase
       const afterFreq = stages.some((s) => s.kind === 'macro' && s.part === info.part && s.stage < info.stage);
-      if (spec.cue) addEl([].concat(spec.cue, afterFreq && [].concat(spec.cue).includes('LIMIT') ? ['FREQ'] : []), `${info.exec.op}.${m.mod}`);
+      // rg/grep -m is a per-file limit: "3 matches per file" names it
+      const perFileLimit = info.exec.op === 'text.search' && m.mod === 'max_count' ? ['PER_FILE'] : [];
+      // ls -h alone shows no sizes: "human sizes for X" asks for ls -lh
+      if (info.exec.op === 'dir.list' && m.mod === 'long' && hasMod(info, 'human')) perFileLimit.push('HUMAN_SIZES');
+      if (spec.cue) addEl([].concat(spec.cue, afterFreq && [].concat(spec.cue).includes('LIMIT') ? ['FREQ'] : [], perFileLimit), `${info.exec.op}.${m.mod}`);
       for (const s of info.modValues[m.mod] || []) if (spec.value?.enum_cue?.[s]) addEl(spec.value.enum_cue[s], `${m.mod}=${s}`);
     }
     if (hasRegexPattern(info)) addEl('REGEX', `${info.exec.op} regex pattern`);
     if (info.exec.op === 'http.head') addEl('HEADERS', 'http.head');
+    const op = info.exec.op;
+    for (const m of info.exec.mods) if (MOD_EXPLAINS[`${op}.${m.mod}`]) addExplains(MOD_EXPLAINS[`${op}.${m.mod}`], `${op}.${m.mod}`);
+    // a sort stage is what "sorted" asks for; head/tail with no count still take the first/last 10
+    if (op === 'lines.sort') addExplains('SORT', op);
+    // plain ls prints bare names
+    if (op === 'dir.list' && !hasMod(info, 'long') && !hasMod(info, 'recursive')) addExplains('NAMES_ONLY', op);
+    if ((op === 'file.head' || op === 'file.tail') && (!info.exec.mods.length || hasMod(info, 'bytes'))) addExplains('LIMIT', op);
+    // per-file results: rg/grep -c/-l/-L/-m, wc over a path list or file operands, find listings
+    const perFileMods = ['count', 'count_matches', 'files_with_matches', 'files_without_match', 'max_count'];
+    if (op === 'text.search' && info.exec.mods.some((m) => perFileMods.includes(m.mod))) addExplains('PER_FILE', op);
+    if (op === 'files.find' && info.stage === 0) addExplains('PER_FILE', op);
+    if (['git.log', 'git.show', 'git.diff'].includes(op) && info.exec.mods.some((m) => ['stat', 'name_status', 'name_only'].includes(m.mod))) addExplains('PER_FILE', op);
+    if (op === 'file.count' && (info.kind === 'each' || info.inStream === 'paths' || (info.exec.args.paths || []).length)) addExplains('PER_FILE', op);
     if (info.exec.op === 'lines.uniq') {
       const before = stages.find((s) => s.part === info.part && s.stage === info.stage - 1);
       if (!(before && before.exec?.op === 'lines.sort')) addEl('ADJACENT', 'uniq not after sort');
     }
   }
+  const cueHas = (c, cls) => c.cls === cls || (c.also || []).includes(cls);
   for (const el of elements) {
-    if (!cues.some((c) => el.classes.includes(c.cls)) && !(el.alt && hasFree(el.alt))) fail('cue', `${el.d} needs a ${el.classes.join(' or ')} cue in the request`);
+    if (el.optional) continue;
+    if (!cues.some((c) => el.classes.some((x) => cueHas(c, x))) && !(el.alt && hasFree(el.alt))) fail('cue', `${el.d} needs a ${el.classes.join(' or ')} cue in the request`);
   }
+  // BOUND_MODS keys: `op.mod`, a bare `op` (run without a recursive mod), or `op!mod` (op without mod)
+  const hasOpMod = (key) => {
+    // `op~literal`: the op runs with literal (non-regex) patterns only (rg/grep derive -F themselves)
+    if (key.endsWith('~literal')) {
+      const lop = key.slice(0, -'~literal'.length);
+      return execInfos.some((i) => i.exec.op === lop && (i.exec.args.pattern || []).length
+        && (i.exec.args.pattern || []).every((v) => v.pkind !== 'regex'));
+    }
+    const [base, without] = key.split('!');
+    const [o1, o2, mod] = base.split('.');
+    const op = `${o1}.${o2}`;
+    return execInfos.some((i) => i.exec.op === op && (mod ? hasMod(i, mod)
+      : without ? !hasMod(i, without) : !hasMod(i, 'recursive')));
+  };
   for (const c of cues) {
-    if (c.cls === 'NEG' || isConsumed(c)) continue;
-    if (!elements.some((el) => el.classes.includes(c.cls))) fail('cue', `"${c.phrase}" (${c.cls}) is not explained by any element`);
+    if (c.cls === 'NEG' || c.cls === 'NEUTRAL' || isConsumed(c)) continue;
+    if (c.cls === 'BOUND') {
+      if (!(BOUND_MODS[c.phrase] || []).some(hasOpMod)) fail('cue', `"${c.phrase}" needs ${BOUND_MODS[c.phrase].join(' or ')}`);
+      continue;
+    }
+    const viaAlso = (el) => c.phrase in ALSO_EXPLAINS && (ALSO_EXPLAINS[c.phrase] === null || ALSO_EXPLAINS[c.phrase].includes(el.d))
+      && el.classes.some((x) => cueHas(c, x));
+    if (!elements.some((el) => el.classes.includes(c.cls) || viaAlso(el))) fail('cue', `"${c.phrase}" (${c.cls}) is not explained by any element`);
   }
   pass('cues', [...new Set(elements.flatMap((el) => el.classes))].join(' ') || 'none');
 
@@ -222,8 +291,10 @@ export function obligations(ir, stages, ctx, used) {
   for (const c of countCues) {
     const near = [words[c.a - 1], ...words.slice(c.b, c.b + 3)];
     const kindOf = (w) => ({ files: 'files', file: 'files', times: 'occ', occurrences: 'occ', occurrence: 'occ', matches: 'occ',
-      lines: 'lines', line: 'lines', words: 'words', word: 'words', bytes: 'bytes', characters: 'chars', chars: 'chars' })[w];
-    const kind = kindOf(words[c.a - 1]) || words.slice(c.b, c.b + 3).map(kindOf).find(Boolean);
+      lines: 'lines', line: 'lines', words: 'words', word: 'words', bytes: 'bytes', byte: 'bytes', characters: 'chars',
+      character: 'chars', chars: 'chars', char: 'chars', commits: 'commits', branches: 'branches' })[w];
+    // "total lines": the kind may sit inside the cue phrase itself
+    const kind = kindOf(words[c.a - 1]) || words.slice(c.a, c.b + 3).map(kindOf).find(Boolean);
     // freq counts identical lines: "sort by count", "with counts"
     if (hasFreq && (!kind || kind === 'lines' || kind === 'occ')) { pass('count_kind', 'freq'); continue; }
     if (!kind) fail('count_kind', `"${c.phrase} ${near.slice(1).join(' ')}" does not say what to count`, 'ambiguous');
@@ -237,9 +308,50 @@ export function obligations(ir, stages, ctx, used) {
     } else if (kind === 'lines') {
       okKind = has('text.search', 'count') || stages.some((s) => wc(s, 'lines') && !(s.kind === 'exec' && s.inStream === 'paths') &&
         !stages.some((p) => p.part === s.part && p.stage === s.stage - 1 && p.exec?.mods.some((m) => m.mod === 'only_matching')));
+    } else if (kind === 'commits' || kind === 'branches') {
+      // wc -l right after a one-line-per-item producer: git log --oneline/--format, git branch
+      okKind = stages.some((s) => wc(s, 'lines') && s.kind === 'exec' && s.stage > 0 && s.exec.mods.length === 1 && (() => {
+        const p = prevOf(s);
+        if (!p?.exec) return false;
+        if (kind === 'branches') return p.exec.op === 'git.branch' && !p.exec.mods.some((m) => m.mod === 'show_current');
+        return p.exec.op === 'git.log' && p.exec.mods.some((m) => ['oneline', 'format'].includes(m.mod))
+          && !p.exec.mods.some((m) => ['stat', 'name_only', 'name_status', 'patch', 'graph'].includes(m.mod));
+      })());
     } else okKind = stages.some((s) => wc(s, kind));
     if (!okKind) fail('count_kind', `request counts ${kind}; the command counts something else`);
     pass('count_kind', kind);
+  }
+
+  // Audit r1 (conservative rejects of known wrong accepts; docs/IR.md §6.3).
+  for (const info of execInfos) {
+    const op = info.exec.op;
+    // "just the number" of a file: wc FILE also prints the name (wc -c < FILE is not expressible)
+    if (op === 'file.count' && (info.exec.args.paths || []).length && hasFree(BARE_NUMBER))
+      fail('bare_output', '"just the number" but wc prints the file name too');
+    // uniq -i after a case-sensitive sort misses case variants (needs sort -f)
+    if (op === 'lines.uniq' && hasMod(info, 'ignore_case')) {
+      const p = prevOf(info);
+      if (p?.exec?.op === 'lines.sort' && !p.exec.mods.some((m) => m.mod === 'ignore_case')) fail('case_fold', 'uniq -i after a case-sensitive sort');
+    }
+    // npm ls PKG shows the paths leading to PKG, not the tree under it
+    if (op === 'npm.ls' && hasMod(info, 'depth') && (info.exec.args.packages || []).length) fail('scope', 'npm ls --depth with a package shows who depends on it');
+    // find -maxdepth -type d without -mindepth 1 lists the start directory itself
+    if (op === 'files.find' && hasMod(info, 'max_depth') && (info.modValues.type || []).includes('d') && !hasMod(info, 'min_depth'))
+      fail('scope', 'find -maxdepth -type d also lists the start directory (no -mindepth 1)');
+    // "dotfiles" asks for the hidden entries only; ls -a/-A lists everything
+    if (op === 'dir.list' && hasMod(info, 'hidden') && words.some((w, i) => w === 'dotfiles' || (w === 'dot' && words[i + 1] === 'files'))
+      && !words.some((w) => ['including', 'include', 'with', 'too', 'also', 'plus'].includes(w))) fail('scope', 'ls -a lists more than the dotfiles');
+    // git branch --merged=X always lists X itself: a count is off by one
+    if (op === 'git.branch' && hasMod(info, 'merged') && countCues.length) fail('count_kind', 'git branch --merged also lists the reference branch');
+  }
+  // Paths copied from loose request words: a bare word path (no / . ~) must not be a multiword
+  // guess ("release notes"), a noun modifier ("config files") or follow an unconsumed modifier ("app logs").
+  for (const v of used) {
+    if (v.role !== 'paths' || v.kind !== 'span' || /[/.~]/.test(v.value) || /^['"`]/.test(seg.units[v.u[0]].t)) continue;
+    if (v.u[1] - v.u[0] > 1) fail('path', `path "${v.value}" is built from several request words`);
+    if (FILE_KIND_WORDS.has(words[v.u[0]]) && ['files', 'file'].includes(words[v.u[1]])) fail('path', `"${v.value} files" names a kind of file, not a directory`);
+    const prev = v.u[0] - 1;
+    if (prev >= 0 && !consumed.has(prev) && /^[a-z]/.test(words[prev]) && !PATH_LEAD.has(words[prev]) && !/ing$/.test(words[prev]) && !(words[prev] in OP_VERBS) && !CLAUSE_VERBS.has(words[prev]) && !(words[prev] in TOOL_WORDS) && !inCue(prev)) fail('path', `"${words[prev]} ${v.value}" leaves "${words[prev]}" unexplained`);
   }
 
   // Kill: a kill verb (not "stop listing", "stop watching": a verb followed by another gerund) and

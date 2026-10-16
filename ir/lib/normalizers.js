@@ -35,6 +35,7 @@ export function parseIntPhrase(text) {
   if (t in TENS) return TENS[t];
   if (/^(a |one )?hundred$/.test(t)) return 100;
   if (t === 'a dozen' || t === 'dozen') return 12;
+  if (/^(a |one )?thousand$/.test(t)) return 1000;
   return null;
 }
 
@@ -119,7 +120,8 @@ function isoDate(text) {
 export const LANG_EXT = { python: 'py', go: 'go', golang: 'go', rust: 'rs', ruby: 'rb', java: 'java',
   kotlin: 'kt', swift: 'swift', php: 'php', lua: 'lua', dart: 'dart', scala: 'scala', elixir: 'ex',
   haskell: 'hs', perl: 'pl', zig: 'zig', svelte: 'svelte', vue: 'vue', json: 'json', toml: 'toml',
-  css: 'css', scss: 'scss', sql: 'sql', csv: 'csv', terraform: 'tf' };
+  css: 'css', scss: 'scss', sql: 'sql', csv: 'csv', terraform: 'tf', groovy: 'groovy', blade: 'blade.php',
+  parquet: 'parquet', haml: 'haml', erb: 'erb', mdx: 'mdx', jsonl: 'jsonl', ndjson: 'ndjson' };
 // Languages with several extensions: ambiguous unless the request names the extension.
 export const LANG_MULTI = new Set(['typescript', 'javascript', 'c++', 'cpp', 'c', 'yaml', 'html',
   'markdown', 'shell', 'bash', 'jsx', 'react', 'objective-c', 'csharp', 'c#', 'xml', 'text']);
@@ -129,7 +131,12 @@ export const KNOWN_EXT = new Set(['ts', 'tsx', 'js', 'jsx', 'mjs', 'cjs', 'py', 
   'svelte', 'json', 'toml', 'yaml', 'yml', 'md', 'txt', 'log', 'csv', 'tsv', 'html', 'htm', 'css',
   'scss', 'sql', 'sh', 'bash', 'zsh', 'c', 'h', 'cc', 'cpp', 'hpp', 'cxx', 'cs', 'xml', 'ini',
   'cfg', 'conf', 'env', 'lock', 'tf', 'gradle', 'proto', 'graphql', 'png', 'jpg', 'jpeg', 'gif',
-  'svg', 'pdf', 'zip', 'gz', 'tar', 'tgz', 'mp4', 'mov', 'mp3', 'wav']);
+  'svg', 'pdf', 'zip', 'gz', 'tar', 'tgz', 'mp4', 'mov', 'mp3', 'wav', 'erb', 'haml', 'mdx', 'parquet',
+  'jar', 'ipynb', 'groovy', 'jsonl', 'ndjson', 'pyc', 'class', 'j2', 'snap', 'rst', 'bak', 'tfvars',
+  'tfstate', 'ckpt', 'rake', 'hcl', 'plist', 'bin', 'cmake', 'po', 'sqlite3', 'sqlite', 'pid', 'fish',
+  'orig', 'swp', 'whl', 'pkl', 'npy', 'onnx', 'pem', 'crt', 'pt', 'pth', 'h5', 'avro', 'twig', 'jinja', 'tpl']);
+// Compound extensions accepted as a word ("min.js files", "blade.php templates").
+const COMPOUND_PREFIX = new Set(['min', 'd', 'blade', 'spec', 'test', 'pb', 'stories', 'module']);
 
 function extGlob(text) {
   const t = trimSource(text);
@@ -137,6 +144,8 @@ function extGlob(text) {
   let m = /^\.([A-Za-z0-9_+-]{1,16})$/.exec(t);
   if (m) return ok(`*.${m[1]}`);
   if (KNOWN_EXT.has(lower)) return ok(`*.${lower}`);
+  m = /^\.?([a-z]+)\.([a-z0-9]+)$/.exec(lower);
+  if (m && COMPOUND_PREFIX.has(m[1]) && KNOWN_EXT.has(m[2])) return ok(`*.${m[1]}.${m[2]}`);
   if (lower in LANG_EXT) return ok(`*.${LANG_EXT[lower]}`);
   if (LANG_MULTI.has(lower)) return fail(`${t} has several extensions`, 'ambiguous');
   return fail(`unknown extension or language: ${t}`);
@@ -200,8 +209,24 @@ function port(text) {
 
 export const JQ_PATH_RE = /^(\.[A-Za-z_][A-Za-z0-9_]*(\[\d+\])*|\.\[\d+\])+$/;
 
+// "index 5" -> .[5]; "results index 0", "item at index 0 of results", "results item 2" -> .results[0]
+const JQ_INDEX_NOUN = '(?:index|element|item|entry)';
+function jqIndex(t) {
+  const n = (s) => { const v = parseIntPhrase(s); return v !== null && v >= 0 ? v : null; };
+  const id = '([A-Za-z_][A-Za-z0-9_]*)';
+  let m = new RegExp(`^(?:the )?${JQ_INDEX_NOUN} (?:at )?(?:index )?(\\S+)$`, 'i').exec(t);
+  if (m && n(m[1]) !== null) return `.[${n(m[1])}]`;
+  m = new RegExp(`^${id} ${JQ_INDEX_NOUN} (\\S+)$`, 'i').exec(t);
+  if (m && n(m[2]) !== null && !/^(index|element|item|entry|the)$/i.test(m[1])) return `.${m[1]}[${n(m[2])}]`;
+  m = new RegExp(`^(?:the )?${JQ_INDEX_NOUN} (?:at )?(?:index )?(\\S+) (?:of|in) (?:the )?${id}$`, 'i').exec(t);
+  if (m && n(m[1]) !== null) return `.${m[2]}[${n(m[1])}]`;
+  return null;
+}
+
 function jqPath(text) {
   const t = trimSource(text);
+  const idx = /\s/.test(t) ? jqIndex(t.replace(/\s+/g, ' ')) : null;
+  if (idx) return JQ_PATH_RE.test(idx) ? ok(idx) : fail(`not a jq field path: ${text}`);
   const v = t.startsWith('.') ? t : `.${t}`;
   return JQ_PATH_RE.test(v) ? ok(v) : fail(`not a jq field path: ${text}`);
 }
@@ -257,6 +282,13 @@ function anchored(where) {
 
 // ---------- signal / scope_top ----------
 
+// "bob's" -> bob, "Jane Doe's" -> Jane Doe (a possessive author / owner name)
+function possessive(text) {
+  const t = trimSource(text);
+  const m = /^(.*[^\s'’])['’]s$/.exec(t);
+  return m ? ok(m[1]) : fail(`not a possessive: ${text}`);
+}
+
 function signal(text) {
   const t = trimSource(text).toLowerCase();
   if (['force', '-9', 'hard'].includes(t)) return ok('KILL');
@@ -278,7 +310,7 @@ export const NORM = Object.freeze({
   int, size, age_days: ageDays, age_minutes: ageMinutes, git_date: gitDate, iso_date: isoDate,
   ext_glob: extGlob, substr_glob: substrGlob, home_path: homePath, rev_rel: revRel,
   line_range: lineRange, port, jq_path: jqPath, url_scheme: urlScheme,
-  starts_with: anchored('start'), ends_with: anchored('end'), signal, scope_top: scopeTop,
+  starts_with: anchored('start'), ends_with: anchored('end'), signal, scope_top: scopeTop, possessive,
 });
 
 export function normalize(kind, text, ctx) {

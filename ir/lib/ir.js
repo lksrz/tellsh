@@ -15,7 +15,7 @@ export const VTYPES = ['Pattern', 'Path', 'Glob', 'Name', 'Rev', 'Url', 'ScriptN
   'ProcName', 'JqPath', 'Int', 'Size', 'Port', 'Date', 'LineRange'];
 export const NORM_KINDS = ['int', 'size', 'age_days', 'age_minutes', 'git_date', 'iso_date',
   'ext_glob', 'substr_glob', 'home_path', 'rev_rel', 'line_range', 'port', 'jq_path',
-  'url_scheme', 'starts_with', 'ends_with', 'signal', 'scope_top'];
+  'url_scheme', 'starts_with', 'ends_with', 'signal', 'scope_top', 'possessive'];
 export const PKINDS = ['literal', 'regex'];
 export const STDERR_MODES = ['discard', 'merge'];
 export const MACROS = ['freq'];

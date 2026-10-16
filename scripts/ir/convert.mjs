@@ -13,10 +13,8 @@
 // accepted | rejected | decompile_error | mismatch | not_ok. Prints a summary.
 import { readFileSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
-import {
-  loadSchemas, decompile, gate, equals, segment, resolveValue,
-  opSchema, realize, valueActions, span, norm, cnst,
-} from '../../ir/lib/index.js';
+import { loadSchemas, decompile, gate, equals } from '../../ir/lib/index.js';
+import { lift as liftWith } from '../../ir/lib/lift.js';
 
 const args = process.argv.slice(2);
 const dir = args.find((a) => !a.startsWith('--'));
@@ -24,66 +22,7 @@ const opt = (k, d) => { const i = args.indexOf(`--${k}`); return i >= 0 ? Number
 if (!dir) { console.error('usage: convert.mjs <dir> [--seed N] [--examples N]'); process.exit(2); }
 const schemas = loadSchemas();
 const PLATFORM = { linux: 'linux_gnu', darwin: 'darwin_bsd' };
-const MAX_SPAN = 8;
-
-// ---------- lift lit values to provenance values ----------
-
-function liftValue(v, spec, seg, used) {
-  if (v.k !== 'lit') return v; // const ids come back from decompile already
-  const acts = valueActions(spec);
-  const n = seg.units.length;
-  const want = v.s;
-  const free = (a, b) => used.every(([x, y]) => b <= x || y <= a);
-  const same = (cand) => {
-    try { return resolveValue(cand, spec, { seg }).s === want; } catch { return false; }
-  };
-  if (acts.consts.includes(want)) return cnst(want);
-  // span first (shortest, earliest, non-overlapping), then each allowed norm kind
-  const cands = [];
-  if (acts.span) cands.push((a, b) => span(a, b, spec.type));
-  for (const k of acts.norms) cands.push((a, b) => norm(k, a, b));
-  for (const make of cands) {
-    for (let len = 1; len <= Math.min(MAX_SPAN, n); len++) {
-      for (let a = 0; a + len <= n; a++) {
-        const b = a + len;
-        if (!free(a, b)) continue;
-        const c = make(a, b);
-        if (same(c)) { used.push([a, b]); return c; }
-      }
-    }
-  }
-  throw new Error(`no provenance for ${spec.type} "${want}"`);
-}
-
-function lift(ir, request) {
-  const seg = segment(request);
-  const used = [];
-  const out = structuredClone(ir);
-  if (out.cwd) out.cwd = liftValue(out.cwd, { type: 'Path', cwd: true }, seg, used);
-  for (const part of out.body.parts) {
-    part.stages.forEach((st, si) => {
-      if (st.k === 'macro') {
-        if (st.args?.paths) st.args.paths = st.args.paths.map((v) => liftValue(v, { type: 'Path' }, seg, used));
-        return;
-      }
-      const e = st.k === 'each' ? st.exec : st;
-      const position = st.k === 'each' ? 'each' : si === 0 ? 'first' : 'filter';
-      const r = realize(schemas, e, position);
-      if (r.error) throw new Error(r.error);
-      const op = opSchema(schemas, r.tool, e.op);
-      for (const m of e.mods || []) {
-        if (!m.values) continue;
-        const spec = op.options.find((o) => o.mod === m.mod).value;
-        m.values = m.values.map((v) => liftValue(v, spec, seg, used));
-      }
-      for (const [role, vs] of Object.entries(e.args || {})) {
-        const spec = op.positionals.find((p) => p.role === role);
-        e.args[role] = vs.map((v) => liftValue(v, spec, seg, used));
-      }
-    });
-  }
-  return out;
-}
+const lift = (ir, request) => liftWith(schemas, ir, request);
 
 // ---------- per item ----------
 

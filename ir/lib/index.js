@@ -13,3 +13,4 @@ export { canon, resolveValue } from './canon.js';
 export { compile, quote, renderWord, renderPlan } from './compile.js';
 export { decompile } from './decompile.js';
 export { gate } from './gate.js';
+export { lift } from './lift.js';

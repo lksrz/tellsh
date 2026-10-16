@@ -723,18 +723,49 @@
         {
           "excl": [
             "merged",
+            "no_merged",
+            "contains"
+          ]
+        },
+        {
+          "excl": [
+            "show_current",
+            "all"
+          ]
+        },
+        {
+          "excl": [
+            "show_current",
+            "remotes"
+          ]
+        },
+        {
+          "excl": [
+            "show_current",
+            "verbose"
+          ]
+        },
+        {
+          "excl": [
+            "show_current",
+            "merged"
+          ]
+        },
+        {
+          "excl": [
+            "show_current",
             "no_merged"
           ]
         },
         {
           "excl": [
             "show_current",
-            "all",
-            "remotes",
-            "verbose",
-            "merged",
-            "no_merged",
-            "contains",
+            "contains"
+          ]
+        },
+        {
+          "excl": [
+            "show_current",
             "sort"
           ]
         }
