@@ -126,14 +126,14 @@ def quantize(W):
 def cascade_scores(p_tool, tool_labels, intent_models, X, fam_intents, k=3):
     """For each row: best (intent, score, tool_p, tool) using top-k tools; score = p(tool)*p(intent|tool)."""
     out = []
-    none = tool_labels.index('__none__') if '__none__' in tool_labels else -1
+    rej = {tool_labels.index(l) for l in ('__none__', '__ooc__') if l in tool_labels}
     cache = {}
     for fam, m in intent_models.items():
         cache[fam] = m.proba(X)
     for r in range(X.shape[0]):
         order = np.argsort(-p_tool[r])
         best = (None, 0.0, 0.0, None)
-        cand = [t for t in order if t != none][:k]
+        cand = [t for t in order if t not in rej][:k]
         for t in cand:
             fam = tool_labels[t]
             pt = p_tool[r, t]
@@ -233,8 +233,10 @@ def main():
     # thresholds are calibrated on curated rows only: the real-usage rows (g == 'real') carry noisy LLM labels, and
     # their "errors" would push the accept threshold up (they still train the models)
     src = [rows[i]['g'] for i in ho_idx]
-    ind = np.array([g != '__none__' and gi != '' and s != 'real' for g, gi, s in zip(gold_t, gold_i, src)])
-    oodm = np.array([g == '__none__' for g in gold_t])
+    # out-of-catalog real rows (__ooc__, or __none__ from real usage) only train the models: thresholds stay calibrated
+    # on curated in-domain and out-of-domain rows, so the accept / compose thresholds do not drift with the OOC weight
+    ind = np.array([g not in ('__none__', '__ooc__') and gi != '' and s != 'real' for g, gi, s in zip(gold_t, gold_i, src)])
+    oodm = np.array([g == '__none__' and s != 'real' for g, s in zip(gold_t, src)])
     score = np.array([r[1] for r in res])
     correct = np.array([r[0] == gi for r, gi in zip(res, gold_i)])
     t1 = np.array([r[3] == g for r, g in zip(res, gold_t)])
@@ -258,12 +260,16 @@ def main():
         best_t = max(ok) if ok else 0.3
         log(f'WARNING: no accept threshold keeps 97% of correct answers; using {best_t:.3f}')
     # compose threshold: stage-1 top tool probability (non-__none__) that lets <=5% of OOD through
-    top_nn = np.array([r[2] if r[3] != '__none__' else 0.0 for r in res])
+    top_nn = np.array([r[2] if r[3] not in ('__none__', '__ooc__') else 0.0 for r in res])
     cands = [t for t in np.arange(0.1, 0.95, 0.01) if (top_nn[oodm] >= t).mean() <= 0.05] if oodm.any() else [0.5]
     compose_t = float(cands[0]) if cands else 0.9
     log(f'calibration rows: {int(ind.sum())} in-domain, {int(oodm.sum())} out-of-domain')
     log(f'accept threshold={best_t:.3f} (correct kept={(score[ind & correct] >= best_t).mean():.3f}, '
         f'OOD rejected={(score[oodm] < best_t).mean() if oodm.any() else float("nan"):.3f}); compose tool threshold={compose_t:.2f}')
+
+    # the split models hold full-width coefficient matrices (~1 GB with all intent models): free them before the final fit
+    del tool_s, int_s, p_tool, Xho
+    gc.collect()
 
     # ---------------- final models on all data ----------------
     # free the calibration models first (peak memory: the final fit runs on the full matrix)

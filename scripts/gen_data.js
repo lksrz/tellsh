@@ -8,8 +8,8 @@ import { readFileSync, readdirSync, existsSync, mkdirSync, writeFileSync, create
 import { join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { INTENTS } from '../src/catalog.js';
-import { FAMILIES, FAMILY_OF, NONE, TAG_TYPES } from '../src/tools.js';
-import { vectorize, normalize, tagTokens, tagFeatures } from '../src/features.js';
+import { FAMILIES, FAMILY_OF, NONE, OOC, TAG_TYPES } from '../src/tools.js';
+import { vectorize, normalize, tagTokens, tagFeatures, fnv1a } from '../src/features.js';
 import { ctxFeatures } from '../src/history.js';
 import { silverSpans, relex, bioLabels, mulberry32 } from './lib/silver.js';
 import { exclusionIndex } from './lib/heldout.js';
@@ -22,6 +22,10 @@ export const TAG_DIM = 1 << 18;
 const args = process.argv.slice(2);
 const SEED = +(args.find((a) => a.startsWith('--seed='))?.slice(7) || 13);
 const rng = mulberry32(SEED);
+// out-of-catalog real-usage rows (train split, intent null) -> stage-1 rejection label (HYBRID.md#out-of-catalog-rejection)
+const OOC_W = +(args.find((a) => a.startsWith('--ooc-weight='))?.slice(13) ?? 0);
+const OOC_LABEL = (args.find((a) => a.startsWith('--ooc-label='))?.slice(12) || 'ooc') === 'none' ? NONE : OOC;
+const OOC_CAP = +(args.find((a) => a.startsWith('--ooc-cap='))?.slice(10) || Infinity); // rows per command group
 const pick = (arr) => arr[Math.floor(rng() * arr.length)];
 
 const readJsonl = (p) => (existsSync(p) ? readFileSync(p, 'utf8').split('\n').filter((l) => l.trim()).map((l, i) => {
@@ -239,20 +243,33 @@ function main() {
     emit(typo(r.text), NONE, '', [...sampleEnv(), ...(rng() < 0.25 ? randomCtx() : [])], 1, 'ood', r.lang, g);
   }
 
+  // 5. out-of-catalog real shell tasks (train split only; the eval split is held out by command group)
+  let nOoc = 0;
+  if (OOC_W > 0) {
+    const perGroup = {};
+    const oocRows = real.filter((r) => r.split === 'train' && !r.intent).map((r) => ({ r, k: fnv1a('ooc:' + r.text) })).sort((a, b) => a.k - b.k).map(({ r }) => r);
+    for (const r of oocRows) {
+      if (heldOut.has(r.text) || leaks(r.text)) continue;
+      if ((perGroup[r.group] = (perGroup[r.group] || 0) + 1) > OOC_CAP) continue;
+      emit(r.text, OOC_LABEL, '', [`shell=${r.shell || 'bash'}`, `os=${r.os || 'linux'}`], OOC_W, 'real', r.lang, gid++);
+      nOoc++;
+    }
+  }
+
   cls.end();
   tag.end();
   const tagLabels = ['O', ...TAG_TYPES.flatMap((t) => [`B-${t}`, `I-${t}`])];
   const meta = {
     dim: DIM, tagDim: TAG_DIM, seed: SEED,
-    families: [...Object.keys(FAMILIES), NONE],
+    families: [...Object.keys(FAMILIES), NONE, ...(nOoc && OOC_LABEL === OOC ? [OOC] : [])],
     intentsByFamily: FAMILIES,
     tagLabels,
-    counts: { ...counts, base: base.length, public: publicCount, real: realRows.length, realUsed: base.filter((r) => r.src === 'real').length, droppedHeldOut: dropped, droppedEvalValue, droppedDerived, teacherDropped, boosted: nBoost, anaphora: nAna, tldr: nT, ood: ood.length },
+    counts: { ...counts, base: base.length, public: publicCount, real: realRows.length, realUsed: base.filter((r) => r.src === 'real').length, droppedHeldOut: dropped, droppedEvalValue, droppedDerived, teacherDropped, boosted: nBoost, anaphora: nAna, tldr: nT, ood: ood.length, ooc: nOoc, oocWeight: OOC_W, oocLabel: OOC_LABEL },
   };
   writeFileSync(join(outDir, 'meta.json'), JSON.stringify(meta, null, 1));
   console.log(`gen_data: ${base.length} base sentences (${dropped} dropped: collide with held-out sets; ${droppedEvalValue} mention an eval-only value; ` +
     `${droppedDerived} derived rows dropped), ` +
-    `${counts.cls} classifier rows ${JSON.stringify(counts.bySrc)}, ${counts.tag} tagger sequences, ${nT} tldr rows, ${nAna} anaphora rows`);
+    `${counts.cls} classifier rows ${JSON.stringify(counts.bySrc)}, ${counts.tag} tagger sequences, ${nT} tldr rows, ${nAna} anaphora rows, ${nOoc} out-of-catalog rows`);
 }
 
 main();
