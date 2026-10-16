@@ -85,7 +85,11 @@
               0,
               64
             ]
-          }
+          },
+          "cue": [
+            "SCOPE_TOP",
+            "SIZE"
+          ]
         },
         {
           "mod": "exclude_dir",
@@ -244,7 +248,10 @@
               "age_days"
             ]
           },
-          "cue": "RECENCY"
+          "cue": [
+            "RECENCY",
+            "SIZE"
+          ]
         },
         {
           "mod": "modified_within_minutes",
@@ -277,7 +284,8 @@
           "model": "predict",
           "value": {
             "type": "Path"
-          }
+          },
+          "cue": "RECENCY"
         },
         {
           "mod": "print0",

@@ -52,7 +52,10 @@
           "flag": "-h",
           "form": "bool",
           "model": "predict",
-          "cue": "SORT"
+          "cue": [
+            "HUMAN_SIZES",
+            "SORT"
+          ]
         },
         {
           "mod": "reverse",

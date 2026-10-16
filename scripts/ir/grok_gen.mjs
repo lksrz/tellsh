@@ -255,6 +255,29 @@ async function runBackend(promptFile, a, cwd) {
     const so = j.structured_output ?? j.structuredOutput;
     return { code: r.code, err: r.err, out: JSON.stringify({ structuredOutput: so, text: j.result, usage: { input_tokens: (u.input_tokens || 0) + (u.cache_read_input_tokens || 0) + (u.cache_creation_input_tokens || 0), output_tokens: u.output_tokens || 0, reasoning_tokens: 0 }, total_cost_usd: j.total_cost_usd || 0, modelUsage: j.modelUsage || { [a.model || 'claude-haiku-5-5']: {} } }) };
   }
+  if (a.backend === 'api') {
+    // Anthropic Messages API (raw HTTP; key from CLAUDE_API_KEY or ANTHROPIC_API_KEY, never logged)
+    const key = process.env.CLAUDE_API_KEY || process.env.ANTHROPIC_API_KEY;
+    if (!key) return { code: 1, out: '', err: 'no CLAUDE_API_KEY / ANTHROPIC_API_KEY' };
+    const model = a.model || 'claude-haiku-5-5';
+    const body = { model, max_tokens: 32000, system: SYSTEM, messages: [{ role: 'user', content: prompt }],
+      output_config: { effort: a.effort || 'medium', format: { type: 'json_schema', schema: OUT_SCHEMA } } };
+    try {
+      const ctl = new AbortController(); const t = setTimeout(() => ctl.abort(), a.timeoutS * 1000);
+      const res = await fetch('https://api.anthropic.com/v1/messages', { method: 'POST', signal: ctl.signal,
+        headers: { 'x-api-key': key, 'anthropic-version': '2023-06-01', 'content-type': 'application/json', ...((process.env.CLAUDE_WORKSPACE_ID || process.env.ANTHROPIC_WORKSPACE_ID) ? { 'anthropic-workspace-id': process.env.CLAUDE_WORKSPACE_ID || process.env.ANTHROPIC_WORKSPACE_ID } : {}) }, body: JSON.stringify(body) });
+      clearTimeout(t);
+      const j = await res.json();
+      if (!res.ok) return { code: 1, out: '', err: `HTTP ${res.status}: ${j?.error?.type || ''} ${j?.error?.message || ''}`.slice(0, 300) };
+      if (j.stop_reason !== 'end_turn') return { code: 1, out: '', err: `stop_reason ${j.stop_reason}` };
+      const text = (j.content || []).filter((b) => b.type === 'text').map((b) => b.text).join('');
+      const u = j.usage || {};
+      const PRICE = { 'claude-haiku-5-5': [0.10, 0.50], 'claude-sonnet-5-5': [2, 10], 'claude-opus-5-5': [4, 20] }[model] || [0, 0];
+      const inTok = (u.input_tokens || 0) + (u.cache_creation_input_tokens || 0) + (u.cache_read_input_tokens || 0);
+      const cost = (inTok * PRICE[0] + (u.output_tokens || 0) * PRICE[1]) / 1e6;
+      return { code: 0, err: '', out: JSON.stringify({ text, usage: { input_tokens: inTok, output_tokens: u.output_tokens || 0, reasoning_tokens: 0 }, total_cost_usd: cost, modelUsage: { [model]: {} } }) };
+    } catch (e) { return { code: 1, out: '', err: String(e).slice(0, 300) }; }
+  }
   throw new Error('unknown backend ' + a.backend);
 }
 
@@ -331,8 +354,13 @@ async function main() {
       const p = todo[next++];
       const pf = path.join(promptDir, `call${p.call}.txt`); fs.writeFileSync(pf, buildPrompt(p.spec));
       let res, error = '', ms = 0, usage = {}, c = 0;
-      for (let attempt = 0; attempt < 3; attempt++) {
+      for (let attempt = 0, waits = 0; attempt < 3; attempt++) {
         const s = Date.now(); const r = await runBackend(pf, a, cwd); ms += Date.now() - s;
+        // rate limited / overloaded: back off and retry without spending an attempt (bounded)
+        if (r.code !== 0 && /HTTP (429|529)|overloaded/i.test(r.err || '') && waits < 40) {
+          waits++; attempt--; await new Promise((ok) => setTimeout(ok, Math.min(120000, 15000 * Math.min(waits, 4) + (p.call % 13) * 1000)));
+          continue;
+        }
         try {
           if (r.code !== 0) throw new Error(`exit ${r.code}: ${(r.err || r.out).slice(0, 300)}`);
           res = parseGrok(r.out); usage = res.usage; c = res.cost; break;

@@ -319,7 +319,8 @@
           "mod": "follow_renames",
           "flag": "--follow",
           "form": "bool",
-          "model": "predict"
+          "model": "predict",
+          "cue": "FOLLOW"
         },
         {
           "mod": "date_format",
