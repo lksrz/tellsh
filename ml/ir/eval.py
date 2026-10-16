@@ -93,7 +93,8 @@ def main():
     ck = torch.load(args.ckpt, map_location=dev, weights_only=False)
     vocab = Vocab(ck["vocab"])
     ta = ck["args"]
-    model = IRModel(vocab, d_model=ta["d_model"], d_layers=ta["d_layers"], d_heads=ta["d_heads"], d_ff=ta["d_ff"], arm=ta["arm"])
+    extra = {k: ta[k] for k in ("tern_enc", "tern_dec", "subln", "enc_layers", "enc_hidden", "enc_heads", "enc_ff") if k in ta}  # ternary arms
+    model = IRModel(vocab, d_model=ta["d_model"], d_layers=ta["d_layers"], d_heads=ta["d_heads"], d_ff=ta["d_ff"], arm=ta["arm"], **extra)
     model.load_state_dict(ck["model"])
     model.to(dev).eval()
     ds = IRDataset(args.data_file or os.path.join(args.targets, f"{args.split}.jsonl"), vocab, limit=args.limit)
