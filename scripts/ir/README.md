@@ -171,6 +171,30 @@ backoff. Usage and `cost_usd` come from the CLI JSON (`total_cost_usd`, notional
 records wall time. The cache key ignores the backend, so api and cli verdicts share `OUT/cache.jsonl`. Measured on 5
 v4 dev rows (opus, low): ~5.4k input tokens, 5.6-9.8 s per call.
 
+`--batch N` (cli backend and the cascade Opus stage; default 1 = one row per call) puts N uncached rows into one
+`claude -p` call: each item is the single-row prompt body (same per-row A/B order, same refusal context), the system
+prompt is SYSTEM plus "judge each item independently" (`BATCH_SYSTEM`), and `--json-schema BATCH_SCHEMA` asks for
+`{"verdicts": [{item, a_correct, b_correct, equivalent, reason}, ...]}`. Items that are missing, malformed, out of
+range or duplicated trigger one retry of the whole batch; whatever is still missing is judged single-row. Batched
+verdicts are cached per row under the single key + `batch N` (records add `batch: N`; `usage` is the batch call's usage
+divided by N): single mode never reads them, batch mode reuses cached single verdicts first, and fallbacks are stored
+as ordinary single verdicts (`batch_single: true`). Default concurrency with
+`--batch` > 1 is 3 (`--concurrency` / `--opus-concurrency`); `summary.batch_calls` counts CLI batch calls.
+Measured (opus, low, 2026-10-17) on 300 rows from `v4_dev_t50` (150 Opus-wrong / 150 Opus-correct), reference
+= the original single-row verdicts; s1 / s2 are two fresh single-row reruns (noise floor):
+
+| run | calls | wall s | agree vs ref | recall ref-wrong | precision | agree vs s1 |
+|---|---|---|---|---|---|---|
+| single s1 (conc 6) | 300 | 275 | 0.947 | 0.893 | 1.000 | - |
+| single s2 (conc 6) | 300 | 274 | 0.950 | 0.900 | 1.000 | 0.983 |
+| batch 10 (conc 3) | 31 | 131 | 0.917 | 0.847 | 0.985 | 0.957 |
+| batch 20 (conc 3) | 15 | 91 | 0.917 | 0.853 | 0.977 | 0.957 |
+
+No fallbacks or errors (batch 10 needed one batch retry). Batching costs ~3 pt agreement and ~4-5 pt recall of
+Opus-wrong rows versus fresh single reruns (single-vs-single 0.983, batch-vs-single 0.957), i.e. above the noise floor;
+batch 10 and 20 are equal in quality. Use `--batch 20` only for cheap triage passes; keep single-row Opus for headline
+adjudications.
+
 `--backend codex` (`codex exec -m M -c model_reasoning_effort=E -s read-only --json --output-schema F -o F -`, default
 `gpt-6-luna`; rubric prepended to the prompt) and `--backend grok` (`grok --prompt-file F --max-turns 1 --tools ""
 --system-prompt-override SYSTEM --json-schema OUT_SCHEMA -m M --reasoning-effort E`, default `grok-4.6`) are cheap

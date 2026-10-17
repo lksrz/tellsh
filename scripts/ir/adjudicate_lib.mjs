@@ -123,9 +123,9 @@ export function adjudicatedY(y, id, command, adj, truth = false) {
 
 // ---------- --backend cli (Claude Code CLI on the subscription login) ----------
 // argv for `claude -p`, same flags as grok_gen.mjs's claude backend: no tools, no session, rubric as system prompt.
-export function cliArgs(model, effort) {
-  return ['-p', '--model', model, '--effort', effort, '--output-format', 'json', '--json-schema', JSON.stringify(OUT_SCHEMA),
-    '--no-session-persistence', '--tools', '', '--strict-mcp-config', '--disable-slash-commands', '--system-prompt', SYSTEM];
+export function cliArgs(model, effort, batch = false) {
+  return ['-p', '--model', model, '--effort', effort, '--output-format', 'json', '--json-schema', JSON.stringify(batch ? BATCH_SCHEMA : OUT_SCHEMA),
+    '--no-session-persistence', '--tools', '', '--strict-mcp-config', '--disable-slash-commands', '--system-prompt', batch ? BATCH_SYSTEM : SYSTEM];
 }
 // child env without API credentials, so the CLI falls back to the subscription (OAuth) login.
 export const CLI_STRIP_ENV = ['ANTHROPIC_API_KEY', 'CLAUDE_API_KEY', 'ANTHROPIC_AUTH_TOKEN', 'OPENAI_API_KEY', 'XAI_API_KEY', 'GROK_API_KEY'];
@@ -145,6 +145,84 @@ export function parseCliResult(stdout) {
   const usage = { input_tokens: u.input_tokens || 0, cache_creation_input_tokens: u.cache_creation_input_tokens || 0,
     cache_read_input_tokens: u.cache_read_input_tokens || 0, output_tokens: u.output_tokens || 0 };
   return { verdict, usage, cost_usd: Number(j.total_cost_usd) || 0 };
+}
+
+// ---------- --batch N (cli backend / cascade Opus stage): N rows per `claude -p` call ----------
+// Structured output must be an object, so the array sits under "verdicts"; each verdict carries its 1-based item index.
+export const BATCH_SCHEMA = {
+  type: 'object', additionalProperties: false, required: ['verdicts'],
+  properties: { verdicts: { type: 'array', items: { ...OUT_SCHEMA, required: ['item', ...OUT_SCHEMA.required],
+    properties: { item: { type: 'integer' }, ...OUT_SCHEMA.properties } } } },
+};
+export const BATCH_SYSTEM = `${SYSTEM}
+
+You will get several numbered items. Judge each item independently, exactly as if it were the only one: items are
+unrelated, and nothing in one item says anything about another. Return one verdict per item, with its item number.`;
+
+// rows -> {items: [{aIsPred}], text}: each item is the single-row prompt body (same A/B order and refusal context)
+export function buildBatchPrompt(rows) {
+  const items = [], parts = [];
+  rows.forEach((r, i) => {
+    const { aIsPred, text } = buildPrompt(r);
+    items.push({ aIsPred });
+    parts.push(`=== Item ${i + 1} ===\n${text.split('\nFor each answer decide:')[0].trimEnd()}`);
+  });
+  return { items, text: `${parts.join('\n\n')}
+
+For EACH of the ${rows.length} items decide: does each answer fully and exactly do what was asked, and are A and B
+behaviourally equivalent for that request? Output JSON {"verdicts": [{"item": <1..${rows.length}>, "a_correct": bool,
+"b_correct": bool, "equivalent": bool, "reason": "<one short sentence>"}, ...]} with exactly one verdict per item.` };
+}
+// batch verdict text / object -> Map item (1-based) -> verdict; only well-formed, in-range, non-duplicate items kept
+export function parseBatchVerdicts(textOrObj, n) {
+  let j = textOrObj;
+  if (typeof j !== 'object' || j == null) {
+    const t = String(j ?? '').trim().replace(/^```(?:json)?\s*/, '').replace(/```\s*$/, '');
+    const m = t.match(/[\[{][\s\S]*[\]}]/);
+    if (!m) throw new Error('no JSON object');
+    j = JSON.parse(m[0]);
+  }
+  const arr = Array.isArray(j) ? j : j.verdicts;
+  if (!Array.isArray(arr)) throw new Error('missing verdicts');
+  const out = new Map(), dup = new Set();
+  for (const v of arr) {
+    const k = Number(v?.item);
+    if (!Number.isInteger(k) || k < 1 || k > n) continue;
+    let pv; try { pv = parseVerdict(JSON.stringify(v)); } catch { continue; }
+    if (out.has(k)) dup.add(k); else out.set(k, pv);
+  }
+  for (const k of dup) out.delete(k);  // ambiguous: judged again
+  return out;
+}
+// `claude -p` batch stdout -> {verdicts: Map, usage, cost_usd}; throws on a CLI error / no parseable array
+export function parseCliBatchResult(stdout, n) {
+  let j;
+  try { j = JSON.parse(stdout); } catch { throw new Error('cli: stdout is not JSON'); }
+  if (j.is_error) throw new Error(`cli error: ${String(j.result ?? j.subtype ?? '').slice(0, 200)}`);
+  const so = j.structured_output ?? j.structuredOutput;
+  const verdicts = parseBatchVerdicts(so && typeof so === 'object' ? so : j.result, n);
+  const u = j.usage || {};
+  return { verdicts, usage: { input_tokens: u.input_tokens || 0, cache_creation_input_tokens: u.cache_creation_input_tokens || 0,
+    cache_read_input_tokens: u.cache_read_input_tokens || 0, output_tokens: u.output_tokens || 0 }, cost_usd: Number(j.total_cost_usd) || 0 };
+}
+// one batch: call(prompt) -> {verdicts: Map, ...}; retry once when items are missing, then single(rowIndex) for the rest.
+// Returns [{i, verdict, aIsPred, single}] in row order plus the batch call results (for usage / timing).
+export async function judgeBatch(rows, call, single) {
+  const { items, text } = buildBatchPrompt(rows);
+  const got = new Map(), calls = [];
+  for (let attempt = 0; attempt < 2 && got.size < rows.length; attempt++) {
+    try {
+      const res = await call(text);
+      calls.push(res);
+      for (const [k, v] of res.verdicts) if (!got.has(k)) got.set(k, v);
+    } catch (e) { calls.push({ error: String(e.message || e) }); }
+  }
+  const out = [];
+  for (let i = 0; i < rows.length; i++) {
+    const v = got.get(i + 1);
+    out.push(v ? { i, verdict: v, aIsPred: items[i].aIsPred, single: false } : { i, ...(await single(i)), single: true });
+  }
+  return { out, calls };
 }
 
 // ---------- --backend codex / grok (subscription CLIs, same flags as grok_gen.mjs) ----------

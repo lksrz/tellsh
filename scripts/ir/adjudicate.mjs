@@ -10,6 +10,7 @@
 // seeded random subset beyond that stays Jev-only: stratum flagged_jev_only) plus a seeded audit sample of Jev-passed rows
 // (--audit 0.05, clamped to --audit-min 50 / --audit-max 200). Final verdict = Opus if judged, else Jev; records add
 // judge / stratum / audit / jev_p; summary.cascade has strata counts, audit miss rate + CP UB95, flagged overturn rate.
+// --batch N (cli / cascade Opus stage): N rows per `claude -p` call, default concurrency 3; see scripts/ir/README.md.
 // --extra-cache F[,F] reads further cache.jsonl files (read-only; e.g. an earlier Opus run on the same candidates).
 //   node scripts/ir/adjudicate.mjs --rows ROWS.jsonl --out DIR ...   (adjudication-shaped rows, gold already joined)
 //
@@ -32,7 +33,7 @@ import { readJsonl, goldCommand } from './make_candidates.mjs';
 import { spawn } from 'node:child_process';
 import { SYSTEM, OUT_SCHEMA, buildPrompt, parseVerdict, unshuffle, summarize, costOf, hashKey, cliArgs, cliEnv, parseCliResult,
   DEFAULT_MODEL, codexArgs, codexPrompt, parseCodexResult, grokArgs, parseGrokResult, rowsFromAdjudications,
-  JEV_URL, JEV_PRICE_PER_TOK, JEV_VARIANTS, jevBody, parseJevResult, jevVerdict, jevRetryable, jevBackoffMs } from './adjudicate_lib.mjs';
+  parseCliBatchResult, judgeBatch, JEV_URL, JEV_PRICE_PER_TOK, JEV_VARIANTS, jevBody, parseJevResult, jevVerdict, jevRetryable, jevBackoffMs } from './adjudicate_lib.mjs';
 import { cascadeStrata, cascadeSummary } from './cascade_lib.mjs';
 
 const args = process.argv.slice(2);
@@ -44,11 +45,13 @@ if (!['api', 'cli', 'codex', 'grok', 'jev', 'cascade'].includes(BACKEND)) { cons
 const CASCADE = BACKEND === 'cascade';
 const MODEL = opt('model', CASCADE ? DEFAULT_MODEL.cli : DEFAULT_MODEL[BACKEND]), EFFORT = opt('effort', 'low');
 const TIMEOUT_S = Number(opt('timeout', 600));
-const CONC = Number(opt('concurrency', BACKEND === 'cli' ? 6 : BACKEND === 'api' ? 16 : BACKEND === 'jev' || CASCADE ? 8 : 4)), SAMPLE = Number(opt('sample-agree', 0)), LIMIT = Number(opt('limit', 0));
+const BATCH = Math.max(1, Number(opt('batch', 1)));  // rows per `claude -p` call (cli backend, cascade Opus stage)
+if (BATCH > 1 && !['cli', 'cascade'].includes(BACKEND)) { console.error('--batch needs --backend cli or cascade'); process.exit(2); }
+const CONC = Number(opt('concurrency', BACKEND === 'cli' ? (BATCH > 1 ? 3 : 6) : BACKEND === 'api' ? 16 : BACKEND === 'jev' || CASCADE ? 8 : 4)), SAMPLE = Number(opt('sample-agree', 0)), LIMIT = Number(opt('limit', 0));
 let seed = Number(opt('seed', 1));
 const JEV_VARIANT = opt('jev-variant', 'gold'), JEV_THRESHOLD = Number(opt(CASCADE ? 'jev-threshold' : 'threshold', CASCADE ? 0.73 : 0.5));
 const JEV_MODEL = CASCADE ? opt('jev-model', 'jev-1.13.0') : MODEL;
-const OPUS_CONC = Number(opt('opus-concurrency', 6));
+const OPUS_CONC = Number(opt('opus-concurrency', BATCH > 1 ? 3 : 6));
 const CASCADE_OPT = { threshold: JEV_THRESHOLD, maxOpus: Number(opt('max-opus', 600)), audit: Number(opt('audit', 0.05)),
   auditMin: Number(opt('audit-min', 50)), auditMax: Number(opt('audit-max', 200)), seed: Number(opt('seed', 1)) };
 const EXTRA_CACHE = (opt('extra-cache') || '').split(',').filter(Boolean);  // read-only caches (e.g. an earlier Opus run)
@@ -74,6 +77,7 @@ fs.mkdirSync(OUT, { recursive: true });
 const CACHE = path.join(OUT, 'cache.jsonl');
 const keyFor = (r, model) => hashKey(r.id, r.command, r.gold ?? `!${r.goldLabel}`, model, ...(CACHE_TAG ? [CACHE_TAG] : []));
 const keyOf = (r) => keyFor(r, MODEL);
+const batchKeyFor = (r, model) => hashKey(keyFor(r, model), 'batch', BATCH);
 const cache = new Map();
 for (const f of [...EXTRA_CACHE, CACHE]) if (fs.existsSync(f)) for (const l of fs.readFileSync(f, 'utf8').split('\n').filter(Boolean)) { try { const j = JSON.parse(l); if (!j.error) cache.set(j.key, j); } catch {} }
 
@@ -149,8 +153,12 @@ function spawnCli(bin, argv, input) {
   });
 }
 // one call of the selected CLI backend -> {code, out, err, parse()} (parse throws on a bad verdict)
-async function runCli(prompt, backend = BACKEND) {
-  if (backend === 'cli') { const r = await spawnCli('claude', cliArgs(MODEL, EFFORT), prompt); return { ...r, parse: () => parseCliResult(r.out) }; }
+// batchN > 0: batch prompt (cli only), parse -> {verdicts: Map item -> verdict}
+async function runCli(prompt, backend = BACKEND, batchN = 0) {
+  if (backend === 'cli') {
+    const r = await spawnCli('claude', cliArgs(MODEL, EFFORT, batchN > 0), prompt);
+    return { ...r, parse: () => (batchN > 0 ? parseCliBatchResult(r.out, batchN) : parseCliResult(r.out)) };
+  }
   fs.mkdirSync(TMP, { recursive: true });
   const base = path.join(TMP, `${process.pid}_${tmpSeq++}`);
   try {
@@ -168,11 +176,11 @@ async function runCli(prompt, backend = BACKEND) {
   } finally { for (const f of ['.schema.json', '.out.json', '.prompt.txt']) fs.rmSync(base + f, { force: true }); }
 }
 // one CLI call per attempt; up to 2 retries on unparseable verdicts, up to 4 on CLI failures (exponential backoff)
-async function callCli(prompt, backend = BACKEND) {
+async function callCli(prompt, backend = BACKEND, batchN = 0) {
   let lastErr = '', parseFails = 0, cliFails = 0;
   for (;;) {
     const t0 = Date.now();
-    const r = await runCli(prompt, backend);
+    const r = await runCli(prompt, backend, batchN);
     const secs = (Date.now() - t0) / 1000;
     try {
       if (r.code !== 0 && !r.out.trim()) throw new Error(`cli exit ${r.code}: ${r.err.slice(0, 200)}`);
@@ -219,6 +227,40 @@ async function judgeLlm(r, backend, model) {
     return rec;
   } catch (e) { return { key, ...r, model, error: String(e.message || e) }; }
 }
+// --batch N: uncached rows of idxs judged N per `claude -p` call (judgeBatch: one retry of the batch for missing items,
+// then single-row calls). Batched verdicts agree less with single Opus than single reruns do (README), so they are
+// cached under batchKeyFor (key + batch N): single mode never reads them; batch mode reads single verdicts first.
+// Records add batch: N (+ batch_single when a fallback judged the row alone under the single key).
+async function judgeLlmBatched(idxs, conc, model, dest) {
+  const todo = [];
+  for (const i of idxs) {
+    const k = keyFor(rows[i], model), kb = batchKeyFor(rows[i], model);
+    if (cache.has(k)) dest[i] = cache.get(k); else if (cache.has(kb)) dest[i] = cache.get(kb); else todo.push(i);
+  }
+  const chunks = [];
+  for (let k = 0; k < todo.length; k += BATCH) chunks.push(todo.slice(k, k + BATCH));
+  await pool(chunks.length, conc, async (c) => {
+    const ch = chunks[c], rs = ch.map((i) => rows[i]);
+    const { out: res, calls } = await judgeBatch(rs, (text) => callCli(text, 'cli', rs.length), async (j) => {
+      const rec = await judgeLlm(rs[j], 'cli', model);
+      return { rec };
+    });
+    const ok = calls.filter((x) => !x.error), per = (f) => +(ok.reduce((a, x) => a + (f(x) || 0), 0) / rs.length).toFixed(4);
+    const usage = { input_tokens: per((x) => x.usage.input_tokens), cache_read_input_tokens: per((x) => x.usage.cache_read_input_tokens),
+      output_tokens: per((x) => x.usage.output_tokens), batch_calls: calls.length, batch_seconds: +ok.reduce((a, x) => a + x.usage.cli_seconds, 0).toFixed(2) };
+    for (const x of res) {
+      const i = ch[x.i];
+      if (x.single) { dest[i] = x.rec.error ? x.rec : { ...x.rec, batch: BATCH, batch_single: true }; continue; }
+      const key = batchKeyFor(rows[i], model);
+      const rec = { key, ...rows[i], model, backend: 'cli', batch: BATCH, a_is_pred: x.aIsPred, ...unshuffle(x.verdict, x.aIsPred), usage, cost_usd: per((y) => y.cost_usd) };
+      fs.appendFileSync(CACHE, JSON.stringify(rec) + '\n');
+      cache.set(key, rec); fresh++;
+      dest[i] = rec;
+    }
+    batchCalls += calls.length;
+  });
+}
+let batchCalls = 0;
 async function pool(n, conc, fn) {
   let next = 0;
   await Promise.all(Array.from({ length: Math.max(1, conc) }, async () => {
@@ -227,7 +269,8 @@ async function pool(n, conc, fn) {
 }
 let out = new Array(rows.length), cascadeInfo;
 const t0 = Date.now();
-if (!CASCADE) await pool(rows.length, CONC, async (i) => { out[i] = BACKEND === 'jev' ? await judgeJev(rows[i], MODEL) : await judgeLlm(rows[i], BACKEND, MODEL); });
+if (!CASCADE && BATCH > 1) await judgeLlmBatched(rows.map((_, i) => i), CONC, MODEL, out);
+else if (!CASCADE) await pool(rows.length, CONC, async (i) => { out[i] = BACKEND === 'jev' ? await judgeJev(rows[i], MODEL) : await judgeLlm(rows[i], BACKEND, MODEL); });
 else {
   // stage 1: Jev on every row; stage 2: Opus (cli) on flagged (capped) + audit sample; final = Opus if judged, else Jev
   const jev = new Array(rows.length);
@@ -235,10 +278,11 @@ else {
   const tJev = Date.now();
   const strata = cascadeStrata(jev.map((j) => (j.error ? null : j.p)), CASCADE_OPT);
   const toOpus = strata.map((s, i) => (s === 'flagged' || s === 'audit' ? i : -1)).filter((i) => i >= 0);
-  const cachedOpus = toOpus.filter((i) => cache.has(keyOf(rows[i]))).length;
+  const cachedOpus = toOpus.filter((i) => cache.has(keyOf(rows[i])) || (BATCH > 1 && cache.has(batchKeyFor(rows[i], MODEL)))).length;
   const opus = new Array(rows.length);
   const freshJev = fresh;
-  await pool(toOpus.length, OPUS_CONC, async (k) => { const i = toOpus[k]; opus[i] = await judgeLlm(rows[i], 'cli', MODEL); });
+  if (BATCH > 1) await judgeLlmBatched(toOpus, OPUS_CONC, MODEL, opus);
+  else await pool(toOpus.length, OPUS_CONC, async (k) => { const i = toOpus[k]; opus[i] = await judgeLlm(rows[i], 'cli', MODEL); });
   out = rows.map((r, i) => {
     const j = jev[i], o = opus[i], useOpus = o && !o.error;
     const base = useOpus ? o : j.error ? { ...j } : j;
@@ -252,7 +296,7 @@ else {
     seconds: { jev: +((tJev - t0) / 1000).toFixed(1), opus: +((Date.now() - tJev) / 1000).toFixed(1) }, ...cascadeSummary(out) };
 }
 fs.writeFileSync(path.join(OUT, 'adjudications.jsonl'), out.map((r) => JSON.stringify(r)).join('\n') + '\n');
-const summary = { cands: CANDS, data: DATA, rows_file: ROWS, cache_tag: CACHE_TAG || undefined, model: MODEL, effort: EFFORT, backend: BACKEND, rows: rows.length, new_calls: fresh,
+const summary = { cands: CANDS, data: DATA, rows_file: ROWS, cache_tag: CACHE_TAG || undefined, model: MODEL, effort: EFFORT, backend: BACKEND, ...(BATCH > 1 ? { batch: BATCH, batch_calls: batchCalls } : {}), rows: rows.length, new_calls: fresh,
   seconds: +((Date.now() - t0) / 1000).toFixed(1), ...(cascadeInfo ? { cascade: cascadeInfo } : {}), ...summarize(out) };
 fs.writeFileSync(path.join(OUT, 'summary.json'), JSON.stringify(summary, null, 1));
 console.log(JSON.stringify(summary, null, 1));
