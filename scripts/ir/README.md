@@ -160,7 +160,16 @@ Key from `CLAUDE_API_KEY` (or `ANTHROPIC_API_KEY`), workspace from `CLAUDE_WORKS
 never logged. 429/5xx are retried with backoff. `OUT/cache.jsonl` (keyed by id, command, gold, model) makes runs
 resumable; `OUT/adjudications.jsonl` and `OUT/summary.json` (both_correct / pred_correct_gold_wrong / pred_wrong /
 both_wrong, equivalent, cost) are rewritten each run. Pure helpers live in `adjudicate_lib.mjs`
-(tests: `ir/test/adjudicate.test.js`).
+(tests: `ir/test/adjudicate.test.js`, `ir/test/adjudicate_cli.test.js`).
+
+`--backend cli` (the default; `api` is the paid HTTP path and must not be used, see the global no-paid-API rule) judges each row with the Claude Code CLI on the subscription login instead of the API:
+`claude -p --model M --effort E --output-format json --json-schema OUT_SCHEMA --no-session-persistence --tools ""
+--strict-mcp-config --disable-slash-commands --system-prompt SYSTEM`, prompt on stdin. `ANTHROPIC_API_KEY`,
+`CLAUDE_API_KEY` and `ANTHROPIC_AUTH_TOKEN` are removed from the child env so the OAuth login is used. Default
+`--concurrency 6`, `--timeout 600` s per call; unparseable verdicts are retried twice, CLI failures four times with
+backoff. Usage and `cost_usd` come from the CLI JSON (`total_cost_usd`, notional on a subscription); `usage.cli_seconds`
+records wall time. The cache key ignores the backend, so api and cli verdicts share `OUT/cache.jsonl`. Measured on 5
+v4 dev rows (opus, low): ~5.4k input tokens, 5.6-9.8 s per call.
 
 `score_combined.mjs --adjudications DEV_ADJ,TEST_ADJ` counts a `y = 0` candidate as correct when its adjudication
 (same id and command) says the prediction is correct, and reports `adj_wrong`, `adj_accepted_wrong_rate`,

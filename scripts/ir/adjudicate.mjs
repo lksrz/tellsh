@@ -4,7 +4,10 @@
 //
 //   node scripts/ir/adjudicate.mjs --cands build/ir/verifier/v1/cand_test.jsonl --data build/ir/dataset/v1/test.jsonl \
 //     --out build/ir/adjudicate/v1_test [--model claude-opus-5-5] [--effort low] [--concurrency 16] \
-//     [--sample-agree N] [--limit N] [--seed 1]
+//     [--sample-agree N] [--limit N] [--seed 1] [--backend api|cli] [--timeout 600]
+//
+// --backend cli runs `claude -p` per row on the subscription login (API key vars stripped from the child env, no
+// tools); default concurrency 6 there. The cache key ignores the backend, so api and cli verdicts are interchangeable.
 //
 // Key from CLAUDE_API_KEY (or ANTHROPIC_API_KEY), workspace from CLAUDE_WORKSPACE_ID (anthropic-workspace-id header);
 // neither is ever logged. Results are cached in OUT/cache.jsonl keyed by (id, command, gold, model), so reruns are
@@ -13,14 +16,18 @@ import fs from 'node:fs';
 import path from 'node:path';
 import { loadSchemas } from '../../ir/lib/index.js';
 import { readJsonl, goldCommand } from './make_candidates.mjs';
-import { SYSTEM, OUT_SCHEMA, buildPrompt, parseVerdict, unshuffle, summarize, costOf, hashKey } from './adjudicate_lib.mjs';
+import { spawn } from 'node:child_process';
+import { SYSTEM, OUT_SCHEMA, buildPrompt, parseVerdict, unshuffle, summarize, costOf, hashKey, cliArgs, cliEnv, parseCliResult } from './adjudicate_lib.mjs';
 
 const args = process.argv.slice(2);
 const opt = (k, d) => { const i = args.indexOf(`--${k}`); return i >= 0 ? args[i + 1] : d; };
 const CANDS = opt('cands'), DATA = opt('data'), OUT = opt('out');
 if (!CANDS || !DATA || !OUT) { console.error('usage: adjudicate.mjs --cands CAND.jsonl --data SPLIT.jsonl --out DIR [--model M] [--concurrency 16] [--sample-agree N] [--limit N]'); process.exit(2); }
 const MODEL = opt('model', 'claude-opus-5-5'), EFFORT = opt('effort', 'low');
-const CONC = Number(opt('concurrency', 16)), SAMPLE = Number(opt('sample-agree', 0)), LIMIT = Number(opt('limit', 0));
+const BACKEND = opt('backend', 'cli')  // cli (subscription) by default; never use the paid api (global rule);
+if (!['api', 'cli'].includes(BACKEND)) { console.error(`unknown --backend ${BACKEND}`); process.exit(2); }
+const TIMEOUT_S = Number(opt('timeout', 600));
+const CONC = Number(opt('concurrency', BACKEND === 'cli' ? 6 : 16)), SAMPLE = Number(opt('sample-agree', 0)), LIMIT = Number(opt('limit', 0));
 let seed = Number(opt('seed', 1));
 const rand = () => ((seed = (seed * 1103515245 + 12345) % 2147483648) / 2147483648);
 
@@ -78,7 +85,38 @@ async function call(prompt) {
   throw new Error(`gave up: ${lastErr}`);
 }
 
-if (!KEY && rows.some((r) => !cache.has(keyOf(r)))) { console.error('no CLAUDE_API_KEY / ANTHROPIC_API_KEY'); process.exit(1); }
+function runCli(prompt) {
+  return new Promise((resolve) => {
+    const ch = spawn('claude', cliArgs(MODEL, EFFORT), { stdio: ['pipe', 'pipe', 'pipe'], env: cliEnv(process.env) });
+    let out = '', err = '';
+    ch.stdout.on('data', (d) => (out += d)); ch.stderr.on('data', (d) => (err += d));
+    ch.stdin.end(prompt);
+    const t = setTimeout(() => ch.kill('SIGKILL'), TIMEOUT_S * 1000);
+    ch.on('close', (code) => { clearTimeout(t); resolve({ code, out, err }); });
+    ch.on('error', (e) => { clearTimeout(t); resolve({ code: -1, out, err: String(e) }); });
+  });
+}
+// one CLI call per attempt; up to 2 retries on unparseable verdicts, up to 4 on CLI failures (exponential backoff)
+async function callCli(prompt) {
+  let lastErr = '', parseFails = 0, cliFails = 0;
+  for (;;) {
+    const t0 = Date.now();
+    const r = await runCli(prompt);
+    const secs = (Date.now() - t0) / 1000;
+    try {
+      if (r.code !== 0 && !r.out.trim()) throw new Error(`cli exit ${r.code}: ${r.err.slice(0, 200)}`);
+      const res = parseCliResult(r.out);
+      return { ...res, usage: { ...res.usage, cli_seconds: +secs.toFixed(2) } };
+    } catch (e) {
+      lastErr = String(e.message || e).slice(0, 300);
+      const isParse = /JSON|missing/.test(lastErr) && !/^cli/.test(lastErr);
+      if (isParse ? ++parseFails > 2 : ++cliFails > 4) throw new Error(`gave up: ${lastErr}`);
+      await sleep(2000 * 2 ** (isParse ? 0 : cliFails - 1) + Math.random() * 1000);
+    }
+  }
+}
+
+if (BACKEND === 'api' && !KEY && rows.some((r) => !cache.has(keyOf(r)))) { console.error('no CLAUDE_API_KEY / ANTHROPIC_API_KEY'); process.exit(1); }
 const out = new Array(rows.length);
 let next = 0, done = 0, fresh = 0;
 async function worker() {
@@ -88,8 +126,10 @@ async function worker() {
     if (!rec) {
       const { aIsPred, text } = buildPrompt(r);
       try {
-        const { verdict, usage } = await call(text);
-        rec = { key, ...r, model: MODEL, a_is_pred: aIsPred, ...unshuffle(verdict, aIsPred), usage, cost_usd: costOf(MODEL, usage) };
+        const res = BACKEND === 'cli' ? await callCli(text) : await call(text);
+        const { verdict, usage } = res;
+        rec = { key, ...r, model: MODEL, backend: BACKEND, a_is_pred: aIsPred, ...unshuffle(verdict, aIsPred), usage,
+          cost_usd: BACKEND === 'cli' ? res.cost_usd : costOf(MODEL, usage) };
         fs.appendFileSync(CACHE, JSON.stringify(rec) + '\n');
         fresh++;
       } catch (e) { rec = { key, ...r, model: MODEL, error: String(e.message || e) }; }
@@ -100,6 +140,6 @@ async function worker() {
 }
 await Promise.all(Array.from({ length: Math.max(1, CONC) }, worker));
 fs.writeFileSync(path.join(OUT, 'adjudications.jsonl'), out.map((r) => JSON.stringify(r)).join('\n') + '\n');
-const summary = { cands: CANDS, data: DATA, model: MODEL, effort: EFFORT, rows: rows.length, new_calls: fresh, ...summarize(out) };
+const summary = { cands: CANDS, data: DATA, model: MODEL, effort: EFFORT, backend: BACKEND, rows: rows.length, new_calls: fresh, ...summarize(out) };
 fs.writeFileSync(path.join(OUT, 'summary.json'), JSON.stringify(summary, null, 1));
 console.log(JSON.stringify(summary, null, 1));

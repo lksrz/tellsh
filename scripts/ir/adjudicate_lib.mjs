@@ -120,3 +120,29 @@ export function adjudicatedY(y, id, command, adj, truth = false) {
   if (y) return true;
   return !!(hit && a.pred_correct);
 }
+
+// ---------- --backend cli (Claude Code CLI on the subscription login) ----------
+// argv for `claude -p`, same flags as grok_gen.mjs's claude backend: no tools, no session, rubric as system prompt.
+export function cliArgs(model, effort) {
+  return ['-p', '--model', model, '--effort', effort, '--output-format', 'json', '--json-schema', JSON.stringify(OUT_SCHEMA),
+    '--no-session-persistence', '--tools', '', '--strict-mcp-config', '--disable-slash-commands', '--system-prompt', SYSTEM];
+}
+// child env without API credentials, so the CLI falls back to the subscription (OAuth) login.
+export const CLI_STRIP_ENV = ['ANTHROPIC_API_KEY', 'CLAUDE_API_KEY', 'ANTHROPIC_AUTH_TOKEN'];
+export function cliEnv(env) {
+  const e = { ...env };
+  for (const k of CLI_STRIP_ENV) delete e[k];
+  return e;
+}
+// `claude -p --output-format json` stdout -> {verdict, usage, cost_usd}; throws on CLI error or a bad verdict.
+export function parseCliResult(stdout) {
+  let j;
+  try { j = JSON.parse(stdout); } catch { throw new Error('cli: stdout is not JSON'); }
+  if (j.is_error) throw new Error(`cli error: ${String(j.result ?? j.subtype ?? '').slice(0, 200)}`);
+  const so = j.structured_output ?? j.structuredOutput;
+  const verdict = parseVerdict(so && typeof so === 'object' ? JSON.stringify(so) : j.result);
+  const u = j.usage || {};
+  const usage = { input_tokens: u.input_tokens || 0, cache_creation_input_tokens: u.cache_creation_input_tokens || 0,
+    cache_read_input_tokens: u.cache_read_input_tokens || 0, output_tokens: u.output_tokens || 0 };
+  return { verdict, usage, cost_usd: Number(j.total_cost_usd) || 0 };
+}
