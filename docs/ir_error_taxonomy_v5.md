@@ -184,6 +184,51 @@ No y flips: equivalence (`scripts/ir/equiv.mjs`, unchanged) treats the new deriv
 for the gold. The reject rules stay well under 3 y=1 rejects per 1000 accepted (r3-c 0.12, r3-e 0.05 per 1000).
 All six dev4 examples now get the wanted command (a, b, d) or a reject (c, e, f).
 
+## v5 round 4 (dev5)
+
+Residual judge-confirmed dev5 errors (fresh set). The judge wins over train-gold conventions; the rules are generic and
+conservative. Tests: `ir/test/v5_round4.test.js`.
+
+1. **r4-1: possessive recency** (`decline.js` rule (d) `recency`). "this / last / past / previous week's / month's /
+   year's / day's / night's" and "today's / yesterday's / tonight's" with no time mod (`since`, `until`,
+   `modified_within_*`, `modified_before_days`, `newer`) fail `dropped_value` (`this week's byte count for F` ->
+   `wc -c F`). The possessive word fails even when a value took it ("rg -e this week's"). Not when a value is a commit
+   range (`a..b`). "N days ago" was already covered by the RECENCY cue rule. Train gold carries these as noise
+   prefixes: 51 of 51,353 ok gold rows (45 "this week's", 4 "today's", 1 "this year's", 1 "past week's") are rejected.
+2. **r4-2: `[wc_dir_operand]`** (`strict_v5r4.js` `looksLikeDir`). `wc` (not in an each stage) with an operand ending
+   in `/`, `.` / `..` / `~`, a known dot directory (`.github`), or a path with a directory part and no extension in the
+   last segment (`spec/models`, `~/.config/nvim`). Bare extensionless words (`build`, `bench`) stay ambiguous and pass;
+   `BARE_FILES` names (`LICENSE`), dot files and globs pass. 1 gold row (`wc -c shell/aliases shell/functions`).
+3. **r4-3: `[line_number_wc]`** (`strict_v5r4.js`). A search with `-n` piped straight into `wc`: the numbers are
+   discarded. 5 gold rows ("count lines ... with line numbers" -> `rg -n X F | wc -l`).
+4. **r4-4: `[branch_name_filter]`** (`strict_v5r4.js`). `git branch --contains / --merged / --no-merged` when the
+   request asks about branch names ("in their names", "named (like)", "name contains / matches / starts with") and does
+   not mention commits / merged. 0 gold rows.
+5. **r4-5: `[ls_d_entries]`** (`strict_v5r4.js`). `ls -d` when the request asks for the entries ("every / each / all
+   entry / file / item in", "what's inside it", "the contents of") and has no only-the-directory cue ("not contents",
+   "directory entries", "itself only", "just the directory itself"). 0 gold rows.
+6. **r4-6: "file names only" word order** (`compile.js` `requestWantsNamesOnlyR3`). "(changed) file names / filenames
+   only" derives `--format=` like "only the file names", with the same per-commit and author / date exclusions.
+7. **r4-7: `ps aux | grep NAME`: skipped.** Train gold answers "is X running / is there a process named X" with
+   `ps aux | grep X` in 27 rows and never with `pgrep`; changing the convention is out of scope for a gate rule.
+8. **r4-8: explanation requests** (`decline.js` rule (i) `explain`, label `not_shell`). "tell me / explain / show me /
+   describe how ... work(s)", "how does / do X work", "explain" (quoted spans excluded). On v5 train the cue matches 849
+   not_shell rows and 0 ok rows. "Is there a sort order for F?" is skipped (too specific for a generic rule).
+
+### Collateral (dev + dev3 + dev4 + dev5 + v5 k-fold heldout, 43,470 previously accepted y=1 candidates)
+
+| fix | y=1 rejected / changed | y=0 rejected / changed | y=0 -> y=1 |
+| --- | --- | --- | --- |
+| r4-1 recency | 40 rejected (0.92 per 1000; gold also lacks the filter: 38 "this week's", 1 "today's", 1 "past week's") | 25 rejected | 0 |
+| r4-2 wc_dir_operand | 5 rejected (4 dev5 incl. the example, 1 fold `shell/aliases shell/functions`) | 5 rejected | 0 |
+| r4-3 line_number_wc | 5 rejected (fold0 "count ... with line numbers") | 1 rejected (the example) | 0 |
+| r4-4 branch_name_filter | 0 | 2 rejected (the example + "branches with staging in the name") | 0 |
+| r4-5 ls_d_entries | 0 (16 before the only-the-directory cues) | 1 rejected (the example) | 0 |
+| r4-6 names only | 12 changed, all stay y=1 (incl. the example) | 1 changed, still y=0 | 0 |
+| r4-8 explain | 0 | 1 rejected (the example) | 0 |
+
+All dev5 examples of fixes 1-6 and 8 now get a reject or the wanted command; fix 7 is skipped.
+
 ## Round 5 measurement (v5 models, judged with Opus in batches of 100)
 
 Ensemble: t50v5 main + h8v5, t50wv5, kfold_v5 folds 0-2. Judging: every kept row goes to Opus (`claude -p`, `--batch 100`).

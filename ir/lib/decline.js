@@ -8,7 +8,8 @@
 //   (e) "upstream" as a bare rev with no remote word (ambiguous: @{u}, a remote, a literal ref);
 //   (f) "In DIR, download ..." with no cwd and no output path (the file would land in the cwd);
 //   (g) a file-permission filter (executable, writable, -perm) that no schema expresses;
-//   (h) a schema gap (git blame / difftool, tac, tail -c +N).
+//   (h) a schema gap (git blame / difftool, tac, tail -c +N);
+//   (i) an explanation request ("tell me how X works", "how does X work", "explain X"): not a command (v5 round 4).
 import { isQuotedUnit } from './units.js';
 
 // The lists are this module's own (strict_values.js keeps its DEIXIS set). Tuned on v4 train gold.
@@ -41,6 +42,10 @@ const RECENCY = ['this week', 'this month', 'this year', 'since yesterday', 'sin
 const RECENCY_LEAD = new Set(['last', 'past']);
 const RECENCY_N = /^(\d+|a|one|two|three|four|five|six|seven|ten|few|couple)$/;
 const RECENCY_UNIT = /^(days?|weeks?|months?|hours?|minutes?|mins?)$/;
+// v5 round 4: possessive recency ("this week's", "today's"); "N days ago" is the RECENCY cue rule
+const RECENCY_POSS_LEAD = new Set(['this', 'last', 'past', 'previous']);
+const RECENCY_POSS = /^(week|month|year|day|night)['\u2019]s$/;
+const RECENCY_DAY_POSS = /^(today|yesterday|tonight)['\u2019]s$/;
 const TIME_MODS = new Set(['since', 'until', 'modified_within_days', 'modified_before_days', 'modified_within_minutes', 'newer']);
 // (e) remote words: "upstream" is then a remote name / remote branch
 const REMOTE_WORDS = new Set(['remote', 'remotes', 'origin', 'tracking', 'fork']);
@@ -49,9 +54,11 @@ const PERM_WORDS = new Set(['executable', 'executables', 'non-executable', 'writ
 
 // (h) schema gaps (fix 22): no op expresses these, so a command for them answers something else
 const GAP_WORDS = new Set(['blame', 'difftool', 'tac', 'annotate']);
+// (i) explanation requests (v5 round 4; 0 ok rows on v5 train gold, 849 not_shell)
+const EXPLAIN_CUE = /\b(tell me|explain( to me)?|show me|describe) how\b[^,;.?]{0,40}\bworks?\b|\bhow (does|do) [^,;.?]{1,40} work\b|\bexplain\b/i;
 const GAP_BYTE_FROM = /\bfrom byte (\d+|[a-z]+) (to|till|until|through) the end\b|\bbytes? (\d+) onwards?\b/i;
 
-export const DECLINE_RULES = ['dangling', 'generic_np', 'placeholder', 'recency', 'upstream', 'download_dir', 'perm', 'gap'];
+export const DECLINE_RULES = ['dangling', 'generic_np', 'placeholder', 'recency', 'upstream', 'download_dir', 'perm', 'gap', 'explain'];
 
 export function declineObligations(cx) {
   const { words, consumed, fail, hasFree, execInfos, used, seg } = cx;
@@ -62,6 +69,7 @@ export function declineObligations(cx) {
   const hasModAny = (set) => execInfos.some((i) => i.exec.mods.some((m) => set.has(m.mod)));
   const covered = (i) => i >= 0 && i < n && consumed.has(i);
   const valueNear = (a, b) => used.some((v) => v.u && v.u[0] < b && v.u[1] > a);
+  const spanAt = (i) => used.find((v) => v.u && v.u[0] <= i && v.u[1] > i);
   const valueTexts = used.map((v) => String(v.value).toLowerCase());
   const fail2 = (check, detail, label) => fail(check, detail, label);
 
@@ -133,6 +141,21 @@ export function declineObligations(cx) {
       if ([i, i + 1, i + 2].some((k) => consumed.has(k))) continue;
       fail2('dropped_value', `recency "${words.slice(i, i + 3).join(' ')}" is not expressed`);
     }
+    // v5 round 4: "this week's X", "today's X"; a git commit range (a..b) scopes the request already
+    if (!valueTexts.some((t) => !t.includes('/') && !t.startsWith('..') && /[^.]\.{2,3}[^.]/.test(t))) {
+      // a possessive taken into a value ("rg -e this week's" for "this week's files ...") is still a dropped scope,
+      // unless the request quotes it or the value is just the possessive at the end ("search docs for today's")
+      for (let i = 0; i < n; i++) {
+        const day = RECENCY_DAY_POSS.test(words[i]);
+        const poss = day || (RECENCY_POSS.test(words[i]) && RECENCY_POSS_LEAD.has(words[i - 1]));
+        if (!poss) continue;
+        const v = spanAt(i);
+        if (v && isQuotedUnit(seg.units[i])) continue;
+        const ph = words.slice(day ? i : i - 1, i + 1).join(' ');
+        if (v && String(v.value).toLowerCase() === ph && !words.slice(v.u[1]).some((w) => !/^[.?!,;:]$/.test(w))) continue;
+        fail2('dropped_value', `recency "${words.slice(RECENCY_DAY_POSS.test(words[i]) ? i : i - 1, i + 1).join(' ')}" is not expressed`);
+      }
+    }
   }
 
   // (e) "upstream" as a bare rev
@@ -167,4 +190,8 @@ export function declineObligations(cx) {
     for (let i = 0; i < n; i++) if (!covered(i) && GAP_WORDS.has(words[i])) fail2('uncovered_content', `"${words[i]}" has no schema`);
     if (ops.has('file.tail') && GAP_BYTE_FROM.test(seg.text || '')) fail2('uncovered_content', '"from byte N to the end" (tail -c +N) has no schema');
   }
+
+  // (i) "tell me how git branches work" -> git branch answers a different question (quoted spans are values)
+  // words inside a value span (a file name, a search pattern) are operands, not wording
+  if (on('explain') && EXPLAIN_CUE.test(words.map((w, i) => (spanAt(i) || /["'`]/.test(w) ? '_' : w)).join(' '))) fail2('not_shell', 'an explanation request, not a command', 'not_shell');
 }

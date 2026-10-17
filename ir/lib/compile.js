@@ -504,7 +504,9 @@ export const requestWantsNamesOnly = (request) => typeof request === 'string'
 // v5 round 3 fix d: "just / only (the) (changed) file names" drops the headers even when commits are mentioned,
 // unless the request groups the names per commit. Unpiped logs only (piped logs keep requestWantsNamesOnly).
 export const requestWantsNamesOnlyR3 = (request) => typeof request === 'string'
-  && /\b(only|just)( the)?( changed)? (file ?names|filenames|names of the (changed )?files)\b/i.test(request)
+  && (/\b(only|just)( the)?( changed)? (file ?names|filenames|names of the (changed )?files)\b/i.test(request)
+    // v5 round 4 fix 6: the reversed word order ("file names only")
+    || /\b(changed )?(file ?names|filenames) only\b/i.test(request))
   && !/\b(who|per commit|each commit|every commit|with (the |their )?commits?|commits? and (the |their )?(changed )?files|which commits?)\b/i.test(request)
   && !NAMES_ONLY_EXTRA_CUE.test(request);
 // round-3 review: names-only drops the headers, so not when the request also wants authors / dates / subjects / hashes
