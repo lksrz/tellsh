@@ -28,8 +28,8 @@ done
 [ -n "$NAME" ] || { [ $PARTIAL = 1 ] && NAME=v2pre || NAME=v2; }
 [ -n "$REWRITE" ] || case "$NAME" in v3*) REWRITE=1 ;; *) REWRITE=0 ;; esac
 # train-only adjudications (never dev/test) and the k-fold preds they judged
-ADJ=build/ir/adjudicate/v2_kfold/adjudications.jsonl,build/ir/adjudicate/v3_kfold/adjudications.jsonl
-KFOLD=build/ir/verifier/v2/kfold.jsonl,build/ir/verifier/v3/kfold.jsonl
+ADJ=build/ir/adjudicate/v2_kfold/adjudications.jsonl,build/ir/adjudicate/v3_kfold/adjudications.jsonl,build/ir/adjudicate/v4_kfold/adjudications.jsonl
+KFOLD=build/ir/verifier/v2/kfold.jsonl,build/ir/verifier/v3/kfold.jsonl,build/ir/verifier/v4/kfold.jsonl
 
 # generator dirs, in priority order (first wins on exact duplicates)
 SOURCES=(
