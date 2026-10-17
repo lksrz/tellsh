@@ -147,7 +147,7 @@ export function parseCliResult(stdout) {
   return { verdict, usage, cost_usd: Number(j.total_cost_usd) || 0 };
 }
 
-// ---------- --batch N (cli backend / cascade Opus stage): N rows per `claude -p` call ----------
+// ---------- --batch N (cli / codex / grok backends, cascade Opus stage): N rows per CLI call ----------
 // Structured output must be an object, so the array sits under "verdicts"; each verdict carries its 1-based item index.
 export const BATCH_SCHEMA = {
   type: 'object', additionalProperties: false, required: ['verdicts'],
@@ -233,20 +233,28 @@ export function codexArgs(model, effort, schemaFile, outFile) {
     '-s', 'read-only', '--skip-git-repo-check', '--json', '--output-schema', schemaFile, '-o', outFile, '-'];
 }
 // codex has no system prompt flag: the rubric is prepended to the user prompt.
-export const codexPrompt = (prompt) => `${SYSTEM}\n\n${prompt}`;
-// codex --json event stream (stdout) + last message (outFile text) -> {verdict, usage, cost_usd}
-export function parseCodexResult(stdout, lastMessage) {
+// batch = true: batch rubric (BATCH_SYSTEM); the schema file then holds BATCH_SCHEMA.
+export const codexPrompt = (prompt, batch = false) => `${batch ? BATCH_SYSTEM : SYSTEM}\n\n${prompt}`;
+function codexUsage(stdout) {
   let u = {};
   for (const l of String(stdout ?? '').split('\n')) {
     try { const e = JSON.parse(l); const x = e.usage || e.msg?.info?.total_token_usage || e.info?.total_token_usage; if (x) u = x; } catch {}
   }
-  const verdict = parseVerdict(lastMessage);
-  return { verdict, usage: { input_tokens: u.input_tokens || 0, cache_read_input_tokens: u.cached_input_tokens || 0,
-    output_tokens: u.output_tokens || 0, reasoning_tokens: u.reasoning_output_tokens || u.reasoning_tokens || 0 }, cost_usd: 0 };
+  return { input_tokens: u.input_tokens || 0, cache_read_input_tokens: u.cached_input_tokens || 0,
+    output_tokens: u.output_tokens || 0, reasoning_tokens: u.reasoning_output_tokens || u.reasoning_tokens || 0 };
 }
-export function grokArgs(model, effort, promptFile) {
+// codex --json event stream (stdout) + last message (outFile text) -> {verdict, usage, cost_usd}
+export function parseCodexResult(stdout, lastMessage) {
+  return { verdict: parseVerdict(lastMessage), usage: codexUsage(stdout), cost_usd: 0 };
+}
+// --batch: last message holds {"verdicts": [...]} -> {verdicts: Map, usage, cost_usd}
+export function parseCodexBatchResult(stdout, lastMessage, n) {
+  return { verdicts: parseBatchVerdicts(lastMessage, n), usage: codexUsage(stdout), cost_usd: 0 };
+}
+export function grokArgs(model, effort, promptFile, batch = false) {
   return ['--prompt-file', promptFile, '--no-subagents', '--disable-web-search', '--max-turns', '1', '--tools', '',
-    '--system-prompt-override', SYSTEM, '--json-schema', JSON.stringify(OUT_SCHEMA), '-m', model, '--reasoning-effort', effort];
+    '--system-prompt-override', batch ? BATCH_SYSTEM : SYSTEM, '--json-schema', JSON.stringify(batch ? BATCH_SCHEMA : OUT_SCHEMA),
+    '-m', model, '--reasoning-effort', effort];
 }
 // grok headless stdout {structuredOutput | text, usage, total_cost_usd} -> {verdict, usage, cost_usd}
 export function parseGrokResult(stdout) {
@@ -256,6 +264,16 @@ export function parseGrokResult(stdout) {
   const verdict = parseVerdict(so && typeof so === 'object' ? JSON.stringify(so) : j.text ?? j.result);
   const u = j.usage || {};
   return { verdict, usage: { input_tokens: u.input_tokens || 0, output_tokens: u.output_tokens || 0, reasoning_tokens: u.reasoning_tokens || 0 },
+    cost_usd: Number(j.total_cost_usd) || 0 };
+}
+// --batch: grok stdout -> {verdicts: Map, usage, cost_usd}
+export function parseGrokBatchResult(stdout, n) {
+  let j;
+  try { j = JSON.parse(stdout); } catch { throw new Error('cli: stdout is not JSON'); }
+  const so = j.structuredOutput ?? j.structured_output;
+  const verdicts = parseBatchVerdicts(so && typeof so === 'object' ? so : j.text ?? j.result, n);
+  const u = j.usage || {};
+  return { verdicts, usage: { input_tokens: u.input_tokens || 0, output_tokens: u.output_tokens || 0, reasoning_tokens: u.reasoning_tokens || 0 },
     cost_usd: Number(j.total_cost_usd) || 0 };
 }
 

@@ -538,14 +538,30 @@ const ONE_COMMIT_CUE = /\b(last|latest|newest|most recent|that|this|single) comm
 const FULL_LOG_CUE = /\b(full|complete|entire|whole|details?|detailed|body|bodies|(messages?|commit) bod(y|ies)|verbose|patch(es)?|diffs?|log lines|lines of (the )?(log|history|output)|how many lines|authors?|authored|emails?|dates?|dated|when|times?|timestamps?|who)\b/i;
 const ONELINE_BLOCK = ['oneline', 'format', 'pretty', 'stat', 'shortstat', 'numstat', 'patch', 'name_only', 'name_status', 'graph', 'date_format', 'no_header'];
 export const requestImpliesOneline = (request) => typeof request === 'string' && COMMIT_CUE.test(request) && !ONE_COMMIT_CUE.test(request) && !FULL_LOG_CUE.test(request);
+// v5 round 2 fix 4: a git log piped straight into a line filter (grep / rg) for "commits" / "commit lines" greps one
+// line per commit (train gold: 46 `git log --oneline | grep` vs 1 plain for these cues). Not for wc / head / tail.
+const PIPED_COMMIT_CUE = /\b(commits|commit lines)\b/i;
+// a downstream pattern on the full-log layout (commit / Author: / Date: headers, indented body) needs the plain log
+const FULL_LOG_PATTERN = /\^\s*(commit|author|date|merge)\b|author:|date:|commit \[0-9a-f|^\^(\s| |\\s)/i;
+const patText = (v, request) => {
+  if (typeof v?.s === 'string') return v.s;
+  if (v?.k !== 'span') return '';
+  try { return spanText(segment(request), v.u); } catch { return ''; }
+};
+const fullLogPattern = (st, request) => (st?.args?.pattern || []).some((v) => FULL_LOG_PATTERN.test(patText(v, request)));
+export const requestImpliesPipedOneline = (request) => typeof request === 'string' && PIPED_COMMIT_CUE.test(request)
+  && !ONE_COMMIT_CUE.test(request) && !FULL_LOG_CUE.test(request);
 export function impliedOneline(ir, request) {
-  if (!requestImpliesOneline(request)) return ir;
+  const last = requestImpliesOneline(request), piped = requestImpliesPipedOneline(request);
+  if (!last && !piped) return ir;
   return {
     ...ir,
     body: {
       ...ir.body,
       parts: ir.body.parts.map((p) => ({ ...p, stages: p.stages.map((st, i) => {
-        if (st?.k !== 'exec' || st.op !== 'git.log' || i !== p.stages.length - 1) return st;
+        if (st?.k !== 'exec' || st.op !== 'git.log') return st;
+        const next = p.stages[i + 1];
+        if (!(i === p.stages.length - 1 ? last : piped && next?.k === 'exec' && next.op === 'text.search' && !fullLogPattern(next, request))) return st;
         if ((st.mods || []).some((m) => ONELINE_BLOCK.includes(m.mod))) return st;
         return { ...st, mods: [...(st.mods || []), { mod: 'oneline' }] };
       }) })),

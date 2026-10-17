@@ -1,10 +1,12 @@
 // Gate step 3, v5 round request-aware checks (docs/ir_error_taxonomy_v5.md fixes 2, 4, 5, 6): a number word
 // kept as a positional value, a find directory exclusion done with -not -name, curl -g over a URL glob, and file
 // names listed (-l / -L) when the request drops them. Called from strict_cover.js with the cover context; every
-// failure is `cover: ... [rule id]`. The git fixes (3, 7, 8) live in strict_cover_git.js.
+// failure is `cover: ... [rule id]`. The git fixes (3, 7, 8) live in strict_cover_git.js;
+// the round 2 (dev4) checks in strict_v5r2.js.
 
 import { DOT_DIRS, BARE_FILES, DROP_NAMES_CUE } from './compile.js';
 import { isQuotedUnit } from './units.js';
+import { v5r2Obligations } from './strict_v5r2.js';
 
 // fix 2: English number words (cardinal or ordinal), whole value only
 const NUM_WORD = /^(zero|one|two|three|four|five|six|seven|eight|nine|ten|eleven|twelve|thirteen|fourteen|fifteen|sixteen|seventeen|eighteen|nineteen|twenty|thirty|forty|fifty|sixty|seventy|eighty|ninety|hundred|dozen|zeroth|first|second|third|fourth|fifth|sixth|seventh|eighth|ninth|tenth|eleventh|twelfth|thirteenth|fourteenth|fifteenth|sixteenth|seventeenth|eighteenth|nineteenth|twentieth|thirtieth|fortieth|fiftieth|sixtieth|seventieth|eightieth|ninetieth|hundredth)$/i;
@@ -60,4 +62,5 @@ export function v5Obligations(cx) {
       && DROP_NAMES.test(request) && /\blines?\b/i.test(request))
       fail('cover', '"drop the file names" asks for the lines, not -l / -L [drop_names]');
   }
+  v5r2Obligations(cx);
 }

@@ -10,7 +10,7 @@
 // seeded random subset beyond that stays Jev-only: stratum flagged_jev_only) plus a seeded audit sample of Jev-passed rows
 // (--audit 0.05, clamped to --audit-min 50 / --audit-max 200). Final verdict = Opus if judged, else Jev; records add
 // judge / stratum / audit / jev_p; summary.cascade has strata counts, audit miss rate + CP UB95, flagged overturn rate.
-// --batch N (cli / cascade Opus stage): N rows per `claude -p` call, default concurrency 3; see scripts/ir/README.md.
+// --batch N (cli / codex / grok / cascade Opus stage): N rows per CLI call, default concurrency 3; see scripts/ir/README.md.
 // --extra-cache F[,F] reads further cache.jsonl files (read-only; e.g. an earlier Opus run on the same candidates).
 //   node scripts/ir/adjudicate.mjs --rows ROWS.jsonl --out DIR ...   (adjudication-shaped rows, gold already joined)
 //
@@ -32,7 +32,7 @@ import { loadSchemas } from '../../ir/lib/index.js';
 import { readJsonl, goldCommand } from './make_candidates.mjs';
 import { spawn } from 'node:child_process';
 import { SYSTEM, OUT_SCHEMA, buildPrompt, parseVerdict, unshuffle, summarize, costOf, hashKey, cliArgs, cliEnv, parseCliResult,
-  DEFAULT_MODEL, codexArgs, codexPrompt, parseCodexResult, grokArgs, parseGrokResult, rowsFromAdjudications,
+  DEFAULT_MODEL, codexArgs, codexPrompt, parseCodexResult, parseCodexBatchResult, grokArgs, parseGrokResult, parseGrokBatchResult, BATCH_SCHEMA, rowsFromAdjudications,
   parseCliBatchResult, judgeBatch, JEV_URL, JEV_PRICE_PER_TOK, JEV_VARIANTS, jevBody, parseJevResult, jevVerdict, jevRetryable, jevBackoffMs } from './adjudicate_lib.mjs';
 import { cascadeStrata, cascadeSummary } from './cascade_lib.mjs';
 
@@ -45,9 +45,9 @@ if (!['api', 'cli', 'codex', 'grok', 'jev', 'cascade'].includes(BACKEND)) { cons
 const CASCADE = BACKEND === 'cascade';
 const MODEL = opt('model', CASCADE ? DEFAULT_MODEL.cli : DEFAULT_MODEL[BACKEND]), EFFORT = opt('effort', 'low');
 const TIMEOUT_S = Number(opt('timeout', 600));
-const BATCH = Math.max(1, Number(opt('batch', 1)));  // rows per `claude -p` call (cli backend, cascade Opus stage)
-if (BATCH > 1 && !['cli', 'cascade'].includes(BACKEND)) { console.error('--batch needs --backend cli or cascade'); process.exit(2); }
-const CONC = Number(opt('concurrency', BACKEND === 'cli' ? (BATCH > 1 ? 3 : 6) : BACKEND === 'api' ? 16 : BACKEND === 'jev' || CASCADE ? 8 : 4)), SAMPLE = Number(opt('sample-agree', 0)), LIMIT = Number(opt('limit', 0));
+const BATCH = Math.max(1, Number(opt('batch', 1)));  // rows per CLI call (cli / codex / grok backends, cascade Opus stage)
+if (BATCH > 1 && !['cli', 'codex', 'grok', 'cascade'].includes(BACKEND)) { console.error('--batch needs --backend cli, codex, grok or cascade'); process.exit(2); }
+const CONC = Number(opt('concurrency', BACKEND === 'cli' ? (BATCH > 1 ? 3 : 6) : BACKEND === 'api' ? 16 : BACKEND === 'jev' || CASCADE ? 8 : BATCH > 1 ? 3 : 4)), SAMPLE = Number(opt('sample-agree', 0)), LIMIT = Number(opt('limit', 0));
 let seed = Number(opt('seed', 1));
 const JEV_VARIANT = opt('jev-variant', 'gold'), JEV_THRESHOLD = Number(opt(CASCADE ? 'jev-threshold' : 'threshold', CASCADE ? 0.73 : 0.5));
 const JEV_MODEL = CASCADE ? opt('jev-model', 'jev-1.13.0') : MODEL;
@@ -153,7 +153,7 @@ function spawnCli(bin, argv, input) {
   });
 }
 // one call of the selected CLI backend -> {code, out, err, parse()} (parse throws on a bad verdict)
-// batchN > 0: batch prompt (cli only), parse -> {verdicts: Map item -> verdict}
+// batchN > 0: batch prompt (BATCH_SYSTEM / BATCH_SCHEMA), parse -> {verdicts: Map item -> verdict}
 async function runCli(prompt, backend = BACKEND, batchN = 0) {
   if (backend === 'cli') {
     const r = await spawnCli('claude', cliArgs(MODEL, EFFORT, batchN > 0), prompt);
@@ -164,15 +164,15 @@ async function runCli(prompt, backend = BACKEND, batchN = 0) {
   try {
     if (backend === 'codex') {
       const sf = base + '.schema.json', of = base + '.out.json';
-      fs.writeFileSync(sf, JSON.stringify(OUT_SCHEMA));
-      const r = await spawnCli('codex', codexArgs(MODEL, EFFORT, sf, of), codexPrompt(prompt));
+      fs.writeFileSync(sf, JSON.stringify(batchN > 0 ? BATCH_SCHEMA : OUT_SCHEMA));
+      const r = await spawnCli('codex', codexArgs(MODEL, EFFORT, sf, of), codexPrompt(prompt, batchN > 0));
       let last = ''; try { last = fs.readFileSync(of, 'utf8'); } catch {}
-      return { ...r, out: last ? r.out || ' ' : '', parse: () => parseCodexResult(r.out, last) };
+      return { ...r, out: last ? r.out || ' ' : '', parse: () => (batchN > 0 ? parseCodexBatchResult(r.out, last, batchN) : parseCodexResult(r.out, last)) };
     }
     const pf = base + '.prompt.txt';
     fs.writeFileSync(pf, prompt);
-    const r = await spawnCli('grok', grokArgs(MODEL, EFFORT, pf), null);
-    return { ...r, parse: () => parseGrokResult(r.out) };
+    const r = await spawnCli('grok', grokArgs(MODEL, EFFORT, pf, batchN > 0), null);
+    return { ...r, parse: () => (batchN > 0 ? parseGrokBatchResult(r.out, batchN) : parseGrokResult(r.out)) };
   } finally { for (const f of ['.schema.json', '.out.json', '.prompt.txt']) fs.rmSync(base + f, { force: true }); }
 }
 // one CLI call per attempt; up to 2 retries on unparseable verdicts, up to 4 on CLI failures (exponential backoff)
@@ -227,11 +227,12 @@ async function judgeLlm(r, backend, model) {
     return rec;
   } catch (e) { return { key, ...r, model, error: String(e.message || e) }; }
 }
-// --batch N: uncached rows of idxs judged N per `claude -p` call (judgeBatch: one retry of the batch for missing items,
+// --batch N: uncached rows of idxs judged N per CLI call (cli / codex / grok; cascade: cli) (judgeBatch: one retry of the batch for missing items,
 // then single-row calls). Batched verdicts agree less with single Opus than single reruns do (README), so they are
 // cached under batchKeyFor (key + batch N): single mode never reads them; batch mode reads single verdicts first.
 // Records add batch: N (+ batch_single when a fallback judged the row alone under the single key).
 async function judgeLlmBatched(idxs, conc, model, dest) {
+  const be = CASCADE ? 'cli' : BACKEND;
   const todo = [];
   for (const i of idxs) {
     const k = keyFor(rows[i], model), kb = batchKeyFor(rows[i], model);
@@ -241,8 +242,8 @@ async function judgeLlmBatched(idxs, conc, model, dest) {
   for (let k = 0; k < todo.length; k += BATCH) chunks.push(todo.slice(k, k + BATCH));
   await pool(chunks.length, conc, async (c) => {
     const ch = chunks[c], rs = ch.map((i) => rows[i]);
-    const { out: res, calls } = await judgeBatch(rs, (text) => callCli(text, 'cli', rs.length), async (j) => {
-      const rec = await judgeLlm(rs[j], 'cli', model);
+    const { out: res, calls } = await judgeBatch(rs, (text) => callCli(text, be, rs.length), async (j) => {
+      const rec = await judgeLlm(rs[j], be, model);
       return { rec };
     });
     const ok = calls.filter((x) => !x.error), per = (f) => +(ok.reduce((a, x) => a + (f(x) || 0), 0) / rs.length).toFixed(4);
@@ -252,7 +253,7 @@ async function judgeLlmBatched(idxs, conc, model, dest) {
       const i = ch[x.i];
       if (x.single) { dest[i] = x.rec.error ? x.rec : { ...x.rec, batch: BATCH, batch_single: true }; continue; }
       const key = batchKeyFor(rows[i], model);
-      const rec = { key, ...rows[i], model, backend: 'cli', batch: BATCH, a_is_pred: x.aIsPred, ...unshuffle(x.verdict, x.aIsPred), usage, cost_usd: per((y) => y.cost_usd) };
+      const rec = { key, ...rows[i], model, backend: be, batch: BATCH, a_is_pred: x.aIsPred, ...unshuffle(x.verdict, x.aIsPred), usage, cost_usd: per((y) => y.cost_usd) };
       fs.appendFileSync(CACHE, JSON.stringify(rec) + '\n');
       cache.set(key, rec); fresh++;
       dest[i] = rec;

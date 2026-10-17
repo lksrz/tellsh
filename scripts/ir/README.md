@@ -171,9 +171,10 @@ backoff. Usage and `cost_usd` come from the CLI JSON (`total_cost_usd`, notional
 records wall time. The cache key ignores the backend, so api and cli verdicts share `OUT/cache.jsonl`. Measured on 5
 v4 dev rows (opus, low): ~5.4k input tokens, 5.6-9.8 s per call.
 
-`--batch N` (cli backend and the cascade Opus stage; default 1 = one row per call) puts N uncached rows into one
-`claude -p` call: each item is the single-row prompt body (same per-row A/B order, same refusal context), the system
-prompt is SYSTEM plus "judge each item independently" (`BATCH_SYSTEM`), and `--json-schema BATCH_SCHEMA` asks for
+`--batch N` (cli, codex and grok backends and the cascade Opus stage; default 1 = one row per call) puts N uncached
+rows into one CLI call: each item is the single-row prompt body (same per-row A/B order, same refusal context), the system
+prompt is SYSTEM plus "judge each item independently" (`BATCH_SYSTEM`), and `--json-schema BATCH_SCHEMA` (codex: `--output-schema` file with BATCH_SCHEMA,
+BATCH_SYSTEM prepended to the prompt; grok: `--system-prompt-override BATCH_SYSTEM --json-schema BATCH_SCHEMA`) asks for
 `{"verdicts": [{item, a_correct, b_correct, equivalent, reason}, ...]}`. Items that are missing, malformed, out of
 range or duplicated trigger one retry of the whole batch; whatever is still missing is judged single-row. Batched
 verdicts are cached per row under the single key + `batch N` (records add `batch: N`; `usage` is the batch call's usage
@@ -198,7 +199,7 @@ adjudications.
 `--backend codex` (`codex exec -m M -c model_reasoning_effort=E -s read-only --json --output-schema F -o F -`, default
 `gpt-6-luna`; rubric prepended to the prompt) and `--backend grok` (`grok --prompt-file F --max-turns 1 --tools ""
 --system-prompt-override SYSTEM --json-schema OUT_SCHEMA -m M --reasoning-effort E`, default `grok-4.6`) are cheap
-subscription judges (default `--concurrency 4`); `OPENAI_API_KEY` / `XAI_API_KEY` / `GROK_API_KEY` are stripped too.
+subscription judges (default `--concurrency 4`, 3 with `--batch` > 1); `OPENAI_API_KEY` / `XAI_API_KEY` / `GROK_API_KEY` are stripped too.
 `--rows FILE` takes adjudication-shaped rows (request, os, command, gold, goldLabel, y) directly instead of
 `--cands` + `--data`. The cache key holds the model (plus `--cache-tag T` if given), not the backend or effort: give
 each judge config its own `--out`. `judge_compare.mjs --ref REF.jsonl name=ADJ.jsonl ... [--combo a+b]` reports

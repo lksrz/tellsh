@@ -77,3 +77,27 @@ test('judgeBatch: failing calls -> all rows judged singly', async () => {
   assert.deepEqual(singles, [0, 1, 2]);
   assert.ok(out.every((x) => x.single));
 });
+
+test('codex / grok batch: prompt, args and result parsing', async () => {
+  const lib = await import('../../scripts/ir/adjudicate_lib.mjs');
+  assert.ok(lib.codexPrompt('X', true).startsWith(BATCH_SYSTEM));
+  assert.ok(!lib.codexPrompt('X').startsWith(BATCH_SYSTEM));
+  const ga = lib.grokArgs('m', 'low', 'p.txt', true);
+  assert.equal(ga[ga.indexOf('--system-prompt-override') + 1], BATCH_SYSTEM);
+  assert.deepEqual(JSON.parse(ga[ga.indexOf('--json-schema') + 1]), BATCH_SCHEMA);
+  assert.equal(lib.grokArgs('m', 'low', 'p.txt')[ga.indexOf('--system-prompt-override') + 1], SYSTEM);
+  // codex strict schema: every object lists all properties as required, no additional properties
+  const it = BATCH_SCHEMA.properties.verdicts.items;
+  assert.equal(it.additionalProperties, false);
+  assert.deepEqual([...it.required].sort(), Object.keys(it.properties).sort());
+  const ev = JSON.stringify({ type: 'turn.completed', usage: { input_tokens: 100, cached_input_tokens: 40, output_tokens: 9 } });
+  const c = lib.parseCodexBatchResult(ev, JSON.stringify({ verdicts: [v(1), v(2, false)] }), 2);
+  assert.equal(c.verdicts.size, 2); assert.equal(c.verdicts.get(2).a_correct, false);
+  assert.equal(c.usage.input_tokens, 100); assert.equal(c.usage.cache_read_input_tokens, 40);
+  assert.throws(() => lib.parseCodexBatchResult('', '', 2));
+  const g = lib.parseGrokBatchResult(JSON.stringify({ structuredOutput: { verdicts: [v(1), v(1), v(2)] }, usage: { input_tokens: 5 }, total_cost_usd: 0.01 }), 2);
+  assert.deepEqual([...g.verdicts.keys()], [2]);  // duplicate item 1 dropped
+  assert.equal(g.cost_usd, 0.01);
+  assert.equal(lib.parseGrokBatchResult(JSON.stringify({ text: '```json\n{"verdicts":[' + JSON.stringify(v(1)) + ']}\n```' }), 1).verdicts.size, 1);
+  assert.throws(() => lib.parseGrokBatchResult('nope', 1), /not JSON/);
+});

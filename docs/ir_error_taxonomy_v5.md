@@ -72,6 +72,73 @@ rejected (`*.bak files anywhere except .idea` now falls to another wrong n-best 
 (conservative cues) gave up 8 y=0 find rejects (extension-less exclusions without folder wording; one had recovered
 to y=1) and one number-word reject.
 
+## v5 round 2 (dev4)
+
+Source: judge-adjudicated residual errors on the dev4 candidates (`build/ir/dataset/dev4/test.jsonl`, t50v5 n-best 8).
+Same policy: generic, conservative, a gate reject or a request-implied mod. Where the reading was in doubt, the
+majority form in the v5 train gold decided (counts below). Rules r2-1 to r2-3 live in `ir/lib/strict_v5r2.js` (called from
+`strict_v5.js`); r2-4 lives in `compile.js`.
+
+1. **Context direction** (`[context_dir]`, `contextDirection`). "trailing / after / following context", "N lines
+   after" -> `-A`, so `-C` or `-B` rejects. "leading / before / preceding context", "N lines before" -> `-B`, so `-C` or
+   `-A` rejects. Only "context / around / surrounding" -> `-C`, so a lone `-A` or `-B` rejects (in practice
+   `mod_words` already catches it). No rule when both sides are named ("before and after", "three lines before and one
+   after", "either side"). rg and grep `text.search` only. The `mod_words` license words follow the same vocabulary
+   (`-B`: before / preceding / above / prior / leading; `-A`: after / following / below / trailing / subsequent), and
+   "following / trailing / leading / preceding / subsequent context" is a CONTEXT phrase, so it no longer reads as the
+   tail -f FOLLOW cue.
+   `... one line of trailing context` -> `rg -F -n -C 1 ...` rejects, `-A 1` accepts.
+2. **"X in the name"** (`[name_contains]`, `nameContains`). "with / having / containing X in the (file)name",
+   "named like X", "(file) name contains / includes X": an rg `-g` / `--glob` or find `-name` / `-iname` / `-not -name`
+   value that is exactly X with no glob characters and no extension rejects. It should be `*X*`. Polarity: a cue
+   after an exclusion word in its clause (except / excluding / without / leaving out / skip / ignore / not ...) checks
+   only negated globs (`-g '!X'`, `-not -name X`); any other cue checks only positive globs. A value the request names
+   exactly ("named X", "called X") is never checked, so `files in src with foo in the name except files named foo` ->
+   `find src -type f -name '*foo*' -not -name foo` accepts.
+   `leaving out anything with test in the name` -> `rg -l -g '!test'` rejects, `-g '!*test*'` accepts.
+3. **Line count of each matching file** (`[file_line_counts]`, `requestWantsFileLineCounts`). The request asks for
+   the total lines of each file, `rg -l -0 X | xargs -0 wc -l --`. Cues: "line count(s) of / for / per (each / every)
+   file(s) [in D] that / with / containing / mentioning / where / has ...", "line counts of the matching files", or
+   "line count per file" with "everything / anything / files ... with X in it". A first-stage rg / grep `-c` then
+   rejects. Match-count wording keeps `-c`: "matching line(s)", "lines that match", "count lines", "how many lines",
+   "lines with / containing X", "matching line count". Train gold: "line count(s) ... per / of each / of every file" +
+   a file clause gives 34 `xargs wc -l` against 11 `-c` (the `-c` ones are "line counts of X per file" / "per-file line
+   counts", which this rule does not match). "count lines per file" gives 15 / 15 `-c`, so
+   `count lines per file under backend/app/models where the regex user_[0-9]+ matches` -> `rg -c` stays accepted.
+   One train gold rejects: "line count per file in templates where extends appears" (`rg -i -c`, ambiguous).
+4. **Implied `--oneline` before a grep** (`compile.js` `requestImpliesPipedOneline`, inside `impliedOneline`).
+   A `git log` with none of the `ONELINE_BLOCK` mods, piped straight into a `text.search` (grep / rg), gets `--oneline`
+   when the request says "commits" or "commit lines". The fix-1 exclusions apply: no singular-commit cue and no full-log /
+   author / date cue. wc / head / tail pipes are unchanged. Train gold for unshaped `git log ... | grep`: 31
+   `--oneline` against 1 plain when the request says "commits", and 15 against 0 for "commit lines". Request wording
+   without "commit" splits 86 / 25 and is left alone. `scripts/ir/equiv.mjs` counts piped `--oneline` as significant,
+   so this changes y. Not when the grep / rg pattern reads the full-log layout (`^commit`, `^Author`, `^Date`,
+   `^Merge`, `Author:`, `Date:`, `commit [0-9a-f`, or an indented-body `^ ` / `^\s`): `grep commits for the regex ^commit`
+   keeps `git log | grep -E '^commit'`.
+   `commit lines by judy from the last 2 days, grep for refactor` -> `git log --oneline --author=judy --since='2 days ago' | grep refactor`.
+5. **Skipped: names-only with commits.** The train gold keeps the commit header. "just / only (the) file names" + commit(s)
+   gives 6 `git log --name-only` (header kept) against 0 `--format=`, and no train gold row has `--format=` together with
+   `--name-only` / `--name-status`. `requestWantsNamesOnly` is unchanged.
+6. **Skipped: `wc -c < FILE`.** The IR has no stdin-redirect form: decompile rejects `<` / `>` as "redirections are not
+   in the pilot IR", and there is no `cat` op. `wc -c Procfile` stays accepted.
+
+### Collateral (dev + dev3 + dev4 + v5 k-fold heldout, 42,829 previously accepted y=1 candidates)
+
+Re-measured after the review hardening (polarity / exact-name exemption, full-log grep patterns, context license words):
+the candidate diff against the pre-round-2 base is unchanged, row for row.
+
+| fix | y=1 rejected / changed | y=0 rejected | y=0 -> y=1 |
+| --- | --- | --- | --- |
+| r2-1 context_dir | 0 | 1 (`after context 1 line` with `-C 1`) | 1 (dev4 brief example, now `-A 1`) |
+| r2-2 name_contains | 0 | 2 rejected + 1 changed, still y=0 (`-name 'retry'` -> `'*retry*'`) | 1 (dev4 brief example, `-g '!*test*'`) |
+| r2-3 file_line_counts | 1 (fold0 "line count per file in templates where extends appears", the ambiguous train phrasing) | 2 | 3 (`xargs wc -l`) |
+| r2-4 piped oneline | 0 | 0 (1 changed, still y=0) | 2 + 1 same-command y flip (the gold now gains `--oneline` too) |
+
+Brief examples: the trailing-context example and the test-in-the-name example now get the wanted command. "everything in bench
+with FIXME in it, line count per file" now abstains: its other n-best hypotheses are not accepted. The judy commit lines
+example now gets `--oneline`. "count lines per file ... user_[0-9]+ matches" stays `rg -c`, which the train gold supports.
+Over all train gold (51,353 decompilable ok rows), the new rules reject 1 row (fix 3, above). The context and name rules reject 0.
+
 ## Round 5 measurement (v5 models, judged with Opus in batches of 100)
 
 Ensemble: t50v5 main + h8v5, t50wv5, kfold_v5 folds 0-2. Judging: every kept row goes to Opus (`claude -p`, `--batch 100`).
