@@ -312,6 +312,14 @@
           "model": "predict"
         },
         {
+          "mod": "no_header",
+          "flag": "--format=",
+          "form": "bool",
+          "model": "derived",
+          "derive": "names_only_requested",
+          "note": "--name-only / --name-status without --oneline / --format when the request asks for only the file names (compile.js requestWantsNamesOnly): an empty format drops each commit header"
+        },
+        {
           "mod": "reverse",
           "flag": "--reverse",
           "form": "bool",

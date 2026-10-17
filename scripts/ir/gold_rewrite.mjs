@@ -27,6 +27,7 @@ import { unitWord } from '../../ir/lib/units.js';
 import { findCues } from '../../ir/lib/lexicon.js';
 import { normReq } from './dedup.mjs';
 import { hiddenOnlyCue, RECURSE } from '../../ir/lib/strict_hidden.js';
+import { ONLY_MATCH_CUE } from '../../ir/lib/compile.js';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const PLATFORM = { linux: 'linux_gnu', darwin: 'darwin_bsd' };
@@ -82,7 +83,8 @@ function filesFind(ir, { request, seg }) {
 }
 
 function dropO(ir, { request }) {
-  if (!/\blines?\b/i.test(request) || MATCH_CUE.test(request)) return null;
+  // never against compile.js impliedOnlyMatching (it re-adds -o on an only-matching cue; its match cue needs no 'lines')
+  if (!/\blines?\b/i.test(request) || MATCH_CUE.test(request) || ONLY_MATCH_CUE.test(request)) return null;
   let hit = false;
   const out = clone(ir);
   for (const p of out.body.parts) p.stages.forEach((st, i) => {

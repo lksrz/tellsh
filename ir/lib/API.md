@@ -112,7 +112,9 @@ Gold false-reject rate (gold IR of ok rows, h8b eval, Oct 2026): train 190 / 253
   (`requestWantsFiles(request)`; `impliedFileType(ir, request)`, applied before `canon`, so `canonical` carries it,
   and the gate's round-trip reference applies it too).
 - **git show names (v3).** `git.show` with `name_only` / `name_status` and no `oneline` derives `no_header`
-  (`--format=`): `git show --name-only --format= REV --` prints only the file names. git log is unchanged.
+  (`--format=`): `git show --name-only --format= REV --` prints only the file names. `git.log` derives the same `no_header` (`names_only_requested`) only when the request
+  asks for just the file names ("only the file names", "just file names") and not for commits / history / per-commit
+  output (`requestWantsNamesOnly(request)`); "names only" alone stays `git log --name-only` (headers kept).
 - **git branch -vv (v3).** `very_verbose` (`-vv`, excl `verbose`); a tracking info / upstream cue needs it
   (`COVER_RULES` `branch_tracking`, not for "remote tracking branches").
 - **Not done:** `wc -c < FILE` for a bare-number cue: the IR has no stdin redirection (decompile rejects `<`).
@@ -120,9 +122,16 @@ Gold false-reject rate (gold IR of ok rows, h8b eval, Oct 2026): train 190 / 253
   "count (matching) lines" over a directory, glob, several paths or `-r` is one total, `search | file.count{lines}`
   (`rg P DIR | wc -l`); the `count` mod (`-c`, per-file counts) is for a single file operand or an each / per / every
   file cue. The gate and the gold relabel enforce it.
-- **Implied `-o` (F7).** `only_matching` is implied only before `wc -l` (`when: before:file.count.lines`: counting
-  occurrences); under `sort | uniq -c`, `sort -u` or `head` it needs a match / occurrence / extract word. The schema
-  validator accepts `before:op[.mod]` (the next stage); `strict.js` evaluates it.
+- **Implied `-o` (F7).** `only_matching` is implied before `wc -l` (`when: before:file.count.lines`: counting
+  occurrences, gate-only) and under `match_cue` (`matchCueImpliesO(stage, next, request)`): a `text.search` with no
+  `-l / -L / -c / --count-matches / context / -v / -m` feeding `sort` / `uniq` / freq when the request has a match cue
+  (`MATCH_CUE`: matches, matched, occurrences, extract, each / every match) and no "line(s)"; or in any position on an
+  only-matching cue (`ONLY_MATCH_CUE`: only / just the match(es) / matching / matched, print only matches; not "only
+  matching files / lines"). `compile` adds it (`impliedOnlyMatching`, inside `impliedMods(ir, request)` with
+  `impliedFileType`, before `canon`; the gate's round-trip reference uses `impliedMods` too), so a model need not emit
+  `-o`. `head` and line pipelines ("lines with X | sort -u") keep the predicted IR. The schema validator accepts
+  `before:op[.mod]` and `match_cue`; `strict.js` evaluates them. The strict COVER only-matching words count the implied
+  `-o` as present. `gold_rewrite` `drop_o` never fires on an `ONLY_MATCH_CUE` request.
 - **Scoring equivalence (F3)** — `scripts/ir/equiv.mjs` `equivKey(cmd, request)` / `sameCommand(a, b, request)`; the
   rule list is in the file header. Request-sensitive: curl `-s` / `-S` (quiet / show-errors cues), `ls -1` ("one per
   line"), `find -type f` (kept when `requestWantsFiles(request)`, the same test compile uses). Not merged on purpose:

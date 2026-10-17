@@ -31,7 +31,9 @@ test('1. cover words need their element', () => {
   ok('which merge commits have ref decorations?', 'git log --decorate --merges');
   no('dedupe ips.txt sorted', 'sort -n ips.txt', /dedupe|numeric/);
   ok('dedupe ips.txt sorted', 'sort -u ips.txt');
-  no('only the matching text order_id in json files under data/samples, first 30', "rg -g '*.json' order_id data/samples | head -n 30", /only_matching/);
+  // an only-matching cue: compile adds the implied -o itself (compile.js impliedOnlyMatching)
+  assert.equal(check('only the matching text order_id in json files under data/samples, first 30', "rg -g '*.json' order_id data/samples | head -n 30").command,
+    "rg -o -g '*.json' order_id data/samples | head -n 30");
   no('branches that contain commit abc1234, with verbose info', 'git branch --contains=abc1234', /verbose/);
   no('which *test*.py files under myapp mention assertEqual', "rg -g '*test*.py' assertEqual myapp", /which files/);
   ok('which *test*.py files under myapp mention assertEqual', "rg -l -g '*test*.py' assertEqual myapp");

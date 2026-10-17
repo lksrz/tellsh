@@ -171,8 +171,8 @@
           "form": "bool",
           "model": "predict",
           "implied": {
-            "reason": "a downstream wc -l counts the matches (occurrences) themselves; elsewhere (sort | uniq -c, sort -u, head) -o needs a match / occurrence / extract word (taxonomy v2 F7)",
-            "when": "before:file.count.lines"
+            "reason": "a downstream wc -l counts the matches (occurrences) themselves; feeding sort / uniq / freq, -o is implied (and added by compile) when the request asks for the matches / occurrences / extracts and not for lines, anywhere when it says only matching (taxonomy v2 F7)",
+            "when": ["before:file.count.lines", "match_cue"]
           }
         },
         {

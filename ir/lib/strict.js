@@ -10,6 +10,7 @@ import { unitWord, isQuotedUnit } from './units.js';
 import { coverObligations } from './strict_cover.js';
 import { valueObligations } from './strict_values.js';
 import { hiddenObligations } from './strict_hidden.js';
+import { matchCueImpliesO } from './compile.js';
 
 // ---------- 3. request words of cue-less mods (key `op.mod` or `op.mod=const`) ----------
 // Mods with a cue class, a negative polarity or a value copied from the request are supported by
@@ -99,7 +100,8 @@ const COVER = [
   { words: ['smart case', 'smart-case', 'smartcase'], keys: ['text.search.smart_case'] },
   { words: ['compact', 'compacted', 'minified'], when: ['json.select'], keys: ['json.select.compact'] },
   { words: ['only the matching', 'matching text', 'matching part', 'matched part', 'just the match', 'only the match',
-    'just the matches', 'only the matches'], when: ['text.search'], keys: ['text.search.only_matching'] },
+    'just the matches', 'only the matches', 'only matches', 'only the matched',
+    'just the matched', 'print only matches'], when: ['text.search'], keys: ['text.search.only_matching'] },
   { words: ['verbose'], when: ['git.branch'], keys: ['git.branch.verbose'] },
   { words: ['drop duplicate', 'drop duplicates', 'remove duplicate', 'remove duplicates', 'drop dupes', 'remove dupes',
     'without duplicates', 'no duplicates'], keys: ['lines.sort.unique', 'lines.uniq.count', 'lines.uniq!repeated'] },
@@ -208,7 +210,9 @@ export function strictObligations(ir, stages, ctx, used, h) {
     }
     const [base, without] = key.split('!');
     const [o1, o2, mod] = base.split('.');
-    return execInfos.some((i) => i.exec.op === `${o1}.${o2}` && (!mod || hasMod(i, mod)) && !(without && hasMod(i, without)));
+    return execInfos.some((i) => i.exec.op === `${o1}.${o2}` && (!mod || hasMod(i, mod)
+      // compile adds the request-implied -o itself (compile.js impliedOnlyMatching)
+      || (mod === 'only_matching' && matchCueImpliesO(i.st, nextOf(i)?.st, seg.text))) && !(without && hasMod(i, without)));
   };
 
   // ---------- 3. unrequested mods ----------
@@ -216,6 +220,7 @@ export function strictObligations(ir, stages, ctx, used, h) {
     if (w === 'always') return true;
     if (w === 'piped') return !!nextOf(info);
     if (w === 'each') return nextOf(info)?.kind === 'each';
+    if (w === 'match_cue') return matchCueImpliesO(info.st, nextOf(info)?.st, seg.text); // compile.js impliedOnlyMatching
     if (w.startsWith('after:')) {
       const [o1, o2, mod] = w.slice(6).split('.');
       const p = prevOf(info);

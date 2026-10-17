@@ -11,7 +11,7 @@ test('all 17 schemas load clean', () => {
   assert.equal(registry.stats.tools, 17);
   assert.equal(registry.stats.ops, 26);
   assert.equal(registry.stats.mods, 115);
-  assert.equal(registry.stats.optionEntries, 181);
+  assert.equal(registry.stats.optionEntries, 182);
   assert.match(registry.hash, /^[0-9a-f]{64}$/);
 });
 

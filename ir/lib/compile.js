@@ -155,6 +155,8 @@ function buildExec(env, e, position, sctx) {
     each_transport: () => sctx.nul,
     each_inner: () => position === 'each',
     names_without_header: () => ['name_only', 'name_status'].some((m) => values.has(m)) && !values.has('oneline'),
+    names_only_requested: () => ['name_only', 'name_status'].some((m) => values.has(m)) && !values.has('oneline') && !values.has('format')
+      && requestWantsNamesOnly(env.request),
     always: () => true,
   };
   const active = new Set(predicted);
@@ -396,6 +398,49 @@ export function impliedFileType(ir, request) {
   };
 }
 
+// F7 (restored): -o for a piped search whose request is about the matches themselves. A text.search exec (no
+// -l / -L / -c / --count-matches / context / -v / -m) feeding sort / uniq / a macro (freq) gets only_matching when the
+// request has a match / occurrence / extract cue and does not talk about lines; and, in any position, when it says
+// "only matching" / "only the matches" / "print only matches". Line pipelines ("lines with X | sort -u") and head /
+// wc -l stay as predicted (wc -l keeps its own schema `implied`). Added before canon like impliedFileType, so
+// `canonical` carries -o; strict.js accepts it through the `implied.when: "match_cue"` form (same predicate).
+export const ONLY_MATCH_CUE = /\b(only|just)[- ](the )?(matching|matched|match(es)?)\b(?! (files?|file ?names|lines?|paths?)\b)|\bprint only match|\bonly[- ]matches\b/i;
+export const MATCH_CUE = /\b(matches|matched|occurrences?|extract(s|ed|ing)?|each match|every match)\b/i;
+const LINE_CUE = /\blines?\b/i;
+const O_BLOCK = ['count_matches', 'files_with_matches', 'files_without_match', 'count', 'context', 'before', 'after', 'invert', 'max_count'];
+const O_DOWNSTREAM = ['lines.sort', 'lines.uniq'];
+// stage: a text.search exec; next: the stage after it in the pipe (or undefined)
+export function matchCueImpliesO(stage, next, request) {
+  if (typeof request !== 'string' || stage?.k !== 'exec' || stage.op !== 'text.search') return false;
+  if ((stage.mods || []).some((m) => O_BLOCK.includes(m.mod))) return false;
+  if (ONLY_MATCH_CUE.test(request)) return true;
+  const sorted = next && (next.k === 'macro' || (next.k === 'exec' && O_DOWNSTREAM.includes(next.op)));
+  return !!sorted && MATCH_CUE.test(request) && !LINE_CUE.test(request);
+}
+
+export function impliedOnlyMatching(ir, request) {
+  if (typeof request !== 'string') return ir;
+  return {
+    ...ir,
+    body: {
+      ...ir.body,
+      parts: ir.body.parts.map((p) => ({ ...p, stages: p.stages.map((st, i) => {
+        if (!matchCueImpliesO(st, p.stages[i + 1], request) || (st.mods || []).some((m) => m.mod === 'only_matching')) return st;
+        return { ...st, mods: [...(st.mods || []), { mod: 'only_matching' }] };
+      }) })),
+    },
+  };
+}
+
+// git log --name-only / --name-status --format= (derived no_header) only when the request asks for just the file names
+// and not for the commits / history / per-commit grouping; git show derives it unconditionally (one commit).
+export const requestWantsNamesOnly = (request) => typeof request === 'string'
+  && /\b(only|just)( the)?( changed)? (file ?names|filenames|names of the (changed )?files)\b/i.test(request)
+  && !/\b(log|history|who|per commit|each commit|commits? (by|on|touching|that|in|since|from|until))\b/i.test(request);
+
+// every request-implied mod compile adds before canon (gate.js builds its round-trip reference the same way)
+export const impliedMods = (ir, request) => impliedOnlyMatching(impliedFileType(ir, request), request);
+
 // compile(ir, env) -> { plan, text, canonical } | { error, label }
 export function compile(ir, env) {
   try {
@@ -405,7 +450,7 @@ export function compile(ir, env) {
     if (!ir || ir.status !== 'ok') return { error: `abstention: ${ir?.status}`, label: ir?.status ?? 'gate_reject' };
     const shape = validateShape(ir);
     if (shape.length) fail(`invalid IR: ${shape.join('; ')}`);
-    const c = canon(impliedFileType(ir, env.request), { schemas: env.schemas, request: env.request, pathExists: env.pathExists });
+    const c = canon(impliedMods(ir, env.request), { schemas: env.schemas, request: env.request, pathExists: env.pathExists });
     const counter = { n: 0 };
     const plan = {};
     if (c.cwd) plan.cwd = cwdText(c.cwd.s);

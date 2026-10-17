@@ -454,8 +454,8 @@ function roundTrip(gated, ctx) {
   let d;
   try { d = decompile(c.text, cenv); } catch (e) { reject(`round_trip: decompile threw: ${e.message}`); }
   if (d.error) reject(`round_trip: decompile failed (compiler bug): ${d.error}`);
-  // compile adds the request-implied find -type f before canon (compile.js impliedFileType): so does the reference
-  const want = canon(compileModule.impliedFileType(gated, ctx.seg.text), { schemas: ctx.reg, seg: ctx.seg, pathExists: env.pathExists });
+  // compile adds the request-implied find -type f / -o before canon (compile.js impliedMods): so does the reference
+  const want = canon(compileModule.impliedMods(gated, ctx.seg.text), { schemas: ctx.reg, seg: ctx.seg, pathExists: env.pathExists });
   if (!equals(d.ir, want)) reject('round_trip: decompile(render(IR)) != canon(IR)');
   obl.push({ check: 'round_trip', ok: true, detail: c.text });
   return c.text;
