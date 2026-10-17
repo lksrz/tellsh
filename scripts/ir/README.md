@@ -108,6 +108,8 @@ when the gate accepts the new IR (strict), otherwise the row is unchanged and co
 - `count_total`: a single-stage `-c` search over directory operands (or none) with no each/per/every-file cue -> `| wc -l`;
 - `curl_head`: `-i` with a headers-only cue -> `-I`; `-I` with a headers-and-body cue -> `-i`;
 - `scope_path`: a literal repo/project/workspace path after the/this/my/our -> dropped (cwd).
+- `hidden_only`: ls -A [-1] [-R] / rg --files --hidden on a hidden-only cue (hidden files / dotfiles, no including /
+  with / all) -> `find X -mindepth 1 [-maxdepth 1] [-type f|d] -name '.*'` (-maxdepth 1 unless -R or a recursion cue).
 
 Adjudications (`build/ir/adjudicate/v2_kfold/adjudications.jsonl`, train ids only; dev/test are never touched): a
 train row the judge called gold-wrong is replaced by the judge-approved k-fold pred IR (`build/ir/verifier/v2/kfold.jsonl`,

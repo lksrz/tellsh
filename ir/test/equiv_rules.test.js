@@ -47,7 +47,9 @@ test('curl, jq, npm, ls no-ops', () => {
 
 test('find: -type f kept on files + exclusion; alternatives order', () => {
   diff("find . -type f -not -name '*.md'", "find . -not -name '*.md'", 'files except markdown');
-  same("find . -type f -name '*.md'", "find . -name '*.md'", 'md files');
+  diff("find . -type f -name '*.md'", "find . -name '*.md'", 'md files');
+  same("find . -type f -name '*.md'", "find . -name '*.md'", 'md files and directories');
+  same("find . -type f -name '*.md'", "find . -name '*.md'", 'markdown entries');
   same("find . -type f -not -name '*.md'", "find . -not -name '*.md'", 'everything but markdown');
   same("find . \\( -name '*.js' -o -name '*.ts' \\)", "find . \\( -name '*.ts' -o -name '*.js' \\)");
 });

@@ -799,7 +799,7 @@ Every command below was checked against §2 and §5: option order, quoting and d
 | 29 | last 10 commit messages mentioning fix, any case | `git.log{oneline, max_count=N:int("10"), grep_message="fix", ignore_case}` | `git log --oneline -n 10 --grep=fix -i` | |
 | 30 | first 20 lines of the git log | `git.log \| file.head{lines=N:int("20")}` | `git log \| head -n 20` | kept as asked; lines ≠ commits |
 | 31 | git log oneline piped to head 5 | `git.log{oneline} \| file.head{lines=N:int("5")}` | `git log --oneline \| head -n 5` | no fold |
-| 32 | which files changed in HEAD~2 | `git.show{name_only}(rev="HEAD~2")` | `git show --name-only 'HEAD~2' --` | `~` quoted (zsh extendedglob); `--` forces a rev |
+| 32 | which files changed in HEAD~2 | `git.show{name_only}(rev="HEAD~2")` | `git show --name-only --format= 'HEAD~2' --` | `~` quoted (zsh extendedglob); `--` forces a rev; derived `--format=` drops the header |
 | 33 | what changed in package.json compared to main | `git.diff(rev="main", paths="package.json")` | `git diff main -- package.json` | |
 | 34 | staged changes summary | `git.diff{staged, stat}` | `git diff --staged --stat` | |
 | 35 | branches sorted by most recent commit | `git.branch{sort=C:-committerdate}` | `git branch --sort=-committerdate` | const value via eq |

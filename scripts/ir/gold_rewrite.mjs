@@ -12,6 +12,9 @@
 //   count_total  text.search -c over directory operands (or none) with no each/per/every-file cue -> | wc -l.
 //   curl_head    http.get -i with a headers-only cue -> http.head (-I); http.head with a headers+body cue -> -i.
 //   scope_path   a literal repo/project/workspace path after the/this/my/our -> dropped (cwd).
+//   hidden_only  ls -a/-A [-1] [-R] or rg --files --hidden on a hidden-only cue (hidden files / dotfiles, no
+//                including / with / all) -> find X -mindepth 1 [-maxdepth 1] [-type f|d] -name '.*'; -maxdepth 1
+//                unless ls -R or a recursion cue (under / recursively); -type f for files, -type d for dirs.
 // Adjudications (train split only; dev/test never): rows the judge called gold-wrong get the judge-approved
 // pred IR (gate-accepted) as an ok row, or are dropped when no pred was judged right. Rows with conflicting
 // gold verdicts are left alone. Matched by request text (normReq) so a rebuilt v3base still lines up.
@@ -23,6 +26,7 @@ import { loadSchemas, gate, segment } from '../../ir/lib/index.js';
 import { unitWord } from '../../ir/lib/units.js';
 import { findCues } from '../../ir/lib/lexicon.js';
 import { normReq } from './dedup.mjs';
+import { hiddenOnlyCue, RECURSE } from '../../ir/lib/strict_hidden.js';
 
 const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), '../..');
 const PLATFORM = { linux: 'linux_gnu', darwin: 'darwin_bsd' };
@@ -149,7 +153,43 @@ function scopePath(ir, { seg }) {
   return hit ? out : null;
 }
 
-export const RULES = { files_find: filesFind, drop_o: dropO, count_total: countTotal, curl_head: curlHead, scope_path: scopePath };
+const HIDDEN_LS_MODS = new Set(['hidden', 'one_per_line', 'recursive']);
+const HID_DIR_NOUN = new Set(['dirs', 'dir', 'directories', 'directory', 'folders', 'folder', 'subdirectories', 'subdirs', 'subfolders', 'dotdirs']);
+const HID_FILE_NOUN = new Set(['files', 'file', 'dotfiles', 'dotfile', 'filenames']);
+// the noun the hidden cue names ("hidden files", "dot dirs", "dotfiles"): f / d / null (entries, ones, items)
+const hiddenNounType = (ws) => {
+  for (const [i, w] of ws.entries()) {
+    const n = ['hidden', 'dot'].includes(w) ? ws[i + 1] : w;
+    if (HID_FILE_NOUN.has(n) && (n.startsWith('dot') || ['hidden', 'dot'].includes(w))) return 'f';
+    if (HID_DIR_NOUN.has(n) && (n.startsWith('dot') || ['hidden', 'dot'].includes(w))) return 'd';
+  }
+  return null;
+};
+const phraseIn = (ws, ph) => { const p = ph.split(' '); return ws.some((_, i) => p.every((x, k) => ws[i + k] === x)); };
+
+function hiddenOnly(ir, { request, seg }) {
+  const ws = words(request);
+  if (!hiddenOnlyCue(ws, (list) => list.find((ph) => phraseIn(ws, ph)))) return null;
+  if (ir.body.parts.length !== 1) return null;
+  const st = ir.body.parts[0].stages[0];
+  if (st.k !== 'exec' || !hasMod(st, 'hidden')) return null;
+  if (st.op === 'dir.list' ? !st.mods.every((m) => HIDDEN_LS_MODS.has(m.mod)) : st.op !== 'files.list' || st.mods.length !== 1) return null;
+  const type = hiddenNounType(ws);
+  const recursive = hasMod(st, 'recursive') || RECURSE.some((ph) => phraseIn(ws, ph));
+  const c = (id) => [{ k: 'const', id }];
+  const mods = [{ mod: 'min_depth', values: c('1') }];
+  if (!recursive) mods.push({ mod: 'max_depth', values: c('1') });
+  if (type) mods.push({ mod: 'type', values: c(type) });
+  mods.push({ mod: 'name_glob', values: c('.*') });
+  const out = clone(ir);
+  const ex = { k: 'exec', op: 'files.find', mods, args: st.args?.paths?.length ? { paths: st.args.paths } : {} };
+  if (st.stderr) ex.stderr = st.stderr;
+  out.body.parts[0].stages[0] = ex;
+  void seg;
+  return out;
+}
+
+export const RULES = { files_find: filesFind, drop_o: dropO, count_total: countTotal, curl_head: curlHead, scope_path: scopePath, hidden_only: hiddenOnly };
 
 // ---------- lint (F10): retired conventions left in an ok row ----------
 export function lint(row) {

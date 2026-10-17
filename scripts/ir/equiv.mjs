@@ -13,8 +13,8 @@
 //       no --graph / -p / --stat / --name-*; -N, -nN, -n N are spelled --max-count=N
 //   git log ... --oneline         == git log ...           only when git log is not piped (before head / wc / grep
 //       the line shape changes the output); --decorate dropped when a --format / --pretty=format: has no %d
-//   find ... -type f              == find ...              unless the request says "file(s)" and the command excludes
-//       names (-not / !): then -type f is part of the answer
+//   find ... -type f              == find ...              unless the request says "file(s)" and names no dirs / folders /
+//       links / entries (compile.js requestWantsFiles, the test impliedFileType adds -type f on): then -type f is part of the answer
 //   find \( -name A -o -name B \)  == the same alternatives in any order
 //   curl -s                       dropped when the output goes to a pipe or -o / -O / -I and the request has no quiet /
 //       silent / progress cue; -S dropped unless the request asks to show errors (or there is no -s)
@@ -23,6 +23,8 @@
 //   ls -1                         dropped with -l or when ls is piped, unless the request says "one per line"
 // Flags before the first operand are compared as a set (order-insensitive); combined boolean short flags of rg/grep/ls/
 // sort are split (-iF == -i -F); single-quoted words without shell-special characters are unquoted ('a+b' == a+b).
+
+import { requestWantsFiles } from '../../ir/lib/compile.js';
 
 const ROTATION_CUE = /\b(rotat\w*|retry\w*|re-?creat\w*|re-?open\w*|truncat\w*|replaced|reappear\w*|even if (?:it|the file) (?:is )?(?:deleted|moved|removed|missing))\b/i;
 
@@ -84,7 +86,6 @@ function sortLeadingFlags(w) {
   return [...w.slice(0, i), ...w.slice(i, j).sort(), ...w.slice(j)];
 }
 
-const FILE_NOUN = /\bfiles?\b/i;
 const QUIET_CUE = /\b(quiet\w*|silent\w*|progress)\b/i;
 const SHOW_ERRORS_CUE = /\b(show\w*|print\w*|report\w*|display\w*|keep|still)\b[\w\s]{0,20}\berrors?\b|\berrors? (?:on|shown|visible)\b/i;
 const ONE_PER_LINE_CUE = /\bone (?:\w+ )?per line\b|\bsingle column\b|\bone column\b/i;
@@ -178,7 +179,7 @@ function sortFindGroups(w) {
 function stageKey(w, { request = '', piped = false } = {}) {
   const tool = w[0];
   if (tool === 'find') {
-    const keepTypeF = FILE_NOUN.test(request) && w.some((x) => x === '-not' || x === '!' || x === '\\!');
+    const keepTypeF = requestWantsFiles(request);
     if (!keepTypeF) w = w.filter((x, i) => !(x === '-type' && w[i + 1] === 'f') && !(x === 'f' && w[i - 1] === '-type'));
     w = sortFindGroups(w);
   } else if (isGitLog(w)) {

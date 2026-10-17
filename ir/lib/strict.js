@@ -9,6 +9,7 @@
 import { unitWord, isQuotedUnit } from './units.js';
 import { coverObligations } from './strict_cover.js';
 import { valueObligations } from './strict_values.js';
+import { hiddenObligations } from './strict_hidden.js';
 
 // ---------- 3. request words of cue-less mods (key `op.mod` or `op.mod=const`) ----------
 // Mods with a cue class, a negative polarity or a value copied from the request are supported by
@@ -69,6 +70,10 @@ export const MOD_WORDS = {
   'json.select.compact': ['compact', 'compacted', 'one line', 'single line', 'single-line', 'minified', 'minify',
     'condensed', 'oneline', 'one-line', 'per line', 'one per line'],
   'dir.list.one_per_line': ['names', 'name', 'one-per-line', 'one line', 'each line', 'one each', 'one per line', 'per line', 'single column', 'one column', 'own line', 'line by line', 'each on'],
+  'files.find.name_glob=.*': ['hidden', 'dotfiles', 'dotfile', 'dot', 'dotdirs', 'dot-files'],
+  'files.find.min_depth=1': ['hidden', 'dotfiles', 'dotfile', 'dot', 'dotdirs', 'dot-files'],
+  'files.find.max_depth=1': ['hidden', 'dotfiles', 'dotfile', 'dot', 'dotdirs', 'dot-files'],
+  'git.branch.very_verbose': ['tracking', 'upstream', 'upstreams', 'tracked', 'remote-tracking', 'ahead', 'behind', 'vv', 'very verbose'],
   'files.find.type=f': ['file', 'files', 'filename', 'filenames', 'regular', 'source', 'sources'],
   'file.count.lines': ['line', 'lines', 'loc', 'long', 'length', 'rows', 'row', 'entries', 'entry', 'how many',
     'number of', 'count', 'counts', 'commits', 'branches', 'files', 'matches', 'occurrences', 'times', 'results',
@@ -425,6 +430,7 @@ export function strictObligations(ir, stages, ctx, used, h) {
 
   auditLeaks();
   coverObligations({ words, fail, hasFree, execInfos, ops, hasMod, ctx, seg, used, consumed, inCue });
+  hiddenObligations({ words, fail, hasFree, execInfos, hasMod, consumed });
   valueObligations({ words, fail, hasFree, execInfos, ops, hasMod, ctx, seg, used, consumed, inCue, isKnown, isExtWord: h.isExtWord,
     isFileLike, prevOf, nextOf, PATH_STOPWORDS, GIT_SCOPE_WORDS, GIT_NOUNS, FILLER, REF_WORD, DIR_NOUNS, FILE_NAMES });
 

@@ -26,7 +26,9 @@ Design: `docs/IR.md` (authoritative). Plain ESM, Node >= 20, no dependencies. Im
   hash (sha256 of the schema files), stats}`. Option specs carry a hidden `_index` (= canonical
   render order; also `optionIndex(spec)`).
 - Lookups: `opSchema(reg, tool, op)`, `optionSpec(reg, tool, op, mod)`,
-  `positionalSpec(reg, tool, op, role)`, `valueActions(spec) -> {span, norms, consts}` (§4.5).
+  `positionalSpec(reg, tool, op, role)`, `valueActions(spec) -> {span, norms, consts}` (§4.5). A value spec's
+  `consts` (any type) lists fixed values the model may emit as `{k:'const'}` without provenance (find
+  `name_glob='.*'`, `min_depth` / `max_depth='1'`: the hidden-only listing; guarded by `strict_hidden.js`).
 - `realize(reg, exec, position) -> {tool} | {error, label}` (§5.2; env availability, e.g. rg
   missing -> `env_unsupported`, is the compiler's/gate's job).
 - Streams: `stdoutOf(opSchema, modIds, input)`, `acceptsStream(opSchema, stream)`,
@@ -106,8 +108,14 @@ Gold false-reject rate (gold IR of ok rows, h8b eval, Oct 2026): train 190 / 253
 - **File listing (F1).** `files.find` (`find … -type f`) is the file lister. `files.list` (`rg --files`) is opt-in:
   only for a gitignore cue (`IGNORED`) or an explicit rg / ripgrep request (the gate enforces it; the schema keeps
   `realization: default` only because rg is its sole realizer). `compile` adds `type=f` to a `files.find` exec that has
-  `exclude_glob` and no `type` when the request says "file(s)" and names no directories / folders / links / entries
-  (`impliedFileType(ir, request)`, applied before `canon`, so `canonical` carries it and decompile round-trips).
+  no `type` (any name / time / size filters), when the request says "file(s)" and names no directories / folders / links / entries / everything / anything
+  (`requestWantsFiles(request)`; `impliedFileType(ir, request)`, applied before `canon`, so `canonical` carries it,
+  and the gate's round-trip reference applies it too).
+- **git show names (v3).** `git.show` with `name_only` / `name_status` and no `oneline` derives `no_header`
+  (`--format=`): `git show --name-only --format= REV --` prints only the file names. git log is unchanged.
+- **git branch -vv (v3).** `very_verbose` (`-vv`, excl `verbose`); a tracking info / upstream cue needs it
+  (`COVER_RULES` `branch_tracking`, not for "remote tracking branches").
+- **Not done:** `wc -c < FILE` for a bare-number cue: the IR has no stdin redirection (decompile rejects `<`).
 - **Count semantics (F4).** IR-level convention, not a compile rewrite (compile stays a pure function of the IR):
   "count (matching) lines" over a directory, glob, several paths or `-r` is one total, `search | file.count{lines}`
   (`rg P DIR | wc -l`); the `count` mod (`-c`, per-file counts) is for a single file operand or an each / per / every
@@ -117,7 +125,7 @@ Gold false-reject rate (gold IR of ok rows, h8b eval, Oct 2026): train 190 / 253
   validator accepts `before:op[.mod]` (the next stage); `strict.js` evaluates it.
 - **Scoring equivalence (F3)** — `scripts/ir/equiv.mjs` `equivKey(cmd, request)` / `sameCommand(a, b, request)`; the
   rule list is in the file header. Request-sensitive: curl `-s` / `-S` (quiet / show-errors cues), `ls -1` ("one per
-  line"), `find -type f` (kept when the request says files and the command excludes names). Not merged on purpose:
+  line"), `find -type f` (kept when `requestWantsFiles(request)`, the same test compile uses). Not merged on purpose:
   `find -exec rg -H` vs `rg -g` (one canonical form instead), `jq -r` on non-numeric output, `git log --oneline` when
   piped (head / wc / grep see a different line shape), `ls -1` on a tty without `-l`.
 
@@ -156,4 +164,12 @@ Called at the end of `strictObligations` (strict.js); tuned on train gold (datas
   - **F13** (conservative): "this file", "that file", "that dir/folder/directory", "the file I", "the
     one I" with no path value → `scope` reject.
 - strict.js `impliedHolds` also accepts `before:op[.mod]` (the next stage's op/mod), mirroring `after:`.
-- obligations.js: a HIDDEN cue is explained by `files.find` (find lists hidden entries by default).
+- obligations.js: a HIDDEN cue is explained by `files.find` (find lists hidden entries by default). A mod whose
+  values are all fixed schema `consts` adds no cue element.
+- `hiddenObligations(cx)` (strict_hidden.js, reason prefix `hidden:`): a hidden-only cue (`hiddenOnlyCue`: hidden
+  files / entries / dirs, only hidden, dotfiles, dot files — free words; no including / include / with / also /
+  plus / as well / all / too / every… and no skip / without / excluding / not / visible) rejects a first-stage
+  `ls -a/-A`, `rg --files --hidden` and a `find` without a dot name glob. The fixed `name_glob='.*'` needs that cue;
+  fixed depths need the dot name, `max_depth=1` needs `min_depth=1` and no recursion cue (under / recursively / …).
+  The hidden-only form is `find X -mindepth 1 [-maxdepth 1] [-type f|d] -name '.*'`; gold rewrite `hidden_only`
+  (scripts/ir/gold_rewrite.mjs) maps ls -A [-1] [-R] / rg --files --hidden gold to it.

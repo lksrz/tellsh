@@ -133,7 +133,9 @@ export function obligations(ir, stages, ctx, used) {
       const perFileLimit = info.exec.op === 'text.search' && m.mod === 'max_count' ? ['PER_FILE'] : [];
       // ls -h alone shows no sizes: "human sizes for X" asks for ls -lh
       if (info.exec.op === 'dir.list' && m.mod === 'long' && hasMod(info, 'human')) perFileLimit.push('HUMAN_SIZES');
-      if (spec.cue) addEl([].concat(spec.cue, afterFreq && [].concat(spec.cue).includes('LIMIT') ? ['FREQ'] : [], perFileLimit), `${info.exec.op}.${m.mod}`);
+      // fixed schema `consts` (find -name '.*' -maxdepth 1) carry no request cue: strict_hidden.js checks them
+      const fixedOnly = spec.value?.consts && (m.values || []).length && m.values.every((v) => v.k === 'const');
+      if (spec.cue && !fixedOnly) addEl([].concat(spec.cue, afterFreq && [].concat(spec.cue).includes('LIMIT') ? ['FREQ'] : [], perFileLimit), `${info.exec.op}.${m.mod}`);
       for (const s of info.modValues[m.mod] || []) if (spec.value?.enum_cue?.[s]) addEl(spec.value.enum_cue[s], `${m.mod}=${s}`);
     }
     if (hasRegexPattern(info)) addEl('REGEX', `${info.exec.op} regex pattern`);

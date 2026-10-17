@@ -486,6 +486,14 @@
           "flag": "-s",
           "form": "bool",
           "model": "predict"
+        },
+        {
+          "mod": "no_header",
+          "flag": "--format=",
+          "form": "bool",
+          "model": "derived",
+          "derive": "names_without_header",
+          "note": "--name-only / --name-status without a patch/stat/format: an empty format drops the commit header, so only file names print"
         }
       ],
       "rules": [
@@ -663,6 +671,13 @@
           "model": "predict"
         },
         {
+          "mod": "very_verbose",
+          "flag": "-vv",
+          "form": "bool",
+          "model": "predict",
+          "note": "upstream (tracking) branch and ahead/behind per branch"
+        },
+        {
           "mod": "merged",
           "flag": "--merged",
           "form": "eq",
@@ -771,6 +786,18 @@
           "excl": [
             "show_current",
             "sort"
+          ]
+        },
+        {
+          "excl": [
+            "verbose",
+            "very_verbose"
+          ]
+        },
+        {
+          "excl": [
+            "show_current",
+            "very_verbose"
           ]
         }
       ],

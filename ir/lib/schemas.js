@@ -71,7 +71,7 @@ const POS_KEYS = ['role', 'type', 'arity', 'leading_dash', 'always_eoo', 'eoo_af
 const OPT_KEYS = ['mod', 'flag', 'form', 'value', 'model', 'derive', 'cue', 'polarity', 'direction',
   'alt_flag_when', 'group', 'same_argv_as', 'effects_add', 'stdout', 'platform', 'min_version', 'implied', 'note'];
 const VAL_KEYS = ['type', 'range', 'enum', 'repeat', 'prefix', 'template', 'quote', 'validator',
-  'dialect', 'norms', 'enum_cue'];
+  'dialect', 'norms', 'enum_cue', 'consts'];
 
 function unknownKeys(obj, allowed, path, add) {
   for (const k of Object.keys(obj)) if (!allowed.includes(k)) add(path, `unknown key "${k}"`);
@@ -378,7 +378,8 @@ export function positionalSpec(reg, tool, op, role) {
 export function valueActions(spec) {
   const type = spec.type;
   const base = TYPE_ACTIONS[type] ?? { span: false, norms: [] };
-  const consts = type === 'Const' && !spec.norms ? Object.keys(spec.enum || {}) : [];
+  // `consts`: fixed values a non-Const mod may take without request provenance (find -name '.*', -maxdepth 1)
+  const consts = spec.consts ?? (type === 'Const' && !spec.norms ? Object.keys(spec.enum || {}) : []);
   return { span: base.span, norms: spec.norms ?? base.norms, consts };
 }
 

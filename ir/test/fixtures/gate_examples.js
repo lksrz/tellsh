@@ -148,7 +148,7 @@ export const BASH = {
   29: "git log --oneline -n 10 --grep=fix -i",
   30: "git log | head -n 20",
   31: "git log --oneline | head -n 5",
-  32: "git show --name-only 'HEAD~2' --",
+  32: "git show --name-only --format= 'HEAD~2' --",
   33: "git diff main -- package.json",
   34: "git diff --staged --stat",
   35: "git branch --sort=-committerdate",

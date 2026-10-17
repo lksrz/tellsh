@@ -80,6 +80,9 @@ export const COVER_RULES = [
   { id: 'branch_current', words: ['current branch', 'which branch am i on', 'what branch am i on', 'branch am i on', "branch i'm on",
     'branch i am on', 'active branch', 'checked out branch', 'checked-out branch', 'branch is checked out', 'current git branch'],
   when: ['git.branch'], unless: ['all', 'every', 'branches', 'other', 'others'], need: ['git.branch.show_current'] },
+  { id: 'branch_tracking', words: ['tracking info', 'tracking information', 'tracking branch', 'tracking branches', 'upstream', 'upstreams',
+    'their upstream', 'remote-tracking branch', 'what they track', 'which remote', 'tracked branch', 'tracking'], when: ['git.branch'],
+  unless: ['remote tracking', 'remote-tracking', 'remote branches'], need: ['git.branch.very_verbose'] },
   // ls
   { id: 'ls_one_per_line', words: ['one per line', 'one column', 'single column', 'one entry per line', 'one name per line',
     'each on its own line', 'one-per-line', 'one file per line', 'a single column'], when: ['dir.list'],

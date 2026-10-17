@@ -10,8 +10,8 @@ test('all 17 schemas load clean', () => {
   assert.deepEqual(problems.map(formatProblem), []);
   assert.equal(registry.stats.tools, 17);
   assert.equal(registry.stats.ops, 26);
-  assert.equal(registry.stats.mods, 113);
-  assert.equal(registry.stats.optionEntries, 179);
+  assert.equal(registry.stats.mods, 115);
+  assert.equal(registry.stats.optionEntries, 181);
   assert.match(registry.hash, /^[0-9a-f]{64}$/);
 });
 

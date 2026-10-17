@@ -42,7 +42,7 @@ const SECTION7 = [
   [29, 'git log --oneline -n 10 --grep=fix -i', program(x('git.log', { mods: [mod('oneline'), mod('max_count', [L('10')]), mod('grep_message', [P('fix')]), mod('ignore_case')] }))],
   [30, 'git log | head -n 20', program(pipe(x('git.log'), x('file.head', { mods: [mod('lines', [L('20')])] })))],
   [31, 'git log --oneline | head -n 5', program(pipe(x('git.log', { mods: [mod('oneline')] }), x('file.head', { mods: [mod('lines', [L('5')])] })))],
-  [32, "git show --name-only 'HEAD~2' --", program(x('git.show', { mods: [mod('name_only')], args: { rev: [L('HEAD~2')] } }))],
+  [32, "git show --name-only --format= 'HEAD~2' --", program(x('git.show', { mods: [mod('name_only')], args: { rev: [L('HEAD~2')] } }))],
   [33, 'git diff main -- package.json', program(x('git.diff', { args: { rev: [L('main')], paths: [L('package.json')] } }))],
   [34, 'git diff --staged --stat', program(x('git.diff', { mods: [mod('staged'), mod('stat')] }))],
   [35, 'git branch --sort=-committerdate', program(x('git.branch', { mods: [mod('sort', [L('-committerdate')])] }))],

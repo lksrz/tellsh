@@ -154,6 +154,7 @@ function buildExec(env, e, position, sctx) {
     endless_input_and_piped_output: () => sctx.input === 'endless' && sctx.pipedOut,
     each_transport: () => sctx.nul,
     each_inner: () => position === 'each',
+    names_without_header: () => ['name_only', 'name_status'].some((m) => values.has(m)) && !values.has('oneline'),
     always: () => true,
   };
   const active = new Set(predicted);
@@ -369,18 +370,21 @@ function cwdText(s) {
   return `./${s}`;
 }
 
-// F1 (taxonomy v2): a name exclusion (`-not -name`) on a request whose noun is files lists regular files only. A
-// files.find exec with exclude_glob and no type gets type=f when the request says "file(s)" and names no
-// directories / folders / links. Deterministic (depends on the IR and the request only); added before canon, so
-// `canonical` carries the mod and decompile(compile(x)) round-trips to it.
-const FILE_NOUN = /\bfiles?\b/i;
-const NON_FILE_NOUN = /\b(dir(ector(y|ies))?s?|folders?|(sym)?links?|entries|everything)\b/i;
+// F1 (taxonomy v2, widened v3): a request whose noun is files lists regular files only. A files.find exec with no
+// type (whatever its name / time / size filters) gets type=f when the request says "file(s)" and names no
+// directories / folders / links / entries / everything / anything.
+// Deterministic (depends on the IR and the request only); added before canon, so `canonical` carries the mod and
+// decompile(compile(x)) round-trips to it. scripts/ir/equiv.mjs keeps -type f significant on the same test.
+export const FILE_NOUN = /\bfiles?\b/i;
+export const NON_FILE_NOUN = /\b(dir(ector(y|ies))?s?|folders?|(sym)?links?|entries|entry|everything|anything|sockets?|fifos?|pipes?)\b/i;
+export const requestWantsFiles = (request) => typeof request === 'string' && FILE_NOUN.test(request) && !NON_FILE_NOUN.test(request);
+
 export function impliedFileType(ir, request) {
-  if (typeof request !== 'string' || !FILE_NOUN.test(request) || NON_FILE_NOUN.test(request)) return ir;
+  if (!requestWantsFiles(request)) return ir;
   const fix = (e) => {
     if (e?.k !== 'exec' || e.op !== 'files.find') return e;
     const mods = e.mods || [];
-    if (!mods.some((m) => m.mod === 'exclude_glob') || mods.some((m) => m.mod === 'type')) return e;
+    if (mods.some((m) => m.mod === 'type')) return e;
     return { ...e, mods: [...mods, { mod: 'type', values: [{ k: 'const', id: 'f' }] }] };
   };
   return {

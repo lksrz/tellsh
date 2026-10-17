@@ -69,6 +69,9 @@
             "norms": [
               "int",
               "scope_top"
+            ],
+            "consts": [
+              "1"
             ]
           },
           "cue": "SCOPE_TOP",
@@ -84,6 +87,9 @@
             "range": [
               0,
               64
+            ],
+            "consts": [
+              "1"
             ]
           },
           "cue": [
@@ -142,7 +148,10 @@
               1,
               1
             ],
-            "quote": "always"
+            "quote": "always",
+            "consts": [
+              ".*"
+            ]
           },
           "alt_flag_when": {
             "mod": "ignore_case",

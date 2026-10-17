@@ -73,7 +73,8 @@ test('4. data-audit patterns', () => {
   no('show my uncommitted changes', 'git diff', /git diff HEAD/);
   ok('show my uncommitted changes against HEAD', 'git diff HEAD');
   no('only hidden files in site', 'ls -A site', /hidden/);
-  ok('show hidden files in site', 'ls -A site');
+  no('show hidden files in site', 'ls -A site', /hidden/);
+  ok('show hidden files in site', "find site -maxdepth 1 -mindepth 1 -type f -name '.*'");
   ok('list site including hidden files', 'ls -A site');
   no('last 20 lines of npm test output', 'npm test | tail -n 20', /2>&1/);
   ok('last 20 lines of npm test output', 'npm test 2>&1 | tail -n 20');
