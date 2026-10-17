@@ -250,7 +250,10 @@ function runGrok(promptFile, a, cwd) {
 // ---------- codex / claude backends (same prompt, same schema) ----------
 function runCmd(bin, args, cwd, a, input) {
   return new Promise((resolve) => {
-    const ch = spawn(bin, args, { cwd, stdio: [input == null ? 'ignore' : 'pipe', 'pipe', 'pipe'] });
+    // CLIs run on the subscription login: never hand them a paid API key (global no-paid-API rule)
+    const env = { ...process.env };
+    for (const k of ['ANTHROPIC_API_KEY', 'CLAUDE_API_KEY', 'ANTHROPIC_AUTH_TOKEN', 'OPENAI_API_KEY', 'XAI_API_KEY']) delete env[k];
+    const ch = spawn(bin, args, { cwd, env, stdio: [input == null ? 'ignore' : 'pipe', 'pipe', 'pipe'] });
     let out = '', err = '';
     ch.stdout.on('data', d => out += d); ch.stderr.on('data', d => err += d);
     if (input != null) { ch.stdin.write(input); ch.stdin.end(); }

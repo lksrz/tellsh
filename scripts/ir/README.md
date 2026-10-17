@@ -26,8 +26,8 @@ Outputs in `--out` (under `build/`, gitignored):
 - `plan.json`, `prompts/callN.txt`
 
 Backends (`--backend`, same prompt and output schema): `grok` (default, CLI), `codex` (CLI,
-`gpt-6-luna`), `claude` (CLI `-p`, `claude-haiku-5-5`), `api` (Anthropic Messages API, key from
-`CLAUDE_API_KEY` / `ANTHROPIC_API_KEY`; HTTP 429/529 are retried with backoff). `--model` and
+`gpt-6-luna`), `claude` (CLI `-p`, `claude-haiku-5-5`), `api` (Anthropic Messages API, paid: do not use, see the global no-paid-API rule;
+CLI backends get the API-key variables stripped from their environment). `--model` and
 `--effort` override the backend defaults.
 
 Resumable: re-running with the same args skips calls whose usage line has `ok: true`.
