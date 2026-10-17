@@ -15,6 +15,10 @@
 //   hidden_only  ls -a/-A [-1] [-R] or rg --files --hidden on a hidden-only cue (hidden files / dotfiles, no
 //                including / with / all) -> find X -mindepth 1 [-maxdepth 1] [-type f|d] -name '.*'; -maxdepth 1
 //                unless ls -R or a recursion cue (under / recursively); -type f for files, -type d for dirs.
+//   oneline_lines (v4) git log --oneline | head/tail/wc -l on "N lines of the log/history/output" (no one-line cue) -> plain git log.
+//   download_cwd  (v4) "In DIR, download URL" with no cwd / -o -> cd DIR && curl -O URL.
+//   uniq_dup      (v4) uniq on a duplicates noun with no removal cue -> uniq -d; -d on a collapse cue -> plain uniq.
+//   recompile     (v4) no rule applied but the gate's command differs (a derived mod changed it) -> the new command.
 // Adjudications (train split only; dev/test never): rows the judge called gold-wrong get the judge-approved
 // pred IR (gate-accepted) as an ok row, or are dropped when no pred was judged right. Rows with conflicting
 // gold verdicts are left alone. Matched by request text (normReq) so a rebuilt v3base still lines up.
@@ -191,7 +195,64 @@ function hiddenOnly(ir, { request, seg }) {
   return out;
 }
 
-export const RULES = { files_find: filesFind, drop_o: dropO, count_total: countTotal, curl_head: curlHead, scope_path: scopePath, hidden_only: hiddenOnly };
+// v4 fix 19 (rubric): "N lines of the log / history / output", "log lines", "how many lines does git log print" mean the
+// plain multi-line `git log`; commits, "commit lines", "one line" (ONE_LINE_CUE) mean --oneline. A git.log with oneline
+// (no format / graph) feeding head / tail / wc -l on such a request drops oneline.
+export const LOG_LINES_CUE = /\blines? (of|from|in) (the )?([\w./~-]+ ){0,3}(git )?(log|history|output)\b|\b(log|history) lines?\b|\blines? (does|do|did|in|of) (the )?git log\b|\blines? of (the )?git log\b/i;
+export const ONE_LINE_CUE = /\b(commits?|one[- ]?lines?|one[- ]?liners?|oneline|single[- ]line|short|compact|summary|summaries|hash(es)?|subjects?|shas?|condensed|brief|terse)\b/i;
+const LINE_SINKS = new Set(['file.head', 'file.tail', 'file.count']);
+function onelineLines(ir, { request }) {
+  if (!LOG_LINES_CUE.test(request) || ONE_LINE_CUE.test(request)) return null;
+  let hit = false;
+  const out = clone(ir);
+  for (const p of out.body.parts) p.stages.forEach((st, i) => {
+    const nx = p.stages[i + 1];
+    if (st.k !== 'exec' || st.op !== 'git.log' || !hasMod(st, 'oneline') || hasMod(st, 'format') || hasMod(st, 'graph')) return;
+    if (nx?.k !== 'exec' || !LINE_SINKS.has(nx.op) || (nx.op === 'file.count' && !hasMod(nx, 'lines'))) return;
+    st.mods = st.mods.filter((m) => m.mod !== 'oneline');
+    hit = true;
+  });
+  return hit ? out : null;
+}
+
+// v4 fix 2 (STRICTDEV): "In DIR, download URL ..." with no cwd and no -o: the download directory becomes the cwd
+// (`cd DIR && curl -O URL`). DIR is the span between the leading "in" and the comma / "download".
+function downloadCwd(ir, { seg }) {
+  const w = seg.units.map(unitWord);
+  if (ir.cwd || !['in', 'into'].includes(w[0])) return null;
+  const di = w.indexOf('download');
+  if (di < 2 || di > 5) return null;
+  const end = w[di - 1] === ',' ? di - 1 : di;
+  if (end - 1 !== 1) return null; // one path unit
+  const sts = stagesOf(ir);
+  if (sts.length !== 1 || sts[0].op !== 'http.download' || hasMod(sts[0], 'output')) return null;
+  return { ...clone(ir), cwd: { k: 'span', u: [1, end], as: 'Path' } };
+}
+
+// v4 fix 4 relabel (WP1 list): uniq on a duplicates noun with no removal cue asks for the repeated lines (uniq -d);
+// a removal / collapse cue asks for plain uniq. Same word lists as strict_cover.js uniq_dup_noun / uniq_collapse.
+const DUP_NOUN = /\b(duplicates?|duplicated|dupes|dups|repeats|repeated|repeating|repeat)\b/i;
+const DUP_REMOVE = /\b(remove[ds]?|removing|drop(s|ped|ping)?|dedupe[ds]?|deduplicate[ds]?|collaps(e|ed|es|ing)|merg(e|es|ed|ing)|squash(ed|es|ing)?|fold(ed|ing)?|without|no dupes|count(s|ed|ing)?|how many|frequen(cy|cies|t)|top|most|once|unique|singletons?|keep one|one of each|each line once|one line per)\b/i;
+const UNIQ_FLAG = /(^|\s)(uniq|-[a-z]*[duc][a-z]*)(\s|$)/i;
+function uniqDup(ir, { request }) {
+  if (UNIQ_FLAG.test(request)) return null;
+  const wantD = DUP_NOUN.test(request) && !DUP_REMOVE.test(request);
+  const collapse = /\b(keep one|one of each|each line once|collaps(e|ed|es|ing)|squash(ed|es|ing)?)\b/i.test(request)
+    && !/\b(repeated ones|only (need |want )?(the )?repeat(ed|s)?)\b/i.test(request);
+  let hit = false;
+  const out = clone(ir);
+  for (const p of out.body.parts) for (const st of p.stages) {
+    if (st.k !== 'exec' || st.op !== 'lines.uniq') continue;
+    const mods = st.mods || [];
+    if (mods.some((m) => ['count', 'unique'].includes(m.mod))) continue;
+    if (wantD && !hasMod(st, 'repeated')) { st.mods = [...mods, { mod: 'repeated' }]; hit = true; }
+    else if (collapse && hasMod(st, 'repeated')) { st.mods = mods.filter((m) => m.mod !== 'repeated'); hit = true; }
+  }
+  return hit ? out : null;
+}
+
+export const RULES = { files_find: filesFind, drop_o: dropO, count_total: countTotal, curl_head: curlHead, scope_path: scopePath, hidden_only: hiddenOnly,
+  oneline_lines: onelineLines, download_cwd: downloadCwd, uniq_dup: uniqDup };
 
 // ---------- lint (F10): retired conventions left in an ok row ----------
 export function lint(row) {
@@ -201,12 +262,14 @@ export function lint(row) {
   sts.forEach((s, i) => {
     if (s.op === 'text.search' && hasMod(s, 'only_matching') && i + 1 < sts.length && /\blines?\b/i.test(req) && !MATCH_CUE.test(req)) out.push('o_in_line_pipeline');
   });
-  if (/^git log\b(?![^|]*(--oneline|--format|--pretty))[^|]*\| head\b/.test(row.command || '')) out.push('git_log_multiline_head');
+  if (/^git log\b(?![^|]*(--oneline|--format|--pretty))[^|]*\| head\b/.test(row.command || '') && !(LOG_LINES_CUE.test(req) && !ONE_LINE_CUE.test(req))) out.push('git_log_multiline_head');
   if (/^curl\b.* -I\b/.test(row.command || '') && HEADERS_BODY.test(req)) out.push('curl_I_with_body_cue');
   if (/^curl\b.* -i\b/.test(row.command || '') && HEADERS_ONLY.test(req)) out.push('curl_i_headers_only_cue');
   if (/\b(the|this|my|our) (repo|project|workspace)\b/i.test(req) && / (repo|project|workspace)( |$)/.test(row.command || '')) out.push('scope_word_path');
   return out;
 }
+
+const V4_DERIVED = [/ --diff-merges=/, /^(rg|grep|git log)\b[^|]* (-F|--fixed-strings)\b/, /'\*\.exs'/, /^ls (-[A-Za-z0-9]+ )*-a\b/];
 
 // Apply every rule in order; each accepted rewrite becomes the base for the next. Returns {row, applied, rejected}.
 export function rewriteRow(row, schemas) {
@@ -222,6 +285,17 @@ export function rewriteRow(row, schemas) {
     if (!g.accept) { rejected.push(name); continue; }
     applied.push(name);
     cur = { ...cur, ir, command: g.command, reasons: [...(cur.reasons || []), `rewrite:${name}`] };
+  }
+  // recompile: a derived / request-implied mod (v4: ls -a, --diff-merges, -F on a literal cue, *.exs) changes the
+  // command of an unchanged IR; the stored command follows the compiler (gate-checked like every rule). Only when
+  // the gate's command gains one of those tokens: stored commands are source spellings, not canonical ones.
+  if (!applied.length) {
+    const g = gate(row.request, cur.ir, env);
+    const gained = (c) => V4_DERIVED.some((re) => re.test(c) && !re.test(cur.command || ''));
+    if (g.accept && g.command !== cur.command && gained(g.command)) {
+      applied.push('recompile');
+      cur = { ...cur, command: g.command, reasons: [...(cur.reasons || []), 'rewrite:recompile'] };
+    }
   }
   return { row: cur, applied, rejected };
 }

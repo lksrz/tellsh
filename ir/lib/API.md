@@ -141,6 +141,33 @@ Gold false-reject rate (gold IR of ok rows, h8b eval, Oct 2026): train 190 / 253
   a well-known bare file (Procfile, Makefile, syslog, ...). Not with `-l / -L / -c / --count-matches / -H` or when the
   request asks for file names / paths / which files / per file (`requestWantsFileNames`). Never in the IR: decompile
   strips it.
+- **Taxonomy v4 round 3 (`docs/ir_error_taxonomy_v4.md` WP4).** Derived or request-implied only: no new predicted mod,
+  so the v4 action vocabulary and checkpoints are unchanged (`scripts/ir/actions.mjs` skips non-`predict` mods).
+  - `git log --merges` with `--name-only` / `--name-status` / `--stat` derives `diff_merges`
+    (`--diff-merges=first-parent`, git ≥2.31; `derive: merges_with_file_lists`).
+  - `ls -a` (`all`, `derive: all_entries_requested`, `requestWantsAllEntries(request, paths)`): ". and ..", "all /
+    every entries", "dot entries", or "all of DIR" right before a path operand (not "all of the DIR files"); never with
+    a predicted `hidden` (`-A`).
+  - A literal cue (`LITERAL_CUE`: literal(ly), fixed string(s), verbatim, not (as a) regex) makes the derived
+    `fixed_strings` hold without a metacharacter: `rg -F` / `grep -F` / `git log -F --grep=`.
+  - `impliedLangExts(ir, request)` (in `impliedMods`): an `ext_glob` norm of a multi-extension language
+    (`normalizers.js` `LANG_EXTRA`: elixir -> `exs`) appends the other globs as literals (find `name_glob` becomes
+    `any_name`: `\( -name '*.ex' -o -name '*.exs' \)`). `lexicon.js` `langExts(w)` lists every extension of a word;
+    `langWordAt` reads a template extension (j2, jinja, twig, tpl, erb, haml, svelte) before "template(s)".
+  - jq's path operand has a validator: a URL (`scheme://`) is invalid (fetch it with curl and pipe).
+  - Implied `when` tokens `with:mod` / `not:a!b` (exec-local; `schemas.js` `impliedModTokenHolds`). Planned for curl
+    `silent` (`["piped", "not:fail!show_error"]`, fix 20) once `strict.js` `impliedHolds` evaluates them; curl.json
+    still says `always`.
+- **Decline pre-check (v4, `decline.js` `declineObligations`).** Called from `obligations()` before `strictObligations`:
+  (a) a dangling last word ("compared to", "containing", "by author", "with", "for", "of"; not after a mode word such
+  as "case-sensitive matching") and (b) a definite generic noun with no value ("the deprecated helper", "that commit",
+  "the hook" taken as the pattern, "in there"), (c) a placeholder as the whole pattern / jq field (`text`, `something`,
+  `.nth`, lowercase only) and (e) a bare `upstream` rev with no remote word give `underspecified` (label
+  `underspecified`); (d) a free recency phrase ("this week", "since yesterday", "last 3 days") with no
+  since / until / mtime / newer mod and (f) "In DIR, download ..." with no value in DIR give `dropped_value`; (g) a
+  permission filter (executable, writable, perms, setuid) with `files.find`, free or taken as a name, gives
+  `uncovered_content`. `env.declineOff` (comma list of `DECLINE_RULES`) switches rules off for measurement.
+  Gold false declines (v4): train 10 / 51,306 ok rows (0.02%), dev 0 / 3,708.
 - **Strict cover (v4).** `find_any_type`: "anything / everything named / called / matching / with ..., any / every
   entry" rejects an explicit `-type f` unless the request also says file(s) / regular or the find has a size filter.
   `wc_units`: every wc unit named in a list ("word and line counts", "words, lines and bytes") or as "<unit>

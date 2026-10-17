@@ -149,7 +149,7 @@ const REJECT = [
   ['git commit -m x', 'tool_unsupported'],
   ['rg --pre cat foo', 'unsupported_construct'],
   ['rg -P foo', 'unsupported_construct'],
-  ['ls -a', 'unsupported_construct'],
+  ['ls -G', 'unsupported_construct'],
   ['find . -delete', 'unsupported_construct'],
   ['find . -exec rm {} ;', 'control_flow'],
   ['find . -name x -exec wc -l {} \\;', 'embedded_program'],

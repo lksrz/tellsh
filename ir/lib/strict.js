@@ -11,6 +11,8 @@ import { coverObligations } from './strict_cover.js';
 import { valueObligations } from './strict_values.js';
 import { hiddenObligations } from './strict_hidden.js';
 import { matchCueImpliesO } from './compile.js';
+import { impliedModTokenHolds } from './schemas.js';
+import { pipelineObligations, modWordsFor, wp3On } from './strict_pipeline.js';
 
 // ---------- 3. request words of cue-less mods (key `op.mod` or `op.mod=const`) ----------
 // Mods with a cue class, a negative polarity or a value copied from the request are supported by
@@ -28,6 +30,8 @@ const PATCH = ['patch', 'patches', 'diff', 'diffs', 'changes', 'changed', 'chang
 export const MOD_WORDS = {
   'http.get.fail': ['fail', 'fails', 'failing', 'failure', 'error', 'errors', 'strict', 'status', 'non-zero', 'nonzero'],
   'http.head.fail': ['fail', 'fails', 'failing', 'failure', 'error', 'errors', 'strict', 'status', 'non-zero', 'nonzero'],
+  'http.get.silent': ['silent', 'silently', 'quiet', 'quietly', 'no progress', 'without progress', 'hide progress', 'progress', 'noise', 'noiseless', 'mute', 'muted'],
+  'http.head.silent': ['silent', 'silently', 'quiet', 'quietly', 'no progress', 'without progress', 'hide progress', 'progress', 'noise', 'noiseless', 'mute', 'muted'],
   'git.status.short': ['short', 'brief', 'briefly', 'compact', 'concise', 'terse', 'summary', 'quick', 'condensed', 'one line', 'per line'],
   'git.status.branch': ['branch', 'tracking', 'upstream', 'ahead', 'behind'],
   'git.status.porcelain': ['porcelain', 'machine', 'machine-readable', 'script', 'scripts', 'parse', 'parsable', 'parseable', 'stable',
@@ -142,7 +146,7 @@ const DOTFILES = new Set(['env', 'gitignore', 'gitattributes', 'editorconfig', '
   'dockerignore', 'eslintrc', 'prettierrc', 'babelrc', 'git', 'github', 'vscode', 'idea', 'cache', 'config', 'local', 'ssh']);
 const SCRIPT_NAMES = new Set(['lint', 'build', 'start', 'dev', 'format', 'typecheck', 'e2e', 'deploy', 'serve', 'watch', 'check', 'test', 'release', 'prepare']);
 // directory names that are also English words
-const DIRISH = new Set(['checks', 'scripts', 'config', 'configs', 'work', 'docs', 'src', 'lib', 'libs', 'tests', 'test', 'app',
+export const DIRISH = new Set(['checks', 'scripts', 'config', 'configs', 'work', 'docs', 'src', 'lib', 'libs', 'tests', 'test', 'app',
   'apps', 'bin', 'build', 'dist', 'packages', 'modules', 'tools', 'utils', 'data', 'assets', 'public', 'templates', 'content']);
 // Capitalised product names: context, not values.
 export const PRODUCT_NAMES = new Set(['django', 'rails', 'react', 'docker', 'kubernetes', 'python', 'node', 'rust', 'java', 'linux',
@@ -220,6 +224,8 @@ export function strictObligations(ir, stages, ctx, used, h) {
     if (w === 'always') return true;
     if (w === 'piped') return !!nextOf(info);
     if (w === 'each') return nextOf(info)?.kind === 'each';
+    const local = impliedModTokenHolds(w, (x) => hasMod(info, x));
+    if (local !== null) return local;
     if (w === 'match_cue') return matchCueImpliesO(info.st, nextOf(info)?.st, seg.text); // compile.js impliedOnlyMatching
     if (w.startsWith('after:')) {
       const [o1, o2, mod] = w.slice(6).split('.');
@@ -245,7 +251,12 @@ export function strictObligations(ir, stages, ctx, used, h) {
         const extGlob = op === 'files.find' && ['name_glob', 'any_name'].some((x) => (info.modValues[x] || []).some((g) => /\.[A-Za-z0-9]+$/.test(g)));
         // -type f is the natural default when the found paths are sized, named, or fed to a file command
         const typeFOk = extGlob || ['size_gt', 'size_lt', 'size', 'name_glob', 'any_name'].some((x) => hasMod(info, x)) || nextOf(info)?.kind === 'each';
-        for (const k of keys) if (!(k === 'files.find.type=f' && typeFOk) && !(k === 'git.log.oneline' && hasFree(['commits'])) && !hasFreeH(MOD_WORDS[k]) && !h.flagSpelled(info, spec)) fail('unrequested_mod', `${k} needs one of: ${MOD_WORDS[k].slice(0, 6).join(', ')}`);
+        for (const k of keys) {
+          const lic = modWordsFor(k, MOD_WORDS[k], info, { seg, words, isExtWord: h.isExtWord, nextOf });
+          // whole words only for git branch -v ("commit-level" is not "commit")
+          const said = k === 'git.branch.verbose' && wp3On('branch_v') ? hasFree(lic) : hasFreeH(lic);
+          if (!(k === 'files.find.type=f' && typeFOk) && !(k === 'git.log.oneline' && hasFree(['commits'])) && !said && !h.flagSpelled(info, spec)) fail('unrequested_mod', `${k} needs one of: ${lic.slice(0, 6).join(', ')}`);
+        }
         continue;
       }
       if (h.requireWordsFor(op, m)) continue; // REQUIRE_WORDS: checked in obligations()
@@ -288,7 +299,9 @@ export function strictObligations(ir, stages, ctx, used, h) {
     if (v.role === 'paths' && v.kind === 'span' && !/[/.~]/.test(v.value) && !isQuotedUnit(seg.units[v.u[0]])) {
       if (GIT_NOUNS.has(v.value.toLowerCase())) fail('span', `path "${v.value}" is a git noun`);
       const lw = v.value.toLowerCase();
-      if ((PATH_STOPWORDS.has(lw) || (GIT_SCOPE_WORDS.has(lw) && [...ops].some((o) => o.startsWith('git.')))) && !DIR_NOUNS.has(words[v.u[1]]) && !['named', 'called'].includes(words[v.u[0] - 1]))
+      // exempt "the unstaged folder", not "unstaged file names" / "changed files list"
+      const dirNext = DIR_NOUNS.has(words[v.u[1]]) && !(wp3On('stop_dirnoun') && ['names', 'name', 'list', 'files', 'only'].includes(words[v.u[1] + 1]));
+      if ((PATH_STOPWORDS.has(lw) || (GIT_SCOPE_WORDS.has(lw) && [...ops].some((o) => o.startsWith('git.')))) && !dirNext && !['named', 'called'].includes(words[v.u[0] - 1]))
         fail('span', `path "${v.value}" is a generic request word, not a path`);
       if (inCue(v.u[0]) && CUE_LEAD.has(words[v.u[0] - 1])) fail('span', `path "${v.value}" is a cue word`);
       if (FILLER.has(v.value.toLowerCase()) || ['and', 'or', 'of', 'in', 'with', 'for', 'to', 'on'].includes(v.value.toLowerCase()))
@@ -366,7 +379,7 @@ export function strictObligations(ir, stages, ctx, used, h) {
   if (hasFree(['empty out', 'clear out', 'truncate', 'wipe', 'empty the file'])) fail('coverage', 'truncating a file is not expressible');
   // "match case" / "case-sensitive" contradict -i
   const caseSensitive = ctx.cues.find((c) => ['match case', 'case-sensitive', 'case sensitive'].includes(c.phrase));
-  if (caseSensitive && execInfos.some((i) => hasMod(i, 'ignore_case'))) fail('cue', `"${caseSensitive.phrase}" but the command ignores case`);
+  if (caseSensitive && !(wp3On('not_case') && ['not', 'non', "isn't", 'no'].includes(words[caseSensitive.a - 1])) && execInfos.some((i) => hasMod(i, 'ignore_case'))) fail('cue', `"${caseSensitive.phrase}" but the command ignores case`);
   for (const info of stages) {
     const p = prevOf(info);
     if (info.kind === 'macro') {
@@ -415,7 +428,8 @@ export function strictObligations(ir, stages, ctx, used, h) {
     }
     // --format without the asked-for date / author
     if (op === 'git.log' && (info.modValues.format || []).length && !['hash_author_date_subject', 'fuller'].includes(info.exec.mods.find((m) => m.mod === 'format').values[0].id)
-      && hasFree(['date', 'dates', 'author', 'authors']) && !hasMod(info, 'author')) fail('cover', 'the format drops the asked-for author / date');
+      && hasFree(['date', 'dates', 'author', 'authors']) && (!hasMod(info, 'author') || (wp3On('fmt_author') && (hasFree(['date', 'dates'])
+        || words.some((w, i) => ['author', 'authors'].includes(w) && !consumed.has(i) && words.slice(Math.max(0, i - 2), i + 3).some((x) => ['hash', 'date', 'dates', 'subject', 'subjects'].includes(x))))))) fail('cover', 'the format drops the asked-for author / date');
     // ls -h without -l shows no sizes
     if (op === 'dir.list' && hasMod(info, 'human') && !hasMod(info, 'long')) fail('scope', 'ls -h without -l shows no sizes');
     // "hidden files" / "only hidden": ls -A lists everything
@@ -439,8 +453,11 @@ export function strictObligations(ir, stages, ctx, used, h) {
   valueObligations({ words, fail, hasFree, execInfos, ops, hasMod, ctx, seg, used, consumed, inCue, isKnown, isExtWord: h.isExtWord,
     isFileLike, prevOf, nextOf, PATH_STOPWORDS, GIT_SCOPE_WORDS, GIT_NOUNS, FILLER, REF_WORD, DIR_NOUNS, FILE_NAMES });
 
+  pipelineObligations({ words, fail, hasFree, execInfos, stages, ops, hasMod, ctx, seg, used, consumed, inCue, isFileLike, nextOf, prevOf,
+    isExtWord: h.isExtWord, isKnown, isKnownStrict: (w) => STRICT_KNOWN.has(w) });
+
   // rg -c / --count-matches print one count per file: a total over a directory needs | wc -l
-  const perFileCue = ctx.cues.some((c) => c.cls === 'PER_FILE') || whichFiles || hasFree(['each file', 'every file', 'per file', 'by file', 'files', 'counts'])
+  const perFileCue = ctx.cues.some((c) => c.cls === 'PER_FILE') || whichFiles || hasFree(['each file', 'every file', 'per file', 'by file', ...(wp3On('perfile') ? [] : ['files', 'counts'])])
     || words.some((w, i) => ['each', 'every', 'per'].includes(w) && words.slice(i + 1, i + 3).some((x) => ['file', 'log', 'script', 'module', 'source'].includes(x)));
   for (const info of execInfos) {
     if (info.exec.op !== 'text.search' || !['count', 'count_matches'].some((x) => hasMod(info, x)) || info.position !== 'first') continue;
@@ -450,7 +467,6 @@ export function strictObligations(ir, stages, ctx, used, h) {
 
   // Audit r3: dropped filters / operands and misread roles still accepted after r2.
   function auditLeaks() {
-    const patVals = execInfos.flatMap((i) => i.values.pattern || []);
     const freeWordAfter = (lead) => {
       const p = lead.split(' ');
       for (let i = 0; i + p.length <= words.length; i++) {
@@ -471,9 +487,7 @@ export function strictObligations(ir, stages, ctx, used, h) {
       const x = freeWordAfter(lead);
       if (x && ops.has('git.diff')) fail('dropped_value', `"${lead} ${x}": "${x}" is not used by any value`);
     }
-    // "starts with X" needs an anchored pattern
-    if (hasFree(['start with', 'starts with', 'starting with', 'begin with', 'begins with', 'beginning with']) && patVals.length && !patVals.some((p) => p.startsWith('^')))
-      fail('cover', '"starts with" needs a ^ anchor');
+    // ("starts with X" needs ^: strict_cover.js anchors, which also covers --grep)
     // an instruction word used as the search pattern; a typo searched while the real word is dropped
     for (const info of execInfos) for (const v of info.exec.args.pattern || []) {
       if (!v.u) continue;

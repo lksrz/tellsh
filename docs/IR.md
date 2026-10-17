@@ -216,7 +216,7 @@ with `-`. Copied values are always protected by the ArgvPlan (§5.3).
 
 | # | mod | flag | value | model | rules / notes |
 |---|---|---|---|---|---|
-| 1 | fixed_strings | `-F` | | derived | `pkind` literal and the pattern contains a regex metacharacter |
+| 1 | fixed_strings | `-F` | | derived | `pkind` literal and the pattern contains a regex metacharacter, or the request has a literal cue ("literal", "fixed string", "verbatim"; v4) |
 | 2 | ignore_case | `-i` | | predict | cue CASE; excl smart_case, case_sensitive |
 | 3 | smart_case | `-S` | | predict | cue CASE |
 | 4 | case_sensitive | `-s` | | predict | cue CASE |
@@ -276,8 +276,9 @@ slash matches the basename at any depth. All listed flags exist in rg ≥ 13 on 
 | 5 | all_refs | `--all` | | excl the rev role |
 | 6 | max_count | `-n` (sep) | Int 1..10^5 | cue LIMIT, direction first (newest first) |
 | 7 | skip | `--skip=` | Int 1..10^5 | |
-| 7a | fixed_strings | `-F` | | derived: no regex-kind value and some value has a metacharacter |
+| 7a | fixed_strings | `-F` | | derived: no regex-kind value and some value has a metacharacter (or a literal cue with a `--grep`, v4) |
 | 7b | extended_regex | `-E` | | derived: a grep_message value is regex kind (ERE); literal values are then ERE-escaped |
+| 7c | diff_merges | `--diff-merges=first-parent` | | derived (v4, git ≥2.31): `merges_only` with `name_only`/`name_status`/`stat` (merges print no diff by default) |
 | 8 | author | `--author=` | Name ×1..2 | a pattern for git: literal under `-F`, ERE-escaped under `-E` |
 | 9 | grep_message | `--grep=` | Pattern ×1..3, dialect ERE (strict) | |
 | 10 | ignore_case | `-i` | | cue CASE; requires author or grep_message (`--regexp-ignore-case`) |
@@ -337,7 +338,7 @@ The remaining schemas (full detail in `ir/schemas/*.json`):
 |---|---|---|
 | grep (`text.search`, pinned or stdin filter) | rg ids; derived `recursive -r` (always for a first stage), `extended_regex -E`, `fixed_strings -F`, `line_buffered`; compiler `-H`; `null` = GNU `-Z` / BSD `--null`; `--include=`, `--exclude=`, `--exclude-dir=` | `-P` GNU-only, excluded; `first_stage_operands` `["."]` (pathless `grep -r` errors on old BSD) |
 | find (`files.find`, `layout: operands_first`) | order: roots, `max_depth`, `min_depth`, `exclude_dir` (prune group), `type` {f,d,l}, `name_glob` (`-iname` with ignore_case), `any_name` (or-group ≤4), `exclude_glob` `-not -name`, `size_gt` `+Nc`, `size_lt` `-Nc` (bytes: exact on GNU and BSD), `modified_within_days` `-mtime -N` / `modified_before_days` `-mtime +N` (norm `age_days`), `modified_within_minutes` `-mmin -N` (norm `age_minutes`), `empty`, `newer`; compiler `-print`, `-print0`, `-exec … -- {} +` | roots = role `paths` 0..8, default `.`; leading dash → `./-x` (no usable `--`); excluded `-delete`, free `-exec`, `-printf` (GNU), `-regex`, `-path` (root-prefixed paths make a copied `src/gen` a silent no-op) |
-| ls (`dir.list`, cluster_short, each_ok) | `-l -A -h -S -t -r -1 -d -R` | stdout `lines`, **never** `paths`: `ls \| xargs` is inexpressible |
+| ls (`dir.list`, cluster_short, each_ok) | `-l -A -h -S -t -r -1 -d -R`; derived `-a` (v4) on an every-entry cue (". and ..", "all entries", "all of DIR") with no `-A` | stdout `lines`, **never** `paths`: `ls \| xargs` is inexpressible |
 | head / tail (`file.head` / `file.tail`, each_ok) | `lines -n N`, `bytes -c N`; tail `from_line -n +N`, `follow -f`, `follow_retry -F` (stdout `endless`) | `head -n -N` GNU-only, excluded |
 | wc (`file.count`, each_ok) | `-l -w -c -m` | |
 | sort (`lines.sort`) | `-n -h -r -u -f` | `-k/-t` phase 2; `-o` writes, excluded |
@@ -345,7 +346,7 @@ The remaining schemas (full detail in `ir/schemas/*.json`):
 | sed (`file.lines`) | `sed -n 'A,Bp' [FILE]`; script is a `word` from `LineRange` ints (`A,Bp`, `Ap`, `A,$p`), always quoted | nothing else of sed; never an `each` inner |
 | npm | `npm.run` (ScriptName `^[A-Za-z0-9:._-]{1,64}$`), `npm.scripts` (`npm run`), `npm.test` (watch-mode trap, §8.6), `npm.ls` (`top_level` = fixed `--depth=0`, `depth --depth=N`, `all --all`); stderr `merge` | run/test = `exec_project`; excluded `install`, `exec`, `-- args` |
 | curl (`http.get` prefix `-g`, `http.head` `-g -I`, `http.download` `-g -f -L`) | `-f -s -S -L -i` (`-i` → stdout `lines`), `--max-time N`; download: `-o PATH` xor `-O` | `-g` (globoff) always: `[]{}` never fan out into many requests; URL `https?://` only, ≤2048 chars, no whitespace/controls; excluded `-d -X -u -H -K -b -T -k --data*` |
-| jq (`json.select`) | `-r`, `-c`; filter = JqPath `^(\.[A-Za-z_][A-Za-z0-9_]*(\[\d+\])*\|\.\[\d+\])+$` from norm `jq_path`, always quoted | paths 0..1; never an `each` inner |
+| jq (`json.select`) | `-r`, `-c`; filter = JqPath `^(\.[A-Za-z_][A-Za-z0-9_]*(\[\d+\])*\|\.\[\d+\])+$` from norm `jq_path`, always quoted | paths 0..1 and never a URL (`curl URL \| jq`, v4); never an `each` inner |
 | ps (`proc.list`) | prefix `aux`; `sort_cpu` linux `--sort=-%cpu`, `sort_mem` linux `--sort=-%mem` | darwin sort mods **absent** until `ps aux -r/-m` is verified |
 | lsof (`port.who`) | prefix `-nP`; required `port` attached `-iTCP:N`; `listening` `-sTCP:LISTEN` | `read_proc`; UDP not covered |
 | pkill (`proc.kill`) | `signal` attached `-KILL`/`-TERM`/`-INT`/`-HUP` (norm `signal` only; `KILL` carries cue FORCE), rendered **first**; derived `exact -x` always; `ignore_case -i` | `signal_proc` (high); name `^[A-Za-z0-9_][A-Za-z0-9_-]{1,63}$` (pkill reads it as an ERE even with `-x`, so `.`/`+` are rejected); `-f` excluded (phase 2); Linux `-x` matches the 15-char `comm` → longer names `env_unsupported` |
@@ -699,8 +700,7 @@ first-stage-stdin (invariant 8).
 URLs, script names (`npm test` needs none), process names, regexes built from descriptions ("email
 addresses"), and format strings.
 
-**Approximations are not allowed.** "today" and "yesterday" have no find mapping and give
-`gate_reject`. git receives them verbatim.
+**Approximations are not allowed.** "today" and "yesterday" have no find mapping and give `gate_reject`. git receives them verbatim.
 
 ### 6.3 Obligations: deterministic request/command compatibility
 
@@ -724,6 +724,7 @@ HIDDEN. The sampler adds double-negation minimal pairs ("skip hidden" vs "don't 
 | Coverage | A word from a closed lexicon that no element explains: **any** gives `gate_reject`. Tool names must be what the command runs; write verbs (delete, rename, copy, …) are inexpressible (except save/write with a `write_fs` effect); op verbs (kill, download) need their op; a language/extension word ("python files") needs a value ending in that extension. Plain-English extension names (go, c, text, json, md) count only before "file(s)" or spelled `.go`. Unknown content words (outside consumed spans, cue phrases, the closed lexicons and the known domain vocabulary): more than `MAX_UNKNOWN` (= 1) gives `gate_reject` ("…and email me the result") |
 | Paths | A bare-word path (no `/ . ~`) is one request word, is not a file-kind noun before "files" ("config files"), and does not follow an unexplained modifier word ("app logs") |
 | Review rejects | Known wrong accepts, rejected conservatively: "just the number" with `wc FILE` (prints the name); `uniq -i` after a case-sensitive sort; `npm ls --depth` with a package; `find -maxdepth -type d` without `-mindepth 1`; "dotfiles" with `ls -A`; a count over `git branch --merged` |
+| Decline (v4) | `ir/lib/decline.js`, before the strict rules: a dangling last word ("compared to", "containing", "by author"), a definite generic noun with no value ("the deprecated helper", "that commit", "for the hook" as the pattern, "in there"), a placeholder as the whole pattern / jq field ("text", "something", `.nth`) and bare `upstream` as a rev give `underspecified`; a free recency phrase ("this week", "last 3 days") with no since/until/mtime/newer mod and "In DIR, download …" with no cwd give `dropped_value`; a permission filter ("executable", "perms" with find) gives `uncovered_content`. Tuned on v4 train: 10 of 51,306 gold `ok` rows declined (0.02%), 0 of 3,708 dev |
 | Kill | pkill requires a kill/stop/terminate verb cue and an exact ProcName span. Its signal always comes from `norm:signal`; `KILL` requires a FORCE cue |
 
 ### 6.4 Environment
@@ -963,10 +964,8 @@ NOT_SHELL from existing OOD sets; gate-negative rows from the obligations (dropp
 head↔tail, invented `-i`). (6) Splits by source session and IR family (op + mod set + shape)
 **before** paraphrasing.
 
-**Volume and training.** ≈120–200k checked rows (≈25k distinct IRs × 5 plus ≈30k negatives);
-teacher + reverse-check throughput is the bottleneck, not GPU time. Encoder initialized from S;
-several seeds for calibration stability. Week 1: encoder + heads (ships the fast path); week 2:
-decoder.
+**Volume and training.** ≈120–200k checked rows (≈25k distinct IRs × 5 plus ≈30k negatives); teacher + reverse-check throughput is the bottleneck, not GPU time.
+Encoder initialized from S; several seeds for calibration stability. Week 1: encoder + heads (ships the fast path); week 2: decoder.
 
 **Evaluation** (frozen, c2/c3): 4k deployment-weighted; 2k unseen combinations of known ops/mods;
 2k contrastive/ambiguous/unsupported/hazardous; ≈500 human-written, reported separately. Primary
@@ -995,6 +994,7 @@ it, do not patch it.
 2. `scripts/ir/convert.mjs <dir>`: decompile each command, `lift` (`ir/lib/lift.js`) every value
    back to a span / norm / const against the request, then run the full gate with round-trip.
    Status `accepted | rejected | mismatch | decompile_error | not_ok`; only `accepted` is kept.
-3. `scripts/ir/dedup.mjs`: exact and MinHash near-dup removal, a cap per IR skeleton (IR with spans
-   and literal strings removed), label balance, and a ~90/5/5 split **by skeleton hash** (dev/test
-   skeletons never appear in train); non-ok items split by request hash.
+3. `scripts/ir/dedup.mjs`: exact and MinHash near-dup removal, a cap per IR skeleton (IR with spans and literal strings removed),
+   label balance, and a ~90/5/5 split **by skeleton hash** (dev/test skeletons never appear in train); non-ok items split by request hash.
+
+**Judge rubric (v4, `scripts/ir/adjudicate_lib.mjs` SYSTEM; gold follows it via `gold_rewrite.mjs`).** "N lines of the log / history / output" and "log lines" mean plain `git log` (`oneline_lines` drops `--oneline`); commits, "commit lines", "one line" mean `--oneline` / `-n`. "in / within the last N lines … X": tail first; "the last N lines with X": search first; "N of the sorted / unique": sort first; "among the last N commits": `git log -n N | grep`, not `-n` with `--grep`.

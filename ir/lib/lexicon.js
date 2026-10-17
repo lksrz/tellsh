@@ -1,7 +1,7 @@
 // Closed EN lexicons of the gate's obligations (docs/IR.md §6.3). Data only, plus findCues.
 // Words are compared NFC + lower case (units.unitWord).
 
-import { LANG_EXT, LANG_MULTI, KNOWN_EXT, parseIntPhrase } from './normalizers.js';
+import { LANG_EXT, LANG_MULTI, LANG_EXTRA, KNOWN_EXT, parseIntPhrase } from './normalizers.js';
 import { unitWord } from './units.js';
 
 // ---------- cue lexicon: matched longest-first, one class per phrase ----------
@@ -221,14 +221,19 @@ const FILE_TYPE_WORDS = new Set([...PLAIN, ...Object.values(LANG_EXT), ...KNOWN_
   'yaml', 'toml', 'txt', 'log', 'cfg', 'ini', 'conf'].map((w) => w.toLowerCase()));
 const FILE_NOUN_NEXT = new Set(['file', 'files', 'source', 'sources', 'code', 'scripts', 'documents', 'docs']);
 export const langExt = (w) => LANG_EXT[w] ?? w;
+const TEMPLATE_EXT = new Set(['j2', 'jinja', 'twig', 'tpl', 'erb', 'haml', 'svelte']);
 export const langWordAt = (words, i) => {
   const w = words[i];
   const bare = w.startsWith('.') ? w.slice(1) : w;
   if (ALWAYS_LANG.has(w)) return w;
   if (!ALWAYS_LANG.has(bare) && !FILE_TYPE_WORDS.has(bare)) return null;
   if (w.startsWith('.') || FILE_NOUN_NEXT.has(words[i + 1])) return bare;
+  // template extensions name a file type before "template(s)" too ("j2 templates", "twig template")
+  if (TEMPLATE_EXT.has(bare) && /^templates?$/.test(words[i + 1] || '')) return bare;
   return null;
 };
+// every extension a language word names (v4 multi-extension: elixir -> ex, exs)
+export const langExts = (w) => [langExt(w), ...(LANG_EXTRA[w] || [])];
 export const PIN_NAMES = { rg: ['rg', 'ripgrep'], grep: ['grep'] };
 
 // ---------- request words a behaviour-changing mod or const needs (§6.3, cue-less mods) ----------

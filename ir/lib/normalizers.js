@@ -122,6 +122,8 @@ export const LANG_EXT = { python: 'py', go: 'go', golang: 'go', rust: 'rs', ruby
   haskell: 'hs', perl: 'pl', zig: 'zig', svelte: 'svelte', vue: 'vue', json: 'json', toml: 'toml',
   css: 'css', scss: 'scss', sql: 'sql', csv: 'csv', terraform: 'tf', groovy: 'groovy', blade: 'blade.php',
   parquet: 'parquet', haml: 'haml', erb: 'erb', mdx: 'mdx', jsonl: 'jsonl', ndjson: 'ndjson' };
+// v4: further extensions of a LANG_EXT language; compile.js impliedLangExts adds them as globs ("elixir files" -> *.ex, *.exs).
+export const LANG_EXTRA = { elixir: ['exs'] };
 // Languages with several extensions: ambiguous unless the request names the extension.
 export const LANG_MULTI = new Set(['typescript', 'javascript', 'c++', 'cpp', 'c', 'yaml', 'html',
   'markdown', 'shell', 'bash', 'jsx', 'react', 'objective-c', 'csharp', 'c#', 'xml', 'text']);

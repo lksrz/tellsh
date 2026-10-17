@@ -7,9 +7,10 @@ import { unitWord } from './units.js';
 import { parseIntPhrase } from './normalizers.js';
 import { strictObligations, STRICT_KNOWN, PRODUCT_NAMES } from './strict.js';
 import { accountability } from './accountability.js';
+import { declineObligations } from './decline.js';
 import {
   CUE_LEXICON, PER_FILE, DIR_WORDS, KILL_VERBS, NOT_GERUND, CLAUSE_BOUNDARY, TOOL_WORDS, WRITE_VERBS,
-  OP_VERBS, langWordAt, langExt, PIN_NAMES, REQUIRE_WORDS, SORT_FORBID, TYPE_F_CONFLICT, FILE_NOUNS, KNOWN_WORDS,
+  OP_VERBS, langWordAt, langExt, langExts, PIN_NAMES, REQUIRE_WORDS, SORT_FORBID, TYPE_F_CONFLICT, FILE_NOUNS, KNOWN_WORDS,
   MAX_UNKNOWN, FREQ_WORDS, BOUND_MODS, MOD_EXPLAINS, CLAUSE_VERBS, ALSO_EXPLAINS, BARE_NUMBER,
 } from './lexicon.js';
 
@@ -389,7 +390,7 @@ export function obligations(ir, stages, ctx, used) {
     if (w in OP_VERBS && !ops.has(OP_VERBS[w])) fail('coverage', `verb "${w}" needs ${OP_VERBS[w]}`);
     const lang = langWordAt(words, i);
     // explained when a value names that extension ("tsx files named Button.tsx", "log files *.log")
-    if (lang && !used.some((v) => v.value.toLowerCase().endsWith(`.${langExt(lang)}`))) fail('coverage', `file type "${lang}" is not used by any value`);
+    if (lang && !used.some((v) => langExts(lang).some((e) => v.value.toLowerCase().endsWith(`.${e}`)))) fail('coverage', `file type "${lang}" is not used by any value`);
     if (isUnknownWord(w) && !inCue(i)) unknown.push(w);
   });
   if (unknown.length > MAX_UNKNOWN) fail('coverage', `unexplained words: ${unknown.join(', ')}`);
@@ -399,6 +400,9 @@ export function obligations(ir, stages, ctx, used) {
   const requireWordsFor = (op, m) => [`${op}.${m.mod}`, ...(m.values || []).filter((v) => v.k === 'const').map((v) => `${op}.${m.mod}=${v.id}`)]
     .some((k) => REQUIRE_WORDS[k]);
   const isKnown = (x) => KNOWN_WORDS.has(x) || LEXICON_WORDS.has(x);
+  // Decline pre-check (decline.js): requests that name no value for what they ask about.
+  declineObligations({ words, consumed, fail, hasFree, execInfos, used, seg, env: ctx.env });
+  pass('decline', 'request names its values');
   strictObligations(ir, stages, ctx, used, { words, consumed, fail, hasFree, hasMod, specOf, prevOf, inCue, isKnown,
     isUnknownWord, flagSpelled, requireWordsFor, isExtWord: (x) => !!langWordAt([x.toLowerCase(), 'files'], 0), nearKnown });
   pass('strict', 'cover words, span integrity, mods requested, audit patterns');

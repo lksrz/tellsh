@@ -14,7 +14,8 @@
 import { canon, needsDotSlash } from './canon.js';
 import { IRError, LIMITS, validateShape, UNSAFE_CHARS } from './ir.js';
 import { realize, opSchema, stdoutOf, pipeIllegal, eachIllegal } from './schemas.js';
-import { escapeRegex, hasRegexMeta } from './normalizers.js';
+import { escapeRegex, hasRegexMeta, LANG_EXTRA } from './normalizers.js';
+import { segment, spanText } from './units.js';
 
 export const COMPILER_VERSION = 1;
 export const SHELLS = ['bash', 'zsh'];
@@ -146,9 +147,9 @@ function buildExec(env, e, position, sctx) {
   const gitAll = GIT_PATTERN_MODS.flatMap((m) => values.get(m) || []);
   const isRegex = (v) => v.pkind === 'regex';
   const derive = {
-    pattern_literal_with_meta: () => !posPats.some(isRegex) && posPats.some((v) => hasRegexMeta(v.s)),
+    pattern_literal_with_meta: () => !posPats.some(isRegex) && posPats.some((v) => hasRegexMeta(v.s) || requestSaysLiteral(env.request)),
     pattern_regex: () => posPats.some(isRegex),
-    git_patterns_literal_with_meta: () => !gitPats.some(isRegex) && gitAll.some((v) => hasRegexMeta(v.s)),
+    git_patterns_literal_with_meta: () => !gitPats.some(isRegex) && gitAll.some((v) => hasRegexMeta(v.s) || (gitPats.length && requestSaysLiteral(env.request))),
     git_pattern_regex: () => gitPats.some(isRegex),
     first_stage: () => position === 'first',
     endless_input_and_piped_output: () => sctx.input === 'endless' && sctx.pipedOut,
@@ -158,6 +159,8 @@ function buildExec(env, e, position, sctx) {
     names_only_requested: () => ['name_only', 'name_status'].some((m) => values.has(m)) && !values.has('oneline') && !values.has('format')
       && requestWantsNamesOnly(env.request),
     multi_file_sorted: () => position === 'first' && searchFeedsSort(paths, sctx.next, values) && !requestWantsFileNames(env.request),
+    merges_with_file_lists: () => values.has('merges_only') && ['name_only', 'name_status', 'stat'].some((m) => values.has(m)),
+    all_entries_requested: () => !values.has('hidden') && requestWantsAllEntries(env.request, paths),
     always: () => true,
   };
   const active = new Set(predicted);
@@ -470,8 +473,61 @@ export const requestWantsNamesOnly = (request) => typeof request === 'string'
   && /\b(only|just)( the)?( changed)? (file ?names|filenames|names of the (changed )?files)\b/i.test(request)
   && !/\b(log|history|who|per commit|each commit|commits? (by|on|touching|that|in|since|from|until))\b/i.test(request);
 
+// v4 fix 2: a literal cue ("literal match", "fixed string", "verbatim") always renders -F (rg / grep) or
+// --fixed-strings (git --grep), not only when the pattern has a metacharacter. Derived: decompile strips it.
+export const LITERAL_CUE = /\b(literal(ly)?|fixed[- ]strings?|verbatim|as a plain string|not (a |as a )?regex)\b/i;
+export const requestSaysLiteral = (request) => typeof request === 'string' && LITERAL_CUE.test(request);
+
+// v4 fix 2: `ls -a` (derived all) when the request asks for every entry of a directory and no hidden (-A) mod is
+// predicted: ". and ..", "dot entries", "all entries", or "all of <path>" right before a path operand.
+const ALL_ENTRIES_CUE = /(^|\s)\. and \.\.(\s|$)|\b(all|every) (the )?entries\b|\bdot entries\b/i;
+const reEsc = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+export function requestWantsAllEntries(request, paths = []) {
+  if (typeof request !== 'string') return false;
+  if (ALL_ENTRIES_CUE.test(request)) return true;
+  return paths.some((v) => typeof v?.s === 'string' && new RegExp(`\\ball of (the )?${reEsc(v.s)}(?!\\s+(files?|dirs?|folders?|directories|entries)\\b)(\\s|[,.;]|$)`, 'i').test(request));
+}
+
+// v4 (lexicon multi-extension): a language with several extensions ("elixir files") names all of them. The ext_glob
+// norm resolves to the first (*.ex, normalizers.js LANG_EXT); compile appends the others as literal globs (find name_glob becomes any_name).
+// Request-implied like impliedFileType: strict.js sees the predicted IR, the round-trip reference applies the same step.
+const GLOB_MODS = ['name_glob', 'any_name'];
+export function impliedLangExts(ir, request) {
+  if (typeof request !== 'string') return ir;
+  let seg = null;
+  const extraOf = (v) => {
+    if (v?.k !== 'norm' || v.kind !== 'ext_glob') return [];
+    seg ??= segment(request);
+    let src;
+    try { src = spanText(seg, v.u).toLowerCase(); } catch { return []; }
+    return LANG_EXTRA[src] || [];
+  };
+  const fix = (e) => {
+    if (e?.k !== 'exec' || !(e.mods || []).length) return e;
+    let changed = false;
+    const mods = e.mods.map((m) => {
+      if (!GLOB_MODS.includes(m.mod)) return m;
+      const extra = (m.values || []).flatMap(extraOf).map((x) => `*.${x}`)
+        .filter((g) => !(m.values || []).some((v) => v.k === 'lit' && v.s === g));
+      if (!extra.length) return m;
+      changed = true;
+      const mod = e.op === 'files.find' && m.mod === 'name_glob' ? 'any_name' : m.mod;
+      return { ...m, mod, values: [...m.values, ...extra.map((g) => ({ k: 'lit', s: g }))] };
+    });
+    if (!changed || mods.filter((m) => m.mod === 'any_name').length > 1) return e;
+    return { ...e, mods };
+  };
+  return {
+    ...ir,
+    body: {
+      ...ir.body,
+      parts: ir.body.parts.map((p) => ({ ...p, stages: p.stages.map((st) => (st.k === 'each' ? { ...st, exec: fix(st.exec) } : fix(st))) })),
+    },
+  };
+}
+
 // every request-implied mod compile adds before canon (gate.js builds its round-trip reference the same way)
-export const impliedMods = (ir, request) => impliedOnlyMatching(impliedFileType(ir, request), request);
+export const impliedMods = (ir, request) => impliedLangExts(impliedOnlyMatching(impliedFileType(ir, request), request), request);
 
 // compile(ir, env) -> { plan, text, canonical } | { error, label }
 export function compile(ir, env) {

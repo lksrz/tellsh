@@ -161,12 +161,15 @@ function checkOption(o, path, add) {
   }
   // implied: {reason, when}: an implied default of the op, needing no request word (strict.js);
   // when: 'always' | 'piped' (the stage feeds another) | 'each' (it feeds an each stage) | 'after:op[.mod]' (the previous stage)
-  // | 'before:op[.mod]' (the next stage) | 'match_cue' (compile.js matchCueImpliesO: the request asks for the matches), or a list
+  // | 'before:op[.mod]' (the next stage) | 'match_cue' (compile.js matchCueImpliesO: the request asks for the matches)
+  // | 'with:mod' (the same exec has mod) | 'not:a!b' (the exec does not have a without b; 'not:a': it lacks a), or a list
+  // (impliedModTokenHolds evaluates the two exec-local forms)
   if (o.implied !== undefined) {
     const ws = [].concat(o.implied?.when ?? []);
     if (!isObj(o.implied) || typeof o.implied.reason !== 'string' || !o.implied.reason || !ws.length
-      || !ws.every((w) => w === 'always' || w === 'piped' || w === 'each' || w === 'match_cue' || /^(after|before):[a-z]+\.[a-z_]+(\.[a-z_]+)?$/.test(w)))
-      add(path, 'implied must be {reason, when: always|piped|each|match_cue|after:op[.mod]|before:op[.mod] (or a list)}');
+      || !ws.every((w) => w === 'always' || w === 'piped' || w === 'each' || w === 'match_cue' || /^(after|before):[a-z]+\.[a-z_]+(\.[a-z_]+)?$/.test(w)
+        || /^(with:[a-z_]+|not:[a-z_]+(![a-z_]+)?)$/.test(w)))
+      add(path, 'implied must be {reason, when: always|piped|each|match_cue|after:op[.mod]|before:op[.mod]|with:mod|not:mod[!mod] (or a list)}');
   }
   if (o.polarity !== undefined && o.polarity !== 'neg') add(path, 'polarity must be "neg"');
   if (o.direction !== undefined && !['first', 'last'].includes(o.direction)) add(path, 'direction must be first|last');
@@ -455,4 +458,15 @@ export function effectsOf(op, modIds = []) {
   const set = new Set(op.effects);
   for (const m of modIds) for (const e of op.options.find((o) => o.mod === m)?.effects_add || []) set.add(e);
   return [...set];
+}
+
+// The exec-local `implied.when` tokens (v4 fix 20): 'with:mod' holds when the exec has mod; 'not:a!b' holds unless the
+// exec has a and lacks b ('not:a' unless it has a). has(mod) -> bool. Returns null for any other token.
+export function impliedModTokenHolds(w, has) {
+  if (w.startsWith('with:')) return has(w.slice(5));
+  if (w.startsWith('not:')) {
+    const [a, b] = w.slice(4).split('!');
+    return !(has(a) && !(b && has(b)));
+  }
+  return null;
 }

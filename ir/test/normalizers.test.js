@@ -117,3 +117,15 @@ test('segmenter and span text', () => {
   assert.equal(segment("it's broken").units.length, 2);
   assert.throws(() => spanText(seg, [5, 99]), RangeError);
 });
+
+test('v4: multi-extension languages and template extension words', async () => {
+  const { LANG_EXTRA } = await import('../lib/normalizers.js');
+  const { langExts, langWordAt } = await import('../lib/lexicon.js');
+  assert.equal(NORM.ext_glob('elixir').value, '*.ex');
+  assert.deepEqual(LANG_EXTRA.elixir, ['exs']);
+  assert.deepEqual(langExts('elixir'), ['ex', 'exs']);
+  assert.deepEqual(langExts('python'), ['py']);
+  assert.equal(langWordAt(['j2', 'templates'], 0), 'j2');
+  assert.equal(langWordAt(['svelte', 'components'], 0), 'svelte');
+  assert.equal(langWordAt(['log', 'templates'], 0), null);
+});

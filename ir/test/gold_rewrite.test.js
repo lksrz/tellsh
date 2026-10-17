@@ -75,3 +75,39 @@ test('adjudicationPlan: train only, replace with a gate-accepted pred, drop when
   assert.equal(plan.has('baz'), false);
   assert.equal(stats.replace, 1);
 });
+
+test('v4 oneline_lines: "N lines of the log" drops --oneline; a commits cue keeps it', () => {
+  const ir = pipe({ k: 'exec', op: 'git.log', mods: [{ mod: 'oneline' }], args: {} },
+    { k: 'exec', op: 'file.head', mods: [{ mod: 'lines', values: [{ k: 'norm', kind: 'int', u: [1, 2] }] }], args: {} });
+  const r = rewriteRow(row('first 25 lines of the log', ir), schemas);
+  assert.deepEqual(r.applied, ['oneline_lines']);
+  assert.equal(r.row.command, 'git log | head -n 25');
+  assert.deepEqual(rewriteRow(row('first 25 commits of the log', ir), schemas).applied.filter((a) => a === 'oneline_lines'), []);
+  assert.deepEqual(lint({ ...r.row, label: 'ok' }), []);
+});
+
+test('v4 download_cwd: "In DIR, download URL" becomes cd DIR && curl -O URL', () => {
+  const ir = pipe({ k: 'exec', op: 'http.download', mods: [{ mod: 'remote_name' }], args: { url: [span(4, 'Url')] } });
+  const r = rewriteRow(row('In e2e, download https://example.com/a.json', ir), schemas);
+  assert.deepEqual(r.applied, ['download_cwd']);
+  assert.match(r.row.command, /^cd \.\/e2e && curl .*-O https:\/\/example\.com\/a\.json$/);
+});
+
+test('v4 recompile: a derived mod updates the stored command, a spelling difference does not', () => {
+  const ir = pipe({ k: 'exec', op: 'git.log', mods: [{ mod: 'grep_message', values: [span(2, 'Pattern')] }], args: {} });
+  const r = rewriteRow(row('commits mentioning tenant_id, literal match', ir, 'git log --grep=tenant_id'), schemas);
+  assert.deepEqual(r.applied, ['recompile']);
+  assert.equal(r.row.command, 'git log -F --grep=tenant_id');
+  const same = rewriteRow(row('commits mentioning tenant_id', ir, "git log --grep='tenant_id'"), schemas);
+  assert.deepEqual(same.applied, []);
+});
+
+test('v4 uniq_dup: a duplicates noun asks for uniq -d; a collapse cue for plain uniq', () => {
+  const u = (mods) => pipe({ k: 'exec', op: 'lines.uniq', mods, args: { paths: [span(4, 'Path')] } });
+  const d = rewriteRow(row('adjacent duplicate lines in values.yaml', u([])), schemas);
+  assert.deepEqual(d.applied, ['uniq_dup']);
+  assert.equal(d.row.command, 'uniq -d values.yaml');
+  assert.deepEqual(rewriteRow(row('remove adjacent duplicates in values.yaml', u([])), schemas).applied, []);
+  const c = rewriteRow(row('collapse adjacent repeats in q.kt', u([{ mod: 'repeated' }])), schemas);
+  assert.equal(c.row.command, 'uniq q.kt');
+});

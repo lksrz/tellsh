@@ -4,14 +4,16 @@ import {
   loadSchemas, validateSchema, formatProblem, opSchema, realize, stdoutOf, acceptsStream,
   pipeIllegal, eachIllegal, valueActions, exec, optionSpec,
 } from '../lib/index.js';
+import { impliedModTokenHolds } from '../lib/schemas.js';
+import { gate } from '../lib/index.js';
 
 test('all 17 schemas load clean', () => {
   const { registry, problems } = loadSchemas(undefined, { strict: false });
   assert.deepEqual(problems.map(formatProblem), []);
   assert.equal(registry.stats.tools, 17);
   assert.equal(registry.stats.ops, 26);
-  assert.equal(registry.stats.mods, 116);
-  assert.equal(registry.stats.optionEntries, 184);
+  assert.equal(registry.stats.mods, 117);
+  assert.equal(registry.stats.optionEntries, 186);
   assert.match(registry.hash, /^[0-9a-f]{64}$/);
 });
 
@@ -102,4 +104,34 @@ test('value actions (§4.5)', () => {
   assert.deepEqual(sig, { span: false, norms: ['signal'], consts: [] });
   assert.deepEqual(valueActions(optionSpec(reg, 'find', 'files.find', 'type').value).consts, ['f', 'd', 'l']);
   assert.equal(valueActions({ type: 'Glob' }).span, true);
+});
+
+test('v4: exec-local implied tokens (with:mod, not:a!b) validate and evaluate', () => {
+  const op = (when) => ({
+    schema_version: 1, tool: 'x', binary: 'x', versions: {}, platforms: { linux_gnu: 'ok', darwin_bsd: 'ok' },
+    ops: { 'x.y': { realization: 'default', argv_prefix: [], gloss: 'g', effects: ['read_fs'], stdin: { accepts: [], when: 'never' },
+      stdout: 'lines', no_operands: 'cwd', positionals: [],
+      options: [{ mod: 'a', flag: '-a', form: 'bool', model: 'predict', implied: { reason: 'r', when } }, { mod: 'b', flag: '-b', form: 'bool', model: 'predict' }] } },
+  });
+  const implErr = (when) => validateSchema(op(when), 'x.json').some((p) => p.msg.startsWith('implied must be'));
+  assert.equal(implErr(['piped', 'not:fail!show_error']), false);
+  assert.equal(implErr('with:output'), false);
+  assert.equal(implErr('sometimes'), true);
+  const has = (...ms) => (m) => ms.includes(m);
+  assert.equal(impliedModTokenHolds('with:output', has('output')), true);
+  assert.equal(impliedModTokenHolds('with:output', has()), false);
+  assert.equal(impliedModTokenHolds('not:fail!show_error', has('fail')), false);
+  assert.equal(impliedModTokenHolds('not:fail!show_error', has('fail', 'show_error')), true);
+  assert.equal(impliedModTokenHolds('not:fail!show_error', has()), true);
+  assert.equal(impliedModTokenHolds('piped', has()), null);
+});
+
+test('v4: jq rejects a URL operand (curl it first)', () => {
+  const schemas = loadSchemas();
+  const request = 'grab .name from https://api.example.com/a.json';
+  const ir = { v: 1, status: 'ok', body: { k: 'and', parts: [{ k: 'pipe', stages: [{ k: 'exec', op: 'json.select', mods: [],
+    args: { filter: [{ k: 'norm', kind: 'jq_path', u: [1, 2] }], paths: [{ k: 'span', u: [3, 4], as: 'Path' }] } }] }] } };
+  const g = gate(request, ir, { schemas, shell: 'bash', platform: 'linux_gnu', request });
+  assert.equal(g.accept, false);
+  assert.match(g.reasons.join(' '), /fails the Path validator/);
 });

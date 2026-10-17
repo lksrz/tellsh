@@ -282,6 +282,15 @@
           "model": "predict"
         },
         {
+          "mod": "diff_merges",
+          "flag": "--diff-merges=first-parent",
+          "form": "bool",
+          "model": "derived",
+          "derive": "merges_with_file_lists",
+          "min_version": "2.31",
+          "note": "v4: git log prints no diff (so no --name-only / --name-status / --stat list) for merge commits by default; --merges with a file list derives --diff-merges=first-parent"
+        },
+        {
           "mod": "first_parent",
           "flag": "--first-parent",
           "form": "bool",

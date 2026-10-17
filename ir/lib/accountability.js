@@ -14,6 +14,15 @@ const CUE_KEYS = [
   { words: ['history'], keys: ['git.log', 'git.show'] },
   { words: ['whose names', 'whose name', 'whose filename', 'whose filenames', 'whose file name', 'whose file names'],
     keys: ['files.find', 'dir.list', 'files.list', 'git.diff.name_only', 'git.log.name_only', 'git.show.name_only', 'lines.sort', 'text.search!files_with_matches'] },
+  // v4 fix 10: op cues the IR's ops must explain
+  { words: ['start of', 'beginning of', 'begining of', 'top of', 'lead of', 'preview', 'peek at'], keys: ['file.head', 'json.select', 'http.*', 'git.*', 'npm.*', 'dir.list'], unless: ['of a line', 'of the line', 'of line', 'of each line', 'of lines', 'of the lines'] },
+  { words: ['end of', 'bottom of', 'tail of', 'last part'], keys: ['file.tail', 'git.*', 'npm.*'], unless: ['of a line', 'of the line', 'of line', 'of each line', 'of lines', 'of the lines'] },
+  { words: ['status', 'name status'], keys: ['git.status', 'git.diff.name_status', 'git.log.name_status', 'git.show.name_status', 'http.*', 'proc.*', 'npm.*', 'port.*', 'freq', 'lines.*', 'text.search'] },
+  { words: ['process', 'processes', 'procs', 'process list', 'process table', 'running processes', 'aux', 'alive'], keys: ['proc.*', 'port.*', 'npm.*', 'http.*'], unless: ['running tests'] },
+  { words: ['symlinks'], keys: ['files.find.type=l', 'dir.list', 'text.search', 'files.find.follow', 'files.list'] },
+  { words: ['git show'], keys: ['git.show'] },
+  { words: ['dependencies', 'deps'], keys: ['npm.*', 'lines.*', 'text.search', 'file.*'], unlessPath: 'node_modules' },
+  { words: ['top level'], keys: ['npm.*', 'files.find.max_depth', 'text.search.max_depth', 'dir.list'], unlessPath: 'node_modules' },
 ];
 
 // Known words that name things (directories, packages, apps) rather than ask for something: a free one is content.
@@ -52,6 +61,7 @@ export function accountability(ir, stages, ctx, h) {
     }
   }
   const has = (k) => {
+    if (k.endsWith('.*')) return [...keys].some((x) => x.startsWith(k.slice(0, -1)));
     const [base, without] = k.split('!');
     if (!without) return keys.has(base);
     return keys.has(base) && !keys.has(`${base}.${without}`);
@@ -66,6 +76,8 @@ export function accountability(ir, stages, ctx, h) {
   const done = new Set();
   // (b) cue words: explained only by a present element
   for (const r of CUE_KEYS) {
+    if (r.unless && r.unless.some((ph) => words.join(' ').includes(ph))) continue;
+    if (r.unlessPath && valueText.some((t) => t.includes(r.unlessPath))) continue;
     for (const ph of r.words) {
       const p = ph.split(' ');
       for (let i = 0; i + p.length <= words.length; i++) {

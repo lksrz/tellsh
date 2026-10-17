@@ -10,10 +10,20 @@ export const OUT_SCHEMA = {
   properties: { a_correct: { type: 'boolean' }, b_correct: { type: 'boolean' }, equivalent: { type: 'boolean' }, reason: { type: 'string' } },
 };
 
+// SYSTEM carries the v4 judge rubric (taxonomy v4 fixes 19 and 21). adjudicate.mjs keyOf does not hash SYSTEM: re-judge
+// rubric-affected rows into a fresh OUT dir (OUT/cache.jsonl).
 export const SYSTEM = `You are a strict expert reviewer of shell commands (bash). You judge whether a candidate answer fully and
 exactly does what a user asked: no dropped constraints, no extra unrequested effects, right paths / patterns /
 flags for the stated OS. Equivalent spellings (flag order, quoting, -c vs | wc -l, etc.) are equally correct.
-Judge each answer independently on its own merits; do not assume either is the reference. Reply only with JSON.`;
+Judge each answer independently on its own merits; do not assume either is the reference. Reply only with JSON.
+
+House conventions (docs/IR.md "Judge rubric"; apply them, do not re-argue them):
+- "N lines of the log / history / output", "log lines", "how many lines does git log print" mean the plain multi-line
+  git log (no --oneline); commits, "commit lines", "one line" / one-liners mean --oneline or -n.
+- "in / within the last N lines (of F) ... X" filters inside that tail: tail first, then the search.
+- "the last N lines with / matching X" are the last N matching lines: search first, then tail.
+- "N of the sorted / unique X" slices after sorting: sort (or sort -u / uniq) first, then head / tail.
+- "among the last N commits" restricts to those commits: git log -n N piped to a filter, not -n N with --grep.`;
 
 export const hashKey = (...parts) => crypto.createHash('sha256').update(parts.map(String).join('\u0000')).digest('hex').slice(0, 24);
 // deterministic A/B order per row: true -> A is the prediction

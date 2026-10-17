@@ -58,7 +58,10 @@
           "model": "predict",
           "implied": {
             "reason": "only hides curl's progress meter on stderr; stdout is unchanged",
-            "when": "always"
+            "when": [
+              "piped",
+              "not:fail!show_error"
+            ]
           }
         },
         {
@@ -156,7 +159,10 @@
           "model": "predict",
           "implied": {
             "reason": "only hides curl's progress meter on stderr; stdout is unchanged",
-            "when": "always"
+            "when": [
+              "piped",
+              "not:fail!show_error"
+            ]
           }
         },
         {

@@ -143,3 +143,11 @@ test('generic words are not paths; a named ref must be used', () => {
   ok('commits from release/2.3 touching src', 'git log release/2.3 -- src');
   ok('last 5 commits on the dev server logs', 'git log -n 5');
 });
+
+test('WP3 (v4 taxonomy): stopword path exemption, case negation, format author, curl -s', () => {
+  no('unstaged file names', 'git diff --name-only -- unstaged', /generic request word/);
+  ok('search TODO in src, not case sensitive', 'rg -i TODO src');
+  no('commits by Priya Patel since 2 weeks ago, hash author date subject', "git log --format=%s --author='Priya Patel' --since='2 weeks ago'", /author \/ date/);
+  ok('log subjects where the author is Jan Kowalski', "git log --format=%s --author='Jan Kowalski'");
+  ok('fetch https://example.com/a.json silently', 'curl -g -s https://example.com/a.json');
+});

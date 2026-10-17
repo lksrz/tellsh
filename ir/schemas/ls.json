@@ -45,6 +45,14 @@
           "cue": "LONG_FORMAT"
         },
         {
+          "mod": "all",
+          "flag": "-a",
+          "form": "bool",
+          "model": "derived",
+          "derive": "all_entries_requested",
+          "note": "v4: every entry ('. and ..', 'all entries', 'all of DIR') with no predicted hidden (-A): compile.js requestWantsAllEntries"
+        },
+        {
           "mod": "hidden",
           "flag": "-A",
           "form": "bool",
@@ -123,7 +131,7 @@
         "-G (GNU: no group; BSD: color)",
         "--time-style (GNU)",
         "-T (differs)",
-        "-a (hidden is rendered -A; '.' and '..' add nothing)"
+        "-a as a predicted mod (hidden is rendered -A; -a is only derived from an every-entry cue)"
       ],
       "notes": [
         "stdout is lines, never paths: 'ls | xargs' is inexpressible",
