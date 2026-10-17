@@ -171,6 +171,28 @@ backoff. Usage and `cost_usd` come from the CLI JSON (`total_cost_usd`, notional
 records wall time. The cache key ignores the backend, so api and cli verdicts share `OUT/cache.jsonl`. Measured on 5
 v4 dev rows (opus, low): ~5.4k input tokens, 5.6-9.8 s per call.
 
+`--backend codex` (`codex exec -m M -c model_reasoning_effort=E -s read-only --json --output-schema F -o F -`, default
+`gpt-6-luna`; rubric prepended to the prompt) and `--backend grok` (`grok --prompt-file F --max-turns 1 --tools ""
+--system-prompt-override SYSTEM --json-schema OUT_SCHEMA -m M --reasoning-effort E`, default `grok-4.6`) are cheap
+subscription judges (default `--concurrency 4`); `OPENAI_API_KEY` / `XAI_API_KEY` / `GROK_API_KEY` are stripped too.
+`--rows FILE` takes adjudication-shaped rows (request, os, command, gold, goldLabel, y) directly instead of
+`--cands` + `--data`. The cache key holds the model (plus `--cache-tag T` if given), not the backend or effort: give
+each judge config its own `--out`. `judge_compare.mjs --ref REF.jsonl name=ADJ.jsonl ... [--combo a+b]` reports
+agreement with a reference judge on `pred_correct`, recall / precision of reference-wrong rows, failures and sec/call
+(comparison set: `build/ir/judge_cmp/rows400.jsonl`, 200 Opus-wrong + 200 Opus-correct, 150 y=0 + 50 y=1 each).
+
+`--backend jev` calls TypeSafe's Jev (`POST https://api.typesafe.ai/v1/systemone`, key from `JEV_API_KEY`, never
+logged; default model `jev-latest`, `--concurrency 8`, backoff on 429 / 529 / 5xx honouring `retry-after`). Each row
+is one request: state `{request, os, command}`, and every `JEV_VARIANTS` Noul (`plain`, `criteria`, `strict`, and the
+gold-aware `gold`, `gold_nocrit`, `gold_strict`, which put the gold in a structured `reference_answer` instruction
+field) plus a `gold_ok` Noul on the gold. Records store `p` (the `--jev-variant`, default `gold`), `p_variants`,
+`p_gold`, and `pred_correct = p >= --threshold` (default 0.5; re-derived from the cache on reruns, so a new threshold or
+variant needs no new calls); `equivalent` is null. Cost = input tokens x $42/Btok (output free). On a 400-row
+Opus-referenced set (200 Opus-wrong; 233 y=0): `gold` AUC 0.96 vs Opus, best agreement 0.90, ~0.25 s/call, $0.02 for
+all 400 rows, 0 failures; the gold-free variants only reach AUC 0.85-0.87. A y=0 => wrong baseline already gets agreement 0.90 / recall 0.98, so
+use Jev only to rescue y=0 rows (within y=0 AUC ~0.91), e.g. `gold` at t~0.73 keeps 95% Opus-wrong recall and clears
+~45% of the Opus-correct y=0 rows.
+
 `score_combined.mjs --adjudications DEV_ADJ,TEST_ADJ` counts a `y = 0` candidate as correct when its adjudication
 (same id and command) says the prediction is correct, and reports `adj_wrong`, `adj_accepted_wrong_rate`,
 `adj_accepted_wrong_ub95` next to the raw numbers (thresholds are still chosen on raw labels). With `--adj-truth`

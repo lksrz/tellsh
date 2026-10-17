@@ -128,7 +128,7 @@ export function cliArgs(model, effort) {
     '--no-session-persistence', '--tools', '', '--strict-mcp-config', '--disable-slash-commands', '--system-prompt', SYSTEM];
 }
 // child env without API credentials, so the CLI falls back to the subscription (OAuth) login.
-export const CLI_STRIP_ENV = ['ANTHROPIC_API_KEY', 'CLAUDE_API_KEY', 'ANTHROPIC_AUTH_TOKEN'];
+export const CLI_STRIP_ENV = ['ANTHROPIC_API_KEY', 'CLAUDE_API_KEY', 'ANTHROPIC_AUTH_TOKEN', 'OPENAI_API_KEY', 'XAI_API_KEY', 'GROK_API_KEY'];
 export function cliEnv(env) {
   const e = { ...env };
   for (const k of CLI_STRIP_ENV) delete e[k];
@@ -145,4 +145,146 @@ export function parseCliResult(stdout) {
   const usage = { input_tokens: u.input_tokens || 0, cache_creation_input_tokens: u.cache_creation_input_tokens || 0,
     cache_read_input_tokens: u.cache_read_input_tokens || 0, output_tokens: u.output_tokens || 0 };
   return { verdict, usage, cost_usd: Number(j.total_cost_usd) || 0 };
+}
+
+// ---------- --backend codex / grok (subscription CLIs, same flags as grok_gen.mjs) ----------
+export const DEFAULT_MODEL = { cli: 'claude-opus-5-5', api: 'claude-opus-5-5', codex: 'gpt-6-luna', grok: 'grok-4.6', jev: 'jev-latest' };
+// `codex exec` argv: prompt on stdin ('-'), schema file + last-message file, read-only sandbox.
+export function codexArgs(model, effort, schemaFile, outFile) {
+  return ['exec', '-m', model, '-c', `model_reasoning_effort="${effort}"`, '--disable', 'multi_agent',
+    '-s', 'read-only', '--skip-git-repo-check', '--json', '--output-schema', schemaFile, '-o', outFile, '-'];
+}
+// codex has no system prompt flag: the rubric is prepended to the user prompt.
+export const codexPrompt = (prompt) => `${SYSTEM}\n\n${prompt}`;
+// codex --json event stream (stdout) + last message (outFile text) -> {verdict, usage, cost_usd}
+export function parseCodexResult(stdout, lastMessage) {
+  let u = {};
+  for (const l of String(stdout ?? '').split('\n')) {
+    try { const e = JSON.parse(l); const x = e.usage || e.msg?.info?.total_token_usage || e.info?.total_token_usage; if (x) u = x; } catch {}
+  }
+  const verdict = parseVerdict(lastMessage);
+  return { verdict, usage: { input_tokens: u.input_tokens || 0, cache_read_input_tokens: u.cached_input_tokens || 0,
+    output_tokens: u.output_tokens || 0, reasoning_tokens: u.reasoning_output_tokens || u.reasoning_tokens || 0 }, cost_usd: 0 };
+}
+export function grokArgs(model, effort, promptFile) {
+  return ['--prompt-file', promptFile, '--no-subagents', '--disable-web-search', '--max-turns', '1', '--tools', '',
+    '--system-prompt-override', SYSTEM, '--json-schema', JSON.stringify(OUT_SCHEMA), '-m', model, '--reasoning-effort', effort];
+}
+// grok headless stdout {structuredOutput | text, usage, total_cost_usd} -> {verdict, usage, cost_usd}
+export function parseGrokResult(stdout) {
+  let j;
+  try { j = JSON.parse(stdout); } catch { throw new Error('cli: stdout is not JSON'); }
+  const so = j.structuredOutput ?? j.structured_output;
+  const verdict = parseVerdict(so && typeof so === 'object' ? JSON.stringify(so) : j.text ?? j.result);
+  const u = j.usage || {};
+  return { verdict, usage: { input_tokens: u.input_tokens || 0, output_tokens: u.output_tokens || 0, reasoning_tokens: u.reasoning_tokens || 0 },
+    cost_usd: Number(j.total_cost_usd) || 0 };
+}
+
+// --rows: adjudication-shaped rows (gold already joined) -> judge input rows, verdict fields dropped.
+export function rowsFromAdjudications(recs) {
+  return recs.filter((r) => !r.error).map((r) => ({ id: r.id, request: r.request, os: r.os, command: r.command, route: r.route, y: r.y,
+    gold: r.gold ?? null, goldLabel: r.goldLabel }));
+}
+
+// judge vs reference (Opus) on pred_correct; "positive" = reference says wrong. Rows matched by id+command.
+export function compareJudges(ref, judge) {
+  const m = new Map(judge.filter((r) => !r.error && typeof r.pred_correct === 'boolean').map((r) => [`${r.id}\u0000${r.command}`, r]));
+  const c = { n: 0, missing: 0, agree: 0, tp: 0, fp: 0, fn: 0, tn: 0 };
+  for (const r of ref) {
+    const j = m.get(`${r.id}\u0000${r.command}`);
+    if (!j) { c.missing++; continue; }
+    c.n++;
+    const rw = !r.pred_correct, jw = !j.pred_correct;
+    if (rw === jw) c.agree++;
+    if (rw && jw) c.tp++; else if (!rw && jw) c.fp++; else if (rw) c.fn++; else c.tn++;
+  }
+  const div = (a, b) => (b ? +(a / b).toFixed(4) : null);
+  return { ...c, agreement: div(c.agree, c.n), recall_wrong: div(c.tp, c.tp + c.fn), precision_wrong: div(c.tp, c.tp + c.fp) };
+}
+// combine judges: wrong if any judge says wrong (OR) -> rows with pred_correct = all correct; rows missing in any judge dropped
+export function combineAnyWrong(...judges) {
+  const maps = judges.map((js) => new Map(js.filter((r) => !r.error && typeof r.pred_correct === 'boolean').map((r) => [`${r.id}\u0000${r.command}`, r])));
+  const out = [];
+  for (const [k, r] of maps[0]) {
+    const all = maps.map((m) => m.get(k));
+    if (all.some((x) => !x)) continue;
+    out.push({ id: r.id, command: r.command, pred_correct: all.every((x) => x.pred_correct) });
+  }
+  return out;
+}
+
+// ---------- --backend jev (TypeSafe Jev System One HTTP API, Noul questions -> p(correct)) ----------
+// One request per row: state {request, os, command}, every variant below asked as its own Noul (evaluated
+// independently, input tokens billed once for the state). --jev-variant picks the one behind pred_correct.
+export const JEV_URL = 'https://api.typesafe.ai/v1/systemone';
+export const JEV_PRICE_PER_TOK = 42 / 1e9;  // $42 / Btok input, output free (docs.typesafe.ai/models)
+const JEV_Q = 'The shell command `command` does exactly what `request` asks on the `os` target: no dropped constraints, '
+  + 'no extra unrequested effects, correct paths / patterns / flags. Equivalent spellings (flag order, quoting) count as correct.';
+const JEV_CRIT = { true: 'Running `command` fully satisfies every part of `request` on `os` and does nothing else.',
+  false: '`command` misses, changes or adds something relative to `request`, uses a wrong path / pattern / flag, or does not work on `os`.' };
+const goldRef = (row) => row.gold ?? `(no command: the request should be declined, label "${row.goldLabel}")`;
+export const JEV_VARIANTS = {
+  plain: () => ({ type: 'noul', instructions: JEV_Q }),
+  criteria: () => ({ type: 'noul', instructions: JEV_Q, criteria: JEV_CRIT }),
+  strict: () => ({ type: 'noul', instructions: 'Would a strict expert shell reviewer accept `command` as an exact, complete answer to '
+    + '`request` on `os`? Reject it for any dropped constraint, extra effect, wrong path, pattern or flag, or wrong tool for the OS.' }),
+  gold: (row) => ({ type: 'noul', criteria: JEV_CRIT, instructions: { reference_answer: goldRef(row),
+    question: `${JEV_Q} \`reference_answer\` is a reference answer that may itself be wrong; use it only as a hint.` } }),  gold_nocrit: (row) => ({ type: 'noul', instructions: { reference_answer: goldRef(row),
+    question: `${JEV_Q} \`reference_answer\` is a reference answer that may itself be wrong; use it only as a hint.` } }),
+  gold_strict: (row) => ({ type: 'noul', criteria: JEV_CRIT, instructions: { reference_answer: goldRef(row),
+    question: 'Would a strict expert shell reviewer accept `command` as an exact, complete answer to `request` on `os`? '
+      + '`reference_answer` is one possible answer (possibly wrong): compare what both do, and reject `command` for any dropped '
+      + 'constraint, extra effect, wrong path, pattern or flag that the request does not allow.' } }),
+};
+// gold check: is the reference answer itself correct (-> gold_correct)
+const JEV_GOLD_Q = (row) => ({ type: 'noul', criteria: JEV_CRIT, instructions: { reference_answer: goldRef(row),
+  question: 'Judge `reference_answer` instead of `command`: it does exactly what `request` asks on `os` (no dropped constraints, '
+    + 'no extra effects, correct paths / patterns / flags). If it declines, yes means the request really should not be answered with a shell command.' } });
+
+export function jevBody(row, model, variants = Object.keys(JEV_VARIANTS), withGold = true) {
+  const questions = {};
+  for (const v of variants) {
+    if (!JEV_VARIANTS[v]) throw new Error(`unknown jev variant ${v}`);
+    questions[`v_${v}`] = JEV_VARIANTS[v](row);
+  }
+  if (withGold) questions.gold_ok = JEV_GOLD_Q(row);
+  return { model, state: { request: row.request, os: PLATFORM_NAME[row.os] || PLATFORM_NAME.linux, command: row.command }, questions };
+}
+// response JSON -> {p: {variant: number}, p_gold, model, usage}; throws when an asked Noul is missing
+export function parseJevResult(j, variants = Object.keys(JEV_VARIANTS), withGold = true) {
+  const a = j?.answers || {}, num = (k) => { const x = a[k]?.noul; if (typeof x !== 'number' || !Number.isFinite(x)) throw new Error(`jev: missing ${k}`); return x; };
+  const p = Object.fromEntries(variants.map((v) => [v, num(`v_${v}`)]));
+  return { p, p_gold: withGold ? num('gold_ok') : null, model: j.model, usage: { input_tokens: j.usage?.input_tokens || 0, output_tokens: j.usage?.output_tokens || 0 } };
+}
+// parsed result -> verdict fields of an adjudication record (pred_correct = p >= threshold)
+export function jevVerdict(res, variant, threshold) {
+  if (!(variant in res.p)) throw new Error(`jev: variant ${variant} not asked`);
+  const p = res.p[variant];
+  return { p, p_variants: res.p, p_gold: res.p_gold, threshold, pred_correct: p >= threshold,
+    gold_correct: res.p_gold == null ? null : res.p_gold >= threshold, equivalent: null, reason: `jev ${variant} p=${p}` };
+}
+// retry policy: 429 / 529 / 5xx / network -> backoff (retry-after seconds if given), anything else fatal
+export const jevRetryable = (status) => status === 429 || status >= 500;
+export const jevBackoffMs = (attempt, retryAfter) => (Number(retryAfter) > 0 ? Number(retryAfter) * 1000 : Math.min(30000, 500 * 2 ** attempt));
+
+// ROC AUC of score s for positive label (Mann-Whitney, ties count 1/2); rows [{s, pos}]
+export function aucOf(rows) {
+  const pos = rows.filter((r) => r.pos), neg = rows.filter((r) => !r.pos);
+  if (!pos.length || !neg.length) return null;
+  const all = rows.map((r) => r.s).sort((a, b) => a - b), rank = new Map();
+  for (let i = 0; i < all.length;) { let j = i; while (j < all.length && all[j] === all[i]) j++; rank.set(all[i], (i + j + 1) / 2); i = j; }
+  const sumPos = pos.reduce((a, r) => a + rank.get(r.s), 0);
+  return +((sumPos - pos.length * (pos.length + 1) / 2) / (pos.length * neg.length)).toFixed(4);
+}
+// threshold sweep for "wrong" detection: flag wrong when p < t. rows [{p, wrong}] -> per-t {t, recall, precision, agreement, flagged}
+export function sweepWrong(rows) {
+  const ts = [...new Set(rows.map((r) => r.p))].sort((a, b) => a - b).map((p) => p + 1e-9);
+  const nW = rows.filter((r) => r.wrong).length;
+  return [0, ...ts].map((t) => {
+    let tp = 0, fp = 0;
+    for (const r of rows) if (r.p < t) { if (r.wrong) tp++; else fp++; }
+    const fn = nW - tp, tn = rows.length - nW - fp;
+    return { t: +t.toFixed(4), recall: nW ? tp / nW : null, precision: tp + fp ? tp / (tp + fp) : null, agreement: (tp + tn) / rows.length, flagged: tp + fp, fn };
+  });
 }
