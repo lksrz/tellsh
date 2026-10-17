@@ -247,3 +247,20 @@ written; the review hardening above only narrows those rules.
 - dev3 (fresh, unseen skeletons) predicted final before fixes (1.1%). It is now spent too, because fixes 1-8 target its errors.
 - Next: a fresh dev4 generated through the subscription CLI (`grok_gen.mjs --backend claude`, haiku). It is used for setting
   selection and error analysis, and final stays untouched.
+
+## Final after round 4 (measured once)
+
+Gate at 94337e8, same ensemble and `--select-adj` setting (min_agree 5, rank 0). Labels are the earlier Opus verdicts on
+final. 53 kept rows had no verdict: Jev (gold, 0.73) flagged 3 of them, and grok-4.6 (batched) judged all 3 correct.
+
+| split | kept | coverage | adj. wrong | rate | UB95 |
+| --- | --- | --- | --- | --- | --- |
+| dev | 2,696 | 72.6% | 5 | 0.19% | 0.39% |
+| dev5 | 467 | 55.5% | 8 | 1.71% | 3.07% |
+| final (round 1 gate) | 1,749 | 74.3% | 20 | 1.14% | 1.66% |
+| final (round 4 gate) | 1,748 | 76.6% | 19 | 1.09% | 1.59% |
+
+- Rounds 2-4 fixed errors on dev4 and dev5 but moved final by one row. Every fresh set lands at 1-2%, while dev, which
+  the gate has been tuned on, reads 0.2%.
+- Conclusion: per-pattern gate rules do not generalise to new phrasings. Reaching 0.5% on final needs a different
+  mechanism, not another round of rules on the same error stream.
