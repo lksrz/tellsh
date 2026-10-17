@@ -3,6 +3,7 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
 import { loadSchemas, compile, decompile, gate, canon, equals, toJSON } from '../lib/index.js';
+import { impliedMods } from '../lib/compile.js';
 import { OK_EXAMPLES, BASH, helpers } from './fixtures/gate_examples.js';
 
 const schemas = loadSchemas();
@@ -16,7 +17,7 @@ for (const ex of OK_EXAMPLES) {
     if (BASH[ex.n]) assert.equal(c.text, BASH[ex.n]);
     const d = decompile(c.text, env);
     assert.ok(!d.error, `${d.error} (${d.reason})`);
-    const want = canon(ir, { schemas, request: ex.request });
+    const want = canon(impliedMods(ir, ex.request), { schemas, request: ex.request }); // as gate.js builds its reference
     assert.ok(equals(d.ir, want), `${toJSON(d.ir)}\n!=\n${toJSON(want)}`);
     const g = gate(ex.request, ir, env);
     assert.equal(g.accept, true, g.reasons.join(' / '));

@@ -158,6 +158,15 @@ Gold false-reject rate (gold IR of ok rows, h8b eval, Oct 2026): train 190 / 253
   - Implied `when` tokens `with:mod` / `not:a!b` (exec-local; `schemas.js` `impliedModTokenHolds`). Planned for curl
     `silent` (`["piped", "not:fail!show_error"]`, fix 20) once `strict.js` `impliedHolds` evaluates them; curl.json
     still says `always`.
+- **v5 round (`docs/ir_error_taxonomy_v5.md`).** Request-implied only, no new predicted mod:
+  - `impliedOneline(ir, request)` (in `impliedMods`): an unpiped last-stage `git.log` gets `--oneline` when the
+    request says the plural "commits" (`requestImpliesOneline`: no singular "last / latest / most recent / that / this
+    commit", no full-log (full / complete / entire / whole / body ...) / author / date cue) and the log has no
+    oneline / format / stat / patch / name list / graph / `--date` mod.
+  - `requestWantsFileNames` ignores negated mentions (`DROP_NAMES_CUE`: "drop / without / no the file names"; file
+    name wording only, "skip paths" is scope), so the
+    derived `no_filename` holds for them.
+  - `DOT_DIRS` and `BARE_FILES` are exported (used by `strict_v5.js`).
 - **Decline pre-check (v4, `decline.js` `declineObligations`).** Called from `obligations()` before `strictObligations`:
   (a) a dangling last word ("compared to", "containing", "by author", "with", "for", "of"; not after a mode word such
   as "case-sensitive matching") and (b) a definite generic noun with no value ("the deprecated helper", "that commit",

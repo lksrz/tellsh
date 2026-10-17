@@ -38,7 +38,7 @@ test('fix 8: a directory in path position must reach a path', () => {
 });
 
 test('fix 17: a named ref must be a rev', () => {
-  no('graph of the dev branch', 'git log --graph', /ref "dev"/);
+  no('graph of the dev branch', 'git log --graph', /ref "dev"|branch_ref/);
   ok('graph of the dev branch', 'git log --graph dev --');
   no('7 newest commits of v1.2.0 printed oldest first', 'git log -n 7 --reverse', /v1\.2\.0/);
   ok('commits whose message contains the literal v1.2.0', 'git log -F --grep=v1.2.0');

@@ -8,6 +8,7 @@
 // Key forms: `op`, `op.mod`, `op.mod=const`, `op.mod!other`.
 
 import { GIT_COVER_RULES, gitCoverObligations } from './strict_cover_git.js';
+import { v5Obligations } from './strict_v5.js';
 
 const DEPTH = ['depth', 'deep', 'level', 'levels', 'deeper', 'mindepth', 'maxdepth', 'nested', 'subdirectory', 'subdirectories'];
 const IGNORE_CASE = ['ignore case', 'ignoring case', 'case-insensitive', 'case insensitive', 'case-insensitively', 'case insensitively',
@@ -263,6 +264,7 @@ export function coverObligations(cx) {
   }
 
   gitCoverObligations(cx, has);
+  v5Obligations(cx);
 
   // anchors: "ends with X" -> X$, "starts with X" -> ^X; never the other anchor. grep / rg patterns and git --grep.
   const END = ['ends with', 'end with', 'ending with', 'ends in', 'end in', 'ending in', 'that end with', 'finishing with', 'finish with'];

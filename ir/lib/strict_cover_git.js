@@ -1,4 +1,4 @@
-// Gate step 3, strict cue coverage for git ops (split from strict_cover.js; docs/ir_error_taxonomy_v4.md fix 9).
+// Gate step 3, strict cue coverage for git ops (split from strict_cover.js; docs/ir_error_taxonomy_v4.md fix 9, v5.md fixes 3, 7, 8).
 // Same rule fields and key forms as strict_cover.js COVER_RULES; the custom checks get the cover context plus
 // its `has(key)` helper. Tuned on v4 train gold.
 
@@ -29,7 +29,8 @@ export const GIT_COVER_RULES = [
   { id: 'log_relative', words: ['relative date', 'relative dates', 'relative time', 'relative times', 'how long ago', 'relative'],
     when: ['git.log'], need: ['git.log.date_format=relative'] },
   { id: 'log_iso', words: ['iso', 'iso-8601', 'iso8601', 'iso 8601'], when: ['git.log'], need: ['git.log.date_format=iso'] },
-  { id: 'log_short_date', words: ['short date', 'short dates', 'short-date', 'short-dates'], when: ['git.log'], need: ['git.log.date_format=short'] },
+  { id: 'log_short_date', words: ['short date', 'short dates', 'short-date', 'short-dates',
+    'date short', 'dates short', 'date=short'], when: ['git.log'], need: ['git.log.date_format=short'] },
   { id: 'log_until', words: ['until', 'up until', 'till'], when: ['git.log'], need: ['git.log.until'] },
   { id: 'log_patch', words: ['with patches', 'with patch', 'with the patch', 'with diffs', 'with the diffs', 'with the diff',
     'with diff', 'including diffs', 'including the diff', 'including patches', 'plus the diff', 'plus diffs', 'and their diffs',
@@ -85,6 +86,39 @@ export const GIT_COVER_RULES = [
     when: ['git.branch'], need: ['git.branch.no_merged'] },
 ];
 
+// v5 fix 3: words that make "<w> branch" / "branch <w>" not a ref name
+const NON_REF = new Set(['this', 'that', 'current', 'my', 'same', 'other', 'each', 'every', 'new', 'remote', 'default', 'feature', 'the', 'a', 'an',
+  'local', 'any', 'one', 'another', 'which', 'what', 'whose', 'your', 'our', 'their', 'its', 'his', 'her', 'checked-out', 'active', 'upstream',
+  'tracking', 'release', 'git', 'whole', 'entire', 'given', 'specific', 'named', 'called', 'and', 'or', 'of', 'on', 'in', 'to', 'from', 'with',
+  'is', 'was', 'that\'s', 'all', 'both', 'per', 'branch', 'branches', 'old', 'previous', 'last', 'parent', 'base', 'target', 'source', 'working',
+  'name', 'names', 'head', 'detached', 'for', 'by', 'vs', 'versus', 'than', 'into', 'at', 'off', 'only', 'just', 'when', 'since', 'until']);
+const REF_TOKEN = /^[a-z0-9][a-z0-9._/-]*$/i;
+// a ref-like X: has / . _ - or a digit, is a well-known branch name, or appears quoted / backticked in the request
+const KNOWN_BRANCHES = new Set(['main', 'master', 'develop', 'dev', 'staging', 'production', 'prod', 'trunk', 'next', 'stable',
+  'api', 'web', 'frontend', 'backend', 'hotfix']);
+const esc = (x) => x.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+const refLike = (x, request) => REF_TOKEN.test(x) && !NON_REF.has(x) && !/^\d+$/.test(x)
+  && (/[/._\-\d]/.test(x) || KNOWN_BRANCHES.has(x) || new RegExp(`[\`'"]${esc(x)}[\`'"]`).test(request));
+const BRANCH_LEAD = new Set(['on', 'the', 'from', 'of', 'in', 'against', 'vs', 'versus', 'to', 'into']);
+const AFTER_STOP = ['since', 'until', 'before', 'after', 'by', 'that', 'with', 'touching', 'and'];
+// every ref "on / from (the) X branch" or "on / from branch X" names (conservative: ref-like X only)
+export function branchRefs(words, request = '') {
+  const out = [];
+  for (let i = 0; i < words.length; i++) {
+    if (words[i] !== 'branch') continue;
+    const before = words[i - 1], lead = words[i - 2] === 'the' ? words[i - 3] : words[i - 2];
+    if (before && refLike(before, request) && ['on', 'from'].includes(lead)) out.push(before);
+    const after = words[i + 1];
+    if (after && refLike(after, request) && ['on', 'from'].includes(before)
+      && (i + 2 >= words.length || /^[,.;:!?)]$/.test(words[i + 2]) || BRANCH_LEAD.has(words[i + 2]) || AFTER_STOP.includes(words[i + 2]))) out.push(after);
+  }
+  return [...new Set(out)];
+}
+export const branchRef = (words, request = '') => branchRefs(words, request)[0] ?? null;
+const LAST_N_WINDOW = /\b(in|within|among|amongst|across|through) (the )?(last|latest|past|previous|most recent|recent) (\d+|[a-z]+) commits\b/i;
+// message filters only: "commits by X in the last N commits" reads either way in the gold (-n N --author=X)
+const LOG_FILTERS = ['grep_message', 'invert_grep'];
+
 // custom git checks: hash+subject in any order, bare subjects, "older than / before <time>", branch -a/-r, message grep
 export function gitCoverObligations(cx, has) {
   const { words, fail, hasFree, execInfos, ops, consumed } = cx;
@@ -127,6 +161,29 @@ export function gitCoverObligations(cx, has) {
       if (gm.length && hasFree(["doesn't contain", 'does not contain', "doesn't mention", 'does not mention', "don't mention", 'do not mention',
         "don't contain", 'do not contain', 'not mentioning', 'not containing', 'lacking', "doesn't include", 'does not include']) && !hasM('invert_grep'))
         fail('cover', '"doesn\'t mention X" needs --invert-grep [invert_grep]');
+    }
+  }
+
+  // v5 fix 3: "on the api branch" / "api branch" / "branch api" names a ref the log / diff / show must carry
+  const REV_OPS = ['git.log', 'git.diff', 'git.show'];
+  const revInfos = execInfos.filter((i) => REV_OPS.includes(i.exec.op));
+  if (revInfos.length && !ops.has('git.branch')) {
+    for (const ref of branchRefs(words, cx.seg.text)) {
+      // carried only as a revision argument (api, origin/api, main..api), not inside a path or an --author / --grep value
+      const re = new RegExp(`(^|[^A-Za-z0-9_-])${esc(ref)}($|[^A-Za-z0-9_-])`, 'i');
+      const carried = revInfos.some((i) => (i.values?.rev || []).some((x) => typeof x === 'string' && re.test(x)));
+      if (!carried) fail('cover', `"${ref} branch" names a ref the command does not use [branch_ref]`);
+    }
+  }
+
+  // v5 fix 8: "search ... in / within / among the last N commits" restricts the window first: git log -n N | grep,
+  // not git log -n N --grep (the last N matching commits)
+  // quoted spans are literal text, not a window ("grep 'in the last 5 commits'")
+  const windowText = () => cx.seg.text.replace(/(["'`]).*?\1/g, ' ');
+  if (ops.has('git.log') && LAST_N_WINDOW.test(windowText())) {
+    for (const info of execInfos) {
+      if (info.exec.op !== 'git.log' || !info.exec.mods.some((m) => m.mod === 'max_count')) continue;
+      if (info.exec.mods.some((m) => LOG_FILTERS.includes(m.mod))) fail('cover', '"in the last N commits" with -n and a filter keeps the last N matching commits [log_window]');
     }
   }
 

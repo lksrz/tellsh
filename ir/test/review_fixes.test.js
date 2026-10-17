@@ -143,7 +143,7 @@ test('#12 find roots that look like expression syntax get ./', () => {
 test('#13/#14 converter-facing: the gate command compiles the gate IR (pkind) and cwd ./X round-trips', () => {
   const r = run('commits whose message matches regex leak|uaf', ({ S }) => program(exec('git.log', { mods: [mod('grep_message', [S('leak|uaf', 'Pattern')])] })));
   accepts(r);
-  assert.equal(compile(r.ir, ENV).text, r.command);
+  assert.equal(compile(r.ir, { ...ENV, request: 'commits whose message matches regex leak|uaf' }).text, r.command);
   assert.match(r.command, /-E --grep=/);
   const c = run('go into ./packages/web and run npm test', ({ S }) => {
     const p = program(exec('npm.test', {}));

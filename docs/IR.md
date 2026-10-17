@@ -796,7 +796,7 @@ Every command below was checked against §2 and §5: option order, quoting and d
 | 25 | follow logs/server.log | `file.tail{follow}(paths="logs/server.log")` | `tail -f logs/server.log` | stdout endless |
 | 26 | print lines 120 to 160 of src/cli.js | `file.lines{line_range=N:line_range("120 to 160")}(paths="src/cli.js")` | `sed -n '120,160p' src/cli.js` | script always quoted |
 | 27 | last 5 commits, one line each | `git.log{oneline, max_count=N:int("5")}` | `git log --oneline -n 5` | |
-| 28 | alice's commits since last week touching src | `git.log{author="alice", since=N:git_date("last week")}(paths="src")` | `git log --author=alice --since='1 week ago' -- src` | |
+| 28 | alice's commits since last week touching src | `git.log{author="alice", since=N:git_date("last week")}(paths="src")` | `git log --oneline --author=alice --since='1 week ago' -- src` (v5: implied `--oneline`) | |
 | 29 | last 10 commit messages mentioning fix, any case | `git.log{oneline, max_count=N:int("10"), grep_message="fix", ignore_case}` | `git log --oneline -n 10 --grep=fix -i` | |
 | 30 | first 20 lines of the git log | `git.log \| file.head{lines=N:int("20")}` | `git log \| head -n 20` | kept as asked; lines ≠ commits |
 | 31 | git log oneline piped to head 5 | `git.log{oneline} \| file.head{lines=N:int("5")}` | `git log --oneline \| head -n 5` | no fold |

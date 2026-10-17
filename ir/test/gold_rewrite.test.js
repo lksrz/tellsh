@@ -97,7 +97,7 @@ test('v4 recompile: a derived mod updates the stored command, a spelling differe
   const ir = pipe({ k: 'exec', op: 'git.log', mods: [{ mod: 'grep_message', values: [span(2, 'Pattern')] }], args: {} });
   const r = rewriteRow(row('commits mentioning tenant_id, literal match', ir, 'git log --grep=tenant_id'), schemas);
   assert.deepEqual(r.applied, ['recompile']);
-  assert.equal(r.row.command, 'git log -F --grep=tenant_id');
+  assert.equal(r.row.command, 'git log --oneline -F --grep=tenant_id');
   const same = rewriteRow(row('commits mentioning tenant_id', ir, "git log --grep='tenant_id'"), schemas);
   assert.deepEqual(same.applied, []);
 });

@@ -248,6 +248,11 @@ the verdict decides both ways: an adjudicated `y = 1` candidate the judge calls 
 command) also counts as wrong. Use it when every accepted candidate was adjudicated (`adjudicate.mjs --sample-agree`
 larger than the candidate count); this is the headline metric, independent of gold noise.
 
+`score_combined.mjs --dump-kept FILE [--dump-setting by_upper_bound]` writes the dev and test candidates kept at the
+dev-chosen n-best setting (default `by_coverage_50`; a `none` setting or an unknown name falls back to it with a
+stderr warning) as JSONL (split, id, request,
+command, gold, y), e.g. to send exactly the kept rows to a judge.
+
 ### Ensemble agreement
 
 `score_combined.mjs --dev-agree P1,P2,... --test-agree P1,P2,...` takes other models' predictions for the same split

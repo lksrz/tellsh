@@ -144,7 +144,7 @@ export const BASH = {
   25: "tail -f logs/server.log",
   26: "sed -n '120,160p' src/cli.js",
   27: "git log --oneline -n 5",
-  28: "git log --author=alice --since='1 week ago' -- src",
+  28: "git log --oneline --author=alice --since='1 week ago' -- src",
   29: "git log --oneline -n 10 --grep=fix -i",
   30: "git log | head -n 20",
   31: "git log --oneline | head -n 5",

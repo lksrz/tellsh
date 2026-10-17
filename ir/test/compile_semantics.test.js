@@ -28,7 +28,7 @@ test('v4: git log --merges with a file list derives --diff-merges=first-parent',
   assert.equal(r.text, 'git log --merges --diff-merges=first-parent --name-only main --');
   rt(r);
   const plain = program(exec('git.log', { mods: [mod('merges_only')] }));
-  assert.equal(compile(plain, env({ request: 'merge commits' })).text, 'git log --merges');
+  assert.equal(compile(plain, env({ request: 'merge commits' })).text, 'git log --oneline --merges'); // v5 fix 1: implied --oneline
 });
 
 test('v4: ls -a on an every-entry cue, never with hidden (-A)', () => {
@@ -43,7 +43,7 @@ test('v4: ls -a on an every-entry cue, never with hidden (-A)', () => {
 
 test('v4: a literal cue renders -F even without a metacharacter', () => {
   const g = compile(program(exec('git.log', { mods: [mod('grep_message', [v4span(2, 'Pattern')])] })), env({ request: 'commits mentioning tenant_id, literal match' }));
-  assert.equal(g.text, 'git log -F --grep=tenant_id');
+  assert.equal(g.text, 'git log --oneline -F --grep=tenant_id');
   rt(g);
   const s = (req) => compile(program(exec('text.search', { args: { pattern: [v4span(4, 'Pattern')], paths: [v4span(6, 'Path')] } })), env({ request: req })).text;
   assert.equal(s('search the literal string CRITICAL in out'), 'rg -F CRITICAL out');

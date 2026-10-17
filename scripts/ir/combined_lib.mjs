@@ -37,3 +37,10 @@ export function chooseGrid(items, N, crit, minKept, useScores = true) {
   }
   return best;
 }
+
+// --dump-setting: the named n-best setting, else by_coverage_50 (an unknown name or a 'none' / null setting warns)
+export function dumpSetting(nbSet, name, warn = (m) => console.error(m)) {
+  if (!(name in nbSet)) warn(`--dump-setting ${name}: unknown (have ${Object.keys(nbSet).join(', ')}); using by_coverage_50`);
+  else if (!nbSet[name]) warn(`--dump-setting ${name}: no setting on dev ('none'); using by_coverage_50`);
+  return nbSet[name] || nbSet.by_coverage_50 || null;
+}

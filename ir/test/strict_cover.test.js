@@ -56,7 +56,7 @@ test('F6: request words and possessives are not values', () => {
 
 test('F8: glob / exclude shapes', () => {
   no('grep legacyMode everywhere except CHANGELOG.md', 'grep -r --exclude-dir=CHANGELOG.md legacyMode .', /is a file/);
-  no('files over 10mb outside of .git', "find . -type f -not -name '.git' -size +10485760c", /exclude_dir/);
+  no('files over 10mb outside of .git', "find . -type f -not -name '.git' -size +10485760c", /exclude_dir|find_dir_name/);
 });
 
 test('implied only_matching before wc -l', () => {

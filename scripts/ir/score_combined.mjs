@@ -27,7 +27,8 @@
 // before everything else (P candidates always pass). When dev has n-best candidates, `nbest` adds a dev-chosen
 // (max_rank, min_agree (ensemble), min_beam_agree, min_margin, t) setting (max kept subject to UB / point <= target),
 // `by_coverage` settings (lowest dev UB with dev coverage >= 20/30/40/50 %), all applied unchanged to test, and a
-// --dump-kept FILE writes the candidates kept at the dev-chosen by_coverage_50 setting (dev and test) for error analysis.
+// --dump-kept FILE writes the candidates kept at the dev-chosen by_coverage_50 setting (dev and test) for error analysis;
+// --dump-setting NAME picks another nbest_settings entry (e.g. by_upper_bound; falls back to by_coverage_50 when it is none).
 // `sweep` over the whole grid (t in the agreement sweep thresholds). --select-adj makes these dev choices count wrong /
 // correct with the adjudications (dev ones; test is never used for choosing). Test rows add `unadjudicated_wrong`:
 // kept raw-wrong candidates without an adjudication of that exact command (they count as wrong in adj numbers).
@@ -42,7 +43,7 @@ import { readJsonl, candidates, goldCommand } from './make_candidates.mjs';
 import { sameCommand } from './equiv.mjs';
 import { loadAdjudications, adjudicatedY } from './adjudicate_lib.mjs';
 import { cpUpper, auditStats, strataEstimate } from './cascade_lib.mjs';
-import { acceptedById, agreeCount, keeps, chooseGrid } from './combined_lib.mjs';
+import { acceptedById, agreeCount, keeps, chooseGrid, dumpSetting } from './combined_lib.mjs';
 import { nbestKeeps, nbestEval, pickMaxKept, pickByCoverage } from './nbest_lib.mjs';
 
 const args = process.argv.slice(2);
@@ -53,7 +54,7 @@ const num = (k) => (opt(k) != null ? Number(opt(k)) : null);
 const KNOBS = { max_rank: num('max-rank'), min_margin: num('min-margin'), min_beam_agree: num('min-beam-agree') };
 const SELECT_ADJ = args.includes('--select-adj');
 const ADJ_TRUTH = args.includes('--adj-truth');
-const DUMP_KEPT = opt('dump-kept');  // JSONL of the candidates kept at the dev-chosen n-best by_coverage_50 setting (error analysis)
+const DUMP_KEPT = opt('dump-kept'), DUMP_SETTING = opt('dump-setting', 'by_coverage_50');  // JSONL of the candidates kept at the dev-chosen n-best by_coverage_50 setting (error analysis)
 const dumped = [];  // judge verdict overrides gold in both directions (fully adjudicated sets)
 const ADJ = opt('adjudications') ? loadAdjudications(opt('adjudications').split(',')) : null;
 // --adj-strata: cascade adjudications (adjudicate.mjs --backend cascade); audit miss rate pooled over all loaded files
@@ -171,6 +172,7 @@ const nbSet = HAS_NB ? {
   by_point: pickMaxKept(nbRows, (w, k) => w / k <= TARGET, MIN_KEPT, SELECT_ADJ),
   ...Object.fromEntries(COV_FLOORS.map((f) => [`by_coverage_${f * 100}`, pickByCoverage(nbRows, f, dev.goldOk, ubFn, SELECT_ADJ)])),
 } : null;
+const dumpG = nbSet && DUMP_KEPT ? dumpSetting(nbSet, DUMP_SETTING) : null;
 const knobsOf = (g) => ({ max_rank: g.max_rank, min_margin: g.min_margin, min_beam_agree: g.min_beam_agree });
 const settingOf = (v) => (v ? { ...knobsOf(v), min_agree: v.min_agree, t: v.t === -Infinity ? 0 : r4(v.t) } : 'none');
 if (nbSet) report.nbest_settings = { select_adj: SELECT_ADJ, ...Object.fromEntries(Object.entries(nbSet).map(([k, v]) => [k, settingOf(v)])) };
@@ -191,7 +193,7 @@ for (const S of [dev, test].filter(Boolean)) {
       t: r.t === -Infinity ? 0 : r4(r.t), kept: r.kept, coverage: pct(r.correct, S.goldOk), wrong: r.wrong, rate: pct(r.wrong, r.kept),
       ub95: pct(cpUpper(r.wrong, r.kept), 1), ...(ADJ ? { adj_wrong: r.adj_wrong, adj_coverage: pct(r.adj_correct, S.goldOk),
         adj_rate: pct(r.adj_wrong, r.kept), adj_ub95: pct(cpUpper(r.adj_wrong, r.kept), 1) } : {}) }));
-    const g50 = nbSet.by_coverage_50;
+    const g50 = dumpG;
     if (DUMP_KEPT && g50) for (const x of S.items) if (keeps(x, g50.min_agree, g50.t) && nbestKeeps(x, knobsOf(g50)))
       dumped.push({ split: S.name, id: x.id, request: x.request, command: x.command, gold: x.gold, y: x.y, ya: x.ya, adj_reason: ADJ?.get(String(x.id))?.reason });
     report[S.name] = { ...report[S.name], nbest: { chosen_rank: ranks, ...Object.fromEntries(Object.entries(nbSet).map(([k, v]) => [k, pick(v)])), sweep } };

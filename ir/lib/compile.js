@@ -444,12 +444,14 @@ export function impliedOnlyMatching(ir, request) {
 // no_filename (rg -I / grep -h) drops the prefix unless the search lists / counts files or the request asks for them.
 // Derived (never in the IR): decompile strips it, so round-trips are unaffected.
 const FILENAME_CUE = /\b(file ?names?|filenames?|paths?|which files?|in which files?|per file|each file|every file|by file)\b/i;
-export const requestWantsFileNames = (request) => typeof request === 'string' && FILENAME_CUE.test(request);
+// v5 fix 6: "drop / omit / without / no / hide / strip / leave out (the) file names" negates the mention, it does not ask for them
+export const DROP_NAMES_CUE = /\b(drop(ping)?|omit(ting)?|without|no|hide|hiding|strip(ping)?|leave out|leaving out|remove|removing|exclude|excluding|suppress(ing)?|skip(ping)?)( the| any| all)? (file ?names?|filenames?)\b/gi;
+export const requestWantsFileNames = (request) => typeof request === 'string' && FILENAME_CUE.test(request.replace(DROP_NAMES_CUE, ' '));
 const NF_BLOCK = ['files_with_matches', 'files_without_match', 'count', 'count_matches', 'with_filename'];
 // a single operand counts as one file when its basename has an extension, is a dotfile (not a known dot dir)
 // or is a well-known extension-less file; anything else reads as a directory (rg / grep -r recurse into it)
-const DOT_DIRS = new Set(['.git', '.github', '.config', '.ssh', '.cache', '.local', '.vscode', '.idea', '.cargo', '.npm', '.venv', '.terraform']);
-const BARE_FILES = /^(Procfile|Makefile|GNUmakefile|Dockerfile|Containerfile|Gemfile|Rakefile|Vagrantfile|Jenkinsfile|Brewfile|Podfile|Justfile|LICENSE|README|CHANGELOG|AUTHORS|NOTICE|VERSION|CODEOWNERS|syslog|messages|auth|kern|dmesg|hosts|passwd|group|fstab|crontab)$/i;
+export const DOT_DIRS = new Set(['.git', '.github', '.config', '.ssh', '.cache', '.local', '.vscode', '.idea', '.cargo', '.npm', '.venv', '.terraform']);
+export const BARE_FILES = /^(Procfile|Makefile|GNUmakefile|Dockerfile|Containerfile|Gemfile|Rakefile|Vagrantfile|Jenkinsfile|Brewfile|Podfile|Justfile|LICENSE|README|CHANGELOG|AUTHORS|NOTICE|VERSION|CODEOWNERS|syslog|messages|auth|kern|dmesg|hosts|passwd|group|fstab|crontab)$/i;
 const looksLikeFile = (v) => {
   if (v?.k === 'lit' || v?.k === 'span' || v?.k === 'norm') {
     const s = String(v.s ?? '');
@@ -526,8 +528,33 @@ export function impliedLangExts(ir, request) {
   };
 }
 
+// v5 fix 1: a git log printed as is (last stage of its pipe) for a request about commits lists them --oneline (the
+// judge rubric: "commits ... mean --oneline or -n"). Not when the log is piped (wc / head / grep count lines), already
+// shaped (format / stat / patch / name lists / graph / --date) or the request asks for the full multi-line entry or
+// for authors / dates. Request-implied like impliedFileType: strict.js sees the predicted IR, the round-trip
+// reference applies the same step; scripts/ir/equiv.mjs treats unpiped --oneline as insignificant.
+const COMMIT_CUE = /\bcommits\b/i;
+const ONE_COMMIT_CUE = /\b(last|latest|newest|most recent|that|this|single) commit\b(?! (messages?|subjects?|bod(y|ies)))/i;
+const FULL_LOG_CUE = /\b(full|complete|entire|whole|details?|detailed|body|bodies|(messages?|commit) bod(y|ies)|verbose|patch(es)?|diffs?|log lines|lines of (the )?(log|history|output)|how many lines|authors?|authored|emails?|dates?|dated|when|times?|timestamps?|who)\b/i;
+const ONELINE_BLOCK = ['oneline', 'format', 'pretty', 'stat', 'shortstat', 'numstat', 'patch', 'name_only', 'name_status', 'graph', 'date_format', 'no_header'];
+export const requestImpliesOneline = (request) => typeof request === 'string' && COMMIT_CUE.test(request) && !ONE_COMMIT_CUE.test(request) && !FULL_LOG_CUE.test(request);
+export function impliedOneline(ir, request) {
+  if (!requestImpliesOneline(request)) return ir;
+  return {
+    ...ir,
+    body: {
+      ...ir.body,
+      parts: ir.body.parts.map((p) => ({ ...p, stages: p.stages.map((st, i) => {
+        if (st?.k !== 'exec' || st.op !== 'git.log' || i !== p.stages.length - 1) return st;
+        if ((st.mods || []).some((m) => ONELINE_BLOCK.includes(m.mod))) return st;
+        return { ...st, mods: [...(st.mods || []), { mod: 'oneline' }] };
+      }) })),
+    },
+  };
+}
+
 // every request-implied mod compile adds before canon (gate.js builds its round-trip reference the same way)
-export const impliedMods = (ir, request) => impliedLangExts(impliedOnlyMatching(impliedFileType(ir, request), request), request);
+export const impliedMods = (ir, request) => impliedOneline(impliedLangExts(impliedOnlyMatching(impliedFileType(ir, request), request), request), request);
 
 // compile(ir, env) -> { plan, text, canonical } | { error, label }
 export function compile(ir, env) {
