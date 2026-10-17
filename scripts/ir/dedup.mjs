@@ -77,7 +77,23 @@ function minhash(sh) {
 }
 function jaccard(a, b) { let n = 0; for (const x of a) if (b.has(x)) n++; return n / (a.size + b.size - n || 1); }
 
-function mulberry32(s) {
+// Near-dup index over normalized requests: LSH band candidates, verified word-3-shingle Jaccard >= thr.
+export class NearIndex {
+  constructor(thr) { this.thr = thr; this.buckets = new Map(); this.shs = []; }
+  #keys(sh) { const sig = minhash(sh); const ks = []; for (let b = 0; b < BANDS; b++) ks.push(b + ':' + Array.from(sig.subarray(b * ROWS, b * ROWS + ROWS)).join(',')); return ks; }
+  hasDup(n) {
+    const sh = shingles(n); const cand = new Set();
+    for (const key of this.#keys(sh)) { const xs = this.buckets.get(key); if (xs) for (const x of xs) cand.add(x); }
+    for (const c of cand) if (jaccard(sh, this.shs[c]) >= this.thr) return true;
+    return false;
+  }
+  add(n) {
+    const sh = shingles(n); const idx = this.shs.length; this.shs.push(sh);
+    for (const key of this.#keys(sh)) { const xs = this.buckets.get(key); if (xs) xs.push(idx); else this.buckets.set(key, [idx]); }
+  }
+}
+
+export function mulberry32(s) {
   return () => { s |= 0; s = (s + 0x6D2B79F5) | 0; let t = Math.imul(s ^ (s >>> 15), 1 | s); t = (t + Math.imul(t ^ (t >>> 7), 61 | t)) ^ t; return ((t ^ (t >>> 14)) >>> 0) / 4294967296; };
 }
 
@@ -137,18 +153,10 @@ function main() {
   }
 
   // 2. near-dup removal (LSH candidates, verified Jaccard >= near; keep first)
-  const buckets = new Map(); const kept = [];
+  const near = new NearIndex(a.near); const kept = [];
   for (const it of items) {
-    const sh = shingles(it.n); const sig = minhash(sh); const keys = [];
-    let dup = false; const cand = new Set();
-    for (let b = 0; b < BANDS; b++) {
-      const key = b + ':' + Array.from(sig.subarray(b * ROWS, b * ROWS + ROWS)).join(','); keys.push(key);
-      const xs = buckets.get(key); if (xs) for (const x of xs) cand.add(x);
-    }
-    for (const c of cand) if (jaccard(sh, kept[c].sh) >= a.near) { dup = true; break; }
-    if (dup) { st.near_dups++; srcStat(it.src).near_dups++; continue; }
-    const idx = kept.length; kept.push({ ...it, sh });
-    for (const key of keys) { const xs = buckets.get(key); if (xs) xs.push(idx); else buckets.set(key, [idx]); }
+    if (near.hasDup(it.n)) { st.near_dups++; srcStat(it.src).near_dups++; continue; }
+    near.add(it.n); kept.push(it);
   }
 
   // 3. per-skeleton cap (ok items), shuffled deterministically so the cap keeps a varied subset

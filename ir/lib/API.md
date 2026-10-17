@@ -132,6 +132,19 @@ Gold false-reject rate (gold IR of ok rows, h8b eval, Oct 2026): train 190 / 253
   `-o`. `head` and line pipelines ("lines with X | sort -u") keep the predicted IR. The schema validator accepts
   `before:op[.mod]` and `match_cue`; `strict.js` evaluates them. The strict COVER only-matching words count the implied
   `-o` as present. `gold_rewrite` `drop_o` never fires on an `ONLY_MATCH_CUE` request.
+  "each / every (X) match" (`EACH_MATCH_CUE`; not "each matching line", "every line / file / rg match") implies `-o`
+  in any position too, piped or not ("print each TODO match and its line number" -> `rg -o -n`).
+- **Derived `--no-filename` (F8, v4).** `rg -I` / `grep -h` (`no_filename`, `derive: multi_file_sorted`): a first-stage
+  `text.search` over several files (no path = cwd, a directory-like operand, a `-g` / `--include` glob, two or more
+  paths) feeding `sort` / `uniq` / freq drops the `path:` prefix, so unique / counted matches are not per file. A single
+  operand counts as a file when its basename has an extension, is a dotfile (not `.git`, `.github`, `.config`, ...) or
+  a well-known bare file (Procfile, Makefile, syslog, ...). Not with `-l / -L / -c / --count-matches / -H` or when the
+  request asks for file names / paths / which files / per file (`requestWantsFileNames`). Never in the IR: decompile
+  strips it.
+- **Strict cover (v4).** `find_any_type`: "anything / everything named / called / matching / with ..., any / every
+  entry" rejects an explicit `-type f` unless the request also says file(s) / regular or the find has a size filter.
+  `wc_units`: every wc unit named in a list ("word and line counts", "words, lines and bytes") or as "<unit>
+  count(s)" needs its flag (bytes / chars accept `-c` or `-m`).
 - **Scoring equivalence (F3)** — `scripts/ir/equiv.mjs` `equivKey(cmd, request)` / `sameCommand(a, b, request)`; the
   rule list is in the file header. Request-sensitive: curl `-s` / `-S` (quiet / show-errors cues), `ls -1` ("one per
   line"), `find -type f` (kept when `requestWantsFiles(request)`, the same test compile uses). Not merged on purpose:

@@ -197,6 +197,14 @@
           "derive": "each_inner"
         },
         {
+          "mod": "no_filename",
+          "flag": "-I",
+          "form": "bool",
+          "model": "derived",
+          "derive": "multi_file_sorted",
+          "note": "a multi-file search feeding sort / uniq / freq: drop the path: prefix so the matches themselves are counted / deduplicated (not for -l / -L / -c or when the request asks for file names / paths)"
+        },
+        {
           "mod": "max_count",
           "flag": "-m",
           "form": "sep",

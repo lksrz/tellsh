@@ -63,3 +63,19 @@ test('implied only_matching before wc -l', () => {
   ok('how many times does Log::error show up in laravel.log', 'rg -o Log::error laravel.log | wc -l');
   no('most common error lines in app.log', 'rg -o error app.log | sort | uniq -c | sort -rn', /only_matching|unrequested/);
 });
+
+test('find_any_type: "anything / any entry named X" is any type, unless files or a size filter', () => {
+  no('anything named build.gradle under the repo', "find . -type f -name 'build.gradle'", /find_any_type/);
+  ok('anything named build.gradle under the repo', "find . -name 'build.gradle'");
+  ok('any entry or file named build.gradle under the repo', "find . -type f -name 'build.gradle'");
+  ok('anything over 10mb in dist', 'find dist -type f -size +10485760c');
+});
+
+test('wc_units: every unit named in a list / "<unit> count" needs its flag', () => {
+  no('word and line counts for yarn.lock', 'wc -l yarn.lock', /wc_units/);
+  no('word and line counts for yarn.lock', 'wc -w yarn.lock', /wc_units|count_kind/);
+  ok('word and line counts for yarn.lock', 'wc -l -w yarn.lock');
+  no('count words, lines and bytes of a.txt', 'wc -l -w a.txt', /wc_units/);
+  ok('count words, lines and bytes of a.txt', 'wc -l -w -c a.txt');
+  no('line count and word count of a.txt', 'wc -l a.txt', /wc_units|count_kind/);
+});

@@ -120,6 +120,19 @@ against the cue, scope-word paths) and lists them in `OUT/lint.jsonl`. Counts pe
 `OUT/stats.json` (`gold_rewrite`). Tests: `ir/test/gold_rewrite.test.js`. The generator prompt (`grok_gen.mjs`,
 "Conventions") asks for the same conventions in new generations.
 
+## build_final.mjs: fresh held-out final test set
+
+`node scripts/ir/build_final.mjs [--gen DIR[,DIR...]] [--ref v4] [--name final] [--ref-splits train] [--partial]`
+converts each GEN dir (convert.mjs, when stale; incomplete dirs are skipped unless `--partial`, which snapshots into
+`<dir>_partial/` like build_v2.sh), applies the dedup.mjs status filter and the deterministic gold_rewrite rules (no
+adjudication overlay), then drops every row whose skeleton (dedup.mjs `skeleton()`, before or after the rewrite) occurs
+in a `--ref-splits` split (default `train`: skeletons unseen by ref-trained models), or whose request is an exact / near
+duplicate (dedup.mjs `NearIndex`) of any ref row in any split; then exact + near dedup across all GEN dirs (first wins),
+the ref per-skeleton cap and label-ratio cap (ref `stats.json` params). Writes
+`build/ir/dataset/NAME/{test.jsonl,stats.json}` (read, dropped by reason, label mix, distinct skeletons, target stats)
+and `build/ir/targets/NAME/test.jsonl` via `export_targets.mjs --vocab build/ir/targets/REF/vocab.json` (rows with
+actions outside the ref vocab are dropped as `unknown_action`). Tests: `ir/test/build_final.test.js`.
+
 ## equiv.mjs: command equivalence key
 
 `equivKey(command, request)` / `sameCommand(a, b, request)` treat equivalent spellings as one answer; used by

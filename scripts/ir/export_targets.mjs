@@ -2,9 +2,10 @@
 // Export model targets for the typed-IR trainer (ml/ir/) from a dataset built by dedup.mjs.
 // All IR logic stays in JS: Python reads token ids, unit maps and action/P targets only.
 //
-//   node scripts/ir/export_targets.mjs [--data build/ir/dataset/v1] [--out build/ir/targets/v1] [--max-tokens 128]
+//   node scripts/ir/export_targets.mjs [--data build/ir/dataset/v1] [--out build/ir/targets/v1] [--max-tokens 128] [--vocab FILE]
 //
-// Writes OUT/{train,dev,test}.jsonl, OUT/vocab.json (actions + P head vocabularies) and OUT/stats.json.
+// Writes OUT/{train,dev,test}.jsonl, OUT/vocab.json (actions + P head vocabularies; --vocab: copied from FILE,
+// rows with actions outside it are dropped as unknown_action) and OUT/stats.json.
 // Row: {id, request, os, label, ids, tok_unit, units, actions: [[actionId, u0, u1]], p: {...} | null}
 //   ids       = <s> request </s></s> os </s> (student Unigram tokenizer, XLM-R pair layout)
 //   tok_unit  = pointer-unit index of each request token (-1 for specials / os tokens)
@@ -25,6 +26,7 @@ const opt = (k, d) => { const i = args.indexOf(`--${k}`); return i >= 0 ? args[i
 const DATA = path.resolve(ROOT, opt('data', 'build/ir/dataset/v1'));
 const OUT = path.resolve(ROOT, opt('out', 'build/ir/targets/v1'));
 const MAX_TOK = Number(opt('max-tokens', 128));
+const VOCAB = opt('vocab', ''); // fixed vocab.json (e.g. a held-out set scored by models trained on another build)
 const MAX_UNITS = 64, MAX_ACTIONS = 32;
 
 export function loadTokenizer(dir = path.join(ROOT, 'hybrid/models/student')) {
@@ -52,7 +54,7 @@ export function encodeInput(tok, request, os) {
 
 function main() {
   const schemas = loadSchemas();
-  const vocab = buildVocab(schemas);
+  const vocab = VOCAB ? JSON.parse(fs.readFileSync(path.resolve(ROOT, VOCAB), 'utf8')) : buildVocab(schemas);
   const aid = new Map(vocab.actions.map((a, i) => [a, i]));
   const tok = loadTokenizer();
   fs.mkdirSync(OUT, { recursive: true });

@@ -157,6 +157,7 @@ function buildExec(env, e, position, sctx) {
     names_without_header: () => ['name_only', 'name_status'].some((m) => values.has(m)) && !values.has('oneline'),
     names_only_requested: () => ['name_only', 'name_status'].some((m) => values.has(m)) && !values.has('oneline') && !values.has('format')
       && requestWantsNamesOnly(env.request),
+    multi_file_sorted: () => position === 'first' && searchFeedsSort(paths, sctx.next, values) && !requestWantsFileNames(env.request),
     always: () => true,
   };
   const active = new Set(predicted);
@@ -351,7 +352,7 @@ function compilePart(env, part, counter) {
       i++;
       continue;
     }
-    built = buildExec(env, s, position, { input: stream, pipedOut });
+    built = buildExec(env, s, position, { input: stream, pipedOut, next });
     out.push(stage(built.argv, s.stderr));
     stream = built.stdout;
     prevOp = s.op;
@@ -401,19 +402,22 @@ export function impliedFileType(ir, request) {
 // F7 (restored): -o for a piped search whose request is about the matches themselves. A text.search exec (no
 // -l / -L / -c / --count-matches / context / -v / -m) feeding sort / uniq / a macro (freq) gets only_matching when the
 // request has a match / occurrence / extract cue and does not talk about lines; and, in any position, when it says
-// "only matching" / "only the matches" / "print only matches". Line pipelines ("lines with X | sort -u") and head /
+// "only matching" / "only the matches" / "print only matches" / "each (X) match" (EACH_MATCH_CUE). Line pipelines ("lines with X | sort -u") and head /
 // wc -l stay as predicted (wc -l keeps its own schema `implied`). Added before canon like impliedFileType, so
 // `canonical` carries -o; strict.js accepts it through the `implied.when: "match_cue"` form (same predicate).
 export const ONLY_MATCH_CUE = /\b(only|just)[- ](the )?(matching|matched|match(es)?)\b(?! (files?|file ?names|lines?|paths?)\b)|\bprint only match|\bonly[- ]matches\b/i;
 export const MATCH_CUE = /\b(matches|matched|occurrences?|extract(s|ed|ing)?|each match|every match)\b/i;
 const LINE_CUE = /\blines?\b/i;
+// "each / every (X) match" asks for the matches one by one, piped or not ("print each TODO match and its line number");
+// "each matching line" / "every line with a match" stay line-level
+export const EACH_MATCH_CUE = /\b(each|every)( (?!(lines?|files?|paths?|rg|grep|ripgrep)\b)[^\s,;]+){0,2} match(es)?\b/i;
 const O_BLOCK = ['count_matches', 'files_with_matches', 'files_without_match', 'count', 'context', 'before', 'after', 'invert', 'max_count'];
 const O_DOWNSTREAM = ['lines.sort', 'lines.uniq'];
 // stage: a text.search exec; next: the stage after it in the pipe (or undefined)
 export function matchCueImpliesO(stage, next, request) {
   if (typeof request !== 'string' || stage?.k !== 'exec' || stage.op !== 'text.search') return false;
   if ((stage.mods || []).some((m) => O_BLOCK.includes(m.mod))) return false;
-  if (ONLY_MATCH_CUE.test(request)) return true;
+  if (ONLY_MATCH_CUE.test(request) || EACH_MATCH_CUE.test(request)) return true;
   const sorted = next && (next.k === 'macro' || (next.k === 'exec' && O_DOWNSTREAM.includes(next.op)));
   return !!sorted && MATCH_CUE.test(request) && !LINE_CUE.test(request);
 }
@@ -430,6 +434,34 @@ export function impliedOnlyMatching(ir, request) {
       }) })),
     },
   };
+}
+
+// F8 (v4): a multi-file search (no path = cwd recursive, a directory-like operand, a glob, several paths) prefixes
+// each line with `path:`, so its matches fed to sort / uniq / freq would be unique per file. The schema's derived
+// no_filename (rg -I / grep -h) drops the prefix unless the search lists / counts files or the request asks for them.
+// Derived (never in the IR): decompile strips it, so round-trips are unaffected.
+const FILENAME_CUE = /\b(file ?names?|filenames?|paths?|which files?|in which files?|per file|each file|every file|by file)\b/i;
+export const requestWantsFileNames = (request) => typeof request === 'string' && FILENAME_CUE.test(request);
+const NF_BLOCK = ['files_with_matches', 'files_without_match', 'count', 'count_matches', 'with_filename'];
+// a single operand counts as one file when its basename has an extension, is a dotfile (not a known dot dir)
+// or is a well-known extension-less file; anything else reads as a directory (rg / grep -r recurse into it)
+const DOT_DIRS = new Set(['.git', '.github', '.config', '.ssh', '.cache', '.local', '.vscode', '.idea', '.cargo', '.npm', '.venv', '.terraform']);
+const BARE_FILES = /^(Procfile|Makefile|GNUmakefile|Dockerfile|Containerfile|Gemfile|Rakefile|Vagrantfile|Jenkinsfile|Brewfile|Podfile|Justfile|LICENSE|README|CHANGELOG|AUTHORS|NOTICE|VERSION|CODEOWNERS|syslog|messages|auth|kern|dmesg|hosts|passwd|group|fstab|crontab)$/i;
+const looksLikeFile = (v) => {
+  if (v?.k === 'lit' || v?.k === 'span' || v?.k === 'norm') {
+    const s = String(v.s ?? '');
+    if (/[*?[]/.test(s) || s === '.' || s === '..' || s.endsWith('/')) return false;
+    const base = s.split('/').pop();
+    if (/^\./.test(base)) return !DOT_DIRS.has(base);
+    return /\.[^/]+$/.test(base) || BARE_FILES.test(base);
+  }
+  return false;
+};
+export function searchFeedsSort(paths, next, values) {
+  if (NF_BLOCK.some((m) => values.has(m))) return false;
+  const sorted = next && (next.k === 'macro' || (next.k === 'exec' && O_DOWNSTREAM.includes(next.op)));
+  if (!sorted) return false;
+  return paths.length !== 1 || values.has('name_glob') || !looksLikeFile(paths[0]);
 }
 
 // git log --name-only / --name-status --format= (derived no_header) only when the request asks for just the file names

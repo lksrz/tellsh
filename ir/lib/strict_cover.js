@@ -98,6 +98,11 @@ export const COVER_RULES = [
     need: ['files.find.empty'] },
   { id: 'find_min_depth', words: ['or deeper', 'below the top', 'not at the top'], when: ['files.find'],
     unless: ['no deeper', 'not deeper'], need: ['files.find.min_depth'] },
+  // "anything / everything / any entry named X" is any type (compile.js impliedFileType never adds -type f for it);
+  // a size filter or a per-file exec still reads as files
+  { id: 'find_any_type', words: ['anything named', 'anything called', 'everything named', 'everything called', 'anything matching',
+    'everything matching', 'anything with', 'everything with', 'any entry', 'any entries', 'every entry', 'all entries'],
+  when: ['files.find'], unless: ['file', 'files', 'regular'], forbid: ['files.find.type=f!size'] },
   // curl
   { id: 'curl_silent', words: ['quiet', 'quietly', 'silent', 'silently', 'no progress', 'hide progress', 'without progress',
     'hide the progress', 'without the progress', 'no progress bar', 'suppress progress', 'without a progress'],
@@ -145,6 +150,26 @@ export function coverObligations(cx) {
     if (r.need && !r.need.some(has)) fail('cover', `"${w}" needs ${r.need.join(' or ')} [${r.id}]`);
     const bad = (r.forbid || []).find(has);
     if (bad) fail('cover', `"${w}" contradicts ${bad} [${r.id}]`);
+  }
+
+  // wc: a list of units ("words and lines", "words, lines and bytes") or "<unit> count(s)" needs every unit named
+  if (ops.has('file.count')) {
+    const UNIT = { word: 'words', words: 'words', line: 'lines', lines: 'lines', byte: 'bytes', bytes: 'bytes', char: 'chars',
+      chars: 'chars', character: 'chars', characters: 'chars' };
+    const JOIN = new Set(['and', ',', '&', '+', 'plus', 'or']);
+    const named = new Set();
+    const unitAt = (k) => (k < words.length && !consumed.has(k) ? UNIT[String(words[k]).replace(/,$/, '')] : undefined);
+    words.forEach((w, i) => {
+      const u = unitAt(i);
+      if (!u) return;
+      if (['count', 'counts'].includes(String(words[i + 1]).replace(/,$/, ''))) named.add(u);
+      const v = String(w).endsWith(',') ? unitAt(i + 1) : JOIN.has(words[i + 1]) ? unitAt(i + 2) : undefined;
+      if (v) { named.add(u); named.add(v); }
+    });
+    for (const u of named) {
+      const need = u === 'bytes' || u === 'chars' ? ['file.count.bytes', 'file.count.chars'] : [`file.count.${u}`];
+      if (!need.some(has)) fail('cover', `"${u}" count needs ${need.join(' or ')} [wc_units]`);
+    }
   }
 
   // git branch: "remote branches" is -r; "all / local and remote branches" is -a
