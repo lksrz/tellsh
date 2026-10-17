@@ -90,11 +90,6 @@ test('r2 fix 4: git log piped into grep for commits is --oneline', () => {
   assert.equal(requestImpliesPipedOneline('commit lines mentioning deploy'), true);
 });
 
-test('r2 fixes 5 / 6 not implemented: names-only commits keep the header, wc FILE stays', () => {
-  ok('just file names touched by non-merge commits by erin in the last 90 days', "git log --author=erin --since='90 days ago' --no-merges --name-only");
-  ok('need byte count of Procfile, nothing else', 'wc -c Procfile', 'wc -c Procfile');
-});
-
 test('r2 review fixes: full-log grep patterns, name-cue polarity, leading / following context words', () => {
   // piped --oneline is not added when the grep pattern reads the full-log layout
   ok('grep commits for the regex ^commit', "git log | grep -E '^commit'", "git log | grep -E '^commit'");

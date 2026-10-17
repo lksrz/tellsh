@@ -117,7 +117,7 @@ Gold false-reject rate (gold IR of ok rows, h8b eval, Oct 2026): train 190 / 253
   output (`requestWantsNamesOnly(request)`); "names only" alone stays `git log --name-only` (headers kept).
 - **git branch -vv (v3).** `very_verbose` (`-vv`, excl `verbose`); a tracking info / upstream cue needs it
   (`COVER_RULES` `branch_tracking`, not for "remote tracking branches").
-- **Not done:** `wc -c < FILE` for a bare-number cue: the IR has no stdin redirection (decompile rejects `<`).
+- **Not done:** `wc -c < FILE` for a bare-number cue: the IR has no stdin redirection (decompile rejects `<`); v5 round 3 rejects `wc FILE` for that cue instead.
 - **Count semantics (F4).** IR-level convention, not a compile rewrite (compile stays a pure function of the IR):
   "count (matching) lines" over a directory, glob, several paths or `-r` is one total, `search | file.count{lines}`
   (`rg P DIR | wc -l`); the `count` mod (`-c`, per-file counts) is for a single file operand or an each / per / every
@@ -167,6 +167,14 @@ Gold false-reject rate (gold IR of ok rows, h8b eval, Oct 2026): train 190 / 253
     name wording only, "skip paths" is scope), so the
     derived `no_filename` holds for them.
   - `DOT_DIRS` and `BARE_FILES` are exported (used by `strict_v5.js`).
+- **v5 round 3 (dev4, `docs/ir_error_taxonomy_v5.md` "v5 round 3").** Derived / request-implied only:
+  - `no_filename` (`multi_file_sorted`) also holds for "nothing else" / "only the matched text" / "just the matches"
+    over a multi-file search in any position, not on stdin (`bareMatchesMultiFile(paths, values, request)`).
+  - `impliedFileType` adds `type=f` also when every `name_glob` / `any_name` value is file-like (has an extension;
+    `namesAreFileLike(exec, request)`) and the request mentions no dir / directory / folder.
+  - `names_only_requested` (`no_header`, `--format=`) also holds for an unpiped `git.log` when
+    `requestWantsNamesOnlyR3(request)`: just / only the file names, commits mentioned or not, no per-commit grouping.
+  - Gate rejects in `strict_v5r3.js`: `[oneline_date]`, `[wc_bare_number]`, `[name_contains]` for a bare-name prune.
 - **Decline pre-check (v4, `decline.js` `declineObligations`).** Called from `obligations()` before `strictObligations`:
   (a) a dangling last word ("compared to", "containing", "by author", "with", "for", "of"; not after a mode word such
   as "case-sensitive matching") and (b) a definite generic noun with no value ("the deprecated helper", "that commit",

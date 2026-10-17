@@ -9,6 +9,7 @@
 
 import { GIT_COVER_RULES, gitCoverObligations } from './strict_cover_git.js';
 import { v5Obligations } from './strict_v5.js';
+import { FIND_ANY_TYPE_WORDS } from './compile.js';
 
 const DEPTH = ['depth', 'deep', 'level', 'levels', 'deeper', 'mindepth', 'maxdepth', 'nested', 'subdirectory', 'subdirectories'];
 const IGNORE_CASE = ['ignore case', 'ignoring case', 'case-insensitive', 'case insensitive', 'case-insensitively', 'case insensitively',
@@ -98,8 +99,7 @@ export const COVER_RULES = [
   need: ['files.find.max_depth'] },
   // "anything / everything / any entry named X" is any type (compile.js impliedFileType never adds -type f for it);
   // a size filter or a per-file exec still reads as files
-  { id: 'find_any_type', words: ['anything named', 'anything called', 'everything named', 'everything called', 'anything matching',
-    'everything matching', 'anything with', 'everything with', 'any entry', 'any entries', 'every entry', 'all entries'],
+  { id: 'find_any_type', words: FIND_ANY_TYPE_WORDS,
   when: ['files.find'], unless: ['file', 'files', 'regular'], forbid: ['files.find.type=f!size'] },
   // curl
   { id: 'curl_silent', words: ['quiet', 'quietly', 'silent', 'silently', 'no progress', 'hide progress', 'without progress',

@@ -139,6 +139,51 @@ with FIXME in it, line count per file" now abstains: its other n-best hypotheses
 example now gets `--oneline`. "count lines per file ... user_[0-9]+ matches" stays `rg -c`, which the train gold supports.
 Over all train gold (51,353 decompilable ok rows), the new rules reject 1 row (fix 3, above). The context and name rules reject 0.
 
+## v5 round 3 (dev4)
+
+Residual judge-confirmed dev4 errors. Where the judge and the Haiku train gold disagree on a convention, the judge wins
+(round 2 skipped items 5 and 6 on gold grounds; they are done here). Tests: `ir/test/v5_round3.test.js`.
+
+1. **r3-a: derived `-h` / `-I` for bare matches** (`compile.js` `bareMatchesMultiFile`, under `derive: multi_file_sorted`).
+   "nothing else", "only / just the matched / matching text", "just the matches" over a multi-file search (no path,
+   a directory-like operand, a glob, several paths) derive `no_filename` in any position: `grep -r -o -h user_id tmp`.
+   Not on stdin (a later stage with no path), not with `-l / -L / -c / --count-matches / -H`, not when the request asks
+   for file names / paths (`requestWantsFileNames`).
+2. **r3-b: implied `-type f` for file-like names** (`compile.js` `impliedFileType`, `namesAreFileLike`). A `files.find`
+   with no `type` whose every `name_glob` / `any_name` value has an extension (`*.css`, `cache.java`, an `ext_glob`
+   norm; not `*.d`) gets `-type f` unless the request mentions dir(s) / directory / directories / subdirectories /
+   folder(s) / subfolder(s), or has any-type wording (the `find_any_type` words, anything, entries, whatever, items
+   named, symlinks / links). Request-implied (in the IR), so it round-trips.
+3. **r3-c: `[oneline_date]`** (`strict_v5r3.js`). Reject `git log` / `git show` with `--oneline` and `--date=...`
+   and no `--format` / `--pretty`: `--date` has no effect under `--oneline`.
+4. **r3-d: `--format=` for "just the file names" of commits** (`compile.js` `requestWantsNamesOnlyR3`, under
+   `derive: names_only_requested`). "just / only (the) (changed) file names / filenames / names of the files" derives
+   `no_header` even when the request mentions commits / log / history, unless it groups per commit (per / each / every
+   commit, with the commits, commits and files, which commit) or also asks for authors / dates / relative / when /
+   who / subjects / messages / hashes / sha. Unpiped logs only: a piped log
+   (`git log --name-only | sort -u`) keeps the old `requestWantsNamesOnly`.
+5. **r3-e: `[wc_bare_number]`** (`strict_v5r3.js`). Reject `wc` (`file.count`) on file operand(s) when the request
+   says "nothing else", "just / only the number / count", "number only", "bare number" or "without the (file)name":
+   `wc -c FILE` prints the name and the IR has no `wc -c < FILE`. Also `wc` in an each stage (`find -exec` / `xargs`);
+   quoted spans of the request are not cues. The existing `bare_output` rule covers some of these.
+6. **r3-f: `[name_contains]` for a prune** (`strict_v5r3.js`). For an exclusion "X in the name" cue
+   (`strict_v5r2.js` `nameCues`, neg), a `find` `exclude_dir` (`-type d -name X -prune`) of the bare X fails.
+
+### Collateral (dev + dev3 + dev4 + v5 k-fold heldout, 42,836 previously accepted y=1 candidates)
+
+| fix | y=1 rejected / changed | y=0 rejected / changed | y=0 -> y=1 |
+| --- | --- | --- | --- |
+| r3-a no_filename | 79 changed, all stay y=1 | 2 changed, still y=0 | 0 |
+| r3-b -type f | 313 changed, all stay y=1 (318 before the any-type exception; inside cover-cue buckets still accepted) | 12 changed, still y=0 | 0 |
+| r3-c oneline_date | 5 rejected (1 the dev4 example; 4 fold "one line / oneline log with dates") | 1 rejected | 0 |
+| r3-d no_header | 21 changed, all stay y=1 | 0 | 0 |
+| r3-e wc_bare_number | 2 rejected (both dev4 "..., nothing else": the example + `wc -l pyproject.toml`) | 0 | 0 |
+| r3-f name_contains | 0 | 1 rejected (the dev4 example) | 0 |
+
+No y flips: equivalence (`scripts/ir/equiv.mjs`, unchanged) treats the new derived / implied mods as insignificant
+for the gold. The reject rules stay well under 3 y=1 rejects per 1000 accepted (r3-c 0.12, r3-e 0.05 per 1000).
+All six dev4 examples now get the wanted command (a, b, d) or a reject (c, e, f).
+
 ## Round 5 measurement (v5 models, judged with Opus in batches of 100)
 
 Ensemble: t50v5 main + h8v5, t50wv5, kfold_v5 folds 0-2. Judging: every kept row goes to Opus (`claude -p`, `--batch 100`).

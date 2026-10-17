@@ -157,8 +157,10 @@ function buildExec(env, e, position, sctx) {
     each_inner: () => position === 'each',
     names_without_header: () => ['name_only', 'name_status'].some((m) => values.has(m)) && !values.has('oneline'),
     names_only_requested: () => ['name_only', 'name_status'].some((m) => values.has(m)) && !values.has('oneline') && !values.has('format')
-      && requestWantsNamesOnly(env.request),
-    multi_file_sorted: () => position === 'first' && searchFeedsSort(paths, sctx.next, values) && !requestWantsFileNames(env.request),
+      && (requestWantsNamesOnly(env.request) || (!sctx.pipedOut && requestWantsNamesOnlyR3(env.request)))
+      && !(!sctx.pipedOut && NAMES_ONLY_EXTRA_CUE.test(env.request)),
+    multi_file_sorted: () => !requestWantsFileNames(env.request)
+      && ((position === 'first' && searchFeedsSort(paths, sctx.next, values)) || ((position === 'first' || paths.length > 0) && bareMatchesMultiFile(paths, values, env.request))),
     merges_with_file_lists: () => values.has('merges_only') && ['name_only', 'name_status', 'stat'].some((m) => values.has(m)),
     all_entries_requested: () => !values.has('hidden') && requestWantsAllEntries(env.request, paths),
     always: () => true,
@@ -385,12 +387,30 @@ export const FILE_NOUN = /\bfiles?\b/i;
 export const NON_FILE_NOUN = /\b(dir(ector(y|ies))?s?|folders?|(sym)?links?|entries|entry|everything|anything|sockets?|fifos?|pipes?)\b/i;
 export const requestWantsFiles = (request) => typeof request === 'string' && FILE_NOUN.test(request) && !NON_FILE_NOUN.test(request);
 
+// v5 round 3 fix b: a find whose every name / iname value is file-like (an extension: *.css, cache.java) lists files
+// even when the request does not say "files", unless it mentions directories / folders.
+const DIR_MENTION = /\b(dirs?|directory|directories|subdirector(y|ies)|folders?|subfolders?)\b/i;
+const FILE_LIKE_NAME = /\.(?!d$)[A-Za-z0-9]+$/;
+const nameText = (v, request) => (v?.k === 'norm' ? (v.kind === 'ext_glob' ? '*.ext' : '') : patText(v, request));
+export function namesAreFileLike(e, request) {
+  const vals = (e.mods || []).filter((m) => GLOB_MODS.includes(m.mod)).flatMap((m) => m.values || []);
+  return vals.length > 0 && vals.every((v) => FILE_LIKE_NAME.test(nameText(v, request).split('/').pop()));
+}
+
+// "anything / any entry named X", symlinks / links: any type, so no -type f from file-like names (round-3 review).
+// strict_cover.js find_any_type uses the same words.
+export const FIND_ANY_TYPE_WORDS = ['anything named', 'anything called', 'everything named', 'everything called', 'anything matching',
+  'everything matching', 'anything with', 'everything with', 'any entry', 'any entries', 'every entry', 'all entries'];
+const ANY_TYPE_CUE = new RegExp(`\\b(${FIND_ANY_TYPE_WORDS.join('|')}|anything|entries|whatever|items named|symlinks?|links?)\\b`, 'i');
 export function impliedFileType(ir, request) {
-  if (!requestWantsFiles(request)) return ir;
+  const files = requestWantsFiles(request);
+  const noDirs = typeof request === 'string' && !DIR_MENTION.test(request);
+  if (!files && !noDirs) return ir;
   const fix = (e) => {
     if (e?.k !== 'exec' || e.op !== 'files.find') return e;
     const mods = e.mods || [];
     if (mods.some((m) => m.mod === 'type')) return e;
+    if (!files && (ANY_TYPE_CUE.test(request) || !namesAreFileLike(e, request))) return e;
     return { ...e, mods: [...mods, { mod: 'type', values: [{ k: 'const', id: 'f' }] }] };
   };
   return {
@@ -462,6 +482,13 @@ const looksLikeFile = (v) => {
   }
   return false;
 };
+// v5 round 3 fix a: "nothing else" / "only the matched text" / "just the matches" over a multi-file search asks
+// for the bare matches, so the `path:` prefix goes too (in any position).
+const BARE_MATCH_CUE = /\bnothing else\b|\b(only|just) (the )?(match(ed|ing)? text|matches)\b/i;
+export function bareMatchesMultiFile(paths, values, request) {
+  if (typeof request !== 'string' || !BARE_MATCH_CUE.test(request) || NF_BLOCK.some((m) => values.has(m))) return false;
+  return paths.length !== 1 || values.has('name_glob') || !looksLikeFile(paths[0]);
+}
 export function searchFeedsSort(paths, next, values) {
   if (NF_BLOCK.some((m) => values.has(m))) return false;
   const sorted = next && (next.k === 'macro' || (next.k === 'exec' && O_DOWNSTREAM.includes(next.op)));
@@ -474,6 +501,14 @@ export function searchFeedsSort(paths, next, values) {
 export const requestWantsNamesOnly = (request) => typeof request === 'string'
   && /\b(only|just)( the)?( changed)? (file ?names|filenames|names of the (changed )?files)\b/i.test(request)
   && !/\b(log|history|who|per commit|each commit|commits? (by|on|touching|that|in|since|from|until))\b/i.test(request);
+// v5 round 3 fix d: "just / only (the) (changed) file names" drops the headers even when commits are mentioned,
+// unless the request groups the names per commit. Unpiped logs only (piped logs keep requestWantsNamesOnly).
+export const requestWantsNamesOnlyR3 = (request) => typeof request === 'string'
+  && /\b(only|just)( the)?( changed)? (file ?names|filenames|names of the (changed )?files)\b/i.test(request)
+  && !/\b(who|per commit|each commit|every commit|with (the |their )?commits?|commits? and (the |their )?(changed )?files|which commits?)\b/i.test(request)
+  && !NAMES_ONLY_EXTRA_CUE.test(request);
+// round-3 review: names-only drops the headers, so not when the request also wants authors / dates / subjects / hashes
+const NAMES_ONLY_EXTRA_CUE = /\b(authors?|authored|dates?|dated|relative|when|who|subjects?|messages?|hash(es)?|sha)\b/i;
 
 // v4 fix 2: a literal cue ("literal match", "fixed string", "verbatim") always renders -F (rg / grep) or
 // --fixed-strings (git --grep), not only when the pattern has a metacharacter. Derived: decompile strips it.
