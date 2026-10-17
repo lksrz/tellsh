@@ -193,6 +193,30 @@ all 400 rows, 0 failures; the gold-free variants only reach AUC 0.85-0.87. A y=0
 use Jev only to rescue y=0 rows (within y=0 AUC ~0.91), e.g. `gold` at t~0.73 keeps 95% Opus-wrong recall and clears
 ~45% of the Opus-correct y=0 rows.
 
+### Cascade: Jev for bulk, Opus sampled (`--backend cascade`)
+
+    zsh -ic 'node scripts/ir/adjudicate.mjs --backend cascade --cands C.jsonl --data D.jsonl --sample-agree 100000 \
+      --out build/ir/adjudicate/X [--jev-model jev-1.13.0] [--jev-threshold 0.73] [--max-opus 600] [--audit 0.05] \
+      [--audit-min 50] [--audit-max 200] [--seed 1] [--opus-concurrency 6] [--extra-cache OLD/cache.jsonl]'
+
+Stage 1 runs Jev (`gold` variant, pinned `jev-1.13.0`) on every row (y = 0 and y = 1). Stage 2 runs Opus (`claude -p`,
+subscription) only on (a) flagged rows (Jev p < threshold, or a Jev error), at most `--max-opus`; a seeded random subset
+beyond the cap stays Jev-only (`stratum: flagged_jev_only`), and (b) a seeded audit sample of Jev-passed rows
+(`--audit` fraction clamped to [min, max]). The final verdict is Opus when judged, else Jev; each record adds `judge`
+(opus / jev), `stratum` (flagged / flagged_jev_only / audit / passed), `audit`, `jev_p`, `jev_pred_correct`.
+`summary.cascade` has strata counts, `audit` (Opus-wrong among audited Jev-passed rows, miss rate and one-sided 95%
+Clopper-Pearson UB), `flagged_opus.overturn_rate` (Opus says correct among flagged), new / cached call counts and stage
+timings. Both judges share `OUT/cache.jsonl` (keys hold the model, so they never collide); `--extra-cache` reads older
+caches read-only, so rows already judged by Opus (e.g. `v4_dev_t50`) cost nothing. Pure helpers: `cascade_lib.mjs`
+(tests: `ir/test/cascade.test.js`). Smoke (60 v4 dev rows, 30 y=0 + 30 y=1): Jev 2 s for 60 calls, 43 Opus rows all cached.
+
+`score_combined.mjs --adjudications CASCADE_ADJ --adj-truth --adj-strata` adds per kept set `adj_wrong_obs` (Opus-confirmed
+wrong, Jev-only flagged, unadjudicated raw wrong), `jev_unaudited_kept` (kept rows whose cascade verdict is an unaudited
+Jev pass), `adj_wrong_est` = obs + unaudited x audit miss rate (and `adj_wrong_est_rate`, % of kept), and
+`adj_ub95_est` (% of kept) = CP UB95 of obs over kept + unaudited x audit-miss CP UB95: a conservative sum of two 95%
+bounds (jointly >= 90% by the union bound, wider in practice). The report adds the pooled `audit` stats. Without the
+flag the output is unchanged.
+
 `score_combined.mjs --adjudications DEV_ADJ,TEST_ADJ` counts a `y = 0` candidate as correct when its adjudication
 (same id and command) says the prediction is correct, and reports `adj_wrong`, `adj_accepted_wrong_rate`,
 `adj_accepted_wrong_ub95` next to the raw numbers (thresholds are still chosen on raw labels). With `--adj-truth`

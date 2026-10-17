@@ -31,12 +31,17 @@
 // `sweep` over the whole grid (t in the agreement sweep thresholds). --select-adj makes these dev choices count wrong /
 // correct with the adjudications (dev ones; test is never used for choosing). Test rows add `unadjudicated_wrong`:
 // kept raw-wrong candidates without an adjudication of that exact command (they count as wrong in adj numbers).
+// --adj-strata (with --adjudications from adjudicate.mjs --backend cascade, normally plus --adj-truth): rows with adj
+// numbers add adj_wrong_est = observed wrongs (Opus-confirmed, Jev-only flagged, unadjudicated raw) + unaudited
+// Jev-passed kept rows x audit miss rate, and adj_ub95_est (% of kept) = CP UB of the observed wrongs + unaudited x
+// audit-miss CP UB (conservative sum of two 95% bounds); the report adds the pooled `audit` miss stats.
 
 import fs from 'node:fs';
 import { loadSchemas } from '../../ir/lib/index.js';
 import { readJsonl, candidates, goldCommand } from './make_candidates.mjs';
 import { sameCommand } from './equiv.mjs';
 import { loadAdjudications, adjudicatedY } from './adjudicate_lib.mjs';
+import { cpUpper, auditStats, strataEstimate } from './cascade_lib.mjs';
 import { acceptedById, agreeCount, keeps, chooseGrid } from './combined_lib.mjs';
 import { nbestKeeps, nbestEval, pickMaxKept, pickByCoverage } from './nbest_lib.mjs';
 
@@ -51,6 +56,8 @@ const ADJ_TRUTH = args.includes('--adj-truth');
 const DUMP_KEPT = opt('dump-kept');  // JSONL of the candidates kept at the dev-chosen n-best by_coverage_50 setting (error analysis)
 const dumped = [];  // judge verdict overrides gold in both directions (fully adjudicated sets)
 const ADJ = opt('adjudications') ? loadAdjudications(opt('adjudications').split(',')) : null;
+// --adj-strata: cascade adjudications (adjudicate.mjs --backend cascade); audit miss rate pooled over all loaded files
+const AUDIT = args.includes('--adj-strata') && ADJ ? auditStats(ADJ) : null;
 
 // ---------------------------------------------------------------- stats
 function logBinomPmf(k, n, p) {
@@ -60,23 +67,7 @@ function logBinomPmf(k, n, p) {
   for (let i = 1; i <= k; i++) lc += Math.log(n - k + i) - Math.log(i);
   return lc + k * Math.log(p) + (n - k) * Math.log(1 - p);
 }
-// O(k): pmf(i + 1) = pmf(i) * (n - i) / (i + 1) * p / (1 - p), in log space from pmf(0)
-function binomCdf(k, n, p) {
-  if (p <= 0) return 1;
-  if (p >= 1) return k >= n ? 1 : 0;
-  let l = n * Math.log(1 - p), s = Math.exp(l);
-  const r = Math.log(p) - Math.log(1 - p);
-  for (let i = 0; i < k; i++) { l += Math.log(n - i) - Math.log(i + 1) + r; s += Math.exp(l); }
-  return Math.min(1, s);
-}
-// one-sided (1 - alpha) Clopper-Pearson upper bound of a proportion k / n
-export function cpUpper(k, n, alpha = 0.05) {
-  if (n === 0) return 1;
-  if (k >= n) return 1;
-  let lo = k / n, hi = 1;
-  for (let it = 0; it < 60; it++) { const mid = (lo + hi) / 2; if (binomCdf(k, n, mid) > alpha) lo = mid; else hi = mid; }
-  return hi;
-}
+export { cpUpper };
 function auc(items) {
   const s = [...items].sort((a, b) => a.p - b.p);
   const n1 = s.filter((x) => x.y).length, n0 = s.length - n1;
@@ -139,7 +130,8 @@ function at(S, t, a = 0, nk = null) {
 function adjAt(kept, S) {
   const w = kept.filter((x) => !x.ya).length;
   const unadj = kept.filter((x) => !x.ya && ADJ.get(String(x.id))?.command !== x.command).length;
-  return { adj_wrong: w, adj_coverage: pct(kept.length - w, S.goldOk), adj_accepted_wrong_rate: pct(w, kept.length), adj_accepted_wrong_ub95: pct(cpUpper(w, kept.length), 1), unadjudicated_wrong: unadj };
+  return { adj_wrong: w, adj_coverage: pct(kept.length - w, S.goldOk), adj_accepted_wrong_rate: pct(w, kept.length), adj_accepted_wrong_ub95: pct(cpUpper(w, kept.length), 1), unadjudicated_wrong: unadj,
+    ...(AUDIT ? strataEstimate(kept, ADJ, AUDIT) : {}) };
 }
 
 // lowest threshold (max kept) whose criterion holds on dev; unscored candidates (p = -1) are never kept and never a
@@ -162,7 +154,7 @@ const thr = AGREE_ONLY ? {} : {
   by_upper_bound: choose(dev, (w, k) => cpUpper(w, k) <= TARGET),
   by_point: choose(dev, (w, k) => w / k <= TARGET),
 };
-const report = { target_pct: TARGET * 100, thresholds: Object.fromEntries(Object.entries(thr).map(([k, v]) => [k, v === Infinity ? 'none' : r4(v)])) };
+const report = { target_pct: TARGET * 100, ...(AUDIT ? { audit: { n: AUDIT.n, miss: AUDIT.miss, miss_rate: r4(AUDIT.rate), miss_ub95: r4(AUDIT.ub95) } } : {}), thresholds: Object.fromEntries(Object.entries(thr).map(([k, v]) => [k, v === Infinity ? 'none' : r4(v)])) };
 const N = dev.nOthers;
 const SWEEP_T = AGREE_ONLY ? [-Infinity] : [-Infinity, 0.5, 0.7, 0.8, 0.9, 0.95, 0.98, 0.99];
 const grid = N ? {

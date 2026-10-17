@@ -5,6 +5,12 @@
 //   node scripts/ir/adjudicate.mjs --cands build/ir/verifier/v1/cand_test.jsonl --data build/ir/dataset/v1/test.jsonl \
 //     --out build/ir/adjudicate/v1_test [--model claude-opus-5-5] [--effort low] [--concurrency 16] \
 //     [--sample-agree N] [--limit N] [--seed 1] [--backend api|cli|codex|grok] [--timeout 600] [--cache-tag T]
+// --backend cascade: stage 1 Jev (--jev-model jev-1.13.0, --jev-variant gold, --jev-threshold 0.73) on every row; stage 2
+// Opus via cli (--model, --opus-concurrency 6) on flagged rows (Jev p < threshold or Jev error; at most --max-opus 600, a
+// seeded random subset beyond that stays Jev-only: stratum flagged_jev_only) plus a seeded audit sample of Jev-passed rows
+// (--audit 0.05, clamped to --audit-min 50 / --audit-max 200). Final verdict = Opus if judged, else Jev; records add
+// judge / stratum / audit / jev_p; summary.cascade has strata counts, audit miss rate + CP UB95, flagged overturn rate.
+// --extra-cache F[,F] reads further cache.jsonl files (read-only; e.g. an earlier Opus run on the same candidates).
 //   node scripts/ir/adjudicate.mjs --rows ROWS.jsonl --out DIR ...   (adjudication-shaped rows, gold already joined)
 //
 // --backend cli runs `claude -p` per row on the subscription login (API key vars stripped from the child env, no
@@ -27,19 +33,26 @@ import { spawn } from 'node:child_process';
 import { SYSTEM, OUT_SCHEMA, buildPrompt, parseVerdict, unshuffle, summarize, costOf, hashKey, cliArgs, cliEnv, parseCliResult,
   DEFAULT_MODEL, codexArgs, codexPrompt, parseCodexResult, grokArgs, parseGrokResult, rowsFromAdjudications,
   JEV_URL, JEV_PRICE_PER_TOK, JEV_VARIANTS, jevBody, parseJevResult, jevVerdict, jevRetryable, jevBackoffMs } from './adjudicate_lib.mjs';
+import { cascadeStrata, cascadeSummary } from './cascade_lib.mjs';
 
 const args = process.argv.slice(2);
 const opt = (k, d) => { const i = args.indexOf(`--${k}`); return i >= 0 ? args[i + 1] : d; };
 const CANDS = opt('cands'), DATA = opt('data'), OUT = opt('out'), ROWS = opt('rows'), CACHE_TAG = opt('cache-tag', '');
 if (!OUT || (!ROWS && (!CANDS || !DATA))) { console.error('usage: adjudicate.mjs --cands CAND.jsonl --data SPLIT.jsonl --out DIR [--model M] [--concurrency 16] [--sample-agree N] [--limit N]'); process.exit(2); }
 const BACKEND = opt('backend', 'cli');  // cli (subscription) by default; never use the paid api (global rule)
-if (!['api', 'cli', 'codex', 'grok', 'jev'].includes(BACKEND)) { console.error(`unknown --backend ${BACKEND}`); process.exit(2); }
-const MODEL = opt('model', DEFAULT_MODEL[BACKEND]), EFFORT = opt('effort', 'low');
+if (!['api', 'cli', 'codex', 'grok', 'jev', 'cascade'].includes(BACKEND)) { console.error(`unknown --backend ${BACKEND}`); process.exit(2); }
+const CASCADE = BACKEND === 'cascade';
+const MODEL = opt('model', CASCADE ? DEFAULT_MODEL.cli : DEFAULT_MODEL[BACKEND]), EFFORT = opt('effort', 'low');
 const TIMEOUT_S = Number(opt('timeout', 600));
-const CONC = Number(opt('concurrency', BACKEND === 'cli' ? 6 : BACKEND === 'api' ? 16 : BACKEND === 'jev' ? 8 : 4)), SAMPLE = Number(opt('sample-agree', 0)), LIMIT = Number(opt('limit', 0));
+const CONC = Number(opt('concurrency', BACKEND === 'cli' ? 6 : BACKEND === 'api' ? 16 : BACKEND === 'jev' || CASCADE ? 8 : 4)), SAMPLE = Number(opt('sample-agree', 0)), LIMIT = Number(opt('limit', 0));
 let seed = Number(opt('seed', 1));
-const JEV_VARIANT = opt('jev-variant', 'gold'), JEV_THRESHOLD = Number(opt('threshold', 0.5));
-if (BACKEND === 'jev' && !JEV_VARIANTS[JEV_VARIANT]) { console.error(`unknown --jev-variant ${JEV_VARIANT}`); process.exit(2); }
+const JEV_VARIANT = opt('jev-variant', 'gold'), JEV_THRESHOLD = Number(opt(CASCADE ? 'jev-threshold' : 'threshold', CASCADE ? 0.73 : 0.5));
+const JEV_MODEL = CASCADE ? opt('jev-model', 'jev-1.13.0') : MODEL;
+const OPUS_CONC = Number(opt('opus-concurrency', 6));
+const CASCADE_OPT = { threshold: JEV_THRESHOLD, maxOpus: Number(opt('max-opus', 600)), audit: Number(opt('audit', 0.05)),
+  auditMin: Number(opt('audit-min', 50)), auditMax: Number(opt('audit-max', 200)), seed: Number(opt('seed', 1)) };
+const EXTRA_CACHE = (opt('extra-cache') || '').split(',').filter(Boolean);  // read-only caches (e.g. an earlier Opus run)
+if ((BACKEND === 'jev' || CASCADE) && !JEV_VARIANTS[JEV_VARIANT]) { console.error(`unknown --jev-variant ${JEV_VARIANT}`); process.exit(2); }
 const rand = () => ((seed = (seed * 1103515245 + 12345) % 2147483648) / 2147483648);
 
 const schemas = ROWS ? null : loadSchemas();
@@ -59,9 +72,10 @@ if (LIMIT > 0) rows = rows.slice(0, LIMIT);
 
 fs.mkdirSync(OUT, { recursive: true });
 const CACHE = path.join(OUT, 'cache.jsonl');
-const keyOf = (r) => hashKey(r.id, r.command, r.gold ?? `!${r.goldLabel}`, MODEL, ...(CACHE_TAG ? [CACHE_TAG] : []));
+const keyFor = (r, model) => hashKey(r.id, r.command, r.gold ?? `!${r.goldLabel}`, model, ...(CACHE_TAG ? [CACHE_TAG] : []));
+const keyOf = (r) => keyFor(r, MODEL);
 const cache = new Map();
-if (fs.existsSync(CACHE)) for (const l of fs.readFileSync(CACHE, 'utf8').split('\n').filter(Boolean)) { try { const j = JSON.parse(l); cache.set(j.key, j); } catch {} }
+for (const f of [...EXTRA_CACHE, CACHE]) if (fs.existsSync(f)) for (const l of fs.readFileSync(f, 'utf8').split('\n').filter(Boolean)) { try { const j = JSON.parse(l); if (!j.error) cache.set(j.key, j); } catch {} }
 
 const KEY = process.env.CLAUDE_API_KEY || process.env.ANTHROPIC_API_KEY;
 const WS = process.env.CLAUDE_WORKSPACE_ID || process.env.ANTHROPIC_WORKSPACE_ID;
@@ -98,8 +112,8 @@ async function call(prompt) {
 
 // --backend jev: one POST per row (all variants + gold check as Nouls); backoff on 429 / 529 / 5xx / network errors
 const JEV_KEY = process.env.JEV_API_KEY;
-async function callJev(row) {
-  const body = JSON.stringify(jevBody(row, MODEL));
+async function callJev(row, model = MODEL) {
+  const body = JSON.stringify(jevBody(row, model));
   let lastErr = '';
   for (let attempt = 0; attempt < 8; attempt++) {
     const t0 = Date.now();
@@ -135,12 +149,12 @@ function spawnCli(bin, argv, input) {
   });
 }
 // one call of the selected CLI backend -> {code, out, err, parse()} (parse throws on a bad verdict)
-async function runCli(prompt) {
-  if (BACKEND === 'cli') { const r = await spawnCli('claude', cliArgs(MODEL, EFFORT), prompt); return { ...r, parse: () => parseCliResult(r.out) }; }
+async function runCli(prompt, backend = BACKEND) {
+  if (backend === 'cli') { const r = await spawnCli('claude', cliArgs(MODEL, EFFORT), prompt); return { ...r, parse: () => parseCliResult(r.out) }; }
   fs.mkdirSync(TMP, { recursive: true });
   const base = path.join(TMP, `${process.pid}_${tmpSeq++}`);
   try {
-    if (BACKEND === 'codex') {
+    if (backend === 'codex') {
       const sf = base + '.schema.json', of = base + '.out.json';
       fs.writeFileSync(sf, JSON.stringify(OUT_SCHEMA));
       const r = await spawnCli('codex', codexArgs(MODEL, EFFORT, sf, of), codexPrompt(prompt));
@@ -154,11 +168,11 @@ async function runCli(prompt) {
   } finally { for (const f of ['.schema.json', '.out.json', '.prompt.txt']) fs.rmSync(base + f, { force: true }); }
 }
 // one CLI call per attempt; up to 2 retries on unparseable verdicts, up to 4 on CLI failures (exponential backoff)
-async function callCli(prompt) {
+async function callCli(prompt, backend = BACKEND) {
   let lastErr = '', parseFails = 0, cliFails = 0;
   for (;;) {
     const t0 = Date.now();
-    const r = await runCli(prompt);
+    const r = await runCli(prompt, backend);
     const secs = (Date.now() - t0) / 1000;
     try {
       if (r.code !== 0 && !r.out.trim()) throw new Error(`cli exit ${r.code}: ${r.err.slice(0, 200)}`);
@@ -173,41 +187,72 @@ async function callCli(prompt) {
   }
 }
 
-if (BACKEND === 'jev' && !JEV_KEY && rows.some((r) => !cache.has(keyOf(r)))) { console.error('no JEV_API_KEY'); process.exit(1); }
+if ((BACKEND === 'jev' || CASCADE) && !JEV_KEY && rows.some((r) => !cache.has(keyFor(r, JEV_MODEL)))) { console.error('no JEV_API_KEY'); process.exit(1); }
 if (BACKEND === 'api' && !KEY && rows.some((r) => !cache.has(keyOf(r)))) { console.error('no CLAUDE_API_KEY / ANTHROPIC_API_KEY'); process.exit(1); }
-const out = new Array(rows.length);
-let next = 0, done = 0, fresh = 0;
-async function worker() {
-  while (next < rows.length) {
-    const i = next++, r = rows[i], key = keyOf(r);
-    let rec = cache.get(key);
-    if (rec && BACKEND === 'jev' && rec.p_variants) rec = { ...rec, ...jevVerdict({ p: rec.p_variants, p_gold: rec.p_gold }, JEV_VARIANT, JEV_THRESHOLD) };
-    if (!rec && BACKEND === 'jev') {
-      try {
-        const res = await callJev(r);
-        rec = { key, ...r, model: MODEL, model_version: res.model, backend: 'jev', jev_variant: JEV_VARIANT, ...jevVerdict(res, JEV_VARIANT, JEV_THRESHOLD),
-          usage: res.usage, cost_usd: res.usage.input_tokens * JEV_PRICE_PER_TOK };
-        fs.appendFileSync(CACHE, JSON.stringify(rec) + '\n');
-        fresh++;
-      } catch (e) { rec = { key, ...r, model: MODEL, error: String(e.message || e) }; }
-    }
-    if (!rec) {
-      const { aIsPred, text } = buildPrompt(r);
-      try {
-        const res = BACKEND !== 'api' ? await callCli(text) : await call(text);
-        const { verdict, usage } = res;
-        rec = { key, ...r, model: MODEL, backend: BACKEND, a_is_pred: aIsPred, ...unshuffle(verdict, aIsPred), usage,
-          cost_usd: BACKEND !== 'api' ? res.cost_usd : costOf(MODEL, usage) };
-        fs.appendFileSync(CACHE, JSON.stringify(rec) + '\n');
-        fresh++;
-      } catch (e) { rec = { key, ...r, model: MODEL, error: String(e.message || e) }; }
-    }
-    out[i] = rec;
-    if (++done % 25 === 0) console.error(`${done}/${rows.length} (${fresh} new)`);
-  }
+let done = 0, fresh = 0;
+// one Jev verdict for row r (cache or call); variant / threshold re-derived from cached p_variants
+async function judgeJev(r, model) {
+  const key = keyFor(r, model);
+  let rec = cache.get(key);
+  if (rec && rec.p_variants) return { ...rec, ...jevVerdict({ p: rec.p_variants, p_gold: rec.p_gold }, JEV_VARIANT, JEV_THRESHOLD) };
+  try {
+    const res = await callJev(r, model);
+    rec = { key, ...r, model, model_version: res.model, backend: 'jev', jev_variant: JEV_VARIANT, ...jevVerdict(res, JEV_VARIANT, JEV_THRESHOLD),
+      usage: res.usage, cost_usd: res.usage.input_tokens * JEV_PRICE_PER_TOK };
+    fs.appendFileSync(CACHE, JSON.stringify(rec) + '\n');
+    cache.set(key, rec); fresh++;
+    return rec;
+  } catch (e) { return { key, ...r, model, error: String(e.message || e) }; }
 }
-await Promise.all(Array.from({ length: Math.max(1, CONC) }, worker));
+// one LLM verdict (api / cli / codex / grok) for row r
+async function judgeLlm(r, backend, model) {
+  const key = keyFor(r, model);
+  if (cache.has(key)) return cache.get(key);
+  const { aIsPred, text } = buildPrompt(r);
+  try {
+    const res = backend !== 'api' ? await callCli(text, backend) : await call(text);
+    const { verdict, usage } = res;
+    const rec = { key, ...r, model, backend, a_is_pred: aIsPred, ...unshuffle(verdict, aIsPred), usage,
+      cost_usd: backend !== 'api' ? res.cost_usd : costOf(model, usage) };
+    fs.appendFileSync(CACHE, JSON.stringify(rec) + '\n');
+    cache.set(key, rec); fresh++;
+    return rec;
+  } catch (e) { return { key, ...r, model, error: String(e.message || e) }; }
+}
+async function pool(n, conc, fn) {
+  let next = 0;
+  await Promise.all(Array.from({ length: Math.max(1, conc) }, async () => {
+    while (next < n) { const i = next++; await fn(i); if (++done % 25 === 0) console.error(`${done} done (${fresh} new)`); }
+  }));
+}
+let out = new Array(rows.length), cascadeInfo;
+const t0 = Date.now();
+if (!CASCADE) await pool(rows.length, CONC, async (i) => { out[i] = BACKEND === 'jev' ? await judgeJev(rows[i], MODEL) : await judgeLlm(rows[i], BACKEND, MODEL); });
+else {
+  // stage 1: Jev on every row; stage 2: Opus (cli) on flagged (capped) + audit sample; final = Opus if judged, else Jev
+  const jev = new Array(rows.length);
+  await pool(rows.length, CONC, async (i) => { jev[i] = await judgeJev(rows[i], JEV_MODEL); });
+  const tJev = Date.now();
+  const strata = cascadeStrata(jev.map((j) => (j.error ? null : j.p)), CASCADE_OPT);
+  const toOpus = strata.map((s, i) => (s === 'flagged' || s === 'audit' ? i : -1)).filter((i) => i >= 0);
+  const cachedOpus = toOpus.filter((i) => cache.has(keyOf(rows[i]))).length;
+  const opus = new Array(rows.length);
+  const freshJev = fresh;
+  await pool(toOpus.length, OPUS_CONC, async (k) => { const i = toOpus[k]; opus[i] = await judgeLlm(rows[i], 'cli', MODEL); });
+  out = rows.map((r, i) => {
+    const j = jev[i], o = opus[i], useOpus = o && !o.error;
+    const base = useOpus ? o : j.error ? { ...j } : j;
+    return { ...base, judge: useOpus ? 'opus' : j.error ? null : 'jev', stratum: strata[i], audit: strata[i] === 'audit',
+      jev_p: j.error ? null : j.p, jev_pred_correct: j.error ? null : j.pred_correct, jev_model: JEV_MODEL, jev_threshold: JEV_THRESHOLD,
+      ...(o?.error ? { opus_error: o.error } : {}), ...(!useOpus && j.error ? { error: j.error } : {}) };
+  });
+  cascadeInfo = { jev_model: JEV_MODEL, jev_variant: JEV_VARIANT, jev_threshold: JEV_THRESHOLD, max_opus: CASCADE_OPT.maxOpus,
+    audit_fraction: CASCADE_OPT.audit, audit_min: CASCADE_OPT.auditMin, audit_max: CASCADE_OPT.auditMax, seed: CASCADE_OPT.seed,
+    jev_new_calls: freshJev, opus_rows: toOpus.length, opus_cached: cachedOpus, opus_new_calls: fresh - freshJev,
+    seconds: { jev: +((tJev - t0) / 1000).toFixed(1), opus: +((Date.now() - tJev) / 1000).toFixed(1) }, ...cascadeSummary(out) };
+}
 fs.writeFileSync(path.join(OUT, 'adjudications.jsonl'), out.map((r) => JSON.stringify(r)).join('\n') + '\n');
-const summary = { cands: CANDS, data: DATA, rows_file: ROWS, cache_tag: CACHE_TAG || undefined, model: MODEL, effort: EFFORT, backend: BACKEND, rows: rows.length, new_calls: fresh, ...summarize(out) };
+const summary = { cands: CANDS, data: DATA, rows_file: ROWS, cache_tag: CACHE_TAG || undefined, model: MODEL, effort: EFFORT, backend: BACKEND, rows: rows.length, new_calls: fresh,
+  seconds: +((Date.now() - t0) / 1000).toFixed(1), ...(cascadeInfo ? { cascade: cascadeInfo } : {}), ...summarize(out) };
 fs.writeFileSync(path.join(OUT, 'summary.json'), JSON.stringify(summary, null, 1));
 console.log(JSON.stringify(summary, null, 1));
