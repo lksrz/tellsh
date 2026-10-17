@@ -3,7 +3,7 @@
 // F1, F2, F4, F7, F9, F10, M7). Runs on a dataset built by dedup.mjs and writes a new dataset dir.
 //
 //   node scripts/ir/gold_rewrite.mjs --in build/ir/dataset/v3base --out build/ir/dataset/v3 \
-//        [--adj build/ir/adjudicate/v2_kfold/adjudications.jsonl --kfold build/ir/verifier/v2/kfold.jsonl]
+//        [--adj build/ir/adjudicate/v2_kfold/adjudications.jsonl[,...] --kfold build/ir/verifier/v2/kfold.jsonl[,...]]
 //
 // Rules (all splits, same deterministic rule; a rewrite is kept only when the gate accepts the new IR, strict):
 //   files_find   cue-less files.list (rg --files) -> files.find -type f (max_depth, -name / any_name, -not -name,
@@ -262,11 +262,23 @@ function main() {
   const args = process.argv.slice(2);
   const opt = (k, d) => { const i = args.indexOf(`--${k}`); return i >= 0 ? args[i + 1] : d; };
   const IN = opt('in'), OUT = opt('out'), ADJ = opt('adj'), KF = opt('kfold');
-  if (!IN || !OUT) { console.error('usage: gold_rewrite.mjs --in DIR --out DIR [--adj A.jsonl --kfold K.jsonl]'); process.exit(2); }
+  if (!IN || !OUT) { console.error('usage: gold_rewrite.mjs --in DIR --out DIR [--adj A.jsonl[,A2...] --kfold K.jsonl[,K2...]]'); process.exit(2); }
   const inDir = path.resolve(ROOT, IN), outDir = path.resolve(ROOT, OUT);
   fs.mkdirSync(outDir, { recursive: true });
   const schemas = loadSchemas();
-  const adj = ADJ ? adjudicationPlan(readLines(path.resolve(ROOT, ADJ)), readLines(path.resolve(ROOT, KF)), schemas) : null;
+  // --adj A1,A2 --kfold K1,K2: pairs (each adjudication file with the k-fold preds it judged; ids are per pair); plans are
+  // merged by request text, a later pair overriding an earlier one
+  let adj = null;
+  if (ADJ) {
+    const as = ADJ.split(','), ks = (KF || '').split(',');
+    if (as.length !== ks.length) { console.error('--adj and --kfold need the same number of files'); process.exit(2); }
+    for (let i = 0; i < as.length; i++) {
+      const p = adjudicationPlan(readLines(path.resolve(ROOT, as[i])), readLines(path.resolve(ROOT, ks[i])), schemas);
+      if (!adj) adj = { plan: new Map(), stats: { pairs: [] } };
+      for (const [k, v] of p.plan) adj.plan.set(k, v);
+      adj.stats.pairs.push({ adj: as[i], ...p.stats });
+    }
+  }
   const stats = { in: IN, adjudication: adj?.stats ?? null, splits: {} };
   const lintRows = [];
   for (const split of ['train', 'dev', 'test']) {
