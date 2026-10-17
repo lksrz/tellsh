@@ -63,3 +63,12 @@ test('adjudicatedY flips only y=0 with matching command and pred correct', () =>
   assert.equal(adjudicatedY(true, 'dev:9', 'x', adj), true);
   assert.equal(adjudicatedY(false, 'dev:1', 'ls a', null), false);
 });
+
+test('adjudicatedY truth mode lets the verdict override gold both ways', async () => {
+  const { adjudicatedY } = await import('../../scripts/ir/adjudicate_lib.mjs');
+  const adj = new Map([['a', { command: 'ls', pred_correct: false }], ['b', { command: 'pwd', pred_correct: true }]]);
+  assert.equal(adjudicatedY(1, 'a', 'ls', adj), true);
+  assert.equal(adjudicatedY(1, 'a', 'ls', adj, true), false);
+  assert.equal(adjudicatedY(0, 'b', 'pwd', adj, true), true);
+  assert.equal(adjudicatedY(1, 'a', 'ls -l', adj, true), true);
+});

@@ -149,7 +149,10 @@ both_wrong, equivalent, cost) are rewritten each run. Pure helpers live in `adju
 
 `score_combined.mjs --adjudications DEV_ADJ,TEST_ADJ` counts a `y = 0` candidate as correct when its adjudication
 (same id and command) says the prediction is correct, and reports `adj_wrong`, `adj_accepted_wrong_rate`,
-`adj_accepted_wrong_ub95` next to the raw numbers (thresholds are still chosen on raw labels).
+`adj_accepted_wrong_ub95` next to the raw numbers (thresholds are still chosen on raw labels). With `--adj-truth`
+the verdict decides both ways: an adjudicated `y = 1` candidate the judge calls wrong (pred and gold agree on a wrong
+command) also counts as wrong. Use it when every accepted candidate was adjudicated (`adjudicate.mjs --sample-agree`
+larger than the candidate count); this is the headline metric, independent of gold noise.
 
 ### Ensemble agreement
 

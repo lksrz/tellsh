@@ -16,7 +16,8 @@
 // bound and by the point estimate, and applied unchanged to test. `gate_only` = no verifier (t = 0).
 // --adjudications F[,F...] (adjudicate.mjs output, dev and/or test): a y = 0 candidate whose adjudication (same id and
 // command) says the prediction is correct also counts as correct; each row then adds adj_wrong / adj_accepted_wrong_rate /
-// adj_accepted_wrong_ub95 next to the raw numbers (thresholds are still chosen on the raw labels).
+// adj_accepted_wrong_ub95 next to the raw numbers (thresholds are still chosen on the raw labels). --adj-truth: the verdict
+// also turns an adjudicated y = 1 candidate wrong (use when every accepted candidate was adjudicated, --sample-agree all).
 // --dev-agree P1,P2,... / --test-agree P1,P2,... (other models' preds for the same split): each candidate gets
 // agree = number of other models whose own gate-accepted command is sameCommand-equal (combined_lib.mjs). Adds
 // `agreement`: a dev-chosen (min_agree, t) setting (max kept subject to UB / point <= target) applied to test, and a
@@ -26,6 +27,7 @@
 // before everything else (P candidates always pass). When dev has n-best candidates, `nbest` adds a dev-chosen
 // (max_rank, min_agree (ensemble), min_beam_agree, min_margin, t) setting (max kept subject to UB / point <= target),
 // `by_coverage` settings (lowest dev UB with dev coverage >= 20/30/40/50 %), all applied unchanged to test, and a
+// --dump-kept FILE writes the candidates kept at the dev-chosen by_coverage_50 setting (dev and test) for error analysis.
 // `sweep` over the whole grid (t in the agreement sweep thresholds). --select-adj makes these dev choices count wrong /
 // correct with the adjudications (dev ones; test is never used for choosing). Test rows add `unadjudicated_wrong`:
 // kept raw-wrong candidates without an adjudication of that exact command (they count as wrong in adj numbers).
@@ -45,6 +47,9 @@ const schemas = loadSchemas();
 const num = (k) => (opt(k) != null ? Number(opt(k)) : null);
 const KNOBS = { max_rank: num('max-rank'), min_margin: num('min-margin'), min_beam_agree: num('min-beam-agree') };
 const SELECT_ADJ = args.includes('--select-adj');
+const ADJ_TRUTH = args.includes('--adj-truth');
+const DUMP_KEPT = opt('dump-kept');  // JSONL of the candidates kept at the dev-chosen n-best by_coverage_50 setting (error analysis)
+const dumped = [];  // judge verdict overrides gold in both directions (fully adjudicated sets)
 const ADJ = opt('adjudications') ? loadAdjudications(opt('adjudications').split(',')) : null;
 
 // ---------------------------------------------------------------- stats
@@ -107,7 +112,7 @@ function load(split) {
   const others = (opt(`${split}-agree`) || '').split(',').filter(Boolean).map((f) => acceptedById(schemas, gold, readJsonl(f), name));
   const items = candidates(schemas, gold, readJsonl(PREDS), name).map((c) => {
     const y = sameCommand(c.command, goldCommand(schemas, gold[c.i]), c.request);
-    return { id: c.id, command: c.command, p: scores ? scores.get(String(c.id)) ?? -1 : 1, y, ya: adjudicatedY(y, c.id, c.command, ADJ), route: c.route,
+    return { id: c.id, command: c.command, p: scores ? scores.get(String(c.id)) ?? -1 : 1, y, ya: adjudicatedY(y, c.id, c.command, ADJ, ADJ_TRUTH), route: c.route, request: c.request, gold: goldCommand(schemas, gold[c.i]),
       agree: agreeCount(c.id, c.command, c.request, others), rank: c.rank, margin: c.margin, nb_agree: c.nb_agree };
   }).filter((x) => nbestKeeps(x, KNOBS));
   const missing = items.filter((x) => x.p < 0).length;
@@ -194,6 +199,9 @@ for (const S of [dev, test].filter(Boolean)) {
       t: r.t === -Infinity ? 0 : r4(r.t), kept: r.kept, coverage: pct(r.correct, S.goldOk), wrong: r.wrong, rate: pct(r.wrong, r.kept),
       ub95: pct(cpUpper(r.wrong, r.kept), 1), ...(ADJ ? { adj_wrong: r.adj_wrong, adj_coverage: pct(r.adj_correct, S.goldOk),
         adj_rate: pct(r.adj_wrong, r.kept), adj_ub95: pct(cpUpper(r.adj_wrong, r.kept), 1) } : {}) }));
+    const g50 = nbSet.by_coverage_50;
+    if (DUMP_KEPT && g50) for (const x of S.items) if (keeps(x, g50.min_agree, g50.t) && nbestKeeps(x, knobsOf(g50)))
+      dumped.push({ split: S.name, id: x.id, request: x.request, command: x.command, gold: x.gold, y: x.y, ya: x.ya, adj_reason: ADJ?.get(String(x.id))?.reason });
     report[S.name] = { ...report[S.name], nbest: { chosen_rank: ranks, ...Object.fromEntries(Object.entries(nbSet).map(([k, v]) => [k, pick(v)])), sweep } };
   }
   if (AGREE_ONLY) { Object.assign(report[S.name], { rows: S.n, gold_ok: S.goldOk, accepted_candidates: S.items.length, gate_only: at(S, -Infinity) }); continue; }
@@ -208,4 +216,5 @@ for (const S of [dev, test].filter(Boolean)) {
 }
 const text = JSON.stringify(report, null, 1);
 if (opt('out')) fs.writeFileSync(opt('out'), text);
+if (DUMP_KEPT) fs.writeFileSync(DUMP_KEPT, dumped.map((r) => JSON.stringify(r)).join('\n') + (dumped.length ? '\n' : ''));
 console.log(text);

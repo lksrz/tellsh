@@ -100,9 +100,13 @@ export function loadAdjudications(files) {
   }
   return m;
 }
-// adjudicated correctness: a y=0 candidate is correct when its adjudication (same command) says the pred is correct
-export function adjudicatedY(y, id, command, adj) {
-  if (y) return true;
+// adjudicated correctness: a y=0 candidate is correct when its adjudication (same command) says the pred is correct.
+// truth = true (score_combined --adj-truth, for fully adjudicated sets): the judge verdict decides in both directions,
+// so a y=1 candidate the judge calls wrong (gold and pred agree on a wrong command) counts as wrong.
+export function adjudicatedY(y, id, command, adj, truth = false) {
   const a = adj?.get(String(id));
-  return !!(a && a.command === command && a.pred_correct);
+  const hit = a && a.command === command && typeof a.pred_correct === 'boolean';
+  if (truth && hit) return a.pred_correct;
+  if (y) return true;
+  return !!(hit && a.pred_correct);
 }
